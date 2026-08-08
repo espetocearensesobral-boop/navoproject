@@ -2903,7 +2903,7 @@ async function seedDatabase() {
       specialties: ['Corte Clássico', 'Degradê (Fade)', 'Barba Imperial'],
       commissionRate: '0.40',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-18:00' }
+      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
     },
     {
       id: 'prof_2',
@@ -2916,7 +2916,7 @@ async function seedDatabase() {
       specialties: ['Barba Terapia', 'Design de Sobrancelhas', 'Freestyle'],
       commissionRate: '0.35',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-18:00' }
+      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
     },
     {
       id: 'prof_3',
@@ -2929,7 +2929,7 @@ async function seedDatabase() {
       specialties: ['Corte Moderno', 'Pigmentação', 'Platinado'],
       commissionRate: '0.38',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-18:00' }
+      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
     },
     {
       id: 'prof_4',
@@ -2942,7 +2942,7 @@ async function seedDatabase() {
       specialties: ['Corte Tesoura', 'Nevou', 'Barba Modelada'],
       commissionRate: '0.35',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-18:00' }
+      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
     },
     {
       id: 'prof_5',
@@ -2955,7 +2955,7 @@ async function seedDatabase() {
       specialties: ['Fade Americano', 'Selagem', 'Tratamento Capilar'],
       commissionRate: '0.38',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-18:00' }
+      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
     }
   ];
 
