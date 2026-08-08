@@ -886,21 +886,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         </motion.div>
       </section>
 
-      {/* SECTION 6: FINAL CTA & FOOTER (HERO-LIKE FULL BACKGROUND) */}
+      {/* SECTION 6: FINAL CTA & FOOTER */}
       <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between bg-[#0a0b0e] text-white overflow-hidden box-border">
         
-        {/* Background Image with Dark Gradient Overlay (Similar to Hero) */}
+        {/* Background Image with Dark Overlay */}
         <div 
-          className="absolute inset-0 z-0 bg-cover bg-center opacity-40 mix-blend-luminosity pointer-events-none"
+          className="absolute inset-0 z-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none"
           style={{
-            backgroundImage: `linear-gradient(180deg, rgba(10,11,14,0.7) 0%, rgba(10,11,14,0.88) 50%, #06070a 100%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1200&q=80')`
+            backgroundImage: `linear-gradient(180deg, rgba(10,11,14,0.85) 0%, rgba(10,11,14,0.95) 50%, #06070a 100%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1200&q=80')`
           }}
         />
 
-        {/* Ambient Gold Glow Effect */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#d4a853]/15 rounded-full blur-3xl pointer-events-none z-0" />
-
-        {/* Main CTA Content Area (Unboxed, Full Immersive Layout) */}
+        {/* Main CTA Content Area */}
         <motion.div 
           initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -908,26 +905,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="relative z-10 w-full flex-1 flex flex-col justify-center items-center my-auto py-[clamp(1rem,3vh,2.5rem)] px-[clamp(1.25rem,4vh,3rem)] text-center max-w-2xl lg:max-w-3xl mx-auto min-h-0"
         >
-          {/* TRUST / RATING BADGE */}
-          <div className="inline-flex items-center gap-2 bg-[#d4a853]/15 border border-[#d4a853]/30 px-3.5 py-1.5 rounded-full text-xs font-bold text-[#d4a853] mb-[clamp(0.5rem,1.5vh,1rem)] backdrop-blur-xs shadow-xs">
-            <span className="tracking-widest text-[0.7rem] font-black">★★★★★</span>
-            <span>4.9 · 1.2k avaliações</span>
-          </div>
 
           {/* MAIN HEADING */}
           <h2 className="text-[clamp(1.75rem,4.2vh,3rem)] font-extrabold text-white mb-[clamp(0.35rem,1.2vh,0.85rem)] tracking-tight leading-[1.12]">
-            Pronto para o seu <span className="text-[#d4a853]">novo visual</span>?
+            Pronto para o seu <span className="text-[#e5b863] font-black">novo visual</span>?
           </h2>
 
-          {/* SUBTITLE & MICRO-URGENCY */}
-          <p className="text-[clamp(0.8rem,1.6vh,1.05rem)] text-[#b0b0b0] font-normal leading-relaxed mb-[clamp(1rem,2.2vh,1.75rem)] max-w-md sm:max-w-lg">
+          {/* SUBTITLE */}
+          <p className="text-[clamp(0.85rem,1.7vh,1.1rem)] text-[#d1d5db] font-medium leading-relaxed mb-[clamp(1rem,2.2vh,1.75rem)] max-w-md sm:max-w-lg">
             Agende em segundos, escolha seu barbeiro e garanta seu horário exclusivo com atendimento VIP.
           </p>
 
           {/* ACTION BUTTONS GROUP */}
           <div className="flex flex-col gap-3 w-full max-w-sm sm:max-w-md items-center">
             
-            {/* PRIMARY CTA - GOLD BUTTON */}
+            {/* PRIMARY CTA - GOLD BUTTON (CLEAN SOLID HIGH CONTRAST, NO GLOW/SHADOW) */}
             <motion.button 
               whileHover={{ scale: 1.015 }}
               whileTap={{ scale: 0.97 }}
@@ -936,13 +928,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_online_footer');
                 onGoToBooking();
               }}
-              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.85rem,1.8vh,1.05rem)] py-[clamp(0.85rem,1.9vh,1.15rem)] px-6 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-[0_6px_35px_rgba(212,168,83,0.38)] transition-all cursor-pointer border border-[#f3c973]/40"
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.85rem,1.8vh,1.05rem)] py-[clamp(0.85rem,1.9vh,1.15rem)] px-6 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-colors cursor-pointer border border-[#d4a853]"
             >
               <span className="flex items-center gap-2 font-extrabold tracking-wide">
                 <span>Agendar meu horário agora</span>
                 <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
               </span>
-              <span className="text-[0.68rem] font-semibold opacity-80 normal-case">
+              <span className="text-[0.7rem] font-bold text-[#1a1a1a] normal-case">
                 Próxima vaga hoje às {nextAvailableTimeSlot}
               </span>
             </motion.button>
@@ -953,7 +945,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_whatsapp_footer');
                 handleOpenWhatsApp();
               }}
-              className="flex items-center justify-center gap-2 text-[#25D366] hover:text-[#34e275] font-semibold text-[clamp(0.75rem,1.5vh,0.875rem)] py-1.5 transition-colors cursor-pointer group"
+              className="flex items-center justify-center gap-2 text-[#4ade80] hover:text-[#22c55e] font-bold text-[clamp(0.8rem,1.6vh,0.9rem)] py-1.5 transition-colors cursor-pointer group"
             >
               <MessageCircle className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
               <span>ou tirar dúvidas no WhatsApp</span>
@@ -961,37 +953,37 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </div>
 
           {/* TRUST GUARANTEES BADGES */}
-          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-[clamp(1rem,2.2vh,1.5rem)] pt-[clamp(0.75rem,1.8vh,1.25rem)] border-t border-white/10 text-[#a8a8a8] text-[clamp(0.68rem,1.3vh,0.78rem)] font-medium">
-            <span className="flex items-center gap-1.5"><span className="text-[#25D366] font-bold">✓</span> Confirmação instantânea</span>
-            <span className="flex items-center gap-1.5"><span className="text-[#25D366] font-bold">✓</span> Sem taxa de cancelamento</span>
-            <span className="flex items-center gap-1.5"><span className="text-[#25D366] font-bold">✓</span> Bebida cortesia no local</span>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-[clamp(1rem,2.2vh,1.5rem)] pt-[clamp(0.75rem,1.8vh,1.25rem)] border-t border-gray-800 text-[#d1d5db] text-[clamp(0.7rem,1.4vh,0.82rem)] font-semibold">
+            <span className="flex items-center gap-1.5"><span className="text-[#4ade80] font-bold">✓</span> Confirmação instantânea</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#4ade80] font-bold">✓</span> Sem taxa de cancelamento</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#4ade80] font-bold">✓</span> Bebida cortesia no local</span>
           </div>
         </motion.div>
 
-        {/* BACK TO TOP BUTTON (DARK GLASS STYLE) */}
+        {/* BACK TO TOP BUTTON */}
         <div className="relative z-10 flex justify-center pt-1 pb-[clamp(0.5rem,1.5vh,1rem)] shrink-0 px-4">
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={scrollToTop}
-            className="group flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-white/70 hover:text-white transition-all text-xs font-semibold cursor-pointer backdrop-blur-xs"
+            className="group flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#181a20] hover:bg-[#22252e] border border-gray-700 text-gray-200 hover:text-white transition-all text-xs font-bold cursor-pointer"
             aria-label="Voltar ao topo"
           >
-            <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform duration-300 text-[#d4a853]" />
+            <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform duration-300 text-[#e5b863]" />
             <span>Voltar ao topo</span>
           </motion.button>
         </div>
 
         {/* FOOTER */}
-        <footer className="relative z-10 w-full bg-[#06070a]/90 border-t border-white/10 px-5 py-3.5 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto text-[0.7rem] text-[#888888]">
+        <footer className="relative z-10 w-full bg-[#06070a] border-t border-gray-800 px-5 py-3.5 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto text-[0.75rem] text-[#d1d5db] font-medium">
           <p>
             © 2026 Navo Premium. Todos os direitos reservados.
           </p>
-          <p>
+          <p className="text-gray-300">
             {shopProfile.address}
           </p>
           <p>
-            Desenvolvido com excelência por <span className="text-[#d4a853] font-semibold">Navo</span>
+            Desenvolvido com excelência por <span className="text-[#e5b863] font-bold">Navo</span>
           </p>
         </footer>
       </section>
