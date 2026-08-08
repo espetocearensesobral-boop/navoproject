@@ -7,6 +7,7 @@ import {
   daysOfWeekMap 
 } from '../../services/shopProfileService';
 import { fetchServicesFromSupabase } from '../../services/supabaseDataService';
+import { openWhatsAppDirect, openMapsDirect, openWazeDirect, getShopStatusInfo } from '../../utils/externalLinks';
 import { 
   Clock, 
   MapPin, 
@@ -239,39 +240,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
   const handleOpenGoogleMaps = () => {
     hapticLight();
-    const url = shopProfile.mapsUrl || `https://maps.google.com/?q=${encodeURIComponent(shopProfile.address)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    openMapsDirect(shopProfile.address, shopProfile.mapsUrl);
   };
 
   const handleOpenWhatsApp = () => {
     hapticLight();
-    const num = shopProfile.whatsapp ? shopProfile.whatsapp.replace(/\D/g, '') : '5588998340085';
-    window.open(`https://wa.me/${num}?text=Olá!%20Gostaria%20de%20agendar%20um%20horário%20na%20${encodeURIComponent(shopProfile.name)}.`, '_blank', 'noopener,noreferrer');
+    openWhatsAppDirect(shopProfile.whatsapp, `Olá! Gostaria de agendar um horário na ${shopProfile.name}.`);
   };
 
   const handleOpenWaze = () => {
     hapticLight();
-    const address = shopProfile.address || 'Rua Fortaleza 1420 Expectativa Sobral CE';
-    const url = `https://waze.com/ul?q=${encodeURIComponent(address)}&navigate=yes`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    openWazeDirect(shopProfile.address);
   };
 
-  const isShopOpenNow = (() => {
-    const now = new Date();
-    const dayIndex = now.getDay();
-    const dayItem = daysOfWeekMap.find(item => item.dayIndex === dayIndex);
-    if (!dayItem) return true;
-    const sch = shopProfile.operatingSchedule?.[dayItem.key];
-    if (!sch || !sch.active) return false;
-
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    const [openH, openM] = (sch.open || shopProfile.openTime || '09:00').split(':').map(Number);
-    const [closeH, closeM] = (sch.close || shopProfile.closeTime || '20:00').split(':').map(Number);
-    const openMinutes = (openH || 9) * 60 + (openM || 0);
-    const closeMinutes = (closeH || 20) * 60 + (closeM || 0);
-
-    return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
-  })();
+  const shopStatusInfo = useMemo(() => {
+    return getShopStatusInfo(shopProfile);
+  }, [shopProfile]);
 
   return (
     <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
@@ -531,7 +515,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <button onClick={toggleHoursModal} className="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition-transform hover:opacity-80">
               <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">STATUS</span>
               <div className="flex items-center gap-1.5">
-                <span className="text-green-500 font-semibold text-sm whitespace-nowrap">Aberto</span>
+                <span className={`font-semibold text-sm whitespace-nowrap ${shopStatusInfo.status === 'open' ? 'text-green-500' : shopStatusInfo.status === 'closing_soon' ? 'text-amber-400' : 'text-red-400'}`}>
+                  {shopStatusInfo.label}
+                </span>
               </div>
             </button>
 
@@ -777,9 +763,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
             {/* Live Open/Closed Status Pill */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-100 text-neutral-800 border border-neutral-200/90 shadow-2xs shrink-0">
-              <span className={`w-2 h-2 rounded-full ${isShopOpenNow ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
+              <span className={`w-2 h-2 rounded-full ${shopStatusInfo.status === 'open' ? 'bg-emerald-500 animate-pulse' : shopStatusInfo.status === 'closing_soon' ? 'bg-amber-500 animate-pulse' : 'bg-red-500'}`} />
               <span className="text-[clamp(0.6rem,1.1vh,0.75rem)] font-bold uppercase tracking-wider">
-                {isShopOpenNow ? 'Aberto Agora' : 'Atendimento Fechado'}
+                {shopStatusInfo.detail}
               </span>
             </div>
           </div>
@@ -850,7 +836,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                     <div>
                       <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Horário Hoje</span>
                       <span className="text-[10.5px] font-bold text-neutral-800">
-                        {shopProfile.openTime || '09:00'} às {shopProfile.closeTime || '20:00'}
+                        {shopStatusInfo.todayHours}
                       </span>
                     </div>
                   </div>
