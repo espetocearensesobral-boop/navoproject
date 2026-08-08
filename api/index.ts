@@ -492,6 +492,17 @@ async function initializeDb(): Promise<void> {
           updated_at timestamp DEFAULT NOW()
         );
       `;
+
+      // Auto-seed inicial se a tabela de serviços estiver vazia no Supabase
+      try {
+        const servicesCount = await queryClient`SELECT count(*)::int FROM services;`;
+        if (servicesCount && servicesCount[0] && Number(servicesCount[0].count) === 0) {
+          console.log('[API] 📦 Tabela de serviços vazia no Supabase. Executando seed de dados padrão...');
+          await seedDatabase();
+        }
+      } catch (seedErr: any) {
+        console.warn('[API] Aviso ao verificar auto-seed:', seedErr.message);
+      }
     } catch (migErr: any) {
       console.warn('[API] Aviso na migração de tabelas:', migErr.message);
     }

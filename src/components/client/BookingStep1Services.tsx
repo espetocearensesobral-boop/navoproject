@@ -69,10 +69,18 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
     let isMounted = true;
     async function loadData() {
       setLoading(true);
-      const data = await fetchServicesFromSupabase();
-      if (isMounted) {
-        setServices(data);
-        setLoading(false);
+      try {
+        const data = await fetchServicesFromSupabase();
+        if (isMounted) {
+          setServices(data);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar serviços:', err);
+        if (isMounted) {
+          setServices([]);
+          setLoading(false);
+        }
       }
     }
     loadData();

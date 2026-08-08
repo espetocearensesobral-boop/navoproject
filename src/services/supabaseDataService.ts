@@ -26,20 +26,24 @@ export async function fetchServicesFromSupabase(forceRefresh = false): Promise<S
       if (!Array.isArray(data)) {
         throw new Error('Resposta inválida do banco de dados para serviços');
       }
-      const mapped = data.map((s: any) => ({
-        id: s.id,
-        category_id: `cat_${s.categorySlug}`,
-        title: s.title,
-        description: s.description,
-        price: Number(s.price),
-        duration_minutes: s.durationMinutes,
-        is_combo: s.isCombo,
-        original_price: s.originalPrice ? Number(s.originalPrice) : undefined,
-        discount_percentage: s.discountPercentage,
-        popular: s.isPopular,
-        image_url: s.imageUrl,
-        gallery_urls: Array.isArray(s.galleryUrls) && s.galleryUrls.length > 0 ? s.galleryUrls : (s.imageUrl ? [s.imageUrl] : [])
-      }));
+      const mapped = data.map((s: any) => {
+        const rawSlug = s.categorySlug || 'cabelo';
+        const cleanSlug = rawSlug.startsWith('cat_') ? rawSlug.slice(4) : rawSlug;
+        return {
+          id: s.id,
+          category_id: `cat_${cleanSlug}`,
+          title: s.title,
+          description: s.description,
+          price: Number(s.price),
+          duration_minutes: s.durationMinutes,
+          is_combo: s.isCombo,
+          original_price: s.originalPrice ? Number(s.originalPrice) : undefined,
+          discount_percentage: s.discountPercentage,
+          popular: s.isPopular,
+          image_url: s.imageUrl,
+          gallery_urls: Array.isArray(s.galleryUrls) && s.galleryUrls.length > 0 ? s.galleryUrls : (s.imageUrl ? [s.imageUrl] : [])
+        };
+      });
       return mapped;
     } catch (err) {
       console.error('Erro ao carregar serviços do Supabase:', err);
