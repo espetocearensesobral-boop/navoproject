@@ -9,35 +9,68 @@ export const TIMEZONE = 'America/Sao_Paulo';
  * Retorna a data atual no formato YYYY-MM-DD no fuso horário de Brasília (BRT)
  */
 export function getTodayStringBRT(): string {
+  try {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: TIMEZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const parts = formatter.formatToParts(now);
+    const map: Record<string, string> = {};
+    parts.forEach(p => { map[p.type] = p.value; });
+    if (map.year && map.month && map.day) {
+      return `${map.year}-${map.month}-${map.day}`;
+    }
+  } catch (e) {}
+
+  // Fallback: UTC - 3 hours (Brasília time)
   const now = new Date();
-  const formatter = new Intl.DateTimeFormat('en-CA', {
-    timeZone: TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-  const parts = formatter.formatToParts(now);
-  const map: Record<string, string> = {};
-  parts.forEach(p => { map[p.type] = p.value; });
-  return `${map.year}-${map.month}-${map.day}`;
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  const brtMs = utcMs - 3 * 3600 * 1000;
+  const brtDate = new Date(brtMs);
+  const y = brtDate.getFullYear();
+  const m = String(brtDate.getMonth() + 1).padStart(2, '0');
+  const d = String(brtDate.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 /**
  * Retorna o horário atual (horas, minutos, string HH:mm e minutos totais) em BRT
  */
 export function getCurrentTimeBRT(): { hours: number; minutes: number; timeStr: string; totalMinutes: number } {
+  try {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: TIMEZONE,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      hourCycle: 'h23'
+    });
+    const parts = formatter.formatToParts(now);
+    const map: Record<string, string> = {};
+    parts.forEach(p => { map[p.type] = p.value; });
+    const hours = parseInt(map.hour || '', 10);
+    const minutes = parseInt(map.minute || '', 10);
+    if (!isNaN(hours) && !isNaN(minutes)) {
+      return {
+        hours,
+        minutes,
+        timeStr: `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
+        totalMinutes: hours * 60 + minutes
+      };
+    }
+  } catch (e) {}
+
+  // Fallback: UTC - 3 hours (Brasília time)
   const now = new Date();
-  const formatter = new Intl.DateTimeFormat('en-CA', {
-    timeZone: TIMEZONE,
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  });
-  const parts = formatter.formatToParts(now);
-  const map: Record<string, string> = {};
-  parts.forEach(p => { map[p.type] = p.value; });
-  const hours = parseInt(map.hour || '0', 10);
-  const minutes = parseInt(map.minute || '0', 10);
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  const brtMs = utcMs - 3 * 3600 * 1000;
+  const brtDate = new Date(brtMs);
+  const hours = brtDate.getHours();
+  const minutes = brtDate.getMinutes();
   return {
     hours,
     minutes,
