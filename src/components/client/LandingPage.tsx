@@ -928,15 +928,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_online_footer');
                 onGoToBooking();
               }}
-              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.85rem,1.8vh,1.05rem)] py-[clamp(0.85rem,1.9vh,1.15rem)] px-6 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-colors cursor-pointer border border-[#d4a853]"
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.85rem,1.8vh,1.05rem)] py-[clamp(0.85rem,1.9vh,1.15rem)] px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-[#d4a853]"
             >
-              <span className="flex items-center gap-2 font-extrabold tracking-wide">
-                <span>Agendar meu horário agora</span>
-                <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
-              </span>
-              <span className="text-[0.7rem] font-bold text-[#1a1a1a] normal-case">
-                Próxima vaga hoje às {nextAvailableTimeSlot}
-              </span>
+              <span className="font-extrabold tracking-wide">Agendar meu horário agora</span>
+              <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
             </motion.button>
 
             {/* SECONDARY CTA - WHATSAPP LINK */}
