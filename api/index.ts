@@ -1086,7 +1086,10 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
     const reqEnd = reqStart + calculatedDuration;
 
     // Verificar horário de funcionamento do estabelecimento
-    const shopProfileRows = await db.query.shopProfile.findMany();
+    let shopProfileRows: any[] = [];
+    try {
+      shopProfileRows = await db.query.shopSettings.findMany();
+    } catch (e) {}
     const shopProf = shopProfileRows[0] || {};
     const dayKey = getDayOfWeekKey(date);
     const daySchedule = shopProf.operatingSchedule?.[dayKey];
@@ -1561,7 +1564,10 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
       const reqEnd = reqStart + durationMins;
 
       // 1. Horário de funcionamento do estabelecimento
-      const shopProfileRows = await db.query.shopProfile.findMany();
+      let shopProfileRows: any[] = [];
+      try {
+        shopProfileRows = await db.query.shopSettings.findMany();
+      } catch (e) {}
       const shopProf = shopProfileRows[0] || {};
       const dayKey = getDayOfWeekKey(newDate);
       const daySchedule = shopProf.operatingSchedule?.[dayKey];
@@ -1985,7 +1991,10 @@ app.get("/api/availability", async (req, res) => {
     } catch (e) {}
 
     // Buscar perfil da barbearia
-    const shopProfileRows = await db.query.shopProfile.findMany();
+    let shopProfileRows: any[] = [];
+    try {
+      shopProfileRows = await db.query.shopSettings.findMany();
+    } catch (e) {}
     const shopProf = shopProfileRows[0] || {};
     const dayKey = getDayOfWeekKey(dateStr);
     const daySchedule = shopProf.operatingSchedule?.[dayKey];
