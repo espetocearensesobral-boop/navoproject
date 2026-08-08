@@ -169,7 +169,7 @@ export function generateTimeSlotsFromProfile(
   serviceDurationMinutes: number = 30
 ): string[] {
   let open = profile.openTime || '09:00';
-  let close = profile.closeTime || '20:00';
+  let close = profile.closeTime || '21:00';
 
   if (dateStr) {
     const dayKey = getDayOfWeekKey(dateStr);
@@ -183,11 +183,11 @@ export function generateTimeSlotsFromProfile(
 
   const openMinutes = timeToMinutes(open);
   const closeMinutes = timeToMinutes(close);
-  const requiredDuration = Math.max(30, serviceDurationMinutes);
 
   const slots: string[] = [];
-  // Importante: O serviço precisa terminar ANTES ou EXATAMENTE na hora de fechamento
-  for (let m = openMinutes; m + requiredDuration <= closeMinutes; m += 30) {
+  // Gera os slots desde o horário de abertura até 90 minutos após o horário de encerramento,
+  // permitindo que solicitações que ultrapassem o expediente sejam selecionadas
+  for (let m = openMinutes; m < closeMinutes + 90; m += 30) {
     slots.push(minutesToTime(m));
   }
 

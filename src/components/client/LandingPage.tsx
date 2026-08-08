@@ -41,6 +41,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
+import { trackEvent } from '../../lib/analytics';
 import { authFetch } from '../../lib/api';
 import { 
   getTodayStringBRT, 
@@ -114,34 +115,37 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         const todayStr = getTodayStringBRT();
         const currTimeBRT = getCurrentTimeBRT();
         
-        // Consultar disponibilidade real no backend para hoje
+        // Consultar disponibilidade unificada no backend para hoje
         const res = await authFetch(`/api/availability?date=${todayStr}&duration=30`);
         if (res.ok) {
-          const busyData = await res.json();
-          const busySlots: string[] = Array.isArray(busyData)
-            ? busyData.map((b: any) => typeof b === 'string' ? b : (b.timeSlot || b.time_slot))
-            : [];
+          const availData = await res.json();
+          let slotsList: any[] = [];
 
-          const dayKey = getDayOfWeekKey(todayStr);
-          const daySch = shopProfile.operatingSchedule?.[dayKey];
-          const openStr = daySch?.open || shopProfile.openTime || '09:00';
-          const closeStr = daySch?.close || shopProfile.closeTime || '20:00';
-          const isActiveToday = daySch ? daySch.active : true;
-
-          const openMins = timeToMinutes(openStr);
-          const closeMins = timeToMinutes(closeStr);
-
-          if (isActiveToday) {
-            for (let m = openMins; m + 30 <= closeMins; m += 30) {
-              const timeStr = minutesToTime(m);
-              if (m > currTimeBRT.totalMinutes && !busySlots.includes(timeStr)) {
-                if (isMounted) setNextAvailableTimeSlot(timeStr);
-                return;
-              }
+          if (availData.slots && Array.isArray(availData.slots)) {
+            slotsList = availData.slots;
+          } else if (Array.isArray(availData)) {
+            const busy = availData.map((b: any) => typeof b === 'string' ? b : (b.timeSlot || b.time_slot));
+            const dayKey = getDayOfWeekKey(todayStr);
+            const daySch = shopProfile.operatingSchedule?.[dayKey];
+            const openStr = daySch?.open || shopProfile.openTime || '09:00';
+            const closeStr = daySch?.close || shopProfile.closeTime || '21:00';
+            const openMins = timeToMinutes(openStr);
+            const closeMins = timeToMinutes(closeStr);
+            for (let m = openMins; m < closeMins + 90; m += 30) {
+              const ts = minutesToTime(m);
+              slotsList.push({ timeSlot: ts, available: !busy.includes(ts) });
             }
           }
 
-          // Se não houver horário restante hoje ou loja fechada hoje, verificar dias futuros
+          // Procurar o primeiro horário disponível hoje no futuro
+          const validSlotToday = slotsList.find(s => s.available && timeToMinutes(s.timeSlot) > currTimeBRT.totalMinutes);
+
+          if (validSlotToday) {
+            if (isMounted) setNextAvailableTimeSlot(validSlotToday.timeSlot);
+            return;
+          }
+
+          // Se não houver horário restante hoje, verificar os próximos 7 dias
           const now = new Date();
           for (let i = 1; i <= 7; i++) {
             const nextDate = new Date(now);
@@ -151,30 +155,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             const d = String(nextDate.getDate()).padStart(2, '0');
             const futureIso = `${y}-${month}-${d}`;
 
-            const futDayKey = getDayOfWeekKey(futureIso);
-            const futSch = shopProfile.operatingSchedule?.[futDayKey];
-            const futActive = futSch ? futSch.active : true;
-
-            if (futActive) {
-              const futRes = await authFetch(`/api/availability?date=${futureIso}&duration=30`);
-              if (futRes.ok) {
-                const futBusyData = await futRes.json();
-                const futBusySlots: string[] = Array.isArray(futBusyData)
-                  ? futBusyData.map((b: any) => typeof b === 'string' ? b : (b.timeSlot || b.time_slot))
-                  : [];
-                
-                const futOpenMins = timeToMinutes(futSch?.open || shopProfile.openTime || '09:00');
-                const futCloseMins = timeToMinutes(futSch?.close || shopProfile.closeTime || '20:00');
-
-                for (let fm = futOpenMins; fm + 30 <= futCloseMins; fm += 30) {
-                  const futTimeStr = minutesToTime(fm);
-                  if (!futBusySlots.includes(futTimeStr)) {
-                    const dayItem = daysOfWeekMap.find(item => item.key === futDayKey);
-                    const dayLabel = i === 1 ? 'Amanhã' : (dayItem ? dayItem.label.split('-')[0].trim() : 'Próximo');
-                    if (isMounted) setNextAvailableTimeSlot(`${dayLabel} ${futTimeStr}`);
-                    return;
-                  }
+            const futRes = await authFetch(`/api/availability?date=${futureIso}&duration=30`);
+            if (futRes.ok) {
+              const futAvailData = await futRes.json();
+              let futSlotsList: any[] = [];
+              if (futAvailData.slots && Array.isArray(futAvailData.slots)) {
+                futSlotsList = futAvailData.slots;
+              } else if (Array.isArray(futAvailData)) {
+                const futBusy = futAvailData.map((b: any) => typeof b === 'string' ? b : (b.timeSlot || b.time_slot));
+                const futDayKey = getDayOfWeekKey(futureIso);
+                const futSch = shopProfile.operatingSchedule?.[futDayKey];
+                const futOpenStr = futSch?.open || shopProfile.openTime || '09:00';
+                const futCloseStr = futSch?.close || shopProfile.closeTime || '21:00';
+                const futOpenMins = timeToMinutes(futOpenStr);
+                const futCloseMins = timeToMinutes(futCloseStr);
+                for (let fm = futOpenMins; fm < futCloseMins + 90; fm += 30) {
+                  const fts = minutesToTime(fm);
+                  futSlotsList.push({ timeSlot: fts, available: !futBusy.includes(fts) });
                 }
+              }
+
+              const futValidSlot = futSlotsList.find(s => s.available);
+              if (futValidSlot) {
+                const futDayKey = getDayOfWeekKey(futureIso);
+                const dayItem = daysOfWeekMap.find(item => item.key === futDayKey);
+                const dayLabel = i === 1 ? 'Amanhã' : (dayItem ? dayItem.label.split('-')[0].trim() : 'Próximo');
+                if (isMounted) setNextAvailableTimeSlot(`${dayLabel} ${futValidSlot.timeSlot}`);
+                return;
               }
             }
           }

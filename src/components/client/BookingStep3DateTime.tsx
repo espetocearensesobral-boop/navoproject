@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Professional, ServiceItem } from '../../types';
-import { Calendar as CalendarIcon, Clock, ArrowLeft, ArrowRight, Loader2, ChevronLeft, ChevronRight} from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, ArrowLeft, ArrowRight, Loader2, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import { authFetch } from '../../lib/api';
 import { 
   ShopProfile, 
@@ -39,6 +39,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   onNext
 }) => {
   const [busySlots, setBusySlots] = useState<string[]>([]);
+  const [requiresApprovalSlots, setRequiresApprovalSlots] = useState<string[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
@@ -70,7 +71,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     }
   }, [selectedDate, onSelectDate, todayStr]);
 
-  // Fetch appointments & availability considering duration
+  // Fetch availability considering duration and outside hours approval
   useEffect(() => {
     let isMounted = true;
     
@@ -81,12 +82,18 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
         const profId = selectedBarber?.id || 'prof_any';
         const response = await authFetch(`/api/availability?professionalId=${profId}&date=${selectedDate}&duration=${totalDurationMinutes}`);
         if (response.ok) {
-          const resBusySlots = await response.json();
-          const bookedTimes = Array.isArray(resBusySlots) 
-            ? resBusySlots.map((apt: any) => apt?.timeSlot || apt).filter(Boolean)
-            : [];
-          if (isMounted) {
-            setBusySlots(bookedTimes);
+          const resData = await response.json();
+          if (Array.isArray(resData)) {
+            const bookedTimes = resData.map((apt: any) => apt?.timeSlot || apt).filter(Boolean);
+            if (isMounted) {
+              setBusySlots(bookedTimes);
+              setRequiresApprovalSlots([]);
+            }
+          } else {
+            if (isMounted) {
+              setBusySlots(resData.busySlots || []);
+              setRequiresApprovalSlots(resData.requiresApprovalSlots || []);
+            }
           }
         }
       } catch (err) {
@@ -259,38 +266,64 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
             <span>Carregando horários para {formatDateBR(selectedDate)}...</span>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-            {baseSlots.map((time) => {
-              const isSelected = selectedTimeSlot === time;
-              
-              // Validar se o horário já passou na data de hoje usando Fuso BRT
-              const currTimeBRT = getCurrentTimeBRT();
-              const slotMins = timeToMinutes(time);
-              const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
-              
-              const isAvailable = !busySlots.includes(time) && !isPastTime;
-              return (
-                <button
-                  key={time}
-                  type="button"
-                  disabled={!isAvailable}
-                  onClick={() => {
-                    if ('vibrate' in navigator) navigator.vibrate(40);
-                    onSelectTimeSlot(time);
-                  }}
-                  className={`py-3.5 px-2 rounded-btn text-center text-sm sm:text-base transition-all duration-200 focus:outline-none select-none ${
-                    isSelected
-                      ? 'bg-gold-base text-surface-base font-extrabold shadow-lg scale-[1.02]'
-                      : isAvailable
-                      ? 'bg-surface-card border border-border-subtle hover:border-border-subtle text-content-base font-bold hover:bg-surface-card active:scale-95'
-                      : 'bg-surface-base text-content-muted line-through cursor-not-allowed opacity-40 border border-transparent'
-                  }`}
-                >
-                  {time}
-                </button>
-              );
-            })}
-          </div>
+          <>
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+              {baseSlots.map((time) => {
+                const isSelected = selectedTimeSlot === time;
+                
+                // Validar se o horário já passou na data de hoje usando Fuso BRT
+                const currTimeBRT = getCurrentTimeBRT();
+                const slotMins = timeToMinutes(time);
+                const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
+                
+                const isBusy = busySlots.includes(time) || isPastTime;
+                const isReqApproval = requiresApprovalSlots.includes(time);
+                const isAvailable = !isBusy;
+
+                return (
+                  <button
+                    key={time}
+                    type="button"
+                    disabled={!isAvailable}
+                    onClick={() => {
+                      if ('vibrate' in navigator) navigator.vibrate(40);
+                      onSelectTimeSlot(time);
+                    }}
+                    className={`py-3.5 px-2 rounded-btn text-center text-sm sm:text-base transition-all duration-200 focus:outline-none select-none flex flex-col items-center justify-center ${
+                      isSelected
+                        ? isReqApproval
+                          ? 'bg-amber-500 text-surface-base font-extrabold shadow-lg scale-[1.02]'
+                          : 'bg-gold-base text-surface-base font-extrabold shadow-lg scale-[1.02]'
+                        : isReqApproval
+                        ? 'bg-amber-500/10 border border-amber-500/40 text-amber-300 font-bold hover:bg-amber-500/20 active:scale-95'
+                        : isAvailable
+                        ? 'bg-surface-card border border-border-subtle hover:border-border-subtle text-content-base font-bold hover:bg-surface-card active:scale-95'
+                        : 'bg-surface-base text-content-muted line-through cursor-not-allowed opacity-40 border border-transparent'
+                    }`}
+                  >
+                    <span>{time}</span>
+                    {isReqApproval && (
+                      <span className="text-[9px] font-medium tracking-tight uppercase opacity-90 mt-0.5">
+                        Fora Expediente
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {selectedTimeSlot && requiresApprovalSlots.includes(selectedTimeSlot) && (
+              <div className="mt-3 p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/35 text-amber-300 text-xs flex items-start gap-2.5 animate-fade-in shadow-sm">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="block font-bold text-amber-200 text-xs mb-0.5">
+                    Solicitação Fora do Expediente
+                  </strong>
+                  Este atendimento ultrapassa o horário normal de funcionamento. O agendamento será enviado para análise e aprovação do barbeiro.
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

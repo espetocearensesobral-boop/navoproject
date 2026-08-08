@@ -356,6 +356,8 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'pending_approval':
+        return 'bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse';
       case 'in_queue':
         return 'bg-status-warning/20 text-[#FF8C00] border-status-warning/30';
       case 'in_service':
@@ -372,6 +374,8 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
   const getStatusText = (status: string) => {
     switch (status) {
+      case 'pending_approval':
+        return '⚠️ Aguardando Aprovação (Fora do Expediente)';
       case 'in_queue':
         return '⏳ Em Fila de Espera';
       case 'in_service':

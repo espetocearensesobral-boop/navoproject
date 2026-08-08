@@ -115,6 +115,25 @@ export const ScheduleGrid: React.FC = () => {
     showNotification('Bloqueio removido da agenda!');
   };
 
+  const handleAcceptPendingAppointment = async (aptId: string) => {
+    try {
+      const res = await fetch(`/api/appointments/${aptId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'confirmed' })
+      });
+      if (res.ok) {
+        showNotification('Agendamento fora do expediente aprovado com sucesso!');
+        await loadData();
+      } else {
+        const errData = await res.json();
+        showNotification(`Erro ao aprovar agendamento: ${errData.error || 'Erro desconhecido'}`);
+      }
+    } catch (err) {
+      showNotification('Falha ao conectar com o servidor para aprovar agendamento.');
+    }
+  };
+
   const handleManualBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const prof = barbers.find(b => b.id === manualBookingForm.professional_id);
@@ -287,18 +306,51 @@ export const ScheduleGrid: React.FC = () => {
                     ) : (
                       slotAppointments.map(({ barber, apt, block }) => {
                         if (apt) {
+                          const isPending = apt.status === 'pending_approval';
                           return (
-                            <div key={apt.id} className="p-2.5 rounded-xl bg-surface-base border-l-2 border-l-[#FFFFFF] border border-border-subtle">
+                            <div key={apt.id} className={`p-2.5 rounded-xl transition-all ${
+                              isPending
+                                ? 'bg-amber-500/10 border-2 border-amber-500/50 text-amber-200 shadow-sm'
+                                : 'bg-surface-base border-l-2 border-l-[#FFFFFF] border border-border-subtle'
+                            }`}>
+                              {isPending && (
+                                <div className="flex items-center justify-between text-[10px] font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30">
+                                  <div className="flex items-center gap-1">
+                                    <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                    <span>Fora do Expediente</span>
+                                  </div>
+                                  <span className="text-[9px] bg-amber-400 text-black px-1.5 rounded font-extrabold">Aprovação Pendente</span>
+                                </div>
+                              )}
                               <div className="flex justify-between items-center text-xs mb-1">
-                                <span className="font-bold text-content-base truncate">{apt.client_name}</span>
-                                <span className="font-bold text-gold-hover text-[11px] shrink-0">R$ {apt.final_amount ? apt.final_amount.toFixed(2) : '60.00'}</span>
+                                <span className="font-bold text-content-base truncate">{apt.client_name || (apt as any).clientName}</span>
+                                <span className="font-bold text-gold-hover text-[11px] shrink-0">R$ {apt.final_amount ? Number(apt.final_amount).toFixed(2) : '60.00'}</span>
                               </div>
                               <div className="flex justify-between items-center text-[10px] text-content-muted">
-                                <span className="truncate">{apt.services[0]?.title || 'Atendimento'} • <strong className="text-[#A67B5B]">{barber.name}</strong></span>
-                                <span className="px-2 py-0.5 rounded-full bg-status-success/15 text-status-success font-semibold text-[9px] shrink-0">
-                                  {apt.status === 'completed' ? 'Concluído' : 'Confirmado'}
+                                <span className="truncate">{(apt.services && apt.services[0]?.title) || 'Atendimento'} • <strong className="text-[#A67B5B]">{barber.name}</strong></span>
+                                <span className={`px-2 py-0.5 rounded-full font-semibold text-[9px] shrink-0 ${
+                                  isPending
+                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
+                                    : apt.status === 'completed'
+                                    ? 'bg-status-success/15 text-status-success'
+                                    : 'bg-status-success/15 text-status-success'
+                                }`}>
+                                  {isPending ? 'Requer Aprovação' : apt.status === 'completed' ? 'Concluído' : 'Confirmado'}
                                 </span>
                               </div>
+
+                              {isPending && (
+                                <div className="pt-2 border-t border-amber-500/20 flex items-center justify-end gap-2 mt-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAcceptPendingAppointment(apt.id)}
+                                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] flex items-center gap-1 shadow-sm transition-all active:scale-95"
+                                  >
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    <span>ACEITAR AGENDAMENTO</span>
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           );
                         }

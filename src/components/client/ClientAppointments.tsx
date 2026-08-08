@@ -183,7 +183,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
   // Current appointment is the most recent active or non-cancelled one, or simply the first
   const currentAppointment = appointments.find(
-    a => a.status === 'confirmed' || a.status === 'in_queue' || a.status === 'in_service'
+    a => a.status === 'confirmed' || a.status === 'in_queue' || a.status === 'in_service' || a.status === 'pending_approval'
   ) || appointments[0];
 
   // History section only shows appointments other than the current active one (past/other appointments)
@@ -335,6 +335,12 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
         return (
           <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-status-success/15 text-status-success border border-status-success/30 inline-flex items-center space-x-1">
             <span>Atendimento</span>
+          </span>
+        );
+      case 'pending_approval':
+        return (
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 inline-flex items-center space-x-1 animate-pulse">
+            <span>⚠️ Aguardando Aprovação</span>
           </span>
         );
       case 'confirmed':

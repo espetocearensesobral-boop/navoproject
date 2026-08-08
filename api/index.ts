@@ -1203,6 +1203,8 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
       }
     }
 
+    const isPendingApproval = checkRes.requiresApproval || data.status === 'pending_approval';
+
     const newApt = {
       id: data.id || `apt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       clientId,
@@ -1212,7 +1214,7 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
       professionalName: resolvedProfessionalName,
       date,
       timeSlot,
-      status: data.status || 'confirmed',
+      status: isPendingApproval ? 'pending_approval' : (data.status || 'confirmed'),
       totalDurationMinutes: calculatedDuration > 0 ? calculatedDuration : Number(data.totalDurationMinutes || data.total_duration_minutes || 30),
       originalAmount: originalAmount.toString(),
       discountAmount: discountAmount.toString(),
@@ -1511,6 +1513,8 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
     const durationMins = Number(data.totalDurationMinutes || data.total_duration_minutes || dbApt.totalDurationMinutes || 30);
 
     if (newDate !== dbApt.date || newTimeSlot !== dbApt.timeSlot || newProfessionalId !== dbApt.professionalId || data.services !== undefined) {
+      const todayBRT = getTodayStringBRT();
+      const currTimeBRT = getCurrentTimeBRT();
       const reqStart = timeToMinutes(newTimeSlot);
       const reqEnd = reqStart + durationMins;
 
@@ -1875,13 +1879,19 @@ interface CheckSlotParams {
   profId?: string;
   excludeAptId?: string;
   todayBRT: string;
-  currTimeBRT: { totalMinutes: number };
+  currTimeBRT: { totalMinutes: number; timeStr: string };
+  debug?: boolean;
 }
 
 interface CheckSlotResult {
+  statusCode: 'AVAILABLE' | 'REQUIRES_APPROVAL' | 'PAST_TIME' | 'SHOP_CLOSED' | 'CONFIRMED_OCCUPIED' | 'BLOCKED' | 'PROFESSIONAL_UNAVAILABLE';
   available: boolean;
+  requiresApproval?: boolean;
+  isOutsideHours?: boolean;
   chosenProf?: any;
   reason?: string;
+  endMins?: number;
+  closeMins?: number;
 }
 
 async function checkSlotAvailability({
@@ -1892,20 +1902,28 @@ async function checkSlotAvailability({
   excludeAptId,
   todayBRT,
   currTimeBRT,
+  debug = false
 }: CheckSlotParams): Promise<CheckSlotResult> {
   const endMins = startMins + reqDuration;
 
-  // 1. Horário já passou hoje?
-  if (dateStr === todayBRT && startMins <= currTimeBRT.totalMinutes) {
-    return { available: false, reason: 'Não é possível agendar para um horário que já passou.' };
-  }
-
-  // 2. Data no passado?
+  // 1. Data/Horário no passado?
   if (dateStr < todayBRT) {
-    return { available: false, reason: 'Não é possível agendar para uma data no passado.' };
+    return {
+      statusCode: 'PAST_TIME',
+      available: false,
+      reason: 'Não é possível agendar para uma data no passado.'
+    };
   }
 
-  // 3. Horário de funcionamento da barbearia
+  if (dateStr === todayBRT && startMins <= currTimeBRT.totalMinutes) {
+    return {
+      statusCode: 'PAST_TIME',
+      available: false,
+      reason: 'Não é possível agendar para um horário que já passou.'
+    };
+  }
+
+  // 2. Horário de funcionamento da barbearia
   let shopProfileRows: any[] = [];
   try {
     shopProfileRows = await db.query.shopSettings.findMany();
@@ -1914,18 +1932,30 @@ async function checkSlotAvailability({
   const dayKey = getDayOfWeekKey(dateStr);
   const daySchedule = shopProf.operatingSchedule?.[dayKey];
 
-  if (daySchedule && !daySchedule.active) {
-    return { available: false, reason: 'A barbearia está fechada nesta data.' };
+  if (daySchedule && daySchedule.active === false) {
+    return {
+      statusCode: 'SHOP_CLOSED',
+      available: false,
+      reason: 'A barbearia está fechada nesta data.'
+    };
   }
 
   const openMins = timeToMinutes(daySchedule?.open || shopProf.openTime || '09:00');
-  const closeMins = timeToMinutes(daySchedule?.close || shopProf.closeTime || '20:00');
+  const closeMins = timeToMinutes(daySchedule?.close || shopProf.closeTime || '21:00');
 
-  if (startMins < openMins || endMins > closeMins) {
-    return { available: false, reason: 'O serviço selecionado excede o horário de funcionamento do estabelecimento.' };
+  // Antes de abrir ou muito além do encerramento (> 3 horas após fechamento)
+  if (startMins < openMins || startMins >= closeMins + 180) {
+    return {
+      statusCode: 'SHOP_CLOSED',
+      available: false,
+      reason: 'A barbearia está fechada neste horário.'
+    };
   }
 
-  // 4. Agendamentos do dia (não cancelados)
+  // Se o atendimento ultrapassa o horário normal de encerramento
+  const isOutsideHours = (endMins > closeMins) || (startMins >= closeMins);
+
+  // 3. Agendamentos do dia (não cancelados)
   const allAppointments = await db.query.appointments.findMany({
     where: (apt: any, { and, eq, ne }: any) => {
       const conds = [
@@ -1939,7 +1969,7 @@ async function checkSlotAvailability({
     }
   });
 
-  // 5. Bloqueios de agenda do dia
+  // 4. Bloqueios de agenda do dia
   let allBlocks: any[] = [];
   try {
     allBlocks = await db.query.scheduleBlocks.findMany({
@@ -1947,78 +1977,130 @@ async function checkSlotAvailability({
     });
   } catch (e) {}
 
-  // 6. Profissionais ativos
+  // 5. Profissionais ativos
   const allProfs = await db.query.professionals.findMany();
   let activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any' && p.isActive !== false);
   if (activeProfs.length === 0) {
     activeProfs = [
-      { id: 'prof_1', name: 'Carlos Silva', isActive: true, workingHours: { monday: '09:00-20:00', tuesday: '09:00-20:00', wednesday: '09:00-20:00', thursday: '09:00-20:00', friday: '09:00-20:00', saturday: '08:00-20:00' } },
-      { id: 'prof_2', name: 'Matheus Santos', isActive: true, workingHours: { monday: '09:00-20:00', tuesday: '09:00-20:00', wednesday: '09:00-20:00', thursday: '09:00-20:00', friday: '09:00-20:00', saturday: '08:00-20:00' } }
+      { id: 'prof_1', name: 'Carlos Silva', isActive: true },
+      { id: 'prof_2', name: 'Matheus Santos', isActive: true }
     ];
   }
 
-  // Helper para verificar se um profissional individual está disponível
-  const isSingleProfFree = (prof: any): boolean => {
-    // A. Horário de funcionamento do profissional no dia
-    if (prof.workingHours) {
-      let whObj = prof.workingHours;
-      if (typeof whObj === 'string') {
-        try { whObj = JSON.parse(whObj); } catch (e) {}
-      }
-      const whStr = whObj && typeof whObj === 'object' ? whObj[dayKey] : null;
-      if (whStr && typeof whStr === 'string' && whStr.includes('-')) {
-        const [pOpen, pClose] = whStr.split('-').map((s: string) => timeToMinutes(s.trim()));
-        if (!isNaN(pOpen) && !isNaN(pClose) && (startMins < pOpen || endMins > pClose)) {
-          return false;
-        }
-      }
-    }
-
-    // B. Conflito com agendamentos do profissional
+  // Avaliação individual do profissional (verificando agendamentos e bloqueios)
+  const evalSingleProf = (prof: any): { free: boolean; conflictReason?: string } => {
+    // A. Conflito com agendamentos do profissional
     const profApts = allAppointments.filter((a: any) => a.professionalId === prof.id);
     for (const apt of profApts) {
       const aptStart = timeToMinutes(apt.timeSlot);
       const aptEnd = aptStart + Number(apt.totalDurationMinutes || 30);
       if (checkIntervalOverlap(startMins, endMins, aptStart, aptEnd)) {
-        return false;
+        return { free: false, conflictReason: 'Horário já ocupado por outro agendamento.' };
       }
     }
 
-    // C. Conflito com bloqueios do profissional
+    // B. Conflito com bloqueios do profissional
     const profBlocks = allBlocks.filter((b: any) => b.professionalId === prof.id);
     for (const blk of profBlocks) {
       const blkStart = timeToMinutes(blk.startTime || blk.start_time);
       const blkEnd = timeToMinutes(blk.endTime || blk.end_time);
       if (checkIntervalOverlap(startMins, endMins, blkStart, blkEnd)) {
-        return false;
+        return { free: false, conflictReason: 'Horário bloqueado na agenda do profissional.' };
       }
     }
 
-    return true;
+    return { free: true };
   };
 
   const targetProfId = profId && profId !== 'prof_any' ? profId : '';
 
+  let result: CheckSlotResult;
+
   if (targetProfId) {
     const targetProf = activeProfs.find((p: any) => p.id === targetProfId);
     if (!targetProf) {
-      return { available: false, reason: 'Profissional não encontrado ou inativo' };
+      result = {
+        statusCode: 'PROFESSIONAL_UNAVAILABLE',
+        available: false,
+        reason: 'Profissional não encontrado ou inativo.'
+      };
+    } else {
+      const evalRes = evalSingleProf(targetProf);
+      if (!evalRes.free) {
+        result = {
+          statusCode: 'CONFIRMED_OCCUPIED',
+          available: false,
+          reason: evalRes.conflictReason || 'Horário indisponível para este profissional.'
+        };
+      } else if (isOutsideHours) {
+        result = {
+          statusCode: 'REQUIRES_APPROVAL',
+          available: true,
+          requiresApproval: true,
+          isOutsideHours: true,
+          chosenProf: targetProf,
+          endMins,
+          closeMins,
+          reason: 'Este atendimento ultrapassa o horário normal de funcionamento. O administrador/barbeiro precisa confirmar se será possível realizar o atendimento.'
+        };
+      } else {
+        result = {
+          statusCode: 'AVAILABLE',
+          available: true,
+          requiresApproval: false,
+          isOutsideHours: false,
+          chosenProf: targetProf,
+          endMins,
+          closeMins
+        };
+      }
     }
-    const free = isSingleProfFree(targetProf);
-    return { available: free, chosenProf: free ? targetProf : null, reason: free ? undefined : 'Horário indisponível para este profissional (conflito ou fora do expediente).' };
   } else {
-    // Para prof_any: pelo menos 1 profissional ativo livre
-    const freeProfs = activeProfs.filter((p: any) => isSingleProfFree(p));
-    if (freeProfs.length > 0) {
-      return { available: true, chosenProf: freeProfs[0] };
+    // Para prof_any: procurar primeiro profissional livre
+    const freeProfs = activeProfs.filter((p: any) => evalSingleProf(p).free);
+    if (freeProfs.length === 0) {
+      result = {
+        statusCode: 'CONFIRMED_OCCUPIED',
+        available: false,
+        reason: 'Nenhum profissional disponível para realizar o atendimento neste horário.'
+      };
+    } else {
+      const chosen = freeProfs[0];
+      if (isOutsideHours) {
+        result = {
+          statusCode: 'REQUIRES_APPROVAL',
+          available: true,
+          requiresApproval: true,
+          isOutsideHours: true,
+          chosenProf: chosen,
+          endMins,
+          closeMins,
+          reason: 'Este atendimento ultrapassa o horário normal de funcionamento. O administrador/barbeiro precisa confirmar se será possível realizar o atendimento.'
+        };
+      } else {
+        result = {
+          statusCode: 'AVAILABLE',
+          available: true,
+          requiresApproval: false,
+          isOutsideHours: false,
+          chosenProf: chosen,
+          endMins,
+          closeMins
+        };
+      }
     }
-    return { available: false, reason: 'Nenhum profissional disponível para realizar todo o atendimento neste horário.' };
   }
+
+  if (debug || process.env.NODE_ENV !== 'production') {
+    console.log(`[AVAILABILITY_DEBUG] Date: ${dateStr} | Time: ${minutesToTime(startMins)}-${minutesToTime(endMins)} (Close: ${minutesToTime(closeMins)}) | Code: ${result.statusCode} | Available: ${result.available} | ReqApproval: ${!!result.requiresApproval} | Reason: ${result.reason || 'OK'}`);
+  }
+
+  return result;
 }
 
 app.get("/api/availability", async (req, res) => {
   try {
-    const { professionalId, date, duration, excludeAppointmentId } = req.query;
+    const { professionalId, date, duration, excludeAppointmentId, debug } = req.query;
     if (!date) {
       return res.status(400).json({ error: 'Data não informada' });
     }
@@ -2037,15 +2119,29 @@ app.get("/api/availability", async (req, res) => {
     const todayBRT = getTodayStringBRT();
     const currTimeBRT = getCurrentTimeBRT();
 
-    const busyTimeSlots: string[] = [];
+    let shopProfileRows: any[] = [];
+    try { shopProfileRows = await db.query.shopSettings.findMany(); } catch (e) {}
+    const shopProf = shopProfileRows[0] || {};
+    const dayKey = getDayOfWeekKey(dateStr);
+    const daySchedule = shopProf.operatingSchedule?.[dayKey];
 
-    // Gerar lista de horários ocupados para todos os slots de 30 min do dia
-    const allFullDaySlots: string[] = [];
-    for (let m = 0; m < 24 * 60; m += 30) {
-      allFullDaySlots.push(minutesToTime(m));
+    const openStr = daySchedule?.open || shopProf.openTime || '09:00';
+    const closeStr = daySchedule?.close || shopProf.closeTime || '21:00';
+    const openMins = timeToMinutes(openStr);
+    const closeMins = timeToMinutes(closeStr);
+
+    // Gerar slots a partir do horário de abertura até 2 horas após o encerramento
+    const daySlots: string[] = [];
+    for (let m = openMins; m < closeMins + 90; m += 30) {
+      daySlots.push(minutesToTime(m));
     }
 
-    for (const slot of allFullDaySlots) {
+    const busySlots: string[] = [];
+    const requiresApprovalSlots: string[] = [];
+    const availableSlots: string[] = [];
+    const detailedSlots: any[] = [];
+
+    for (const slot of daySlots) {
       const startMins = timeToMinutes(slot);
       const checkRes = await checkSlotAvailability({
         dateStr,
@@ -2055,14 +2151,39 @@ app.get("/api/availability", async (req, res) => {
         excludeAptId,
         todayBRT,
         currTimeBRT,
+        debug: debug === 'true'
       });
 
       if (!checkRes.available) {
-        busyTimeSlots.push(slot);
+        busySlots.push(slot);
+      } else if (checkRes.requiresApproval) {
+        requiresApprovalSlots.push(slot);
+      } else {
+        availableSlots.push(slot);
       }
+
+      detailedSlots.push({
+        timeSlot: slot,
+        statusCode: checkRes.statusCode,
+        available: checkRes.available,
+        requiresApproval: !!checkRes.requiresApproval,
+        isOutsideHours: !!checkRes.isOutsideHours,
+        reason: checkRes.reason,
+        chosenProf: checkRes.chosenProf ? { id: checkRes.chosenProf.id, name: checkRes.chosenProf.name } : null
+      });
     }
 
-    return res.json(busyTimeSlots.map(ts => ({ timeSlot: ts })));
+    if (req.query.format === 'legacy') {
+      return res.json(busySlots.map(ts => ({ timeSlot: ts })));
+    }
+
+    return res.json({
+      date: dateStr,
+      busySlots,
+      requiresApprovalSlots,
+      availableSlots,
+      slots: detailedSlots
+    });
   } catch (e: any) {
     return handleError(res, e, req.path);
   }

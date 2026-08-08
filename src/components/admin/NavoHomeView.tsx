@@ -54,6 +54,12 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
             Na Cadeira
           </span>
         );
+      case 'pending_approval':
+        return (
+          <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded whitespace-nowrap inline-flex items-center gap-1 animate-pulse">
+            ⚠️ Fora do Expediente
+          </span>
+        );
       case 'completed':
         return (
           <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded whitespace-nowrap">
