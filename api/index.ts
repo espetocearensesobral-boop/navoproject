@@ -13,6 +13,76 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 
 // =====================================================================
+// UTILITÁRIOS DE DATA, HORA E FUSO HORÁRIO (BRT - America/Sao_Paulo)
+// Fonte única de verdade para disponibilidade e prevenção de conflitos
+// =====================================================================
+const TIMEZONE = 'America/Sao_Paulo';
+
+function getTodayStringBRT(): string {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const parts = formatter.formatToParts(now);
+  const map: Record<string, string> = {};
+  parts.forEach(p => { map[p.type] = p.value; });
+  return `${map.year}-${map.month}-${map.day}`;
+}
+
+function getCurrentTimeBRT(): { hours: number; minutes: number; timeStr: string; totalMinutes: number } {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: TIMEZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+  const parts = formatter.formatToParts(now);
+  const map: Record<string, string> = {};
+  parts.forEach(p => { map[p.type] = p.value; });
+  const hours = parseInt(map.hour || '0', 10);
+  const minutes = parseInt(map.minute || '0', 10);
+  return {
+    hours,
+    minutes,
+    timeStr: `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
+    totalMinutes: hours * 60 + minutes
+  };
+}
+
+function timeToMinutes(timeStr: string): number {
+  if (!timeStr) return 0;
+  const parts = timeStr.trim().split(':');
+  const h = parseInt(parts[0] || '0', 10);
+  const m = parseInt(parts[1] || '0', 10);
+  return h * 60 + m;
+}
+
+function minutesToTime(totalMins: number): string {
+  const h = Math.floor(Math.max(0, totalMins) / 60);
+  const m = Math.max(0, totalMins) % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function getDayOfWeekKey(dateStr: string): 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' {
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return 'monday';
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dateObj = new Date(y, m - 1, d);
+  const dayIndex = dateObj.getDay();
+  const keys: ('sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday')[] = [
+    'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'
+  ];
+  return keys[dayIndex] || 'monday';
+}
+
+function checkIntervalOverlap(startA: number, endA: number, startB: number, endB: number): boolean {
+  return startA < endB && endA > startB;
+}
+
+// =====================================================================
 // FUNÇÃO UTILITÁRIA: Mensagens amigáveis para o usuário
 // =====================================================================
 const userErrors = {
@@ -959,7 +1029,6 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
       return res.status(400).json({ error: 'Dados inválidos', details: validationError });
     }
 
-    // 1. Conflict Check (Server-side)
     const professionalId = data.professionalId || data.professional_id;
     const date = data.date;
     const timeSlot = data.timeSlot || data.time_slot;
@@ -968,57 +1037,17 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
       return res.status(400).json({ error: 'Profissional, data e horário são obrigatórios' });
     }
 
-    const existingApt = await db.query.appointments.findFirst({
-      where: (apt: any, { and, eq, ne }: any) => and(
-        eq(apt.professionalId, professionalId),
-        eq(apt.date, date),
-        eq(apt.timeSlot, timeSlot),
-        ne(apt.status, 'cancelled')
-      )
-    });
+    const todayBRT = getTodayStringBRT();
+    const currTimeBRT = getCurrentTimeBRT();
+    const reqStart = timeToMinutes(timeSlot);
 
-    if (existingApt && existingApt.id !== data.id) {
-      return res.status(409).json({ error: 'Este horário já está reservado para este profissional.' });
-    }
-
-    let resolvedProfessionalId = professionalId;
-    let resolvedProfessionalName = data.professionalName || data.professional_name || 'Carlos Silva';
-
-    if (resolvedProfessionalId === 'prof_any') {
-      const allProfs = await db.query.professionals.findMany();
-      if (allProfs.length > 0) {
-        // Try to find one without conflicts
-        let chosenProf = null;
-        for (const prof of allProfs) {
-          const conflict = await db.query.appointments.findFirst({
-            where: (apt: any, { and, eq, ne }: any) => and(
-              eq(apt.professionalId, prof.id),
-              eq(apt.date, date),
-              eq(apt.timeSlot, timeSlot),
-              ne(apt.status, 'cancelled')
-            )
-          });
-          if (!conflict) {
-            chosenProf = prof;
-            break;
-          }
-        }
-        
-        if (!chosenProf) {
-          return res.status(409).json({ error: 'Nenhum profissional disponível para este horário. Por favor, escolha outro.' });
-        }
-        
-        resolvedProfessionalId = chosenProf.id;
-        resolvedProfessionalName = chosenProf.name;
-      }
+    if (date < todayBRT || (date === todayBRT && reqStart <= currTimeBRT.totalMinutes)) {
+      return res.status(400).json({ error: 'Não é possível agendar para uma data ou horário que já passou.' });
     }
 
     const isAdmin = req.user && req.user.role === 'admin';
 
-    // Calculate total price from services on the server side.
-    // The price/duration NEVER come from the client — only from the `services`
-    // table, looked up by id. Every id sent by the client must resolve to a
-    // real service; an unmatched id is a validation error, not a silent 0.
+    // Calculate total price and total duration from services on the server side.
     let calculatedTotal = 0;
     let calculatedDuration = 0;
 
@@ -1043,13 +1072,119 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
         return res.status(400).json({ error: 'Um ou mais serviços selecionados são inválidos.', invalidServiceIds: unmatchedIds });
       }
     } else if (isAdmin && data.originalAmount) {
-      // Admin-only manual override (e.g. custom/off-menu charge from the admin panel).
-      // Regular clients can never supply the price directly — it must always
-      // come from real `services` rows above.
       calculatedTotal = Number(data.originalAmount ?? data.original_amount ?? 0);
       if (!Number.isFinite(calculatedTotal) || calculatedTotal < 0) calculatedTotal = 0;
+      calculatedDuration = Number(data.totalDurationMinutes ?? data.total_duration_minutes ?? 30);
     } else {
       return res.status(400).json({ error: 'Selecione ao menos um serviço válido.' });
+    }
+
+    if (calculatedDuration <= 0) {
+      calculatedDuration = 30;
+    }
+
+    const reqEnd = reqStart + calculatedDuration;
+
+    // Verificar horário de funcionamento do estabelecimento
+    const shopProfileRows = await db.query.shopProfile.findMany();
+    const shopProf = shopProfileRows[0] || {};
+    const dayKey = getDayOfWeekKey(date);
+    const daySchedule = shopProf.operatingSchedule?.[dayKey];
+
+    if (daySchedule && !daySchedule.active) {
+      return res.status(400).json({ error: 'A barbearia está fechada nesta data.' });
+    }
+
+    const shopCloseMins = timeToMinutes(daySchedule?.close || shopProf.closeTime || '20:00');
+    if (reqEnd > shopCloseMins) {
+      return res.status(400).json({ error: 'O serviço selecionado excede o horário de funcionamento do estabelecimento.' });
+    }
+
+    // Helper para verificar conflito de intervalo para um profissional
+    const checkProfConflict = async (profId: string) => {
+      // 1. Verificar agendamentos existentes no mesmo dia
+      const profApts = await db.query.appointments.findMany({
+        where: (apt: any, { and, eq, ne }: any) => and(
+          eq(apt.professionalId, profId),
+          eq(apt.date, date),
+          ne(apt.status, 'cancelled')
+        )
+      });
+
+      for (const apt of profApts) {
+        const aptStart = timeToMinutes(apt.timeSlot);
+        const aptEnd = aptStart + Number(apt.totalDurationMinutes || 30);
+        if (checkIntervalOverlap(reqStart, reqEnd, aptStart, aptEnd)) {
+          return true; // Há conflito com agendamento
+        }
+      }
+
+      // 2. Verificar bloqueios de agenda
+      try {
+        const profBlocks = await db.query.scheduleBlocks.findMany({
+          where: (blk: any, { and, eq }: any) => and(
+            eq(blk.professionalId, profId),
+            eq(blk.date, date)
+          )
+        });
+
+        for (const blk of profBlocks) {
+          const blkStart = timeToMinutes(blk.startTime || blk.start_time);
+          const blkEnd = timeToMinutes(blk.endTime || blk.end_time);
+          if (checkIntervalOverlap(reqStart, reqEnd, blkStart, blkEnd)) {
+            return true; // Há conflito com bloqueio
+          }
+        }
+      } catch (e) {}
+
+      // 3. Horário de trabalho do profissional
+      const allProfs = await db.query.professionals.findMany();
+      const profObj = allProfs.find((p: any) => p.id === profId);
+      if (profObj && profObj.workingHours) {
+        const whStr = profObj.workingHours[dayKey];
+        if (whStr && whStr.includes('-')) {
+          const [pOpen, pClose] = whStr.split('-').map((s: string) => timeToMinutes(s.trim()));
+          if (reqStart < pOpen || reqEnd > pClose) {
+            return true; // Fora do horário do profissional
+          }
+        }
+      }
+
+      return false; // Sem conflito
+    };
+
+    let resolvedProfessionalId = professionalId;
+    let resolvedProfessionalName = data.professionalName || data.professional_name || 'Profissional';
+
+    if (resolvedProfessionalId === 'prof_any') {
+      const allProfs = await db.query.professionals.findMany();
+      const activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any');
+      let chosenProf = null;
+
+      for (const prof of activeProfs) {
+        const hasConflict = await checkProfConflict(prof.id);
+        if (!hasConflict) {
+          chosenProf = prof;
+          break;
+        }
+      }
+
+      if (!chosenProf) {
+        return res.status(409).json({ error: 'Nenhum profissional disponível para realizar todo o atendimento neste horário.' });
+      }
+
+      resolvedProfessionalId = chosenProf.id;
+      resolvedProfessionalName = chosenProf.name;
+    } else {
+      const hasConflict = await checkProfConflict(resolvedProfessionalId);
+      if (hasConflict) {
+        return res.status(409).json({ error: 'Este horário conflita com outro agendamento ou bloqueio de agenda.' });
+      }
+      const allProfs = await db.query.professionals.findMany();
+      const profObj = allProfs.find((p: any) => p.id === resolvedProfessionalId);
+      if (profObj) {
+        resolvedProfessionalName = profObj.name;
+      }
     }
 
     const originalAmount = calculatedTotal;
@@ -1419,21 +1554,62 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
     const newDate = data.date || dbApt.date;
     const newTimeSlot = data.timeSlot || data.time_slot || dbApt.timeSlot;
     const newProfessionalId = data.professionalId || data.professional_id || dbApt.professionalId;
+    const durationMins = Number(data.totalDurationMinutes || data.total_duration_minutes || dbApt.totalDurationMinutes || 30);
 
-    if (newDate !== dbApt.date || newTimeSlot !== dbApt.timeSlot || newProfessionalId !== dbApt.professionalId) {
-      const conflict = await db.query.appointments.findFirst({
+    if (newDate !== dbApt.date || newTimeSlot !== dbApt.timeSlot || newProfessionalId !== dbApt.professionalId || data.services !== undefined) {
+      const reqStart = timeToMinutes(newTimeSlot);
+      const reqEnd = reqStart + durationMins;
+
+      // 1. Horário de funcionamento do estabelecimento
+      const shopProfileRows = await db.query.shopProfile.findMany();
+      const shopProf = shopProfileRows[0] || {};
+      const dayKey = getDayOfWeekKey(newDate);
+      const daySchedule = shopProf.operatingSchedule?.[dayKey];
+
+      if (daySchedule && !daySchedule.active) {
+        return res.status(400).json({ error: 'A barbearia está fechada nesta data.' });
+      }
+
+      const shopCloseMins = timeToMinutes(daySchedule?.close || shopProf.closeTime || '20:00');
+      if (reqEnd > shopCloseMins) {
+        return res.status(400).json({ error: 'O serviço selecionado excede o horário de funcionamento do estabelecimento.' });
+      }
+
+      // 2. Conflito com agendamentos existentes
+      const profApts = await db.query.appointments.findMany({
         where: (apt: any, { and, eq, ne }: any) => and(
           eq(apt.professionalId, newProfessionalId),
           eq(apt.date, newDate),
-          eq(apt.timeSlot, newTimeSlot),
           ne(apt.status, 'cancelled'),
           ne(apt.id, id)
         )
       });
 
-      if (conflict) {
-        return res.status(409).json({ error: 'Este horário já está reservado para este profissional. Por favor, escolha outro.' });
+      for (const apt of profApts) {
+        const aptStart = timeToMinutes(apt.timeSlot);
+        const aptEnd = aptStart + Number(apt.totalDurationMinutes || 30);
+        if (checkIntervalOverlap(reqStart, reqEnd, aptStart, aptEnd)) {
+          return res.status(409).json({ error: 'Este horário conflita com outro agendamento existente.' });
+        }
       }
+
+      // 3. Conflito com bloqueios na agenda
+      try {
+        const profBlocks = await db.query.scheduleBlocks.findMany({
+          where: (blk: any, { and, eq }: any) => and(
+            eq(blk.professionalId, newProfessionalId),
+            eq(blk.date, newDate)
+          )
+        });
+
+        for (const blk of profBlocks) {
+          const blkStart = timeToMinutes(blk.startTime || blk.start_time);
+          const blkEnd = timeToMinutes(blk.endTime || blk.end_time);
+          if (checkIntervalOverlap(reqStart, reqEnd, blkStart, blkEnd)) {
+            return res.status(409).json({ error: 'Este horário conflita com um bloqueio de agenda.' });
+          }
+        }
+      } catch (e) {}
     }
 
     if (isDbConnected && db) {
@@ -1774,7 +1950,7 @@ app.delete("/api/cash-transactions/:id", requireAuth, requireAdmin, async (req, 
 
 app.get("/api/availability", async (req, res) => {
   try {
-    const { professionalId, date } = req.query;
+    const { professionalId, date, duration } = req.query;
     if (!date) {
       return res.status(400).json({ error: 'Data não informada' });
     }
@@ -1787,6 +1963,10 @@ app.get("/api/availability", async (req, res) => {
     if (profIdStr && !/^[a-zA-Z0-9_-]+$/.test(profIdStr)) {
       return res.status(400).json({ error: 'Identificador de profissional inválido.' });
     }
+
+    const reqDuration = Math.max(30, Number(duration || 30));
+    const todayBRT = getTodayStringBRT();
+    const currTimeBRT = getCurrentTimeBRT();
 
     // Buscar agendamentos não cancelados para a data
     const allAppointments = await db.query.appointments.findMany({
@@ -1802,127 +1982,97 @@ app.get("/api/availability", async (req, res) => {
       allBlocks = await db.query.scheduleBlocks.findMany({
         where: (blk: any, { eq }: any) => eq(blk.date, dateStr)
       });
-    } catch (e) {
-      // Tabela scheduleBlocks pode não estar criada em alguns cenários
-    }
+    } catch (e) {}
+
+    // Buscar perfil da barbearia
+    const shopProfileRows = await db.query.shopProfile.findMany();
+    const shopProf = shopProfileRows[0] || {};
+    const dayKey = getDayOfWeekKey(dateStr);
+    const daySchedule = shopProf.operatingSchedule?.[dayKey];
+
+    let openMins = timeToMinutes(daySchedule?.open || shopProf.openTime || '09:00');
+    let closeMins = timeToMinutes(daySchedule?.close || shopProf.closeTime || '20:00');
 
     // Buscar profissionais ativos
     const allProfs = await db.query.professionals.findMany();
     const activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any');
 
-    if (profIdStr && profIdStr !== 'prof_any') {
-      // Para um profissional específico
-      const profApts = allAppointments.filter((a: any) => a.professionalId === profIdStr);
-      const profBlocks = allBlocks.filter((b: any) => b.professionalId === profIdStr);
+    // Função para verificar se um profissional P está livre no intervalo [startMins, startMins + reqDuration)
+    const isProfFree = (prof: any, startMins: number): boolean => {
+      const endMins = startMins + reqDuration;
 
-      const busyTimeSlots = new Set<string>();
+      // 1. Horário já passou hoje?
+      if (dateStr === todayBRT && startMins <= currTimeBRT.totalMinutes) {
+        return false;
+      }
 
-      // Expansão de horários conforme duração do serviço
+      // 2. Horário de funcionamento do profissional no dia
+      if (prof.workingHours) {
+        const whStr = prof.workingHours[dayKey];
+        if (whStr && whStr.includes('-')) {
+          const [pOpen, pClose] = whStr.split('-').map((s: string) => timeToMinutes(s.trim()));
+          if (startMins < pOpen || endMins > pClose) {
+            return false;
+          }
+        }
+      }
+
+      // 3. Conflito com agendamentos do profissional
+      const profApts = allAppointments.filter((a: any) => a.professionalId === prof.id);
       for (const apt of profApts) {
-        if (apt.timeSlot) {
-          busyTimeSlots.add(apt.timeSlot);
-          const duration = Number(apt.totalDurationMinutes || 30);
-          if (duration > 30) {
-            const [h, m] = apt.timeSlot.split(':').map(Number);
-            let totalMins = h * 60 + m;
-            for (let d = 30; d < duration; d += 30) {
-              totalMins += 30;
-              const slotH = String(Math.floor(totalMins / 60)).padStart(2, '0');
-              const slotM = String(totalMins % 60).padStart(2, '0');
-              busyTimeSlots.add(`${slotH}:${slotM}`);
-            }
-          }
+        const aptStart = timeToMinutes(apt.timeSlot);
+        const aptEnd = aptStart + Number(apt.totalDurationMinutes || 30);
+        if (checkIntervalOverlap(startMins, endMins, aptStart, aptEnd)) {
+          return false;
         }
       }
 
-      // Horários bloqueados por bloqueio de agenda
+      // 4. Conflito com bloqueios do profissional
+      const profBlocks = allBlocks.filter((b: any) => b.professionalId === prof.id);
       for (const blk of profBlocks) {
-        const startTime = blk.startTime || blk.start_time;
-        const endTime = blk.endTime || blk.end_time;
-        if (startTime && endTime) {
-          const [sh, sm] = startTime.split(':').map(Number);
-          const [eh, em] = endTime.split(':').map(Number);
-          let startMins = sh * 60 + sm;
-          const endMins = eh * 60 + em;
-          while (startMins < endMins) {
-            const slotH = String(Math.floor(startMins / 60)).padStart(2, '0');
-            const slotM = String(startMins % 60).padStart(2, '0');
-            busyTimeSlots.add(`${slotH}:${slotM}`);
-            startMins += 30;
-          }
+        const blkStart = timeToMinutes(blk.startTime || blk.start_time);
+        const blkEnd = timeToMinutes(blk.endTime || blk.end_time);
+        if (checkIntervalOverlap(startMins, endMins, blkStart, blkEnd)) {
+          return false;
         }
       }
 
-      return res.json(Array.from(busyTimeSlots).map(ts => ({ timeSlot: ts })));
-    } else {
-      // prof_any ou sem preferência: o horário só está ocupado se TODOS os profissionais estiverem ocupados
-      if (activeProfs.length === 0) {
-        return res.json([]);
-      }
+      return true;
+    };
 
-      const profBusyMap = new Map<string, Set<string>>();
-      for (const prof of activeProfs) {
-        profBusyMap.set(prof.id, new Set<string>());
-      }
+    const busyTimeSlots: string[] = [];
 
-      for (const apt of allAppointments) {
-        const pSlots = profBusyMap.get(apt.professionalId);
-        if (pSlots && apt.timeSlot) {
-          pSlots.add(apt.timeSlot);
-          const duration = Number(apt.totalDurationMinutes || 30);
-          if (duration > 30) {
-            const [h, m] = apt.timeSlot.split(':').map(Number);
-            let totalMins = h * 60 + m;
-            for (let d = 30; d < duration; d += 30) {
-              totalMins += 30;
-              const slotH = String(Math.floor(totalMins / 60)).padStart(2, '0');
-              const slotM = String(totalMins % 60).padStart(2, '0');
-              pSlots.add(`${slotH}:${slotM}`);
-            }
-          }
-        }
-      }
-
-      for (const blk of allBlocks) {
-        const pSlots = profBusyMap.get(blk.professionalId);
-        const startTime = blk.startTime || blk.start_time;
-        const endTime = blk.endTime || blk.end_time;
-        if (pSlots && startTime && endTime) {
-          const [sh, sm] = startTime.split(':').map(Number);
-          const [eh, em] = endTime.split(':').map(Number);
-          let startMins = sh * 60 + sm;
-          const endMins = eh * 60 + em;
-          while (startMins < endMins) {
-            const slotH = String(Math.floor(startMins / 60)).padStart(2, '0');
-            const slotM = String(startMins % 60).padStart(2, '0');
-            pSlots.add(`${slotH}:${slotM}`);
-            startMins += 30;
-          }
-        }
-      }
-
-      const candidateSlots = new Set<string>();
-      for (const set of profBusyMap.values()) {
-        for (const slot of set) {
-          candidateSlots.add(slot);
-        }
-      }
-
-      const allBusySlots = new Set<string>();
-      for (const slot of candidateSlots) {
-        let countBusy = 0;
-        for (const prof of activeProfs) {
-          if (profBusyMap.get(prof.id)?.has(slot)) {
-            countBusy++;
-          }
-        }
-        if (countBusy >= activeProfs.length) {
-          allBusySlots.add(slot);
-        }
-      }
-
-      return res.json(Array.from(allBusySlots).map(ts => ({ timeSlot: ts })));
+    // Gerar lista de horários ocupados para todos os slots de 30 min do dia
+    const allFullDaySlots: string[] = [];
+    for (let m = 0; m < 24 * 60; m += 30) {
+      allFullDaySlots.push(minutesToTime(m));
     }
+
+    for (const slot of allFullDaySlots) {
+      const startMins = timeToMinutes(slot);
+      const endMins = startMins + reqDuration;
+
+      // Se a barbearia estiver fechada no dia ou se o serviço ultrapassar o horário de fechamento
+      if ((daySchedule && !daySchedule.active) || startMins < openMins || endMins > closeMins) {
+        busyTimeSlots.push(slot);
+        continue;
+      }
+
+      if (profIdStr && profIdStr !== 'prof_any') {
+        const targetProf = activeProfs.find((p: any) => p.id === profIdStr);
+        if (!targetProf || !isProfFree(targetProf, startMins)) {
+          busyTimeSlots.push(slot);
+        }
+      } else {
+        // Para prof_any: o horário está disponível se ao menos 1 profissional estiver livre
+        const anyFree = activeProfs.some((p: any) => isProfFree(p, startMins));
+        if (!anyFree) {
+          busyTimeSlots.push(slot);
+        }
+      }
+    }
+
+    return res.json(busyTimeSlots.map(ts => ({ timeSlot: ts })));
   } catch (e: any) {
     return handleError(res, e, req.path);
   }

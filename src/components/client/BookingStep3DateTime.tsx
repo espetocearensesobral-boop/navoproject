@@ -9,6 +9,13 @@ import {
   generateTimeSlotsFromProfile, 
   isDateOpenInProfile 
 } from '../../services/shopProfileService';
+import { 
+  getTodayStringBRT, 
+  getCurrentTimeBRT, 
+  formatDateBR, 
+  calculateTotalServicesDuration,
+  timeToMinutes
+} from '../../utils/dateUtils';
 
 interface BookingStep3Props {
   selectedServices: ServiceItem[];
@@ -37,6 +44,10 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
 
+  const totalDurationMinutes = useMemo(() => {
+    return calculateTotalServicesDuration(selectedServices);
+  }, [selectedServices]);
+
   useEffect(() => {
     fetchShopProfile().then(p => {
       if (p) setShopProfile(p);
@@ -48,13 +59,9 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   // Calendar Modal State
   const [calendarMonth, setCalendarMonth] = useState(() => new Date());
 
-  // Set default date to today if empty or in the past (using local timezone)
+  // Set default date to today in BRT if empty or in the past
   const todayStr = useMemo(() => {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    return getTodayStringBRT();
   }, []);
 
   useEffect(() => {
@@ -63,7 +70,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     }
   }, [selectedDate, onSelectDate, todayStr]);
 
-  // Fetch appointments to calculate availability
+  // Fetch appointments & availability considering duration
   useEffect(() => {
     let isMounted = true;
     
@@ -72,11 +79,11 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
       setIsLoadingSlots(true);
       try {
         const profId = selectedBarber?.id || 'prof_any';
-        const response = await authFetch(`/api/availability?professionalId=${profId}&date=${selectedDate}`);
+        const response = await authFetch(`/api/availability?professionalId=${profId}&date=${selectedDate}&duration=${totalDurationMinutes}`);
         if (response.ok) {
-          const appointments = await response.json();
-          const bookedTimes = Array.isArray(appointments) 
-            ? appointments.map((apt: any) => apt?.timeSlot).filter(Boolean)
+          const resBusySlots = await response.json();
+          const bookedTimes = Array.isArray(resBusySlots) 
+            ? resBusySlots.map((apt: any) => apt?.timeSlot || apt).filter(Boolean)
             : [];
           if (isMounted) {
             setBusySlots(bookedTimes);
@@ -94,22 +101,12 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     return () => {
       isMounted = false;
     };
-  }, [selectedDate, selectedBarber]);
+  }, [selectedDate, selectedBarber, totalDurationMinutes]);
 
-  // Format YYYY-MM-DD to DD/MM/YYYY for display
-  const formatDateBR = (isoDate: string) => {
-    if (!isoDate) return '';
-    const parts = isoDate.split('-');
-    if (parts.length === 3) {
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-    return isoDate;
-  };
-
-  // Base Time Slots list dynamically generated from shopProfile
+  // Base Time Slots list dynamically generated from shopProfile and duration
   const baseSlots = useMemo(() => {
-    return generateTimeSlotsFromProfile(shopProfile, selectedDate);
-  }, [shopProfile, selectedDate]);
+    return generateTimeSlotsFromProfile(shopProfile, selectedDate, totalDurationMinutes);
+  }, [shopProfile, selectedDate, totalDurationMinutes]);
 
   const monthYearHeader = useMemo(() => {
     const monthNames = [
@@ -266,12 +263,10 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
             {baseSlots.map((time) => {
               const isSelected = selectedTimeSlot === time;
               
-              // Validar se o horário já passou na data de hoje
-              const now = new Date();
-              const currentHour = now.getHours();
-              const currentMinute = now.getMinutes();
-              const [slotH, slotM] = time.split(':').map(Number);
-              const isPastTime = selectedDate === todayStr && (slotH < currentHour || (slotH === currentHour && slotM <= currentMinute));
+              // Validar se o horário já passou na data de hoje usando Fuso BRT
+              const currTimeBRT = getCurrentTimeBRT();
+              const slotMins = timeToMinutes(time);
+              const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
               
               const isAvailable = !busySlots.includes(time) && !isPastTime;
               return (

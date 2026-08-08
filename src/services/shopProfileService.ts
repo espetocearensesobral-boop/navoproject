@@ -1,4 +1,5 @@
 import { authFetch } from '../lib/api';
+import { getDayOfWeekKey, timeToMinutes, minutesToTime, getTodayStringBRT } from '../utils/dateUtils';
 
 export interface OperatingDaySchedule {
   active: boolean;
@@ -132,7 +133,6 @@ export async function saveShopProfile(data: Partial<ShopProfile>): Promise<ShopP
 /**
  * Retorna os dias da semana em português mapeados para chave do schedule
  */
-
 export const daysOfWeekMap: { key: keyof ShopProfile['operatingSchedule']; label: string; short: string; dayIndex: number }[] = [
   { key: 'sunday', label: 'Domingo', short: 'Dom', dayIndex: 0 },
   { key: 'monday', label: 'Segunda-feira', short: 'Seg', dayIndex: 1 },
@@ -147,51 +147,50 @@ export const daysOfWeekMap: { key: keyof ShopProfile['operatingSchedule']; label
  * Verifica se a data dada (YYYY-MM-DD ou Date) está aberta na barbearia
  */
 export function isDateOpenInProfile(profile: ShopProfile, dateStr: string | Date): boolean {
-  const d = typeof dateStr === 'string' ? new Date(dateStr + 'T00:00:00') : dateStr;
-  const dayIndex = d.getDay(); // 0 = Dom
-  const dayItem = daysOfWeekMap.find(item => item.dayIndex === dayIndex);
+  const str = typeof dateStr === 'string' ? dateStr : getTodayStringBRT();
+  const dayKey = getDayOfWeekKey(str);
   
-  if (!dayItem) return true;
-  
-  const scheduleForDay = profile.operatingSchedule?.[dayItem.key];
+  const scheduleForDay = profile.operatingSchedule?.[dayKey];
   if (scheduleForDay) {
     return scheduleForDay.active;
   }
 
+  const dayItem = daysOfWeekMap.find(item => item.key === dayKey);
+  const dayIndex = dayItem ? dayItem.dayIndex : 1;
   return profile.operatingDays ? profile.operatingDays.includes(dayIndex) : true;
 }
 
 /**
- * Gera horários de 30 em 30 min com base no perfil e na data
+ * Gera horários de 30 em 30 min com base no perfil, data e duração do serviço
  */
-export function generateTimeSlotsFromProfile(profile: ShopProfile, dateStr?: string): string[] {
+export function generateTimeSlotsFromProfile(
+  profile: ShopProfile, 
+  dateStr?: string, 
+  serviceDurationMinutes: number = 30
+): string[] {
   let open = profile.openTime || '09:00';
   let close = profile.closeTime || '20:00';
 
   if (dateStr) {
-    const d = new Date(dateStr + 'T00:00:00');
-    const dayIndex = d.getDay();
-    const dayItem = daysOfWeekMap.find(item => item.dayIndex === dayIndex);
-    if (dayItem && profile.operatingSchedule?.[dayItem.key]) {
-      const sch = profile.operatingSchedule[dayItem.key];
+    const dayKey = getDayOfWeekKey(dateStr);
+    if (profile.operatingSchedule?.[dayKey]) {
+      const sch = profile.operatingSchedule[dayKey];
       if (!sch.active) return []; // Fechado
       open = sch.open || open;
       close = sch.close || close;
     }
   }
 
-  const [openH, openM] = open.split(':').map(Number);
-  const [closeH, closeM] = close.split(':').map(Number);
-
-  const openMinutes = openH * 60 + (openM || 0);
-  const closeMinutes = closeH * 60 + (closeM || 0);
+  const openMinutes = timeToMinutes(open);
+  const closeMinutes = timeToMinutes(close);
+  const requiredDuration = Math.max(30, serviceDurationMinutes);
 
   const slots: string[] = [];
-  for (let m = openMinutes; m < closeMinutes; m += 30) {
-    const hh = String(Math.floor(m / 60)).padStart(2, '0');
-    const mm = String(m % 60).padStart(2, '0');
-    slots.push(`${hh}:${mm}`);
+  // Importante: O serviço precisa terminar ANTES ou EXATAMENTE na hora de fechamento
+  for (let m = openMinutes; m + requiredDuration <= closeMinutes; m += 30) {
+    slots.push(minutesToTime(m));
   }
 
   return slots;
 }
+
