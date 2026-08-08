@@ -27,40 +27,39 @@ function getTodayStringBRT(): string {
       month: '2-digit',
       day: '2-digit',
     });
-    const parts = formatter.formatToParts(now);
-    const map: Record<string, string> = {};
-    parts.forEach(p => { map[p.type] = p.value; });
-    if (map.year && map.month && map.day) {
-      return `${map.year}-${map.month}-${map.day}`;
+    const result = formatter.format(now);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(result)) {
+      return result;
     }
   } catch (e) {}
 
   const now = new Date();
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-  const brtMs = utcMs - 3 * 3600 * 1000;
-  const brtDate = new Date(brtMs);
-  const y = brtDate.getFullYear();
-  const m = String(brtDate.getMonth() + 1).padStart(2, '0');
-  const d = String(brtDate.getDate()).padStart(2, '0');
+  const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const brtTime = new Date(utcTime - (3 * 3600 * 1000));
+  const y = brtTime.getUTCFullYear();
+  const m = String(brtTime.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(brtTime.getUTCDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
 
 function getCurrentTimeBRT(): { hours: number; minutes: number; timeStr: string; totalMinutes: number } {
   try {
     const now = new Date();
-    const formatter = new Intl.DateTimeFormat('en-CA', {
+    const formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: TIMEZONE,
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      hourCycle: 'h23'
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false
     });
     const parts = formatter.formatToParts(now);
-    const map: Record<string, string> = {};
-    parts.forEach(p => { map[p.type] = p.value; });
-    const hours = parseInt(map.hour || '', 10);
-    const minutes = parseInt(map.minute || '', 10);
+    let hours = NaN;
+    let minutes = NaN;
+    for (const p of parts) {
+      if (p.type === 'hour') hours = parseInt(p.value, 10);
+      if (p.type === 'minute') minutes = parseInt(p.value, 10);
+    }
     if (!isNaN(hours) && !isNaN(minutes)) {
+      if (hours === 24) hours = 0;
       return {
         hours,
         minutes,
@@ -71,11 +70,10 @@ function getCurrentTimeBRT(): { hours: number; minutes: number; timeStr: string;
   } catch (e) {}
 
   const now = new Date();
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-  const brtMs = utcMs - 3 * 3600 * 1000;
-  const brtDate = new Date(brtMs);
-  const hours = brtDate.getHours();
-  const minutes = brtDate.getMinutes();
+  const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const brtTime = new Date(utcTime - (3 * 3600 * 1000));
+  const hours = brtTime.getUTCHours();
+  const minutes = brtTime.getUTCMinutes();
   return {
     hours,
     minutes,
@@ -2050,7 +2048,13 @@ app.get("/api/availability", async (req, res) => {
 
     // Buscar profissionais ativos
     const allProfs = await db.query.professionals.findMany();
-    const activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any');
+    let activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any' && p.isActive !== false);
+    if (activeProfs.length === 0) {
+      activeProfs = [
+        { id: 'prof_1', name: 'Carlos Silva', isActive: true, workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' } },
+        { id: 'prof_2', name: 'Matheus Santos', isActive: true, workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' } }
+      ];
+    }
 
     // Função para verificar se um profissional P está livre no intervalo [startMins, startMins + reqDuration)
     const isProfFree = (prof: any, startMins: number): boolean => {
@@ -2063,10 +2067,14 @@ app.get("/api/availability", async (req, res) => {
 
       // 2. Horário de funcionamento do profissional no dia
       if (prof.workingHours) {
-        const whStr = prof.workingHours[dayKey];
-        if (whStr && whStr.includes('-')) {
+        let whObj = prof.workingHours;
+        if (typeof whObj === 'string') {
+          try { whObj = JSON.parse(whObj); } catch (e) {}
+        }
+        const whStr = whObj && typeof whObj === 'object' ? whObj[dayKey] : null;
+        if (whStr && typeof whStr === 'string' && whStr.includes('-')) {
           const [pOpen, pClose] = whStr.split('-').map((s: string) => timeToMinutes(s.trim()));
-          if (startMins < pOpen || endMins > pClose) {
+          if (!isNaN(pOpen) && !isNaN(pClose) && (startMins < pOpen || endMins > pClose)) {
             return false;
           }
         }

@@ -17,22 +17,19 @@ export function getTodayStringBRT(): string {
       month: '2-digit',
       day: '2-digit',
     });
-    const parts = formatter.formatToParts(now);
-    const map: Record<string, string> = {};
-    parts.forEach(p => { map[p.type] = p.value; });
-    if (map.year && map.month && map.day) {
-      return `${map.year}-${map.month}-${map.day}`;
+    const result = formatter.format(now);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(result)) {
+      return result;
     }
   } catch (e) {}
 
   // Fallback: UTC - 3 hours (Brasília time)
   const now = new Date();
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-  const brtMs = utcMs - 3 * 3600 * 1000;
-  const brtDate = new Date(brtMs);
-  const y = brtDate.getFullYear();
-  const m = String(brtDate.getMonth() + 1).padStart(2, '0');
-  const d = String(brtDate.getDate()).padStart(2, '0');
+  const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const brtTime = new Date(utcTime - (3 * 3600 * 1000));
+  const y = brtTime.getUTCFullYear();
+  const m = String(brtTime.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(brtTime.getUTCDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
 
@@ -42,19 +39,21 @@ export function getTodayStringBRT(): string {
 export function getCurrentTimeBRT(): { hours: number; minutes: number; timeStr: string; totalMinutes: number } {
   try {
     const now = new Date();
-    const formatter = new Intl.DateTimeFormat('en-CA', {
+    const formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: TIMEZONE,
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      hourCycle: 'h23'
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false
     });
     const parts = formatter.formatToParts(now);
-    const map: Record<string, string> = {};
-    parts.forEach(p => { map[p.type] = p.value; });
-    const hours = parseInt(map.hour || '', 10);
-    const minutes = parseInt(map.minute || '', 10);
+    let hours = NaN;
+    let minutes = NaN;
+    for (const p of parts) {
+      if (p.type === 'hour') hours = parseInt(p.value, 10);
+      if (p.type === 'minute') minutes = parseInt(p.value, 10);
+    }
     if (!isNaN(hours) && !isNaN(minutes)) {
+      if (hours === 24) hours = 0;
       return {
         hours,
         minutes,
@@ -66,11 +65,10 @@ export function getCurrentTimeBRT(): { hours: number; minutes: number; timeStr: 
 
   // Fallback: UTC - 3 hours (Brasília time)
   const now = new Date();
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-  const brtMs = utcMs - 3 * 3600 * 1000;
-  const brtDate = new Date(brtMs);
-  const hours = brtDate.getHours();
-  const minutes = brtDate.getMinutes();
+  const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const brtTime = new Date(utcTime - (3 * 3600 * 1000));
+  const hours = brtTime.getUTCHours();
+  const minutes = brtTime.getUTCMinutes();
   return {
     hours,
     minutes,
