@@ -1,5 +1,5 @@
 import { authFetch } from '../../lib/api';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Appointment } from '../../types';
 import {
   X,
@@ -27,6 +27,8 @@ import { useToast } from '../ui/Toast';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { SuccessOverlay } from '../ui/SuccessOverlay';
 import { LoadingButton } from '../ui/LoadingButton';
+import { getTodayStringBRT, getCurrentTimeBRT, timeToMinutes } from '../../utils/dateUtils';
+import { fetchShopProfile, isDateOpenInProfile, generateTimeSlotsFromProfile, defaultShopProfile, ShopProfile } from '../../services/shopProfileService';
 
 interface AppointmentDetailsModalProps {
   isOpen: boolean;
@@ -52,7 +54,6 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   const [cancelToast, setCancelToast] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
 
-
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('Compromisso inesperado');
   const [cancelOtherReason, setCancelOtherReason] = useState('');
@@ -62,38 +63,73 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   const [rescheduleTimeSlot, setRescheduleTimeSlot] = useState('');
   const [busySlots, setBusySlots] = useState<string[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-
-  const baseSlots = [
-    { time: '08:00' }, { time: '08:30' }, { time: '09:00' }, { time: '09:30' },
-    { time: '10:00' }, { time: '10:30' }, { time: '11:00' }, { time: '11:30' },
-    { time: '13:00' }, { time: '13:30' }, { time: '14:00' }, { time: '14:30' },
-    { time: '15:00' }, { time: '15:30' }, { time: '16:00' }, { time: '16:30' },
-    { time: '17:00' }, { time: '17:30' }, { time: '18:00' }, { time: '18:30' },
-    { time: '19:00' }
-  ];
+  const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
 
   const { showToast } = useToast();
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const [successOverlayMessage, setSuccessOverlayMessage] = useState({ title: '', subtitle: '' });
   const [successOverlayAction, setSuccessOverlayAction] = useState<'close_modal' | 'stay_open'>('close_modal');
 
+  const todayStrBRT = useMemo(() => getTodayStringBRT(), []);
+  const currTimeBRT = useMemo(() => getCurrentTimeBRT(), []);
+
+  // Load shop profile
+  useEffect(() => {
+    fetchShopProfile().then(p => {
+      if (p) setShopProfile(p);
+    });
+  }, []);
+
+  // Calculate duration of appointment services
+  const durationMinutes = useMemo(() => {
+    if (!currentApt) return 30;
+    if (currentApt.total_duration_minutes) return Number(currentApt.total_duration_minutes);
+    if (Array.isArray(currentApt.services) && currentApt.services.length > 0) {
+      const sum = currentApt.services.reduce((acc, s) => {
+        const dur = Number(s.duration_minutes || (s as any).durationMinutes || 0);
+        return acc + dur;
+      }, 0);
+      if (sum > 0) return sum;
+    }
+    return 30;
+  }, [currentApt]);
+
+  // Check if date is open in shop
+  const isClosedOnSelectedDate = useMemo(() => {
+    if (!rescheduleDate) return false;
+    return !isDateOpenInProfile(shopProfile, rescheduleDate);
+  }, [shopProfile, rescheduleDate]);
+
+  // Dynamic slots based on shop schedule & duration
+  const dynamicSlots = useMemo(() => {
+    if (!rescheduleDate || isClosedOnSelectedDate) return [];
+    return generateTimeSlotsFromProfile(shopProfile, rescheduleDate, durationMinutes);
+  }, [shopProfile, rescheduleDate, durationMinutes, isClosedOnSelectedDate]);
+
+  // Initialize reschedule state when modal opens
+  useEffect(() => {
+    if (showRescheduleModal && currentApt) {
+      const initialDate = currentApt.date || todayStrBRT;
+      setRescheduleDate(initialDate >= todayStrBRT ? initialDate : todayStrBRT);
+      setRescheduleTimeSlot('');
+    }
+  }, [showRescheduleModal, currentApt, todayStrBRT]);
+
+  // Fetch real availability from backend /api/availability
   useEffect(() => {
     let isMounted = true;
     const fetchAvailability = async () => {
-      if (!rescheduleDate || !currentApt?.professional_id) return;
+      if (!rescheduleDate || !currentApt || isClosedOnSelectedDate) return;
       setIsLoadingSlots(true);
       try {
-        const response = await authFetch('/api/appointments');
+        const profId = currentApt.professional_id || (currentApt as any).professionalId || 'prof_any';
+        const url = `/api/availability?professionalId=${profId}&date=${rescheduleDate}&duration=${durationMinutes}&excludeAppointmentId=${currentApt.id}`;
+        const response = await authFetch(url);
         if (response.ok) {
-          const appointments = await response.json();
-          const activeApts = appointments.filter((apt: any) => 
-            apt.status !== 'cancelled' &&
-            apt.date === rescheduleDate &&
-            apt.professionalId === currentApt.professional_id &&
-            apt.id !== currentApt.id
-          );
-          
-          const bookedTimes = activeApts.map((apt: any) => apt.timeSlot || apt.time_slot);
+          const busyData = await response.json();
+          const bookedTimes = Array.isArray(busyData)
+            ? busyData.map((b: any) => typeof b === 'string' ? b : (b.timeSlot || b.time_slot))
+            : [];
           if (isMounted) setBusySlots(bookedTimes);
         }
       } catch (err) {
@@ -104,33 +140,54 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
     };
     if (showRescheduleModal) fetchAvailability();
     return () => { isMounted = false; };
-  }, [rescheduleDate, currentApt, showRescheduleModal]);
+  }, [rescheduleDate, currentApt, durationMinutes, showRescheduleModal, isClosedOnSelectedDate]);
 
   const handleConfirmReschedule = async () => {
     if (!currentApt || !rescheduleDate || !rescheduleTimeSlot) return;
+
+    if (rescheduleDate < todayStrBRT) {
+      showToast('error', 'Data inválida', 'Selecione uma data futura.');
+      return;
+    }
+
+    if (isClosedOnSelectedDate) {
+      showToast('error', 'Barbearia fechada', 'A barbearia não funciona nesta data.');
+      return;
+    }
+
     setIsRescheduling(true);
     try {
+      const profId = currentApt.professional_id || (currentApt as any).professionalId;
       const res = await authFetch(`/api/appointments/${currentApt.id}`, {
         method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           date: rescheduleDate,
           timeSlot: rescheduleTimeSlot,
           time_slot: rescheduleTimeSlot,
+          professionalId: profId,
+          professional_id: profId,
+          totalDurationMinutes: durationMinutes,
+          total_duration_minutes: durationMinutes,
           clientPhone: currentApt.client_phone || (currentApt as any).clientPhone,
           client_phone: currentApt.client_phone || (currentApt as any).clientPhone,
           bookingCode: currentApt.booking_code || (currentApt as any).bookingCode
         })
       });
 
-      if (!res.ok) throw new Error('Falha ao reagendar');
-      
+      const resData = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(resData.error || 'Falha ao reagendar agendamento');
+      }
+
       const updatedApt = {
         ...currentApt,
         date: rescheduleDate,
         timeSlot: rescheduleTimeSlot,
         time_slot: rescheduleTimeSlot
       };
-      
+
       setCurrentApt(updatedApt);
       if (onAppointmentUpdated) {
         onAppointmentUpdated(updatedApt);
@@ -157,7 +214,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
       showToast(
         'error',
         'Não foi possível reagendar',
-        err.message || 'Verifique a disponibilidade do horário'
+        err.message || 'Verifique se o horário ainda está disponível.'
       );
     } finally {
       setIsRescheduling(false);
@@ -684,7 +741,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                   <input
                     type="date"
                     value={rescheduleDate}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={todayStrBRT}
                     onChange={(e) => {
                       setRescheduleDate(e.target.value);
                       setRescheduleTimeSlot(''); // reset time when date changes
@@ -698,38 +755,56 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
               {/* Time Selection */}
               <div className="space-y-2">
                 <label className="text-content-muted font-medium flex items-center justify-between">
-                  <span>Horário Disponível</span>
+                  <span>Horários Disponíveis ({durationMinutes} min)</span>
                   {isLoadingSlots && <Loader2 className="w-3 h-3 animate-spin text-gold-base" />}
                 </label>
-                <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto pr-1">
-                  {baseSlots.map((slot) => {
-                    const isBusy = busySlots.includes(slot.time);
-                    const isSelected = rescheduleTimeSlot === slot.time;
-                    return (
-                      <button
-                        key={slot.time}
-                        disabled={isBusy}
-                        onClick={() => setRescheduleTimeSlot(slot.time)}
-                        className={`py-2 rounded-lg text-center font-bold transition-all border ${
-                          isSelected
-                            ? 'bg-content-base text-surface-base border-content-base'
-                            : isBusy
-                            ? 'bg-border-subtle border-transparent text-content-muted opacity-50 cursor-not-allowed'
-                            : 'bg-border-subtle border-border-subtle text-content-base hover:border-gold-base/50 hover:bg-surface-card'
-                        }`}
-                      >
-                        {slot.time}
-                      </button>
-                    );
-                  })}
-                </div>
+
+                {isClosedOnSelectedDate ? (
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs text-center font-medium">
+                    A barbearia está fechada nesta data. Por favor, escolha outro dia.
+                  </div>
+                ) : rescheduleDate < todayStrBRT ? (
+                  <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-xl text-xs text-center font-medium">
+                    Selecione uma data futura para reagendar.
+                  </div>
+                ) : dynamicSlots.length === 0 ? (
+                  <div className="p-3 bg-surface-base border border-border-subtle text-content-muted rounded-xl text-xs text-center font-medium">
+                    Nenhum horário disponível para esta data.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto pr-1">
+                    {dynamicSlots.map((slotTime) => {
+                      const slotMins = timeToMinutes(slotTime);
+                      const isPast = rescheduleDate === todayStrBRT && slotMins <= currTimeBRT.totalMinutes;
+                      const isBusy = busySlots.includes(slotTime) || isPast;
+                      const isSelected = rescheduleTimeSlot === slotTime;
+                      return (
+                        <button
+                          key={slotTime}
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => setRescheduleTimeSlot(slotTime)}
+                          className={`py-2 rounded-lg text-center font-bold text-xs transition-all border ${
+                            isSelected
+                              ? 'bg-content-base text-surface-base border-content-base shadow-sm'
+                              : isBusy
+                              ? 'bg-border-subtle/50 border-transparent text-content-muted opacity-40 cursor-not-allowed line-through'
+                              : 'bg-surface-base border-border-subtle text-content-base hover:border-gold-base/50 hover:bg-surface-card'
+                          }`}
+                        >
+                          {slotTime}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="p-3 rounded-xl bg-surface-base border border-border-subtle flex flex-col gap-1">
               <div className="flex justify-between items-center">
                 <span className="text-content-muted text-xs">Serviços mantidos</span>
-                <span className="text-content-base font-bold text-xs">{currentApt?.services?.length || 1} serviço(s)</span>
+                <span className="text-content-base font-bold text-xs">{currentApt?.services?.length || 1} serviço(s) ({durationMinutes} min)</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-content-muted text-xs">Diferença de valor</span>
@@ -750,7 +825,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
               <LoadingButton
                 onClick={handleConfirmReschedule}
                 isLoading={isRescheduling}
-                disabled={isRescheduling || !rescheduleDate || !rescheduleTimeSlot}
+                disabled={isRescheduling || !rescheduleDate || !rescheduleTimeSlot || isClosedOnSelectedDate || rescheduleDate < todayStrBRT}
                 className="py-3 rounded-xl bg-content-base hover:bg-gold-base text-surface-base font-bold transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50"
                 loadingText="Salvando..."
               >

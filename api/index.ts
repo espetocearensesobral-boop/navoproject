@@ -1563,6 +1563,13 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
       const reqStart = timeToMinutes(newTimeSlot);
       const reqEnd = reqStart + durationMins;
 
+      // 0. Validar se a data ou horário já passaram
+      const todayBRT = getTodayStringBRT();
+      const currTimeBRT = getCurrentTimeBRT();
+      if (newDate < todayBRT || (newDate === todayBRT && reqStart <= currTimeBRT.totalMinutes)) {
+        return res.status(400).json({ error: 'Não é possível reagendar para uma data ou horário que já passou.' });
+      }
+
       // 1. Horário de funcionamento do estabelecimento
       let shopProfileRows: any[] = [];
       try {
@@ -1956,7 +1963,7 @@ app.delete("/api/cash-transactions/:id", requireAuth, requireAdmin, async (req, 
 
 app.get("/api/availability", async (req, res) => {
   try {
-    const { professionalId, date, duration } = req.query;
+    const { professionalId, date, duration, excludeAppointmentId } = req.query;
     if (!date) {
       return res.status(400).json({ error: 'Data não informada' });
     }
@@ -1970,16 +1977,24 @@ app.get("/api/availability", async (req, res) => {
       return res.status(400).json({ error: 'Identificador de profissional inválido.' });
     }
 
+    const excludeAptId = excludeAppointmentId ? String(excludeAppointmentId) : '';
+
     const reqDuration = Math.max(30, Number(duration || 30));
     const todayBRT = getTodayStringBRT();
     const currTimeBRT = getCurrentTimeBRT();
 
     // Buscar agendamentos não cancelados para a data
     const allAppointments = await db.query.appointments.findMany({
-      where: (apt: any, { and, eq, ne }: any) => and(
-        eq(apt.date, dateStr),
-        ne(apt.status, 'cancelled')
-      )
+      where: (apt: any, { and, eq, ne }: any) => {
+        const conds = [
+          eq(apt.date, dateStr),
+          ne(apt.status, 'cancelled')
+        ];
+        if (excludeAptId) {
+          conds.push(ne(apt.id, excludeAptId));
+        }
+        return and(...conds);
+      }
     });
 
     // Buscar bloqueios de agenda para a data
