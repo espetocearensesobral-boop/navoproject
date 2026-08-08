@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2D08A" />
+      <stop offset="50%" stop-color="#CDA865" />
+      <stop offset="100%" stop-color="#9A7532" />
+    </linearGradient>
+    <linearGradient id="darkBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E1E1E" />
+      <stop offset="100%" stop-color="#0A0A0A" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="url(#darkBg)" stroke="url(#gold)" stroke-width="8"/>
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#gold)" stroke-width="4" stroke-dasharray="12 12" opacity="0.4"/>
+  <!-- Razor / Barber Pole Icon -->
+  <g transform="translate(256,256) scale(1.8)" text-anchor="middle">
+    <path d="M-40 -60 L40 -60 L20 60 L-20 60 Z" fill="url(#gold)"/>
+    <text x="0" y="20" font-family="sans-serif" font-weight="900" font-size="54" fill="#121212" text-anchor="middle">BX</text>
+  </g>
+</svg>

@@ -1,0 +1,3 @@
+Contact: mailto:security@navopremium.com.br
+Preferred-Languages: pt-BR, en
+Canonical: https://navopremium.vercel.app/.well-known/security.txt

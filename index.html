@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <script>
+      // Remove warnings de lazy loading (comportamento esperado)
+      const originalConsoleWarn = console.warn;
+      console.warn = (...args) => {
+        if (typeof args[0] === 'string' && (args[0].includes('lazy') || args[0].includes('Intervention'))) {
+          return; // Silencia warnings de lazy loading
+        }
+        originalConsoleWarn.apply(console, args);
+      };
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Navo Premium | Barbearia & Club | Agendamento Online</title>
+    <meta name="description" content="Navo Premium - Agende seu corte de cabelo e barba online em menos de 30 segundos. Atendimento VIP sem filas, com horário marcado e experiência exclusiva." />
+    <meta name="keywords" content="Navo Premium, barbearia, barbearia premium, corte masculino, barba, barbeiro, agendamento online, club de assinatura, Jardins São Paulo" />
+    <meta name="author" content="Navo Premium" />
+    
+    <!-- Open Graph / WhatsApp / Facebook Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Navo Premium" />
+    <meta property="og:title" content="Navo Premium | Barbearia & Club | Agendamento Online" />
+    <meta property="og:description" content="Seu melhor visual começa aqui. Agende online em menos de 30 segundos na Navo Premium. Atendimento VIP, café cortesia e ambiente exclusivo." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1200&auto=format&fit=crop" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Navo Premium | Barbearia & Club" />
+    <meta name="twitter:description" content="Agende seu corte na Navo Premium sem filas e com confirmação instantânea." />
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1200&auto=format&fit=crop" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0A0A0A" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Navo Premium" />
+    <link rel="apple-touch-icon" href="/pwa-192x192.svg" />
+    <link rel="icon" type="image/svg+xml" href="/pwa-192x192.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  
+    <!-- Theme Script -->
+    <script>
+      (function() {
+        try {
+          var theme = null;
+          if (!theme) {
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDark ? 'dark' : 'light';
+          }
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+
+  <body class="antialiased bg-surface-base text-content-base">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

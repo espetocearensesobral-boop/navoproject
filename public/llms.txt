@@ -1,0 +1,10 @@
+# Navo Premium | Barbearia & Club
+
+Navo Premium is a modern barber shop and club management application built with React, TypeScript, Tailwind CSS, Express, and PostgreSQL (Drizzle ORM).
+
+## Key Features
+- Online Booking System (Step-by-step: Services -> Barbers -> Date/Time -> Review -> Confirmation)
+- Client Appointments Management & Lookup (via phone number + verification code)
+- Subscriptions & Loyalty Programs (Points, rewards, Instagram check-in, referral system)
+- Admin Dashboard (Financial management, cash transactions, schedule blocks, client management, WhatsApp reminders integration)
+- PWA Support & Responsive Mobile-First UI
