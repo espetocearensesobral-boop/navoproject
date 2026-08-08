@@ -85,7 +85,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
         const newMap: Record<string, string[]> = {};
         for (const b of barbers) {
           if (b.id === 'prof_any') continue;
-          const res = await authFetch(`/api/availability?professionalId=${b.id}&date=${selectedDate}`);
+          const res = await authFetch(`/api/availability?professionalId=${b.id}&date=${selectedDate}&duration=${totalDurationMinutes}`);
           if (res.ok) {
             const data = await res.json();
             newMap[b.id] = Array.isArray(data) ? data.map((item: any) => item?.timeSlot).filter(Boolean) : [];
@@ -101,7 +101,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
 
     loadBarbersAvailability();
     return () => { isMounted = false; };
-  }, [selectedDate, barbers]);
+  }, [selectedDate, barbers, totalDurationMinutes]);
 
   // Format date BR
   const formatDateBR = (iso: string) => {

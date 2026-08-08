@@ -1112,106 +1112,28 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
       calculatedDuration = 30;
     }
 
-    const reqEnd = reqStart + calculatedDuration;
+    const checkRes = await checkSlotAvailability({
+      dateStr: date,
+      startMins: reqStart,
+      reqDuration: calculatedDuration,
+      profId: professionalId,
+      todayBRT,
+      currTimeBRT,
+    });
 
-    // Verificar horário de funcionamento do estabelecimento
-    let shopProfileRows: any[] = [];
-    try {
-      shopProfileRows = await db.query.shopSettings.findMany();
-    } catch (e) {}
-    const shopProf = shopProfileRows[0] || {};
-    const dayKey = getDayOfWeekKey(date);
-    const daySchedule = shopProf.operatingSchedule?.[dayKey];
-
-    if (daySchedule && !daySchedule.active) {
-      return res.status(400).json({ error: 'A barbearia está fechada nesta data.' });
+    if (!checkRes.available) {
+      return res.status(409).json({ error: checkRes.reason || 'Este horário conflita com outro agendamento ou bloqueio de agenda.' });
     }
-
-    const shopCloseMins = timeToMinutes(daySchedule?.close || shopProf.closeTime || '20:00');
-    if (reqEnd > shopCloseMins) {
-      return res.status(400).json({ error: 'O serviço selecionado excede o horário de funcionamento do estabelecimento.' });
-    }
-
-    // Helper para verificar conflito de intervalo para um profissional
-    const checkProfConflict = async (profId: string) => {
-      // 1. Verificar agendamentos existentes no mesmo dia
-      const profApts = await db.query.appointments.findMany({
-        where: (apt: any, { and, eq, ne }: any) => and(
-          eq(apt.professionalId, profId),
-          eq(apt.date, date),
-          ne(apt.status, 'cancelled')
-        )
-      });
-
-      for (const apt of profApts) {
-        const aptStart = timeToMinutes(apt.timeSlot);
-        const aptEnd = aptStart + Number(apt.totalDurationMinutes || 30);
-        if (checkIntervalOverlap(reqStart, reqEnd, aptStart, aptEnd)) {
-          return true; // Há conflito com agendamento
-        }
-      }
-
-      // 2. Verificar bloqueios de agenda
-      try {
-        const profBlocks = await db.query.scheduleBlocks.findMany({
-          where: (blk: any, { and, eq }: any) => and(
-            eq(blk.professionalId, profId),
-            eq(blk.date, date)
-          )
-        });
-
-        for (const blk of profBlocks) {
-          const blkStart = timeToMinutes(blk.startTime || blk.start_time);
-          const blkEnd = timeToMinutes(blk.endTime || blk.end_time);
-          if (checkIntervalOverlap(reqStart, reqEnd, blkStart, blkEnd)) {
-            return true; // Há conflito com bloqueio
-          }
-        }
-      } catch (e) {}
-
-      // 3. Horário de trabalho do profissional
-      const allProfs = await db.query.professionals.findMany();
-      const profObj = allProfs.find((p: any) => p.id === profId);
-      if (profObj && profObj.workingHours) {
-        const whStr = profObj.workingHours[dayKey];
-        if (whStr && whStr.includes('-')) {
-          const [pOpen, pClose] = whStr.split('-').map((s: string) => timeToMinutes(s.trim()));
-          if (reqStart < pOpen || reqEnd > pClose) {
-            return true; // Fora do horário do profissional
-          }
-        }
-      }
-
-      return false; // Sem conflito
-    };
 
     let resolvedProfessionalId = professionalId;
     let resolvedProfessionalName = data.professionalName || data.professional_name || 'Profissional';
 
     if (resolvedProfessionalId === 'prof_any') {
-      const allProfs = await db.query.professionals.findMany();
-      const activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any');
-      let chosenProf = null;
-
-      for (const prof of activeProfs) {
-        const hasConflict = await checkProfConflict(prof.id);
-        if (!hasConflict) {
-          chosenProf = prof;
-          break;
-        }
+      if (checkRes.chosenProf) {
+        resolvedProfessionalId = checkRes.chosenProf.id;
+        resolvedProfessionalName = checkRes.chosenProf.name;
       }
-
-      if (!chosenProf) {
-        return res.status(409).json({ error: 'Nenhum profissional disponível para realizar todo o atendimento neste horário.' });
-      }
-
-      resolvedProfessionalId = chosenProf.id;
-      resolvedProfessionalName = chosenProf.name;
     } else {
-      const hasConflict = await checkProfConflict(resolvedProfessionalId);
-      if (hasConflict) {
-        return res.status(409).json({ error: 'Este horário conflita com outro agendamento ou bloqueio de agenda.' });
-      }
       const allProfs = await db.query.professionals.findMany();
       const profObj = allProfs.find((p: any) => p.id === resolvedProfessionalId);
       if (profObj) {
@@ -1592,66 +1514,19 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
       const reqStart = timeToMinutes(newTimeSlot);
       const reqEnd = reqStart + durationMins;
 
-      // 0. Validar se a data ou horário já passaram
-      const todayBRT = getTodayStringBRT();
-      const currTimeBRT = getCurrentTimeBRT();
-      if (newDate < todayBRT || (newDate === todayBRT && reqStart <= currTimeBRT.totalMinutes)) {
-        return res.status(400).json({ error: 'Não é possível reagendar para uma data ou horário que já passou.' });
-      }
-
-      // 1. Horário de funcionamento do estabelecimento
-      let shopProfileRows: any[] = [];
-      try {
-        shopProfileRows = await db.query.shopSettings.findMany();
-      } catch (e) {}
-      const shopProf = shopProfileRows[0] || {};
-      const dayKey = getDayOfWeekKey(newDate);
-      const daySchedule = shopProf.operatingSchedule?.[dayKey];
-
-      if (daySchedule && !daySchedule.active) {
-        return res.status(400).json({ error: 'A barbearia está fechada nesta data.' });
-      }
-
-      const shopCloseMins = timeToMinutes(daySchedule?.close || shopProf.closeTime || '20:00');
-      if (reqEnd > shopCloseMins) {
-        return res.status(400).json({ error: 'O serviço selecionado excede o horário de funcionamento do estabelecimento.' });
-      }
-
-      // 2. Conflito com agendamentos existentes
-      const profApts = await db.query.appointments.findMany({
-        where: (apt: any, { and, eq, ne }: any) => and(
-          eq(apt.professionalId, newProfessionalId),
-          eq(apt.date, newDate),
-          ne(apt.status, 'cancelled'),
-          ne(apt.id, id)
-        )
+      const checkRes = await checkSlotAvailability({
+        dateStr: newDate,
+        startMins: reqStart,
+        reqDuration: durationMins,
+        profId: newProfessionalId,
+        excludeAptId: id,
+        todayBRT,
+        currTimeBRT,
       });
 
-      for (const apt of profApts) {
-        const aptStart = timeToMinutes(apt.timeSlot);
-        const aptEnd = aptStart + Number(apt.totalDurationMinutes || 30);
-        if (checkIntervalOverlap(reqStart, reqEnd, aptStart, aptEnd)) {
-          return res.status(409).json({ error: 'Este horário conflita com outro agendamento existente.' });
-        }
+      if (!checkRes.available) {
+        return res.status(409).json({ error: checkRes.reason || 'Este horário conflita com outro agendamento ou bloqueio de agenda.' });
       }
-
-      // 3. Conflito com bloqueios na agenda
-      try {
-        const profBlocks = await db.query.scheduleBlocks.findMany({
-          where: (blk: any, { and, eq }: any) => and(
-            eq(blk.professionalId, newProfessionalId),
-            eq(blk.date, newDate)
-          )
-        });
-
-        for (const blk of profBlocks) {
-          const blkStart = timeToMinutes(blk.startTime || blk.start_time);
-          const blkEnd = timeToMinutes(blk.endTime || blk.end_time);
-          if (checkIntervalOverlap(reqStart, reqEnd, blkStart, blkEnd)) {
-            return res.status(409).json({ error: 'Este horário conflita com um bloqueio de agenda.' });
-          }
-        }
-      } catch (e) {}
     }
 
     if (isDbConnected && db) {
@@ -1990,6 +1865,157 @@ app.delete("/api/cash-transactions/:id", requireAuth, requireAdmin, async (req, 
 // Products API
 // =====================================
 
+// =====================================================================
+// UNIFIED AVAILABILITY ENGINE (SINGLE SOURCE OF TRUTH)
+// =====================================================================
+interface CheckSlotParams {
+  dateStr: string;
+  startMins: number;
+  reqDuration: number;
+  profId?: string;
+  excludeAptId?: string;
+  todayBRT: string;
+  currTimeBRT: { totalMinutes: number };
+}
+
+interface CheckSlotResult {
+  available: boolean;
+  chosenProf?: any;
+  reason?: string;
+}
+
+async function checkSlotAvailability({
+  dateStr,
+  startMins,
+  reqDuration,
+  profId,
+  excludeAptId,
+  todayBRT,
+  currTimeBRT,
+}: CheckSlotParams): Promise<CheckSlotResult> {
+  const endMins = startMins + reqDuration;
+
+  // 1. Horário já passou hoje?
+  if (dateStr === todayBRT && startMins <= currTimeBRT.totalMinutes) {
+    return { available: false, reason: 'Não é possível agendar para um horário que já passou.' };
+  }
+
+  // 2. Data no passado?
+  if (dateStr < todayBRT) {
+    return { available: false, reason: 'Não é possível agendar para uma data no passado.' };
+  }
+
+  // 3. Horário de funcionamento da barbearia
+  let shopProfileRows: any[] = [];
+  try {
+    shopProfileRows = await db.query.shopSettings.findMany();
+  } catch (e) {}
+  const shopProf = shopProfileRows[0] || {};
+  const dayKey = getDayOfWeekKey(dateStr);
+  const daySchedule = shopProf.operatingSchedule?.[dayKey];
+
+  if (daySchedule && !daySchedule.active) {
+    return { available: false, reason: 'A barbearia está fechada nesta data.' };
+  }
+
+  const openMins = timeToMinutes(daySchedule?.open || shopProf.openTime || '09:00');
+  const closeMins = timeToMinutes(daySchedule?.close || shopProf.closeTime || '20:00');
+
+  if (startMins < openMins || endMins > closeMins) {
+    return { available: false, reason: 'O serviço selecionado excede o horário de funcionamento do estabelecimento.' };
+  }
+
+  // 4. Agendamentos do dia (não cancelados)
+  const allAppointments = await db.query.appointments.findMany({
+    where: (apt: any, { and, eq, ne }: any) => {
+      const conds = [
+        eq(apt.date, dateStr),
+        ne(apt.status, 'cancelled')
+      ];
+      if (excludeAptId) {
+        conds.push(ne(apt.id, excludeAptId));
+      }
+      return and(...conds);
+    }
+  });
+
+  // 5. Bloqueios de agenda do dia
+  let allBlocks: any[] = [];
+  try {
+    allBlocks = await db.query.scheduleBlocks.findMany({
+      where: (blk: any, { eq }: any) => eq(blk.date, dateStr)
+    });
+  } catch (e) {}
+
+  // 6. Profissionais ativos
+  const allProfs = await db.query.professionals.findMany();
+  let activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any' && p.isActive !== false);
+  if (activeProfs.length === 0) {
+    activeProfs = [
+      { id: 'prof_1', name: 'Carlos Silva', isActive: true, workingHours: { monday: '09:00-20:00', tuesday: '09:00-20:00', wednesday: '09:00-20:00', thursday: '09:00-20:00', friday: '09:00-20:00', saturday: '08:00-20:00' } },
+      { id: 'prof_2', name: 'Matheus Santos', isActive: true, workingHours: { monday: '09:00-20:00', tuesday: '09:00-20:00', wednesday: '09:00-20:00', thursday: '09:00-20:00', friday: '09:00-20:00', saturday: '08:00-20:00' } }
+    ];
+  }
+
+  // Helper para verificar se um profissional individual está disponível
+  const isSingleProfFree = (prof: any): boolean => {
+    // A. Horário de funcionamento do profissional no dia
+    if (prof.workingHours) {
+      let whObj = prof.workingHours;
+      if (typeof whObj === 'string') {
+        try { whObj = JSON.parse(whObj); } catch (e) {}
+      }
+      const whStr = whObj && typeof whObj === 'object' ? whObj[dayKey] : null;
+      if (whStr && typeof whStr === 'string' && whStr.includes('-')) {
+        const [pOpen, pClose] = whStr.split('-').map((s: string) => timeToMinutes(s.trim()));
+        if (!isNaN(pOpen) && !isNaN(pClose) && (startMins < pOpen || endMins > pClose)) {
+          return false;
+        }
+      }
+    }
+
+    // B. Conflito com agendamentos do profissional
+    const profApts = allAppointments.filter((a: any) => a.professionalId === prof.id);
+    for (const apt of profApts) {
+      const aptStart = timeToMinutes(apt.timeSlot);
+      const aptEnd = aptStart + Number(apt.totalDurationMinutes || 30);
+      if (checkIntervalOverlap(startMins, endMins, aptStart, aptEnd)) {
+        return false;
+      }
+    }
+
+    // C. Conflito com bloqueios do profissional
+    const profBlocks = allBlocks.filter((b: any) => b.professionalId === prof.id);
+    for (const blk of profBlocks) {
+      const blkStart = timeToMinutes(blk.startTime || blk.start_time);
+      const blkEnd = timeToMinutes(blk.endTime || blk.end_time);
+      if (checkIntervalOverlap(startMins, endMins, blkStart, blkEnd)) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const targetProfId = profId && profId !== 'prof_any' ? profId : '';
+
+  if (targetProfId) {
+    const targetProf = activeProfs.find((p: any) => p.id === targetProfId);
+    if (!targetProf) {
+      return { available: false, reason: 'Profissional não encontrado ou inativo' };
+    }
+    const free = isSingleProfFree(targetProf);
+    return { available: free, chosenProf: free ? targetProf : null, reason: free ? undefined : 'Horário indisponível para este profissional (conflito ou fora do expediente).' };
+  } else {
+    // Para prof_any: pelo menos 1 profissional ativo livre
+    const freeProfs = activeProfs.filter((p: any) => isSingleProfFree(p));
+    if (freeProfs.length > 0) {
+      return { available: true, chosenProf: freeProfs[0] };
+    }
+    return { available: false, reason: 'Nenhum profissional disponível para realizar todo o atendimento neste horário.' };
+  }
+}
+
 app.get("/api/availability", async (req, res) => {
   try {
     const { professionalId, date, duration, excludeAppointmentId } = req.query;
@@ -2007,101 +2033,9 @@ app.get("/api/availability", async (req, res) => {
     }
 
     const excludeAptId = excludeAppointmentId ? String(excludeAppointmentId) : '';
-
     const reqDuration = Math.max(30, Number(duration || 30));
     const todayBRT = getTodayStringBRT();
     const currTimeBRT = getCurrentTimeBRT();
-
-    // Buscar agendamentos não cancelados para a data
-    const allAppointments = await db.query.appointments.findMany({
-      where: (apt: any, { and, eq, ne }: any) => {
-        const conds = [
-          eq(apt.date, dateStr),
-          ne(apt.status, 'cancelled')
-        ];
-        if (excludeAptId) {
-          conds.push(ne(apt.id, excludeAptId));
-        }
-        return and(...conds);
-      }
-    });
-
-    // Buscar bloqueios de agenda para a data
-    let allBlocks: any[] = [];
-    try {
-      allBlocks = await db.query.scheduleBlocks.findMany({
-        where: (blk: any, { eq }: any) => eq(blk.date, dateStr)
-      });
-    } catch (e) {}
-
-    // Buscar perfil da barbearia
-    let shopProfileRows: any[] = [];
-    try {
-      shopProfileRows = await db.query.shopSettings.findMany();
-    } catch (e) {}
-    const shopProf = shopProfileRows[0] || {};
-    const dayKey = getDayOfWeekKey(dateStr);
-    const daySchedule = shopProf.operatingSchedule?.[dayKey];
-
-    let openMins = timeToMinutes(daySchedule?.open || shopProf.openTime || '09:00');
-    let closeMins = timeToMinutes(daySchedule?.close || shopProf.closeTime || '20:00');
-
-    // Buscar profissionais ativos
-    const allProfs = await db.query.professionals.findMany();
-    let activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any' && p.isActive !== false);
-    if (activeProfs.length === 0) {
-      activeProfs = [
-        { id: 'prof_1', name: 'Carlos Silva', isActive: true, workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' } },
-        { id: 'prof_2', name: 'Matheus Santos', isActive: true, workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' } }
-      ];
-    }
-
-    // Função para verificar se um profissional P está livre no intervalo [startMins, startMins + reqDuration)
-    const isProfFree = (prof: any, startMins: number): boolean => {
-      const endMins = startMins + reqDuration;
-
-      // 1. Horário já passou hoje?
-      if (dateStr === todayBRT && startMins <= currTimeBRT.totalMinutes) {
-        return false;
-      }
-
-      // 2. Horário de funcionamento do profissional no dia
-      if (prof.workingHours) {
-        let whObj = prof.workingHours;
-        if (typeof whObj === 'string') {
-          try { whObj = JSON.parse(whObj); } catch (e) {}
-        }
-        const whStr = whObj && typeof whObj === 'object' ? whObj[dayKey] : null;
-        if (whStr && typeof whStr === 'string' && whStr.includes('-')) {
-          const [pOpen, pClose] = whStr.split('-').map((s: string) => timeToMinutes(s.trim()));
-          if (!isNaN(pOpen) && !isNaN(pClose) && (startMins < pOpen || endMins > pClose)) {
-            return false;
-          }
-        }
-      }
-
-      // 3. Conflito com agendamentos do profissional
-      const profApts = allAppointments.filter((a: any) => a.professionalId === prof.id);
-      for (const apt of profApts) {
-        const aptStart = timeToMinutes(apt.timeSlot);
-        const aptEnd = aptStart + Number(apt.totalDurationMinutes || 30);
-        if (checkIntervalOverlap(startMins, endMins, aptStart, aptEnd)) {
-          return false;
-        }
-      }
-
-      // 4. Conflito com bloqueios do profissional
-      const profBlocks = allBlocks.filter((b: any) => b.professionalId === prof.id);
-      for (const blk of profBlocks) {
-        const blkStart = timeToMinutes(blk.startTime || blk.start_time);
-        const blkEnd = timeToMinutes(blk.endTime || blk.end_time);
-        if (checkIntervalOverlap(startMins, endMins, blkStart, blkEnd)) {
-          return false;
-        }
-      }
-
-      return true;
-    };
 
     const busyTimeSlots: string[] = [];
 
@@ -2113,25 +2047,18 @@ app.get("/api/availability", async (req, res) => {
 
     for (const slot of allFullDaySlots) {
       const startMins = timeToMinutes(slot);
-      const endMins = startMins + reqDuration;
+      const checkRes = await checkSlotAvailability({
+        dateStr,
+        startMins,
+        reqDuration,
+        profId: profIdStr,
+        excludeAptId,
+        todayBRT,
+        currTimeBRT,
+      });
 
-      // Se a barbearia estiver fechada no dia ou se o serviço ultrapassar o horário de fechamento
-      if ((daySchedule && !daySchedule.active) || startMins < openMins || endMins > closeMins) {
+      if (!checkRes.available) {
         busyTimeSlots.push(slot);
-        continue;
-      }
-
-      if (profIdStr && profIdStr !== 'prof_any') {
-        const targetProf = activeProfs.find((p: any) => p.id === profIdStr);
-        if (!targetProf || !isProfFree(targetProf, startMins)) {
-          busyTimeSlots.push(slot);
-        }
-      } else {
-        // Para prof_any: o horário está disponível se ao menos 1 profissional estiver livre
-        const anyFree = activeProfs.some((p: any) => isProfFree(p, startMins));
-        if (!anyFree) {
-          busyTimeSlots.push(slot);
-        }
       }
     }
 
@@ -2911,7 +2838,7 @@ async function seedDatabase() {
       specialties: ['Corte Clássico', 'Degradê (Fade)', 'Barba Imperial'],
       commissionRate: '0.40',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
+      workingHours: { monday: '09:00-20:00', tuesday: '09:00-20:00', wednesday: '09:00-20:00', thursday: '09:00-20:00', friday: '09:00-20:00', saturday: '08:00-20:00', sunday: '10:00-16:00' }
     },
     {
       id: 'prof_2',
@@ -2924,7 +2851,7 @@ async function seedDatabase() {
       specialties: ['Barba Terapia', 'Design de Sobrancelhas', 'Freestyle'],
       commissionRate: '0.35',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
+      workingHours: { monday: '09:00-20:00', tuesday: '09:00-20:00', wednesday: '09:00-20:00', thursday: '09:00-20:00', friday: '09:00-20:00', saturday: '08:00-20:00', sunday: '10:00-16:00' }
     },
     {
       id: 'prof_3',
@@ -2937,7 +2864,7 @@ async function seedDatabase() {
       specialties: ['Corte Moderno', 'Pigmentação', 'Platinado'],
       commissionRate: '0.38',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
+      workingHours: { monday: '09:00-20:00', tuesday: '09:00-20:00', wednesday: '09:00-20:00', thursday: '09:00-20:00', friday: '09:00-20:00', saturday: '08:00-20:00', sunday: '10:00-16:00' }
     },
     {
       id: 'prof_4',
@@ -2950,7 +2877,7 @@ async function seedDatabase() {
       specialties: ['Corte Tesoura', 'Nevou', 'Barba Modelada'],
       commissionRate: '0.35',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
+      workingHours: { monday: '09:00-20:00', tuesday: '09:00-20:00', wednesday: '09:00-20:00', thursday: '09:00-20:00', friday: '09:00-20:00', saturday: '08:00-20:00', sunday: '10:00-16:00' }
     },
     {
       id: 'prof_5',
@@ -2963,7 +2890,7 @@ async function seedDatabase() {
       specialties: ['Fade Americano', 'Selagem', 'Tratamento Capilar'],
       commissionRate: '0.38',
       isActive: true,
-      workingHours: { monday: '09:00-19:00', tuesday: '09:00-19:00', wednesday: '09:00-19:00', thursday: '09:00-19:00', friday: '09:00-20:00', saturday: '08:00-20:00' }
+      workingHours: { monday: '09:00-20:00', tuesday: '09:00-20:00', wednesday: '09:00-20:00', thursday: '09:00-20:00', friday: '09:00-20:00', saturday: '08:00-20:00', sunday: '10:00-16:00' }
     }
   ];
 

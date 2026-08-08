@@ -41,7 +41,14 @@ import {
   Sparkles
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
-import { trackEvent } from '../../lib/analytics';
+import { authFetch } from '../../lib/api';
+import { 
+  getTodayStringBRT, 
+  getCurrentTimeBRT, 
+  timeToMinutes, 
+  minutesToTime, 
+  getDayOfWeekKey 
+} from '../../utils/dateUtils';
 
 interface LandingPageProps {
   onGoToBooking: (service?: any) => void;
@@ -98,45 +105,87 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     scrollToSection(0);
   };
 
-  const nextAvailableTimeSlot = useMemo(() => {
-    const now = new Date();
-    const dayIndex = now.getDay();
-    const dayItem = daysOfWeekMap.find(item => item.dayIndex === dayIndex);
-    
-    if (dayItem && shopProfile.operatingSchedule?.[dayItem.key]?.active) {
-      const sch = shopProfile.operatingSchedule[dayItem.key];
-      const [openH, openM] = (sch.open || shopProfile.openTime || '09:00').split(':').map(Number);
-      const [closeH, closeM] = (sch.close || shopProfile.closeTime || '20:00').split(':').map(Number);
-      
-      const currentMins = now.getHours() * 60 + now.getMinutes();
-      const openMins = openH * 60 + openM;
-      const closeMins = closeH * 60 + closeM;
-      
-      if (currentMins < openMins) {
-        return sch.open || shopProfile.openTime || '09:00';
-      } else if (currentMins < closeMins - 30) {
-        const nextTotalMins = Math.ceil((currentMins + 1) / 30) * 30;
-        const h = Math.floor(nextTotalMins / 60);
-        const m = nextTotalMins % 60;
-        if (h * 60 + m <= closeMins) {
-          return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  const [nextAvailableTimeSlot, setNextAvailableTimeSlot] = useState<string>('09:00');
+
+  useEffect(() => {
+    let isMounted = true;
+    async function calculateNextAvailableSlot() {
+      try {
+        const todayStr = getTodayStringBRT();
+        const currTimeBRT = getCurrentTimeBRT();
+        
+        // Consultar disponibilidade real no backend para hoje
+        const res = await authFetch(`/api/availability?date=${todayStr}&duration=30`);
+        if (res.ok) {
+          const busyData = await res.json();
+          const busySlots: string[] = Array.isArray(busyData)
+            ? busyData.map((b: any) => typeof b === 'string' ? b : (b.timeSlot || b.time_slot))
+            : [];
+
+          const dayKey = getDayOfWeekKey(todayStr);
+          const daySch = shopProfile.operatingSchedule?.[dayKey];
+          const openStr = daySch?.open || shopProfile.openTime || '09:00';
+          const closeStr = daySch?.close || shopProfile.closeTime || '20:00';
+          const isActiveToday = daySch ? daySch.active : true;
+
+          const openMins = timeToMinutes(openStr);
+          const closeMins = timeToMinutes(closeStr);
+
+          if (isActiveToday) {
+            for (let m = openMins; m + 30 <= closeMins; m += 30) {
+              const timeStr = minutesToTime(m);
+              if (m > currTimeBRT.totalMinutes && !busySlots.includes(timeStr)) {
+                if (isMounted) setNextAvailableTimeSlot(timeStr);
+                return;
+              }
+            }
+          }
+
+          // Se não houver horário restante hoje ou loja fechada hoje, verificar dias futuros
+          const now = new Date();
+          for (let i = 1; i <= 7; i++) {
+            const nextDate = new Date(now);
+            nextDate.setDate(now.getDate() + i);
+            const y = nextDate.getFullYear();
+            const month = String(nextDate.getMonth() + 1).padStart(2, '0');
+            const d = String(nextDate.getDate()).padStart(2, '0');
+            const futureIso = `${y}-${month}-${d}`;
+
+            const futDayKey = getDayOfWeekKey(futureIso);
+            const futSch = shopProfile.operatingSchedule?.[futDayKey];
+            const futActive = futSch ? futSch.active : true;
+
+            if (futActive) {
+              const futRes = await authFetch(`/api/availability?date=${futureIso}&duration=30`);
+              if (futRes.ok) {
+                const futBusyData = await futRes.json();
+                const futBusySlots: string[] = Array.isArray(futBusyData)
+                  ? futBusyData.map((b: any) => typeof b === 'string' ? b : (b.timeSlot || b.time_slot))
+                  : [];
+                
+                const futOpenMins = timeToMinutes(futSch?.open || shopProfile.openTime || '09:00');
+                const futCloseMins = timeToMinutes(futSch?.close || shopProfile.closeTime || '20:00');
+
+                for (let fm = futOpenMins; fm + 30 <= futCloseMins; fm += 30) {
+                  const futTimeStr = minutesToTime(fm);
+                  if (!futBusySlots.includes(futTimeStr)) {
+                    const dayItem = daysOfWeekMap.find(item => item.key === futDayKey);
+                    const dayLabel = i === 1 ? 'Amanhã' : (dayItem ? dayItem.label.split('-')[0].trim() : 'Próximo');
+                    if (isMounted) setNextAvailableTimeSlot(`${dayLabel} ${futTimeStr}`);
+                    return;
+                  }
+                }
+              }
+            }
+          }
         }
+      } catch (e) {
+        console.warn('Erro ao obter disponibilidade para landing page:', e);
       }
     }
 
-    for (let i = 1; i <= 7; i++) {
-      const nextDate = new Date();
-      nextDate.setDate(now.getDate() + i);
-      const nextDayIndex = nextDate.getDay();
-      const nextDayItem = daysOfWeekMap.find(item => item.dayIndex === nextDayIndex);
-      if (nextDayItem && shopProfile.operatingSchedule?.[nextDayItem.key]?.active) {
-        const openTime = shopProfile.operatingSchedule[nextDayItem.key].open || shopProfile.openTime || '09:00';
-        const dayLabel = i === 1 ? 'Amanhã' : nextDayItem.label.split('-')[0].trim();
-        return `${dayLabel} ${openTime}`;
-      }
-    }
-
-    return '09:00';
+    calculateNextAvailableSlot();
+    return () => { isMounted = false; };
   }, [shopProfile]);
 
   // A landing page não possui catálogo local: banco vazio significa galeria vazia.
