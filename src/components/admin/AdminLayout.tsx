@@ -68,6 +68,17 @@ export const AdminLayout: React.FC = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [adminName, setAdminName] = useState('Admin');
 
+  const mainRef = useRef<HTMLElement>(null);
+  const { pullDistance, isRefreshing, handlers: pullToRefreshHandlers } = usePullToRefresh(
+    mainRef,
+    {
+      onRefresh: async () => {
+        window.dispatchEvent(new CustomEvent('adminRefresh'));
+        await new Promise(resolve => setTimeout(resolve, 800)); // wait a bit for data to load
+      }
+    }
+  );
+
   // A autorização vem exclusivamente da sessão HTTP e do perfil no banco.
   React.useEffect(() => {
     authFetch('/api/auth/me')
@@ -228,16 +239,6 @@ export const AdminLayout: React.FC = () => {
   };
 
   
-  const mainRef = useRef<HTMLDivElement>(null);
-  const { pullDistance, isRefreshing, handlers: pullToRefreshHandlers } = usePullToRefresh(
-    mainRef,
-    {
-      onRefresh: async () => {
-        window.dispatchEvent(new CustomEvent('adminRefresh'));
-        await new Promise(resolve => setTimeout(resolve, 800)); // wait a bit for data to load
-      }
-    }
-  );
 
   const renderContent = () => {
     switch (activeTab) {
