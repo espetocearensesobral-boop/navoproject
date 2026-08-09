@@ -44,6 +44,10 @@ export const ClientApp: React.FC = () => {
 
   // Pull-to-refresh: força recarregar dados em cache e remonta a aba de agendamentos
   const mainRef = useRef<HTMLElement | null>(null);
+  // Na aba "home" o <main> usa overflow-hidden — quem rola de verdade é o
+  // snap-scroll interno da LandingPage, então precisamos da ref dele para
+  // o pull-to-refresh saber quando o usuário está realmente no topo.
+  const landingScrollRef = useRef<HTMLElement | null>(null);
   const [appointmentsRefreshKey, setAppointmentsRefreshKey] = useState(0);
 
   // Toast Notification System State
@@ -220,18 +224,21 @@ export const ClientApp: React.FC = () => {
     }, 280);
   };
 
-  const { pullDistance, isRefreshing, handlers: pullToRefreshHandlers } = usePullToRefresh(mainRef, {
-    enabled: !isChangingTab && !isChangingStep,
-    onRefresh: async () => {
-      await Promise.allSettled([
-        fetchServicesFromSupabase(true),
-        fetchProfessionalsFromSupabase(true),
-      ]);
-      if (activeTab === 'appointments') {
-        setAppointmentsRefreshKey((k) => k + 1);
-      }
-    },
-  });
+  const { pullDistance, isRefreshing, handlers: pullToRefreshHandlers } = usePullToRefresh(
+    activeTab === 'home' ? landingScrollRef : mainRef,
+    {
+      enabled: !isChangingTab && !isChangingStep,
+      onRefresh: async () => {
+        await Promise.allSettled([
+          fetchServicesFromSupabase(true),
+          fetchProfessionalsFromSupabase(true),
+        ]);
+        if (activeTab === 'appointments') {
+          setAppointmentsRefreshKey((k) => k + 1);
+        }
+      },
+    }
+  );
 
   const handleTabChange = (tabId: 'home' | 'booking' | 'appointments' | 'more') => {
     hapticLight();
@@ -472,6 +479,7 @@ export const ClientApp: React.FC = () => {
                     setIsLoginModalOpen(true);
                   }}
                   onOpenProfile={() => setIsProfileModalOpen(true)}
+                  scrollContainerRef={landingScrollRef}
                 />
               )}
 

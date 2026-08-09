@@ -59,10 +59,23 @@ interface LandingPageProps {
   currentUser?: any;
   onOpenLogin?: () => void;
   onOpenProfile?: () => void;
+  /** Recebe a referência do container real de scroll (snap-scroll de seções), usado pelo pull-to-refresh do componente pai. */
+  scrollContainerRef?: React.MutableRefObject<HTMLElement | null>;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments, isGuest = true, currentUser, onOpenLogin, onOpenProfile }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments, isGuest = true, currentUser, onOpenLogin, onOpenProfile, scrollContainerRef }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Expõe o container de scroll interno (a landing page rola dentro de si mesma,
+  // com snap-scroll por seção) para o pai identificar corretamente o topo real.
+  useEffect(() => {
+    if (scrollContainerRef) {
+      scrollContainerRef.current = containerRef.current;
+    }
+    return () => {
+      if (scrollContainerRef) scrollContainerRef.current = null;
+    };
+  }, [scrollContainerRef]);
   const [activeCategory, setActiveCategory] = useState<'todos' | 'cabelo' | 'barba'>('todos');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHoursModalOpen, setIsHoursModalOpen] = useState(false);
