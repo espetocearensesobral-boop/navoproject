@@ -103,69 +103,39 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
         <span>Atualizar Dados</span>
       </button>
 
-      {/* KPI SNAP CAROUSEL (Mobile snap carousel, Desktop 3-col grid) */}
-      <div className="bg-border-subtle border border-border-subtle rounded-xl flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-px no-scrollbar">
-        {/* KPI 1: Caixa de Hoje */}
-        <div className="bg-surface-card p-4 sm:p-5 flex flex-col justify-between min-w-[82vw] sm:min-w-[280px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
-          <div className="flex justify-between items-start h-12">
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gold-base block">
-                Faturamento Atual
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-mono font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
-                R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </h2>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-base shrink-0">
-              <Receipt className="w-4 h-4" />
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-gold-base mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Faturamento</span>
+            <div className="w-6 h-6 rounded-lg bg-gold-base/10 flex items-center justify-center shrink-0">
+              <Receipt className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between text-xs text-content-muted">
-            <span className="truncate">Cortes Ativos Hoje</span>
-            <span className="font-bold text-content-base num-tabular whitespace-nowrap shrink-0">{activeToday.length}</span>
-          </div>
+          <p className="text-lg font-black text-content-base tabular-nums truncate">R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{activeToday.length} cortes hoje</p>
         </div>
 
-        {/* KPI 2: Ticket Médio */}
-        <div className="bg-surface-card p-4 sm:p-5 flex flex-col justify-between min-w-[82vw] sm:min-w-[280px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
-          <div className="flex justify-between items-start h-12">
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
-                Ticket Médio
-              </span>
-              <div className="text-2xl sm:text-3xl font-mono font-bold text-gold-base mt-1 num-tabular whitespace-nowrap truncate">
-                R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
-              <CalendarCheck2 className="w-4 h-4" />
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Ticket Médio</span>
+            <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle text-gold-base flex items-center justify-center shrink-0">
+              <CalendarCheck2 className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between text-xs text-content-muted">
-            <span className="truncate">Em cadeira agora</span>
-            <span className="font-bold text-status-success num-tabular whitespace-nowrap shrink-0">{inServiceToday} ativos</span>
-          </div>
+          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+          <p className="text-[9px] text-status-success mt-1 font-medium truncate">{inServiceToday} ativos agora</p>
         </div>
 
-        {/* KPI 3: Base de Clientes */}
-        <div className="bg-surface-card p-4 sm:p-5 flex flex-col justify-between min-w-[82vw] sm:min-w-[280px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
-          <div className="flex justify-between items-start h-12">
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
-                Clientes Cadastrados
-              </span>
-              <div className="text-2xl sm:text-3xl font-mono font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
-                {uniqueClients}
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
-              <Users className="w-4 h-4" />
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Clientes Cadastrados</span>
+            <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle text-gold-base flex items-center justify-center shrink-0">
+              <Users className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between text-xs text-content-muted">
-            <span className="truncate">Aguardando confirmação</span>
-            <span className="font-bold text-gold-base num-tabular whitespace-nowrap shrink-0">{pendingToday} hoje</span>
-          </div>
+          <p className="text-lg font-black text-content-base tabular-nums truncate">{uniqueClients}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{pendingToday} aguardando</p>
         </div>
       </div>
 

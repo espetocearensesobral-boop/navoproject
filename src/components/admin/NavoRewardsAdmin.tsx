@@ -276,91 +276,49 @@ export const NavoRewardsAdmin: React.FC = () => {
       </button>
 
       {/* 2. KPIS (Sempre no topo, logo abaixo do Header) */}
-      <div className="bg-border-subtle border border-border-subtle rounded-xl flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 gap-px no-scrollbar">
-        {/* KPI 1: NPS Score */}
-        <div className="bg-surface-card p-4 flex flex-col justify-between min-w-[70vw] sm:min-w-[220px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
-          <div className="flex justify-between items-start h-10">
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
-                Score NPS
-              </span>
-              <div className="text-xl sm:text-2xl font-mono font-bold text-gold-base mt-1 num-tabular whitespace-nowrap truncate">
-                {data?.npsScore || 100} <span className="text-xs text-status-success font-sans">/ 100</span>
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-base shrink-0">
-              <Star className="w-4 h-4" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Score NPS</span>
+            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0">
+              <Star className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between text-[11px] text-content-muted">
-            <span className="truncate">Promotores / Detratores</span>
-            <span className="font-bold text-content-base num-tabular whitespace-nowrap shrink-0">
-              {data?.promoters || 0} / {data?.detractors || 0}
-            </span>
-          </div>
+          <p className="text-lg font-black text-gold-base tabular-nums truncate">{data?.npsScore || 100} <span className="text-[10px] text-status-success">/ 100</span></p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{data?.promoters || 0} prom / {data?.detractors || 0} detr</p>
         </div>
 
-        {/* KPI 2: Pontos Emitidos */}
-        <div className="bg-surface-card p-4 flex flex-col justify-between min-w-[70vw] sm:min-w-[220px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
-          <div className="flex justify-between items-start h-10">
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
-                Pontos Emitidos
-              </span>
-              <div className="text-xl sm:text-2xl font-mono font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
-                +{data?.totalIssued || 0}
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
-              <Sparkles className="w-4 h-4" />
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Pts Emitidos</span>
+            <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle flex items-center justify-center shrink-0">
+              <Sparkles className="w-3.5 h-3.5 text-gold-base" />
             </div>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between text-[11px] text-content-muted">
-            <span className="truncate">Cortes e Indicações</span>
-            <span className="font-bold text-status-success num-tabular whitespace-nowrap shrink-0">Acumulado</span>
-          </div>
+          <p className="text-lg font-black text-content-base tabular-nums truncate">+{data?.totalIssued || 0}</p>
+          <p className="text-[9px] text-status-success mt-1 font-medium truncate">Cortes e indicações</p>
         </div>
 
-        {/* KPI 3: Pontos Resgatados */}
-        <div className="bg-surface-card p-4 flex flex-col justify-between min-w-[70vw] sm:min-w-[220px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
-          <div className="flex justify-between items-start h-10">
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
-                Pontos Resgatados
-              </span>
-              <div className="text-xl sm:text-2xl font-mono font-bold text-status-error mt-1 num-tabular whitespace-nowrap truncate">
-                -{data?.totalRedeemed || 0}
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
-              <Gift className="w-4 h-4" />
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Pts Resgatados</span>
+            <div className="w-6 h-6 rounded-lg bg-status-error/10 text-status-error flex items-center justify-center shrink-0">
+              <Gift className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between text-[11px] text-content-muted">
-            <span className="truncate">Resgates Efetuados</span>
-            <span className="font-bold text-content-base num-tabular whitespace-nowrap shrink-0">Cupons</span>
-          </div>
+          <p className="text-lg font-black text-status-error tabular-nums truncate">-{data?.totalRedeemed || 0}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Cupons gerados</p>
         </div>
 
-        {/* KPI 4: Avaliações Recebidas */}
-        <div className="bg-surface-card p-4 flex flex-col justify-between min-w-[70vw] sm:min-w-[220px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
-          <div className="flex justify-between items-start h-10">
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
-                Avaliações Pós-Serviço
-              </span>
-              <div className="text-xl sm:text-2xl font-mono font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
-                {data?.totalReviews || 0}
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
-              <MessageSquare className="w-4 h-4" />
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Avaliações</span>
+            <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle flex items-center justify-center shrink-0">
+              <MessageSquare className="w-3.5 h-3.5 text-gold-base" />
             </div>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between text-[11px] text-content-muted">
-            <span className="truncate">Pesquisas Ativas</span>
-            <span className="font-bold text-gold-base num-tabular whitespace-nowrap shrink-0">100% NPS</span>
-          </div>
+          <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.totalReviews || 0}</p>
+          <p className="text-[9px] text-gold-base mt-1 font-medium truncate">100% NPS Ativo</p>
         </div>
       </div>
 
@@ -423,29 +381,49 @@ export const NavoRewardsAdmin: React.FC = () => {
                 <span>Distribuição por Nível VIP</span>
               </h3>
 
-              <div className="grid grid-cols-2 gap-2.5">
-                <div className="p-3 rounded-xl bg-surface-base border border-border-subtle space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-amber-700 block truncate">Bronze (0 - 999 pts)</span>
-                  <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Bronze || 0} clientes</span>
-                  <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Bronze || 1.0}x</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-2.5">
+                <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+                  <div className="flex items-center justify-between text-amber-700 mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider truncate">Bronze</span>
+                    <div className="w-6 h-6 rounded-lg bg-amber-700/10 flex items-center justify-center shrink-0">
+                      <Crown className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Bronze || 0}</p>
+                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{config.tierMultipliers?.Bronze || 1.0}x mult</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-surface-base border border-border-subtle space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block truncate">Prata (1000 - 2999 pts)</span>
-                  <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Prata || 0} clientes</span>
-                  <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Prata || 1.2}x</span>
+                <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+                  <div className="flex items-center justify-between text-slate-400 mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider truncate">Prata</span>
+                    <div className="w-6 h-6 rounded-lg bg-slate-400/10 flex items-center justify-center shrink-0">
+                      <Crown className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Prata || 0}</p>
+                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{config.tierMultipliers?.Prata || 1.2}x mult</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-surface-base border border-border-subtle space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-gold-base block truncate">Ouro (3000 - 5999 pts)</span>
-                  <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Ouro || 0} clientes</span>
-                  <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Ouro || 1.5}x</span>
+                <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+                  <div className="flex items-center justify-between text-gold-base mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider truncate">Ouro</span>
+                    <div className="w-6 h-6 rounded-lg bg-gold-base/10 flex items-center justify-center shrink-0">
+                      <Crown className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Ouro || 0}</p>
+                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{config.tierMultipliers?.Ouro || 1.5}x mult</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-surface-base border border-border-subtle space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-cyan-400 block truncate">Diamante (6000+ pts)</span>
-                  <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Diamante || 0} clientes</span>
-                  <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Diamante || 2.0}x VIP</span>
+                <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+                  <div className="flex items-center justify-between text-cyan-400 mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider truncate">Diamante</span>
+                    <div className="w-6 h-6 rounded-lg bg-cyan-400/10 flex items-center justify-center shrink-0">
+                      <Crown className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Diamante || 0}</p>
+                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{config.tierMultipliers?.Diamante || 2.0}x mult</p>
                 </div>
               </div>
             </div>
