@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Appointment } from '../../types';
 import { fetchAppointmentsFromSupabase } from '../../services/supabaseDataService';
 import { motion, AnimatePresence } from 'motion/react';
@@ -45,10 +45,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef<number | null>(null);
 
   const matchPhoneNumbers = (phone1?: string, phone2?: string): boolean => {
     if (!phone1 || !phone2) return false;
@@ -67,14 +64,9 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     return false;
   };
 
-  const loadAppointments = async (showRefreshState = false) => {
+  const loadAppointments = async () => {
     setHasError(false);
-    if (showRefreshState) {
-      setIsRefreshing(true);
-      hapticLight();
-    } else {
-      setIsLoading(true);
-    }
+    setIsLoading(true);
 
     // Registros persistentes são consultados somente pela API/banco.
     const allLocal = [...customAppointments];
@@ -88,7 +80,6 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     if (isGuest && !searchedPhone && localCombined.length === 0) {
       setAppointments([]);
       setIsLoading(false);
-      setIsRefreshing(false);
       return;
     }
 
@@ -143,43 +134,12 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
       }
     } finally {
       setIsLoading(false);
-      if (showRefreshState) {
-        setTimeout(() => {
-          setIsRefreshing(false);
-          hapticSuccess();
-        }, 400);
-      }
     }
   };
 
   useEffect(() => {
     loadAppointments();
   }, [isGuest, customAppointments, currentUser]);
-
-  // Pull-to-refresh Touch Handlers
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (window.scrollY === 0) {
-      touchStartY.current = e.touches[0].clientY;
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartY.current !== null && window.scrollY <= 0) {
-      const currentY = e.touches[0].clientY;
-      const distance = Math.max(0, (currentY - touchStartY.current) * 0.45);
-      if (distance > 0 && distance < 120) {
-        setPullDistance(distance);
-      }
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (pullDistance >= 60) {
-      loadAppointments(true);
-    }
-    touchStartY.current = null;
-    setPullDistance(0);
-  };
 
   // Current appointment is the most recent active or non-cancelled one, or simply the first
   const currentAppointment = appointments.find(
@@ -301,7 +261,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
       
 
       // Reload appointments with newly acquired guest auth session
-      loadAppointments(searchedPhone);
+      loadAppointments();
     } catch (err: any) {
       hapticMedium();
       setVoucherError(err.message || 'Erro ao validar o código.');
@@ -377,22 +337,10 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
   return (
     <div
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
       className={`space-y-4 pt-2 sm:pt-4 pb-8 px-4 relative flex-1 flex flex-col ${
         appointments.length === 0 ? 'min-h-[60vh] justify-center pt-0 my-auto' : ''
       }`}
     >
-      {/* Pull To Refresh Indicator */}
-      {(pullDistance > 0 || isRefreshing) && (
-        <div className="flex items-center justify-center py-2 transition-all duration-200">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold-base/10 border border-gold-base/30 text-gold-base text-xs font-bold shadow-md">
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing || pullDistance >= 60 ? 'animate-spin' : ''}`} />
-            <span>{isRefreshing ? 'Atualizando agendamentos...' : pullDistance >= 60 ? 'Solte para atualizar' : 'Puxe para atualizar'}</span>
-          </div>
-        </div>
-      )}
 
       <motion.div
         initial={{ opacity: 0, y: 8 }}
