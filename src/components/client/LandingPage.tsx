@@ -108,7 +108,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     scrollToSection(0);
   };
 
-  const [nextAvailableTimeSlot, setNextAvailableTimeSlot] = useState<string>('09:00');
+  const [nextAvailableTimeSlot, setNextAvailableTimeSlot] = useState<string>('');
+
+  const scheduleSummary = useMemo(() => {
+    if (!shopProfile || !shopProfile.operatingSchedule) return 'Ter-Sáb: 09:00 às 20:00';
+    
+    const days = [
+      { key: 'monday', label: 'Seg' },
+      { key: 'tuesday', label: 'Ter' },
+      { key: 'wednesday', label: 'Qua' },
+      { key: 'thursday', label: 'Qui' },
+      { key: 'friday', label: 'Sex' },
+      { key: 'saturday', label: 'Sáb' },
+      { key: 'sunday', label: 'Dom' }
+    ] as const;
+
+    const activeDays = days.filter(d => shopProfile.operatingSchedule[d.key]?.active);
+    if (activeDays.length === 0) return 'Fechado temporariamente';
+
+    const firstActive = activeDays[0];
+    const lastActive = activeDays[activeDays.length - 1];
+    const sch = shopProfile.operatingSchedule[firstActive.key];
+    
+    if (activeDays.length === 1) return `${firstActive.label}: ${sch.open} às ${sch.close}`;
+    return `${firstActive.label} a ${lastActive.label}: ${sch.open} às ${sch.close}`;
+  }, [shopProfile]);
 
   useEffect(() => {
     let isMounted = true;
@@ -546,7 +570,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">STATUS DA LOJA</span>
               <div className="flex items-center gap-1.5">
                 <span className={`font-semibold text-sm whitespace-nowrap ${shopStatusInfo.status === 'open' ? 'text-green-500' : shopStatusInfo.status === 'closing_soon' ? 'text-amber-400' : 'text-white'}`}>
-                  {shopStatusInfo.status === 'closed' ? `Abre ${nextAvailableTimeSlot.startsWith('0') || nextAvailableTimeSlot.startsWith('1') || nextAvailableTimeSlot.startsWith('2') ? 'hoje às ' + nextAvailableTimeSlot : nextAvailableTimeSlot}` : shopStatusInfo.label}
+                  {shopStatusInfo.status === 'closed' ? (nextAvailableTimeSlot ? `Abre ${nextAvailableTimeSlot.startsWith('0') || nextAvailableTimeSlot.startsWith('1') || nextAvailableTimeSlot.startsWith('2') ? 'hoje às ' + nextAvailableTimeSlot : nextAvailableTimeSlot}` : 'Fechado hoje') : shopStatusInfo.label}
                 </span>
               </div>
             </button>
@@ -554,7 +578,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             {shopStatusInfo.status !== 'closed' && (
               <div className="flex flex-col items-center gap-1">
                 <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO HORÁRIO</span>
-                <span className="text-white font-bold text-sm">{nextAvailableTimeSlot}</span>
+                <span className="text-white font-bold text-sm">
+                  {nextAvailableTimeSlot ? nextAvailableTimeSlot : <span className="opacity-50">...</span>}
+                </span>
               </div>
             )}
           </div>
@@ -1022,7 +1048,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <div className="flex flex-col gap-1.5">
               <span className="text-[#d4a853] font-bold text-sm uppercase tracking-widest">{shopProfile.name}</span>
               <span>{shopProfile.address}</span>
-              <span className="text-gray-400">Ter-Sáb: 09:00 às 20:00</span>
+              <span className="text-gray-400">{scheduleSummary}</span>
             </div>
             <div className="flex flex-wrap gap-4 sm:gap-6">
               <a href="#" className="hover:text-white transition-colors">Privacidade</a>
@@ -1036,7 +1062,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 w-full">
             <p>
-              © 2026 Navo Premium. Todos os direitos reservados.
+              © {new Date().getFullYear()} {shopProfile.name}. Todos os direitos reservados.
             </p>
             <p>
               Desenvolvido por <span className="text-[#e5b863] font-bold">Navo</span>
