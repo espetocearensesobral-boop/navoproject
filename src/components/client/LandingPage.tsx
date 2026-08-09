@@ -779,13 +779,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                     "{item.text}"
                   </p>
                 </div>
-
-                <div className="pt-2 border-t border-neutral-200/60 flex items-center justify-between text-[clamp(0.6rem,1.1vh,0.725rem)] text-neutral-400 font-semibold">
-                  <span className="flex items-center gap-1 text-emerald-600 font-bold">
-                    <Check className="w-3.5 h-3.5" /> Cliente Verificado
-                  </span>
-                  <span>Google Reviews 5.0 ★</span>
-                </div>
               </motion.div>
             ))}
           </div>
