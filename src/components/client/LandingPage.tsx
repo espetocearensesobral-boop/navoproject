@@ -55,9 +55,13 @@ import {
 interface LandingPageProps {
   onGoToBooking: (service?: any) => void;
   onGoToAppointments?: () => void;
+  isGuest?: boolean;
+  currentUser?: any;
+  onOpenLogin?: () => void;
+  onOpenProfile?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments, isGuest = true, currentUser, onOpenLogin, onOpenProfile }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState<'todos' | 'cabelo' | 'barba'>('todos');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -397,16 +401,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
-              href="#servicos" 
+              href="#agendar" 
               onClick={(e) => { e.preventDefault(); toggleMenu(); onGoToBooking(); }} 
-              className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
+              className="text-gold-base text-2xl font-semibold hover:opacity-100 transition-opacity"
             >
-              Serviços
+              Agendar Agora
             </motion.a>
-            <motion.a 
+            <motion.button 
               initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
+              onClick={() => { 
+                toggleMenu(); 
+                if (onGoToAppointments) onGoToAppointments(); 
+              }} 
+              className="text-gold-base text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer"
+            >
+              Meus Cortes
+            </motion.button>
+            <motion.button 
+              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              onClick={() => {
+                toggleMenu();
+                if (isGuest) {
+                  if (onOpenLogin) onOpenLogin();
+                } else {
+                  if (onOpenProfile) onOpenProfile();
+                }
+              }}
+              className="text-gold-base text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer"
+            >
+              {isGuest ? 'Entrar / Criar Conta' : `Olá, ${currentUser?.name?.split(' ')[0] || 'Minha Conta'}`}
+            </motion.button>
+
+            <div className="w-16 h-px bg-white/15 my-1" />
+
+            <motion.a 
+              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
               href="#diferenciais" 
               onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(1); }} 
               className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
@@ -416,7 +451,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <motion.a 
               initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
+              transition={{ delay: 0.25 }}
               href="#galeria" 
               onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(2); }} 
               className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
@@ -426,25 +461,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <motion.a 
               initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.3 }}
               href="#contato" 
               onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(4); }} 
               className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
             >
               Contato
             </motion.a>
-            <motion.button 
-              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              onClick={() => { 
-                toggleMenu(); 
-                if (onGoToAppointments) onGoToAppointments(); 
-              }} 
-              className="text-gold-base text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer mt-2"
-            >
-              Meus Cortes
-            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>

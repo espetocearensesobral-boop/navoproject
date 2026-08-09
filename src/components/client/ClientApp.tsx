@@ -465,6 +465,13 @@ export const ClientApp: React.FC = () => {
                 <LandingPage
                   onGoToBooking={handleStartBookingWithService}
                   onGoToAppointments={() => handleTabChange('appointments')}
+                  isGuest={isGuest}
+                  currentUser={currentUser}
+                  onOpenLogin={() => {
+                    setLoginModalView('login');
+                    setIsLoginModalOpen(true);
+                  }}
+                  onOpenProfile={() => setIsProfileModalOpen(true)}
                 />
               )}
 
