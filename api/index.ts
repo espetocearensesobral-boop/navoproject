@@ -2400,7 +2400,8 @@ app.get("/api/auth/me", requireAuth, async (req: any, res) => {
 const themePaletteSchema = z.object({
   palette: z.enum([
     'heritage', 'sapphire', 'emerald', 'amethyst', 'ruby', 'ocean', 'copper', 'rose', 'olive', 'slate',
-    'amber', 'teal', 'indigo', 'crimson', 'bronze', 'violet', 'champagne', 'mint', 'coral', 'titanium'
+    'amber', 'teal', 'indigo', 'crimson', 'bronze', 'violet', 'champagne', 'mint', 'coral', 'titanium',
+    'onyx', 'pearl', 'sand', 'plum', 'electric', 'sage', 'terracotta', 'midnight'
   ]),
 });
 

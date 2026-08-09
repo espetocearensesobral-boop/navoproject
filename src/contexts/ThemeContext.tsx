@@ -21,7 +21,15 @@ export type ThemePalette =
   | 'champagne'
   | 'mint'
   | 'coral'
-  | 'titanium';
+  | 'titanium'
+  | 'onyx'
+  | 'pearl'
+  | 'sand'
+  | 'plum'
+  | 'electric'
+  | 'sage'
+  | 'terracotta'
+  | 'midnight';
 
 export interface PaletteItem {
   id: ThemePalette;
@@ -53,6 +61,14 @@ export const PALETTES: PaletteItem[] = [
   { id: 'mint', name: 'Menta Ice', description: 'Refrescante e contemporâneo', accent: '#10B981', accentSoft: '#6EE7B7', deep: '#047857' },
   { id: 'coral', name: 'Coral Sunset', description: 'Vibrante e caloroso', accent: '#F97316', accentSoft: '#FDBA74', deep: '#C2410C' },
   { id: 'titanium', name: 'Titânio Grafite', description: 'Sóbrio e urbano', accent: '#64748B', accentSoft: '#CBD5E1', deep: '#334155' },
+  { id: 'onyx', name: 'Preto Onyx', description: 'Monocromático escuro absoluto', accent: '#18181B', accentSoft: '#3F3F46', deep: '#09090B' },
+  { id: 'pearl', name: 'Branco Pérola', description: 'Monocromático claro radiante', accent: '#F8FAFC', accentSoft: '#E2E8F0', deep: '#CBD5E1' },
+  { id: 'sand', name: 'Duna Dourada', description: 'Quente e terroso', accent: '#D97706', accentSoft: '#FBBF24', deep: '#92400E' },
+  { id: 'plum', name: 'Ameixa Velvet', description: 'Rico e aveludado', accent: '#A855F7', accentSoft: '#D8B4FE', deep: '#7E22CE' },
+  { id: 'electric', name: 'Azul Elétrico', description: 'Neon moderno e dinâmico', accent: '#06B6D4', accentSoft: '#67E8F9', deep: '#0891B2' },
+  { id: 'sage', name: 'Sálvia Botânica', description: 'Suave e ecorresponsável', accent: '#84A98C', accentSoft: '#CAD2C5', deep: '#52796F' },
+  { id: 'terracotta', name: 'Terracota Argila', description: 'Artesanal e caloroso', accent: '#E07A5F', accentSoft: '#F2CC8F', deep: '#B35338' },
+  { id: 'midnight', name: 'Azul Meia-Noite', description: 'Profundo e majestoso', accent: '#3B82F6', accentSoft: '#93C5FD', deep: '#1D4ED8' },
 ];
 
 interface ThemeContextType {
