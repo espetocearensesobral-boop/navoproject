@@ -2,6 +2,16 @@ import React, { useState } from 'react';
 import { NavoHomeView } from './NavoHomeView';
 import { ScheduleGrid } from './ScheduleGrid';
 import { PdvInteligente } from './PdvInteligente';
+import { ComandasManagement } from './ComandasManagement';
+import { ReportsManagement } from './ReportsManagement';
+import { CaixaManagement } from './CaixaManagement';
+import { AuditLogsManagement } from './AuditLogsManagement';
+import { SubscriptionsManagement } from './SubscriptionsManagement';
+import { AccountsPayableManagement } from './AccountsPayableManagement';
+import { FinancialStatementManagement } from './FinancialStatementManagement';
+import { FinancialHealthManagement } from './FinancialHealthManagement';
+import { WhatsAppManagement } from './WhatsAppManagement';
+import { QrCodeManagement } from './QrCodeManagement';
 import { ServicesManagement } from './ServicesManagement';
 import { ProfessionalsManagement } from './ProfessionalsManagement';
 import { ClientsManagement } from './ClientsManagement';
@@ -27,7 +37,15 @@ import {
   Award,
   Store,
   MoreHorizontal,
-  LayoutGrid
+  LayoutGrid,
+  FileText,
+  Wallet,
+  ShieldCheck,
+  CreditCard,
+  DollarSign,
+  Activity,
+  MessageSquare,
+  QrCode
 } from 'lucide-react';
 
 export type AdminTab = 
@@ -35,6 +53,16 @@ export type AdminTab =
   | 'dashboard' 
   | 'agenda' 
   | 'pdv'
+  | 'comandas'
+  | 'caixa'
+  | 'reports'
+  | 'audit'
+  | 'subscriptions'
+  | 'payable'
+  | 'financial_statement'
+  | 'financial_health'
+  | 'whatsapp'
+  | 'qrcode'
   | 'queue' 
   | 'rewards'
   | 'servicos' 
@@ -92,9 +120,69 @@ export const AdminLayout: React.FC = () => {
     },
     { 
       id: 'pdv' as AdminTab, 
-      label: 'PDV / Caixa', 
+      label: 'PDV Rápido', 
       icon: Receipt,
-      description: 'Checkout de serviços & vendas'
+      description: 'Checkout instantâneo'
+    },
+    { 
+      id: 'comandas' as AdminTab, 
+      label: 'Comandas', 
+      icon: FileText,
+      description: 'Fechamento de conta'
+    },
+    { 
+      id: 'caixa' as AdminTab, 
+      label: 'Gestão de Caixa', 
+      icon: Wallet,
+      description: 'Sangria, suprimento e Abertura'
+    },
+    { 
+      id: 'reports' as AdminTab, 
+      label: 'Relatórios', 
+      icon: TrendingUp,
+      description: 'Desempenho por serviço e barbeiro'
+    },
+    { 
+      id: 'subscriptions' as AdminTab, 
+      label: 'Assinaturas & Clube', 
+      icon: Award,
+      description: 'Planos e comissões de clube'
+    },
+    { 
+      id: 'payable' as AdminTab, 
+      label: 'Contas a Pagar', 
+      icon: CreditCard,
+      description: 'Fornecedores e boletos'
+    },
+    { 
+      id: 'financial_statement' as AdminTab, 
+      label: 'Extrato Financeiro', 
+      icon: DollarSign,
+      description: 'Entradas e saídas de caixa'
+    },
+    { 
+      id: 'financial_health' as AdminTab, 
+      label: 'Saúde Financeira', 
+      icon: Activity,
+      description: 'Indicadores e margens'
+    },
+    { 
+      id: 'audit' as AdminTab, 
+      label: 'Logs & Auditoria', 
+      icon: ShieldCheck,
+      description: 'Rastreio de ações'
+    },
+    { 
+      id: 'whatsapp' as AdminTab, 
+      label: 'Painel WhatsApp', 
+      icon: MessageSquare,
+      description: 'Notificações e saldo'
+    },
+    { 
+      id: 'qrcode' as AdminTab, 
+      label: 'QR Code & Balcão', 
+      icon: QrCode,
+      description: 'Totens de agendamento'
     },
     { 
       id: 'agenda' as AdminTab, 
@@ -171,6 +259,26 @@ export const AdminLayout: React.FC = () => {
         return <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />;
       case 'pdv':
         return <PdvInteligente />;
+      case 'comandas':
+        return <ComandasManagement />;
+      case 'caixa':
+        return <CaixaManagement />;
+      case 'reports':
+        return <ReportsManagement />;
+      case 'audit':
+        return <AuditLogsManagement />;
+      case 'subscriptions':
+        return <SubscriptionsManagement />;
+      case 'payable':
+        return <AccountsPayableManagement />;
+      case 'financial_statement':
+        return <FinancialStatementManagement />;
+      case 'financial_health':
+        return <FinancialHealthManagement />;
+      case 'whatsapp':
+        return <WhatsAppManagement />;
+      case 'qrcode':
+        return <QrCodeManagement />;
       case 'agenda':
         return <ScheduleGrid />;
       case 'queue':
