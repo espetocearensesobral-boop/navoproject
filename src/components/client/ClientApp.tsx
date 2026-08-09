@@ -21,11 +21,15 @@ import { GuestSignupPromptModal } from './GuestSignupPromptModal';
 import { LandingPage } from './LandingPage';
 import { ClientMoreDrawer } from './ClientMoreDrawer';
 import { PWAInstallModal } from '../pwa/PWAInstallModal';
+import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
+import { usePullToRefresh } from '../../hooks/usePullToRefresh';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Calendar, Crown, Award, Clock, Home, Menu, Smartphone, User, Sparkles, Scissors, Loader2, Sun, Moon, CheckCircle2, Info, AlertTriangle, Sliders, Download } from 'lucide-react';
 
 import { authFetch } from '../../lib/api';
 
 export const ClientApp: React.FC = () => {
+  const { theme, setTheme } = useTheme();
   const [isAppInitializing, setIsAppInitializing] = useState(true);
   const [activeTab, setActiveTab] = useState<'home' | 'booking' | 'subscriptions' | 'loyalty' | 'appointments'>('home');
   const [isMoreDrawerOpen, setIsMoreDrawerOpen] = useState(false);
@@ -37,6 +41,10 @@ export const ClientApp: React.FC = () => {
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
   const [showGuestSignupPrompt, setShowGuestSignupPrompt] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+
+  // Pull-to-refresh: força recarregar dados em cache e remonta a aba de agendamentos
+  const mainRef = useRef<HTMLElement | null>(null);
+  const [appointmentsRefreshKey, setAppointmentsRefreshKey] = useState(0);
 
   // Toast Notification System State
   const [toast, setToast] = useState<{ id: number; message: string; type?: 'success' | 'info' | 'warning' } | null>(null);
@@ -212,6 +220,19 @@ export const ClientApp: React.FC = () => {
     }, 280);
   };
 
+  const { pullDistance, isRefreshing, handlers: pullToRefreshHandlers } = usePullToRefresh(mainRef, {
+    enabled: !isChangingTab && !isChangingStep,
+    onRefresh: async () => {
+      await Promise.allSettled([
+        fetchServicesFromSupabase(true),
+        fetchProfessionalsFromSupabase(true),
+      ]);
+      if (activeTab === 'appointments') {
+        setAppointmentsRefreshKey((k) => k + 1);
+      }
+    },
+  });
+
   const handleTabChange = (tabId: 'home' | 'booking' | 'appointments' | 'more') => {
     hapticLight();
     
@@ -355,6 +376,23 @@ export const ClientApp: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Theme Toggle Button in Header */}
+              <button
+                onClick={() => {
+                  hapticLight();
+                  setTheme(theme === 'dark' ? 'light' : 'dark');
+                }}
+                title={theme === 'dark' ? 'Tema Escuro' : 'Tema Claro'}
+                aria-label="Alternar tema"
+                className="p-2 rounded-xl text-content-base hover:text-content-base transition-all active:scale-95 flex items-center justify-center shrink-0"
+              >
+                {theme === 'dark' ? (
+                  <Moon className="w-5 h-5 text-gold-base" />
+                ) : (
+                  <Sun className="w-5 h-5 text-gold-base" />
+                )}
+              </button>
+
               {/* Install PWA Button in Header */}
               <button
                 onClick={() => setIsPwaModalOpen(true)}
@@ -397,10 +435,15 @@ export const ClientApp: React.FC = () => {
 
         {/* Main Content Area with Swipe Gesture */}
         <main
+          ref={mainRef}
           id="main-content"
           className={`flex-1 min-h-0 ${activeTab === 'home' ? 'overflow-hidden' : 'overflow-y-auto no-scrollbar'} outline-none flex flex-col`}
           tabIndex={-1}
+          onTouchStart={pullToRefreshHandlers.onTouchStart}
+          onTouchMove={pullToRefreshHandlers.onTouchMove}
+          onTouchEnd={pullToRefreshHandlers.onTouchEnd}
         >
+          <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
           {/* Loading transition indicator when changing tab or step */}
           {(isChangingTab || isChangingStep) ? (
             <div className="flex-1 min-h-[60vh] px-6 my-auto flex flex-col items-center justify-center text-center space-y-4 animate-in fade-in zoom-in-95 duration-150">
@@ -539,6 +582,7 @@ export const ClientApp: React.FC = () => {
           {activeTab === 'loyalty' && <ClientLoyalty currentUser={currentUser} />}
           {activeTab === 'appointments' && (
             <ClientAppointments 
+              key={appointmentsRefreshKey}
               customAppointments={userCreatedAppointments} 
               isGuest={isGuest} 
               currentUser={currentUser} 
