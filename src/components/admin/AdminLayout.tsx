@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { usePullToRefresh } from '../../hooks/usePullToRefresh';
+import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
 import { NavoHomeView } from './NavoHomeView';
 import { ScheduleGrid } from './ScheduleGrid';
 import { PdvInteligente } from './PdvInteligente';
@@ -224,6 +226,18 @@ export const AdminLayout: React.FC = () => {
   const handleLogout = () => {
     window.location.href = '/';
   };
+
+  
+  const mainRef = useRef<HTMLDivElement>(null);
+  const { pullDistance, isRefreshing, handlers: pullToRefreshHandlers } = usePullToRefresh(
+    mainRef,
+    {
+      onRefresh: async () => {
+        window.dispatchEvent(new CustomEvent('adminRefresh'));
+        await new Promise(resolve => setTimeout(resolve, 800)); // wait a bit for data to load
+      }
+    }
+  );
 
   const renderContent = () => {
     switch (activeTab) {
@@ -476,7 +490,8 @@ export const AdminLayout: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 lg:ml-64 pt-[56px] lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full">
+      <main ref={mainRef} className="flex-1 lg:ml-64 pt-[56px] lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
+        <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 lg:py-8 pb-28 lg:pb-12 w-full min-w-0">
           {/* Tab Content */}
           <div className="animate-fade-in w-full min-w-0">

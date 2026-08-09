@@ -14,6 +14,9 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
 
   useEffect(() => {
     loadData();
+    const handleRefresh = () => loadData();
+    window.addEventListener('adminRefresh', handleRefresh);
+    return () => window.removeEventListener('adminRefresh', handleRefresh);
   }, []);
 
   const loadData = async () => {
@@ -90,18 +93,11 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
         icon={Receipt}
         title="Caixa de Hoje & Operação"
         stats={[{ label: todayFormatted, value: '', tone: 'gold' }]}
-        action={{ label: 'Atualizar Dados', onClick: loadData, icon: () => <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> }}
+        
       />
 
       {/* Ação (mobile) */}
-      <button
-        onClick={loadData}
-        disabled={loading}
-        className="md:hidden w-full h-10 rounded-xl bg-surface-base text-gold-base hover:text-content-base hover:bg-surface-card border border-border-subtle transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 active:bg-surface-card active:scale-95 disabled:opacity-50"
-      >
-        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-        <span>Atualizar Dados</span>
-      </button>
+      
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">

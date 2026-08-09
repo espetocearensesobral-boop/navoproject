@@ -138,6 +138,9 @@ export const NavoRewardsAdmin: React.FC = () => {
 
   useEffect(() => {
     loadData();
+    const handleRefresh = () => loadData();
+    window.addEventListener('adminRefresh', handleRefresh);
+    return () => window.removeEventListener('adminRefresh', handleRefresh);
   }, []);
 
   const handleSaveConfig = async (e?: React.FormEvent) => {
@@ -266,14 +269,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       />
 
       {/* Ação (mobile) */}
-      <button
-        onClick={loadData}
-        disabled={loading}
-        className="md:hidden w-full h-10 rounded-xl bg-surface-base text-gold-base hover:text-content-base hover:bg-surface-card border border-border-subtle transition-all text-xs font-bold flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
-      >
-        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-        <span>Atualizar Dados</span>
-      </button>
+      
 
       {/* 2. KPIS (Sempre no topo, logo abaixo do Header) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
