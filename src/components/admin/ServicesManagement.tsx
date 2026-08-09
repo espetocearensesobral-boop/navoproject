@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ServiceItem } from '../../types';
 import { fetchServicesFromSupabase, saveServiceInSupabase, deleteServiceInSupabase, deleteAllServicesInSupabase } from '../../services/supabaseDataService';
 import { DEFAULT_CATEGORIES, getCategoryName } from '../../data/categories';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 import {
   Scissors,
   Plus,
@@ -316,6 +317,28 @@ export const ServicesManagement: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Scissors}
+        title="Cardápio de Serviços"
+        stats={[
+          { label: 'serviços', value: totalServices, tone: 'gold' },
+          { label: 'VIPs', value: totalCombos, tone: 'success' },
+          { label: 'duração méd.', value: `${avgDuration} min`, tone: 'info' },
+          { label: 'preço méd.', value: `R$ ${avgPrice.toFixed(2)}`, tone: 'warning' },
+        ]}
+        action={{ label: 'Cadastrar Novo Serviço', onClick: handleOpenCreate, icon: Plus }}
+      />
+
+      {/* Ação (mobile) */}
+      <button
+        onClick={handleOpenCreate}
+        className="md:hidden w-full bg-gold-base text-surface-base px-3.5 py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+      >
+        <Plus className="w-4 h-4" />
+        <span>Cadastrar Novo Serviço</span>
+      </button>
+
       {/* Success Notification Banner */}
       {successMsg && (
         <div className="p-3 bg-status-success/15 border border-status-success/30 text-status-success rounded-xl text-xs font-bold flex items-center justify-between animate-fade-in">
@@ -346,15 +369,6 @@ export const ServicesManagement: React.FC = () => {
               className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-2.5 py-1.5 text-xs text-content-base placeholder-[#666666] outline-none focus:border-[#FFFFFF]"
             />
           </div>
-
-          {/* New Service Button */}
-          <button
-            onClick={handleOpenCreate}
-            className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1 shadow-sm shrink-0 active:scale-95 transition-transform"
-          >
-            <Plus className="w-3.5 h-3.5 stroke-[3]" />
-            <span>Novo</span>
-          </button>
         </div>
 
         {/* Repositioned Category & Quick Filter Pills */}
@@ -496,75 +510,6 @@ export const ServicesManagement: React.FC = () => {
       {/* DESKTOP SERVICES VIEW (FULL RICH MANAGEMENT) - hidden md:block */}
       {/* ========================================================= */}
       <div className="hidden md:block space-y-6">
-        {/* Header & KPI Summary */}
-        <div className="bg-surface-card p-5 sm:p-6 rounded-2xl border border-border-subtle shadow-xl space-y-5">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center space-x-2 text-gold-base text-xs font-bold uppercase tracking-widest mb-1">
-                <Scissors className="w-4 h-4" />
-                <span>Painel de Gestão do Cardápio de Serviços</span>
-              </div>
-              <h1 className="text-2xl font-serif text-content-base font-semibold tracking-tight">
-                Gestão Geral de Serviços, Combos & Galeria de Fotos
-              </h1>
-              <p className="text-xs text-[#9B9B9B] max-w-2xl mt-1">
-                Cadastre, edite preços, configure galeria de fotos, crie combos e gerencie a vitrine da sua barbearia em tempo real.
-              </p>
-            </div>
-
-            <button
-              onClick={handleOpenCreate}
-              className="px-5 py-3 rounded-xl bg-gold-base text-surface-base font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(212,175,55,0.3)] flex items-center justify-center space-x-2 hover:brightness-110 active:scale-95 transition-all self-start md:self-auto"
-            >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Cadastrar Novo Serviço</span>
-            </button>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-border-subtle">
-            <div className="bg-surface-card p-3.5 rounded-xl border border-border-subtle flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center border border-gold-base/20">
-                <Scissors className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] text-[#8B8B8B] font-bold uppercase">Total no Cardápio</p>
-                <p className="text-lg font-mono num-tabular text-content-base font-semibold">{totalServices} <span className="text-xs text-gold-base font-normal">serviços</span></p>
-              </div>
-            </div>
-
-            <div className="bg-surface-card p-3.5 rounded-xl border border-border-subtle flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center border border-[#00A86B]/20">
-                <Flame className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] text-[#8B8B8B] font-bold uppercase">Combos Promocionais</p>
-                <p className="text-lg font-mono num-tabular text-content-base font-semibold">{totalCombos} <span className="text-xs text-status-success font-normal">VIPs</span></p>
-              </div>
-            </div>
-
-            <div className="bg-surface-card p-3.5 rounded-xl border border-border-subtle flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] text-[#8B8B8B] font-bold uppercase">Duração Média</p>
-                <p className="text-lg font-mono num-tabular text-content-base font-semibold">{avgDuration} <span className="text-xs text-blue-400 font-normal">minutos</span></p>
-              </div>
-            </div>
-
-            <div className="bg-surface-card p-3.5 rounded-xl border border-border-subtle flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
-                <DollarSign className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] text-[#8B8B8B] font-bold uppercase">Preço Médio</p>
-                <p className="text-lg font-mono num-tabular text-content-base font-semibold">R$ {avgPrice.toFixed(2)}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
       {/* Success Notification Banner */}
       {successMsg && (
         <div className="p-3.5 bg-status-success/20 border border-[#00A86B]/40 text-status-success rounded-xl text-xs font-bold flex items-center justify-between shadow-lg animate-fade-in">
