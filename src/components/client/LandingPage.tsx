@@ -38,7 +38,8 @@ import {
   Eye,
   Plus,
   ZoomIn,
-  Sparkles
+  Sparkles,
+  MapPin
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
 import { trackEvent } from '../../lib/analytics';
@@ -204,12 +205,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   });
 
   const differentials = [
-    { icon: User, secondaryIcon: Scissors, label: 'Profissionais experientes', strokeColor: '#b89060', bgColor: '#f5eedc' },
-    { icon: Snowflake, label: 'Ambiente climatizado', strokeColor: '#80b6c6', bgColor: '#e3f4f8' },
-    { icon: Coffee, label: 'Café cortesia', strokeColor: '#9e795a', bgColor: '#f5efe9' },
-    { icon: Wifi, label: 'Wi-Fi gratuito', strokeColor: '#71a67a', bgColor: '#e6f5ea' },
-    { icon: Car, label: 'Estacionamento próprio', strokeColor: '#9a9bc4', bgColor: '#edeefc' },
-    { icon: Clock, secondaryIcon: Check, secondaryColor: '#4ade80', label: 'Horário marcado', strokeColor: '#c1877f', bgColor: '#faece9' }
+    { icon: User, secondaryIcon: Scissors, label: 'Barbeiros Master', desc: '10+ anos de experiência', strokeColor: '#b89060', bgColor: '#f5eedc' },
+    { icon: Snowflake, label: 'Ambiente Premium', desc: 'Som e ar-condicionado', strokeColor: '#80b6c6', bgColor: '#e3f4f8' },
+    { icon: Coffee, label: 'Bebida Cortesia', desc: 'Café e cerveja artesanal', strokeColor: '#9e795a', bgColor: '#f5efe9' },
+    { icon: Wifi, label: 'Conectividade', desc: 'Wi-Fi de alta velocidade livre', strokeColor: '#71a67a', bgColor: '#e6f5ea' },
+    { icon: Car, label: 'Estacionamento', desc: 'Vagas próprias gratuitas', strokeColor: '#9a9bc4', bgColor: '#edeefc' },
+    { icon: Clock, secondaryIcon: Check, secondaryColor: '#4ade80', label: 'Agendamento Ágil', desc: 'Confirmação por WhatsApp', strokeColor: '#c1877f', bgColor: '#faece9' }
   ];
 
   const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
@@ -250,44 +251,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     {
       name: 'Rafael M.',
       rating: 5,
-      date: '10 de Julho, 2026',
+      date: 'Há 2 dias',
       text: 'Melhor barbearia da cidade. Atendimento impecável e resultado sempre perfeito.',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150'
     },
     {
       name: 'Lucas S.',
       rating: 5,
-      date: '02 de Agosto, 2026',
+      date: 'Há 1 semana',
       text: 'Ambiente sensacional e um corte de primeira. Recomendo demais!',
       avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150'
     },
     {
       name: 'Felipe C.',
       rating: 5,
-      date: '28 de Julho, 2026',
+      date: 'Há 3 semanas',
       text: 'Experiência incrível! O café é ótimo e os profissionais sabem exatamente o que estão fazendo.',
       avatar: 'https://images.unsplash.com/photo-1600486913747-55e5470d6f40?auto=format&fit=crop&q=80&w=150'
-    },
-    {
-      name: 'Thiago R.',
-      rating: 5,
-      date: '15 de Junho, 2026',
-      text: 'Finalmente encontrei uma barbearia que acerta em cheio no corte que eu quero.',
-      avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=150'
-    },
-    {
-      name: 'Marcos V.',
-      rating: 5,
-      date: '05 de Agosto, 2026',
-      text: 'Estrutura de ponta e equipe muito simpática. O corte com toalha quente é sensacional.',
-      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150'
-    },
-    {
-      name: 'João P.',
-      rating: 5,
-      date: '20 de Julho, 2026',
-      text: 'Sempre saio renovado. O ambiente climatizado e o wi-fi grátis ajudam muito na espera.',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150'
     }
   ];
 
@@ -449,7 +429,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(180deg, rgba(10,10,10,0.25) 0%, rgba(10,10,10,0.7) 45%, #0a0a0a 85%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80')`
+            backgroundImage: `linear-gradient(180deg, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0.85) 45%, #0a0a0a 95%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80')`
           }}
         />
 
@@ -525,30 +505,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-lg py-[1.15rem] px-8 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-[0_6px_35px_rgba(212,168,83,0.4)] hover:shadow-[0_8px_45px_rgba(212,168,83,0.5)] transition-all shrink-0 cursor-pointer"
             >
               <span className="flex items-center gap-2 font-extrabold tracking-wide">
-                Agendar meu horário
+                Ver horários disponíveis
                 <ArrowRight className="w-[1.35rem] h-[1.35rem] text-[#0a0a0a]" />
               </span>
             </motion.button>
 
             <button 
               onClick={() => onGoToAppointments && onGoToAppointments()}
-              className="flex items-center gap-1.5 text-[0.9rem] font-medium text-[#d1d5db] cursor-pointer hover:text-white transition-colors active:scale-95"
+              className="mt-1 flex items-center justify-center gap-1.5 text-[0.85rem] font-bold text-[#d4a853] border border-[#d4a853]/40 hover:border-[#d4a853] hover:bg-[#d4a853]/10 px-5 py-2.5 rounded-full cursor-pointer transition-all active:scale-95"
             >
               <span>Já possui agendamento? Clique aqui.</span>
             </button>
 
-            {/* SCROLL DOWN INDICATOR */}
-            <motion.button
-              animate={reducedMotion ? {} : { y: [0, 5, 0] }}
-              transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-              onClick={() => scrollToSection(1)}
-              className="mt-8 flex flex-col items-center justify-center cursor-pointer opacity-70 hover:opacity-100 transition-all active:scale-95 group"
-              aria-label="Rolar para a próxima seção"
+            {/* DEPOIMENTO CURTO */}
+            <motion.div 
+              initial={reducedMotion ? {} : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
+              className="mt-6 flex items-start gap-3 bg-black/40 border border-white/10 rounded-2xl p-3 max-w-[280px] sm:max-w-xs backdrop-blur-md"
             >
-              <div className="w-6 h-10 rounded-full border-[1.5px] border-white/60 flex justify-center p-1 relative">
-                <div className="w-1 h-2 bg-white/80 rounded-full mt-1"></div>
+              <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop&q=80" alt="Carlos M." className="w-10 h-10 rounded-full border-[1.5px] border-[#d4a853]/50 object-cover shrink-0" />
+              <div className="flex flex-col text-left justify-center">
+                <span className="text-[#d4a853] text-[0.55rem] tracking-widest mb-0.5">★★★★★</span>
+                <span className="text-gray-200 text-[0.75rem] font-medium leading-tight">"Melhor barbearia de SP, atendimento impecável."</span>
+                <span className="text-[#a0a0a0] text-[0.65rem] font-bold mt-1">Carlos M.</span>
               </div>
-            </motion.button>
+            </motion.div>
           </motion.div>
         </div>
 
@@ -556,25 +538,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         <div className="relative z-10 w-full max-w-md md:max-w-2xl mx-auto px-5 pb-6 shrink-0 mt-auto">
           <div className="w-full h-px bg-white/10 mb-6"></div>
 
-          <div className="flex justify-between items-center w-full px-2">
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO HORÁRIO</span>
-              <span className="text-white font-bold text-sm">{nextAvailableTimeSlot}</span>
-            </div>
-
+          <div className="flex justify-around items-center w-full px-2">
             <button onClick={toggleHoursModal} className="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition-transform hover:opacity-80">
-              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">STATUS</span>
+              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">STATUS DA LOJA</span>
               <div className="flex items-center gap-1.5">
-                <span className={`font-semibold text-sm whitespace-nowrap ${shopStatusInfo.status === 'open' ? 'text-green-500' : shopStatusInfo.status === 'closing_soon' ? 'text-amber-400' : 'text-red-400'}`}>
-                  {shopStatusInfo.label}
+                <span className={`font-semibold text-sm whitespace-nowrap ${shopStatusInfo.status === 'open' ? 'text-green-500' : shopStatusInfo.status === 'closing_soon' ? 'text-amber-400' : 'text-white'}`}>
+                  {shopStatusInfo.status === 'closed' ? `Abre ${nextAvailableTimeSlot.startsWith('0') || nextAvailableTimeSlot.startsWith('1') || nextAvailableTimeSlot.startsWith('2') ? 'hoje às ' + nextAvailableTimeSlot : nextAvailableTimeSlot}` : shopStatusInfo.label}
                 </span>
               </div>
             </button>
 
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">TEMPO MÉDIO</span>
-              <span className="text-white font-bold text-sm">30 min</span>
-            </div>
+            {shopStatusInfo.status !== 'closed' && (
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO HORÁRIO</span>
+                <span className="text-white font-bold text-sm">{nextAvailableTimeSlot}</span>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -626,9 +605,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                       </div>
                     )}
                   </div>
-                  <span className="text-[clamp(0.75rem,1.4vh,0.9rem)] font-bold text-neutral-800 leading-[1.2] px-1 max-w-[80%]">
-                    {item.label}
-                  </span>
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-[clamp(0.75rem,1.4vh,0.9rem)] font-bold text-neutral-800 leading-[1.2] px-1 max-w-[80%]">
+                      {item.label}
+                    </span>
+                    <span className="text-[clamp(0.6rem,1.1vh,0.7rem)] text-neutral-500 font-medium leading-[1.2] px-1 max-w-[90%]">
+                      {item.desc}
+                    </span>
+                  </div>
                 </motion.div>
               );
             })}
@@ -658,28 +642,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </div>
             <button 
               onClick={() => { hapticLight(); onGoToBooking(); }}
-              className="text-[clamp(0.65rem,1.3vh,0.875rem)] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1 cursor-pointer"
+              className="text-[clamp(0.7rem,1.4vh,0.875rem)] font-bold text-[#d4a853] border border-[#d4a853]/40 hover:bg-[#d4a853]/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-95"
             >
-              <span>Ver todos os serviços</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Todos os serviços</span>
+              <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
             </button>
           </div>
 
-          {/* Galeria Bento Grid dos Serviços com Selo de Destaque (no máximo 6 fotos) */}
-          <div className="grid grid-cols-12 grid-rows-6 gap-[clamp(0.25rem,0.6vh,0.65rem)] flex-1 min-h-0 w-full h-full">
+          {/* Galeria Bento Grid dos Serviços com Selo de Destaque (no máximo 5 fotos) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-4 md:grid-rows-2 gap-[clamp(0.25rem,0.6vh,0.65rem)] flex-1 min-h-0 w-full h-full">
             {galleryFeaturedItems.length === 0 ? (
-              <div className="col-span-12 row-span-6 flex items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 text-center p-6">
+              <div className="col-span-2 md:col-span-4 row-span-4 md:row-span-2 flex items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 text-center p-6">
                 <p className="text-sm font-medium text-neutral-500">Nenhum serviço cadastrado no banco de dados.</p>
               </div>
-            ) : galleryFeaturedItems.map((item, index) => {
+            ) : galleryFeaturedItems.slice(0, 5).map((item, index) => {
               const isHero = index === 0;
-              let gridClass = 'col-span-4 md:col-span-4 row-span-2 md:row-span-2';
-              if (index === 0) {
-                gridClass = 'col-span-12 md:col-span-8 row-span-2 md:row-span-4';
-              } else if (index === 1 || index === 2) {
-                gridClass = 'col-span-6 md:col-span-4 row-span-2 md:row-span-2';
-              } else if (index >= 3) {
-                gridClass = 'col-span-4 md:col-span-4 row-span-2 md:row-span-2';
+              let gridClass = 'col-span-1 row-span-1';
+              if (isHero) {
+                gridClass = 'col-span-2 md:col-span-2 row-span-2 md:row-span-2';
               }
 
               return (
@@ -703,21 +683,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   />
 
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-[clamp(0.35rem,0.8vh,0.75rem)] select-none">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-[clamp(0.4rem,1vh,0.85rem)] select-none">
                     {/* Bottom Info */}
                     <div className="space-y-1">
-                      <h3 className={`text-white font-extrabold ${isHero ? 'text-[clamp(0.75rem,1.5vh,1.1rem)]' : 'text-[clamp(0.6rem,1.15vh,0.85rem)]'} leading-tight line-clamp-1`}>
+                      <h3 className={`text-white font-extrabold ${isHero ? 'text-[clamp(0.9rem,1.8vh,1.3rem)]' : 'text-[clamp(0.65rem,1.25vh,0.85rem)]'} leading-tight line-clamp-2`}>
                         {item.title}
                       </h3>
 
                       {isHero && (
-                        <p className="text-neutral-300 text-[clamp(0.5rem,0.85vh,0.7rem)] line-clamp-1">
+                        <p className="text-neutral-300 text-[clamp(0.65rem,1vh,0.85rem)] line-clamp-2 max-w-[90%]">
                           {item.description}
                         </p>
                       )}
 
-                      <div className="flex items-center justify-between gap-1 pt-0.5">
-                        <span className="text-[#C8A96A] font-black text-[clamp(0.6rem,1.2vh,0.85rem)]">
+                      <div className="flex items-center justify-between gap-1 pt-1">
+                        <span className="text-[#d4a853] font-black text-[clamp(0.7rem,1.4vh,0.95rem)]">
                           R$ {item.price.toFixed(2)}
                         </span>
                       </div>
@@ -786,6 +766,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 </div>
               </motion.div>
             ))}
+            <div className="flex justify-center pt-[clamp(0.25rem,0.5vh,0.5rem)] shrink-0">
+              <button onClick={handleOpenGoogleMaps} className="text-[clamp(0.7rem,1.4vh,0.875rem)] font-bold text-[#d4a853] hover:text-[#b89060] transition-colors flex items-center gap-1.5 cursor-pointer group">
+                <span className="border-b border-[#d4a853]/30 group-hover:border-[#b89060]">Ver mais avaliações no Google</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </motion.div>
       </section>
@@ -882,38 +868,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 {/* Quick Info Grid (Hours & Phone) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   <div className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs">
-                    <Clock className="w-3.5 h-3.5 text-[#C8A96A] shrink-0" />
+                    <Clock className={`w-3.5 h-3.5 shrink-0 ${shopStatusInfo.status === 'open' ? 'text-emerald-500' : 'text-[#C8A96A]'}`} />
                     <div>
                       <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Horário Hoje</span>
                       <span className="text-[10.5px] font-bold text-neutral-800">
-                        {shopStatusInfo.todayHours}
+                        {shopStatusInfo.status === 'closed' ? 'Fechado hoje' : shopStatusInfo.todayHours}
                       </span>
                     </div>
                   </div>
 
-                  <div className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs">
-                    <Phone className="w-3.5 h-3.5 text-[#C8A96A] shrink-0" />
+                  <a href={`tel:${(shopProfile.phone || '(88) 99834-0085').replace(/\D/g, '')}`} className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs hover:bg-neutral-100 transition-colors cursor-pointer group">
+                    <Phone className="w-3.5 h-3.5 text-[#C8A96A] shrink-0 group-hover:scale-110 transition-transform" />
                     <div>
                       <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Contato Direto</span>
                       <span className="text-[10.5px] font-bold text-neutral-800">
                         {shopProfile.phone || '(88) 99834-0085'}
                       </span>
                     </div>
-                  </div>
+                  </a>
                 </div>
               </div>
 
               {/* Action Buttons Zone */}
-              <div className="pt-2 sm:pt-3 border-t border-neutral-200/80 shrink-0">
+              <div className="pt-2 sm:pt-3 border-t border-neutral-200/80 shrink-0 grid grid-cols-2 gap-2">
                 <motion.button 
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={handleOpenGoogleMaps}
-                  className="w-full bg-neutral-900 hover:bg-black text-white font-extrabold text-[clamp(0.75rem,1.5vh,0.875rem)] py-[clamp(0.75rem,1.8vh,1rem)] px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-md cursor-pointer tracking-wide border border-neutral-900"
+                  className="w-full bg-neutral-900 hover:bg-black text-white font-extrabold text-[clamp(0.7rem,1.4vh,0.8rem)] py-3 px-2 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer tracking-wide border border-neutral-900"
                 >
                   <Navigation className="w-4 h-4 fill-[#C8A96A] text-[#C8A96A]" />
                   <span>COMO CHEGAR</span>
                 </motion.button>
+                <motion.a 
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.97 }}
+                  href={`tel:${(shopProfile.phone || '(88) 99834-0085').replace(/\D/g, '')}`}
+                  className="w-full bg-white hover:bg-neutral-50 text-neutral-900 font-extrabold text-[clamp(0.7rem,1.4vh,0.8rem)] py-3 px-2 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer tracking-wide border border-neutral-200"
+                >
+                  <Phone className="w-4 h-4 fill-neutral-200 text-neutral-900" />
+                  <span>LIGAR AGORA</span>
+                </motion.a>
               </div>
 
             </div>
@@ -964,9 +959,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_online_footer');
                 onGoToBooking();
               }}
-              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.85rem,1.8vh,1.05rem)] py-[clamp(0.85rem,1.9vh,1.15rem)] px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-[#d4a853]"
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-extrabold text-[clamp(1rem,2vh,1.15rem)] py-[clamp(1rem,2.2vh,1.25rem)] px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-[#d4a853] shadow-lg shadow-[#d4a853]/10"
             >
-              <span className="font-extrabold tracking-wide">Agendar meu horário agora</span>
+              <span className="tracking-wide">Agendar meu horário agora</span>
               <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
             </motion.button>
 
@@ -976,10 +971,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_whatsapp_footer');
                 handleOpenWhatsApp();
               }}
-              className="flex items-center justify-center gap-2 text-[#4ade80] hover:text-[#22c55e] font-bold text-[clamp(0.8rem,1.6vh,0.9rem)] py-1.5 transition-colors cursor-pointer group"
+              className="flex items-center justify-center gap-2 text-[#4ade80]/80 hover:text-[#4ade80] font-semibold text-[clamp(0.7rem,1.4vh,0.8rem)] py-1.5 transition-colors cursor-pointer group"
             >
-              <MessageCircle className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
-              <span>ou tirar dúvidas no WhatsApp</span>
+              <MessageCircle className="w-3.5 h-3.5 fill-current group-hover:scale-110 transition-transform" />
+              <span className="border-b border-transparent group-hover:border-[#4ade80]/50 transition-colors">Tirar dúvidas no WhatsApp</span>
             </button>
           </div>
 
@@ -1006,16 +1001,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         </div>
 
         {/* FOOTER */}
-        <footer className="relative z-10 w-full bg-[#06070a] border-t border-gray-800 px-5 py-3.5 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto text-[0.75rem] text-[#d1d5db] font-medium">
-          <p>
-            © 2026 Navo Premium. Todos os direitos reservados.
-          </p>
-          <p className="text-gray-300">
-            {shopProfile.address}
-          </p>
-          <p>
-            Desenvolvido com excelência por <span className="text-[#e5b863] font-bold">Navo</span>
-          </p>
+        <footer className="relative z-10 w-full bg-[#06070a] border-t border-gray-800 px-5 py-6 shrink-0 flex flex-col gap-5 mt-auto text-[0.75rem] text-[#8b919e] font-medium">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-800/60 pb-5">
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[#d4a853] font-bold text-sm uppercase tracking-widest">{shopProfile.name}</span>
+              <span>{shopProfile.address}</span>
+              <span className="text-gray-400">Ter-Sáb: 09:00 às 20:00</span>
+            </div>
+            <div className="flex flex-wrap gap-4 sm:gap-6">
+              <a href="#" className="hover:text-white transition-colors">Privacidade</a>
+              <a href="#" className="hover:text-white transition-colors">Termos</a>
+              {shopProfile.instagramUrl && (
+                <a href={shopProfile.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <Instagram className="w-3.5 h-3.5" /> Instagram
+                </a>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 w-full">
+            <p>
+              © 2026 Navo Premium. Todos os direitos reservados.
+            </p>
+            <p>
+              Desenvolvido por <span className="text-[#e5b863] font-bold">Navo</span>
+            </p>
+          </div>
         </footer>
       </section>
 
