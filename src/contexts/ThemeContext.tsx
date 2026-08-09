@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { authFetch } from '../lib/api';
 
+export type ThemeMode = 'dark' | 'light';
+
 export type ThemePalette =
   | 'heritage'
   | 'sapphire'
@@ -63,8 +65,8 @@ export const PALETTES: PaletteItem[] = [
   { id: 'mint', name: 'Menta Ice', description: 'Refrescante e contemporâneo', accent: '#10B981', accentSoft: '#6EE7B7', deep: '#047857' },
   { id: 'coral', name: 'Coral Sunset', description: 'Vibrante e caloroso', accent: '#F97316', accentSoft: '#FDBA74', deep: '#C2410C' },
   { id: 'titanium', name: 'Titânio Grafite', description: 'Sóbrio e urbano', accent: '#64748B', accentSoft: '#CBD5E1', deep: '#334155' },
-  { id: 'onyx', name: 'Preto Onyx', description: 'Monocromático escuro absoluto', accent: '#18181B', accentSoft: '#3F3F46', deep: '#09090B' },
-  { id: 'pearl', name: 'Branco Pérola', description: 'Monocromático claro radiante', accent: '#F8FAFC', accentSoft: '#E2E8F0', deep: '#CBD5E1' },
+  { id: 'onyx', name: 'Preto Onyx', description: 'Monocromático escuro absoluto', accent: '#F4F4F5', accentSoft: '#FAFAFA', deep: '#A1A1AA' },
+  { id: 'pearl', name: 'Branco Pérola', description: 'Monocromático claro radiante', accent: '#E2E8F0', accentSoft: '#F8FAFC', deep: '#94A3B8' },
   { id: 'sand', name: 'Duna Dourada', description: 'Quente e terroso', accent: '#D97706', accentSoft: '#FBBF24', deep: '#92400E' },
   { id: 'plum', name: 'Ameixa Velvet', description: 'Rico e aveludado', accent: '#A855F7', accentSoft: '#D8B4FE', deep: '#7E22CE' },
   { id: 'electric', name: 'Azul Elétrico', description: 'Neon moderno e dinâmico', accent: '#06B6D4', accentSoft: '#67E8F9', deep: '#0891B2' },
@@ -76,18 +78,28 @@ export const PALETTES: PaletteItem[] = [
 ];
 
 interface ThemeContextType {
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode) => void;
   palette: ThemePalette;
   setPalette: (palette: ThemePalette) => void;
   paletteDefinition: PaletteItem;
 }
 
 const STORAGE_KEY = 'navo_theme_palette';
+const THEME_STORAGE_KEY = 'navo_theme_mode';
 
 const ThemeContext = createContext<ThemeContextType>({
+  theme: 'dark',
+  setTheme: () => {},
   palette: 'heritage',
   setPalette: () => {},
   paletteDefinition: PALETTES[0],
 });
+
+function getInitialTheme(): ThemeMode {
+  if (typeof window === 'undefined') return 'dark';
+  return localStorage.getItem(THEME_STORAGE_KEY) === 'light' ? 'light' : 'dark';
+}
 
 function getInitialPalette(): ThemePalette {
   if (typeof window === 'undefined') return 'heritage';
@@ -96,17 +108,20 @@ function getInitialPalette(): ThemePalette {
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setThemeState] = useState<ThemeMode>(getInitialTheme);
   const [palette, setPaletteState] = useState<ThemePalette>(getInitialPalette);
   const hasUserChangedPalette = useRef(false);
 
   useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
     if (palette && palette !== 'heritage') {
       document.documentElement.setAttribute('data-palette', palette);
     } else {
       document.documentElement.removeAttribute('data-palette');
     }
     localStorage.setItem(STORAGE_KEY, palette);
-  }, [palette]);
+  }, [theme, palette]);
 
   useEffect(() => {
     let cancelled = false;
@@ -131,6 +146,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
+  const setTheme = (nextTheme: ThemeMode) => {
+    setThemeState(nextTheme);
+  };
+
   const setPalette = (nextPalette: ThemePalette) => {
     hasUserChangedPalette.current = true;
     setPaletteState(nextPalette);
@@ -146,7 +165,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const paletteDefinition = PALETTES.find((item) => item.id === palette) || PALETTES[0];
 
   return (
-    <ThemeContext.Provider value={{ palette, setPalette, paletteDefinition }}>
+    <ThemeContext.Provider value={{ theme, setTheme, palette, setPalette, paletteDefinition }}>
       {children}
     </ThemeContext.Provider>
   );

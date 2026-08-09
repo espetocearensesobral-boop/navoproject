@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { hapticLight, hapticMedium } from '../../lib/haptics';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
+import { useTheme } from '../../contexts/ThemeContext';
 import { 
   User, 
   Crown, 
@@ -42,12 +43,8 @@ export const ClientMoreDrawer: React.FC<ClientMoreDrawerProps> = ({
   onLogout,
   onOpenInstall,
 }) => {
-  const [theme, setTheme] = useState(document.documentElement.getAttribute('data-theme') || 'dark');
+  const { theme, setTheme } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
-  React.useEffect(() => {
-    setTheme(document.documentElement.getAttribute('data-theme') || 'dark');
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -218,9 +215,8 @@ export const ClientMoreDrawer: React.FC<ClientMoreDrawerProps> = ({
             {/* Theme Toggle */}
             <button
               onClick={() => {
-                const newTheme = theme === 'dark' ? 'light' : 'dark';
-                setTheme(newTheme);
-                document.documentElement.setAttribute('data-theme', newTheme);
+                hapticLight();
+                setTheme(theme === 'dark' ? 'light' : 'dark');
               }}
               className="w-full bg-surface-base/50 hover:bg-surface-base p-3.5 rounded-btn border border-border-subtle/60 flex items-center justify-between transition-all text-left"
             >
@@ -256,7 +252,7 @@ export const ClientMoreDrawer: React.FC<ClientMoreDrawerProps> = ({
                   onClose();
                   onOpenLogin();
                 }}
-                className="w-full p-3.5 rounded-btn bg-gold-base hover:bg-gold-base text-surface-base text-xs font-extrabold flex items-center justify-center gap-2 transition-all active:scale-95"
+                className="w-full p-3.5 rounded-btn bg-gold-base hover:bg-gold-hover text-content-on-accent text-xs font-extrabold flex items-center justify-center gap-2 transition-all active:scale-95"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Fazer Login ou Criar Conta</span>

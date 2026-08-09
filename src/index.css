@@ -8,7 +8,9 @@
   --color-gold-base: var(--color-gold-base);
   --color-gold-deep: var(--color-gold-deep);
   --color-gold-accent: var(--color-gold-accent);
+  --color-gold-hover: var(--color-gold-hover);
   --color-content-base: var(--color-content-base);
+  --color-content-on-accent: var(--color-content-on-accent);
   
   --color-border-subtle: var(--color-border-subtle);
   --color-content-muted: var(--color-content-muted);
@@ -43,7 +45,9 @@
   --color-gold-base: #D4AF5A;
   --color-gold-deep: #A88234;
   --color-gold-accent: #C8A24B;
+  --color-gold-hover: #E4C372;
   --color-content-base: #F2EDE4;
+  --color-content-on-accent: #12131A;
   --color-content-muted: #8A8F98;
   --color-border-subtle: rgba(242, 237, 228, 0.08);
 
@@ -79,7 +83,9 @@
   --color-gold-base: #8B6914;
   --color-gold-deep: #70540F;
   --color-gold-accent: #D4AF5A;
+  --color-gold-hover: #70540F;
   --color-content-base: #1A1C1E;
+  --color-content-on-accent: #FFFFFF;
   --color-content-muted: #6B6E73;
   --color-border-subtle: rgba(26, 28, 30, 0.08);
 
@@ -110,8 +116,8 @@
 [data-palette="mint"] { --color-gold-base: #10B981; --color-gold-deep: #047857; --color-gold-accent: #6EE7B7; }
 [data-palette="coral"] { --color-gold-base: #F97316; --color-gold-deep: #C2410C; --color-gold-accent: #FDBA74; }
 [data-palette="titanium"] { --color-gold-base: #64748B; --color-gold-deep: #334155; --color-gold-accent: #CBD5E1; }
-[data-palette="onyx"] { --color-gold-base: #FFFFFF; --color-gold-deep: #E4E4E7; --color-gold-accent: #FAFAFA; }
-[data-palette="pearl"] { --color-gold-base: #FFFFFF; --color-gold-deep: #E2E8F0; --color-gold-accent: #FAFAFA; }
+[data-palette="onyx"] { --color-gold-base: #F4F4F5; --color-gold-deep: #A1A1AA; --color-gold-accent: #FAFAFA; }
+[data-palette="pearl"] { --color-gold-base: #E2E8F0; --color-gold-deep: #94A3B8; --color-gold-accent: #F8FAFC; }
 [data-palette="sand"] { --color-gold-base: #D97706; --color-gold-deep: #92400E; --color-gold-accent: #FBBF24; }
 [data-palette="plum"] { --color-gold-base: #A855F7; --color-gold-deep: #7E22CE; --color-gold-accent: #D8B4FE; }
 [data-palette="electric"] { --color-gold-base: #06B6D4; --color-gold-deep: #0891B2; --color-gold-accent: #67E8F9; }
@@ -121,7 +127,69 @@
 [data-palette="lavender"] { --color-gold-base: #C084FC; --color-gold-deep: #9333EA; --color-gold-accent: #E9D5FF; }
 [data-palette="bordeaux"] { --color-gold-base: #F43F5E; --color-gold-deep: #BE123C; --color-gold-accent: #FECDD3; }
 
+/* Hover semântico por paleta */
+[data-palette="heritage"] { --color-gold-hover: #E5CD9A; }
+[data-palette="sapphire"] { --color-gold-hover: #9DBBFF; }
+[data-palette="emerald"] { --color-gold-hover: #7DDBAA; }
+[data-palette="amethyst"] { --color-gold-hover: #C4B5FD; }
+[data-palette="ruby"] { --color-gold-hover: #FF9AA0; }
+[data-palette="ocean"] { --color-gold-hover: #67DCEB; }
+[data-palette="copper"] { --color-gold-hover: #F0B184; }
+[data-palette="rose"] { --color-gold-hover: #F5A9C8; }
+[data-palette="olive"] { --color-gold-hover: #C7D2A9; }
+[data-palette="slate"] { --color-gold-hover: #C2CCD8; }
+[data-palette="amber"] { --color-gold-hover: #FCD34D; }
+[data-palette="teal"] { --color-gold-hover: #5EEAD4; }
+[data-palette="indigo"] { --color-gold-hover: #A5B4FC; }
+[data-palette="crimson"] { --color-gold-hover: #FDA4AF; }
+[data-palette="bronze"] { --color-gold-hover: #E4B28C; }
+[data-palette="violet"] { --color-gold-hover: #DDD6FE; }
+[data-palette="champagne"] { --color-gold-hover: #E8D7C3; }
+[data-palette="mint"] { --color-gold-hover: #6EE7B7; }
+[data-palette="coral"] { --color-gold-hover: #FDBA74; }
+[data-palette="titanium"] { --color-gold-hover: #CBD5E1; }
+[data-palette="onyx"] { --color-gold-hover: #3F3F46; }
+[data-palette="pearl"] { --color-gold-hover: #E2E8F0; }
+[data-palette="sand"] { --color-gold-hover: #FBBF24; }
+[data-palette="plum"] { --color-gold-hover: #D8B4FE; }
+[data-palette="electric"] { --color-gold-hover: #67E8F9; }
+[data-palette="sage"] { --color-gold-hover: #CAD2C5; }
+[data-palette="terracotta"] { --color-gold-hover: #F2CC8F; }
+[data-palette="midnight"] { --color-gold-hover: #93C5FD; }
+[data-palette="lavender"] { --color-gold-hover: #E9D5FF; }
+[data-palette="bordeaux"] { --color-gold-hover: #FECDD3; }
+
 /* Em tema claro, tons de destaque mais profundos preservam contraste em CTAs e foco. */
+[data-theme="light"][data-palette="heritage"] { --color-gold-hover: #8F7138; }
+[data-theme="light"][data-palette="sapphire"] { --color-gold-hover: #315FBA; }
+[data-theme="light"][data-palette="emerald"] { --color-gold-hover: #168052; }
+[data-theme="light"][data-palette="amethyst"] { --color-gold-hover: #7658D4; }
+[data-theme="light"][data-palette="ruby"] { --color-gold-hover: #B83D49; }
+[data-theme="light"][data-palette="ocean"] { --color-gold-hover: #087F92; }
+[data-theme="light"][data-palette="copper"] { --color-gold-hover: #A55225; }
+[data-theme="light"][data-palette="rose"] { --color-gold-hover: #B6497B; }
+[data-theme="light"][data-palette="olive"] { --color-gold-hover: #68764F; }
+[data-theme="light"][data-palette="slate"] { --color-gold-hover: #5E6D82; }
+[data-theme="light"][data-palette="amber"] { --color-gold-hover: #B45309; }
+[data-theme="light"][data-palette="teal"] { --color-gold-hover: #0F766E; }
+[data-theme="light"][data-palette="indigo"] { --color-gold-hover: #4338CA; }
+[data-theme="light"][data-palette="crimson"] { --color-gold-hover: #9F1239; }
+[data-theme="light"][data-palette="bronze"] { --color-gold-hover: #8A4F23; }
+[data-theme="light"][data-palette="violet"] { --color-gold-hover: #6D28D9; }
+[data-theme="light"][data-palette="champagne"] { --color-gold-hover: #9E815D; }
+[data-theme="light"][data-palette="mint"] { --color-gold-hover: #047857; }
+[data-theme="light"][data-palette="coral"] { --color-gold-hover: #C2410C; }
+[data-theme="light"][data-palette="titanium"] { --color-gold-hover: #334155; }
+[data-theme="light"][data-palette="onyx"] { --color-gold-hover: #09090B; }
+[data-theme="light"][data-palette="pearl"] { --color-gold-hover: #CBD5E1; }
+[data-theme="light"][data-palette="sand"] { --color-gold-hover: #92400E; }
+[data-theme="light"][data-palette="plum"] { --color-gold-hover: #7E22CE; }
+[data-theme="light"][data-palette="electric"] { --color-gold-hover: #0891B2; }
+[data-theme="light"][data-palette="sage"] { --color-gold-hover: #52796F; }
+[data-theme="light"][data-palette="terracotta"] { --color-gold-hover: #B35338; }
+[data-theme="light"][data-palette="midnight"] { --color-gold-hover: #1D4ED8; }
+[data-theme="light"][data-palette="lavender"] { --color-gold-hover: #9333EA; }
+[data-theme="light"][data-palette="bordeaux"] { --color-gold-hover: #BE123C; }
 [data-theme="light"][data-palette="sapphire"] { --color-gold-base: #315FBA; --color-gold-deep: #244B99; --color-gold-accent: #5B8DEF; }
 [data-theme="light"][data-palette="emerald"] { --color-gold-base: #168052; --color-gold-deep: #0D633F; --color-gold-accent: #35B779; }
 [data-theme="light"][data-palette="amethyst"] { --color-gold-base: #7658D4; --color-gold-deep: #5940AD; --color-gold-accent: #A78BFA; }
