@@ -12,28 +12,7 @@ export default defineConfig(() => {
       },
     },
     build: {
-      chunkSizeWarningLimit: 1000,
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            if (id.includes('node_modules')) {
-              if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/react-router') || id.includes('/@remix-run/')) {
-                return 'vendor-react';
-              }
-              if (id.includes('lucide-react')) {
-                return 'vendor-icons';
-              }
-              if (id.includes('framer-motion') || id.includes('/motion/')) {
-                return 'vendor-motion';
-              }
-              if (id.includes('date-fns') || id.includes('react-day-picker')) {
-                return 'vendor-date';
-              }
-              return 'vendor'; // all other node_modules
-            }
-          },
-        },
-      },
+      chunkSizeWarningLimit: 2000,
     },
     server: {
     port: 3000,
