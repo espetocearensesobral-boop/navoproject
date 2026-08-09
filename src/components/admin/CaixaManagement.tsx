@@ -426,9 +426,9 @@ export const CaixaManagement: React.FC = () => {
           <p className="text-xs text-content-muted py-3 text-center">Nenhum histórico de fechamento gravado.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs min-w-[880px]">
               <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
-                <tr>
+                <tr className="whitespace-nowrap">
                   <th className="p-3">Data Fechamento</th>
                   <th className="p-3">Operador</th>
                   <th className="p-3 text-right">Fundo Inicial</th>

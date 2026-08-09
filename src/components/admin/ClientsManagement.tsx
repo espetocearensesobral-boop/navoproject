@@ -395,22 +395,22 @@ export const ClientsManagement: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
           <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
             {/* Header */}
-            <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
+            <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover shrink-0">
                   <Users className="w-4 h-4" />
                 </div>
-                <div>
-                  <h2 className="text-sm font-bold text-content-base">
+                <div className="min-w-0">
+                  <h2 className="text-sm font-bold text-content-base truncate">
                     {editingClient ? `Editar: ${editingClient.name}` : 'Cadastrar Novo Cliente'}
                   </h2>
-                  <p className="text-[10px] text-content-muted">Ajuste informações de contato e pontuação</p>
+                  <p className="text-[10px] text-content-muted truncate">Ajuste informações de contato e pontuação</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-7 h-7 rounded-xl bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-xl bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>

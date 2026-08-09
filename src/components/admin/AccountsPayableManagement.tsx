@@ -217,9 +217,9 @@ export const AccountsPayableManagement: React.FC = () => {
       {/* Accounts List */}
       <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-xs min-w-[760px]">
             <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
-              <tr>
+              <tr className="whitespace-nowrap">
                 <th className="p-3">Descrição / Fornecedor</th>
                 <th className="p-3">Categoria</th>
                 <th className="p-3">Vencimento</th>

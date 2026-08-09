@@ -366,9 +366,9 @@ export const ReportsManagement: React.FC = () => {
               </p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+                <table className="w-full text-left text-xs min-w-[600px]">
                   <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
-                    <tr>
+                    <tr className="whitespace-nowrap">
                       <th className="p-3">Posição</th>
                       <th className="p-3">Cliente</th>
                       <th className="p-3 text-center">Visitas</th>

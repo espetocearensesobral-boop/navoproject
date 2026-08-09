@@ -548,9 +548,9 @@ export const ComandasManagement: React.FC = () => {
           ) : (
             <div className="bg-surface-card border border-border-subtle rounded-xl overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+                <table className="w-full text-left text-xs min-w-[760px]">
                   <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
-                    <tr>
+                    <tr className="whitespace-nowrap">
                       <th className="p-3">Código</th>
                       <th className="p-3">Cliente</th>
                       <th className="p-3">Profissional</th>
