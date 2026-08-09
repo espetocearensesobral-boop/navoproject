@@ -38,8 +38,7 @@ import {
   Eye,
   Plus,
   ZoomIn,
-  Sparkles,
-  MapPin
+  Sparkles
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
 import { trackEvent } from '../../lib/analytics';

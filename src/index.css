@@ -90,6 +90,28 @@
   --color-status-info: #2563EB;
 }
 
+/* Paletas de destaque: o restante da identidade permanece vinculado ao tema claro/preto. */
+[data-palette="sapphire"] { --color-gold-base: #5B8DEF; --color-gold-deep: #315FBA; --color-gold-accent: #9DBBFF; }
+[data-palette="emerald"] { --color-gold-base: #35B779; --color-gold-deep: #168052; --color-gold-accent: #7DDBAA; }
+[data-palette="amethyst"] { --color-gold-base: #A78BFA; --color-gold-deep: #7658D4; --color-gold-accent: #C4B5FD; }
+[data-palette="ruby"] { --color-gold-base: #EF6B73; --color-gold-deep: #B83D49; --color-gold-accent: #FF9AA0; }
+[data-palette="ocean"] { --color-gold-base: #22B8CF; --color-gold-deep: #087F92; --color-gold-accent: #67DCEB; }
+[data-palette="copper"] { --color-gold-base: #D88952; --color-gold-deep: #A55225; --color-gold-accent: #F0B184; }
+[data-palette="rose"] { --color-gold-base: #E779A9; --color-gold-deep: #B6497B; --color-gold-accent: #F5A9C8; }
+[data-palette="olive"] { --color-gold-base: #A3B18A; --color-gold-deep: #68764F; --color-gold-accent: #C7D2A9; }
+[data-palette="slate"] { --color-gold-base: #94A3B8; --color-gold-deep: #5E6D82; --color-gold-accent: #C2CCD8; }
+
+/* Em tema claro, tons de destaque mais profundos preservam contraste em CTAs e foco. */
+[data-theme="light"][data-palette="sapphire"] { --color-gold-base: #315FBA; --color-gold-deep: #244B99; --color-gold-accent: #5B8DEF; }
+[data-theme="light"][data-palette="emerald"] { --color-gold-base: #168052; --color-gold-deep: #0D633F; --color-gold-accent: #35B779; }
+[data-theme="light"][data-palette="amethyst"] { --color-gold-base: #7658D4; --color-gold-deep: #5940AD; --color-gold-accent: #A78BFA; }
+[data-theme="light"][data-palette="ruby"] { --color-gold-base: #B83D49; --color-gold-deep: #922E39; --color-gold-accent: #EF6B73; }
+[data-theme="light"][data-palette="ocean"] { --color-gold-base: #087F92; --color-gold-deep: #056572; --color-gold-accent: #22B8CF; }
+[data-theme="light"][data-palette="copper"] { --color-gold-base: #A55225; --color-gold-deep: #813D1A; --color-gold-accent: #D88952; }
+[data-theme="light"][data-palette="rose"] { --color-gold-base: #B6497B; --color-gold-deep: #963662; --color-gold-accent: #E779A9; }
+[data-theme="light"][data-palette="olive"] { --color-gold-base: #68764F; --color-gold-deep: #515D3D; --color-gold-accent: #A3B18A; }
+[data-theme="light"][data-palette="slate"] { --color-gold-base: #5E6D82; --color-gold-deep: #465366; --color-gold-accent: #94A3B8; }
+
 
 
 html, body {
@@ -223,7 +245,7 @@ button, a, input, select, textarea {
 
 .geometric-grid-bg {
   background-color: var(--color-surface-base);
-  background-image: radial-gradient(rgba(201, 169, 110, 0.1) 0.5px, transparent 0.5px);
+  background-image: radial-gradient(color-mix(in srgb, var(--color-gold-base) 16%, transparent) 0.5px, transparent 0.5px);
   background-size: 24px 24px;
 }
 
@@ -251,7 +273,7 @@ button, a, input, select, textarea {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 .border-accent {
-  border: 1px solid rgba(201, 169, 110, 0.25);
+  border: 1px solid color-mix(in srgb, var(--color-gold-base) 25%, transparent);
 }
 .transition-sharp {
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -260,7 +282,7 @@ button, a, input, select, textarea {
 
 /* Texturas adaptadas para tema claro */
 [data-theme="light"] .geometric-grid-bg {
-  background-image: radial-gradient(rgba(139, 99, 50, 0.14) 0.5px, transparent 0.5px);
+  background-image: radial-gradient(color-mix(in srgb, var(--color-gold-base) 18%, transparent) 0.5px, transparent 0.5px);
 }
 [data-theme="light"] .gradient-surface {
   background: linear-gradient(180deg, var(--color-surface-card), var(--color-surface-base));

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Store, Phone, Link as LinkIcon, Save, Camera, CheckCircle2, Globe, Clock, MapPin } from 'lucide-react';
+import { Store, Phone, Link as LinkIcon, Save, Camera, CheckCircle2, Globe, Clock, MapPin, Palette, Check } from 'lucide-react';
+import { PALETTES, useTheme } from '../../contexts/ThemeContext';
 
-type SettingsTab = 'contacts' | 'links';
+type SettingsTab = 'contacts' | 'links' | 'appearance';
 
 export const SettingsManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('contacts');
@@ -27,6 +28,8 @@ export const SettingsManagement: React.FC = () => {
         return <ContactSettings onSave={handleSave} isSaving={isSaving} />;
       case 'links':
         return <LinkSettings onSave={handleSave} isSaving={isSaving} />;
+      case 'appearance':
+        return <AppearanceSettings />;
       default:
         return null;
     }
@@ -76,6 +79,7 @@ export const SettingsManagement: React.FC = () => {
       <div className="bg-surface-card border border-border-subtle rounded-md p-1 flex items-center gap-1 overflow-x-auto custom-scrollbar">
         <TabButton active={activeTab === 'contacts'} onClick={() => setActiveTab('contacts')} icon={Phone} label="Canais de Contato" />
         <TabButton active={activeTab === 'links'} onClick={() => setActiveTab('links')} icon={LinkIcon} label="Links & Redes" />
+        <TabButton active={activeTab === 'appearance'} onClick={() => setActiveTab('appearance')} icon={Palette} label="Aparência" />
       </div>
 
       {/* MAIN CONTENT AREA */}
@@ -100,6 +104,57 @@ const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
 );
 
 // --- Subcomponents for each tab ---
+
+const AppearanceSettings: React.FC = () => {
+  const { palette, setPalette } = useTheme();
+
+  return (
+    <div className="space-y-6 max-w-3xl text-xs min-w-0">
+      <div>
+        <h2 className="text-sm font-serif font-bold text-content-base mb-0.5">Paleta do sistema</h2>
+        <p className="text-[11px] text-content-muted mb-4 max-w-xl">
+          Personalize a cor de destaque do Navo sem alterar o tema claro/preto. A escolha é salva neste dispositivo e aplicada em todo o sistema.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+        {PALETTES.map((item) => {
+          const selected = palette === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setPalette(item.id)}
+              aria-pressed={selected}
+              className={`group text-left rounded-lg border p-3 transition-all active:scale-[0.98] ${selected ? 'border-gold-base bg-gold-base/10 shadow-sm' : 'border-border-subtle bg-surface-base hover:border-gold-base/50 hover:bg-surface-elevated'}`}
+            >
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-8 h-8 rounded-md shrink-0 border border-white/10 shadow-inner" style={{ background: `linear-gradient(135deg, ${item.accentSoft}, ${item.deep})` }} />
+                  <span className="min-w-0">
+                    <span className="block text-xs font-bold text-content-base truncate">{item.name}</span>
+                    <span className="block text-[10px] text-content-muted truncate">{item.description}</span>
+                  </span>
+                </div>
+                {selected && <span className="w-5 h-5 rounded-full flex items-center justify-center text-surface-base" style={{ backgroundColor: item.accent }}><Check className="w-3 h-3" /></span>}
+              </div>
+              <div className="flex gap-1.5" aria-hidden="true">
+                <span className="h-1.5 flex-1 rounded-full" style={{ backgroundColor: item.deep }} />
+                <span className="h-1.5 flex-1 rounded-full" style={{ backgroundColor: item.accent }} />
+                <span className="h-1.5 flex-1 rounded-full" style={{ backgroundColor: item.accentSoft }} />
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="pt-4 border-t border-border-subtle flex items-start gap-2 text-[11px] text-content-muted">
+        <Palette className="w-4 h-4 text-gold-base shrink-0 mt-0.5" />
+        <p>O dourado Heritage permanece como padrão original. As demais opções alteram apenas os tokens de destaque, mantendo contraste, estados e hierarquia visual nativos.</p>
+      </div>
+    </div>
+  );
+};
 
 const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: boolean }) => (
   <div className="space-y-6 max-w-2xl text-xs min-w-0">
