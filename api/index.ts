@@ -2651,7 +2651,7 @@ app.get("/api/profiles", requireAuth, async (req: any, res) => {
 
 app.post("/api/profiles", authLimiter, async (req, res) => {
   try {
-    const { name, email, phone, password, role, id, avatar_url, avatarUrl, ...rest } = req.body;
+    const { name, email, phone, password, role, id, avatar_url, avatarUrl, lgpdConsent, lgpdConsentDate, ...rest } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Nome é obrigatório.' });
@@ -2688,6 +2688,8 @@ app.post("/api/profiles", authLimiter, async (req, res) => {
       avatarUrl: avatar,
       loyaltyPoints: 0,
       loyaltyTier: 'Bronze',
+      lgpdConsent: Boolean(lgpdConsent),
+      lgpdConsentDate: lgpdConsent ? (lgpdConsentDate ? new Date(lgpdConsentDate) : new Date()) : null,
       createdAt: new Date(),
       updatedAt: new Date()
     };

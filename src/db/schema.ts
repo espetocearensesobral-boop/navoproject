@@ -17,6 +17,8 @@ export const profiles = pgTable('profiles', {
   themePalette: text('theme_palette').notNull().default('heritage'),
   resetCodeHash: text('reset_code_hash'),
   resetCodeExpiresAt: timestamp('reset_code_expires_at'),
+  lgpdConsent: boolean('lgpd_consent').notNull().default(false),
+  lgpdConsentDate: timestamp('lgpd_consent_date'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
