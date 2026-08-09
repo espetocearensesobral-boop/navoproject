@@ -15,7 +15,6 @@ import { WaitingQueue } from './WaitingQueue';
 import { SettingsManagement } from './SettingsManagement';
 import { NavoRewardsAdmin } from './NavoRewardsAdmin';
 import { BarbershopProfileManagement } from './BarbershopProfileManagement';
-import { AdminMobileHub } from './AdminMobileHub';
 import { authFetch } from '../../lib/api';
 import { 
   Calendar,
@@ -42,7 +41,6 @@ import {
 } from 'lucide-react';
 
 export type AdminTab = 
-  | 'hub'
   | 'dashboard' 
   | 'agenda' 
   | 'pdv'
@@ -63,12 +61,7 @@ export type AdminTab =
 export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionamento' | 'sistema';
 
 export const AdminLayout: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<AdminTab>(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      return 'hub';
-    }
-    return 'agenda';
-  });
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [adminName, setAdminName] = useState('Admin');
@@ -97,13 +90,6 @@ export const AdminLayout: React.FC = () => {
   }
 
   const navItems = [
-    { 
-      id: 'hub' as AdminTab, 
-      label: 'Módulos / Hub', 
-      icon: LayoutGrid,
-      description: 'Painel principal de entrada',
-      section: 'operacao' as AdminSection,
-    },
     { 
       id: 'dashboard' as AdminTab, 
       label: 'Dashboard', 
@@ -230,7 +216,7 @@ export const AdminLayout: React.FC = () => {
 
   // Quick bottom bar items matching mobile model
   const bottomBarItems = [
-    { id: 'hub' as AdminTab, label: 'Módulos', icon: LayoutGrid },
+    { id: 'dashboard' as AdminTab, label: 'Dashboard', icon: TrendingUp },
     { id: 'agenda' as AdminTab, label: 'Agenda', icon: Calendar },
     { id: 'clientes' as AdminTab, label: 'Clientes', icon: UserCheck },
   ];
@@ -241,14 +227,6 @@ export const AdminLayout: React.FC = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'hub':
-        return (
-          <AdminMobileHub 
-            onSelectTab={(tab) => setActiveTab(tab)} 
-            adminName={adminName} 
-            onLogout={handleLogout} 
-          />
-        );
       case 'dashboard':
         return <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />;
       case 'pdv':
@@ -366,33 +344,25 @@ export const AdminLayout: React.FC = () => {
         </div>
       </aside>
 
-      {/* Mobile Topbar - Only shown when inside a specific module (not on Hub) */}
-      {activeTab !== 'hub' && (
-        <header className="lg:hidden fixed top-0 left-0 right-0 h-[56px] bg-surface-card border-b border-border-subtle z-40 px-3 flex items-center justify-between">
-          <button
-            onClick={() => setActiveTab('hub')}
-            className="h-9 px-2.5 flex items-center gap-1.5 rounded-lg border border-gold-base/30 bg-gold-base/10 text-gold-base text-xs font-bold active:scale-95 transition-all"
-            aria-label="Voltar para Módulos"
-          >
-            <LayoutGrid className="w-4 h-4" />
-            <span>Módulos</span>
-          </button>
-          
-          <div className="flex items-center gap-2 min-w-0 px-2">
-            <h1 className="text-sm font-serif font-bold text-content-base truncate">
-              {navItems.find(i => i.id === activeTab)?.label || 'Navo Premium'}
-            </h1>
+      {/* Mobile Topbar */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-[56px] bg-surface-card border-b border-border-subtle z-40 px-3 flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0 px-2">
+          <div className="w-8 h-8 bg-gold-base text-surface-base rounded-xl flex items-center justify-center shadow-sm shrink-0">
+            <Scissors className="w-4 h-4" />
           </div>
+          <h1 className="text-sm font-serif font-bold text-content-base truncate">
+            {navItems.find(i => i.id === activeTab)?.label || 'Navo Premium'}
+          </h1>
+        </div>
 
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg border border-border-subtle text-content-muted active:text-gold-base active:bg-surface-base"
-            aria-label="Abrir Menu de Navegação"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
-        </header>
-      )}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="w-9 h-9 flex items-center justify-center rounded-xl border border-border-subtle text-content-muted active:text-gold-base active:bg-surface-base"
+          aria-label="Abrir Menu de Navegação"
+        >
+          <Menu className="w-4 h-4" />
+        </button>
+      </header>
 
       {/* Mobile Bottom Navigation Bar */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-[64px] bg-surface-card/95 backdrop-blur-md border-t border-border-subtle z-40 flex items-center justify-around px-1 pb-[env(safe-area-inset-bottom)]">
@@ -506,8 +476,8 @@ export const AdminLayout: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main className={`flex-1 lg:ml-64 ${activeTab === 'hub' ? 'pt-0 lg:pt-0' : 'pt-[56px] lg:pt-0'} h-[100dvh] overflow-y-auto no-scrollbar relative w-full`}>
-        <div className={`max-w-7xl mx-auto ${activeTab === 'hub' ? 'px-0 py-0 pb-20' : 'px-3 sm:px-6 lg:px-8 py-4 lg:py-8 pb-28 lg:pb-12'} w-full min-w-0`}>
+      <main className="flex-1 lg:ml-64 pt-[56px] lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 lg:py-8 pb-28 lg:pb-12 w-full min-w-0">
           {/* Tab Content */}
           <div className="animate-fade-in w-full min-w-0">
             {renderContent()}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchAppointmentsFromSupabase } from '../../services/supabaseDataService';
 import { Appointment } from '../../types';
 import { RefreshCw, ArrowRight, Clock, Receipt, Scissors, Users, CalendarCheck2 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 interface NavoHomeViewProps {
   onNavigateToAgenda: () => void;
@@ -84,34 +85,23 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
 
   return (
     <div className="space-y-5 animate-fade-in text-content-base min-w-0">
-      {/* PAGE HEADER (Zona de ação fixada à direita) */}
-      <div className="flex items-center justify-between gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-0.5 barber-pole-line" />
-        <div className="min-w-0 flex-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-gold-base block mb-0.5 capitalize whitespace-nowrap">
-            {todayFormatted}
-          </span>
-          <h1 className="text-base sm:text-xl font-serif text-content-base font-bold tracking-tight truncate">
-            Caixa de Hoje & Operação
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5 truncate hidden sm:block">
-            Acompanhe a receita em tempo real, status das cadeiras e agendamentos confirmados.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Receipt}
+        title="Caixa de Hoje & Operação"
+        stats={[{ label: todayFormatted, value: '', tone: 'gold' }]}
+        action={{ label: 'Atualizar Dados', onClick: loadData, icon: () => <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> }}
+      />
 
-        {/* Action Zone: Right Button (Mobile Icon-only button with >= 40px touch area) */}
-        <div className="shrink-0 flex items-center justify-end">
-          <button 
-            onClick={loadData}
-            disabled={loading}
-            className="h-10 sm:h-9 px-0 sm:px-3.5 w-10 sm:w-auto rounded-xl bg-surface-base text-gold-base hover:text-content-base hover:bg-surface-card border border-border-subtle transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 active:bg-surface-card active:scale-95 disabled:opacity-50 whitespace-nowrap"
-            aria-label="Atualizar Dados"
-          >
-            <RefreshCw className={`w-4 h-4 sm:w-3.5 sm:h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Atualizar Dados</span>
-          </button>
-        </div>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={loadData}
+        disabled={loading}
+        className="md:hidden w-full h-10 rounded-xl bg-surface-base text-gold-base hover:text-content-base hover:bg-surface-card border border-border-subtle transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 active:bg-surface-card active:scale-95 disabled:opacity-50"
+      >
+        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+        <span>Atualizar Dados</span>
+      </button>
 
       {/* KPI SNAP CAROUSEL (Mobile snap carousel, Desktop 3-col grid) */}
       <div className="bg-border-subtle border border-border-subtle rounded-xl flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-px no-scrollbar">

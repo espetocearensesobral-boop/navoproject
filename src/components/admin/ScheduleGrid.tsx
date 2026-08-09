@@ -16,6 +16,7 @@ import {
   generateTimeSlotsFromProfile 
 } from '../../services/shopProfileService';
 import { Calendar, Clock, Plus, Lock, Unlock, UserCheck, ShieldAlert, CheckCircle2, X, Save, RefreshCw, Scissors } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export const ScheduleGrid: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -388,16 +389,11 @@ export const ScheduleGrid: React.FC = () => {
       {/* ========================================================= */}
       <div className="hidden md:block space-y-6">
         {/* Header Bar */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-surface-card p-5 rounded-2xl border border-border-subtle">
-          <div>
-            <div className="flex items-center space-x-2 text-gold-hover text-xs font-bold uppercase tracking-widest mb-1">
-              <Calendar className="w-4 h-4" />
-              <span>Grade da Agenda & Bloqueios</span>
-            </div>
-            <h1 className="text-xl font-serif text-content-base font-semibold">Agenda Interativa por Barbeiro</h1>
-          </div>
-
-          {/* Controls */}
+        <AdminPageHeader
+          icon={Calendar}
+          title="Agenda Interativa"
+          action={{ label: 'Encaixe Manual', onClick: () => setIsManualBookingOpen(true), icon: Plus }}
+        >
           <div className="flex flex-wrap items-center gap-3">
             <input
               type="date"
@@ -418,14 +414,6 @@ export const ScheduleGrid: React.FC = () => {
             </select>
 
             <button
-              onClick={() => setIsManualBookingOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-gold-base text-surface-base font-extrabold text-xs shadow-md flex items-center space-x-1.5 hover:opacity-90"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Encaixe Manual</span>
-            </button>
-
-            <button
               onClick={() => setIsBlockModalOpen(true)}
               className="px-3.5 py-2 rounded-xl bg-surface-card hover:bg-surface-card text-red-400 font-extrabold text-xs border border-red-500/20 flex items-center space-x-1.5"
             >
@@ -433,7 +421,7 @@ export const ScheduleGrid: React.FC = () => {
               <span>Bloquear Horário</span>
             </button>
           </div>
-        </div>
+        </AdminPageHeader>
 
         {/* Schedule Grid Table */}
         <div className="w-full overflow-x-auto rounded-2xl border border-border-subtle bg-surface-card shadow-xl">
