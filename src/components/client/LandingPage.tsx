@@ -228,7 +228,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   });
 
   const differentials = [
-    { icon: User, secondaryIcon: Scissors, label: 'Barbeiros Master', desc: '10+ anos de experiência', strokeColor: '#b89060', bgColor: '#f5eedc' },
+    { icon: User, secondaryIcon: Scissors, label: 'Barbeiros Master', desc: '10+ anos de experiência', strokeColor: 'var(--color-gold-deep)', bgColor: 'color-mix(in srgb, var(--color-gold-base) 14%, transparent)' },
     { icon: Snowflake, label: 'Ambiente Premium', desc: 'Som e ar-condicionado', strokeColor: '#80b6c6', bgColor: '#e3f4f8' },
     { icon: Coffee, label: 'Bebida Cortesia', desc: 'Café e cerveja artesanal', strokeColor: '#9e795a', bgColor: '#f5efe9' },
     { icon: Wifi, label: 'Conectividade', desc: 'Wi-Fi de alta velocidade livre', strokeColor: '#71a67a', bgColor: '#e6f5ea' },
@@ -317,7 +317,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   }, [shopProfile]);
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
+    <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-gold-base/20 selection:text-neutral-900 no-scrollbar">
       {/* HOURS MODAL OVERLAY */}
       <AnimatePresence>
         {isHoursModalOpen && (
@@ -441,7 +441,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 toggleMenu(); 
                 if (onGoToAppointments) onGoToAppointments(); 
               }} 
-              className="text-[#d4a853] text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer mt-2"
+              className="text-gold-base text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer mt-2"
             >
               Meus Cortes
             </motion.button>
@@ -467,7 +467,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           className="relative z-20 flex items-center justify-between p-5 shrink-0"
         >
           <div className="font-extrabold text-lg tracking-tight text-white flex items-center gap-1">
-            <span>NAVO</span><span className="text-[#d4a853]">PREMIUM</span>
+            <span>NAVO</span><span className="text-gold-base">PREMIUM</span>
           </div>
           <motion.button 
             whileTap={{ scale: 0.95 }}
@@ -486,7 +486,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-            className="inline-flex items-center gap-2 bg-[#d4a853]/12 border border-[#d4a853]/25 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#d4a853] mb-4 backdrop-blur-xs"
+            className="inline-flex items-center gap-2 bg-gold-base/12 border border-gold-base/25 px-3.5 py-1.5 rounded-full text-xs font-semibold text-gold-base mb-4 backdrop-blur-xs"
           >
             <span className="tracking-widest text-[0.7rem] font-bold">★★★★★</span>
             <span>4.9 · 1.2k avaliações</span>
@@ -499,7 +499,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
             className="text-[clamp(1.85rem,4.5vh,2.8rem)] font-extrabold leading-[1.08] tracking-tight text-white mb-3"
           >
-            Seu melhor <span className="text-[#d4a853]">visual</span><br />
+            Seu melhor <span className="text-gold-base">visual</span><br />
             começa aqui.
           </motion.h1>
 
@@ -528,7 +528,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_horario_hero');
                 onGoToBooking(); 
               }}
-              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-lg py-[1.15rem] px-8 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-[0_6px_35px_rgba(212,168,83,0.4)] hover:shadow-[0_8px_45px_rgba(212,168,83,0.5)] transition-all shrink-0 cursor-pointer"
+              className="w-full bg-gold-base hover:bg-gold-deep text-[#0a0a0a] font-bold text-lg py-[1.15rem] px-8 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-[0_6px_35px_color-mix(in_srgb,var(--color-gold-base)_40%,transparent)] hover:shadow-[0_8px_45px_color-mix(in_srgb,var(--color-gold-base)_50%,transparent)] transition-all shrink-0 cursor-pointer"
             >
               <span className="flex items-center gap-2 font-extrabold tracking-wide">
                 Ver horários disponíveis
@@ -538,7 +538,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
             <button 
               onClick={() => onGoToAppointments && onGoToAppointments()}
-              className="mt-1 flex items-center justify-center gap-1.5 text-[0.85rem] font-bold text-[#d4a853] border border-[#d4a853]/40 hover:border-[#d4a853] hover:bg-[#d4a853]/10 px-5 py-2.5 rounded-full cursor-pointer transition-all active:scale-95"
+              className="mt-1 flex items-center justify-center gap-1.5 text-[0.85rem] font-bold text-gold-base border border-gold-base/40 hover:border-gold-base hover:bg-gold-base/10 px-5 py-2.5 rounded-full cursor-pointer transition-all active:scale-95"
             >
               <span>Já possui agendamento? Clique aqui.</span>
             </button>
@@ -550,9 +550,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
               className="mt-6 flex items-start gap-3 bg-black/40 border border-white/10 rounded-2xl p-3 max-w-[280px] sm:max-w-xs backdrop-blur-md"
             >
-              <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop&q=80" alt="Carlos M." className="w-10 h-10 rounded-full border-[1.5px] border-[#d4a853]/50 object-cover shrink-0" />
+              <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop&q=80" alt="Carlos M." className="w-10 h-10 rounded-full border-[1.5px] border-gold-base/50 object-cover shrink-0" />
               <div className="flex flex-col text-left justify-center">
-                <span className="text-[#d4a853] text-[0.55rem] tracking-widest mb-0.5">★★★★★</span>
+                <span className="text-gold-base text-[0.55rem] tracking-widest mb-0.5">★★★★★</span>
                 <span className="text-gray-200 text-[0.75rem] font-medium leading-tight">"Melhor barbearia de SP, atendimento impecável."</span>
                 <span className="text-[#a0a0a0] text-[0.65rem] font-bold mt-1">Carlos M.</span>
               </div>
@@ -596,11 +596,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto"
         >
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
-            <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
+            <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               POR QUE A NAVO
             </span>
             <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight">
-              Feito para você <span className="text-[#b89060]">relaxar</span>
+              Feito para você <span className="text-gold-deep">relaxar</span>
             </h2>
           </div>
 
@@ -660,8 +660,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           {/* Header */}
           <div className="flex justify-between items-end mb-[clamp(0.25rem,0.8vh,0.75rem)] shrink-0">
             <div>
-              <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5 flex items-center gap-1">
-                <Star className="w-3 h-3 fill-[#C8A96A]" />
+              <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5 flex items-center gap-1">
+                <Star className="w-3 h-3 fill-gold-base text-gold-base" />
                 <span>GALERIA • DESTAQUES</span>
               </span>
               <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
@@ -670,7 +670,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </div>
             <button 
               onClick={() => { hapticLight(); onGoToBooking(); }}
-              className="text-[clamp(0.7rem,1.4vh,0.875rem)] font-bold text-[#d4a853] border border-[#d4a853]/40 hover:bg-[#d4a853]/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-95"
+              className="text-[clamp(0.7rem,1.4vh,0.875rem)] font-bold text-gold-base border border-gold-base/40 hover:bg-gold-base/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-95"
             >
               <span>Todos os serviços</span>
               <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -700,7 +700,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                     hapticLight();
                     setSelectedGalleryIndex(index);
                   }}
-                  className={`${gridClass} rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 border border-neutral-200/50 hover:border-[#C8A96A]/80 shadow-xs min-h-0 h-full cursor-pointer`}
+                  className={`${gridClass} rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 border border-neutral-200/50 hover:border-gold-base/80 shadow-xs min-h-0 h-full cursor-pointer`}
                 >
                   {/* Photo image */}
                   <img
@@ -725,7 +725,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                       )}
 
                       <div className="flex items-center justify-between gap-1 pt-1">
-                        <span className="text-[#d4a853] font-black text-[clamp(0.7rem,1.4vh,0.95rem)]">
+                        <span className="text-gold-base font-black text-[clamp(0.7rem,1.4vh,0.95rem)]">
                           R$ {item.price.toFixed(2)}
                         </span>
                       </div>
@@ -748,7 +748,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto"
         >
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
-            <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
+            <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               DEPOIMENTOS
             </span>
             <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
@@ -762,7 +762,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 key={idx}
                 whileHover={reducedMotion ? {} : { y: -3, scale: 1.01 }}
                 transition={{ duration: 0.2 }}
-                className="w-full bg-neutral-50/80 border border-neutral-200/90 rounded-[clamp(0.875rem,1.8vh,1.25rem)] p-[clamp(0.85rem,2vh,1.35rem)] flex flex-col justify-between gap-3 shadow-2xs hover:border-[#d4a853]/60 hover:shadow-md transition-all h-full min-h-0"
+                className="w-full bg-neutral-50/80 border border-neutral-200/90 rounded-[clamp(0.875rem,1.8vh,1.25rem)] p-[clamp(0.85rem,2vh,1.35rem)] flex flex-col justify-between gap-3 shadow-2xs hover:border-gold-base/60 hover:shadow-md transition-all h-full min-h-0"
               >
                 <div className="flex flex-col gap-2.5">
                   {/* Top Header: Avatar, Name, Rating & Date */}
@@ -771,7 +771,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                       <img 
                         src={item.avatar} 
                         alt={item.name}
-                        className="w-[clamp(2.25rem,4.5vh,3rem)] h-[clamp(2.25rem,4.5vh,3rem)] rounded-full object-cover shrink-0 border-2 border-[#d4a853]/40"
+                        className="w-[clamp(2.25rem,4.5vh,3rem)] h-[clamp(2.25rem,4.5vh,3rem)] rounded-full object-cover shrink-0 border-2 border-gold-base/40"
                       />
                       <div>
                         <h4 className="text-[clamp(0.85rem,1.6vh,1.05rem)] font-extrabold text-neutral-900 leading-tight">
@@ -791,9 +791,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
                   {/* Service Badge */}
                   {item.service && (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#d4a853]/12 border border-[#d4a853]/25 w-fit">
-                      <Scissors className="w-3 h-3 text-[#d4a853]" />
-                      <span className="text-[clamp(0.625rem,1.15vh,0.725rem)] font-bold text-[#b89060]">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-base/12 border border-gold-base/25 w-fit">
+                      <Scissors className="w-3 h-3 text-gold-base" />
+                      <span className="text-[clamp(0.625rem,1.15vh,0.725rem)] font-bold text-gold-deep">
                         {item.service}
                       </span>
                     </div>
@@ -809,8 +809,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </div>
 
           <div className="flex justify-center pt-2 shrink-0">
-            <button onClick={handleOpenGoogleMaps} className="text-[clamp(0.75rem,1.5vh,0.875rem)] font-bold text-[#d4a853] hover:text-[#b89060] transition-colors flex items-center gap-1.5 cursor-pointer group">
-              <span className="border-b border-[#d4a853]/40 group-hover:border-[#b89060]">Ver mais avaliações no Google (4.9 · 1.2k avaliações)</span>
+            <button onClick={handleOpenGoogleMaps} className="text-[clamp(0.75rem,1.5vh,0.875rem)] font-bold text-gold-base hover:text-gold-deep transition-colors flex items-center gap-1.5 cursor-pointer group">
+              <span className="border-b border-gold-base/40 group-hover:border-gold-deep">Ver mais avaliações no Google (4.9 · 1.2k avaliações)</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -829,8 +829,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           {/* Section Header */}
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)] flex items-end justify-between gap-3">
             <div>
-              <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase flex items-center gap-1.5 mb-0.5">
-                <MapPin className="w-3.5 h-3.5 text-[#C8A96A]" />
+              <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase flex items-center gap-1.5 mb-0.5">
+                <MapPin className="w-3.5 h-3.5 text-gold-base" />
                 LOCALIZAÇÃO & ATENDIMENTO
               </span>
               <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight font-serif">
@@ -871,7 +871,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   className="bg-white/95 hover:bg-neutral-50 text-neutral-800 border border-neutral-200 px-2.5 py-1 rounded-lg shadow-xs transition-all pointer-events-auto flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold cursor-pointer"
                   title="Abrir no Google Maps"
                 >
-                  <ExternalLink className="w-3 h-3 text-[#C8A96A]" />
+                  <ExternalLink className="w-3 h-3 text-gold-base" />
                   <span className="hidden sm:inline">Ver no Mapa</span>
                 </motion.button>
               </div>
@@ -883,7 +883,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               {/* Highlighted Custom Typography */}
               <div className="space-y-[clamp(0.375rem,1vh,0.75rem)]">
                 <div>
-                  <span className="text-[clamp(0.6rem,1vh,0.725rem)] font-bold uppercase tracking-widest text-[#C8A96A] block mb-0.5">
+                  <span className="text-[clamp(0.6rem,1vh,0.725rem)] font-bold uppercase tracking-widest text-gold-base block mb-0.5">
                     {shopProfile.unitName || 'Unidade Expectativa'}
                   </span>
                   <h3 className="text-[clamp(1.1rem,2.2vh,1.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight font-serif">
@@ -894,7 +894,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 {/* Big Display Address Highlight Callout */}
                 <div className="bg-neutral-50 border border-neutral-200/80 p-[clamp(0.5rem,1.2vh,0.75rem)] rounded-xl space-y-1.5 shadow-2xs">
                   <div className="flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-[#C8A96A]/15 border border-[#C8A96A]/30 text-[#C8A96A] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                    <div className="w-7 h-7 rounded-lg bg-gold-base/15 border border-gold-base/30 text-gold-base flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                       <MapPin className="w-4 h-4" />
                     </div>
                     <div>
@@ -909,7 +909,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 {/* Quick Info Grid (Hours & Phone) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   <div className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs">
-                    <Clock className={`w-3.5 h-3.5 shrink-0 ${shopStatusInfo.status === 'open' ? 'text-emerald-500' : 'text-[#C8A96A]'}`} />
+                    <Clock className={`w-3.5 h-3.5 shrink-0 ${shopStatusInfo.status === 'open' ? 'text-emerald-500' : 'text-gold-base'}`} />
                     <div>
                       <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Horário Hoje</span>
                       <span className="text-[10.5px] font-bold text-neutral-800">
@@ -919,7 +919,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   </div>
 
                   <a href={`tel:${(shopProfile.phone || '(88) 99834-0085').replace(/\D/g, '')}`} className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs hover:bg-neutral-100 transition-colors cursor-pointer group">
-                    <Phone className="w-3.5 h-3.5 text-[#C8A96A] shrink-0 group-hover:scale-110 transition-transform" />
+                    <Phone className="w-3.5 h-3.5 text-gold-base shrink-0 group-hover:scale-110 transition-transform" />
                     <div>
                       <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Contato Direto</span>
                       <span className="text-[10.5px] font-bold text-neutral-800">
@@ -938,7 +938,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   onClick={handleOpenGoogleMaps}
                   className="w-full bg-neutral-900 hover:bg-black text-white font-extrabold text-[clamp(0.7rem,1.4vh,0.8rem)] py-3 px-2 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer tracking-wide border border-neutral-900"
                 >
-                  <Navigation className="w-4 h-4 fill-[#C8A96A] text-[#C8A96A]" />
+                  <Navigation className="w-4 h-4 fill-gold-base text-gold-base" />
                   <span>COMO CHEGAR</span>
                 </motion.button>
                 <motion.a 
@@ -980,7 +980,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
           {/* MAIN HEADING */}
           <h2 className="text-[clamp(1.75rem,4.2vh,3rem)] font-extrabold text-white mb-[clamp(0.35rem,1.2vh,0.85rem)] tracking-tight leading-[1.12]">
-            Pronto para o seu <span className="text-[#e5b863] font-black">novo visual</span>?
+            Pronto para o seu <span className="text-gold-base font-black">novo visual</span>?
           </h2>
 
           {/* SUBTITLE */}
@@ -991,7 +991,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           {/* ACTION BUTTONS GROUP */}
           <div className="flex flex-col gap-3 w-full max-w-sm sm:max-w-md items-center">
             
-            {/* PRIMARY CTA - GOLD BUTTON (CLEAN SOLID HIGH CONTRAST, NO GLOW/SHADOW) */}
+            {/* PRIMARY CTA - GOLD BUTTON */}
             <motion.button 
               whileHover={{ scale: 1.015 }}
               whileTap={{ scale: 0.97 }}
@@ -1000,7 +1000,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_online_footer');
                 onGoToBooking();
               }}
-              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-extrabold text-[clamp(1rem,2vh,1.15rem)] py-[clamp(1rem,2.2vh,1.25rem)] px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-[#d4a853] shadow-lg shadow-[#d4a853]/10"
+              className="w-full bg-gold-base hover:bg-gold-deep text-[#0a0a0a] font-extrabold text-[clamp(1rem,2vh,1.15rem)] py-[clamp(1rem,2.2vh,1.25rem)] px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-gold-base shadow-lg shadow-gold-base/10"
             >
               <span className="tracking-wide">Agendar meu horário agora</span>
               <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
@@ -1036,7 +1036,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             className="group flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#181a20] hover:bg-[#22252e] border border-gray-700 text-gray-200 hover:text-white transition-all text-xs font-bold cursor-pointer"
             aria-label="Voltar ao topo"
           >
-            <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform duration-300 text-[#e5b863]" />
+            <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform duration-300 text-gold-base" />
             <span>Voltar ao topo</span>
           </motion.button>
         </div>
@@ -1045,7 +1045,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         <footer className="relative z-10 w-full bg-[#06070a] border-t border-gray-800 px-5 py-6 shrink-0 flex flex-col gap-5 mt-auto text-[0.75rem] text-[#8b919e] font-medium">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-800/60 pb-5">
             <div className="flex flex-col gap-1.5">
-              <span className="text-[#d4a853] font-bold text-sm uppercase tracking-widest">{shopProfile.name}</span>
+              <span className="text-gold-base font-bold text-sm uppercase tracking-widest">{shopProfile.name}</span>
               <span>{shopProfile.address}</span>
               <span className="text-gray-400">{scheduleSummary}</span>
             </div>
@@ -1064,7 +1064,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               © {new Date().getFullYear()} {shopProfile.name}. Todos os direitos reservados.
             </p>
             <p>
-              Desenvolvido por <span className="text-[#e5b863] font-bold">Navo</span>
+              Desenvolvido por <span className="text-gold-base font-bold">Navo</span>
             </p>
           </div>
         </footer>
