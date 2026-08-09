@@ -543,20 +543,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               <span>Já possui agendamento? Clique aqui.</span>
             </button>
 
-            {/* DEPOIMENTO CURTO */}
-            <motion.div 
-              initial={reducedMotion ? {} : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
-              className="mt-6 flex items-start gap-3 bg-black/40 border border-white/10 rounded-2xl p-3 max-w-[280px] sm:max-w-xs backdrop-blur-md"
-            >
-              <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop&q=80" alt="Carlos M." className="w-10 h-10 rounded-full border-[1.5px] border-gold-base/50 object-cover shrink-0" />
-              <div className="flex flex-col text-left justify-center">
-                <span className="text-gold-base text-[0.55rem] tracking-widest mb-0.5">★★★★★</span>
-                <span className="text-gray-200 text-[0.75rem] font-medium leading-tight">"Melhor barbearia de SP, atendimento impecável."</span>
-                <span className="text-[#a0a0a0] text-[0.65rem] font-bold mt-1">Carlos M.</span>
-              </div>
-            </motion.div>
+
           </motion.div>
         </div>
 
