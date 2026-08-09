@@ -16,6 +16,7 @@ import {
   X,
   CreditCard
 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export interface SubscriptionPlan {
   id: string;
@@ -165,29 +166,22 @@ export const SubscriptionsManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle shadow-xs">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-bold tracking-tight flex items-center gap-2">
-            <Award className="w-5 h-5 text-gold-base" />
-            <span>Clube de Assinaturas Recorrentes</span>
-            <span className="text-[10px] bg-gold-base/15 text-gold-base border border-gold-base/30 px-2.5 py-0.5 rounded-full font-bold uppercase">
-              {totalActiveSubscribers} Assinantes
-            </span>
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5">
-            Receita previsível mensal (MRR), planos de cortes ilimitados e ciclo de comissões por atendimento.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Award}
+        title="Clube de Assinaturas Recorrentes"
+        stats={[{ label: 'assinantes', value: totalActiveSubscribers, tone: 'gold' }]}
+        action={{ label: 'Criar Novo Plano', onClick: () => setIsPlanModalOpen(true), icon: Plus }}
+      />
 
-        <button
-          onClick={() => setIsPlanModalOpen(true)}
-          className="bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md transition-all shrink-0"
-        >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>Criar Novo Plano</span>
-        </button>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={() => setIsPlanModalOpen(true)}
+        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
+      >
+        <Plus className="w-4 h-4 stroke-[2.5]" />
+        <span>Criar Novo Plano</span>
+      </button>
 
       {/* MRR Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Store, Phone, Link as LinkIcon, Save, Camera, CheckCircle2, Globe, Clock, MapPin, Palette, Check } from 'lucide-react';
+import { Store, Phone, Link as LinkIcon, Save, Camera, CheckCircle2, Globe, Clock, MapPin, Palette, Check, Settings } from 'lucide-react';
 import { PALETTES, useTheme } from '../../contexts/ThemeContext';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 type SettingsTab = 'contacts' | 'links' | 'appearance';
 
@@ -37,35 +38,24 @@ export const SettingsManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300 min-w-0">
-      {/* PAGE HEADER (Action zone fixed at right) */}
-      <div className="flex items-center justify-between gap-3 bg-surface-card p-4 rounded-md border border-border-subtle">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-base sm:text-xl font-serif text-content-base font-bold tracking-tight truncate">
-              Configurações do Sistema
-            </h1>
-            <span className="text-[10px] bg-gold-base/10 text-gold-base border border-gold-base/30 px-2 py-0.5 rounded uppercase font-bold tracking-wider whitespace-nowrap shrink-0">
-              Geral
-            </span>
-          </div>
-          <p className="text-content-muted text-xs mt-0.5 truncate hidden sm:block">
-            Gerencie canais de atendimento, integrações e links da plataforma.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Settings}
+        title="Configurações do Sistema"
+        stats={[{ label: 'Geral', value: '', tone: 'gold' }]}
+        action={{ label: isSaving ? 'Salvando...' : 'Salvar Alterações', onClick: handleSave, icon: Save }}
+      />
 
-        {/* Action Zone: Header Right Button */}
-        <div className="shrink-0 flex items-center justify-end">
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="h-10 sm:h-9 px-0 sm:px-4 w-10 sm:w-auto bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 disabled:opacity-50 whitespace-nowrap"
-            aria-label="Salvar Alterações"
-          >
-            <Save className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
-            <span className="hidden sm:inline">{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
-          </button>
-        </div>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={handleSave}
+        disabled={isSaving}
+        className="md:hidden w-full h-10 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 shrink-0"
+        aria-label="Salvar Alterações"
+      >
+        <Save className="w-4 h-4" />
+        <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
+      </button>
 
       {/* TOAST MESSAGE */}
       {toastMsg && (

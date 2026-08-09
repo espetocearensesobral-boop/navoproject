@@ -14,6 +14,7 @@ import {
   Tag, 
   X 
 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export interface PayableAccount {
   id: string;
@@ -142,26 +143,21 @@ export const AccountsPayableManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle shadow-xs">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-bold tracking-tight flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-gold-base" />
-            <span>Contas a Pagar & Despesas</span>
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5">
-            Gestão de fornecedores, boletos, contas fixas e parcelamentos.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={CreditCard}
+        title="Contas a Pagar & Despesas"
+        action={{ label: 'Nova Conta', onClick: () => setIsModalOpen(true) }}
+      />
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md transition-all shrink-0"
-        >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>Lançar Nova Conta</span>
-        </button>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
+      >
+        <Plus className="w-4 h-4 stroke-[2.5]" />
+        <span>Lançar Nova Conta</span>
+      </button>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Professional } from '../../types';
 import { fetchProfessionalsFromSupabase, saveProfessionalInSupabase, deleteProfessionalInSupabase } from '../../services/supabaseDataService';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 import {
   Users,
   Plus,
@@ -287,28 +288,22 @@ export const ProfessionalsManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      {/* HEADER & TOP BAR */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-semibold tracking-tight flex items-center gap-2">
-            <span>Barbeiros & Equipe</span>
-            <span className="text-[10px] bg-gold-base/15 text-gold-hover border border-[#FFFFFF]/30 px-2 py-0.5 rounded-full uppercase font-bold">
-              Navo Staff
-            </span>
-          </h1>
-          <p className="text-content-muted text-xs mt-0.5">
-            Gestão de profissionais, comissões, turnos e especialidades na agenda
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Users}
+        title="Barbeiros & Equipe"
+        stats={[{ label: 'ativos', value: activeBarbers, tone: 'gold' }]}
+        action={{ label: 'Cadastrar Barbeiro', onClick: handleOpenCreate, icon: Plus }}
+      />
 
-        <button
-          onClick={handleOpenCreate}
-          className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Cadastrar Barbeiro</span>
-        </button>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={handleOpenCreate}
+        className="md:hidden w-full bg-gold-base text-surface-base px-3.5 py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+      >
+        <Plus className="w-4 h-4" />
+        <span>Cadastrar Barbeiro</span>
+      </button>
 
       {/* TOAST MESSAGE */}
       {toastMsg && (

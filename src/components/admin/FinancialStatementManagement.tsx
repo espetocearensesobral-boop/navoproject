@@ -12,6 +12,7 @@ import {
   Clock, 
   PieChart 
 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export interface FinancialTransaction {
   id: string;
@@ -94,37 +95,34 @@ export const FinancialStatementManagement: React.FC = () => {
     return matchesType && matchesSearch;
   });
 
+  const handleExportCsv = () => {
+    const csv = 'Data,Tipo,Categoria,Descrição,Valor,Forma Pagamento\n' +
+      filtered.map(t => `"${new Date(t.date).toLocaleString('pt-BR')}","${t.type}","${t.category}","${t.description}",${t.amount},"${t.paymentMethod}"`).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `extrato_financeiro_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+  };
+
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle shadow-xs">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-bold tracking-tight flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-gold-base" />
-            <span>Extrato Financeiro & Balancete</span>
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5">
-            Demonstrativo em tempo real de entradas e saídas de caixa e faturamento.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={DollarSign}
+        title="Extrato Financeiro & Balancete"
+        action={{ label: 'Baixar CSV', onClick: handleExportCsv, icon: Download }}
+      />
 
-        <button
-          onClick={() => {
-            const csv = 'Data,Tipo,Categoria,Descrição,Valor,Forma Pagamento\n' +
-              filtered.map(t => `"${new Date(t.date).toLocaleString('pt-BR')}","${t.type}","${t.category}","${t.description}",${t.amount},"${t.paymentMethod}"`).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `extrato_financeiro_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-          }}
-          className="bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shrink-0"
-        >
-          <Download className="w-4 h-4 text-gold-base" />
-          <span>Baixar Extrato CSV</span>
-        </button>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={handleExportCsv}
+        className="md:hidden w-full bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
+      >
+        <Download className="w-4 h-4 text-gold-base" />
+        <span>Baixar Extrato CSV</span>
+      </button>
 
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

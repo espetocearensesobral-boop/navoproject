@@ -24,6 +24,7 @@ import {
   ArrowDownRight,
   AlertCircle
 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export const ReportsManagement: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -177,19 +178,11 @@ export const ReportsManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle shadow-xs">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-bold tracking-tight flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-gold-base" />
-            <span>Relatórios & Desempenho</span>
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5">
-            Análises estratégicas por Serviço, Base de Clientes e Produtividade dos Barbeiros.
-          </p>
-        </div>
-
-        {/* Period Filter Buttons */}
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={BarChart3}
+        title="Relatórios & Desempenho"
+      >
         <div className="flex items-center gap-1 bg-surface-base p-1 rounded-xl border border-border-subtle shrink-0">
           {[
             { id: 'today', label: 'Hoje' },
@@ -211,6 +204,29 @@ export const ReportsManagement: React.FC = () => {
             </button>
           ))}
         </div>
+      </AdminPageHeader>
+
+      {/* Ações (mobile) */}
+      <div className="md:hidden w-full flex items-center gap-1 bg-surface-base p-1 rounded-xl border border-border-subtle overflow-x-auto no-scrollbar">
+        {[
+          { id: 'today', label: 'Hoje' },
+          { id: 'week', label: 'Semana' },
+          { id: 'month', label: 'Mês' },
+          { id: 'quarter', label: '90 Dias' },
+          { id: 'year', label: 'Ano' }
+        ].map(p => (
+          <button
+            key={p.id}
+            onClick={() => setPeriodFilter(p.id as any)}
+            className={`px-3 py-2 rounded-lg text-xs font-bold transition-all shrink-0 whitespace-nowrap ${
+              periodFilter === p.id
+                ? 'bg-gold-base text-surface-base shadow-xs'
+                : 'text-content-muted hover:text-content-base'
+            }`}
+          >
+            {p.label}
+          </button>
+        ))}
       </div>
 
       {/* Overview Metrics Cards */}

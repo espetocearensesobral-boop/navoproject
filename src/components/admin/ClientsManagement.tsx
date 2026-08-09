@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Search, Edit2, Trash2, Plus, Star, Award, ShieldCheck, Mail, Phone, Calendar, CheckCircle2, X } from 'lucide-react';
 import { authFetch } from '../../lib/api';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 interface Profile {
   id: string;
@@ -146,53 +147,17 @@ export const ClientsManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      {/* DESKTOP HEADER (MD AND UP) */}
-      <div className="hidden md:flex justify-between items-center">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-semibold tracking-tight">Gestão de Clientes</h1>
-          <p className="text-content-muted text-xs mt-0.5">Gerencie os perfis, níveis de fidelidade e pontuação</p>
-        </div>
-        <button
-          onClick={() => handleOpenModal()}
-          className="bg-gold-base text-surface-base px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Novo Cliente</span>
-        </button>
-      </div>
-
-      {/* DESKTOP KPI STATS (MD AND UP) */}
-      <div className="hidden md:grid grid-cols-3 gap-3">
-        <div className="p-3.5 bg-surface-card border border-border-subtle rounded-2xl flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Total de Clientes</p>
-            <p className="text-xl font-mono num-tabular text-content-base font-semibold mt-0.5">{safeClients.length}</p>
-          </div>
-          <div className="w-9 h-9 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
-            <Users className="w-4 h-4" />
-          </div>
-        </div>
-
-        <div className="p-3.5 bg-surface-card border border-border-subtle rounded-2xl flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Clientes VIP</p>
-            <p className="text-xl font-extrabold text-gold-hover mt-0.5">{vipCount}</p>
-          </div>
-          <div className="w-9 h-9 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
-            <Star className="w-4 h-4" />
-          </div>
-        </div>
-
-        <div className="p-3.5 bg-surface-card border border-border-subtle rounded-2xl flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Pontos Totais</p>
-            <p className="text-xl font-mono num-tabular text-content-base font-semibold mt-0.5">{totalPoints} pts</p>
-          </div>
-          <div className="w-9 h-9 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
-            <Award className="w-4 h-4" />
-          </div>
-        </div>
-      </div>
+      {/* HEADER (MD AND UP) */}
+      <AdminPageHeader
+        icon={Users}
+        title="Gestão de Clientes"
+        stats={[
+          { label: 'clientes', value: safeClients.length },
+          { label: 'VIP', value: vipCount, tone: 'gold' },
+          { label: 'pts totais', value: totalPoints, tone: 'info' },
+        ]}
+        action={{ label: 'Novo Cliente', onClick: () => handleOpenModal() }}
+      />
 
       {/* MOBILE TOP BAR (COMPACT MINIMALIST MD:HIDDEN) */}
       <div className="md:hidden flex items-center gap-2">

@@ -18,6 +18,7 @@ import {
   Settings, 
   Package 
 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export interface AuditLogItem {
   id: string;
@@ -112,39 +113,34 @@ export const AuditLogsManagement: React.FC = () => {
     }
   };
 
+  const handleExportLogs = () => {
+    const json = JSON.stringify(logs, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `audit_logs_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+  };
+
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle shadow-xs">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-bold tracking-tight flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-gold-base" />
-            <span>Logs de Atividades & Auditoria</span>
-            <span className="text-[10px] bg-gold-base/15 text-gold-base border border-gold-base/30 px-2.5 py-0.5 rounded-full font-bold uppercase">
-              {logs.length} Registros
-            </span>
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5">
-            Rastreabilidade completa de ações dos operadores, alterações de dados e abertura de caixa.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={ShieldCheck}
+        title="Logs de Atividades & Auditoria"
+        stats={[{ label: 'registros', value: logs.length }]}
+        action={{ label: 'Exportar', onClick: handleExportLogs, icon: Download }}
+      />
 
-        <button
-          onClick={() => {
-            const json = JSON.stringify(logs, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `audit_logs_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-          }}
-          className="bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shrink-0"
-        >
-          <Download className="w-4 h-4 text-gold-base" />
-          <span>Exportar Logs</span>
-        </button>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={handleExportLogs}
+        className="md:hidden w-full bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
+      >
+        <Download className="w-4 h-4 text-gold-base" />
+        <span>Exportar Logs</span>
+      </button>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">

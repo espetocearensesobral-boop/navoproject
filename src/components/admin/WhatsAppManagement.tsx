@@ -13,6 +13,7 @@ import {
   Sparkles, 
   AlertCircle 
 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export const WhatsAppManagement: React.FC = () => {
   const [balance, setBalance] = useState<number>(45.50);
@@ -21,36 +22,22 @@ export const WhatsAppManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle shadow-xs">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-bold tracking-tight flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-gold-base" />
-            <span>Painel WhatsApp & Notificações</span>
-            {isConnected ? (
-              <span className="text-[10px] bg-status-success/15 text-status-success border border-status-success/30 px-2.5 py-0.5 rounded-full font-bold uppercase flex items-center gap-1">
-                <Wifi className="w-3 h-3" />
-                <span>Conectado</span>
-              </span>
-            ) : (
-              <span className="text-[10px] bg-status-error/15 text-status-error border border-status-error/30 px-2.5 py-0.5 rounded-full font-bold uppercase">
-                Desconectado
-              </span>
-            )}
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5">
-            Lembretes automáticos pré-agendamento, confirmação via WhatsApp e recarga de saldo de disparos.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={MessageSquare}
+        title="Painel WhatsApp & Notificações"
+        stats={isConnected ? [{ label: 'conectado', value: '', tone: 'success' }] : [{ label: 'desconectado', value: '', tone: 'error' }]}
+        action={{ label: 'Recarregar Saldo (+ R$ 50)', onClick: () => setBalance(prev => prev + 50), icon: CreditCard }}
+      />
 
-        <button
-          onClick={() => setBalance(prev => prev + 50)}
-          className="bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md transition-all shrink-0"
-        >
-          <CreditCard className="w-4 h-4" />
-          <span>Recarregar Saldo (+ R$ 50)</span>
-        </button>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={() => setBalance(prev => prev + 50)}
+        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
+      >
+        <CreditCard className="w-4 h-4" />
+        <span>Recarregar Saldo (+ R$ 50)</span>
+      </button>
 
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

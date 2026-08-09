@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 import {
   fetchNavoRewardsAdminDashboard,
   triggerInactiveClientsCampaign,
@@ -256,35 +257,23 @@ export const NavoRewardsAdmin: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* 1. HEADER (Sem pill decorativo, subtítulo de 1 linha truncado) */}
-      <div className="flex items-center justify-between gap-3 bg-surface-card p-4 rounded-md border border-border-subtle relative overflow-hidden">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-base sm:text-xl font-serif text-content-base font-bold tracking-tight truncate">
-              Navo Rewards & NPS Admin
-            </h1>
-            <span className="text-[10px] bg-gold-base/10 text-gold-base border border-gold-base/30 px-2 py-0.5 rounded uppercase font-bold tracking-wider whitespace-nowrap shrink-0">
-              Fidelidade
-            </span>
-          </div>
-          <p className="text-xs text-content-muted mt-0.5 truncate">
-            Gestão de fidelidade, cupons de desconto, indicações e pesquisas NPS.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Award}
+        title="Navo Rewards & NPS"
+        stats={[{ label: 'score NPS', value: data?.npsScore || 100, tone: 'gold' }]}
+        action={{ label: 'Atualizar', onClick: loadData, icon: RefreshCw, disabled: loading }}
+      />
 
-        {/* Header Right Action Button */}
-        <div className="shrink-0 flex items-center justify-end">
-          <button
-            onClick={loadData}
-            disabled={loading}
-            className="h-10 sm:h-9 px-0 sm:px-3.5 w-10 sm:w-auto rounded-md bg-surface-base text-gold-base hover:text-content-base hover:bg-surface-card border border-border-subtle transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 active:bg-surface-card active:scale-95 disabled:opacity-50 whitespace-nowrap"
-            aria-label="Atualizar Dados"
-          >
-            <RefreshCw className={`w-4 h-4 sm:w-3.5 sm:h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Atualizar Dados</span>
-          </button>
-        </div>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={loadData}
+        disabled={loading}
+        className="md:hidden w-full h-10 rounded-xl bg-surface-base text-gold-base hover:text-content-base hover:bg-surface-card border border-border-subtle transition-all text-xs font-bold flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+      >
+        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+        <span>Atualizar Dados</span>
+      </button>
 
       {/* 2. KPIS (Sempre no topo, logo abaixo do Header) */}
       <div className="bg-border-subtle border border-border-subtle rounded-md flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 gap-px no-scrollbar">

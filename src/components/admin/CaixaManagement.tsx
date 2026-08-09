@@ -18,6 +18,7 @@ import {
   Unlock,
   X
 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export interface CaixaSession {
   id: string;
@@ -221,59 +222,59 @@ export const CaixaManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle shadow-xs">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-bold tracking-tight flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-gold-base" />
-            <span>Gestão & Controle de Caixa</span>
-            {currentSession ? (
-              <span className="text-[10px] bg-status-success/15 text-status-success border border-status-success/30 px-2.5 py-0.5 rounded-full font-bold uppercase flex items-center gap-1">
-                <Unlock className="w-3 h-3" />
-                <span>Caixa Aberto</span>
-              </span>
-            ) : (
-              <span className="text-[10px] bg-status-error/15 text-status-error border border-status-error/30 px-2.5 py-0.5 rounded-full font-bold uppercase flex items-center gap-1">
-                <Lock className="w-3 h-3" />
-                <span>Caixa Fechado</span>
-              </span>
-            )}
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5">
-            Abertura, conferência de sangria e suprimentos, cálculo de divergência e fechamento oficial.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Wallet}
+        title="Gestão & Controle de Caixa"
+        stats={[
+          { label: currentSession ? 'caixa aberto' : 'caixa fechado', value: '', tone: currentSession ? 'success' : 'muted' },
+        ]}
+        action={
+          !currentSession
+            ? { label: 'Abrir Caixa do Dia', onClick: () => setIsOpeningModalOpen(true), icon: Unlock }
+            : { label: 'Fechar Caixa', onClick: () => setIsClosingModalOpen(true), icon: Lock }
+        }
+      >
+        {currentSession && (
+          <button
+            onClick={() => setIsMovementModalOpen(true)}
+            className="px-4 py-2 rounded-xl bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base text-xs font-bold flex items-center gap-1.5 transition-all"
+          >
+            <PlusCircle className="w-3.5 h-3.5 text-gold-base" />
+            <span>Suprimento / Sangria</span>
+          </button>
+        )}
+      </AdminPageHeader>
 
-        {/* Action Buttons */}
-        <div>
-          {!currentSession ? (
+      {/* Ações (mobile) */}
+      <div className="md:hidden">
+        {!currentSession ? (
+          <button
+            onClick={() => setIsOpeningModalOpen(true)}
+            className="w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+          >
+            <Unlock className="w-4 h-4" />
+            <span>Abrir Caixa do Dia</span>
+          </button>
+        ) : (
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setIsOpeningModalOpen(true)}
-              className="bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md transition-all active:scale-95"
+              onClick={() => setIsMovementModalOpen(true)}
+              className="flex-1 bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
             >
-              <Unlock className="w-4 h-4" />
-              <span>Abrir Caixa do Dia</span>
+              <PlusCircle className="w-4 h-4 text-gold-base" />
+              <span>Suprimento</span>
             </button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsMovementModalOpen(true)}
-                className="bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
-              >
-                <PlusCircle className="w-4 h-4 text-gold-base" />
-                <span>Suprimento / Sangria</span>
-              </button>
 
-              <button
-                onClick={() => setIsClosingModalOpen(true)}
-                className="bg-status-error/10 hover:bg-status-error/20 text-status-error border border-status-error/30 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95"
-              >
-                <Lock className="w-4 h-4" />
-                <span>Fechar Caixa</span>
-              </button>
-            </div>
-          )}
-        </div>
+            <button
+              onClick={() => setIsClosingModalOpen(true)}
+              className="flex-1 bg-status-error/10 hover:bg-status-error/20 text-status-error border border-status-error/30 px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+            >
+              <Lock className="w-4 h-4" />
+              <span>Fechar Caixa</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ACTIVE CAIXA DASHBOARD */}

@@ -6,6 +6,7 @@ import {
   fetchProfessionalsFromSupabase 
 } from '../../services/supabaseDataService';
 import { Appointment, ServiceItem, ProductItem, Professional } from '../../types';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 import { 
   Receipt, 
   Plus, 
@@ -358,29 +359,24 @@ export const ComandasManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle shadow-xs">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-bold tracking-tight flex items-center gap-2">
-            <Receipt className="w-5 h-5 text-gold-base" />
-            <span>Comandas & Atendimentos</span>
-            <span className="text-[10px] bg-gold-base/15 text-gold-base border border-gold-base/30 px-2.5 py-0.5 rounded-full font-bold uppercase">
-              {openComandas.length} Abertas
-            </span>
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5">
-            Gerencie comandas ativas, consumo de produtos em bancada e fechamento de conta do cliente.
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Receipt}
+        title="Comandas & Atendimentos"
+        stats={[
+          { label: 'abertas', value: openComandas.length, tone: 'success' },
+        ]}
+        action={{ label: 'Nova Comanda', onClick: () => setActiveTab('new') }}
+      />
 
-        <button
-          onClick={() => setActiveTab('new')}
-          className="bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md active:scale-95 shrink-0"
-        >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>Abrir Nova Comanda</span>
-        </button>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={() => setActiveTab('new')}
+        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 shrink-0"
+      >
+        <Plus className="w-4 h-4 stroke-[2.5]" />
+        <span>Abrir Nova Comanda</span>
+      </button>
 
       {/* Navigation Tabs */}
       <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">

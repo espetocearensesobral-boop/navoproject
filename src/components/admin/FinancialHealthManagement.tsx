@@ -11,25 +11,17 @@ import {
   Activity, 
   Zap 
 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export const FinancialHealthManagement: React.FC = () => {
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle shadow-xs">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-bold tracking-tight flex items-center gap-2">
-            <Activity className="w-5 h-5 text-gold-base" />
-            <span>Saúde Financeira & Diagnóstico</span>
-            <span className="text-[10px] bg-status-success/15 text-status-success border border-status-success/30 px-2.5 py-0.5 rounded-full font-bold uppercase">
-              Saúde Ótima (Score 88/100)
-            </span>
-          </h1>
-          <p className="text-xs text-content-muted mt-0.5">
-            Indicadores de ponto de equilíbrio, margem de lucro real e alertas preditivos de caixa.
-          </p>
-        </div>
-      </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Activity}
+        title="Saúde Financeira & Diagnóstico"
+        stats={[{ label: 'score', value: '88/100', tone: 'success' }]}
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

@@ -16,6 +16,7 @@ import {
   Info,
   AlertTriangle
 } from 'lucide-react';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 import { 
   ShopProfile, 
   defaultShopProfile, 
@@ -111,36 +112,27 @@ export const BarbershopProfileManagement: React.FC = () => {
 
   return (
     <div className="space-y-5 animate-fade-in pb-12">
-      {/* HEADER PAGE WITH ACTION BUTTON */}
-      <div className="bg-surface-card border border-border-subtle p-4 sm:p-5 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-md bg-gold-base/10 border border-gold-base/30 text-gold-base flex items-center justify-center shrink-0">
-            <Store className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-serif font-bold text-content-base">
-                Perfil & Unidade
-              </h1>
-              <span className="text-[10px] px-2 py-0.5 rounded font-bold uppercase bg-gold-base/10 text-gold-base border border-gold-base/30">
-                Geral
-              </span>
-            </div>
-            <p className="text-xs text-content-muted mt-0.5">
-              Configure nome, localização, contatos e os horários reais de funcionamento.
-            </p>
-          </div>
-        </div>
+      {/* HEADER (desktop) */}
+      <AdminPageHeader
+        icon={Store}
+        title="Perfil & Unidade"
+        action={{
+          label: isSaving ? 'Salvando...' : 'Salvar Alterações',
+          onClick: handleSave,
+          icon: Save,
+          disabled: isSaving,
+        }}
+      />
 
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="h-10 px-5 bg-gold-base hover:bg-gold-hover text-surface-base rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95 disabled:opacity-50 w-full sm:w-auto"
-        >
-          <Save className="w-4 h-4" />
-          <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
-        </button>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={handleSave}
+        disabled={isSaving}
+        className="md:hidden h-10 px-5 bg-gold-base hover:bg-gold-hover text-surface-base rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95 disabled:opacity-50 w-full"
+      >
+        <Save className="w-4 h-4" />
+        <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
+      </button>
 
       {/* TOAST MESSAGE */}
       {toastMsg && (

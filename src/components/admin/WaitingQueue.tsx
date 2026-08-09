@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { WaitingQueueItem, Professional, ServiceItem } from '../../types';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 import {
   getQueueFromSupabase,
   updateQueueStatusInSupabase,
@@ -237,32 +238,25 @@ export const WaitingQueue: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      {/* HEADER & TOP BAR */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <div>
-          <h1 className="text-xl font-serif text-content-base font-semibold tracking-tight flex items-center gap-2 flex-wrap">
-            <span>Fila de Espera Digital</span>
-            <span className="text-[10px] bg-gold-base/15 text-gold-hover border border-gold-hover/30 px-2 py-0.5 rounded-full uppercase font-bold">
-              Ao Vivo
-            </span>
-            <span className="text-[10px] bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-              <MessageCircle className="w-3 h-3" />
-              Notificações WhatsApp Ativas
-            </span>
-          </h1>
-          <p className="text-content-muted text-xs mt-0.5">
-            Gerenciamento em tempo real de recepção, cadeiras de atendimento, encaixes e envio instantâneo no WhatsApp
-          </p>
-        </div>
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Users}
+        title="Fila de Espera Digital"
+        stats={[
+          { label: 'ao vivo', value: '', tone: 'gold' },
+          { label: 'whatsapp ativo', value: '', tone: 'success' },
+        ]}
+        action={{ label: 'Adicionar Encaixe (Walk-In)', onClick: () => setIsAddModalOpen(true), icon: Plus }}
+      />
 
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Adicionar Encaixe (Walk-In)</span>
-        </button>
-      </div>
+      {/* Ação (mobile) */}
+      <button
+        onClick={() => setIsAddModalOpen(true)}
+        className="md:hidden w-full bg-gold-base text-surface-base px-3.5 py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+      >
+        <Plus className="w-4 h-4" />
+        <span>Adicionar Encaixe (Walk-In)</span>
+      </button>
 
       {/* TOAST MESSAGE */}
       {lastNotification && (

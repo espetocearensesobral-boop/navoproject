@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { authFetch } from '../../lib/api';
+import { AdminPageHeader } from './shared/AdminPageHeader';
 import { 
   fetchAppointmentsFromSupabase, 
   fetchServicesFromSupabase, 
@@ -517,55 +518,52 @@ export const PdvInteligente: React.FC = () => {
 
   return (
     <div className="space-y-4 pb-28 md:pb-6 animate-fade-in text-content-base min-w-0">
-      {/* TOP HEADER: STATUS DO CAIXA & MÉTRICAS RÁPIDAS */}
+      {/* Header (desktop) */}
+      <AdminPageHeader
+        icon={Receipt}
+        title="PDV Inteligente"
+        stats={[
+          { label: isCaixaOpen ? 'caixa aberto' : 'caixa fechado', value: '', tone: isCaixaOpen ? 'success' : 'muted' },
+        ]}
+        action={{
+          label: isCaixaOpen ? 'Fechar Caixa' : 'Abrir Caixa',
+          onClick: () => setIsCaixaOpen(!isCaixaOpen),
+        }}
+      >
+        <button
+          onClick={() => setShowSalesHistory(true)}
+          className="h-9 px-3 rounded-xl bg-surface-base border border-border-subtle hover:bg-surface-card text-content-base text-xs font-bold flex items-center gap-2 transition-all shrink-0 active:scale-95"
+        >
+          <Receipt className="w-3.5 h-3.5 text-gold-hover" />
+          <span>Vendas Hoje ({todaysSales.length})</span>
+        </button>
+      </AdminPageHeader>
+
+      {/* Ações (mobile) */}
+      <div className="md:hidden flex items-center gap-2">
+        <button
+          onClick={() => setShowSalesHistory(true)}
+          className="flex-1 h-10 rounded-xl bg-surface-base border border-border-subtle hover:bg-surface-card text-content-base text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
+        >
+          <Receipt className="w-3.5 h-3.5 text-gold-hover" />
+          <span>Vendas ({todaysSales.length})</span>
+        </button>
+
+        <button
+          onClick={() => setIsCaixaOpen(!isCaixaOpen)}
+          className={`flex-1 h-10 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+            isCaixaOpen 
+              ? 'bg-status-error/10 hover:bg-status-error/20 text-status-error border border-status-error/30' 
+              : 'bg-status-success/10 hover:bg-status-success/20 text-status-success border border-status-success/30'
+          }`}
+        >
+          {isCaixaOpen ? 'Fechar Caixa' : 'Abrir Caixa'}
+        </button>
+      </div>
+
+      {/* Quick Metrics Bar */}
       <div className="bg-surface-card rounded-md border border-border-subtle p-3.5 sm:p-4 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded bg-gold-base/10 border border-gold-base/30 text-gold-hover flex items-center justify-center shrink-0">
-              <Receipt className="w-5 h-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-base sm:text-xl font-bold font-serif text-content-base tracking-tight truncate">PDV Inteligente</h1>
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider whitespace-nowrap shrink-0 ${
-                  isCaixaOpen 
-                    ? 'bg-status-success/10 text-status-success border-status-success/30' 
-                    : 'bg-status-error/10 text-status-error border-status-error/30'
-                }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${isCaixaOpen ? 'bg-status-success animate-pulse' : 'bg-status-error'}`} />
-                  {isCaixaOpen ? 'Caixa Aberto' : 'Caixa Fechado'}
-                </span>
-              </div>
-              <p className="text-xs text-content-muted mt-0.5 truncate">
-                Checkouts de serviços, adicionais e vendas de produtos em tempo real.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
-            <button
-              onClick={() => setShowSalesHistory(true)}
-              className="h-9 px-3 rounded bg-surface-base border border-border-subtle hover:bg-surface-card text-content-base text-xs font-bold flex items-center gap-2 transition-all shrink-0 active:scale-95"
-            >
-              <Receipt className="w-3.5 h-3.5 text-gold-hover" />
-              <span>Vendas Hoje ({todaysSales.length})</span>
-            </button>
-
-            <button
-              onClick={() => setIsCaixaOpen(!isCaixaOpen)}
-              className={`h-9 px-3 rounded text-xs font-bold transition-all shrink-0 active:scale-95 ${
-                isCaixaOpen 
-                  ? 'bg-status-error/10 hover:bg-status-error/20 text-status-error border border-status-error/30' 
-                  : 'bg-status-success/10 hover:bg-status-success/20 text-status-success border border-status-success/30'
-              }`}
-            >
-              {isCaixaOpen ? 'Fechar Caixa' : 'Abrir Caixa'}
-            </button>
-          </div>
-        </div>
-
-        {/* Quick Metrics Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <div className="p-2.5 rounded bg-surface-base border border-border-subtle flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
               <DollarSign className="w-4 h-4" />
