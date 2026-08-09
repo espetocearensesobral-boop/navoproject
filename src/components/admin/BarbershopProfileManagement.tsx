@@ -10,11 +10,7 @@ import {
   CheckCircle2, 
   Globe, 
   Instagram, 
-  MessageSquare, 
   Navigation,
-  Scissors,
-  Calendar,
-  Sparkles,
   Info,
   AlertTriangle
 } from 'lucide-react';
@@ -34,7 +30,7 @@ export const BarbershopProfileManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'address' | 'hours' | 'preview'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'address' | 'hours'>('info');
 
   useEffect(() => {
     loadProfile();
@@ -180,18 +176,6 @@ export const BarbershopProfileManagement: React.FC = () => {
         >
           <MapPin className="w-3.5 h-3.5" />
           <span>Endereço e Contatos</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('preview')}
-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
-            activeTab === 'preview' 
-              ? 'bg-gold-base text-surface-base' 
-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
-          }`}
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Previsualizar no App</span>
         </button>
       </div>
 
@@ -521,75 +505,6 @@ export const BarbershopProfileManagement: React.FC = () => {
             />
           </div>
         </form>
-      )}
-
-      {/* TAB CONTENT: PREVISUALIZAR */}
-      {activeTab === 'preview' && (
-        <div className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-4">
-          <div className="flex items-center gap-2 pb-3 border-b border-border-subtle">
-            <Sparkles className="w-4 h-4 text-gold-base" />
-            <h2 className="text-sm font-serif font-bold text-content-base">Previsualização do Cartão do App</h2>
-          </div>
-
-          <div className="max-w-md mx-auto bg-stone-900 border border-stone-800 rounded-xl p-5 text-white space-y-4 shadow-2xl">
-            {/* Header / Brand */}
-            <div className="text-center space-y-1">
-              {profile.logoUrl ? (
-                <img src={profile.logoUrl} alt="Logo" className="w-12 h-12 rounded-full mx-auto object-cover border border-amber-400/40" />
-              ) : (
-                <div className="w-10 h-10 rounded-lg bg-amber-400/10 border border-amber-400/30 text-amber-400 flex items-center justify-center mx-auto mb-1">
-                  <Scissors className="w-5 h-5" />
-                </div>
-              )}
-              <h3 className="text-lg font-bold font-serif uppercase tracking-wide text-amber-400">{profile.name}</h3>
-              <p className="text-xs font-semibold text-stone-300 uppercase tracking-widest">{profile.unitName}</p>
-              <p className="text-[11px] text-stone-400 italic">"{profile.slogan}"</p>
-            </div>
-
-            {/* Address & Hours Card */}
-            <div className="bg-stone-950 p-3.5 rounded-lg border border-stone-800 space-y-2.5 text-xs">
-              <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span className="text-stone-200">{profile.address}</span>
-              </div>
-
-              <div className="flex items-start gap-2">
-                <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <div className="space-y-0.5">
-                  <span className="text-stone-200 font-bold block mb-1">Funcionamento:</span>
-                  {daysOfWeekMap.map(d => {
-                    const sch = profile.operatingSchedule?.[d.key];
-                    if (!sch || !sch.active) return null;
-                    return (
-                      <div key={d.key} className="flex justify-between gap-4 text-[11px] text-stone-400">
-                        <span>{d.label}:</span>
-                        <span className="font-mono text-stone-200">{sch.open} às {sch.close}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 pt-1 border-t border-stone-800 text-[11px] text-stone-400">
-                <Phone className="w-3.5 h-3.5 text-amber-400" />
-                <span>{profile.phone}</span>
-                <span className="ml-auto font-mono text-amber-400/90">{profile.instagram}</span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <button className="h-9 rounded-xl bg-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>Agendar Horário</span>
-              </button>
-              <button className="h-9 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>WhatsApp</span>
-              </button>
-            </div>
-          </div>
-        </div>
       )}
 
       {/* FOOTER SAVE ACTION */}
