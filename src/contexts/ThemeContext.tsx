@@ -71,7 +71,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     let cancelled = false;
 
-    authFetch('/api/preferences/theme')
+    fetch('/api/preferences/theme', { credentials: 'include' })
       .then(async (response) => {
         if (!response.ok) return null;
         const data = await response.json();

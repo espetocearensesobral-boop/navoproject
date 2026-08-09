@@ -2401,22 +2401,42 @@ const themePaletteSchema = z.object({
   palette: z.enum(['heritage', 'sapphire', 'emerald', 'amethyst', 'ruby', 'ocean', 'copper', 'rose', 'olive', 'slate']),
 });
 
-app.get("/api/preferences/theme", requireAuth, async (req: any, res) => {
+app.get("/api/preferences/theme", async (req: any, res) => {
   try {
     if (!isDbConnected || !db) {
       return res.status(503).json({ error: 'Banco de dados indisponível' });
     }
 
-    const user = await db.query.profiles.findFirst({
-      where: eq(schema.profiles.id, req.user.id),
+    let userPalette = null;
+    const authHeader = req.headers.authorization;
+    const token = req.cookies?.token || (authHeader && authHeader.split(' ')[1]);
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET) as any;
+        if (decoded?.id) {
+          const user = await db.query.profiles.findFirst({
+            where: eq(schema.profiles.id, decoded.id),
+            columns: { themePalette: true },
+          });
+          if (user?.themePalette) {
+            userPalette = user.themePalette;
+          }
+        }
+      } catch (err) {}
+    }
+
+    if (userPalette) {
+      return res.json({ palette: userPalette });
+    }
+
+    // Retorna tema configurado da barbearia para visitantes e clientes não logados
+    const shop = await db.query.shopSettings.findFirst({
+      where: eq(schema.shopSettings.id, 'default'),
       columns: { themePalette: true },
     });
 
-    if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
-    }
-
-    return res.json({ palette: user.themePalette || 'heritage' });
+    return res.json({ palette: shop?.themePalette || 'heritage' });
   } catch (e: any) {
     return handleError(res, e, req.path);
   }
@@ -2433,13 +2453,29 @@ app.put("/api/preferences/theme", requireAuth, async (req: any, res) => {
       return res.status(400).json({ error: 'Paleta de tema inválida.' });
     }
 
+    const nextPalette = parsed.data.palette;
+
     const [updatedUser] = await db.update(schema.profiles)
-      .set({ themePalette: parsed.data.palette, updatedAt: new Date() })
+      .set({ themePalette: nextPalette, updatedAt: new Date() })
       .where(eq(schema.profiles.id, req.user.id))
       .returning({ themePalette: schema.profiles.themePalette });
 
     if (!updatedUser) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    // Se o usuário for admin ou profissional, sincroniza com a paleta padrão da barbearia
+    if (req.user.role === 'admin' || req.user.role === 'professional') {
+      try {
+        await db.insert(schema.shopSettings)
+          .values({ id: 'default', themePalette: nextPalette, updatedAt: new Date() })
+          .onConflictDoUpdate({
+            target: schema.shopSettings.id,
+            set: { themePalette: nextPalette, updatedAt: new Date() }
+          });
+      } catch (shopErr) {
+        console.error("Erro ao atualizar tema da barbearia:", shopErr);
+      }
     }
 
     return res.json({ success: true, palette: updatedUser.themePalette });

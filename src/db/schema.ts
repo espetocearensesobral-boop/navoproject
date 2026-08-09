@@ -274,6 +274,7 @@ export const shopSettings = pgTable('shop_settings', {
   // (fica pendente de aprovação do barbeiro) ou se esses horários simplesmente
   // não são oferecidos. Desativado por padrão.
   allowOutsideHoursApproval: boolean('allow_outside_hours_approval').notNull().default(false),
+  themePalette: text('theme_palette').notNull().default('heritage'),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
