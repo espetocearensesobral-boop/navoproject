@@ -250,23 +250,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   const testimonials = [
     {
       name: 'Rafael M.',
+      service: 'Corte Degradê & Barba VIP',
       rating: 5,
       date: 'Há 2 dias',
-      text: 'Melhor barbearia da cidade. Atendimento impecável e resultado sempre perfeito.',
+      text: 'Melhor barbearia de São Paulo sem dúvidas! O atendimento é personalizado do início ao fim, o café artesanal é excelente e o acabamento na navalha ficou impecável.',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150'
     },
     {
       name: 'Lucas S.',
+      service: 'Corte Masculino & Toalha Quente',
       rating: 5,
       date: 'Há 1 semana',
-      text: 'Ambiente sensacional e um corte de primeira. Recomendo demais!',
+      text: 'Ambiente sensacional, climatizado e muito refinado. O barbeiro entendeu exatamente o estilo que eu queria e a experiência com a toalha quente é inigualável. Recomendo demais!',
       avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150'
     },
     {
       name: 'Felipe C.',
+      service: 'Combo Completo Navo Premium',
       rating: 5,
       date: 'Há 3 semanas',
-      text: 'Experiência incrível! O café é ótimo e os profissionais sabem exatamente o que estão fazendo.',
+      text: 'Experiência 5 estrelas do começo ao fim! Agendei pelo site em segundos com confirmação instantânea no WhatsApp, fui atendido no horário e o resultado do visual superou todas as expectativas.',
       avatar: 'https://images.unsplash.com/photo-1600486913747-55e5470d6f40?auto=format&fit=crop&q=80&w=150'
     }
   ];
@@ -728,50 +731,70 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </h2>
           </div>
 
-          <div className="flex flex-col gap-[clamp(0.375rem,1vh,1rem)] flex-1 min-h-0 justify-center items-stretch my-auto py-[clamp(0.25rem,0.5vh,0.5rem)] w-full">
-            {testimonials.map((item, idx) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[clamp(0.5rem,1.5vh,1.25rem)] flex-1 min-h-0 justify-center items-stretch my-auto py-[clamp(0.25rem,1vh,0.75rem)] w-full">
+            {testimonials.slice(0, 3).map((item, idx) => (
               <motion.div 
                 key={idx}
-                whileHover={reducedMotion ? {} : { y: -2 }}
+                whileHover={reducedMotion ? {} : { y: -3, scale: 1.01 }}
                 transition={{ duration: 0.2 }}
-                className="w-full bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.5rem,1.2vh,1rem)] flex flex-col justify-between gap-[clamp(0.25rem,0.8vh,0.625rem)] shadow-xs hover:border-[#C8A96A]/50 hover:shadow-md transition-shadow flex-1 min-h-0"
+                className="w-full bg-neutral-50/80 border border-neutral-200/90 rounded-[clamp(0.875rem,1.8vh,1.25rem)] p-[clamp(0.85rem,2vh,1.35rem)] flex flex-col justify-between gap-3 shadow-2xs hover:border-[#d4a853]/60 hover:shadow-md transition-all h-full min-h-0"
               >
-                <div>
-                  <div className="flex items-center justify-between gap-[clamp(0.375rem,1vw,0.75rem)] mb-[clamp(0.25rem,0.8vh,0.625rem)]">
-                    <div className="flex items-center gap-[clamp(0.375rem,1vw,0.75rem)]">
+                <div className="flex flex-col gap-2.5">
+                  {/* Top Header: Avatar, Name, Rating & Date */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-3">
                       <img 
                         src={item.avatar} 
                         alt={item.name}
-                        className="w-[clamp(1.75rem,3.5vh,2.5rem)] h-[clamp(1.75rem,3.5vh,2.5rem)] rounded-full object-cover shrink-0"
+                        className="w-[clamp(2.25rem,4.5vh,3rem)] h-[clamp(2.25rem,4.5vh,3rem)] rounded-full object-cover shrink-0 border-2 border-[#d4a853]/40"
                       />
                       <div>
-                        <h4 className="text-[clamp(0.7rem,1.4vh,1rem)] font-bold text-neutral-900">
+                        <h4 className="text-[clamp(0.85rem,1.6vh,1.05rem)] font-extrabold text-neutral-900 leading-tight">
                           {item.name}
                         </h4>
-                        <div className="flex text-amber-400 gap-0.5 mt-0.5">
+                        <div className="flex text-amber-400 gap-0.5 mt-1">
                           {[...Array(item.rating)].map((_, i) => (
-                            <Star key={i} className="w-[clamp(0.6rem,1.1vh,0.8rem)] h-[clamp(0.6rem,1.1vh,0.8rem)] fill-current" />
+                            <Star key={i} className="w-[clamp(0.7rem,1.2vh,0.85rem)] h-[clamp(0.7rem,1.2vh,0.85rem)] fill-current" />
                           ))}
                         </div>
                       </div>
                     </div>
-                    <span className="text-[clamp(0.55rem,1vh,0.75rem)] text-neutral-400 self-start mt-1">
+                    <span className="text-[clamp(0.6rem,1.1vh,0.75rem)] font-medium text-neutral-400 shrink-0">
                       {item.date}
                     </span>
                   </div>
 
-                  <p className="text-[clamp(0.625rem,1.25vh,0.875rem)] text-neutral-600 leading-relaxed font-normal italic line-clamp-3">
+                  {/* Service Badge */}
+                  {item.service && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#d4a853]/12 border border-[#d4a853]/25 w-fit">
+                      <Scissors className="w-3 h-3 text-[#d4a853]" />
+                      <span className="text-[clamp(0.625rem,1.15vh,0.725rem)] font-bold text-[#b89060]">
+                        {item.service}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Testimonial Quote Text */}
+                  <p className="text-[clamp(0.75rem,1.35vh,0.925rem)] text-neutral-700 leading-relaxed font-normal italic mt-1">
                     "{item.text}"
                   </p>
                 </div>
+
+                <div className="pt-2 border-t border-neutral-200/60 flex items-center justify-between text-[clamp(0.6rem,1.1vh,0.725rem)] text-neutral-400 font-semibold">
+                  <span className="flex items-center gap-1 text-emerald-600 font-bold">
+                    <Check className="w-3.5 h-3.5" /> Cliente Verificado
+                  </span>
+                  <span>Google Reviews 5.0 ★</span>
+                </div>
               </motion.div>
             ))}
-            <div className="flex justify-center pt-[clamp(0.25rem,0.5vh,0.5rem)] shrink-0">
-              <button onClick={handleOpenGoogleMaps} className="text-[clamp(0.7rem,1.4vh,0.875rem)] font-bold text-[#d4a853] hover:text-[#b89060] transition-colors flex items-center gap-1.5 cursor-pointer group">
-                <span className="border-b border-[#d4a853]/30 group-hover:border-[#b89060]">Ver mais avaliações no Google</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
+          </div>
+
+          <div className="flex justify-center pt-2 shrink-0">
+            <button onClick={handleOpenGoogleMaps} className="text-[clamp(0.75rem,1.5vh,0.875rem)] font-bold text-[#d4a853] hover:text-[#b89060] transition-colors flex items-center gap-1.5 cursor-pointer group">
+              <span className="border-b border-[#d4a853]/40 group-hover:border-[#b89060]">Ver mais avaliações no Google (4.9 · 1.2k avaliações)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </motion.div>
       </section>
