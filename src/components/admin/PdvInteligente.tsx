@@ -366,7 +366,7 @@ export const PdvInteligente: React.FC = () => {
           @page { size: 80mm auto; margin: 0; }
           * { box-sizing: border-box; }
           body {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
             width: 280px;
             margin: 0 auto;
             padding: 16px 12px;
