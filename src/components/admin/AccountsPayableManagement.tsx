@@ -160,42 +160,45 @@ export const AccountsPayableManagement: React.FC = () => {
       </button>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-surface-card border border-status-error/30 rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-status-error block">Contas Vencidas</span>
-          <span className="text-2xl font-bold text-status-error mt-1 block tabular-nums">
-            R$ {totalOverdue.toFixed(2)}
-          </span>
-          <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-            {accounts.filter(a => a.status === 'overdue').length} conta(s) pendente(s) de pagamento
-          </span>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <div className="p-3 bg-surface-card border border-status-error/30 rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-status-error mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Vencidas</span>
+            <div className="w-6 h-6 rounded-lg bg-status-error/10 flex items-center justify-center shrink-0">
+              <AlertCircle className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-status-error tabular-nums truncate">R$ {totalOverdue.toFixed(2)}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{accounts.filter(a => a.status === 'overdue').length} conta(s)</p>
         </div>
 
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-content-muted block">A Pagar no Mês</span>
-          <span className="text-2xl font-bold text-gold-base mt-1 block tabular-nums">
-            R$ {totalPending.toFixed(2)}
-          </span>
-          <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-            {accounts.filter(a => a.status === 'pending').length} compromisso(s) a vencer
-          </span>
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">A Pagar</span>
+            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0">
+              <Clock className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {totalPending.toFixed(2)}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{accounts.filter(a => a.status === 'pending').length} a vencer</p>
         </div>
 
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-content-muted block">Total Pago</span>
-          <span className="text-2xl font-bold text-status-success mt-1 block tabular-nums">
-            R$ {totalPaid.toFixed(2)}
-          </span>
-          <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-            Liquidadas no período
-          </span>
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Total Pago</span>
+            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-status-success tabular-nums truncate">R$ {totalPaid.toFixed(2)}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Liquidadas no período</p>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex border-b border-border-subtle gap-2">
+      <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">
         {[
-          { id: 'all', label: 'Todas as Contas' },
+          { id: 'all', label: 'Todas' },
           { id: 'pending', label: 'A Vencer' },
           { id: 'overdue', label: 'Vencidas' },
           { id: 'paid', label: 'Pagas' }
@@ -203,7 +206,7 @@ export const AccountsPayableManagement: React.FC = () => {
           <button
             key={f.id}
             onClick={() => setFilterStatus(f.id)}
-            className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all ${
+            className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all whitespace-nowrap shrink-0 ${
               filterStatus === f.id
                 ? 'border-gold-base text-gold-base'
                 : 'border-transparent text-content-muted hover:text-content-base'

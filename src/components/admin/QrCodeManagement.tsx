@@ -94,7 +94,7 @@ export const QrCodeManagement: React.FC = () => {
               className="w-full bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
             >
               <ExternalLink className="w-4 h-4 text-gold-base" />
-              <span>Testar Link do Cliente (Abrir em nova aba)</span>
+              <span>Testar Link do Cliente</span>
             </a>
           </div>
         </div>

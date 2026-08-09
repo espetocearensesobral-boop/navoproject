@@ -184,35 +184,38 @@ export const SubscriptionsManagement: React.FC = () => {
       </button>
 
       {/* MRR Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-content-muted block">Receita Recorrente Mensal (MRR)</span>
-          <span className="text-2xl font-bold text-gold-base mt-1 block tabular-nums">
-            R$ {totalMRR.toFixed(2)}
-          </span>
-          <span className="text-[10px] text-status-success font-semibold mt-1 block">
-            Faturamento garantido todo mês
-          </span>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">MRR</span>
+            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0">
+              <DollarSign className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {totalMRR.toFixed(2)}</p>
+          <p className="text-[9px] text-status-success mt-1 font-medium truncate">Garantido todo mês</p>
         </div>
 
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-content-muted block">Membros Ativos no Clube</span>
-          <span className="text-2xl font-bold text-content-base mt-1 block tabular-nums">
-            {totalActiveSubscribers}
-          </span>
-          <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-            Ticket Médio por Assinante: R$ {totalActiveSubscribers > 0 ? (totalMRR / totalActiveSubscribers).toFixed(0) : '0'}
-          </span>
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Membros Ativos</span>
+            <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle flex items-center justify-center shrink-0">
+              <Users className="w-3.5 h-3.5 text-gold-base" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-content-base tabular-nums">{totalActiveSubscribers}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Ticket: R$ {totalActiveSubscribers > 0 ? (totalMRR / totalActiveSubscribers).toFixed(0) : '0'}</p>
         </div>
 
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-content-muted block">Atendimentos do Clube no Mês</span>
-          <span className="text-2xl font-bold text-status-success mt-1 block tabular-nums">
-            {members.reduce((acc, m) => acc + m.cutsUsedThisMonth, 0)}
-          </span>
-          <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-            Repasses gerados aos barbeiros
-          </span>
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Atend. do Clube</span>
+            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
+              <Scissors className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-status-success tabular-nums">{members.reduce((acc, m) => acc + m.cutsUsedThisMonth, 0)}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Repasses aos barbeiros</p>
         </div>
       </div>
 

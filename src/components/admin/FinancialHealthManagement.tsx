@@ -24,36 +24,40 @@ export const FinancialHealthManagement: React.FC = () => {
       />
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-content-muted block">Margem de Lucro Operacional</span>
-          <span className="text-2xl font-bold text-status-success mt-1 block tabular-nums">
-            34.2%
-          </span>
-          <span className="text-[10px] text-status-success font-semibold mt-1 block flex items-center gap-1">
-            <ArrowUpRight className="w-3 h-3" />
-            +2.8% em relação ao mês anterior
-          </span>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Margem</span>
+            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
+              <TrendingUp className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-status-success tabular-nums">34.2%</p>
+          <p className="text-[9px] text-status-success mt-1 font-medium truncate flex items-center gap-0.5">
+            <ArrowUpRight className="w-2.5 h-2.5 shrink-0" /> +2.8% vs mês anterior
+          </p>
         </div>
 
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-content-muted block">Ponto de Equilíbrio (Break-Even)</span>
-          <span className="text-2xl font-bold text-gold-base mt-1 block tabular-nums">
-            R$ 8.450,00
-          </span>
-          <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-            Atingido no dia 12 de cada mês
-          </span>
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Break-Even</span>
+            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0">
+              <DollarSign className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ 8.450</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Atingido dia 12</p>
         </div>
 
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-content-muted block">Projeção de Caixa a 30 Dias</span>
-          <span className="text-2xl font-bold text-content-base mt-1 block tabular-nums">
-            R$ 18.290,00
-          </span>
-          <span className="text-[10px] text-status-success font-semibold mt-1 block">
-            Fundo de reserva seguro
-          </span>
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
+          <div className="flex items-center justify-between text-content-muted mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Projeção 30 Dias</span>
+            <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+              <PieChart className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-content-base tabular-nums truncate">R$ 18.290</p>
+          <p className="text-[9px] text-status-success mt-1 font-medium truncate">Reserva segura</p>
         </div>
       </div>
 

@@ -281,49 +281,49 @@ export const CaixaManagement: React.FC = () => {
       {currentSession ? (
         <div className="space-y-4">
           {/* Main Caixa Balance Summary */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-surface-card border border-border-subtle rounded-2xl p-4 shadow-xs">
-              <span className="text-[10px] font-bold uppercase text-content-muted block">Saldo Inicial (Fundo)</span>
-              <span className="text-2xl font-bold text-content-base mt-1 block tabular-nums">
-                R$ {currentSession.initialBalance.toFixed(2)}
-              </span>
-              <span className="text-[10px] text-content-muted font-semibold mt-1 block flex items-center gap-1">
-                <User className="w-3 h-3" />
-                {currentSession.operatorName}
-              </span>
-            </div>
-
-            <div className="bg-surface-card border border-border-subtle rounded-2xl p-4 shadow-xs">
-              <span className="text-[10px] font-bold uppercase text-content-muted block">Vendas em Dinheiro</span>
-              <span className="text-2xl font-bold text-status-success mt-1 block tabular-nums">
-                + R$ {currentSession.cashInSales.toFixed(2)}
-              </span>
-              <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-                Entradas em espécie na gaveta
-              </span>
-            </div>
-
-            <div className="bg-surface-card border border-border-subtle rounded-2xl p-4 shadow-xs">
-              <span className="text-[10px] font-bold uppercase text-content-muted block">Suprimentos / Sangrias</span>
-              <span className="text-2xl font-bold text-gold-base mt-1 block tabular-nums">
-                R$ {(currentSession.supplies - currentSession.withdrawals).toFixed(2)}
-              </span>
-              <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-                +{currentSession.supplies.toFixed(0)} sup. / -{currentSession.withdrawals.toFixed(0)} sang.
-              </span>
-            </div>
-
-            <div className="bg-surface-card border border-gold-base/50 rounded-2xl p-4 shadow-sm bg-gold-base/5 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-12 h-12 bg-gold-base/10 rounded-bl-2xl flex items-center justify-center text-gold-base">
-                <Wallet className="w-5 h-5" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+            <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+              <div className="flex items-center justify-between text-content-muted mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider truncate">Saldo Inicial</span>
+                <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle flex items-center justify-center shrink-0">
+                  <User className="w-3.5 h-3.5 text-gold-base" />
+                </div>
               </div>
-              <span className="text-[10px] font-bold uppercase text-gold-base block">Dinheiro Esperado na Gaveta</span>
-              <span className="text-2xl font-bold text-gold-base mt-1 block tabular-nums">
-                R$ {currentSession.expectedCash.toFixed(2)}
-              </span>
-              <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-                Valor para conferência no fechamento
-              </span>
+              <p className="text-lg font-black text-content-base tabular-nums truncate">R$ {currentSession.initialBalance.toFixed(2)}</p>
+              <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{currentSession.operatorName}</p>
+            </div>
+
+            <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+              <div className="flex items-center justify-between text-content-muted mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider truncate">Em Dinheiro</span>
+                <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
+                  <DollarSign className="w-3.5 h-3.5" />
+                </div>
+              </div>
+              <p className="text-lg font-black text-status-success tabular-nums truncate">+ R$ {currentSession.cashInSales.toFixed(2)}</p>
+              <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Espécie na gaveta</p>
+            </div>
+
+            <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+              <div className="flex items-center justify-between text-content-muted mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider truncate">Suprim. / Sangrias</span>
+                <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0">
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </div>
+              </div>
+              <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {(currentSession.supplies - currentSession.withdrawals).toFixed(2)}</p>
+              <p className="text-[9px] text-content-muted mt-1 font-medium truncate">+{currentSession.supplies.toFixed(0)} / -{currentSession.withdrawals.toFixed(0)}</p>
+            </div>
+
+            <div className="p-3 bg-surface-card border border-gold-base/50 rounded-2xl bg-gold-base/5 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-gold-base mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider truncate">Esperado</span>
+                <div className="w-6 h-6 rounded-lg bg-gold-base/15 flex items-center justify-center shrink-0">
+                  <Wallet className="w-3.5 h-3.5" />
+                </div>
+              </div>
+              <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {currentSession.expectedCash.toFixed(2)}</p>
+              <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Conferência no fechamento</p>
             </div>
           </div>
 

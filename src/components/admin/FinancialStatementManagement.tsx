@@ -125,35 +125,40 @@ export const FinancialStatementManagement: React.FC = () => {
       </button>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-status-success block">Entradas Totais</span>
-          <span className="text-2xl font-bold text-status-success mt-1 block tabular-nums">
-            + R$ {totalIncomes.toFixed(2)}
-          </span>
-          <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-            Comandas, vendas e assinaturas
-          </span>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-status-success mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Entradas</span>
+            <div className="w-6 h-6 rounded-lg bg-status-success/10 flex items-center justify-center shrink-0">
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-status-success tabular-nums truncate">+ R$ {totalIncomes.toFixed(2)}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Comandas e assinaturas</p>
         </div>
 
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-status-error block">Saídas Totais</span>
-          <span className="text-2xl font-bold text-status-error mt-1 block tabular-nums">
-            - R$ {totalExpenses.toFixed(2)}
-          </span>
-          <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-            Despesas, sangrias e contas pagas
-          </span>
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-status-error mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Saídas</span>
+            <div className="w-6 h-6 rounded-lg bg-status-error/10 flex items-center justify-center shrink-0">
+              <ArrowDownRight className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-status-error tabular-nums truncate">- R$ {totalExpenses.toFixed(2)}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Despesas e contas pagas</p>
         </div>
 
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase text-gold-base block">Resultado Líquido</span>
-          <span className={`text-2xl font-bold mt-1 block tabular-nums ${netBalance >= 0 ? 'text-gold-base' : 'text-status-error'}`}>
-            R$ {netBalance.toFixed(2)}
-          </span>
-          <span className="text-[10px] text-content-muted font-semibold mt-1 block">
-            Lucro operacional acumulado
-          </span>
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
+          <div className="flex items-center justify-between text-gold-base mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Resultado</span>
+            <div className="w-6 h-6 rounded-lg bg-gold-base/10 flex items-center justify-center shrink-0">
+              <PieChart className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className={`text-lg font-black tabular-nums truncate ${netBalance >= 0 ? 'text-gold-base' : 'text-status-error'}`}>
+             R$ {netBalance.toFixed(2)}
+          </p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Lucro acumulado</p>
         </div>
       </div>
 
