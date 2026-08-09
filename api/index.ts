@@ -2379,6 +2379,7 @@ function formatProfile(p: any) {
     loyalty_points: points,
     loyaltyTier: tier,
     loyalty_tier: tier,
+    themePalette: safe.themePalette || safe.theme_palette || 'heritage',
   };
 }
 
@@ -2391,6 +2392,57 @@ app.get("/api/auth/me", requireAuth, async (req: any, res) => {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
     res.json(formatProfile(user));
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+const themePaletteSchema = z.object({
+  palette: z.enum(['heritage', 'sapphire', 'emerald', 'amethyst', 'ruby', 'ocean', 'copper', 'rose', 'olive', 'slate']),
+});
+
+app.get("/api/preferences/theme", requireAuth, async (req: any, res) => {
+  try {
+    if (!isDbConnected || !db) {
+      return res.status(503).json({ error: 'Banco de dados indisponível' });
+    }
+
+    const user = await db.query.profiles.findFirst({
+      where: eq(schema.profiles.id, req.user.id),
+      columns: { themePalette: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    return res.json({ palette: user.themePalette || 'heritage' });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.put("/api/preferences/theme", requireAuth, async (req: any, res) => {
+  try {
+    if (!isDbConnected || !db) {
+      return res.status(503).json({ error: 'Banco de dados indisponível' });
+    }
+
+    const parsed = themePaletteSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Paleta de tema inválida.' });
+    }
+
+    const [updatedUser] = await db.update(schema.profiles)
+      .set({ themePalette: parsed.data.palette, updatedAt: new Date() })
+      .where(eq(schema.profiles.id, req.user.id))
+      .returning({ themePalette: schema.profiles.themePalette });
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    return res.json({ success: true, palette: updatedUser.themePalette });
   } catch (e: any) {
     return handleError(res, e, req.path);
   }

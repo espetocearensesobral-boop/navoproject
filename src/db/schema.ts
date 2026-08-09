@@ -14,6 +14,7 @@ export const profiles = pgTable('profiles', {
   referralCode: text('referral_code').unique(),
   referredBy: text('referred_by'),
   birthday: text('birthday'),
+  themePalette: text('theme_palette').notNull().default('heritage'),
   resetCodeHash: text('reset_code_hash'),
   resetCodeExpiresAt: timestamp('reset_code_expires_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
