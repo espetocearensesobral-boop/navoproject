@@ -109,6 +109,24 @@ export function formatDateBR(isoDate: string): string {
   return isoDate;
 }
 
+/**
+ * Soma (ou subtrai) dias a uma data YYYY-MM-DD sem depender do fuso horário
+ * local do navegador/servidor. Opera sobre a string, não sobre `new Date()` local,
+ * evitando desalinhamento quando o dispositivo do cliente está em outro fuso.
+ */
+export function addDaysBRT(dateStr: string, days: number): string {
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  // Construção em UTC (meio-dia, pra evitar qualquer problema de horário de verão)
+  // e cálculo puramente aritmético de calendário — não usa a hora local do ambiente.
+  const utcDate = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+  utcDate.setUTCDate(utcDate.getUTCDate() + days);
+  const ny = utcDate.getUTCFullYear();
+  const nm = String(utcDate.getUTCMonth() + 1).padStart(2, '0');
+  const nd = String(utcDate.getUTCDate()).padStart(2, '0');
+  return `${ny}-${nm}-${nd}`;
+}
+
 export type DayOfWeekKey = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
 
 /**

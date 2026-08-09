@@ -48,7 +48,8 @@ import {
   getCurrentTimeBRT, 
   timeToMinutes, 
   minutesToTime, 
-  getDayOfWeekKey 
+  getDayOfWeekKey,
+  addDaysBRT
 } from '../../utils/dateUtils';
 
 interface LandingPageProps {
@@ -146,14 +147,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           }
 
           // Se não houver horário restante hoje, verificar os próximos 7 dias
-          const now = new Date();
+          // (soma dias sobre a string BRT, não sobre new Date() local, pra não
+          // desalinhar "amanhã" quando o dispositivo está em outro fuso horário)
           for (let i = 1; i <= 7; i++) {
-            const nextDate = new Date(now);
-            nextDate.setDate(now.getDate() + i);
-            const y = nextDate.getFullYear();
-            const month = String(nextDate.getMonth() + 1).padStart(2, '0');
-            const d = String(nextDate.getDate()).padStart(2, '0');
-            const futureIso = `${y}-${month}-${d}`;
+            const futureIso = addDaysBRT(todayStr, i);
 
             const futRes = await authFetch(`/api/availability?date=${futureIso}&duration=30`);
             if (futRes.ok) {

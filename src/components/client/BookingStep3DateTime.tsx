@@ -17,6 +17,14 @@ import {
   timeToMinutes
 } from '../../utils/dateUtils';
 
+// Deriva ano/mês "de hoje" a partir da string BRT (não de `new Date()` local),
+// pra não desalinhar a navegação do calendário quando o dispositivo do cliente
+// está em outro fuso horário.
+function getTodayYearMonthBRT(todayStr: string): { year: number; month: number } {
+  const [y, m] = todayStr.split('-').map(Number);
+  return { year: y, month: m - 1 };
+}
+
 interface BookingStep3Props {
   selectedServices: ServiceItem[];
   selectedBarber: Professional | null;
@@ -57,13 +65,17 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
 
   const timeSectionRef = useRef<HTMLDivElement>(null);
 
-  // Calendar Modal State
-  const [calendarMonth, setCalendarMonth] = useState(() => new Date());
-
   // Set default date to today in BRT if empty or in the past
   const todayStr = useMemo(() => {
     return getTodayStringBRT();
   }, []);
+
+  // Calendar Modal State — inicializado a partir do "hoje" em BRT, não de new Date()
+  // local, pra não desalinhar com todayStr se o dispositivo estiver em outro fuso.
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const { year, month } = getTodayYearMonthBRT(todayStr);
+    return new Date(year, month, 1);
+  });
 
   useEffect(() => {
     if (!selectedDate || selectedDate < todayStr) {
@@ -136,11 +148,9 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   }, [calendarMonth]);
 
   const canGoPrevMonth = useMemo(() => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
+    const { year: currentYear, month: currentMonth } = getTodayYearMonthBRT(todayStr);
     return calendarMonth.getFullYear() > currentYear || (calendarMonth.getFullYear() === currentYear && calendarMonth.getMonth() > currentMonth);
-  }, [calendarMonth]);
+  }, [calendarMonth, todayStr]);
 
   const handlePrevMonth = () => {
     if (!canGoPrevMonth) return;

@@ -108,26 +108,29 @@ export async function saveShopProfile(data: Partial<ShopProfile>): Promise<ShopP
     ...data
   };
 
-  try {
-    const res = await authFetch('/api/shop-profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updated)
-    });
+  const res = await authFetch('/api/shop-profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updated)
+  });
 
-    if (res.ok) {
-      const resData = await res.json();
-      if (resData.profile) {
-        cachedProfile = { ...defaultShopProfile, ...resData.profile };
-        return cachedProfile;
-      }
+  if (res.ok) {
+    const resData = await res.json();
+    if (resData.profile) {
+      cachedProfile = { ...defaultShopProfile, ...resData.profile };
+      return cachedProfile;
     }
-  } catch (err) {
-    console.error('Erro ao salvar perfil da barbearia:', err);
   }
 
-  cachedProfile = updated;
-  return cachedProfile;
+  // Erro (ex.: 400 de validação de horário abre>fecha) — propaga em vez de
+  // mascarar como sucesso; antes, uma resposta não-ok fazia a função retornar
+  // silenciosamente o objeto local `updated`, dando falsa impressão de que salvou.
+  let errorMsg = 'Erro ao salvar perfil da barbearia.';
+  try {
+    const errData = await res.json();
+    if (errData?.error) errorMsg = errData.error;
+  } catch (e) {}
+  throw new Error(errorMsg);
 }
 
 /**

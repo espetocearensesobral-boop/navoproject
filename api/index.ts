@@ -1177,29 +1177,31 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
 
     let clientName = data.clientName || data.client_name || 'Cliente';
     let clientPhone = sanitizePhone(data.clientPhone || data.client_phone || '');
-    
+
     // Ensure client profile exists
     if (isDbConnected && db) {
-      const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, clientId) });
-      if (!profile) {
-        try {
+      try {
+        const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, clientId) });
+        if (!profile) {
+          const cleanId = clientId.replace(/[^a-zA-Z0-9_-]/g, '');
+          const safeEmail = `${cleanId}_${Date.now()}@guest.barberx.app`;
           await db.insert(schema.profiles).values({
             id: clientId,
             name: clientName,
-            email: `${clientId}@guest.barberx.app`,
-            phone: clientPhone,
+            email: safeEmail,
+            phone: clientPhone || null,
             role: 'client',
             loyaltyPoints: 0,
             loyaltyTier: 'Bronze'
-          });
-        } catch (e) {
-          console.warn('[API] Could not create guest profile:', e);
+          }).onConflictDoNothing();
+        } else {
+          if (!isAdmin && req.user && req.user.id && req.user.role !== 'guest' && req.user.id !== 'usr_guest' && !req.user.id.startsWith('guest_')) {
+            if (profile.name) clientName = profile.name;
+            if (!clientPhone && profile.phone) clientPhone = profile.phone;
+          }
         }
-      } else {
-        if (!isAdmin && req.user && req.user.id && req.user.role !== 'guest' && req.user.id !== 'usr_guest' && !req.user.id.startsWith('guest_')) {
-          if (profile.name) clientName = profile.name;
-          if (!clientPhone && profile.phone) clientPhone = profile.phone;
-        }
+      } catch (e) {
+        console.warn('[API] Could not check/create guest profile:', e);
       }
     }
 
@@ -1229,11 +1231,50 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
     if (isDbConnected && db && typeof db.transaction === 'function') {
       try {
         await db.transaction(async (tx: any) => {
+          // A. Ensure professional exists in DB before referencing in appointments
+          if (resolvedProfessionalId && resolvedProfessionalId !== 'prof_any') {
+            const profCheck = await tx.query.professionals.findFirst({
+              where: eq(schema.professionals.id, resolvedProfessionalId)
+            });
+            if (!profCheck) {
+              await tx.insert(schema.professionals).values({
+                id: resolvedProfessionalId,
+                name: resolvedProfessionalName || 'Profissional',
+                roleTitle: 'Master Barber',
+                rating: '5.00',
+                reviewsCount: 0,
+                commissionRate: '0.40',
+                isActive: true,
+                workingHours: {}
+              }).onConflictDoNothing();
+            }
+          }
+
+          // B. Ensure profile exists in DB before referencing in appointments
+          if (clientId) {
+            const profileCheck = await tx.query.profiles.findFirst({
+              where: eq(schema.profiles.id, clientId)
+            });
+            if (!profileCheck) {
+              const cleanId = clientId.replace(/[^a-zA-Z0-9_-]/g, '');
+              const safeEmail = `${cleanId}_${Date.now()}@guest.barberx.app`;
+              await tx.insert(schema.profiles).values({
+                id: clientId,
+                name: clientName || 'Cliente',
+                email: safeEmail,
+                phone: clientPhone || null,
+                role: 'client',
+                loyaltyPoints: 0,
+                loyaltyTier: 'Bronze'
+              }).onConflictDoNothing();
+            }
+          }
+
           const dbApt = {
             ...newApt,
             createdAt: newApt.createdAt ? new Date(newApt.createdAt) : new Date()
           };
-          const { createdAt, ...updateFields } = dbApt;
+          const { createdAt, id: _idKey, ...updateFields } = dbApt;
           await tx.insert(schema.appointments).values(dbApt).onConflictDoUpdate({
             target: schema.appointments.id,
             set: {
@@ -1243,7 +1284,9 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
           });
 
           // Auto-feed waiting queue if appointment is for today
-          const todayStr = new Date().toISOString().split('T')[0];
+          // (usa getTodayStringBRT — não new Date().toISOString(), que retorna a data em UTC
+          // e diverge do dia real em BRT entre 21h e 23h59, horário de Brasília)
+          const todayStr = getTodayStringBRT();
           if (newApt.date === todayStr && newApt.status !== 'cancelled') {
             const serviceTitle = Array.isArray(newApt.services) && newApt.services.length > 0
               ? (typeof newApt.services[0] === 'string' ? newApt.services[0] : (newApt.services[0].title || 'Atendimento BarberX'))
@@ -1274,27 +1317,38 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
         const fullErr = `${errMsg} ${causeMsg} ${pgCode} ${pgConstraint}`;
 
         if (fullErr.includes('booking_conflict_idx') || fullErr.includes('23505') || pgCode === '23505') {
-          return res.status(409).json({ error: 'Este horário já está reservado. Por favor, escolha outro.' });
-        }
-        
-        console.error('[API] Atomic transaction failed:', err);
+          if (fullErr.includes('booking_code')) {
+            // Se conflitou no código da reserva, tentar código alternativo
+            newApt.bookingCode = generateBookingCode() + 'X';
+            const dbApt = { ...newApt, createdAt: new Date() };
+            const { createdAt, id: _idKey, ...updateFields } = dbApt;
+            await db.insert(schema.appointments).values(dbApt).onConflictDoUpdate({
+              target: schema.appointments.id,
+              set: { ...updateFields, updatedAt: new Date() }
+            });
+          } else {
+            return res.status(409).json({ error: 'Este horário já está reservado. Por favor, escolha outro.' });
+          }
+        } else {
+          console.error('[API] Atomic transaction failed:', err);
 
-        if (fullErr.includes('appointments_client_id_fkey')) {
-          return res.status(400).json({ error: 'Erro no perfil do cliente. Atualize a página e tente novamente.' });
-        }
-        if (fullErr.includes('appointments_professional_id_fkey')) {
-          return res.status(400).json({ error: 'Profissional não encontrado.' });
-        }
+          if (fullErr.includes('appointments_client_id_fkey')) {
+            return res.status(400).json({ error: 'Erro no perfil do cliente. Atualize a página e tente novamente.' });
+          }
+          if (fullErr.includes('appointments_professional_id_fkey')) {
+            return res.status(400).json({ error: 'Profissional não encontrado.' });
+          }
 
-        return res.status(400).json({ error: 'Falha ao salvar agendamento no banco de dados. Por favor, tente novamente.' });
+          return res.status(400).json({ error: 'Falha ao salvar agendamento no banco de dados. Por favor, tente novamente.' });
+        }
       }
     } else {
-      // Fallback to non-transactional or mock insert
+      // Fallback to non-transactional insert
       const dbApt = {
         ...newApt,
         createdAt: newApt.createdAt ? new Date(newApt.createdAt) : new Date()
       };
-      const { createdAt, ...updateFields } = dbApt;
+      const { createdAt, id: _idKey, ...updateFields } = dbApt;
       try {
         await db.insert(schema.appointments).values(dbApt).onConflictDoUpdate({
           target: schema.appointments.id,
@@ -1317,7 +1371,6 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
         console.error("[API] Fallback insert failed:", err);
         return res.status(400).json({ error: "Falha ao salvar agendamento no banco de dados. Por favor, tente novamente." });
       }
-
     }
 
 
@@ -1932,12 +1985,30 @@ async function checkSlotAvailability({
   const dayKey = getDayOfWeekKey(dateStr);
   const daySchedule = shopProf.operatingSchedule?.[dayKey];
 
-  if (daySchedule && daySchedule.active === false) {
-    return {
-      statusCode: 'SHOP_CLOSED',
-      available: false,
-      reason: 'A barbearia está fechada nesta data.'
+  if (daySchedule) {
+    if (daySchedule.active === false) {
+      return {
+        statusCode: 'SHOP_CLOSED',
+        available: false,
+        reason: 'A barbearia está fechada nesta data.'
+      };
+    }
+  } else {
+    // operatingSchedule não tem essa chave (JSON incompleto/legado) — cai pro fallback
+    // legado operatingDays, igual ao frontend (isDateOpenInProfile), pra não abrir um
+    // dia que a UI mostra como fechado.
+    const daysOfWeekIndex: Record<string, number> = {
+      sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6
     };
+    const dayIndex = daysOfWeekIndex[dayKey] ?? 1;
+    const operatingDays: number[] | undefined = shopProf.operatingDays;
+    if (Array.isArray(operatingDays) && !operatingDays.includes(dayIndex)) {
+      return {
+        statusCode: 'SHOP_CLOSED',
+        available: false,
+        reason: 'A barbearia está fechada nesta data.'
+      };
+    }
   }
 
   const openMins = timeToMinutes(daySchedule?.open || shopProf.openTime || '09:00');
@@ -1953,7 +2024,8 @@ async function checkSlotAvailability({
   }
 
   // Se o atendimento ultrapassa o horário normal de encerramento
-  const isOutsideHours = (endMins > closeMins) || (startMins >= closeMins);
+  // (startMins >= closeMins já implica endMins > closeMins, dado que a duração é sempre > 0)
+  const isOutsideHours = endMins > closeMins;
 
   // 3. Agendamentos do dia (não cancelados)
   const allAppointments = await db.query.appointments.findMany({
@@ -2898,7 +2970,7 @@ app.get("/api/admin/validate-keys", requireAuth, requireAdmin, async (req: any, 
 async function seedDatabase() {
   const defaultPasswordHash = await bcrypt.hash('client123', 10);
   const adminPasswordHash = await bcrypt.hash('admin123', 10);
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getTodayStringBRT();
 
   const seedProfiles = [
     {
@@ -3471,7 +3543,8 @@ app.post("/api/cron/reminders", async (req: any, res: any) => {
   }
 
   try {
-    const todayStr = new Date().toISOString().split('T')[0];
+    // BRT, não UTC — evita disparar/perder lembretes de agendamentos "de hoje" entre 21h-23h59 (Brasília)
+    const todayStr = getTodayStringBRT();
     const upcoming = await db.query.appointments.findMany({
       where: eq(schema.appointments.date, todayStr)
     });
@@ -3558,19 +3631,65 @@ app.get("/api/shop-profile", async (req: any, res: any) => {
   }
 });
 
+const DAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+
 app.post("/api/shop-profile", requireAuth, requireAdmin, async (req: any, res: any) => {
   try {
     const data = req.body;
+    const existing = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
+    const existingRow = existing[0];
+
+    // Mescla o operatingSchedule recebido com o existente em vez de sobrescrever
+    // o JSON inteiro — evita apagar dias que o client não enviou.
+    const mergedSchedule: Record<string, any> = {
+      ...(existingRow?.operatingSchedule || {}),
+      ...(data.operatingSchedule || {})
+    };
+
+    // Garante que as 7 chaves existem (fallback seguro pra qualquer dia ausente)
+    for (const key of DAY_KEYS) {
+      if (!mergedSchedule[key]) {
+        mergedSchedule[key] = { active: true, open: '09:00', close: '20:00' };
+      }
+    }
+
+    // Valida open < close pra cada dia ativo (evita configuração invertida que
+    // resulta silenciosamente em zero horários disponíveis)
+    const invalidDays: string[] = [];
+    for (const key of DAY_KEYS) {
+      const sch = mergedSchedule[key];
+      if (sch && sch.active) {
+        const openM = timeToMinutes(sch.open);
+        const closeM = timeToMinutes(sch.close);
+        if (!(openM < closeM)) {
+          invalidDays.push(key);
+        }
+      }
+    }
+    if (invalidDays.length > 0) {
+      return res.status(400).json({
+        error: `Horário de abertura deve ser antes do horário de fechamento para: ${invalidDays.join(', ')}.`,
+        invalidDays
+      });
+    }
+
+    const globalOpen = data.openTime !== undefined ? data.openTime : existingRow?.openTime;
+    const globalClose = data.closeTime !== undefined ? data.closeTime : existingRow?.closeTime;
+    if (globalOpen && globalClose && !(timeToMinutes(globalOpen) < timeToMinutes(globalClose))) {
+      return res.status(400).json({ error: 'Horário de abertura padrão deve ser antes do horário de fechamento.' });
+    }
+
     const payload = {
       id: 'default', name: data.name, unitName: data.unitName, slogan: data.slogan,
       address: data.address, phone: data.phone, whatsapp: data.whatsapp,
-      openTime: data.openTime, closeTime: data.closeTime,
-      operatingDays: data.operatingDays, operatingSchedule: data.operatingSchedule,
+      openTime: globalOpen, closeTime: globalClose,
+      operatingDays: data.operatingDays !== undefined ? data.operatingDays : existingRow?.operatingDays,
+      operatingSchedule: mergedSchedule,
       mapsUrl: data.mapsUrl || '', instagram: data.instagram || '',
       logoUrl: data.logoUrl || '', description: data.description || '', updatedAt: new Date()
     };
-    const existing = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
-    if (existing.length > 0) {
+
+    if (existingRow) {
       await db.update(schema.shopSettings).set(payload).where(eq(schema.shopSettings.id, 'default'));
     } else {
       await db.insert(schema.shopSettings).values(payload);

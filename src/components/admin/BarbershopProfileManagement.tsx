@@ -23,6 +23,7 @@ import {
   daysOfWeekMap,
   generateTimeSlotsFromProfile 
 } from '../../services/shopProfileService';
+import { timeToMinutes } from '../../utils/dateUtils';
 
 export const BarbershopProfileManagement: React.FC = () => {
   const [profile, setProfile] = useState<ShopProfile>(defaultShopProfile);
@@ -48,11 +49,31 @@ export const BarbershopProfileManagement: React.FC = () => {
   };
 
   const handleSave = async () => {
+    // Validação local: horário de abertura precisa ser antes do de fechamento
+    // em todo dia ativo (evita salvar uma configuração que zera os horários
+    // disponíveis silenciosamente).
+    const invalidDayLabels: string[] = [];
+    for (const d of daysOfWeekMap) {
+      const sch = profile.operatingSchedule?.[d.key];
+      if (sch?.active && !(timeToMinutes(sch.open) < timeToMinutes(sch.close))) {
+        invalidDayLabels.push(d.label);
+      }
+    }
+    if (invalidDayLabels.length > 0) {
+      showToast(`Horário de abertura deve ser antes do fechamento em: ${invalidDayLabels.join(', ')}.`);
+      return;
+    }
+
     setIsSaving(true);
-    const updated = await saveShopProfile(profile);
-    setProfile(updated);
-    setIsSaving(false);
-    showToast('Perfil e horários da barbearia atualizados com sucesso!');
+    try {
+      const updated = await saveShopProfile(profile);
+      setProfile(updated);
+      showToast('Perfil e horários da barbearia atualizados com sucesso!');
+    } catch (err: any) {
+      showToast(err?.message || 'Erro ao salvar perfil da barbearia.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const updateScheduleDay = (dayKey: keyof ShopProfile['operatingSchedule'], field: 'active' | 'open' | 'close', value: any) => {
