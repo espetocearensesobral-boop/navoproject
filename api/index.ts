@@ -1934,6 +1934,9 @@ interface CheckSlotParams {
   todayBRT: string;
   currTimeBRT: { totalMinutes: number; timeStr: string };
   debug?: boolean;
+  // Contexto pré-carregado opcional: quando informado, evita re-consultar o banco.
+  // Usado pelo /api/availability pra buscar tudo uma vez e reaproveitar em cada slot candidato.
+  preloaded?: DaySlotContext;
 }
 
 interface CheckSlotResult {
@@ -1947,6 +1950,54 @@ interface CheckSlotResult {
   closeMins?: number;
 }
 
+// Dados que dependem apenas de (dateStr) e não do slot — buscados uma única vez
+// por requisição e reaproveitados em memória para cada horário candidato do dia.
+interface DaySlotContext {
+  shopProf: any;
+  allAppointments: any[];
+  allBlocks: any[];
+  activeProfs: any[];
+}
+
+async function fetchDaySlotContext(dateStr: string, excludeAptId?: string): Promise<DaySlotContext> {
+  let shopProfileRows: any[] = [];
+  try {
+    shopProfileRows = await db.query.shopSettings.findMany();
+  } catch (e) {}
+  const shopProf = shopProfileRows[0] || {};
+
+  const allAppointments = await db.query.appointments.findMany({
+    where: (apt: any, { and, eq, ne }: any) => {
+      const conds = [
+        eq(apt.date, dateStr),
+        ne(apt.status, 'cancelled')
+      ];
+      if (excludeAptId) {
+        conds.push(ne(apt.id, excludeAptId));
+      }
+      return and(...conds);
+    }
+  });
+
+  let allBlocks: any[] = [];
+  try {
+    allBlocks = await db.query.scheduleBlocks.findMany({
+      where: (blk: any, { eq }: any) => eq(blk.date, dateStr)
+    });
+  } catch (e) {}
+
+  const allProfs = await db.query.professionals.findMany();
+  let activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any' && p.isActive !== false);
+  if (activeProfs.length === 0) {
+    activeProfs = [
+      { id: 'prof_1', name: 'Carlos Silva', isActive: true },
+      { id: 'prof_2', name: 'Matheus Santos', isActive: true }
+    ];
+  }
+
+  return { shopProf, allAppointments, allBlocks, activeProfs };
+}
+
 async function checkSlotAvailability({
   dateStr,
   startMins,
@@ -1955,7 +2006,8 @@ async function checkSlotAvailability({
   excludeAptId,
   todayBRT,
   currTimeBRT,
-  debug = false
+  debug = false,
+  preloaded
 }: CheckSlotParams): Promise<CheckSlotResult> {
   const endMins = startMins + reqDuration;
 
@@ -1976,12 +2028,9 @@ async function checkSlotAvailability({
     };
   }
 
-  // 2. Horário de funcionamento da barbearia
-  let shopProfileRows: any[] = [];
-  try {
-    shopProfileRows = await db.query.shopSettings.findMany();
-  } catch (e) {}
-  const shopProf = shopProfileRows[0] || {};
+  // 2. Horário de funcionamento da barbearia (reaproveita contexto pré-carregado, se houver)
+  const ctx = preloaded || await fetchDaySlotContext(dateStr, excludeAptId);
+  const shopProf = ctx.shopProf;
   const dayKey = getDayOfWeekKey(dateStr);
   const daySchedule = shopProf.operatingSchedule?.[dayKey];
 
@@ -2038,37 +2087,9 @@ async function checkSlotAvailability({
     };
   }
 
-  // 3. Agendamentos do dia (não cancelados)
-  const allAppointments = await db.query.appointments.findMany({
-    where: (apt: any, { and, eq, ne }: any) => {
-      const conds = [
-        eq(apt.date, dateStr),
-        ne(apt.status, 'cancelled')
-      ];
-      if (excludeAptId) {
-        conds.push(ne(apt.id, excludeAptId));
-      }
-      return and(...conds);
-    }
-  });
-
-  // 4. Bloqueios de agenda do dia
-  let allBlocks: any[] = [];
-  try {
-    allBlocks = await db.query.scheduleBlocks.findMany({
-      where: (blk: any, { eq }: any) => eq(blk.date, dateStr)
-    });
-  } catch (e) {}
-
-  // 5. Profissionais ativos
-  const allProfs = await db.query.professionals.findMany();
-  let activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any' && p.isActive !== false);
-  if (activeProfs.length === 0) {
-    activeProfs = [
-      { id: 'prof_1', name: 'Carlos Silva', isActive: true },
-      { id: 'prof_2', name: 'Matheus Santos', isActive: true }
-    ];
-  }
+  // 3. Agendamentos do dia (não cancelados) — 4. Bloqueios de agenda do dia — 5. Profissionais ativos
+  // (já resolvidos em `ctx`, buscados uma única vez por requisição/dia)
+  const { allAppointments, allBlocks, activeProfs } = ctx;
 
   // Avaliação individual do profissional (verificando agendamentos e bloqueios)
   const evalSingleProf = (prof: any): { free: boolean; conflictReason?: string } => {
@@ -2202,9 +2223,11 @@ app.get("/api/availability", async (req, res) => {
     const todayBRT = getTodayStringBRT();
     const currTimeBRT = getCurrentTimeBRT();
 
-    let shopProfileRows: any[] = [];
-    try { shopProfileRows = await db.query.shopSettings.findMany(); } catch (e) {}
-    const shopProf = shopProfileRows[0] || {};
+    // Busca uma única vez (shopSettings, agendamentos, bloqueios e profissionais do dia)
+    // e reaproveita em memória para cada um dos ~24 slots candidatos abaixo, eliminando
+    // o N+1 de consultas ao banco que antes rodava dentro de checkSlotAvailability por slot.
+    const daySlotContext = await fetchDaySlotContext(dateStr, excludeAptId);
+    const shopProf = daySlotContext.shopProf;
     const dayKey = getDayOfWeekKey(dateStr);
     const daySchedule = shopProf.operatingSchedule?.[dayKey];
 
@@ -2238,7 +2261,8 @@ app.get("/api/availability", async (req, res) => {
         excludeAptId,
         todayBRT,
         currTimeBRT,
-        debug: debug === 'true'
+        debug: debug === 'true',
+        preloaded: daySlotContext
       });
 
       if (!checkRes.available) {
