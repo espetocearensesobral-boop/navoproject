@@ -167,7 +167,7 @@ export const ProductsManagement: React.FC = () => {
               <Package className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-serif text-content-base font-semibold">{totalItems} <span className="text-xs text-content-muted font-normal">unidades</span></p>
+          <p className="text-lg font-mono num-tabular text-content-base font-semibold">{totalItems} <span className="text-xs text-content-muted font-normal">unidades</span></p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{products.length} produtos cadastrados</p>
         </div>
 
@@ -302,7 +302,7 @@ export const ProductsManagement: React.FC = () => {
                 <div className="grid grid-cols-3 gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle text-center">
                   <div>
                     <span className="text-[9px] text-content-muted font-bold uppercase block">Venda</span>
-                    <span className="text-xs font-serif text-content-base font-semibold">R$ {prod.price.toFixed(2)}</span>
+                    <span className="text-xs font-mono num-tabular text-content-base font-semibold">R$ {prod.price.toFixed(2)}</span>
                   </div>
                   <div>
                     <span className="text-[9px] text-content-muted font-bold uppercase block">Margem</span>

@@ -295,7 +295,7 @@ export const NavoRewardsAdmin: React.FC = () => {
               <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
                 Score NPS
               </span>
-              <div className="text-xl sm:text-2xl font-serif font-bold text-gold-base mt-1 num-tabular whitespace-nowrap truncate">
+              <div className="text-xl sm:text-2xl font-mono font-bold text-gold-base mt-1 num-tabular whitespace-nowrap truncate">
                 {data?.npsScore || 100} <span className="text-xs text-status-success font-sans">/ 100</span>
               </div>
             </div>
@@ -318,7 +318,7 @@ export const NavoRewardsAdmin: React.FC = () => {
               <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
                 Pontos Emitidos
               </span>
-              <div className="text-xl sm:text-2xl font-serif font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
+              <div className="text-xl sm:text-2xl font-mono font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
                 +{data?.totalIssued || 0}
               </div>
             </div>
@@ -339,7 +339,7 @@ export const NavoRewardsAdmin: React.FC = () => {
               <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
                 Pontos Resgatados
               </span>
-              <div className="text-xl sm:text-2xl font-serif font-bold text-status-error mt-1 num-tabular whitespace-nowrap truncate">
+              <div className="text-xl sm:text-2xl font-mono font-bold text-status-error mt-1 num-tabular whitespace-nowrap truncate">
                 -{data?.totalRedeemed || 0}
               </div>
             </div>
@@ -360,7 +360,7 @@ export const NavoRewardsAdmin: React.FC = () => {
               <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
                 Avaliações Pós-Serviço
               </span>
-              <div className="text-xl sm:text-2xl font-serif font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
+              <div className="text-xl sm:text-2xl font-mono font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
                 {data?.totalReviews || 0}
               </div>
             </div>

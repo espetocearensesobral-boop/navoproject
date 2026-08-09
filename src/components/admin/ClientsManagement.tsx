@@ -166,7 +166,7 @@ export const ClientsManagement: React.FC = () => {
         <div className="p-3.5 bg-surface-card border border-border-subtle rounded-2xl flex items-center justify-between">
           <div>
             <p className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Total de Clientes</p>
-            <p className="text-xl font-serif text-content-base font-semibold mt-0.5">{safeClients.length}</p>
+            <p className="text-xl font-mono num-tabular text-content-base font-semibold mt-0.5">{safeClients.length}</p>
           </div>
           <div className="w-9 h-9 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
             <Users className="w-4 h-4" />
@@ -186,7 +186,7 @@ export const ClientsManagement: React.FC = () => {
         <div className="p-3.5 bg-surface-card border border-border-subtle rounded-2xl flex items-center justify-between">
           <div>
             <p className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Pontos Totais</p>
-            <p className="text-xl font-serif text-content-base font-semibold mt-0.5">{totalPoints} pts</p>
+            <p className="text-xl font-mono num-tabular text-content-base font-semibold mt-0.5">{totalPoints} pts</p>
           </div>
           <div className="w-9 h-9 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
             <Award className="w-4 h-4" />

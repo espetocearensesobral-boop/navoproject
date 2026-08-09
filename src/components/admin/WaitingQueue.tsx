@@ -292,7 +292,7 @@ export const WaitingQueue: React.FC = () => {
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-serif text-content-base font-semibold">{waitingCount}</p>
+          <p className="text-lg font-mono num-tabular text-content-base font-semibold">{waitingCount}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Aguardando atendimento</p>
         </div>
 
@@ -303,7 +303,7 @@ export const WaitingQueue: React.FC = () => {
               <TrendingUp className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-serif text-content-base font-semibold">~{estimatedAvgWait} min</p>
+          <p className="text-lg font-mono num-tabular text-content-base font-semibold">~{estimatedAvgWait} min</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Tempo estimado de fila</p>
         </div>
 

@@ -533,7 +533,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                   {selectedServices.length === 1 ? 'Serviço' : 'Serviços'}
                 </span>
               </div>
-              <div className="text-xl font-serif text-content-base font-semibold leading-tight">
+              <div className="text-xl font-mono num-tabular text-content-base font-semibold leading-tight">
                 R$ {totalPrice.toFixed(2)}
               </div>
             </div>

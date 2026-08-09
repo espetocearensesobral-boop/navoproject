@@ -208,9 +208,9 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
               <span>Subtotal</span>
               <span className="font-semibold text-content-base">R$ {subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between items-center text-sm sm:text-base font-serif text-content-base font-semibold pt-2 border-t border-border-subtle">
+            <div className="flex justify-between items-center text-sm sm:text-base text-content-base font-semibold pt-2 border-t border-border-subtle">
               <span>Total</span>
-              <span className="text-base sm:text-lg font-black text-gold-base">R$ {finalTotal.toFixed(2)}</span>
+              <span className="font-mono num-tabular text-base sm:text-lg font-bold text-gold-base">R$ {finalTotal.toFixed(2)}</span>
             </div>
           </div>
         </div>

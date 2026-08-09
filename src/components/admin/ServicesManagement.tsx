@@ -529,7 +529,7 @@ export const ServicesManagement: React.FC = () => {
               </div>
               <div>
                 <p className="text-[10px] text-[#8B8B8B] font-bold uppercase">Total no Cardápio</p>
-                <p className="text-lg font-serif text-content-base font-semibold">{totalServices} <span className="text-xs text-gold-base font-normal">serviços</span></p>
+                <p className="text-lg font-mono num-tabular text-content-base font-semibold">{totalServices} <span className="text-xs text-gold-base font-normal">serviços</span></p>
               </div>
             </div>
 
@@ -539,7 +539,7 @@ export const ServicesManagement: React.FC = () => {
               </div>
               <div>
                 <p className="text-[10px] text-[#8B8B8B] font-bold uppercase">Combos Promocionais</p>
-                <p className="text-lg font-serif text-content-base font-semibold">{totalCombos} <span className="text-xs text-status-success font-normal">VIPs</span></p>
+                <p className="text-lg font-mono num-tabular text-content-base font-semibold">{totalCombos} <span className="text-xs text-status-success font-normal">VIPs</span></p>
               </div>
             </div>
 
@@ -549,7 +549,7 @@ export const ServicesManagement: React.FC = () => {
               </div>
               <div>
                 <p className="text-[10px] text-[#8B8B8B] font-bold uppercase">Duração Média</p>
-                <p className="text-lg font-serif text-content-base font-semibold">{avgDuration} <span className="text-xs text-blue-400 font-normal">minutos</span></p>
+                <p className="text-lg font-mono num-tabular text-content-base font-semibold">{avgDuration} <span className="text-xs text-blue-400 font-normal">minutos</span></p>
               </div>
             </div>
 
@@ -559,7 +559,7 @@ export const ServicesManagement: React.FC = () => {
               </div>
               <div>
                 <p className="text-[10px] text-[#8B8B8B] font-bold uppercase">Preço Médio</p>
-                <p className="text-lg font-serif text-content-base font-semibold">R$ {avgPrice.toFixed(2)}</p>
+                <p className="text-lg font-mono num-tabular text-content-base font-semibold">R$ {avgPrice.toFixed(2)}</p>
               </div>
             </div>
           </div>
@@ -770,7 +770,7 @@ export const ServicesManagement: React.FC = () => {
                       <td className="py-3 px-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <div className="flex items-center space-x-2">
-                            <span className="font-serif text-content-base font-semibold text-sm text-gold-base">
+                            <span className="font-mono num-tabular text-content-base font-semibold text-sm text-gold-base">
                               R$ {service.price.toFixed(2)}
                             </span>
                             {service.original_price && service.original_price > service.price && (

@@ -122,7 +122,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
               <span className="text-[10px] font-bold uppercase tracking-wider text-gold-base block">
                 Faturamento Atual
               </span>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
+              <h2 className="text-2xl sm:text-3xl font-mono font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
                 R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </h2>
             </div>
@@ -143,7 +143,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
               <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
                 Ticket Médio
               </span>
-              <div className="text-2xl sm:text-3xl font-serif font-bold text-gold-base mt-1 num-tabular whitespace-nowrap truncate">
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-gold-base mt-1 num-tabular whitespace-nowrap truncate">
                 R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </div>
             </div>
@@ -164,7 +164,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
               <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
                 Clientes Cadastrados
               </span>
-              <div className="text-2xl sm:text-3xl font-serif font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
                 {uniqueClients}
               </div>
             </div>

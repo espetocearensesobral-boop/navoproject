@@ -206,7 +206,7 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
           <div>
             <span className="text-[10px] text-content-muted uppercase font-bold tracking-widest block">Nível de Fidelidade</span>
             <div className="flex items-center space-x-2 mt-0.5">
-              <span className="text-2xl font-serif font-black text-gold-base">{currentTier}</span>
+              <span className="text-2xl font-serif font-bold text-gold-base">{currentTier}</span>
               <span className="px-2.5 py-0.5 rounded-full bg-gold-base/20 text-gold-base text-[10px] font-bold border border-gold-base/40 uppercase">
                 {currentTier === 'Bronze' ? '1x Pontos' : currentTier === 'Prata' ? '1.2x Pontos' : currentTier === 'Ouro' ? '1.5x Pontos' : '2x Pontos VIP'}
               </span>
@@ -214,7 +214,7 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
           </div>
 
           <div className="text-right">
-            <span className="text-3xl font-serif text-content-base font-black block">{currentPoints}</span>
+            <span className="text-3xl font-serif text-content-base font-bold block">{currentPoints}</span>
             <span className="text-[10px] text-gold-base font-extrabold uppercase tracking-wider">Pontos Navo</span>
           </div>
         </div>

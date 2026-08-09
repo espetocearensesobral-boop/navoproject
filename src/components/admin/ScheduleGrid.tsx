@@ -286,7 +286,7 @@ export const ScheduleGrid: React.FC = () => {
               <div key={slot} className="border-b border-border-subtle/60 pb-2 last:border-0 last:pb-0">
                 <div className="flex items-start gap-2.5">
                   {/* Time Badge */}
-                  <div className="text-[11px] font-serif text-content-base font-semibold bg-surface-base px-2 py-1 rounded-lg border border-border-subtle shrink-0 mt-0.5">
+                  <div className="text-[11px] font-mono num-tabular text-content-base font-semibold bg-surface-base px-2 py-1 rounded-lg border border-border-subtle shrink-0 mt-0.5">
                     {slot}
                   </div>
 

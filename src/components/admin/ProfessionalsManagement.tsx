@@ -327,7 +327,7 @@ export const ProfessionalsManagement: React.FC = () => {
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-serif text-content-base font-semibold">{totalBarbers}</p>
+          <p className="text-lg font-mono num-tabular text-content-base font-semibold">{totalBarbers}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Profissionais cadastrados</p>
         </div>
 
@@ -338,7 +338,7 @@ export const ProfessionalsManagement: React.FC = () => {
               <UserCheck className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-status-success">{activeBarbers}</p>
+          <p className="text-lg font-mono num-tabular font-bold text-status-success">{activeBarbers}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Cadeiras disponíveis</p>
         </div>
 
@@ -349,7 +349,7 @@ export const ProfessionalsManagement: React.FC = () => {
               <Star className="w-3.5 h-3.5 fill-amber-400" />
             </div>
           </div>
-          <p className="text-lg font-black text-amber-400">{avgRating} ⭐</p>
+          <p className="text-lg font-mono num-tabular font-bold text-amber-400">{avgRating} ⭐</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Sua equipe em destaque</p>
         </div>
 
@@ -360,7 +360,7 @@ export const ProfessionalsManagement: React.FC = () => {
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-serif text-content-base font-semibold">{avgCommission}%</p>
+          <p className="text-lg font-mono num-tabular text-content-base font-semibold">{avgCommission}%</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Por serviço prestado</p>
         </div>
       </div>

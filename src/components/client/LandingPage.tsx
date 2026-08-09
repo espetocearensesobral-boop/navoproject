@@ -466,7 +466,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           transition={{ duration: 0.4, ease: 'easeOut' }}
           className="relative z-20 flex items-center justify-between p-5 shrink-0"
         >
-          <div className="font-extrabold text-lg tracking-tight text-white flex items-center gap-1">
+          <div className="font-serif font-bold text-lg tracking-tight text-white flex items-center gap-1">
             <span>NAVO</span><span className="text-gold-base">PREMIUM</span>
           </div>
           <motion.button 
@@ -497,7 +497,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
-            className="text-[clamp(1.85rem,4.5vh,2.8rem)] font-extrabold leading-[1.08] tracking-tight text-white mb-3"
+            className="font-serif text-[clamp(1.85rem,4.5vh,2.8rem)] font-bold leading-[1.08] tracking-tight text-white mb-3"
           >
             Seu melhor <span className="text-gold-base">visual</span><br />
             começa aqui.
@@ -586,7 +586,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               POR QUE A NAVO
             </span>
-            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight">
+            <h2 className="font-serif text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
               Feito para você <span className="text-gold-deep">relaxar</span>
             </h2>
           </div>
@@ -966,8 +966,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         >
 
           {/* MAIN HEADING */}
-          <h2 className="text-[clamp(1.75rem,4.2vh,3rem)] font-extrabold text-white mb-[clamp(0.35rem,1.2vh,0.85rem)] tracking-tight leading-[1.12]">
-            Pronto para o seu <span className="text-gold-base font-black">novo visual</span>?
+          <h2 className="font-serif text-[clamp(1.75rem,4.2vh,3rem)] font-bold text-white mb-[clamp(0.35rem,1.2vh,0.85rem)] tracking-tight leading-[1.12]">
+            Pronto para o seu <span className="text-gold-base font-bold">novo visual</span>?
           </h2>
 
           {/* SUBTITLE */}

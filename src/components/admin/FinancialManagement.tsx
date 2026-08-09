@@ -346,7 +346,7 @@ export const FinancialManagement: React.FC = () => {
               <ArrowUpRight className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-status-success">
+          <p className="text-lg font-mono num-tabular font-bold text-status-success">
             R$ {totalIncomes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">
@@ -362,7 +362,7 @@ export const FinancialManagement: React.FC = () => {
               <ArrowDownRight className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-red-400">
+          <p className="text-lg font-mono num-tabular font-bold text-red-400">
             R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">
@@ -378,7 +378,7 @@ export const FinancialManagement: React.FC = () => {
               <Wallet className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className={`text-lg font-black ${netBalance >= 0 ? 'text-gold-hover' : 'text-red-400'}`}>
+          <p className={`text-lg font-mono num-tabular font-bold ${netBalance >= 0 ? 'text-gold-hover' : 'text-red-400'}`}>
             R$ {netBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">
@@ -394,7 +394,7 @@ export const FinancialManagement: React.FC = () => {
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-serif text-content-base font-semibold">
+          <p className="text-lg font-mono num-tabular text-content-base font-semibold">
             R$ {totalCommissionsDue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">
