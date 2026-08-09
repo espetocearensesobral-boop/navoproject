@@ -11,7 +11,17 @@ export type ThemePalette =
   | 'copper'
   | 'rose'
   | 'olive'
-  | 'slate';
+  | 'slate'
+  | 'amber'
+  | 'teal'
+  | 'indigo'
+  | 'crimson'
+  | 'bronze'
+  | 'violet'
+  | 'champagne'
+  | 'mint'
+  | 'coral'
+  | 'titanium';
 
 export interface PaletteItem {
   id: ThemePalette;
@@ -33,6 +43,16 @@ export const PALETTES: PaletteItem[] = [
   { id: 'rose', name: 'Rosé Gold', description: 'Estilo e elegância suave', accent: '#E779A9', accentSoft: '#F5A9C8', deep: '#B6497B' },
   { id: 'olive', name: 'Verde Oliva', description: 'Discreto e atemporal', accent: '#A3B18A', accentSoft: '#C7D2A9', deep: '#68764F' },
   { id: 'slate', name: 'Cinza Platina', description: 'Minimalismo contemporâneo', accent: '#94A3B8', accentSoft: '#C2CCD8', deep: '#5E6D82' },
+  { id: 'amber', name: 'Âmbar Solar', description: 'Quente e vívido', accent: '#F59E0B', accentSoft: '#FCD34D', deep: '#B45309' },
+  { id: 'teal', name: 'Turquesa Mística', description: 'Moderna e envolvente', accent: '#14B8A6', accentSoft: '#5EEAD4', deep: '#0F766E' },
+  { id: 'indigo', name: 'Índigo Profundo', description: 'Nobre e marcante', accent: '#6366F1', accentSoft: '#A5B4FC', deep: '#4338CA' },
+  { id: 'crimson', name: 'Carmim Real', description: 'Intenso e elegante', accent: '#E11D48', accentSoft: '#FDA4AF', deep: '#9F1239' },
+  { id: 'bronze', name: 'Bronze Clássico', description: 'Rústico e valioso', accent: '#C07A46', accentSoft: '#E4B28C', deep: '#8A4F23' },
+  { id: 'violet', name: 'Violeta Imperial', description: 'Exclusivo e luxuoso', accent: '#8B5CF6', accentSoft: '#DDD6FE', deep: '#6D28D9' },
+  { id: 'champagne', name: 'Champagne Nude', description: 'Requintado e minimalista', accent: '#D4B996', accentSoft: '#E8D7C3', deep: '#9E815D' },
+  { id: 'mint', name: 'Menta Ice', description: 'Refrescante e contemporâneo', accent: '#10B981', accentSoft: '#6EE7B7', deep: '#047857' },
+  { id: 'coral', name: 'Coral Sunset', description: 'Vibrante e caloroso', accent: '#F97316', accentSoft: '#FDBA74', deep: '#C2410C' },
+  { id: 'titanium', name: 'Titânio Grafite', description: 'Sóbrio e urbano', accent: '#64748B', accentSoft: '#CBD5E1', deep: '#334155' },
 ];
 
 interface ThemeContextType {

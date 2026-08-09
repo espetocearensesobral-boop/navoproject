@@ -2398,7 +2398,10 @@ app.get("/api/auth/me", requireAuth, async (req: any, res) => {
 });
 
 const themePaletteSchema = z.object({
-  palette: z.enum(['heritage', 'sapphire', 'emerald', 'amethyst', 'ruby', 'ocean', 'copper', 'rose', 'olive', 'slate']),
+  palette: z.enum([
+    'heritage', 'sapphire', 'emerald', 'amethyst', 'ruby', 'ocean', 'copper', 'rose', 'olive', 'slate',
+    'amber', 'teal', 'indigo', 'crimson', 'bronze', 'violet', 'champagne', 'mint', 'coral', 'titanium'
+  ]),
 });
 
 app.get("/api/preferences/theme", async (req: any, res) => {

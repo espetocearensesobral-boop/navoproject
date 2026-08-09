@@ -100,6 +100,16 @@
 [data-palette="rose"] { --color-gold-base: #E779A9; --color-gold-deep: #B6497B; --color-gold-accent: #F5A9C8; }
 [data-palette="olive"] { --color-gold-base: #A3B18A; --color-gold-deep: #68764F; --color-gold-accent: #C7D2A9; }
 [data-palette="slate"] { --color-gold-base: #94A3B8; --color-gold-deep: #5E6D82; --color-gold-accent: #C2CCD8; }
+[data-palette="amber"] { --color-gold-base: #F59E0B; --color-gold-deep: #B45309; --color-gold-accent: #FCD34D; }
+[data-palette="teal"] { --color-gold-base: #14B8A6; --color-gold-deep: #0F766E; --color-gold-accent: #5EEAD4; }
+[data-palette="indigo"] { --color-gold-base: #6366F1; --color-gold-deep: #4338CA; --color-gold-accent: #A5B4FC; }
+[data-palette="crimson"] { --color-gold-base: #E11D48; --color-gold-deep: #9F1239; --color-gold-accent: #FDA4AF; }
+[data-palette="bronze"] { --color-gold-base: #C07A46; --color-gold-deep: #8A4F23; --color-gold-accent: #E4B28C; }
+[data-palette="violet"] { --color-gold-base: #8B5CF6; --color-gold-deep: #6D28D9; --color-gold-accent: #DDD6FE; }
+[data-palette="champagne"] { --color-gold-base: #D4B996; --color-gold-deep: #9E815D; --color-gold-accent: #E8D7C3; }
+[data-palette="mint"] { --color-gold-base: #10B981; --color-gold-deep: #047857; --color-gold-accent: #6EE7B7; }
+[data-palette="coral"] { --color-gold-base: #F97316; --color-gold-deep: #C2410C; --color-gold-accent: #FDBA74; }
+[data-palette="titanium"] { --color-gold-base: #64748B; --color-gold-deep: #334155; --color-gold-accent: #CBD5E1; }
 
 /* Em tema claro, tons de destaque mais profundos preservam contraste em CTAs e foco. */
 [data-theme="light"][data-palette="sapphire"] { --color-gold-base: #315FBA; --color-gold-deep: #244B99; --color-gold-accent: #5B8DEF; }
@@ -111,6 +121,16 @@
 [data-theme="light"][data-palette="rose"] { --color-gold-base: #B6497B; --color-gold-deep: #963662; --color-gold-accent: #E779A9; }
 [data-theme="light"][data-palette="olive"] { --color-gold-base: #68764F; --color-gold-deep: #515D3D; --color-gold-accent: #A3B18A; }
 [data-theme="light"][data-palette="slate"] { --color-gold-base: #5E6D82; --color-gold-deep: #465366; --color-gold-accent: #94A3B8; }
+[data-theme="light"][data-palette="amber"] { --color-gold-base: #B45309; --color-gold-deep: #78350F; --color-gold-accent: #F59E0B; }
+[data-theme="light"][data-palette="teal"] { --color-gold-base: #0F766E; --color-gold-deep: #115E59; --color-gold-accent: #14B8A6; }
+[data-theme="light"][data-palette="indigo"] { --color-gold-base: #4338CA; --color-gold-deep: #3730A3; --color-gold-accent: #6366F1; }
+[data-theme="light"][data-palette="crimson"] { --color-gold-base: #9F1239; --color-gold-deep: #881337; --color-gold-accent: #E11D48; }
+[data-theme="light"][data-palette="bronze"] { --color-gold-base: #8A4F23; --color-gold-deep: #683815; --color-gold-accent: #C07A46; }
+[data-theme="light"][data-palette="violet"] { --color-gold-base: #6D28D9; --color-gold-deep: #5B21B6; --color-gold-accent: #8B5CF6; }
+[data-theme="light"][data-palette="champagne"] { --color-gold-base: #9E815D; --color-gold-deep: #755E40; --color-gold-accent: #D4B996; }
+[data-theme="light"][data-palette="mint"] { --color-gold-base: #047857; --color-gold-deep: #065F46; --color-gold-accent: #10B981; }
+[data-theme="light"][data-palette="coral"] { --color-gold-base: #C2410C; --color-gold-deep: #9A3412; --color-gold-accent: #F97316; }
+[data-theme="light"][data-palette="titanium"] { --color-gold-base: #334155; --color-gold-deep: #1E293B; --color-gold-accent: #64748B; }
 
 
 
