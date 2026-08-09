@@ -111,7 +111,7 @@
 [data-palette="coral"] { --color-gold-base: #F97316; --color-gold-deep: #C2410C; --color-gold-accent: #FDBA74; }
 [data-palette="titanium"] { --color-gold-base: #64748B; --color-gold-deep: #334155; --color-gold-accent: #CBD5E1; }
 [data-palette="onyx"] { --color-gold-base: #FFFFFF; --color-gold-deep: #E4E4E7; --color-gold-accent: #FAFAFA; }
-[data-palette="pearl"] { --color-gold-base: #F8FAFC; --color-gold-deep: #E2E8F0; --color-gold-accent: #CBD5E1; }
+[data-palette="pearl"] { --color-gold-base: #FFFFFF; --color-gold-deep: #E2E8F0; --color-gold-accent: #FAFAFA; }
 [data-palette="sand"] { --color-gold-base: #D97706; --color-gold-deep: #92400E; --color-gold-accent: #FBBF24; }
 [data-palette="plum"] { --color-gold-base: #A855F7; --color-gold-deep: #7E22CE; --color-gold-accent: #D8B4FE; }
 [data-palette="electric"] { --color-gold-base: #06B6D4; --color-gold-deep: #0891B2; --color-gold-accent: #67E8F9; }
@@ -141,8 +141,8 @@
 [data-theme="light"][data-palette="mint"] { --color-gold-base: #047857; --color-gold-deep: #065F46; --color-gold-accent: #10B981; }
 [data-theme="light"][data-palette="coral"] { --color-gold-base: #C2410C; --color-gold-deep: #9A3412; --color-gold-accent: #F97316; }
 [data-theme="light"][data-palette="titanium"] { --color-gold-base: #334155; --color-gold-deep: #1E293B; --color-gold-accent: #64748B; }
-[data-theme="light"][data-palette="onyx"] { --color-gold-base: #09090B; --color-gold-deep: #18181B; --color-gold-accent: #27272A; }
-[data-theme="light"][data-palette="pearl"] { --color-gold-base: #334155; --color-gold-deep: #1E293B; --color-gold-accent: #0F172A; }
+[data-theme="light"][data-palette="onyx"] { --color-gold-base: #09090B; --color-gold-deep: #000000; --color-gold-accent: #18181B; }
+[data-theme="light"][data-palette="pearl"] { --color-gold-base: #0F172A; --color-gold-deep: #020617; --color-gold-accent: #1E293B; }
 [data-theme="light"][data-palette="sand"] { --color-gold-base: #A16207; --color-gold-deep: #713F12; --color-gold-accent: #CA8A04; }
 [data-theme="light"][data-palette="plum"] { --color-gold-base: #7E22CE; --color-gold-deep: #581C87; --color-gold-accent: #9333EA; }
 [data-theme="light"][data-palette="electric"] { --color-gold-base: #0E7490; --color-gold-deep: #155E75; --color-gold-accent: #06B6D4; }

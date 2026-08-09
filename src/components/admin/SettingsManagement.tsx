@@ -136,7 +136,7 @@ const AppearanceSettings: React.FC = () => {
                     <span className="block text-[10px] text-content-muted truncate">{item.description}</span>
                   </span>
                 </div>
-                {selected && <span className="w-5 h-5 rounded-full flex items-center justify-center text-surface-base" style={{ backgroundColor: item.accent }}><Check className="w-3 h-3" /></span>}
+                {selected && <span className="w-5 h-5 rounded-full flex items-center justify-center bg-gold-base text-surface-base"><Check className="w-3 h-3" /></span>}
               </div>
               <div className="flex gap-1.5" aria-hidden="true">
                 <span className="h-1.5 flex-1 rounded-full" style={{ backgroundColor: item.deep }} />
