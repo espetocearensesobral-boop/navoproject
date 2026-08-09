@@ -502,7 +502,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-            className="text-[clamp(0.9rem,1.6vh,1.1rem)] leading-relaxed text-[#a0a0a0] mb-5 max-w-xs sm:max-w-md"
+            className="text-[clamp(0.95rem,1.7vh,1.15rem)] leading-relaxed text-[#e5e7eb] mb-6 max-w-xs sm:max-w-md font-medium"
           >
             Agende online, chegue na hora certa e saia renovado. Sem filas, sem espera, sem complicação.
           </motion.p>
@@ -515,27 +515,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             className="flex flex-col gap-5 w-full items-center"
           >
             <motion.button 
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.96 }}
               onClick={() => { 
                 hapticMedium(); 
                 trackEvent('cta_click', 'landing', 'agendar_horario_hero');
                 onGoToBooking(); 
               }}
-              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-[0_4px_30px_rgba(212,168,83,0.3)] transition-all shrink-0 cursor-pointer"
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-lg py-[1.15rem] px-8 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-[0_6px_35px_rgba(212,168,83,0.4)] hover:shadow-[0_8px_45px_rgba(212,168,83,0.5)] transition-all shrink-0 cursor-pointer"
             >
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-2 font-extrabold tracking-wide">
                 Agendar meu horário
-                <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
-              </span>
-              <span className="text-[0.7rem] font-semibold opacity-70 normal-case">
-                Próximo horário: {nextAvailableTimeSlot}
+                <ArrowRight className="w-[1.35rem] h-[1.35rem] text-[#0a0a0a]" />
               </span>
             </motion.button>
 
             <button 
               onClick={() => onGoToAppointments && onGoToAppointments()}
-              className="flex items-center gap-1.5 text-[0.75rem] text-[#a0a0a0]/70 cursor-pointer hover:text-white transition-colors active:scale-95"
+              className="flex items-center gap-1.5 text-[0.9rem] font-medium text-[#d1d5db] cursor-pointer hover:text-white transition-colors active:scale-95"
             >
               <span>Já possui agendamento? Clique aqui.</span>
             </button>
@@ -561,7 +558,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
           <div className="flex justify-between items-center w-full px-2">
             <div className="flex flex-col items-center gap-1">
-              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO</span>
+              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO HORÁRIO</span>
               <span className="text-white font-bold text-sm">{nextAvailableTimeSlot}</span>
             </div>
 
