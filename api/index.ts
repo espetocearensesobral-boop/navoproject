@@ -2401,7 +2401,7 @@ const themePaletteSchema = z.object({
   palette: z.enum([
     'heritage', 'sapphire', 'emerald', 'amethyst', 'ruby', 'ocean', 'copper', 'rose', 'olive', 'slate',
     'amber', 'teal', 'indigo', 'crimson', 'bronze', 'violet', 'champagne', 'mint', 'coral', 'titanium',
-    'onyx', 'pearl', 'sand', 'plum', 'electric', 'sage', 'terracotta', 'midnight'
+    'onyx', 'pearl', 'sand', 'plum', 'electric', 'sage', 'terracotta', 'midnight', 'lavender', 'bordeaux'
   ]),
 });
 

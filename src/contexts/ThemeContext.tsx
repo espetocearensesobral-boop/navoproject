@@ -29,7 +29,9 @@ export type ThemePalette =
   | 'electric'
   | 'sage'
   | 'terracotta'
-  | 'midnight';
+  | 'midnight'
+  | 'lavender'
+  | 'bordeaux';
 
 export interface PaletteItem {
   id: ThemePalette;
@@ -69,6 +71,8 @@ export const PALETTES: PaletteItem[] = [
   { id: 'sage', name: 'Sálvia Botânica', description: 'Suave e ecorresponsável', accent: '#84A98C', accentSoft: '#CAD2C5', deep: '#52796F' },
   { id: 'terracotta', name: 'Terracota Argila', description: 'Artesanal e caloroso', accent: '#E07A5F', accentSoft: '#F2CC8F', deep: '#B35338' },
   { id: 'midnight', name: 'Azul Meia-Noite', description: 'Profundo e majestoso', accent: '#3B82F6', accentSoft: '#93C5FD', deep: '#1D4ED8' },
+  { id: 'lavender', name: 'Lavanda Suave', description: 'Delicada e contemporânea', accent: '#C084FC', accentSoft: '#E9D5FF', deep: '#9333EA' },
+  { id: 'bordeaux', name: 'Vinho Bordô', description: 'Elegante e encorpado', accent: '#F43F5E', accentSoft: '#FECDD3', deep: '#BE123C' },
 ];
 
 interface ThemeContextType {
