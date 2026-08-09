@@ -420,7 +420,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
           >
             {/* Watermark Background */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
-              <span className="font-serif text-[26px] font-bold tracking-[0.15em] text-[#c9a84c] opacity-[0.05] -rotate-[15deg] select-none whitespace-nowrap">
+              <span className="font-serif text-[26px] font-bold tracking-[0.15em] text-gold-base opacity-[0.05] -rotate-[15deg] select-none whitespace-nowrap">
                 NAVO PREMIUM
               </span>
             </div>
@@ -429,7 +429,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-[#ede8e0]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-[#c9a84c] flex items-center justify-center text-white shadow-sm">
+                  <div className="w-8 h-8 rounded-lg bg-gold-base flex items-center justify-center text-surface-base shadow-sm">
                     <Scissors className="w-4 h-4 stroke-[2.5]" />
                   </div>
                   <h2 className="text-[15px] font-semibold text-[#2d2a26]">Comprovante</h2>
@@ -445,7 +445,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
               {/* Brand Strip */}
               <div className="text-center px-5 pt-4 pb-3">
-                <div className="w-10 h-10 rounded-xl bg-[#c9a84c] flex items-center justify-center text-white mx-auto mb-2 shadow-[0_3px_12px_rgba(201,168,76,0.2)]">
+                <div className="w-10 h-10 rounded-xl bg-gold-base flex items-center justify-center text-surface-base mx-auto mb-2 shadow-[0_3px_12px_color-mix(in_srgb,var(--color-gold-base)_30%,transparent)]">
                   <Scissors className="w-5 h-5 stroke-[2.5]" />
                 </div>
                 <h1 className="text-xl font-bold tracking-[0.1em] text-[#2d2a26] mb-0.5 uppercase font-serif">NAVO PREMIUM</h1>
@@ -513,13 +513,13 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Horário</span>
-                  <span className="text-[15px] font-bold text-[#c9a84c] leading-tight">{currentApt.time_slot}</span>
+                  <span className="text-[15px] font-bold text-gold-base leading-tight">{currentApt.time_slot}</span>
                 </div>
 
                 <div className="col-span-2 flex flex-col gap-0.5 pt-0.5">
                   <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Localização</span>
                   <div className="flex items-start gap-2 mt-0.5">
-                    <div className="w-6.5 h-6.5 rounded-lg bg-[#f0ebe3] flex items-center justify-center text-[#c9a84c] shrink-0 mt-0.5">
+                    <div className="w-6.5 h-6.5 rounded-lg bg-gold-base/10 flex items-center justify-center text-gold-base shrink-0 mt-0.5">
                       <MapPin className="w-3.5 h-3.5" />
                     </div>
                     <div>
@@ -549,7 +549,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                       className="flex justify-between items-center py-2 border-b border-[#f0ebe3] last:border-b-0"
                     >
                       <div className="text-[13px] font-medium text-[#2d2a26] flex items-center gap-2">
-                        <span className="w-1 h-1 rounded-full bg-[#c9a84c]" />
+                        <span className="w-1 h-1 rounded-full bg-gold-base" />
                         {service.title}
                       </div>
                       <span className="text-[13px] font-bold text-[#2d2a26] tabular-nums">
@@ -659,7 +659,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                   onClose();
                   if (onReviewClick) onReviewClick();
                 }}
-                className="w-full flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#c9a84c] hover:bg-[#b8983c] text-white font-semibold text-[13px] transition-all cursor-pointer shadow-md"
+                className="w-full flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-gold-base hover:bg-gold-hover text-surface-base font-semibold text-[13px] transition-all cursor-pointer shadow-md"
               >
                 <Star className="w-3.5 h-3.5 fill-current" />
                 <span>Avaliar Serviço</span>
@@ -790,7 +790,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                           onClick={() => setRescheduleTimeSlot(slotTime)}
                           className={`py-2 rounded-lg text-center font-bold text-xs transition-all border ${
                             isSelected
-                              ? 'bg-content-base text-surface-base border-content-base shadow-sm'
+                              ? 'bg-gold-base text-surface-base border-gold-base shadow-md font-extrabold scale-[1.02]'
                               : isBusy
                               ? 'bg-border-subtle/50 border-transparent text-content-muted opacity-40 cursor-not-allowed line-through'
                               : 'bg-surface-base border-border-subtle text-content-base hover:border-gold-base/50 hover:bg-surface-card'
@@ -830,7 +830,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                 onClick={handleConfirmReschedule}
                 isLoading={isRescheduling}
                 disabled={isRescheduling || !rescheduleDate || !rescheduleTimeSlot || isClosedOnSelectedDate || rescheduleDate < todayStrBRT}
-                className="py-3 rounded-xl bg-content-base hover:bg-gold-base text-surface-base font-bold transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50"
+                className="py-3 rounded-xl bg-gold-base hover:bg-gold-hover text-surface-base font-bold transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50"
                 loadingText="Salvando..."
               >
                 Confirmar

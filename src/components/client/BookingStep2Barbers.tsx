@@ -174,7 +174,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                   isOccupiedAtSlot
                     ? 'opacity-50 cursor-not-allowed bg-surface-card border border-status-danger/30'
                     : isSelected
-                    ? 'bg-surface-base border-2 border-content-base shadow-[0_0_20px_rgba(201,169,110,0.15)] scale-[1.01]'
+                    ? 'bg-gold-base/10 border-2 border-gold-base shadow-[0_0_20px_color-mix(in_srgb,var(--color-gold-base)_25%,transparent)] scale-[1.01]'
                     : 'bg-surface-card border border-border-subtle hover:border-border-subtle hover:bg-surface-card'
                 }`}
               >
@@ -226,7 +226,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                         </span>
                       ) : (
                         <div className="flex items-center text-content-muted text-xs">
-                          <Star className="w-3.5 h-3.5 text-gold-base fill-content-base mr-1 shrink-0" />
+                          <Star className="w-3.5 h-3.5 text-gold-base fill-gold-base mr-1 shrink-0" />
                           <span className="font-bold text-content-base mr-1">{barber.rating}</span>
                           <span className="text-content-muted mr-1">·</span>
                           <span className="text-content-muted">{cortesCount} cortes</span>
@@ -240,7 +240,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                 <div className="shrink-0 pl-2 flex items-center">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 ${
                     isSelected
-                      ? 'bg-gold-base border-2 border-content-base shadow-sm'
+                      ? 'bg-gold-base border-2 border-gold-base shadow-sm text-surface-base'
                       : 'border-2 border-border-subtle bg-transparent'
                   }`}>
                     {isSelected && (
@@ -316,7 +316,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                   disabled={!selectedBarber || isAdvancing}
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shrink-0 ${
                     selectedBarber
-                      ? 'bg-gold-base text-surface-base shadow-lg shadow-[#C9A96E]/20 active:scale-95'
+                      ? 'bg-gold-base text-surface-base shadow-lg shadow-gold-base/20 active:scale-95'
                       : 'bg-surface-card text-content-muted cursor-not-allowed opacity-50'
                   }`}
                   title="Avançar"
