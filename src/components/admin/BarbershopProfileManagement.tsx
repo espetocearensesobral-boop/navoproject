@@ -13,7 +13,8 @@ import {
   Scissors,
   Calendar,
   Sparkles,
-  Info
+  Info,
+  AlertTriangle
 } from 'lucide-react';
 import { 
   ShopProfile, 
@@ -324,6 +325,37 @@ export const BarbershopProfileManagement: React.FC = () => {
                 className="w-full bg-surface-card border border-border-subtle rounded p-2 text-xs font-mono text-content-base focus:outline-none focus:border-gold-base"
               />
             </div>
+          </div>
+
+          {/* TOGGLE: HORÁRIO FORA DE EXPEDIENTE COM APROVAÇÃO */}
+          <div className={`p-4 rounded-md border transition-all flex items-start justify-between gap-4 ${
+            profile.allowOutsideHoursApproval
+              ? 'bg-amber-500/10 border-amber-500/40'
+              : 'bg-surface-base border-border-subtle'
+          }`}>
+            <div className="flex items-start gap-3">
+              <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${profile.allowOutsideHoursApproval ? 'text-amber-400' : 'text-content-muted'}`} />
+              <div>
+                <div className="text-xs font-bold text-content-base">
+                  Permitir solicitação fora do expediente
+                </div>
+                <p className="text-[11px] text-content-muted mt-1 max-w-md">
+                  Quando ativado, o cliente pode solicitar um horário cujo atendimento
+                  ultrapasse o fechamento — o agendamento fica pendente de aprovação do
+                  barbeiro. Quando desativado (padrão), esses horários simplesmente não
+                  são oferecidos ao cliente.
+                </p>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={!!profile.allowOutsideHoursApproval}
+                onChange={e => setProfile(p => ({ ...p, allowOutsideHoursApproval: e.target.checked }))}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gold-base"></div>
+            </label>
           </div>
 
           {/* DAY BY DAY SCHEDULE TABLE */}

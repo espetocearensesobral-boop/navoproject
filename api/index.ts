@@ -2026,6 +2026,17 @@ async function checkSlotAvailability({
   // Se o atendimento ultrapassa o horário normal de encerramento
   // (startMins >= closeMins já implica endMins > closeMins, dado que a duração é sempre > 0)
   const isOutsideHours = endMins > closeMins;
+  const allowOutsideHours = shopProf.allowOutsideHoursApproval === true;
+
+  // Toggle de admin desativado (padrão): horário que ultrapassa o fechamento
+  // não é oferecido — nem com aprovação, simplesmente indisponível.
+  if (isOutsideHours && !allowOutsideHours) {
+    return {
+      statusCode: 'SHOP_CLOSED',
+      available: false,
+      reason: 'Este horário ultrapassa o horário de funcionamento da barbearia.'
+    };
+  }
 
   // 3. Agendamentos do dia (não cancelados)
   const allAppointments = await db.query.appointments.findMany({
@@ -2202,9 +2213,13 @@ app.get("/api/availability", async (req, res) => {
     const openMins = timeToMinutes(openStr);
     const closeMins = timeToMinutes(closeStr);
 
-    // Gerar slots a partir do horário de abertura até 2 horas após o encerramento
+    // Gera candidatos até o fechamento; se o toggle "horário fora de expediente
+    // com aprovação" estiver ativo, estende 90min além pra permitir solicitação
+    // sujeita a aprovação do barbeiro (checkSlotAvailability decide o resto).
+    const allowOutsideHours = shopProf.allowOutsideHoursApproval === true;
+    const slotsCutoff = allowOutsideHours ? closeMins + 90 : closeMins;
     const daySlots: string[] = [];
-    for (let m = openMins; m < closeMins + 90; m += 30) {
+    for (let m = openMins; m < slotsCutoff; m += 30) {
       daySlots.push(minutesToTime(m));
     }
 
@@ -3624,7 +3639,7 @@ app.get("/api/shop-profile", async (req: any, res: any) => {
       openTime: row.openTime, closeTime: row.closeTime,
       operatingDays: row.operatingDays, operatingSchedule: row.operatingSchedule,
       mapsUrl: row.mapsUrl, instagram: row.instagram, logoUrl: row.logoUrl || '',
-      description: row.description
+      description: row.description, allowOutsideHoursApproval: !!row.allowOutsideHoursApproval
     });
   } catch (e: any) {
     return handleError(res, e, req.path);
@@ -3686,7 +3701,11 @@ app.post("/api/shop-profile", requireAuth, requireAdmin, async (req: any, res: a
       operatingDays: data.operatingDays !== undefined ? data.operatingDays : existingRow?.operatingDays,
       operatingSchedule: mergedSchedule,
       mapsUrl: data.mapsUrl || '', instagram: data.instagram || '',
-      logoUrl: data.logoUrl || '', description: data.description || '', updatedAt: new Date()
+      logoUrl: data.logoUrl || '', description: data.description || '',
+      allowOutsideHoursApproval: data.allowOutsideHoursApproval !== undefined
+        ? !!data.allowOutsideHoursApproval
+        : !!existingRow?.allowOutsideHoursApproval,
+      updatedAt: new Date()
     };
 
     if (existingRow) {

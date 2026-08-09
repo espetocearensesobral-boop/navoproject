@@ -31,6 +31,10 @@ export interface ShopProfile {
   instagram: string;
   logoUrl?: string;
   description: string;
+  // Se true, um horário que ultrapassa o fechamento pode ser solicitado e fica
+  // pendente de aprovação do barbeiro. Se false (padrão), esses horários
+  // simplesmente não são oferecidos ao cliente.
+  allowOutsideHoursApproval: boolean;
 }
 
 export const defaultShopProfile: ShopProfile = {
@@ -55,7 +59,8 @@ export const defaultShopProfile: ShopProfile = {
   mapsUrl: 'https://maps.app.goo.gl/2uCakwEHwA6bbXq97',
   instagram: '@barbearianavo',
   logoUrl: '',
-  description: 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.'
+  description: 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.',
+  allowOutsideHoursApproval: false
 };
 
 let cachedProfile: ShopProfile = { ...defaultShopProfile };
@@ -164,7 +169,16 @@ export function isDateOpenInProfile(profile: ShopProfile, dateStr: string | Date
 }
 
 /**
- * Gera horários de 30 em 30 min com base no perfil, data e duração do serviço
+ * Gera horários de 30 em 30 min com base no perfil, data e duração do serviço.
+ *
+ * Se `allowOutsideHoursApproval` estiver desativado no perfil (padrão), só gera
+ * horários cujo término (início + duração) caiba dentro do expediente — ou seja,
+ * um horário que estouraria o fechamento simplesmente não é oferecido.
+ *
+ * Se estiver ativado, mantém o comportamento anterior: gera candidatos até 90min
+ * após o fechamento, permitindo que o cliente solicite um horário fora do
+ * expediente (fica pendente de aprovação do barbeiro — ver checkSlotAvailability
+ * no backend, que é quem decide/valida isso de fato).
  */
 export function generateTimeSlotsFromProfile(
   profile: ShopProfile, 
@@ -186,11 +200,20 @@ export function generateTimeSlotsFromProfile(
 
   const openMinutes = timeToMinutes(open);
   const closeMinutes = timeToMinutes(close);
+  const allowOutsideHours = !!profile.allowOutsideHoursApproval;
+  const duration = serviceDurationMinutes > 0 ? serviceDurationMinutes : 30;
+
+  // Limite até onde vale a pena gerar candidatos: com aprovação de horário fora
+  // do expediente ativada, mantém a margem de 90min pós-fechamento; desativada,
+  // não passa do fechamento (nenhum horário que ultrapasse o fechamento é útil).
+  const candidateCutoff = allowOutsideHours ? closeMinutes + 90 : closeMinutes;
 
   const slots: string[] = [];
-  // Gera os slots desde o horário de abertura até 90 minutos após o horário de encerramento,
-  // permitindo que solicitações que ultrapassem o expediente sejam selecionadas
-  for (let m = openMinutes; m < closeMinutes + 90; m += 30) {
+  for (let m = openMinutes; m < candidateCutoff; m += 30) {
+    if (!allowOutsideHours && m + duration > closeMinutes) {
+      // Esse horário terminaria depois do fechamento — não oferece.
+      continue;
+    }
     slots.push(minutesToTime(m));
   }
 

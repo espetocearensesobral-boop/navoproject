@@ -269,6 +269,10 @@ export const shopSettings = pgTable('shop_settings', {
   instagram: text('instagram').default('@barbearianavo'),
   logoUrl: text('logo_url'),
   description: text('description').default('Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.'),
+  // Controla se o cliente pode solicitar um horário que ultrapassa o fechamento
+  // (fica pendente de aprovação do barbeiro) ou se esses horários simplesmente
+  // não são oferecidos. Desativado por padrão.
+  allowOutsideHoursApproval: boolean('allow_outside_hours_approval').notNull().default(false),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
