@@ -2367,7 +2367,7 @@ app.delete("/api/products/:id", requireAuth, requireAdmin, async (req, res) => {
 
 function formatProfile(p: any) {
   if (!p) return null;
-  const { password, ...safe } = p;
+  const { password, resetCodeHash, resetCodeExpiresAt, ...safe } = p;
   const avatar = safe.avatarUrl || safe.avatar_url || null;
   const points = safe.loyaltyPoints ?? safe.loyalty_points ?? 0;
   const tier = safe.loyaltyTier || safe.loyalty_tier || 'Bronze';
@@ -2551,7 +2551,7 @@ app.post("/api/auth/forgot-password", authLimiter, async (req, res) => {
     if (!loginId) {
       return res.status(400).json({ error: 'E-mail ou telefone é obrigatório.' });
     }
-    const cleanLoginId = loginId.replace(/\D/g, '');
+    const cleanLoginId = sanitizePhone(loginId);
     const user = await db.query.profiles.findFirst({
       where: or(
         eq(schema.profiles.email, loginId.toLowerCase()),
@@ -2593,7 +2593,7 @@ app.post("/api/auth/reset-password", authLimiter, async (req, res) => {
       return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres.' });
     }
 
-    const cleanLoginId = loginId.replace(/\D/g, '');
+    const cleanLoginId = sanitizePhone(loginId);
     const user = await db.query.profiles.findFirst({
       where: or(
         eq(schema.profiles.email, loginId.toLowerCase()),
