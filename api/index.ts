@@ -318,7 +318,7 @@ app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false,
 app.use("/api/", apiLimiter);
 app.use("/api", async (req, res, next) => {
   // Rotas públicas que não precisam de banco
-  const publicRoutes = ['/whatsapp/status', '/services'];
+  const publicRoutes = ['/whatsapp/status'];
   if (publicRoutes.includes(req.path)) {
     return next();
   }

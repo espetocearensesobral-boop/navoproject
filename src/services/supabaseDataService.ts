@@ -47,7 +47,7 @@ export async function fetchServicesFromSupabase(forceRefresh = false): Promise<S
       return mapped;
     } catch (err) {
       console.error('Erro ao carregar serviços do Supabase:', err);
-      throw err;
+      return [];
     } finally {
       servicesFetchPromise = null;
     }
@@ -97,7 +97,7 @@ export async function fetchProfessionalsFromSupabase(forceRefresh = false): Prom
       return mapped;
     } catch (err) {
       console.error('Erro ao carregar profissionais do Supabase:', err);
-      throw err;
+      return [];
     } finally {
       professionalsFetchPromise = null;
     }
