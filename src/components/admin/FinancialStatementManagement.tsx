@@ -211,12 +211,12 @@ export const FinancialStatementManagement: React.FC = () => {
                   </td>
                   <td className="p-3 whitespace-nowrap">
                     {t.type === 'income' ? (
-                      <span className="bg-status-success/15 text-status-success font-bold text-[10px] px-2 py-0.5 rounded uppercase inline-flex items-center gap-1">
+                      <span className="bg-status-success/15 text-status-success font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase inline-flex items-center gap-1">
                         <ArrowUpRight className="w-3 h-3" />
                         Entrada
                       </span>
                     ) : (
-                      <span className="bg-status-error/15 text-status-error font-bold text-[10px] px-2 py-0.5 rounded uppercase inline-flex items-center gap-1">
+                      <span className="bg-status-error/15 text-status-error font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase inline-flex items-center gap-1">
                         <ArrowDownRight className="w-3 h-3" />
                         Saída
                       </span>

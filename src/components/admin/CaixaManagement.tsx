@@ -774,7 +774,7 @@ export const CaixaManagement: React.FC = () => {
             </div>
 
             {receiptSession.notes && (
-              <p className="text-[10px] font-sans text-content-muted bg-surface-base p-2 rounded border border-border-subtle">
+              <p className="text-[10px] font-sans text-content-muted bg-surface-base p-2 rounded-xl border border-border-subtle">
                 <strong>Notas:</strong> {receiptSession.notes}
               </p>
             )}

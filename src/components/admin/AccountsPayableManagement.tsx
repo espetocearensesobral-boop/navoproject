@@ -236,7 +236,7 @@ export const AccountsPayableManagement: React.FC = () => {
                     <span className="text-[10px] text-content-muted block font-sans">{a.supplier}</span>
                   </td>
                   <td className="p-3">
-                    <span className="bg-surface-base border border-border-subtle text-content-muted font-bold text-[10px] px-2 py-0.5 rounded capitalize">
+                    <span className="bg-surface-base border border-border-subtle text-content-muted font-bold text-[10px] px-2 py-0.5 rounded-xl capitalize">
                       {a.category}
                     </span>
                   </td>
@@ -245,17 +245,17 @@ export const AccountsPayableManagement: React.FC = () => {
                   </td>
                   <td className="p-3">
                     {a.status === 'paid' && (
-                      <span className="bg-status-success/15 text-status-success font-bold text-[10px] px-2 py-0.5 rounded uppercase">
+                      <span className="bg-status-success/15 text-status-success font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase">
                         Pago
                       </span>
                     )}
                     {a.status === 'pending' && (
-                      <span className="bg-gold-base/15 text-gold-base font-bold text-[10px] px-2 py-0.5 rounded uppercase">
+                      <span className="bg-gold-base/15 text-gold-base font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase">
                         A Vencer
                       </span>
                     )}
                     {a.status === 'overdue' && (
-                      <span className="bg-status-error/15 text-status-error font-bold text-[10px] px-2 py-0.5 rounded uppercase">
+                      <span className="bg-status-error/15 text-status-error font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase">
                         Vencido
                       </span>
                     )}

@@ -410,7 +410,7 @@ export const ProfessionalsManagement: React.FC = () => {
           <div className="flex items-center bg-surface-card p-0.5 rounded-lg border border-border-subtle shrink-0">
             <button
               onClick={() => setViewMode('cards')}
-              className={`p-1 rounded text-xs transition-colors ${
+              className={`p-1 rounded-xl text-xs transition-colors ${
                 viewMode === 'cards' ? 'bg-surface-card text-gold-hover' : 'text-content-muted'
               }`}
               title="Cards"
@@ -419,7 +419,7 @@ export const ProfessionalsManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`p-1 rounded text-xs transition-colors ${
+              className={`p-1 rounded-xl text-xs transition-colors ${
                 viewMode === 'table' ? 'bg-surface-card text-gold-hover' : 'text-content-muted'
               }`}
               title="Tabela"
@@ -486,7 +486,7 @@ export const ProfessionalsManagement: React.FC = () => {
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="px-2 py-0.5 rounded bg-surface-card border border-border-subtle text-gold-hover font-extrabold text-[10px]">
+                        <span className="px-2 py-0.5 rounded-xl bg-surface-card border border-border-subtle text-gold-hover font-extrabold text-[10px]">
                           {commissionPercent}% Com.
                         </span>
                       </div>
@@ -509,7 +509,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           barber.specialties.slice(0, 3).map((spec, i) => (
                             <span
                               key={i}
-                              className="px-2 py-0.5 rounded bg-surface-card text-gold-hover text-[9px] font-semibold border border-border-subtle"
+                              className="px-2 py-0.5 rounded-xl bg-surface-card text-gold-hover text-[9px] font-semibold border border-border-subtle"
                             >
                               {spec}
                             </span>
@@ -632,7 +632,7 @@ export const ProfessionalsManagement: React.FC = () => {
                       </td>
 
                       <td className="p-3.5">
-                        <span className="px-2 py-0.5 rounded bg-surface-card border border-border-subtle text-gold-hover font-bold text-[10px]">
+                        <span className="px-2 py-0.5 rounded-xl bg-surface-card border border-border-subtle text-gold-hover font-bold text-[10px]">
                           {commissionPercent}%
                         </span>
                       </td>
@@ -651,14 +651,14 @@ export const ProfessionalsManagement: React.FC = () => {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => handleToggleStatus(barber)}
-                            className={`p-1.5 rounded ${isActive ? 'text-status-success' : 'text-red-400'}`}
+                            className={`p-1.5 rounded-xl ${isActive ? 'text-status-success' : 'text-red-400'}`}
                             title="Toggle Status"
                           >
                             <Power className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleOpenEdit(barber)}
-                            className="px-2 py-1 bg-gold-base text-surface-base font-bold rounded text-[10px]"
+                            className="px-2 py-1 bg-gold-base text-surface-base font-bold rounded-xl text-[10px]"
                           >
                             Editar
                           </button>

@@ -326,7 +326,7 @@ export const ReportsManagement: React.FC = () => {
                             #{idx + 1}
                           </span>
                           <span className="font-bold text-content-base">{item.title}</span>
-                          <span className="text-[10px] text-content-muted font-bold bg-surface-card px-2 py-0.5 rounded border border-border-subtle">
+                          <span className="text-[10px] text-content-muted font-bold bg-surface-card px-2 py-0.5 rounded-xl border border-border-subtle">
                             {item.count} execuções
                           </span>
                         </div>
@@ -428,7 +428,7 @@ export const ReportsManagement: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      <span className="text-xs font-bold text-gold-base bg-gold-base/10 px-2 py-0.5 rounded">
+                      <span className="text-xs font-bold text-gold-base bg-gold-base/10 px-2 py-0.5 rounded-xl">
                         ★ {prof.rating.toFixed(1)}
                       </span>
                     </div>

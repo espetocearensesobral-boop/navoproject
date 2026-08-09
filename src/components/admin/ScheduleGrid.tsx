@@ -314,12 +314,12 @@ export const ScheduleGrid: React.FC = () => {
                                 : 'bg-surface-base border-l-2 border-l-[#FFFFFF] border border-border-subtle'
                             }`}>
                               {isPending && (
-                                <div className="flex items-center justify-between text-[10px] font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30">
+                                <div className="flex items-center justify-between text-[10px] font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-xl border border-amber-500/30">
                                   <div className="flex items-center gap-1">
                                     <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                                     <span>Fora do Expediente</span>
                                   </div>
-                                  <span className="text-[9px] bg-amber-400 text-black px-1.5 rounded font-extrabold">Aprovação Pendente</span>
+                                  <span className="text-[9px] bg-amber-400 text-black px-1.5 rounded-xl font-extrabold">Aprovação Pendente</span>
                                 </div>
                               )}
                               <div className="flex justify-between items-center text-xs mb-1">
@@ -491,7 +491,7 @@ export const ScheduleGrid: React.FC = () => {
                                 </div>
                                 <div className="text-[10px] text-content-muted flex items-center justify-between">
                                   <span>{apt.services[0]?.title || 'Atendimento'}</span>
-                                  <span className="px-1.5 py-0.5 rounded bg-status-success/20 text-status-success text-[9px] font-bold">
+                                  <span className="px-1.5 py-0.5 rounded-xl bg-status-success/20 text-status-success text-[9px] font-bold">
                                     {apt.status === 'completed' ? 'Concluído' : 'Confirmado'}
                                   </span>
                                 </div>

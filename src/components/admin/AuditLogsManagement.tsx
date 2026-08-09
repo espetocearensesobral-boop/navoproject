@@ -198,7 +198,7 @@ export const AuditLogsManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="p-3 whitespace-nowrap">
-                      <span className="bg-surface-base border border-border-subtle text-content-muted font-bold text-[10px] px-2 py-0.5 rounded capitalize inline-flex items-center gap-1">
+                      <span className="bg-surface-base border border-border-subtle text-content-muted font-bold text-[10px] px-2 py-0.5 rounded-xl capitalize inline-flex items-center gap-1">
                         <Icon className="w-3 h-3 text-gold-base" />
                         {item.category}
                       </span>

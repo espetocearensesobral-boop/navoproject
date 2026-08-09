@@ -128,7 +128,7 @@ export const BarbershopProfileManagement: React.FC = () => {
       <button
         onClick={handleSave}
         disabled={isSaving}
-        className="md:hidden h-10 px-5 bg-gold-base hover:bg-gold-hover text-surface-base rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95 disabled:opacity-50 w-full"
+        className="md:hidden h-10 px-5 bg-gold-base hover:bg-gold-hover text-surface-base rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95 disabled:opacity-50 w-full"
       >
         <Save className="w-4 h-4" />
         <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
@@ -136,7 +136,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
       {/* TOAST MESSAGE */}
       {toastMsg && (
-        <div className="bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 p-3.5 rounded-md flex items-center gap-2.5 text-xs font-bold animate-fade-in shadow-md">
+        <div className="bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 p-3.5 rounded-xl flex items-center gap-2.5 text-xs font-bold animate-fade-in shadow-md">
           <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
           <span>{toastMsg}</span>
         </div>
@@ -146,7 +146,7 @@ export const BarbershopProfileManagement: React.FC = () => {
       <div className="flex items-center gap-1.5 border-b border-border-subtle pb-2 overflow-x-auto custom-scrollbar">
         <button
           onClick={() => setActiveTab('info')}
-          className={`h-9 px-3.5 rounded-md text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
             activeTab === 'info' 
               ? 'bg-gold-base text-surface-base' 
               : 'text-content-muted hover:text-content-base hover:bg-surface-card'
@@ -158,7 +158,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('hours')}
-          className={`h-9 px-3.5 rounded-md text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
             activeTab === 'hours' 
               ? 'bg-gold-base text-surface-base' 
               : 'text-content-muted hover:text-content-base hover:bg-surface-card'
@@ -170,7 +170,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('address')}
-          className={`h-9 px-3.5 rounded-md text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
             activeTab === 'address' 
               ? 'bg-gold-base text-surface-base' 
               : 'text-content-muted hover:text-content-base hover:bg-surface-card'
@@ -182,7 +182,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('preview')}
-          className={`h-9 px-3.5 rounded-md text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
             activeTab === 'preview' 
               ? 'bg-gold-base text-surface-base' 
               : 'text-content-muted hover:text-content-base hover:bg-surface-card'
@@ -211,7 +211,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 value={profile.name}
                 onChange={e => setProfile(p => ({ ...p, name: e.target.value }))}
                 placeholder="Ex: Navo Barber & Club"
-                className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
               />
             </div>
 
@@ -224,7 +224,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 value={profile.unitName}
                 onChange={e => setProfile(p => ({ ...p, unitName: e.target.value }))}
                 placeholder="Ex: Unidade Jardins"
-                className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
               />
             </div>
           </div>
@@ -238,7 +238,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               value={profile.slogan}
               onChange={e => setProfile(p => ({ ...p, slogan: e.target.value }))}
               placeholder="Ex: Estilo, Tradição e Excelência na Medida Certa"
-              className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
             />
           </div>
 
@@ -251,7 +251,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               value={profile.description}
               onChange={e => setProfile(p => ({ ...p, description: e.target.value }))}
               placeholder="Apresente sua barbearia para os clientes no aplicativo..."
-              className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base resize-none"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base resize-none"
             />
           </div>
 
@@ -264,7 +264,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               value={profile.logoUrl || ''}
               onChange={e => setProfile(p => ({ ...p, logoUrl: e.target.value }))}
               placeholder="https://suaimagem.com/logo.png"
-              className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
             />
             <span className="text-[10px] text-content-muted mt-1 block">
               Se deixado em branco, a plataforma usará o ícone padrão estilizado.
@@ -281,12 +281,12 @@ export const BarbershopProfileManagement: React.FC = () => {
               <Clock className="w-4 h-4 text-gold-base" />
               <h2 className="text-sm font-serif font-bold text-content-base">Horários de Funcionamento Semanal</h2>
             </div>
-            <div className="text-[11px] text-content-muted bg-surface-base px-2.5 py-1 rounded border border-border-subtle">
+            <div className="text-[11px] text-content-muted bg-surface-base px-2.5 py-1 rounded-xl border border-border-subtle">
               Slot de atendimento: <strong className="text-gold-base font-mono">30 minutos</strong>
             </div>
           </div>
 
-          <div className="bg-surface-base/80 p-3.5 rounded-md border border-border-subtle text-xs text-content-muted flex items-start gap-2.5">
+          <div className="bg-surface-base/80 p-3.5 rounded-xl border border-border-subtle text-xs text-content-muted flex items-start gap-2.5">
             <Info className="w-4 h-4 text-gold-base shrink-0 mt-0.5" />
             <p>
               Os horários definidos aqui controlam diretamente as opções de agendamento exibidas para os clientes, a grade de horários do Admin e a disponibilidade automática da agenda.
@@ -294,7 +294,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           </div>
 
           {/* GENERAL DEFAULT OPEN & CLOSE TIMES */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-surface-base p-4 rounded-md border border-border-subtle">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-surface-base p-4 rounded-xl border border-border-subtle">
             <div>
               <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
                 Horário Padrão de Abertura
@@ -303,7 +303,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 type="time"
                 value={profile.openTime || '09:00'}
                 onChange={e => setProfile(p => ({ ...p, openTime: e.target.value }))}
-                className="w-full bg-surface-card border border-border-subtle rounded p-2 text-xs font-mono text-content-base focus:outline-none focus:border-gold-base"
+                className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-xs font-mono text-content-base focus:outline-none focus:border-gold-base"
               />
             </div>
             <div>
@@ -314,13 +314,13 @@ export const BarbershopProfileManagement: React.FC = () => {
                 type="time"
                 value={profile.closeTime || '20:00'}
                 onChange={e => setProfile(p => ({ ...p, closeTime: e.target.value }))}
-                className="w-full bg-surface-card border border-border-subtle rounded p-2 text-xs font-mono text-content-base focus:outline-none focus:border-gold-base"
+                className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-xs font-mono text-content-base focus:outline-none focus:border-gold-base"
               />
             </div>
           </div>
 
           {/* TOGGLE: HORÁRIO FORA DE EXPEDIENTE COM APROVAÇÃO */}
-          <div className={`p-4 rounded-md border transition-all flex items-start justify-between gap-4 ${
+          <div className={`p-4 rounded-xl border transition-all flex items-start justify-between gap-4 ${
             profile.allowOutsideHoursApproval
               ? 'bg-amber-500/10 border-amber-500/40'
               : 'bg-surface-base border-border-subtle'
@@ -363,7 +363,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 return (
                   <div 
                     key={dayItem.key}
-                    className={`p-3 rounded-md border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+                    className={`p-3 rounded-xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
                       sch.active 
                         ? 'bg-surface-base border-border-subtle' 
                         : 'bg-surface-base/40 border-border-subtle/50 opacity-60'
@@ -382,7 +382,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                       <div className="w-28 font-bold text-xs text-content-base">
                         {dayItem.label}
                       </div>
-                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-xl ${
                         sch.active ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30' : 'bg-red-950/60 text-red-400 border border-red-500/30'
                       }`}>
                         {sch.active ? 'Aberto' : 'Fechado'}
@@ -397,7 +397,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                             type="time"
                             value={sch.open || '09:00'}
                             onChange={e => updateScheduleDay(dayItem.key, 'open', e.target.value)}
-                            className="bg-surface-card border border-border-subtle rounded px-2 py-1 text-xs font-mono text-content-base focus:outline-none focus:border-gold-base"
+                            className="bg-surface-card border border-border-subtle rounded-xl px-2 py-1 text-xs font-mono text-content-base focus:outline-none focus:border-gold-base"
                           />
                         </div>
 
@@ -409,7 +409,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                             type="time"
                             value={sch.close || '20:00'}
                             onChange={e => updateScheduleDay(dayItem.key, 'close', e.target.value)}
-                            className="bg-surface-card border border-border-subtle rounded px-2 py-1 text-xs font-mono text-content-base focus:outline-none focus:border-gold-base"
+                            className="bg-surface-card border border-border-subtle rounded-xl px-2 py-1 text-xs font-mono text-content-base focus:outline-none focus:border-gold-base"
                           />
                         </div>
                       </div>
@@ -429,10 +429,10 @@ export const BarbershopProfileManagement: React.FC = () => {
             <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
               Amostra dos Horários Gerados Automaticamente ({sampleSlots.length} horários)
             </label>
-            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-surface-base rounded border border-border-subtle custom-scrollbar">
+            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-surface-base rounded-xl border border-border-subtle custom-scrollbar">
               {sampleSlots.length > 0 ? (
                 sampleSlots.map(slot => (
-                  <span key={slot} className="px-2 py-1 bg-surface-card border border-border-subtle rounded text-[10px] font-mono font-bold text-gold-base">
+                  <span key={slot} className="px-2 py-1 bg-surface-card border border-border-subtle rounded-xl text-[10px] font-mono font-bold text-gold-base">
                     {slot}
                   </span>
                 ))
@@ -461,7 +461,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               value={profile.address}
               onChange={e => setProfile(p => ({ ...p, address: e.target.value }))}
               placeholder="Ex: Rua Augusta, 1420 - Jardins, São Paulo - SP"
-              className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
             />
           </div>
 
@@ -474,7 +474,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               value={profile.mapsUrl}
               onChange={e => setProfile(p => ({ ...p, mapsUrl: e.target.value }))}
               placeholder="https://maps.google.com/?q=..."
-              className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
             />
           </div>
 
@@ -488,7 +488,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 value={profile.phone}
                 onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))}
                 placeholder="(11) 99999-8888"
-                className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
               />
             </div>
 
@@ -501,7 +501,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 value={profile.whatsapp}
                 onChange={e => setProfile(p => ({ ...p, whatsapp: e.target.value }))}
                 placeholder="5511999998888"
-                className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
               />
             </div>
           </div>
@@ -515,7 +515,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               value={profile.instagram}
               onChange={e => setProfile(p => ({ ...p, instagram: e.target.value }))}
               placeholder="@barbearianavo"
-              className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
             />
           </div>
         </div>
@@ -577,11 +577,11 @@ export const BarbershopProfileManagement: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <button className="h-9 rounded bg-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-1.5">
+              <button className="h-9 rounded-xl bg-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>Agendar Horário</span>
               </button>
-              <button className="h-9 rounded bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5">
+              <button className="h-9 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5">
                 <MessageSquare className="w-3.5 h-3.5" />
                 <span>WhatsApp</span>
               </button>
@@ -595,7 +595,7 @@ export const BarbershopProfileManagement: React.FC = () => {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="h-11 px-6 bg-gold-base hover:bg-gold-hover text-surface-base rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 w-full sm:w-auto"
+          className="h-11 px-6 bg-gold-base hover:bg-gold-hover text-surface-base rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 w-full sm:w-auto"
         >
           <Save className="w-4 h-4" />
           <span>{isSaving ? 'Salvando...' : 'Salvar Perfil da Barbearia'}</span>

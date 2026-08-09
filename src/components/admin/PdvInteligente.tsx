@@ -562,10 +562,10 @@ export const PdvInteligente: React.FC = () => {
       </div>
 
       {/* Quick Metrics Bar */}
-      <div className="bg-surface-card rounded-md border border-border-subtle p-3.5 sm:p-4 shadow-sm">
+      <div className="bg-surface-card rounded-xl border border-border-subtle p-3.5 sm:p-4 shadow-sm">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div className="p-2.5 rounded bg-surface-base border border-border-subtle flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
+          <div className="p-2.5 rounded-xl bg-surface-base border border-border-subtle flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
               <DollarSign className="w-4 h-4" />
             </div>
             <div className="min-w-0 truncate">
@@ -574,8 +574,8 @@ export const PdvInteligente: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-2.5 rounded bg-surface-base border border-border-subtle flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
+          <div className="p-2.5 rounded-xl bg-surface-base border border-border-subtle flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-4 h-4" />
             </div>
             <div className="min-w-0 truncate">
@@ -584,8 +584,8 @@ export const PdvInteligente: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-2.5 rounded bg-surface-base border border-border-subtle flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+          <div className="p-2.5 rounded-xl bg-surface-base border border-border-subtle flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
               <Clock className="w-4 h-4" />
             </div>
             <div className="min-w-0 truncate">
@@ -594,8 +594,8 @@ export const PdvInteligente: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-2.5 rounded bg-surface-base border border-border-subtle flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+          <div className="p-2.5 rounded-xl bg-surface-base border border-border-subtle flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
               <ShoppingBag className="w-4 h-4" />
             </div>
             <div className="min-w-0 truncate">
@@ -613,12 +613,12 @@ export const PdvInteligente: React.FC = () => {
         <div className="lg:col-span-7 space-y-3 min-w-0">
           
           {/* Tabs & Search */}
-          <div className="bg-surface-card rounded-md border border-border-subtle p-3 space-y-2.5 min-w-0">
+          <div className="bg-surface-card rounded-xl border border-border-subtle p-3 space-y-2.5 min-w-0">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-subtle pb-2.5">
               <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar no-scrollbar min-w-0">
                 <button
                   onClick={() => setActiveTab('agendamentos')}
-                  className={`h-8 px-3 rounded text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                     activeTab === 'agendamentos'
                       ? 'bg-gold-base text-surface-base shadow-sm'
                       : 'text-content-muted hover:text-content-base hover:bg-surface-base'
@@ -630,7 +630,7 @@ export const PdvInteligente: React.FC = () => {
 
                 <button
                   onClick={() => setActiveTab('servicos')}
-                  className={`h-8 px-3 rounded text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                     activeTab === 'servicos'
                       ? 'bg-gold-base text-surface-base shadow-sm'
                       : 'text-content-muted hover:text-content-base hover:bg-surface-base'
@@ -642,7 +642,7 @@ export const PdvInteligente: React.FC = () => {
 
                 <button
                   onClick={() => setActiveTab('produtos')}
-                  className={`h-8 px-3 rounded text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                     activeTab === 'produtos'
                       ? 'bg-gold-base text-surface-base shadow-sm'
                       : 'text-content-muted hover:text-content-base hover:bg-surface-base'
@@ -654,7 +654,7 @@ export const PdvInteligente: React.FC = () => {
 
                 <button
                   onClick={() => setActiveTab('fila')}
-                  className={`h-8 px-3 rounded text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                     activeTab === 'fila'
                       ? 'bg-gold-base text-surface-base shadow-sm'
                       : 'text-content-muted hover:text-content-base hover:bg-surface-base'
@@ -667,7 +667,7 @@ export const PdvInteligente: React.FC = () => {
 
               <button
                 onClick={loadData}
-                className="w-8 h-8 rounded text-content-muted hover:text-content-base hover:bg-surface-base transition-colors flex items-center justify-center shrink-0"
+                className="w-8 h-8 rounded-xl text-content-muted hover:text-content-base hover:bg-surface-base transition-colors flex items-center justify-center shrink-0"
                 title="Atualizar dados"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -682,7 +682,7 @@ export const PdvInteligente: React.FC = () => {
                 placeholder="Buscar cliente, serviço ou produto..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full bg-surface-base border border-border-subtle rounded pl-8 pr-8 py-1.5 text-xs text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base transition-colors"
+                className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-8 py-1.5 text-xs text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base transition-colors"
               />
               {searchQuery && (
                 <button 
@@ -696,7 +696,7 @@ export const PdvInteligente: React.FC = () => {
           </div>
 
           {/* TAB CONTENT PANELS */}
-          <div className="bg-surface-card rounded-md border border-border-subtle p-3 min-h-[360px] max-h-[500px] overflow-y-auto custom-scrollbar no-scrollbar min-w-0">
+          <div className="bg-surface-card rounded-xl border border-border-subtle p-3 min-h-[360px] max-h-[500px] overflow-y-auto custom-scrollbar no-scrollbar min-w-0">
             
             {/* TAB 1: AGENDAMENTOS DO DIA */}
             {activeTab === 'agendamentos' && (
@@ -722,7 +722,7 @@ export const PdvInteligente: React.FC = () => {
                       .map(apt => (
                         <div
                           key={apt.id}
-                          className={`p-3 rounded-md border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 min-w-0 ${
+                          className={`p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 min-w-0 ${
                             linkedAppointmentId === apt.id
                               ? 'bg-gold-base/10 border-gold-base shadow-sm'
                               : 'bg-surface-base border-border-subtle hover:border-gold-base/50'
@@ -730,7 +730,7 @@ export const PdvInteligente: React.FC = () => {
                         >
                           <div className="min-w-0 flex-1 space-y-1">
                             <div className="flex items-center gap-2 min-w-0">
-                              <span className="px-1.5 py-0.5 rounded bg-gold-base/20 text-gold-hover font-bold text-[10px] shrink-0 font-mono">
+                              <span className="px-1.5 py-0.5 rounded-xl bg-gold-base/20 text-gold-hover font-bold text-[10px] shrink-0 font-mono">
                                 {apt.time_slot}
                               </span>
                               <h3 className="font-bold text-content-base text-xs truncate min-w-0">{apt.client_name}</h3>
@@ -759,7 +759,7 @@ export const PdvInteligente: React.FC = () => {
 
                             <button
                               onClick={() => handleSelectAppointmentForCheckout(apt)}
-                              className={`h-8 px-3 rounded text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 active:scale-95 ${
+                              className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 active:scale-95 ${
                                 linkedAppointmentId === apt.id
                                   ? 'bg-gold-base text-surface-base shadow'
                                   : 'bg-gold-base/10 text-gold-hover hover:bg-gold-base hover:text-surface-base'
@@ -785,7 +785,7 @@ export const PdvInteligente: React.FC = () => {
                     <div
                       key={srv.id}
                       onClick={() => handleAddServiceToCart(srv)}
-                      className="p-3 rounded-md bg-surface-base border border-border-subtle hover:border-gold-base/60 transition-all cursor-pointer flex items-center justify-between gap-3 group active:scale-[0.99] min-w-0"
+                      className="p-3 rounded-xl bg-surface-base border border-border-subtle hover:border-gold-base/60 transition-all cursor-pointer flex items-center justify-between gap-3 group active:scale-[0.99] min-w-0"
                     >
                       <div className="min-w-0 flex-1 pr-1">
                         <h4 className="font-bold text-content-base text-xs group-hover:text-gold-hover transition-colors truncate">
@@ -818,10 +818,10 @@ export const PdvInteligente: React.FC = () => {
                     <div
                       key={prod.id}
                       onClick={() => handleAddProductToCart(prod)}
-                      className="p-3 rounded-md bg-surface-base border border-border-subtle hover:border-gold-base/60 transition-all cursor-pointer flex items-center justify-between gap-3 group active:scale-[0.99] min-w-0"
+                      className="p-3 rounded-xl bg-surface-base border border-border-subtle hover:border-gold-base/60 transition-all cursor-pointer flex items-center justify-between gap-3 group active:scale-[0.99] min-w-0"
                     >
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        <div className="w-8 h-8 rounded bg-gold-base/10 text-gold-hover flex items-center justify-center font-bold text-xs shrink-0">
+                        <div className="w-8 h-8 rounded-xl bg-gold-base/10 text-gold-hover flex items-center justify-center font-bold text-xs shrink-0">
                           <ShoppingBag className="w-4 h-4" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -859,12 +859,12 @@ export const PdvInteligente: React.FC = () => {
                   queue.map(q => (
                     <div
                       key={q.id}
-                      className="p-3 rounded-md bg-surface-base border border-border-subtle flex items-center justify-between gap-3 min-w-0"
+                      className="p-3 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-between gap-3 min-w-0"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 min-w-0">
                           <h4 className="font-bold text-content-base text-xs truncate">{q.client_name}</h4>
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 shrink-0">
+                          <span className="px-1.5 py-0.5 rounded-xl text-[10px] font-bold bg-amber-500/10 text-amber-400 shrink-0">
                             Fila
                           </span>
                         </div>
@@ -875,7 +875,7 @@ export const PdvInteligente: React.FC = () => {
 
                       <button
                         onClick={() => handleSelectQueueItemForCheckout(q)}
-                        className="h-8 px-3 rounded bg-gold-base/10 hover:bg-gold-base text-gold-hover hover:text-surface-base text-xs font-bold transition-all shrink-0 active:scale-95 whitespace-nowrap"
+                        className="h-8 px-3 rounded-xl bg-gold-base/10 hover:bg-gold-base text-gold-hover hover:text-surface-base text-xs font-bold transition-all shrink-0 active:scale-95 whitespace-nowrap"
                       >
                         Cobrar
                       </button>
@@ -890,7 +890,7 @@ export const PdvInteligente: React.FC = () => {
 
         {/* RIGHT PANEL: CARRINHO E CHECKOUT DO CAIXA (5 COLS) */}
         <div className="lg:col-span-5 space-y-3 min-w-0">
-          <div className="bg-surface-card rounded-md border border-border-subtle p-3.5 sm:p-4 shadow-sm flex flex-col justify-between min-h-[540px] min-w-0">
+          <div className="bg-surface-card rounded-xl border border-border-subtle p-3.5 sm:p-4 shadow-sm flex flex-col justify-between min-h-[540px] min-w-0">
             
             {/* Header / Client & Barber Selector */}
             <div className="space-y-2.5 pb-2.5 border-b border-border-subtle">
@@ -920,7 +920,7 @@ export const PdvInteligente: React.FC = () => {
                     value={selectedClientName}
                     onChange={e => setSelectedClientName(e.target.value)}
                     placeholder="Nome do cliente"
-                    className="w-full bg-surface-base border border-border-subtle rounded p-2 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base"
                   />
                 </div>
 
@@ -933,7 +933,7 @@ export const PdvInteligente: React.FC = () => {
                     value={selectedClientPhone}
                     onChange={e => setSelectedClientPhone(e.target.value)}
                     placeholder="(11) 99999-9999"
-                    className="w-full bg-surface-base border border-border-subtle rounded p-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                   />
                 </div>
               </div>
@@ -949,7 +949,7 @@ export const PdvInteligente: React.FC = () => {
                     const prof = professionals.find(p => p.id === e.target.value);
                     if (prof) setSelectedBarber(prof);
                   }}
-                  className="w-full bg-surface-base border border-border-subtle rounded p-2 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base"
+                  className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base"
                 >
                   {professionals.map(p => (
                     <option key={p.id} value={p.id}>
@@ -972,7 +972,7 @@ export const PdvInteligente: React.FC = () => {
                 cart.map(item => (
                   <div
                     key={item.id}
-                    className="p-2 rounded-md bg-surface-base border border-border-subtle flex items-center justify-between gap-2 min-w-0"
+                    className="p-2 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-between gap-2 min-w-0"
                   >
                     <div className="min-w-0 flex-1 pr-1">
                       <div className="flex items-center gap-1.5 min-w-0">
@@ -985,17 +985,17 @@ export const PdvInteligente: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <div className="flex items-center gap-1 bg-surface-card border border-border-subtle rounded p-0.5">
+                      <div className="flex items-center gap-1 bg-surface-card border border-border-subtle rounded-xl p-0.5">
                         <button
                           onClick={() => handleQuantityChange(item.id, -1)}
-                          className="w-5 h-5 rounded hover:bg-white/10 flex items-center justify-center text-content-muted active:scale-95"
+                          className="w-5 h-5 rounded-xl hover:bg-white/10 flex items-center justify-center text-content-muted active:scale-95"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
                         <span className="text-xs font-bold text-content-base px-1 font-mono num-tabular">{item.quantity}</span>
                         <button
                           onClick={() => handleQuantityChange(item.id, 1)}
-                          className="w-5 h-5 rounded hover:bg-white/10 flex items-center justify-center text-content-muted active:scale-95"
+                          className="w-5 h-5 rounded-xl hover:bg-white/10 flex items-center justify-center text-content-muted active:scale-95"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
@@ -1007,7 +1007,7 @@ export const PdvInteligente: React.FC = () => {
 
                       <button
                         onClick={() => handleRemoveItem(item.id)}
-                        className="text-content-muted hover:text-status-error transition-colors p-1 rounded"
+                        className="text-content-muted hover:text-status-error transition-colors p-1 rounded-xl"
                         title="Remover"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1033,7 +1033,7 @@ export const PdvInteligente: React.FC = () => {
                     value={discountAmount || ''}
                     onChange={e => setDiscountAmount(Math.max(0, parseFloat(e.target.value) || 0))}
                     placeholder="0.00"
-                    className="w-full bg-surface-base border border-border-subtle rounded p-1.5 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base num-tabular"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-1.5 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base num-tabular"
                   />
                 </div>
 
@@ -1047,7 +1047,7 @@ export const PdvInteligente: React.FC = () => {
                     value={tipAmount || ''}
                     onChange={e => setTipAmount(Math.max(0, parseFloat(e.target.value) || 0))}
                     placeholder="0.00"
-                    className="w-full bg-surface-base border border-border-subtle rounded p-1.5 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base num-tabular"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-1.5 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base num-tabular"
                   />
                 </div>
               </div>
@@ -1091,7 +1091,7 @@ export const PdvInteligente: React.FC = () => {
                 <div className="grid grid-cols-4 gap-1.5">
                   <button
                     onClick={() => setPaymentMethod('pix')}
-                    className={`h-11 rounded text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
+                    className={`h-11 rounded-xl text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
                       paymentMethod === 'pix'
                         ? 'bg-gold-base/15 text-gold-hover border-gold-base'
                         : 'bg-surface-base border-border-subtle text-content-muted hover:text-content-base'
@@ -1103,7 +1103,7 @@ export const PdvInteligente: React.FC = () => {
 
                   <button
                     onClick={() => setPaymentMethod('credit_card')}
-                    className={`h-11 rounded text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
+                    className={`h-11 rounded-xl text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
                       paymentMethod === 'credit_card'
                         ? 'bg-gold-base/15 text-gold-hover border-gold-base'
                         : 'bg-surface-base border-border-subtle text-content-muted hover:text-content-base'
@@ -1115,7 +1115,7 @@ export const PdvInteligente: React.FC = () => {
 
                   <button
                     onClick={() => setPaymentMethod('debit_card')}
-                    className={`h-11 rounded text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
+                    className={`h-11 rounded-xl text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
                       paymentMethod === 'debit_card'
                         ? 'bg-gold-base/15 text-gold-hover border-gold-base'
                         : 'bg-surface-base border-border-subtle text-content-muted hover:text-content-base'
@@ -1127,7 +1127,7 @@ export const PdvInteligente: React.FC = () => {
 
                   <button
                     onClick={() => setPaymentMethod('cash')}
-                    className={`h-11 rounded text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
+                    className={`h-11 rounded-xl text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
                       paymentMethod === 'cash'
                         ? 'bg-gold-base/15 text-gold-hover border-gold-base'
                         : 'bg-surface-base border-border-subtle text-content-muted hover:text-content-base'
@@ -1141,7 +1141,7 @@ export const PdvInteligente: React.FC = () => {
 
               {/* CASH TROCO CALCULATOR & QUICK KEYPAD */}
               {paymentMethod === 'cash' && (
-                <div className="p-2.5 rounded bg-surface-base border border-border-subtle space-y-2 animate-fade-in">
+                <div className="p-2.5 rounded-xl bg-surface-base border border-border-subtle space-y-2 animate-fade-in">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-[11px] font-bold text-content-muted">Valor Recebido (R$):</span>
                     <input
@@ -1149,7 +1149,7 @@ export const PdvInteligente: React.FC = () => {
                       value={cashAmountGiven}
                       onChange={e => setCashAmountGiven(e.target.value)}
                       placeholder={finalTotal.toFixed(2)}
-                      className="w-28 bg-surface-card border border-border-subtle rounded p-1.5 text-xs font-bold text-right text-content-base focus:outline-none focus:border-gold-base font-mono num-tabular"
+                      className="w-28 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-xs font-bold text-right text-content-base focus:outline-none focus:border-gold-base font-mono num-tabular"
                     />
                   </div>
 
@@ -1158,35 +1158,35 @@ export const PdvInteligente: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleSetCashPreset(finalTotal)}
-                      className="h-8 rounded bg-surface-card border border-border-subtle text-[10px] font-bold text-gold-hover hover:border-gold-base/50 active:scale-95 truncate"
+                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-gold-hover hover:border-gold-base/50 active:scale-95 truncate"
                     >
                       Exato
                     </button>
                     <button
                       type="button"
                       onClick={() => handleSetCashPreset(50)}
-                      className="h-8 rounded bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
+                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
                     >
                       R$ 50
                     </button>
                     <button
                       type="button"
                       onClick={() => handleSetCashPreset(100)}
-                      className="h-8 rounded bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
+                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
                     >
                       R$ 100
                     </button>
                     <button
                       type="button"
                       onClick={() => handleSetCashPreset(150)}
-                      className="h-8 rounded bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
+                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
                     >
                       R$ 150
                     </button>
                     <button
                       type="button"
                       onClick={() => handleSetCashPreset(200)}
-                      className="h-8 rounded bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
+                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
                     >
                       R$ 200
                     </button>
@@ -1207,7 +1207,7 @@ export const PdvInteligente: React.FC = () => {
               <button
                 onClick={handleFinalizeSale}
                 disabled={cart.length === 0 || !isCaixaOpen}
-                className="hidden md:flex w-full h-11 px-4 rounded bg-gold-base hover:bg-gold-hover disabled:opacity-40 text-surface-base font-bold text-xs items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
+                className="hidden md:flex w-full h-11 px-4 rounded-xl bg-gold-base hover:bg-gold-hover disabled:opacity-40 text-surface-base font-bold text-xs items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>FINALIZAR E EMITIR RECIBO (R$ {finalTotal.toFixed(2)})</span>
@@ -1233,7 +1233,7 @@ export const PdvInteligente: React.FC = () => {
         <button
           onClick={handleFinalizeSale}
           disabled={cart.length === 0 || !isCaixaOpen}
-          className="h-11 px-4 bg-gold-base text-surface-base font-bold text-xs rounded flex items-center justify-center gap-1.5 shrink-0 hover:bg-gold-hover active:scale-95 disabled:opacity-40 shadow-lg whitespace-nowrap"
+          className="h-11 px-4 bg-gold-base text-surface-base font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shrink-0 hover:bg-gold-hover active:scale-95 disabled:opacity-40 shadow-lg whitespace-nowrap"
         >
           <CheckCircle2 className="w-4 h-4" />
           <span>Finalizar Venda</span>
@@ -1253,27 +1253,27 @@ export const PdvInteligente: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowReceiptModal(false)}
-                className="w-7 h-7 rounded bg-stone-800 hover:bg-stone-700 flex items-center justify-center text-stone-400 hover:text-white transition-colors"
+                className="w-7 h-7 rounded-xl bg-stone-800 hover:bg-stone-700 flex items-center justify-center text-stone-400 hover:text-white transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
 
             {/* REALISTIC THERMAL PAPER TICKET */}
-            <div className="bg-[#FAF8F5] text-stone-900 p-4 rounded-sm shadow-inner font-mono text-xs space-y-3 relative overflow-hidden border border-stone-200 select-text">
+            <div className="bg-[#FAF8F5] text-stone-900 p-4 rounded-lg shadow-inner font-mono text-xs space-y-3 relative overflow-hidden border border-stone-200 select-text">
               
               {/* Serrated Top Edge simulation */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-stone-300 border-b border-dashed border-stone-400 opacity-60" />
 
               {/* Receipt Header */}
               <div className="text-center pt-1 border-b-2 border-dashed border-stone-800 pb-3 space-y-1">
-                <div className="w-8 h-8 rounded bg-stone-900 text-amber-400 flex items-center justify-center mx-auto mb-1">
+                <div className="w-8 h-8 rounded-xl bg-stone-900 text-amber-400 flex items-center justify-center mx-auto mb-1">
                   <Scissors className="w-4 h-4" />
                 </div>
                 <h2 className="text-base font-bold font-serif tracking-wider text-stone-900 uppercase">BARBEARIA NAVO</h2>
                 <p className="text-[9px] uppercase tracking-widest text-stone-600">Unidade Jardins • São Paulo/SP</p>
                 <p className="text-[8px] text-stone-500">CNPJ: 45.892.102/0001-90 | TEL: (11) 99999-8888</p>
-                <div className="inline-block mt-1 px-2 py-0.5 bg-stone-900 text-stone-100 text-[9px] font-bold tracking-widest uppercase rounded-sm">
+                <div className="inline-block mt-1 px-2 py-0.5 bg-stone-900 text-stone-100 text-[9px] font-bold tracking-widest uppercase rounded-lg">
                   COMPROVANTE DE VENDA
                 </div>
               </div>
@@ -1379,7 +1379,7 @@ export const PdvInteligente: React.FC = () => {
             <div className="grid grid-cols-3 gap-2 pt-1">
               <button
                 onClick={() => handlePrintReceipt(lastTransaction)}
-                className="h-10 rounded bg-gold-base hover:bg-gold-hover text-surface-base font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all cursor-pointer"
+                className="h-10 rounded-xl bg-gold-base hover:bg-gold-hover text-surface-base font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all cursor-pointer"
                 title="Imprimir Comprovante"
               >
                 <Printer className="w-4 h-4" />
@@ -1388,7 +1388,7 @@ export const PdvInteligente: React.FC = () => {
 
               <button
                 onClick={() => handleShareWhatsApp(lastTransaction)}
-                className="h-10 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all cursor-pointer"
+                className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all cursor-pointer"
                 title="Enviar por WhatsApp"
               >
                 <Share2 className="w-4 h-4" />
@@ -1397,7 +1397,7 @@ export const PdvInteligente: React.FC = () => {
 
               <button
                 onClick={() => setShowReceiptModal(false)}
-                className="h-10 rounded bg-stone-800 hover:bg-stone-700 text-stone-200 font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
+                className="h-10 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
               >
                 <span>Concluir</span>
               </button>
@@ -1410,7 +1410,7 @@ export const PdvInteligente: React.FC = () => {
       {/* HISTÓRICO DE VENDAS DO DIA MODAL */}
       {showSalesHistory && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-2xl bg-surface-card border border-border-subtle rounded-md p-4 sm:p-5 shadow-2xl space-y-3 max-h-[85vh] flex flex-col">
+          <div className="w-full max-w-2xl bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5 shadow-2xl space-y-3 max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between pb-2.5 border-b border-border-subtle">
               <div className="flex items-center gap-2">
                 <Receipt className="w-4 h-4 text-gold-hover" />
@@ -1418,7 +1418,7 @@ export const PdvInteligente: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowSalesHistory(false)}
-                className="w-7 h-7 rounded bg-surface-base border border-border-subtle flex items-center justify-center text-content-muted hover:text-content-base"
+                className="w-7 h-7 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-content-muted hover:text-content-base"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1433,11 +1433,11 @@ export const PdvInteligente: React.FC = () => {
                 todaysSales.map((sale) => (
                   <div
                     key={sale.id}
-                    className="p-3 rounded bg-surface-base border border-border-subtle flex items-center justify-between gap-3 min-w-0"
+                    className="p-3 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-between gap-3 min-w-0"
                   >
                     <div className="space-y-1 min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gold-base/15 text-gold-hover font-mono shrink-0">
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-xl bg-gold-base/15 text-gold-hover font-mono shrink-0">
                           {sale.timestamp}
                         </span>
                         <h4 className="font-bold text-content-base text-xs truncate min-w-0">{sale.clientName}</h4>

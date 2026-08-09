@@ -356,7 +356,7 @@ export const AdminMobileHub: React.FC<AdminMobileHubProps> = ({
                           <div className="flex items-center gap-2 flex-wrap">
                             <h3 className="font-semibold text-content-base text-base">{mod.title}</h3>
                             {mod.badge && (
-                              <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider border ${badgeToneClass[mod.badgeTone ?? 'neutral']}`}>
+                              <span className={`text-[10px] px-2 py-0.5 rounded-xl font-bold uppercase tracking-wider border ${badgeToneClass[mod.badgeTone ?? 'neutral']}`}>
                                 {mod.badge}
                               </span>
                             )}

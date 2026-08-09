@@ -380,7 +380,7 @@ export const WaitingQueue: React.FC = () => {
                   Cadeiras ({inChairList.length})
                 </span>
               </div>
-              <span className="text-[9px] bg-status-success/15 text-status-success px-2 py-0.5 rounded font-black border border-status-success/30">
+              <span className="text-[9px] bg-status-success/15 text-status-success px-2 py-0.5 rounded-xl font-black border border-status-success/30">
                 AO VIVO
               </span>
             </div>
@@ -519,7 +519,7 @@ export const WaitingQueue: React.FC = () => {
                         <div className="flex items-center gap-1.5">
                           <h4 className="font-bold text-content-base text-xs truncate">{item.client_name}</h4>
                           {item.notes && (
-                            <span className="px-1.5 py-0.5 bg-gold-base/10 text-gold-hover text-[9px] font-bold rounded border border-[#FFFFFF]/20">
+                            <span className="px-1.5 py-0.5 bg-gold-base/10 text-gold-hover text-[9px] font-bold rounded-xl border border-[#FFFFFF]/20">
                               Encaixe
                             </span>
                           )}
@@ -603,7 +603,7 @@ export const WaitingQueue: React.FC = () => {
                       <td className="p-3 text-content-base">{item.professional_name}</td>
                       <td className="p-3 text-status-success font-bold">{item.completed_at || 'Concluído'}</td>
                       <td className="p-3 text-right">
-                        <span className="px-2 py-0.5 rounded bg-status-success/15 text-status-success text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded-xl bg-status-success/15 text-status-success text-[10px] font-bold">
                           ✓ Concluído
                         </span>
                       </td>

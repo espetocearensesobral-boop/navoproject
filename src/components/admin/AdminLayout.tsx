@@ -296,7 +296,7 @@ export const AdminLayout: React.FC = () => {
         <div className="flex items-center h-[56px] px-4 border-b border-border-subtle relative overflow-hidden shrink-0">
           <div className="absolute top-0 left-0 right-0 h-0.5 barber-pole-line" />
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 bg-gold-base text-surface-base rounded-md flex items-center justify-center shadow-sm shrink-0">
+            <div className="w-8 h-8 bg-gold-base text-surface-base rounded-xl flex items-center justify-center shadow-sm shrink-0">
               <Scissors className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -325,7 +325,7 @@ export const AdminLayout: React.FC = () => {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full h-10 px-3 rounded-md text-xs font-semibold flex items-center gap-2.5 transition-colors group min-w-0 active:bg-surface-base ${
+                      className={`w-full h-10 px-3 rounded-xl text-xs font-semibold flex items-center gap-2.5 transition-colors group min-w-0 active:bg-surface-base ${
                         isActive
                           ? 'bg-gold-base/10 text-gold-base border border-gold-base/30'
                           : 'text-content-muted hover:text-content-base hover:bg-surface-base'
@@ -346,8 +346,8 @@ export const AdminLayout: React.FC = () => {
 
         {/* User Profile Footer */}
         <div className="p-3 border-t border-border-subtle shrink-0">
-          <div className="flex items-center gap-2.5 px-3 h-12 rounded-md bg-surface-base border border-border-subtle/80">
-            <div className="w-7 h-7 rounded bg-gold-base flex items-center justify-center text-surface-base font-bold text-xs uppercase shrink-0">
+          <div className="flex items-center gap-2.5 px-3 h-12 rounded-xl bg-surface-base border border-border-subtle/80">
+            <div className="w-7 h-7 rounded-xl bg-gold-base flex items-center justify-center text-surface-base font-bold text-xs uppercase shrink-0">
               {adminName.substring(0, 2)}
             </div>
             <div className="flex-1 min-w-0">
@@ -356,7 +356,7 @@ export const AdminLayout: React.FC = () => {
             </div>
             <button 
               onClick={handleLogout}
-              className="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-card text-content-muted hover:text-gold-base active:bg-surface-card transition-colors shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-card text-content-muted hover:text-gold-base active:bg-surface-card transition-colors shrink-0"
               title="Sair"
               aria-label="Sair"
             >
@@ -403,7 +403,7 @@ export const AdminLayout: React.FC = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex-1 h-12 flex flex-col items-center justify-center gap-0.5 rounded-md transition-all active:scale-95 ${
+              className={`flex-1 h-12 flex flex-col items-center justify-center gap-0.5 rounded-xl transition-all active:scale-95 ${
                 isActive 
                   ? 'text-gold-base font-bold bg-gold-base/10' 
                   : 'text-content-muted hover:text-content-base'
@@ -418,7 +418,7 @@ export const AdminLayout: React.FC = () => {
         {/* 4th Item: Menu / Mais */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className={`flex-1 h-12 flex flex-col items-center justify-center gap-0.5 rounded-md transition-all active:scale-95 ${
+          className={`flex-1 h-12 flex flex-col items-center justify-center gap-0.5 rounded-xl transition-all active:scale-95 ${
             isMoreActive ? 'text-gold-base font-bold' : 'text-content-muted hover:text-content-base'
           }`}
         >
@@ -439,14 +439,14 @@ export const AdminLayout: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between h-[56px] px-4 border-b border-border-subtle shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 bg-gold-base rounded-md flex items-center justify-center text-surface-base shrink-0">
+                <div className="w-7 h-7 bg-gold-base rounded-xl flex items-center justify-center text-surface-base shrink-0">
                   <Scissors className="w-3.5 h-3.5" />
                 </div>
                 <h1 className="text-sm font-serif font-bold text-content-base truncate">Navo Premium</h1>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-md text-content-muted hover:text-content-base active:bg-surface-base"
+                className="w-10 h-10 flex items-center justify-center rounded-xl text-content-muted hover:text-content-base active:bg-surface-base"
                 aria-label="Fechar menu"
               >
                 <X className="w-5 h-5" />
@@ -475,7 +475,7 @@ export const AdminLayout: React.FC = () => {
                             setActiveTab(item.id);
                             setSidebarOpen(false);
                           }}
-                          className={`w-full h-11 px-3 rounded-md text-xs font-semibold flex items-center gap-3 transition-colors active:bg-surface-base ${
+                          className={`w-full h-11 px-3 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors active:bg-surface-base ${
                             isActive
                               ? 'bg-gold-base/10 text-gold-base border border-gold-base/30'
                               : 'text-content-muted hover:text-content-base hover:bg-surface-base'
@@ -495,7 +495,7 @@ export const AdminLayout: React.FC = () => {
             <div className="p-3 border-t border-border-subtle shrink-0 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
               <button 
                 onClick={handleLogout}
-                className="w-full h-11 flex items-center justify-center gap-2 px-3 rounded-md bg-surface-base text-content-muted hover:text-status-error border border-border-subtle font-semibold text-xs active:scale-95"
+                className="w-full h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-surface-base text-content-muted hover:text-status-error border border-border-subtle font-semibold text-xs active:scale-95"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Sair do sistema</span>

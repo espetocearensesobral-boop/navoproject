@@ -278,7 +278,7 @@ export const SubscriptionsManagement: React.FC = () => {
                     </td>
                     <td className="p-3 font-bold text-gold-base">{m.planName}</td>
                     <td className="p-3">
-                      <span className="bg-status-success/15 text-status-success font-bold text-[10px] px-2 py-0.5 rounded uppercase">
+                      <span className="bg-status-success/15 text-status-success font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase">
                         {m.status === 'active' ? 'Ativo' : 'Pendente'}
                       </span>
                     </td>
@@ -286,7 +286,7 @@ export const SubscriptionsManagement: React.FC = () => {
                       {new Date(m.nextBillingDate).toLocaleDateString('pt-BR')}
                     </td>
                     <td className="p-3 text-center font-bold">
-                      <span className="bg-gold-base/15 text-gold-base px-2 py-0.5 rounded">
+                      <span className="bg-gold-base/15 text-gold-base px-2 py-0.5 rounded-xl">
                         {m.cutsUsedThisMonth} cortes
                       </span>
                     </td>

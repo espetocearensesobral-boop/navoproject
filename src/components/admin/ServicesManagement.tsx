@@ -466,10 +466,10 @@ export const ServicesManagement: React.FC = () => {
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-bold text-content-base text-xs truncate">{service.title}</span>
                         {service.is_combo && (
-                          <span className="text-[8px] bg-status-success/20 text-status-success font-black px-1.5 py-0.5 rounded uppercase">Combo</span>
+                          <span className="text-[8px] bg-status-success/20 text-status-success font-black px-1.5 py-0.5 rounded-xl uppercase">Combo</span>
                         )}
                         {service.popular && (
-                          <span className="text-[8px] bg-gold-base/20 text-gold-hover font-black px-1.5 py-0.5 rounded uppercase">Destaque</span>
+                          <span className="text-[8px] bg-gold-base/20 text-gold-hover font-black px-1.5 py-0.5 rounded-xl uppercase">Destaque</span>
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-[10px] text-content-muted mt-0.5">
@@ -676,7 +676,7 @@ export const ServicesManagement: React.FC = () => {
 
                           {/* Photos count pill */}
                           {servicePhotos.length > 0 && (
-                            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-md bg-surface-base/90 text-content-base text-[9px] font-extrabold border border-gold-base/40 shadow-sm flex items-center gap-0.5">
+                            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-xl bg-surface-base/90 text-content-base text-[9px] font-extrabold border border-gold-base/40 shadow-sm flex items-center gap-0.5">
                               <ImageIcon className="w-2.5 h-2.5" />
                               <span>{servicePhotos.length}</span>
                             </span>
@@ -829,12 +829,12 @@ export const ServicesManagement: React.FC = () => {
                       <Scissors className="w-8 h-8 text-gold-base/40" />
                     )}
                     {service.is_combo && (
-                      <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-status-success text-surface-base text-[8px] font-black uppercase shadow">
+                      <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-xl bg-status-success text-surface-base text-[8px] font-black uppercase shadow">
                         Combo
                       </span>
                     )}
                     {service.popular && !service.is_combo && (
-                      <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-gold-base text-surface-base text-[8px] font-black uppercase shadow">
+                      <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-xl bg-gold-base text-surface-base text-[8px] font-black uppercase shadow">
                         Destaque
                       </span>
                     )}
@@ -843,7 +843,7 @@ export const ServicesManagement: React.FC = () => {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1 mb-1">
-                      <span className="px-2 py-0.5 rounded-md bg-surface-base text-gold-base text-[10px] font-bold border border-border-subtle">
+                      <span className="px-2 py-0.5 rounded-xl bg-surface-base text-gold-base text-[10px] font-bold border border-border-subtle">
                         {categoryName}
                       </span>
                       <div className="flex items-center space-x-1 text-[11px] text-content-muted font-medium">
@@ -1117,7 +1117,7 @@ export const ServicesManagement: React.FC = () => {
                               Desconto de R$ {(formData.original_price - (formData.price || 0)).toFixed(2)}
                             </span>
                           </div>
-                          <span className="px-2 py-0.5 rounded bg-status-success text-surface-base font-black text-[10px] uppercase">
+                          <span className="px-2 py-0.5 rounded-xl bg-status-success text-surface-base font-black text-[10px] uppercase">
                             {Math.round(((formData.original_price - (formData.price || 0)) / formData.original_price) * 100)}% OFF
                           </span>
                         </div>
@@ -1203,14 +1203,14 @@ export const ServicesManagement: React.FC = () => {
                                 <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-surface-base border border-border-subtle">
                                   <img src={imgUrl} alt="Galeria" className="w-full h-full object-cover" />
                                   {isCover && (
-                                    <span className="absolute top-1 left-1 bg-gold-base text-surface-base text-[8px] font-black px-1 rounded">Capa</span>
+                                    <span className="absolute top-1 left-1 bg-gold-base text-surface-base text-[8px] font-black px-1 rounded-xl">Capa</span>
                                   )}
                                   <div className="absolute bottom-1 right-1 flex gap-1">
                                     {!isCover && (
                                       <button
                                         type="button"
                                         onClick={() => handleSetCoverImage(imgUrl)}
-                                        className="p-1 rounded bg-surface-base/80 text-gold-hover text-[8px] font-bold"
+                                        className="p-1 rounded-xl bg-surface-base/80 text-gold-hover text-[8px] font-bold"
                                       >
                                         Capa
                                       </button>
@@ -1218,7 +1218,7 @@ export const ServicesManagement: React.FC = () => {
                                     <button
                                       type="button"
                                       onClick={() => handleRemoveGalleryImage(index)}
-                                      className="p-1 rounded bg-red-600 text-content-base"
+                                      className="p-1 rounded-xl bg-red-600 text-content-base"
                                     >
                                       <Trash2 className="w-3 h-3" />
                                     </button>

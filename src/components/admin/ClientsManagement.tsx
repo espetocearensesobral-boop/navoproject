@@ -262,7 +262,7 @@ export const ClientsManagement: React.FC = () => {
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <p className="text-xs font-bold text-content-base truncate">{client.name}</p>
-                      <span className="px-1.5 py-0.2 rounded bg-gold-base/10 text-gold-hover text-[9px] font-extrabold shrink-0">
+                      <span className="px-1.5 py-0.2 rounded-xl bg-gold-base/10 text-gold-hover text-[9px] font-extrabold shrink-0">
                         {client.loyaltyTier}
                       </span>
                     </div>

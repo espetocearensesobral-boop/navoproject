@@ -276,7 +276,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       </button>
 
       {/* 2. KPIS (Sempre no topo, logo abaixo do Header) */}
-      <div className="bg-border-subtle border border-border-subtle rounded-md flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 gap-px no-scrollbar">
+      <div className="bg-border-subtle border border-border-subtle rounded-xl flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 gap-px no-scrollbar">
         {/* KPI 1: NPS Score */}
         <div className="bg-surface-card p-4 flex flex-col justify-between min-w-[70vw] sm:min-w-[220px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
           <div className="flex justify-between items-start h-10">
@@ -288,7 +288,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                 {data?.npsScore || 100} <span className="text-xs text-status-success font-sans">/ 100</span>
               </div>
             </div>
-            <div className="w-8 h-8 rounded-md bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-base shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-base shrink-0">
               <Star className="w-4 h-4" />
             </div>
           </div>
@@ -311,7 +311,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                 +{data?.totalIssued || 0}
               </div>
             </div>
-            <div className="w-8 h-8 rounded-md bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
               <Sparkles className="w-4 h-4" />
             </div>
           </div>
@@ -332,7 +332,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                 -{data?.totalRedeemed || 0}
               </div>
             </div>
-            <div className="w-8 h-8 rounded-md bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
               <Gift className="w-4 h-4" />
             </div>
           </div>
@@ -353,7 +353,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                 {data?.totalReviews || 0}
               </div>
             </div>
-            <div className="w-8 h-8 rounded-md bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
               <MessageSquare className="w-4 h-4" />
             </div>
           </div>
@@ -365,9 +365,9 @@ export const NavoRewardsAdmin: React.FC = () => {
       </div>
 
       {/* 3. LINHA DE CAMPANHA (com botão com verbo curto "Disparar", 1 linha) */}
-      <div className="bg-surface-card border border-border-subtle p-3.5 rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
+      <div className="bg-surface-card border border-border-subtle p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <div className="w-8 h-8 rounded bg-gold-base/10 border border-gold-base/30 text-gold-base flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 text-gold-base flex items-center justify-center shrink-0">
             <Megaphone className="w-4 h-4" />
           </div>
           <div className="min-w-0 flex-1">
@@ -383,7 +383,7 @@ export const NavoRewardsAdmin: React.FC = () => {
         <button
           onClick={handleTriggerCampaign}
           disabled={campaignLoading}
-          className="h-9 px-4 rounded bg-gold-base text-surface-base hover:bg-gold-base/90 transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 whitespace-nowrap active:scale-95 disabled:opacity-50"
+          className="h-9 px-4 rounded-xl bg-gold-base text-surface-base hover:bg-gold-base/90 transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 whitespace-nowrap active:scale-95 disabled:opacity-50"
         >
           <Megaphone className="w-3.5 h-3.5" />
           <span>{campaignLoading ? 'Disparando...' : 'Disparar'}</span>
@@ -391,19 +391,19 @@ export const NavoRewardsAdmin: React.FC = () => {
       </div>
 
       {campaignMsg && (
-        <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-md animate-fade-in">
+        <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-xl animate-fade-in">
           {campaignMsg}
         </div>
       )}
 
       {configSuccessMsg && (
-        <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-md animate-fade-in">
+        <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-xl animate-fade-in">
           {configSuccessMsg}
         </div>
       )}
 
       {/* 4. TABS UNDERLINE (Com scroll horizontal, sem cortar) */}
-      <div className="bg-surface-card border border-border-subtle rounded-md px-3 flex items-center gap-6 overflow-x-auto custom-scrollbar no-scrollbar min-w-0">
+      <div className="bg-surface-card border border-border-subtle rounded-xl px-3 flex items-center gap-6 overflow-x-auto custom-scrollbar no-scrollbar min-w-0">
         <TabNavButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={TrendingUp} label="Dashboard Geral" />
         <TabNavButton active={activeTab === 'loyalty'} onClick={() => setActiveTab('loyalty')} icon={Crown} label="Clube de Fidelidade & Níveis" />
         <TabNavButton active={activeTab === 'rewards'} onClick={() => setActiveTab('rewards')} icon={Gift} label="Prêmios & Cupons Desconto" />
@@ -417,32 +417,32 @@ export const NavoRewardsAdmin: React.FC = () => {
         <div className="space-y-4 min-w-0">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Distribuição por Nível VIP */}
-            <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+            <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
               <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
                 <Crown className="w-4 h-4 text-gold-base" />
                 <span>Distribuição por Nível VIP</span>
               </h3>
 
               <div className="grid grid-cols-2 gap-2.5">
-                <div className="p-3 rounded bg-surface-base border border-border-subtle space-y-1">
+                <div className="p-3 rounded-xl bg-surface-base border border-border-subtle space-y-1">
                   <span className="text-[10px] uppercase font-bold text-amber-700 block truncate">Bronze (0 - 999 pts)</span>
                   <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Bronze || 0} clientes</span>
                   <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Bronze || 1.0}x</span>
                 </div>
 
-                <div className="p-3 rounded bg-surface-base border border-border-subtle space-y-1">
+                <div className="p-3 rounded-xl bg-surface-base border border-border-subtle space-y-1">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block truncate">Prata (1000 - 2999 pts)</span>
                   <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Prata || 0} clientes</span>
                   <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Prata || 1.2}x</span>
                 </div>
 
-                <div className="p-3 rounded bg-surface-base border border-border-subtle space-y-1">
+                <div className="p-3 rounded-xl bg-surface-base border border-border-subtle space-y-1">
                   <span className="text-[10px] uppercase font-bold text-gold-base block truncate">Ouro (3000 - 5999 pts)</span>
                   <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Ouro || 0} clientes</span>
                   <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Ouro || 1.5}x</span>
                 </div>
 
-                <div className="p-3 rounded bg-surface-base border border-border-subtle space-y-1">
+                <div className="p-3 rounded-xl bg-surface-base border border-border-subtle space-y-1">
                   <span className="text-[10px] uppercase font-bold text-cyan-400 block truncate">Diamante (6000+ pts)</span>
                   <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Diamante || 0} clientes</span>
                   <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Diamante || 2.0}x VIP</span>
@@ -451,7 +451,7 @@ export const NavoRewardsAdmin: React.FC = () => {
             </div>
 
             {/* Maiores Embaixadores */}
-            <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+            <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
               <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
                 <Users className="w-4 h-4 text-gold-base" />
                 <span>Maiores Embaixadores (Mural de Indicações)</span>
@@ -462,7 +462,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                   {data.ambassadors.map((amb: any, idx: number) => (
                     <div key={amb.id || idx} className="pt-2 flex items-center justify-between min-w-0">
                       <div className="flex items-center space-x-2.5 min-w-0">
-                        <span className={`w-6 h-6 rounded font-bold text-[10px] flex items-center justify-center shrink-0 ${
+                        <span className={`w-6 h-6 rounded-xl font-bold text-[10px] flex items-center justify-center shrink-0 ${
                           idx === 0 ? 'bg-gold-base text-surface-base' : 'bg-surface-base text-content-muted border border-border-subtle'
                         }`}>
                           #{idx + 1}
@@ -491,7 +491,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       {/* TAB 2: CLUBE DE FIDELIDADE & NÍVEIS */}
       {activeTab === 'loyalty' && (
         <div className="space-y-4 min-w-0">
-          <form onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-4">
+          <form onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
               <div>
                 <h3 className="text-sm font-serif font-bold text-content-base flex items-center gap-2">
@@ -504,7 +504,7 @@ export const NavoRewardsAdmin: React.FC = () => {
               <button
                 type="submit"
                 disabled={savingConfig}
-                className="h-9 px-4 rounded bg-gold-base text-surface-base font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+                className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{savingConfig ? 'Salvando...' : 'Salvar Regras'}</span>
@@ -512,7 +512,7 @@ export const NavoRewardsAdmin: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-2">
+              <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
                 <label className="text-[10px] font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
                   <DollarSign className="w-3.5 h-3.5" /> Razão de Conversão
                 </label>
@@ -524,13 +524,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                     min="0.1"
                     value={config.currencyPerPoint}
                     onChange={(e) => setConfig({ ...config, currencyPerPoint: Number(e.target.value) })}
-                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base text-xs font-bold focus:outline-none focus:border-gold-base num-tabular"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base text-xs font-bold focus:outline-none focus:border-gold-base num-tabular"
                   />
                   <span className="text-content-muted font-bold whitespace-nowrap">= 1 Pts</span>
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-2">
+              <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
                 <label className="text-[10px] font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" /> Validade (Dias)
                 </label>
@@ -540,13 +540,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                     min="0"
                     value={config.pointsValidityDays}
                     onChange={(e) => setConfig({ ...config, pointsValidityDays: Number(e.target.value) })}
-                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base text-xs font-bold focus:outline-none focus:border-gold-base num-tabular"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base text-xs font-bold focus:outline-none focus:border-gold-base num-tabular"
                   />
                   <span className="text-content-muted font-bold">dias</span>
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-2">
+              <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
                 <label className="text-[10px] font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
                   <Gift className="w-3.5 h-3.5" /> Bônus Aniversário
                 </label>
@@ -556,7 +556,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                     min="0"
                     value={config.birthdayBonus}
                     onChange={(e) => setConfig({ ...config, birthdayBonus: Number(e.target.value) })}
-                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base text-xs font-bold focus:outline-none focus:border-gold-base num-tabular"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base text-xs font-bold focus:outline-none focus:border-gold-base num-tabular"
                   />
                   <span className="text-content-muted font-bold">pts</span>
                 </div>
@@ -566,7 +566,7 @@ export const NavoRewardsAdmin: React.FC = () => {
             <div className="space-y-2 pt-2">
               <h4 className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Multiplicadores por Nível VIP</h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-                <div className="p-2.5 bg-surface-base rounded border border-border-subtle space-y-1">
+                <div className="p-2.5 bg-surface-base rounded-xl border border-border-subtle space-y-1">
                   <span className="text-[10px] font-bold uppercase text-amber-700 block truncate">Bronze</span>
                   <div className="flex items-center gap-1">
                     <input
@@ -578,13 +578,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                         ...config,
                         tierMultipliers: { ...config.tierMultipliers, Bronze: Number(e.target.value) }
                       })}
-                      className="w-16 bg-surface-card border border-border-subtle rounded p-1.5 text-content-base text-xs font-bold num-tabular"
+                      className="w-16 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-content-base text-xs font-bold num-tabular"
                     />
                     <span className="text-content-muted text-[11px]">x Pts</span>
                   </div>
                 </div>
 
-                <div className="p-2.5 bg-surface-base rounded border border-border-subtle space-y-1">
+                <div className="p-2.5 bg-surface-base rounded-xl border border-border-subtle space-y-1">
                   <span className="text-[10px] font-bold uppercase text-slate-400 block truncate">Prata</span>
                   <div className="flex items-center gap-1">
                     <input
@@ -596,13 +596,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                         ...config,
                         tierMultipliers: { ...config.tierMultipliers, Prata: Number(e.target.value) }
                       })}
-                      className="w-16 bg-surface-card border border-border-subtle rounded p-1.5 text-content-base text-xs font-bold num-tabular"
+                      className="w-16 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-content-base text-xs font-bold num-tabular"
                     />
                     <span className="text-content-muted text-[11px]">x Pts</span>
                   </div>
                 </div>
 
-                <div className="p-2.5 bg-surface-base rounded border border-border-subtle space-y-1">
+                <div className="p-2.5 bg-surface-base rounded-xl border border-border-subtle space-y-1">
                   <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Ouro</span>
                   <div className="flex items-center gap-1">
                     <input
@@ -614,13 +614,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                         ...config,
                         tierMultipliers: { ...config.tierMultipliers, Ouro: Number(e.target.value) }
                       })}
-                      className="w-16 bg-surface-card border border-border-subtle rounded p-1.5 text-content-base text-xs font-bold num-tabular"
+                      className="w-16 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-content-base text-xs font-bold num-tabular"
                     />
                     <span className="text-content-muted text-[11px]">x Pts</span>
                   </div>
                 </div>
 
-                <div className="p-2.5 bg-surface-base rounded border border-border-subtle space-y-1">
+                <div className="p-2.5 bg-surface-base rounded-xl border border-border-subtle space-y-1">
                   <span className="text-[10px] font-bold uppercase text-cyan-400 block truncate">Diamante</span>
                   <div className="flex items-center gap-1">
                     <input
@@ -632,7 +632,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                         ...config,
                         tierMultipliers: { ...config.tierMultipliers, Diamante: Number(e.target.value) }
                       })}
-                      className="w-16 bg-surface-card border border-border-subtle rounded p-1.5 text-content-base text-xs font-bold num-tabular"
+                      className="w-16 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-content-base text-xs font-bold num-tabular"
                     />
                     <span className="text-content-muted text-[11px]">x Pts</span>
                   </div>
@@ -642,7 +642,7 @@ export const NavoRewardsAdmin: React.FC = () => {
           </form>
 
           {/* Ajuste Manual */}
-          <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+          <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
             <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
               <Zap className="w-4 h-4 text-gold-base" />
               <span>Ajuste Manual de Pontuação de Clientes</span>
@@ -654,7 +654,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                 <select
                   value={selectedClient}
                   onChange={(e) => setSelectedClient(e.target.value)}
-                  className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                  className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
                 >
                   <option value="">-- Escolha o cliente --</option>
                   {clients.map((c) => (
@@ -672,7 +672,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                     type="number"
                     value={manualPointsAmount}
                     onChange={(e) => setManualPointsAmount(Number(e.target.value))}
-                    className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base num-tabular"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base num-tabular"
                   />
                 </div>
                 <div>
@@ -682,20 +682,20 @@ export const NavoRewardsAdmin: React.FC = () => {
                     placeholder="Ex: Cortesia VIP"
                     value={manualPointsReason}
                     onChange={(e) => setManualPointsReason(e.target.value)}
-                    className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="h-9 px-4 bg-gold-base text-surface-base font-bold rounded-md hover:bg-gold-base/90 text-xs active:scale-95"
+                className="h-9 px-4 bg-gold-base text-surface-base font-bold rounded-xl hover:bg-gold-base/90 text-xs active:scale-95"
               >
                 Aplicar Ajuste de Pontos
               </button>
 
               {manualSuccessMsg && (
-                <div className="p-2.5 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-md">
+                <div className="p-2.5 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-xl">
                   {manualSuccessMsg}
                 </div>
               )}
@@ -707,7 +707,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       {/* TAB 3: CATÁLOGO DE PRÊMIOS & CUPONS */}
       {activeTab === 'rewards' && (
         <div className="space-y-4 min-w-0">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-md border border-border-subtle">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle">
             <div>
               <h3 className="text-sm font-serif font-bold text-content-base">Catálogo de Prêmios e Cupons</h3>
               <p className="text-xs text-content-muted mt-0.5">Ofertas ativas para troca de pontos e cupons.</p>
@@ -715,7 +715,7 @@ export const NavoRewardsAdmin: React.FC = () => {
 
             <button
               onClick={() => setShowAddRewardModal(true)}
-              className="h-9 px-3.5 rounded bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0 hover:bg-gold-base/90 active:scale-95 whitespace-nowrap"
+              className="h-9 px-3.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0 hover:bg-gold-base/90 active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Criar Oferta / Cupom</span>
@@ -723,7 +723,7 @@ export const NavoRewardsAdmin: React.FC = () => {
           </div>
 
           {/* Validador de Voucher */}
-          <div className="bg-surface-card p-4 rounded-md border border-border-subtle space-y-2.5 max-w-xl">
+          <div className="bg-surface-card p-4 rounded-xl border border-border-subtle space-y-2.5 max-w-xl">
             <h4 className="text-[10px] font-bold uppercase text-gold-base tracking-wider flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" /> Validar Código de Voucher do Cliente
             </h4>
@@ -733,17 +733,17 @@ export const NavoRewardsAdmin: React.FC = () => {
                 placeholder="Ex: NAV-RWD-123456"
                 value={voucherCodeInput}
                 onChange={(e) => setVoucherCodeInput(e.target.value)}
-                className="flex-1 bg-surface-base border border-border-subtle rounded-md p-2 text-xs text-content-base font-mono uppercase focus:outline-none focus:border-gold-base min-w-0"
+                className="flex-1 bg-surface-base border border-border-subtle rounded-xl p-2 text-xs text-content-base font-mono uppercase focus:outline-none focus:border-gold-base min-w-0"
               />
               <button
                 onClick={handleValidateVoucher}
-                className="h-9 px-4 bg-gold-base text-surface-base font-bold text-xs rounded-md hover:bg-gold-base/90 active:scale-95 shrink-0 whitespace-nowrap"
+                className="h-9 px-4 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 active:scale-95 shrink-0 whitespace-nowrap"
               >
                 Validar Voucher
               </button>
             </div>
             {voucherValidationResult && (
-              <div className="p-2.5 bg-surface-base border border-gold-base/30 text-content-base text-xs font-medium rounded-md">
+              <div className="p-2.5 bg-surface-base border border-gold-base/30 text-content-base text-xs font-medium rounded-xl">
                 {voucherValidationResult}
               </div>
             )}
@@ -754,10 +754,10 @@ export const NavoRewardsAdmin: React.FC = () => {
             {rewardsList.map((rw) => (
               <div
                 key={rw.id}
-                className="bg-surface-card p-4 rounded-md border border-border-subtle flex items-center justify-between gap-3"
+                className="bg-surface-card p-4 rounded-xl border border-border-subtle flex items-center justify-between gap-3"
               >
                 <div className="space-y-1 min-w-0 flex-1">
-                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gold-base/10 text-gold-base text-[10px] font-bold border border-gold-base/30">
+                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl bg-gold-base/10 text-gold-base text-[10px] font-bold border border-gold-base/30">
                     <Gift className="w-3 h-3" />
                     <span>{rw.pointsRequired} PONTOS</span>
                   </div>
@@ -767,7 +767,7 @@ export const NavoRewardsAdmin: React.FC = () => {
 
                 <button
                   onClick={() => handleDeleteReward(rw.id)}
-                  className="w-8 h-8 rounded bg-surface-base text-status-error border border-border-subtle hover:border-status-error/50 shrink-0 flex items-center justify-center active:scale-95"
+                  className="w-8 h-8 rounded-xl bg-surface-base text-status-error border border-border-subtle hover:border-status-error/50 shrink-0 flex items-center justify-center active:scale-95"
                   title="Remover oferta"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -779,7 +779,7 @@ export const NavoRewardsAdmin: React.FC = () => {
           {/* Modal Adicionar Oferta */}
           {showAddRewardModal && (
             <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-sm">
-              <div className="w-full max-w-md bg-surface-card rounded-md border border-border-subtle p-5 space-y-4 shadow-lg">
+              <div className="w-full max-w-md bg-surface-card rounded-xl border border-border-subtle p-5 space-y-4 shadow-lg">
                 <h3 className="text-sm font-serif font-bold text-content-base">Adicionar Oferta ou Cupom</h3>
 
                 <form onSubmit={handleCreateReward} className="space-y-3 text-xs">
@@ -791,7 +791,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                       placeholder="Ex: 15% OFF no Próximo Corte"
                       value={newReward.title}
                       onChange={(e) => setNewReward({ ...newReward, title: e.target.value })}
-                      className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
                     />
                   </div>
 
@@ -803,7 +803,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                       min={50}
                       value={newReward.pointsRequired}
                       onChange={(e) => setNewReward({ ...newReward, pointsRequired: Number(e.target.value) })}
-                      className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base num-tabular"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base num-tabular"
                     />
                   </div>
 
@@ -812,7 +812,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                     <select
                       value={newReward.rewardType}
                       onChange={(e) => setNewReward({ ...newReward, rewardType: e.target.value })}
-                      className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
                     >
                       <option value="upgrade">Upgrade de Serviço</option>
                       <option value="product">Produto Físico</option>
@@ -828,7 +828,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                       placeholder="Ex: Válido para qualquer serviço de barba ou produto."
                       value={newReward.valueDescription}
                       onChange={(e) => setNewReward({ ...newReward, valueDescription: e.target.value })}
-                      className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base min-h-[60px]"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base min-h-[60px]"
                     />
                   </div>
 
@@ -836,13 +836,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowAddRewardModal(false)}
-                      className="flex-1 h-9 rounded border border-border-subtle text-content-muted font-bold text-xs"
+                      className="flex-1 h-9 rounded-xl border border-border-subtle text-content-muted font-bold text-xs"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 h-9 rounded bg-gold-base text-surface-base font-bold text-xs"
+                      className="flex-1 h-9 rounded-xl bg-gold-base text-surface-base font-bold text-xs"
                     >
                       Salvar Oferta
                     </button>
@@ -857,7 +857,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       {/* TAB 4: MOTOR DE INDICAÇÕES */}
       {activeTab === 'referrals' && (
         <div className="space-y-4 min-w-0">
-          <form onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-4">
+          <form onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
               <div>
                 <h3 className="text-sm font-serif font-bold text-content-base flex items-center gap-2">
@@ -870,7 +870,7 @@ export const NavoRewardsAdmin: React.FC = () => {
               <button
                 type="submit"
                 disabled={savingConfig}
-                className="h-9 px-4 rounded bg-gold-base text-surface-base font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+                className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{savingConfig ? 'Salvando...' : 'Salvar Regras'}</span>
@@ -878,7 +878,7 @@ export const NavoRewardsAdmin: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-1.5">
+              <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1.5">
                 <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Bônus de Quem Indica</span>
                 <div className="flex items-center gap-2">
                   <input
@@ -888,13 +888,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                       ...config,
                       referralPoints: { ...config.referralPoints, referrerBonus: Number(e.target.value) }
                     })}
-                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base font-bold text-xs num-tabular"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-xs num-tabular"
                   />
                   <span className="text-content-muted font-bold">pts</span>
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-1.5">
+              <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1.5">
                 <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Bônus do Amigo Indicado</span>
                 <div className="flex items-center gap-2">
                   <input
@@ -904,13 +904,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                       ...config,
                       referralPoints: { ...config.referralPoints, referredBonus: Number(e.target.value) }
                     })}
-                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base font-bold text-xs num-tabular"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-xs num-tabular"
                   />
                   <span className="text-content-muted font-bold">pts</span>
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-1.5">
+              <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1.5">
                 <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Meta Amigos (Milestone)</span>
                 <div className="flex items-center gap-2">
                   <input
@@ -920,13 +920,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                       ...config,
                       referralPoints: { ...config.referralPoints, milestoneCount: Number(e.target.value) }
                     })}
-                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base font-bold text-xs num-tabular"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-xs num-tabular"
                   />
                   <span className="text-content-muted font-bold">amigos</span>
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-1.5">
+              <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1.5">
                 <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Bônus Milestone</span>
                 <div className="flex items-center gap-2">
                   <input
@@ -936,7 +936,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                       ...config,
                       referralPoints: { ...config.referralPoints, milestoneBonus: Number(e.target.value) }
                     })}
-                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base font-bold text-xs num-tabular"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-xs num-tabular"
                   />
                   <span className="text-content-muted font-bold">pts</span>
                 </div>
@@ -945,7 +945,7 @@ export const NavoRewardsAdmin: React.FC = () => {
           </form>
 
           {/* Gerador de Link de Indicação */}
-          <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+          <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
             <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
               <Share2 className="w-4 h-4 text-gold-base" />
               <span>Gerador de Link de Indicação para Clientes</span>
@@ -960,7 +960,7 @@ export const NavoRewardsAdmin: React.FC = () => {
                     const found = clients.find(c => c.id === e.target.value);
                     if (found) setRefClient(found);
                   }}
-                  className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                  className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
                 >
                   {clients.map(c => (
                     <option key={c.id} value={c.id}>{c.name} - Código: {c.referralCode || 'Sem código'}</option>
@@ -973,29 +973,29 @@ export const NavoRewardsAdmin: React.FC = () => {
                 <textarea
                   value={customRefMsg}
                   onChange={(e) => setCustomRefMsg(e.target.value)}
-                  className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base min-h-[60px]"
+                  className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base min-h-[60px]"
                 />
               </div>
 
-              <div className="p-3 bg-surface-base rounded-md border border-border-subtle space-y-2">
+              <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
                 <span className="text-[10px] font-bold uppercase text-content-muted block">Link Único Gerado</span>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     readOnly
                     value={generatedRefUrl}
-                    className="flex-1 bg-surface-card border border-border-subtle rounded-md p-2 text-xs font-mono text-gold-base min-w-0"
+                    className="flex-1 bg-surface-card border border-border-subtle rounded-xl p-2 text-xs font-mono text-gold-base min-w-0"
                   />
                   <button
                     onClick={() => copyToClipboard(generatedRefUrl)}
-                    className="h-9 px-3 bg-gold-base text-surface-base font-bold text-xs rounded-md hover:bg-gold-base/90 shrink-0 flex items-center gap-1"
+                    className="h-9 px-3 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center gap-1"
                   >
                     {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedLink ? 'Copiado!' : 'Copiar'}</span>
                   </button>
                   <button
                     onClick={() => shareViaWhatsapp(refClient?.phone || '', `${customRefMsg} ${generatedRefUrl}`)}
-                    className="h-9 px-3 bg-[#25D366] text-white font-bold text-xs rounded-md hover:opacity-90 shrink-0 flex items-center gap-1"
+                    className="h-9 px-3 bg-[#25D366] text-white font-bold text-xs rounded-xl hover:opacity-90 shrink-0 flex items-center gap-1"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>WhatsApp</span>
@@ -1010,7 +1010,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       {/* TAB 5: AVALIAÇÕES & NPS */}
       {activeTab === 'reviews' && (
         <div className="space-y-4 min-w-0">
-          <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+          <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
                 <QrCode className="w-4 h-4 text-gold-base" />
@@ -1018,25 +1018,25 @@ export const NavoRewardsAdmin: React.FC = () => {
               </h3>
               <button
                 onClick={() => setShowQrModal(true)}
-                className="h-8 px-3 rounded bg-surface-base border border-border-subtle text-gold-base hover:text-content-base text-xs font-bold flex items-center gap-1.5 active:scale-95"
+                className="h-8 px-3 rounded-xl bg-surface-base border border-border-subtle text-gold-base hover:text-content-base text-xs font-bold flex items-center gap-1.5 active:scale-95"
               >
                 <QrCode className="w-3.5 h-3.5" />
                 <span>Ver QR Code</span>
               </button>
             </div>
 
-            <div className="p-3 bg-surface-base rounded-md border border-border-subtle space-y-2 max-w-2xl">
+            <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2 max-w-2xl">
               <span className="text-[10px] font-bold uppercase text-content-muted block">Link Público da Pesquisa NPS</span>
               <div className="flex gap-2">
                 <input
                   type="text"
                   readOnly
                   value={generatedEvalUrl}
-                  className="flex-1 bg-surface-card border border-border-subtle rounded-md p-2 text-xs font-mono text-gold-base min-w-0"
+                  className="flex-1 bg-surface-card border border-border-subtle rounded-xl p-2 text-xs font-mono text-gold-base min-w-0"
                 />
                 <button
                   onClick={() => copyToClipboard(generatedEvalUrl, true)}
-                  className="h-9 px-3 bg-gold-base text-surface-base font-bold text-xs rounded-md hover:bg-gold-base/90 shrink-0 flex items-center gap-1"
+                  className="h-9 px-3 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center gap-1"
                 >
                   {copiedEvalLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedEvalLink ? 'Copiado!' : 'Copiar'}</span>
@@ -1046,7 +1046,7 @@ export const NavoRewardsAdmin: React.FC = () => {
           </div>
 
           {/* Feed de Avaliações */}
-          <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+          <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
             <h4 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-gold-base" />
               <span>Feed de Pesquisas de Pós-Atendimento</span>
@@ -1055,7 +1055,7 @@ export const NavoRewardsAdmin: React.FC = () => {
             {data?.reviewsList && data.reviewsList.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 {data.reviewsList.map((rev: any) => (
-                  <div key={rev.id} className="p-3.5 rounded bg-surface-base border border-border-subtle space-y-2">
+                  <div key={rev.id} className="p-3.5 rounded-xl bg-surface-base border border-border-subtle space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((s) => (
@@ -1089,10 +1089,10 @@ export const NavoRewardsAdmin: React.FC = () => {
           {/* Modal QR Code */}
           {showQrModal && (
             <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-sm">
-              <div className="w-full max-w-xs bg-surface-card rounded-md border border-border-subtle p-5 space-y-3 text-center shadow-lg">
+              <div className="w-full max-w-xs bg-surface-card rounded-xl border border-border-subtle p-5 space-y-3 text-center shadow-lg">
                 <h3 className="text-sm font-serif font-bold text-content-base">QR Code para Mesas & Espelhos</h3>
 
-                <div className="p-3 bg-white rounded border border-border-subtle inline-block mx-auto">
+                <div className="p-3 bg-white rounded-xl border border-border-subtle inline-block mx-auto">
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(generatedEvalUrl)}`}
                     alt="QR Code de Avaliação Navo"
@@ -1106,7 +1106,7 @@ export const NavoRewardsAdmin: React.FC = () => {
 
                 <button
                   onClick={() => setShowQrModal(false)}
-                  className="w-full h-9 bg-gold-base text-surface-base font-bold rounded text-xs"
+                  className="w-full h-9 bg-gold-base text-surface-base font-bold rounded-xl text-xs"
                 >
                   Fechar QR Code
                 </button>

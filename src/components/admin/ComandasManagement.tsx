@@ -468,7 +468,7 @@ export const ComandasManagement: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between border-b border-border-subtle/60 pb-2 mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono font-bold text-gold-base bg-gold-base/10 px-2 py-0.5 rounded">
+                        <span className="text-xs font-mono font-bold text-gold-base bg-gold-base/10 px-2 py-0.5 rounded-xl">
                           {cmd.code}
                         </span>
                         <span className="text-[10px] text-content-muted flex items-center gap-1">
@@ -476,7 +476,7 @@ export const ComandasManagement: React.FC = () => {
                           {new Date(cmd.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <span className="text-[10px] bg-status-success/10 text-status-success font-bold px-2 py-0.5 rounded uppercase">
+                      <span className="text-[10px] bg-status-success/10 text-status-success font-bold px-2 py-0.5 rounded-xl uppercase">
                         Aberta
                       </span>
                     </div>

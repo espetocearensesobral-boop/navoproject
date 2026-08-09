@@ -49,33 +49,33 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
       case 'in_service':
       case 'in_chair':
         return (
-          <span className="text-[10px] font-bold text-status-success bg-status-success/10 border border-status-success/30 px-2 py-0.5 rounded whitespace-nowrap inline-flex items-center gap-1">
+          <span className="text-[10px] font-bold text-status-success bg-status-success/10 border border-status-success/30 px-2 py-0.5 rounded-xl whitespace-nowrap inline-flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
             Na Cadeira
           </span>
         );
       case 'pending_approval':
         return (
-          <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded whitespace-nowrap inline-flex items-center gap-1 animate-pulse">
+          <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-xl whitespace-nowrap inline-flex items-center gap-1 animate-pulse">
             ⚠️ Fora do Expediente
           </span>
         );
       case 'completed':
         return (
-          <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded whitespace-nowrap">
+          <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-xl whitespace-nowrap">
             Finalizado
           </span>
         );
       case 'cancelled':
         return (
-          <span className="text-[10px] font-bold text-status-error bg-status-error/10 border border-status-error/30 px-2 py-0.5 rounded whitespace-nowrap">
+          <span className="text-[10px] font-bold text-status-error bg-status-error/10 border border-status-error/30 px-2 py-0.5 rounded-xl whitespace-nowrap">
             Cancelado
           </span>
         );
       case 'confirmed':
       default:
         return (
-          <span className="text-[10px] font-bold text-gold-base bg-gold-base/10 border border-gold-base/30 px-2 py-0.5 rounded whitespace-nowrap">
+          <span className="text-[10px] font-bold text-gold-base bg-gold-base/10 border border-gold-base/30 px-2 py-0.5 rounded-xl whitespace-nowrap">
             Confirmado
           </span>
         );
@@ -85,7 +85,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
   return (
     <div className="space-y-5 animate-fade-in text-content-base min-w-0">
       {/* PAGE HEADER (Zona de ação fixada à direita) */}
-      <div className="flex items-center justify-between gap-3 bg-surface-card p-4 rounded-md border border-border-subtle relative overflow-hidden">
+      <div className="flex items-center justify-between gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-0.5 barber-pole-line" />
         <div className="min-w-0 flex-1">
           <span className="text-[10px] font-bold uppercase tracking-wider text-gold-base block mb-0.5 capitalize whitespace-nowrap">
@@ -104,7 +104,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
           <button 
             onClick={loadData}
             disabled={loading}
-            className="h-10 sm:h-9 px-0 sm:px-3.5 w-10 sm:w-auto rounded-md bg-surface-base text-gold-base hover:text-content-base hover:bg-surface-card border border-border-subtle transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 active:bg-surface-card active:scale-95 disabled:opacity-50 whitespace-nowrap"
+            className="h-10 sm:h-9 px-0 sm:px-3.5 w-10 sm:w-auto rounded-xl bg-surface-base text-gold-base hover:text-content-base hover:bg-surface-card border border-border-subtle transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 active:bg-surface-card active:scale-95 disabled:opacity-50 whitespace-nowrap"
             aria-label="Atualizar Dados"
           >
             <RefreshCw className={`w-4 h-4 sm:w-3.5 sm:h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -114,7 +114,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
       </div>
 
       {/* KPI SNAP CAROUSEL (Mobile snap carousel, Desktop 3-col grid) */}
-      <div className="bg-border-subtle border border-border-subtle rounded-md flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-px no-scrollbar">
+      <div className="bg-border-subtle border border-border-subtle rounded-xl flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-px no-scrollbar">
         {/* KPI 1: Caixa de Hoje */}
         <div className="bg-surface-card p-4 sm:p-5 flex flex-col justify-between min-w-[82vw] sm:min-w-[280px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
           <div className="flex justify-between items-start h-12">
@@ -126,7 +126,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                 R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </h2>
             </div>
-            <div className="w-8 h-8 rounded-md bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-base shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-base shrink-0">
               <Receipt className="w-4 h-4" />
             </div>
           </div>
@@ -147,7 +147,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                 R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="w-8 h-8 rounded-md bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
               <CalendarCheck2 className="w-4 h-4" />
             </div>
           </div>
@@ -168,7 +168,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                 {uniqueClients}
               </div>
             </div>
-            <div className="w-8 h-8 rounded-md bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
               <Users className="w-4 h-4" />
             </div>
           </div>
@@ -180,7 +180,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
       </div>
 
       {/* TODAY'S SCHEDULE / QUEUE FLOW */}
-      <div className="bg-surface-card rounded-md border border-border-subtle overflow-hidden min-w-0">
+      <div className="bg-surface-card rounded-xl border border-border-subtle overflow-hidden min-w-0">
         {/* Card Header (Fixed 48px height zone) */}
         <div className="h-12 px-4 border-b border-border-subtle flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -192,7 +192,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
           {/* Action Zone: Card Header Right Button (Mobile text-to-icon, >=40px touch) */}
           <button 
             onClick={onNavigateToAgenda}
-            className="h-9 sm:h-8 px-0 sm:px-3 w-9 sm:w-auto rounded-md bg-gold-base/10 hover:bg-gold-base text-gold-base hover:text-surface-base border border-gold-base/30 transition-all text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap active:scale-95"
+            className="h-9 sm:h-8 px-0 sm:px-3 w-9 sm:w-auto rounded-xl bg-gold-base/10 hover:bg-gold-base text-gold-base hover:text-surface-base border border-gold-base/30 transition-all text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap active:scale-95"
             aria-label="Ver na Agenda"
           >
             <Scissors className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
@@ -224,7 +224,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                 <div key={apt.id} className="p-3.5 space-y-2.5 active:bg-surface-base/50 transition-colors">
                   <div className="flex items-start justify-between gap-2 min-w-0">
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <div className="w-8 h-8 rounded bg-surface-base border border-border-subtle text-gold-base font-serif font-bold text-xs flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle text-gold-base font-serif font-bold text-xs flex items-center justify-center shrink-0">
                         {apt.client_name ? apt.client_name.charAt(0).toUpperCase() : 'C'}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -248,7 +248,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                       </span>
                       <button
                         onClick={onNavigateToAgenda}
-                        className="h-8 w-8 flex items-center justify-center rounded bg-surface-base text-content-muted active:text-gold-base border border-border-subtle shrink-0"
+                        className="h-8 w-8 flex items-center justify-center rounded-xl bg-surface-base text-content-muted active:text-gold-base border border-border-subtle shrink-0"
                         aria-label="Ver agendamento"
                       >
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -299,7 +299,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                       {/* Cliente */}
                       <td className="px-4 py-2 min-w-0">
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded bg-surface-base border border-border-subtle text-gold-base font-serif font-bold text-xs flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-xl bg-surface-base border border-border-subtle text-gold-base font-serif font-bold text-xs flex items-center justify-center shrink-0">
                             {apt.client_name ? apt.client_name.charAt(0).toUpperCase() : 'C'}
                           </div>
                           <span className="font-bold text-content-base truncate">{apt.client_name || 'Cliente'}</span>
@@ -334,7 +334,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                       <td className="px-4 py-2 text-right">
                         <button
                           onClick={onNavigateToAgenda}
-                          className="h-8 px-2.5 rounded bg-surface-base hover:bg-surface-card text-content-muted hover:text-gold-base border border-border-subtle transition-all text-[11px] font-bold whitespace-nowrap inline-flex items-center gap-1 active:scale-95"
+                          className="h-8 px-2.5 rounded-xl bg-surface-base hover:bg-surface-card text-content-muted hover:text-gold-base border border-border-subtle transition-all text-[11px] font-bold whitespace-nowrap inline-flex items-center gap-1 active:scale-95"
                         >
                           <span>Ver</span>
                           <ArrowRight className="w-3 h-3" />

@@ -59,21 +59,21 @@ export const SettingsManagement: React.FC = () => {
 
       {/* TOAST MESSAGE */}
       {toastMsg && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-md flex items-center gap-2 text-xs font-bold animate-fade-in">
+        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span className="truncate">{toastMsg}</span>
         </div>
       )}
 
       {/* TAB BAR */}
-      <div className="bg-surface-card border border-border-subtle rounded-md p-1 flex items-center gap-1 overflow-x-auto custom-scrollbar">
+      <div className="bg-surface-card border border-border-subtle rounded-xl p-1 flex items-center gap-1 overflow-x-auto custom-scrollbar">
         <TabButton active={activeTab === 'contacts'} onClick={() => setActiveTab('contacts')} icon={Phone} label="Canais de Contato" />
         <TabButton active={activeTab === 'links'} onClick={() => setActiveTab('links')} icon={LinkIcon} label="Links & Redes" />
         <TabButton active={activeTab === 'appearance'} onClick={() => setActiveTab('appearance')} icon={Palette} label="Aparência" />
       </div>
 
       {/* MAIN CONTENT AREA */}
-      <div className="bg-surface-card border border-border-subtle rounded-md p-4 sm:p-6 min-w-0">
+      <div className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-6 min-w-0">
         {renderContent()}
       </div>
     </div>
@@ -84,7 +84,7 @@ const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
   <button
     onClick={onClick}
     className={`
-      h-10 sm:h-9 px-3.5 flex items-center justify-center gap-2 text-xs font-bold rounded transition-all whitespace-nowrap shrink-0 active:scale-95
+      h-10 sm:h-9 px-3.5 flex items-center justify-center gap-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 active:scale-95
       ${active ? 'bg-gold-base text-surface-base' : 'text-content-muted hover:text-content-base bg-surface-card/60 hover:bg-surface-base'}
     `}
   >
@@ -120,7 +120,7 @@ const AppearanceSettings: React.FC = () => {
             >
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="w-8 h-8 rounded-md shrink-0 border border-white/10 shadow-inner" style={{ background: `linear-gradient(135deg, ${item.accentSoft}, ${item.deep})` }} />
+                  <span className="w-8 h-8 rounded-xl shrink-0 border border-white/10 shadow-inner" style={{ background: `linear-gradient(135deg, ${item.accentSoft}, ${item.deep})` }} />
                   <span className="min-w-0">
                     <span className="block text-xs font-bold text-content-base truncate">{item.name}</span>
                     <span className="block text-[10px] text-content-muted truncate">{item.description}</span>
@@ -152,10 +152,10 @@ const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
       <h2 className="text-sm font-serif font-bold text-content-base mb-0.5 truncate">Identidade Visual da Barbearia</h2>
       <p className="text-[11px] text-content-muted mb-4 truncate">Atualize a logomarca e o nome exibidos no app do cliente.</p>
 
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-surface-base p-3.5 rounded-md border border-border-subtle">
-        <div className="w-20 h-20 bg-surface-card rounded-md border border-border-subtle flex items-center justify-center relative group shrink-0 shadow-inner">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-surface-base p-3.5 rounded-xl border border-border-subtle">
+        <div className="w-20 h-20 bg-surface-card rounded-xl border border-border-subtle flex items-center justify-center relative group shrink-0 shadow-inner">
           <Store className="w-8 h-8 text-gold-base" />
-          <button className="absolute inset-0 bg-surface-base/80 rounded-md opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity text-content-base text-[10px] font-bold gap-1">
+          <button className="absolute inset-0 bg-surface-base/80 rounded-xl opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity text-content-base text-[10px] font-bold gap-1">
             <Camera className="w-4 h-4" />
             <span>Alterar</span>
           </button>
@@ -168,7 +168,7 @@ const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
             <input
               type="text"
               defaultValue="Navo Barber & Club - Unidade Principal"
-              className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
+              className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
             />
           </div>
         </div>
@@ -185,7 +185,7 @@ const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
         <input
           type="text"
           defaultValue="Estilo, Tradição e Excelência na Medida Certa"
-          className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
+          className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
         />
       </div>
 
@@ -196,7 +196,7 @@ const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
         <input
           type="text"
           defaultValue="Av. Paulista, 1000 - Bela Vista, São Paulo - SP"
-          className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
+          className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
         />
       </div>
 
@@ -208,7 +208,7 @@ const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
           <input
             type="time"
             defaultValue="09:00"
-            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
           />
         </div>
         <div>
@@ -218,7 +218,7 @@ const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
           <input
             type="time"
             defaultValue="20:00"
-            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
           />
         </div>
       </div>
@@ -229,7 +229,7 @@ const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
       <button
         onClick={onSave}
         disabled={isSaving}
-        className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+        className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
       >
         <Save className="w-4 h-4" />
         <span>{isSaving ? 'Salvando...' : 'Salvar Alterações do Perfil'}</span>
@@ -254,7 +254,7 @@ const ContactSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
           <input
             type="text"
             defaultValue="(11) 99999-8888"
-            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
           />
         </div>
 
@@ -263,7 +263,7 @@ const ContactSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
           <input
             type="text"
             defaultValue="(11) 3211-0000"
-            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
           />
         </div>
 
@@ -272,7 +272,7 @@ const ContactSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
           <input
             type="email"
             defaultValue="contato@barberclub.com.br"
-            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
           />
         </div>
       </div>
@@ -283,7 +283,7 @@ const ContactSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
       <button
         onClick={onSave}
         disabled={isSaving}
-        className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+        className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
       >
         <Save className="w-4 h-4" />
         <span>{isSaving ? 'Salvando...' : 'Salvar Contatos'}</span>
@@ -320,7 +320,7 @@ const LinkSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: bool
           <input
             type="url"
             defaultValue="https://facebook.com/navobarber"
-            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
           />
         </div>
 
@@ -331,7 +331,7 @@ const LinkSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: bool
           <input
             type="url"
             defaultValue="https://maps.google.com/..."
-            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
           />
         </div>
       </div>
@@ -342,7 +342,7 @@ const LinkSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: bool
       <button
         onClick={onSave}
         disabled={isSaving}
-        className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+        className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
       >
         <Save className="w-4 h-4" />
         <span>{isSaving ? 'Salvando...' : 'Salvar Links'}</span>
