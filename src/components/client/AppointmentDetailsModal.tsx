@@ -1,5 +1,5 @@
-import { authFetch } from '../../lib/api';
 import React, { useRef, useState, useEffect, useMemo } from 'react';
+import { authFetch } from '../../lib/api';
 import { Appointment } from '../../types';
 import {
   X,
