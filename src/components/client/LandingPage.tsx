@@ -820,7 +820,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 <MapPin className="w-3.5 h-3.5 text-gold-base" />
                 LOCALIZAÇÃO & ATENDIMENTO
               </span>
-              <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight font-serif">
+              <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
                 Onde estamos
               </h2>
             </div>
@@ -873,7 +873,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   <span className="text-[clamp(0.6rem,1vh,0.725rem)] font-bold uppercase tracking-widest text-gold-base block mb-0.5">
                     {shopProfile.unitName || 'Unidade Expectativa'}
                   </span>
-                  <h3 className="text-[clamp(1.1rem,2.2vh,1.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight font-serif">
+                  <h3 className="text-[clamp(1.1rem,2.2vh,1.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight">
                     {shopProfile.name}
                   </h3>
                 </div>
