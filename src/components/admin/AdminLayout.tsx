@@ -3,13 +3,9 @@ import { NavoHomeView } from './NavoHomeView';
 import { ScheduleGrid } from './ScheduleGrid';
 import { PdvInteligente } from './PdvInteligente';
 import { ComandasManagement } from './ComandasManagement';
-import { ReportsManagement } from './ReportsManagement';
-import { CaixaManagement } from './CaixaManagement';
+import { FinanceiroManagement } from './FinanceiroManagement';
 import { AuditLogsManagement } from './AuditLogsManagement';
 import { SubscriptionsManagement } from './SubscriptionsManagement';
-import { AccountsPayableManagement } from './AccountsPayableManagement';
-import { FinancialStatementManagement } from './FinancialStatementManagement';
-import { FinancialHealthManagement } from './FinancialHealthManagement';
 import { WhatsAppManagement } from './WhatsAppManagement';
 import { QrCodeManagement } from './QrCodeManagement';
 import { ServicesManagement } from './ServicesManagement';
@@ -41,9 +37,6 @@ import {
   FileText,
   Wallet,
   ShieldCheck,
-  CreditCard,
-  DollarSign,
-  Activity,
   MessageSquare,
   QrCode
 } from 'lucide-react';
@@ -54,13 +47,9 @@ export type AdminTab =
   | 'agenda' 
   | 'pdv'
   | 'comandas'
-  | 'caixa'
-  | 'reports'
+  | 'financeiro'
   | 'audit'
   | 'subscriptions'
-  | 'payable'
-  | 'financial_statement'
-  | 'financial_health'
   | 'whatsapp'
   | 'qrcode'
   | 'queue' 
@@ -70,6 +59,8 @@ export type AdminTab =
   | 'clientes' 
   | 'barbearia'
   | 'settings';
+
+export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionamento' | 'sistema';
 
 export const AdminLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>(() => {
@@ -110,129 +101,132 @@ export const AdminLayout: React.FC = () => {
       id: 'hub' as AdminTab, 
       label: 'Módulos / Hub', 
       icon: LayoutGrid,
-      description: 'Painel principal de entrada'
+      description: 'Painel principal de entrada',
+      section: 'operacao' as AdminSection,
     },
     { 
       id: 'dashboard' as AdminTab, 
       label: 'Dashboard', 
       icon: TrendingUp,
-      description: 'Métricas e análises'
-    },
-    { 
-      id: 'pdv' as AdminTab, 
-      label: 'PDV Rápido', 
-      icon: Receipt,
-      description: 'Checkout instantâneo'
-    },
-    { 
-      id: 'comandas' as AdminTab, 
-      label: 'Comandas', 
-      icon: FileText,
-      description: 'Fechamento de conta'
-    },
-    { 
-      id: 'caixa' as AdminTab, 
-      label: 'Gestão de Caixa', 
-      icon: Wallet,
-      description: 'Sangria, suprimento e Abertura'
-    },
-    { 
-      id: 'reports' as AdminTab, 
-      label: 'Relatórios', 
-      icon: TrendingUp,
-      description: 'Desempenho por serviço e barbeiro'
-    },
-    { 
-      id: 'subscriptions' as AdminTab, 
-      label: 'Assinaturas & Clube', 
-      icon: Award,
-      description: 'Planos e comissões de clube'
-    },
-    { 
-      id: 'payable' as AdminTab, 
-      label: 'Contas a Pagar', 
-      icon: CreditCard,
-      description: 'Fornecedores e boletos'
-    },
-    { 
-      id: 'financial_statement' as AdminTab, 
-      label: 'Extrato Financeiro', 
-      icon: DollarSign,
-      description: 'Entradas e saídas de caixa'
-    },
-    { 
-      id: 'financial_health' as AdminTab, 
-      label: 'Saúde Financeira', 
-      icon: Activity,
-      description: 'Indicadores e margens'
-    },
-    { 
-      id: 'audit' as AdminTab, 
-      label: 'Logs & Auditoria', 
-      icon: ShieldCheck,
-      description: 'Rastreio de ações'
-    },
-    { 
-      id: 'whatsapp' as AdminTab, 
-      label: 'Painel WhatsApp', 
-      icon: MessageSquare,
-      description: 'Notificações e saldo'
-    },
-    { 
-      id: 'qrcode' as AdminTab, 
-      label: 'QR Code & Balcão', 
-      icon: QrCode,
-      description: 'Totens de agendamento'
+      description: 'Métricas e análises',
+      section: 'operacao' as AdminSection,
     },
     { 
       id: 'agenda' as AdminTab, 
       label: 'Agenda', 
       icon: Calendar,
-      description: 'Gerenciar horários'
+      description: 'Gerenciar horários',
+      section: 'operacao' as AdminSection,
     },
     { 
       id: 'queue' as AdminTab, 
       label: 'Fila de Espera', 
       icon: Clock,
-      description: 'Clientes aguardando'
+      description: 'Clientes aguardando',
+      section: 'operacao' as AdminSection,
     },
     { 
-      id: 'rewards' as AdminTab, 
-      label: 'Rewards & NPS', 
-      icon: Award,
-      description: 'Fidelidade e indicações'
+      id: 'pdv' as AdminTab, 
+      label: 'PDV Rápido', 
+      icon: Receipt,
+      description: 'Checkout instantâneo',
+      section: 'operacao' as AdminSection,
+    },
+    { 
+      id: 'comandas' as AdminTab, 
+      label: 'Comandas', 
+      icon: FileText,
+      description: 'Fechamento de conta',
+      section: 'operacao' as AdminSection,
+    },
+    { 
+      id: 'financeiro' as AdminTab, 
+      label: 'Financeiro', 
+      icon: Wallet,
+      description: 'Caixa, extrato, contas a pagar, saúde e relatórios',
+      section: 'financeiro' as AdminSection,
     },
     { 
       id: 'servicos' as AdminTab, 
       label: 'Serviços', 
       icon: Scissors,
-      description: 'Catálogo de serviços'
+      description: 'Catálogo de serviços',
+      section: 'cadastros' as AdminSection,
     },
     { 
       id: 'profissionais' as AdminTab, 
       label: 'Profissionais', 
       icon: Users,
-      description: 'Equipe de barbeiros'
+      description: 'Equipe de barbeiros',
+      section: 'cadastros' as AdminSection,
     },
     { 
       id: 'clientes' as AdminTab, 
       label: 'Clientes', 
       icon: UserCheck,
-      description: 'Base de clientes'
+      description: 'Base de clientes',
+      section: 'cadastros' as AdminSection,
+    },
+    { 
+      id: 'subscriptions' as AdminTab, 
+      label: 'Assinaturas & Clube', 
+      icon: Award,
+      description: 'Planos e comissões de clube',
+      section: 'relacionamento' as AdminSection,
+    },
+    { 
+      id: 'rewards' as AdminTab, 
+      label: 'Rewards & NPS', 
+      icon: Award,
+      description: 'Fidelidade e indicações',
+      section: 'relacionamento' as AdminSection,
+    },
+    { 
+      id: 'whatsapp' as AdminTab, 
+      label: 'Painel WhatsApp', 
+      icon: MessageSquare,
+      description: 'Notificações e saldo',
+      section: 'relacionamento' as AdminSection,
+    },
+    { 
+      id: 'qrcode' as AdminTab, 
+      label: 'QR Code & Balcão', 
+      icon: QrCode,
+      description: 'Totens de agendamento',
+      section: 'relacionamento' as AdminSection,
     },
     { 
       id: 'barbearia' as AdminTab, 
       label: 'Perfil & Unidade', 
       icon: Store,
-      description: 'Endereço, horários e dados'
+      description: 'Endereço, horários e dados',
+      section: 'sistema' as AdminSection,
+    },
+    { 
+      id: 'audit' as AdminTab, 
+      label: 'Logs & Auditoria', 
+      icon: ShieldCheck,
+      description: 'Rastreio de ações',
+      section: 'sistema' as AdminSection,
     },
     { 
       id: 'settings' as AdminTab, 
       label: 'Configurações', 
       icon: Settings,
-      description: 'Preferências do sistema'
+      description: 'Preferências do sistema',
+      section: 'sistema' as AdminSection,
     },
   ];
+
+  const sectionLabels: Record<AdminSection, string> = {
+    operacao: 'Operação do Dia',
+    financeiro: 'Financeiro',
+    cadastros: 'Cadastros',
+    relacionamento: 'Relacionamento',
+    sistema: 'Sistema',
+  };
+
+  const sectionOrder: AdminSection[] = ['operacao', 'financeiro', 'cadastros', 'relacionamento', 'sistema'];
 
   // Quick bottom bar items matching mobile model
   const bottomBarItems = [
@@ -261,20 +255,12 @@ export const AdminLayout: React.FC = () => {
         return <PdvInteligente />;
       case 'comandas':
         return <ComandasManagement />;
-      case 'caixa':
-        return <CaixaManagement />;
-      case 'reports':
-        return <ReportsManagement />;
+      case 'financeiro':
+        return <FinanceiroManagement />;
       case 'audit':
         return <AuditLogsManagement />;
       case 'subscriptions':
         return <SubscriptionsManagement />;
-      case 'payable':
-        return <AccountsPayableManagement />;
-      case 'financial_statement':
-        return <FinancialStatementManagement />;
-      case 'financial_health':
-        return <FinancialHealthManagement />;
       case 'whatsapp':
         return <WhatsAppManagement />;
       case 'qrcode':
@@ -321,27 +307,39 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-2.5 py-4 space-y-1 overflow-y-auto no-scrollbar">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            
+        <nav className="flex-1 px-2.5 py-4 space-y-4 overflow-y-auto no-scrollbar">
+          {sectionOrder.map((section) => {
+            const itemsInSection = navItems.filter((item) => item.section === section);
+            if (itemsInSection.length === 0) return null;
+
             return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full h-10 px-3 rounded-md text-xs font-semibold flex items-center gap-2.5 transition-colors group min-w-0 active:bg-surface-base ${
-                  isActive
-                    ? 'bg-gold-base/10 text-gold-base border border-gold-base/30'
-                    : 'text-content-muted hover:text-content-base hover:bg-surface-base'
-                }`}
-              >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted group-hover:text-content-base'}`} />
-                <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
-                {isActive && (
-                  <ChevronRight className="w-3.5 h-3.5 text-gold-base shrink-0" />
-                )}
-              </button>
+              <div key={section} className="space-y-1">
+                <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-content-muted/70">
+                  {sectionLabels[section]}
+                </p>
+                {itemsInSection.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full h-10 px-3 rounded-md text-xs font-semibold flex items-center gap-2.5 transition-colors group min-w-0 active:bg-surface-base ${
+                        isActive
+                          ? 'bg-gold-base/10 text-gold-base border border-gold-base/30'
+                          : 'text-content-muted hover:text-content-base hover:bg-surface-base'
+                      }`}
+                    >
+                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted group-hover:text-content-base'}`} />
+                      <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
+                      {isActive && (
+                        <ChevronRight className="w-3.5 h-3.5 text-gold-base shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             );
           })}
         </nav>
@@ -456,27 +454,39 @@ export const AdminLayout: React.FC = () => {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                
+            <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto custom-scrollbar">
+              {sectionOrder.map((section) => {
+                const itemsInSection = navItems.filter((item) => item.section === section);
+                if (itemsInSection.length === 0) return null;
+
                 return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActiveTab(item.id);
-                      setSidebarOpen(false);
-                    }}
-                    className={`w-full h-11 px-3 rounded-md text-xs font-semibold flex items-center gap-3 transition-colors active:bg-surface-base ${
-                      isActive
-                        ? 'bg-gold-base/10 text-gold-base border border-gold-base/30'
-                        : 'text-content-muted hover:text-content-base hover:bg-surface-base'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted'}`} />
-                    <span className="truncate flex-1 text-left min-w-0">{item.label}</span>
-                  </button>
+                  <div key={section} className="space-y-1">
+                    <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-content-muted/70">
+                      {sectionLabels[section]}
+                    </p>
+                    {itemsInSection.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = activeTab === item.id;
+
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            setActiveTab(item.id);
+                            setSidebarOpen(false);
+                          }}
+                          className={`w-full h-11 px-3 rounded-md text-xs font-semibold flex items-center gap-3 transition-colors active:bg-surface-base ${
+                            isActive
+                              ? 'bg-gold-base/10 text-gold-base border border-gold-base/30'
+                              : 'text-content-muted hover:text-content-base hover:bg-surface-base'
+                          }`}
+                        >
+                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted'}`} />
+                          <span className="truncate flex-1 text-left min-w-0">{item.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 );
               })}
             </nav>
@@ -507,4 +517,5 @@ export const AdminLayout: React.FC = () => {
     </div>
   );
 };
+
 

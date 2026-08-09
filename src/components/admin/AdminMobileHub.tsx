@@ -15,13 +15,11 @@ import {
   FileText,
   Wallet,
   ShieldCheck,
-  CreditCard,
-  DollarSign,
-  Activity,
   MessageSquare,
-  QrCode
+  QrCode,
+  Heart
 } from 'lucide-react';
-import { AdminTab } from './AdminLayout';
+import { AdminTab, AdminSection } from './AdminLayout';
 import { 
   fetchAppointmentsFromSupabase, 
   getQueueFromSupabase, 
@@ -33,6 +31,16 @@ interface AdminMobileHubProps {
   onSelectTab: (tab: AdminTab) => void;
   adminName: string;
   onLogout: () => void;
+}
+
+interface HubModule {
+  id: AdminTab;
+  title: string;
+  subtitle: string;
+  icon: React.ElementType;
+  badge?: string | number;
+  badgeTone?: 'success' | 'warning' | 'neutral';
+  featured?: boolean;
 }
 
 export const AdminMobileHub: React.FC<AdminMobileHubProps> = ({
@@ -95,6 +103,160 @@ export const AdminMobileHub: React.FC<AdminMobileHubProps> = ({
   }, []);
 
   const adminInitials = adminName ? adminName.substring(0, 2).toUpperCase() : 'BA';
+
+  // Estrutura de seções inteligente: agrupa por intenção do usuário
+  // (o que ele veio fazer agora) em vez de listar 20 módulos soltos.
+  // A ordem das seções segue a frequência de uso no dia a dia de uma barbearia:
+  // 1) operar o balcão, 2) dinheiro, 3) cadastros, 4) relacionamento com cliente, 5) sistema.
+  const sections: { id: AdminSection; label: string; hint: string; modules: HubModule[] }[] = [
+    {
+      id: 'operacao',
+      label: 'Operação do Dia',
+      hint: 'O que você usa a toda hora',
+      modules: [
+        {
+          id: 'pdv',
+          title: 'PDV / Caixa',
+          subtitle: 'Abrir caixa e registrar vendas',
+          icon: Receipt,
+          badge: 'Principal',
+          badgeTone: 'neutral',
+          featured: true,
+        },
+        {
+          id: 'agenda',
+          title: 'Agenda',
+          subtitle: 'Horários do dia',
+          icon: Calendar,
+          badge: loading ? undefined : todayAppointmentsCount,
+          badgeTone: 'success',
+        },
+        {
+          id: 'queue',
+          title: 'Fila',
+          subtitle: 'Clientes aguardando',
+          icon: Clock,
+          badge: loading ? undefined : queueCount,
+          badgeTone: 'warning',
+        },
+        {
+          id: 'comandas',
+          title: 'Comandas',
+          subtitle: 'Fechamento de conta',
+          icon: FileText,
+        },
+        {
+          id: 'dashboard',
+          title: 'Dashboard',
+          subtitle: 'Visão geral do negócio',
+          icon: TrendingUp,
+        },
+      ],
+    },
+    {
+      id: 'financeiro',
+      label: 'Financeiro',
+      hint: 'Caixa, extrato, contas e relatórios em um só lugar',
+      modules: [
+        {
+          id: 'financeiro',
+          title: 'Financeiro',
+          subtitle: 'Caixa · Extrato · A Pagar · Saúde · Relatórios',
+          icon: Wallet,
+          badge: revenueToday >= 1000 ? `R$${(revenueToday / 1000).toFixed(1)}k hoje` : `R$${revenueToday.toFixed(0)} hoje`,
+          badgeTone: 'success',
+          featured: true,
+        },
+      ],
+    },
+    {
+      id: 'cadastros',
+      label: 'Cadastros',
+      hint: 'Serviços, equipe e clientes',
+      modules: [
+        {
+          id: 'servicos',
+          title: 'Serviços',
+          subtitle: `${servicesCount} itens`,
+          icon: Scissors,
+        },
+        {
+          id: 'profissionais',
+          title: 'Equipe',
+          subtitle: `${professionalsCount} barbeiros`,
+          icon: Users,
+        },
+        {
+          id: 'clientes',
+          title: 'Clientes',
+          subtitle: `${clientCount} cadastrados`,
+          icon: UserCheck,
+        },
+      ],
+    },
+    {
+      id: 'relacionamento',
+      label: 'Relacionamento',
+      hint: 'Fidelização e canais com o cliente',
+      modules: [
+        {
+          id: 'rewards',
+          title: 'Rewards',
+          subtitle: 'Fidelidade e NPS',
+          icon: Award,
+        },
+        {
+          id: 'subscriptions',
+          title: 'Assinaturas',
+          subtitle: 'Clube VIP',
+          icon: Heart,
+        },
+        {
+          id: 'whatsapp',
+          title: 'WhatsApp',
+          subtitle: 'Notificações',
+          icon: MessageSquare,
+        },
+        {
+          id: 'qrcode',
+          title: 'QR Code',
+          subtitle: 'Totem de balcão',
+          icon: QrCode,
+        },
+      ],
+    },
+    {
+      id: 'sistema',
+      label: 'Sistema',
+      hint: 'Configuração e controle',
+      modules: [
+        {
+          id: 'barbearia',
+          title: 'Unidade',
+          subtitle: 'Perfil & lojas',
+          icon: Store,
+        },
+        {
+          id: 'audit',
+          title: 'Auditoria',
+          subtitle: 'Logs de sistema',
+          icon: ShieldCheck,
+        },
+        {
+          id: 'settings',
+          title: 'Ajustes',
+          subtitle: 'Configurar sistema',
+          icon: Settings,
+        },
+      ],
+    },
+  ];
+
+  const badgeToneClass: Record<NonNullable<HubModule['badgeTone']>, string> = {
+    success: 'text-status-success bg-status-success/10 border-status-success/30',
+    warning: 'text-amber-400 bg-amber-400/10 border-amber-400/30',
+    neutral: 'text-gold-base bg-gold-base/10 border-gold-base/30',
+  };
 
   return (
     <div className="min-h-full bg-surface-base text-content-base font-sans pb-10">
@@ -165,274 +327,74 @@ export const AdminMobileHub: React.FC<AdminMobileHubProps> = ({
         </div>
       </section>
 
-      {/* Grid de Módulos */}
-      <main className="px-4 pb-12">
-        <p className="text-xs text-content-muted uppercase tracking-wider mb-3 mt-2 font-bold">Módulos</p>
-        <div className="grid grid-cols-2 gap-3">
-
-          {/* PDV / Caixa (destaque col-span-2) */}
-          <div 
-            onClick={() => onSelectTab('pdv')}
-            className="col-span-2 bg-surface-card border border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer relative overflow-hidden shadow-md hover:border-gold-base group"
-          >
-            <div className="absolute -right-4 -top-4 w-24 h-24 bg-gold-base/10 rounded-full blur-xl pointer-events-none" />
-            <div className="flex items-center gap-4 relative z-10">
-              <div className="w-12 h-12 rounded-xl bg-gold-base/15 flex items-center justify-center flex-shrink-0 text-gold-base group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-                <Receipt className="w-6 h-6" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-content-base text-base">PDV / Caixa</h3>
-                  <span className="text-[10px] text-gold-base bg-gold-base/10 border border-gold-base/30 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
-                    Principal
-                  </span>
-                </div>
-                <p className="text-xs text-content-muted mt-0.5 truncate">Abrir caixa e registrar vendas</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-content-muted group-hover:text-gold-base flex-shrink-0 transition-colors" />
+      {/* Seções agrupadas de módulos */}
+      <main className="px-4 pb-12 space-y-7">
+        {sections.map((section) => (
+          <section key={section.id}>
+            <div className="flex items-baseline justify-between mb-3 mt-2">
+              <p className="text-xs text-content-base uppercase tracking-wider font-bold">{section.label}</p>
+              <p className="text-[10px] text-content-muted truncate ml-3">{section.hint}</p>
             </div>
-          </div>
 
-          {/* Comandas */}
-          <div 
-            onClick={() => onSelectTab('comandas')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <FileText className="w-5 h-5" />
+            <div className="grid grid-cols-2 gap-3">
+              {section.modules.map((mod) => {
+                const Icon = mod.icon;
+
+                if (mod.featured) {
+                  return (
+                    <div
+                      key={mod.id}
+                      onClick={() => onSelectTab(mod.id)}
+                      className="col-span-2 bg-surface-card border border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer relative overflow-hidden shadow-md hover:border-gold-base group"
+                    >
+                      <div className="absolute -right-4 -top-4 w-24 h-24 bg-gold-base/10 rounded-full blur-xl pointer-events-none" />
+                      <div className="flex items-center gap-4 relative z-10">
+                        <div className="w-12 h-12 rounded-xl bg-gold-base/15 flex items-center justify-center flex-shrink-0 text-gold-base group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
+                          <Icon className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-semibold text-content-base text-base">{mod.title}</h3>
+                            {mod.badge && (
+                              <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider border ${badgeToneClass[mod.badgeTone ?? 'neutral']}`}>
+                                {mod.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-content-muted mt-0.5 truncate">{mod.subtitle}</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-content-muted group-hover:text-gold-base flex-shrink-0 transition-colors" />
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={mod.id}
+                    onClick={() => onSelectTab(mod.id)}
+                    className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      {mod.badge !== undefined && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${badgeToneClass[mod.badgeTone ?? 'neutral']}`}>
+                          {mod.badge}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-semibold text-sm text-content-base">{mod.title}</h3>
+                    <p className="text-[11px] text-content-muted mt-0.5 truncate">{mod.subtitle}</p>
+                  </div>
+                );
+              })}
             </div>
-            <h3 className="font-semibold text-sm text-content-base">Comandas</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Fechamento</p>
-          </div>
-
-          {/* Gestão de Caixa */}
-          <div 
-            onClick={() => onSelectTab('caixa')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <Wallet className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Caixa</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Sangria e troco</p>
-          </div>
-
-          {/* Relatórios */}
-          <div 
-            onClick={() => onSelectTab('reports')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Relatórios</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Desempenho</p>
-          </div>
-
-          {/* Assinaturas */}
-          <div 
-            onClick={() => onSelectTab('subscriptions')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <Award className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Assinaturas</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Clube VIP</p>
-          </div>
-
-          {/* Contas a Pagar */}
-          <div 
-            onClick={() => onSelectTab('payable')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <CreditCard className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">A Pagar</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Contas e boletos</p>
-          </div>
-
-          {/* Extrato Financeiro */}
-          <div 
-            onClick={() => onSelectTab('financial_statement')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <DollarSign className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Extrato</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Histórico</p>
-          </div>
-
-          {/* Saúde Financeira */}
-          <div 
-            onClick={() => onSelectTab('financial_health')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <Activity className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Saúde</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Break-even</p>
-          </div>
-
-          {/* Logs */}
-          <div 
-            onClick={() => onSelectTab('audit')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Auditoria</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Logs de sistema</p>
-          </div>
-
-          {/* Painel WhatsApp */}
-          <div 
-            onClick={() => onSelectTab('whatsapp')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <MessageSquare className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">WhatsApp</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Notificações</p>
-          </div>
-
-          {/* QR Code */}
-          <div 
-            onClick={() => onSelectTab('qrcode')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <QrCode className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">QR Code</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Totem de balcão</p>
-          </div>
-
-          {/* Dashboard */}
-          <div 
-            onClick={() => onSelectTab('dashboard')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Dashboard</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Visão geral</p>
-          </div>
-
-          {/* Agenda */}
-          <div 
-            onClick={() => onSelectTab('agenda')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-                <Calendar className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] text-status-success bg-status-success/10 border border-status-success/30 px-2 py-0.5 rounded-full font-bold">
-                {todayAppointmentsCount}
-              </span>
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Agenda</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Horários</p>
-          </div>
-
-          {/* Fila de Espera */}
-          <div 
-            onClick={() => onSelectTab('queue')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-                <Clock className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] text-amber-400 bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded-full font-bold">
-                {queueCount}
-              </span>
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Fila</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Espera</p>
-          </div>
-
-          {/* Rewards & NPS */}
-          <div 
-            onClick={() => onSelectTab('rewards')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <Award className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Rewards</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Fidelidade</p>
-          </div>
-
-          {/* Serviços */}
-          <div 
-            onClick={() => onSelectTab('servicos')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <Scissors className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Serviços</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">{servicesCount} itens</p>
-          </div>
-
-          {/* Profissionais */}
-          <div 
-            onClick={() => onSelectTab('profissionais')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <Users className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Equipe</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">{professionalsCount} barbeiros</p>
-          </div>
-
-          {/* Clientes */}
-          <div 
-            onClick={() => onSelectTab('clientes')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <UserCheck className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Clientes</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">{clientCount}</p>
-          </div>
-
-          {/* Perfil & Unidade */}
-          <div 
-            onClick={() => onSelectTab('barbearia')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <Store className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Unidade</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Perfil & Lojas</p>
-          </div>
-
-          {/* Configurações */}
-          <div 
-            onClick={() => onSelectTab('settings')}
-            className="bg-surface-card border border-border-subtle hover:border-gold-base/50 rounded-2xl p-4 active:scale-[0.98] transition-all cursor-pointer group shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center mb-3 group-hover:bg-gold-base group-hover:text-surface-base transition-colors">
-              <Settings className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-sm text-content-base">Ajustes</h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Configurar</p>
-          </div>
-
-        </div>
+          </section>
+        ))}
       </main>
     </div>
   );
 };
+
