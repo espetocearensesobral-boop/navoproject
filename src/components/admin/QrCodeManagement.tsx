@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { QrCode, Download, Printer, Copy, Check, ExternalLink, Smartphone, Share2, Sparkles } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 
@@ -13,7 +14,7 @@ export const QrCodeManagement: React.FC = () => {
   };
 
   // Generate Google Chart API QR Code image URL for clean rendering
-  const qrCodeImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(bookingUrl)}&color=d4af37&bgcolor=141414`;
+  
 
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
@@ -44,11 +45,7 @@ export const QrCodeManagement: React.FC = () => {
 
           {/* QR Code Container */}
           <div className="bg-surface-base p-4 rounded-2xl border-2 border-gold-base/60 inline-block shadow-inner mx-auto">
-            <img
-              src={qrCodeImageUrl}
-              alt="QR Code de Agendamento NAVO"
-              className="w-48 h-48 rounded-xl mx-auto"
-            />
+            <QRCodeSVG value={bookingUrl} size={192} fgColor="#d4af37" bgColor="#141414" className="mx-auto" />
           </div>
 
           <div className="space-y-1 text-xs font-sans">

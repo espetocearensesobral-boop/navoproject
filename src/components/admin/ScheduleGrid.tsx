@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Appointment, Professional } from '../../types';
+import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   fetchAppointmentsFromSupabase,
   fetchProfessionalsFromSupabase,
@@ -214,7 +215,7 @@ export const ScheduleGrid: React.FC = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-surface-base border border-border-subtle text-xs font-bold text-content-base rounded-xl px-2.5 py-1.5 outline-none focus:border-[#FFFFFF] max-w-[130px]"
+              className="bg-surface-base border border-border-subtle text-xs font-bold text-content-base rounded-xl px-2.5 py-1.5 outline-none focus:border-gold-base max-w-[130px]"
             />
           </div>
 
@@ -243,7 +244,7 @@ export const ScheduleGrid: React.FC = () => {
             onClick={() => setSelectedBarberId('all')}
             className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
               selectedBarberId === 'all'
-                ? 'bg-gold-base text-surface-base border-[#FFFFFF]'
+                ? 'bg-gold-base text-surface-base border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
@@ -255,7 +256,7 @@ export const ScheduleGrid: React.FC = () => {
               onClick={() => setSelectedBarberId(b.id)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 border ${
                 selectedBarberId === b.id
-                  ? 'bg-gold-base text-surface-base border-[#FFFFFF]'
+                  ? 'bg-gold-base text-surface-base border-gold-base'
                   : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
               }`}
             >
@@ -299,10 +300,10 @@ export const ScheduleGrid: React.FC = () => {
                           setManualBookingForm(prev => ({ ...prev, time_slot: slot }));
                           setIsManualBookingOpen(true);
                         }}
-                        className="py-1 px-2.5 rounded-xl bg-surface-base/50 border border-dashed border-border-subtle hover:border-border-subtle flex items-center justify-between text-[11px] text-[#555555] cursor-pointer group"
+                        className="py-1 px-2.5 rounded-xl bg-surface-base/50 border border-dashed border-border-subtle hover:border-border-subtle flex items-center justify-between text-[11px] text-content-muted cursor-pointer group"
                       >
                         <span>Livre</span>
-                        <Plus className="w-3 h-3 text-[#444444] group-hover:text-gold-hover" />
+                        <Plus className="w-3 h-3 text-content-muted group-hover:text-gold-hover" />
                       </div>
                     ) : (
                       slotAppointments.map(({ barber, apt, block }) => {
@@ -328,7 +329,7 @@ export const ScheduleGrid: React.FC = () => {
                                 <span className="font-bold text-gold-hover text-[11px] shrink-0">R$ {apt.final_amount ? Number(apt.final_amount).toFixed(2) : '60.00'}</span>
                               </div>
                               <div className="flex justify-between items-center text-[10px] text-content-muted">
-                                <span className="truncate">{(apt.services && apt.services[0]?.title) || 'Atendimento'} • <strong className="text-[#A67B5B]">{barber.name}</strong></span>
+                                <span className="truncate">{(apt.services && apt.services[0]?.title) || 'Atendimento'} • <strong className="text-gold-base">{barber.name}</strong></span>
                                 <span className={`px-2 py-0.5 rounded-full font-semibold text-[9px] shrink-0 ${
                                   isPending
                                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
@@ -399,13 +400,13 @@ export const ScheduleGrid: React.FC = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-surface-base border border-border-subtle text-xs text-content-base rounded-xl px-3 py-2 outline-none focus:border-[#FFFFFF]"
+              className="bg-surface-base border border-border-subtle text-xs text-content-base rounded-xl px-3 py-2 outline-none focus:border-gold-base"
             />
 
             <select
               value={selectedBarberId}
               onChange={(e) => setSelectedBarberId(e.target.value)}
-              className="bg-surface-base border border-border-subtle text-xs text-content-base rounded-xl px-3 py-2 outline-none focus:border-[#FFFFFF]"
+              className="bg-surface-base border border-border-subtle text-xs text-content-base rounded-xl px-3 py-2 outline-none focus:border-gold-base"
             >
               <option value="all">💈 Todos os Barbeiros</option>
               {barbers.map(b => (
@@ -436,7 +437,7 @@ export const ScheduleGrid: React.FC = () => {
               <div className="col-span-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-x divide-[#2A2A2A]">
                 {activeBarbers.map(barber => (
                   <div key={barber.id} className="p-3 flex items-center justify-center space-x-2">
-                    <img src={barber.photo_url} alt={barber.name} className="w-6 h-6 rounded-full object-cover border border-[#FFFFFF]" />
+                    <img src={barber.photo_url} alt={barber.name} className="w-6 h-6 rounded-full object-cover border border-gold-base" />
                     <span className="text-content-base font-bold">{barber.name}</span>
                   </div>
                 ))}
@@ -447,7 +448,7 @@ export const ScheduleGrid: React.FC = () => {
             <div className="divide-y divide-[#2A2A2A]">
               {timeSlots.map(slot => {
                 return (
-                  <div key={slot} className="grid grid-cols-12 hover:bg-[#1C1C1C] transition-colors">
+                  <div key={slot} className="grid grid-cols-12 hover:bg-surface-card transition-colors">
                     {/* Time Label */}
                     <div className="col-span-2 p-3 border-r border-border-subtle text-center text-xs font-bold text-gold-hover flex items-center justify-center">
                       {slot}
@@ -499,7 +500,7 @@ export const ScheduleGrid: React.FC = () => {
                                 </button>
                               </div>
                             ) : (
-                              <span className="text-[10px] text-[#444444] italic">Disponível</span>
+                              <span className="text-[10px] text-content-muted italic">Disponível</span>
                             )}
                           </div>
                         );
@@ -527,9 +528,9 @@ export const ScheduleGrid: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleAddBlock} className="p-5 space-y-4">
+            <form onKeyDown={handleEnterAsTab} onSubmit={handleAddBlock} className="p-5 space-y-4">
               <div>
-                <label className="text-xs font-bold text-[#E6D4B5] block mb-1">Barbeiro *</label>
+                <label className="text-xs font-bold text-gold-base block mb-1">Barbeiro *</label>
                 <select
                   value={blockForm.professional_id}
                   onChange={(e) => setBlockForm({ ...blockForm, professional_id: e.target.value })}
@@ -542,7 +543,7 @@ export const ScheduleGrid: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[#E6D4B5] block mb-1">Horário a Bloquear *</label>
+                <label className="text-xs font-bold text-gold-base block mb-1">Horário a Bloquear *</label>
                 <select
                   value={blockForm.time_slot}
                   onChange={(e) => setBlockForm({ ...blockForm, time_slot: e.target.value })}
@@ -555,7 +556,7 @@ export const ScheduleGrid: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[#E6D4B5] block mb-1">Motivo do Bloqueio *</label>
+                <label className="text-xs font-bold text-gold-base block mb-1">Motivo do Bloqueio *</label>
                 <input
                   type="text"
                   value={blockForm.reason}
@@ -600,9 +601,9 @@ export const ScheduleGrid: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleManualBookingSubmit} className="p-5 space-y-4">
+            <form onKeyDown={handleEnterAsTab} onSubmit={handleManualBookingSubmit} className="p-5 space-y-4">
               <div>
-                <label className="text-xs font-bold text-[#E6D4B5] block mb-1">Nome do Cliente *</label>
+                <label className="text-xs font-bold text-gold-base block mb-1">Nome do Cliente *</label>
                 <input
                   type="text"
                   value={manualBookingForm.client_name}
@@ -615,7 +616,7 @@ export const ScheduleGrid: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-[#E6D4B5] block mb-1">Telefone WhatsApp</label>
+                  <label className="text-xs font-bold text-gold-base block mb-1">Telefone WhatsApp</label>
                   <input
                     type="text"
                     value={manualBookingForm.client_phone}
@@ -626,7 +627,7 @@ export const ScheduleGrid: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-[#E6D4B5] block mb-1">Barbeiro *</label>
+                  <label className="text-xs font-bold text-gold-base block mb-1">Barbeiro *</label>
                   <select
                     value={manualBookingForm.professional_id}
                     onChange={(e) => setManualBookingForm({ ...manualBookingForm, professional_id: e.target.value })}
@@ -641,7 +642,7 @@ export const ScheduleGrid: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-[#E6D4B5] block mb-1">Serviço</label>
+                  <label className="text-xs font-bold text-gold-base block mb-1">Serviço</label>
                   <input
                     type="text"
                     value={manualBookingForm.service_title}
@@ -651,7 +652,7 @@ export const ScheduleGrid: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-[#E6D4B5] block mb-1">Horário *</label>
+                  <label className="text-xs font-bold text-gold-base block mb-1">Horário *</label>
                   <select
                     value={manualBookingForm.time_slot}
                     onChange={(e) => setManualBookingForm({ ...manualBookingForm, time_slot: e.target.value })}
@@ -665,7 +666,7 @@ export const ScheduleGrid: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[#E6D4B5] block mb-1">Valor Cobrado (R$) *</label>
+                <label className="text-xs font-bold text-gold-base block mb-1">Valor Cobrado (R$) *</label>
                 <input
                   type="number"
                   step="0.01"

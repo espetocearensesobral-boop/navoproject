@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { handleEnterAsTab } from '../../utils/formUtils';
 import { 
   fetchAppointmentsFromSupabase, 
   fetchServicesFromSupabase, 
@@ -596,7 +597,7 @@ export const ComandasManagement: React.FC = () => {
 
       {/* VIEW 3: NEW COMANDA FORM */}
       {activeTab === 'new' && (
-        <form onSubmit={handleCreateComanda} className="bg-surface-card border border-border-subtle rounded-2xl p-5 space-y-5 shadow-xs max-w-2xl mx-auto">
+        <form onKeyDown={handleEnterAsTab} onSubmit={handleCreateComanda} className="bg-surface-card border border-border-subtle rounded-2xl p-5 space-y-5 shadow-xs max-w-2xl mx-auto">
           <div className="border-b border-border-subtle pb-3">
             <h2 className="text-base font-bold text-content-base flex items-center gap-2">
               <Plus className="w-5 h-5 text-gold-base" />

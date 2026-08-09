@@ -369,7 +369,7 @@ export const ProfessionalsManagement: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nome, apelido, cargo ou especialidade..."
-            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
           />
         </div>
 
@@ -461,7 +461,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           <img
                             src={barber.photo_url}
                             alt={barber.name}
-                            className="w-12 h-12 rounded-xl object-cover border border-[#FFFFFF]/40"
+                            className="w-12 h-12 rounded-xl object-cover border border-gold-base/40"
                           />
                           <button
                             onClick={() => handleToggleStatus(barber)}
@@ -618,7 +618,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           <img
                             src={barber.photo_url}
                             alt={barber.name}
-                            className="w-8 h-8 rounded-lg object-cover border border-[#FFFFFF]/40"
+                            className="w-8 h-8 rounded-lg object-cover border border-gold-base/40"
                           />
                           <div>
                             <p className="font-bold text-content-base text-xs">{barber.name}</p>
@@ -682,11 +682,11 @@ export const ProfessionalsManagement: React.FC = () => {
       {/* CREATE/EDIT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
+          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
             {/* Header */}
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center gap-2 shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-hover shrink-0">
                   <Users className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
@@ -772,7 +772,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Ex: Carlos Eduardo Silva"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                       />
                     </div>
 
@@ -785,7 +785,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.nickname}
                         onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
                         placeholder="Ex: Carlão Fade"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                       />
                     </div>
                   </div>
@@ -800,7 +800,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.role}
                         onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                         placeholder="Master Barber"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                       />
                     </div>
 
@@ -813,7 +813,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.phone || ''}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="(11) 99887-6655"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                       />
                     </div>
                   </div>
@@ -827,7 +827,7 @@ export const ProfessionalsManagement: React.FC = () => {
                       value={formData.bio || ''}
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       placeholder="Descreva a experiência do profissional..."
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] resize-none"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base resize-none"
                     />
                   </div>
 
@@ -841,14 +841,14 @@ export const ProfessionalsManagement: React.FC = () => {
                       <img
                         src={formData.photo_url}
                         alt="Preview"
-                        className="w-10 h-10 rounded-xl object-cover border border-[#FFFFFF]"
+                        className="w-10 h-10 rounded-xl object-cover border border-gold-base"
                       />
                       <input
                         type="url"
                         value={formData.photo_url || ''}
                         onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
                         placeholder="URL da imagem..."
-                        className="flex-1 bg-surface-card border border-border-subtle rounded-xl px-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="flex-1 bg-surface-card border border-border-subtle rounded-xl px-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
                       />
                     </div>
 
@@ -859,7 +859,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           type="button"
                           onClick={() => setFormData({ ...formData, photo_url: preset.url })}
                           className={`rounded-lg overflow-hidden border transition-all ${
-                            formData.photo_url === preset.url ? 'border-[#FFFFFF] ring-1 ring-[#FFFFFF]' : 'border-border-subtle opacity-70'
+                            formData.photo_url === preset.url ? 'border-gold-base ring-1 ring-gold-base' : 'border-border-subtle opacity-70'
                           }`}
                         >
                           <img src={preset.url} alt={preset.name} className="w-full h-8 object-cover" />
@@ -882,7 +882,7 @@ export const ProfessionalsManagement: React.FC = () => {
                       value={specialtiesText}
                       onChange={(e) => setSpecialtiesText(e.target.value)}
                       placeholder="Degradê / Fade, Barboterapia Imperial"
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                     />
                   </div>
 
@@ -923,7 +923,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         required
                         value={formData.commission_rate}
                         onChange={(e) => setFormData({ ...formData, commission_rate: Number(e.target.value) })}
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs font-bold text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base"
                       />
                     </div>
 
@@ -936,7 +936,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.pix_key || ''}
                         onChange={(e) => setFormData({ ...formData, pix_key: e.target.value })}
                         placeholder="CPF, e-mail ou telefone"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                       />
                     </div>
                   </div>

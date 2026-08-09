@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { handleEnterAsTab } from '../../utils/formUtils';
 import { 
   Wallet, 
   DollarSign, 
@@ -478,7 +479,7 @@ export const CaixaManagement: React.FC = () => {
       {/* MODAL: OPEN CAIXA */}
       {isOpeningModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <form onSubmit={handleConfirmOpenCaixa} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in">
+          <form onKeyDown={handleEnterAsTab} onSubmit={handleConfirmOpenCaixa} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in">
             <button
               type="button"
               onClick={() => setIsOpeningModalOpen(false)}
@@ -543,7 +544,7 @@ export const CaixaManagement: React.FC = () => {
       {/* MODAL: MOVEMENT (SUPRIMENTO / SANGRIA) */}
       {isMovementModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <form onSubmit={handleConfirmMovement} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in">
+          <form onKeyDown={handleEnterAsTab} onSubmit={handleConfirmMovement} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in">
             <button
               type="button"
               onClick={() => setIsMovementModalOpen(false)}
@@ -631,7 +632,7 @@ export const CaixaManagement: React.FC = () => {
       {/* MODAL: CLOSE CAIXA */}
       {isClosingModalOpen && currentSession && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <form onSubmit={handleConfirmCloseCaixa} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in">
+          <form onKeyDown={handleEnterAsTab} onSubmit={handleConfirmCloseCaixa} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in">
             <button
               type="button"
               onClick={() => setIsClosingModalOpen(false)}

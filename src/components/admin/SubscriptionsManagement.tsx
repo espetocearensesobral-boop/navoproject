@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { handleEnterAsTab } from '../../utils/formUtils';
 import { 
   Award, 
   Plus, 
@@ -379,7 +380,7 @@ export const SubscriptionsManagement: React.FC = () => {
       {/* CREATE PLAN MODAL */}
       {isPlanModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <form onSubmit={handleCreatePlan} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in">
+          <form onKeyDown={handleEnterAsTab} onSubmit={handleCreatePlan} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-md p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in">
             <button
               type="button"
               onClick={() => setIsPlanModalOpen(false)}

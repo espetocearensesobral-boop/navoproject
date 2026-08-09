@@ -366,7 +366,7 @@ export const ServicesManagement: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar serviço..."
-              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-2.5 py-1.5 text-xs text-content-base placeholder-[#666666] outline-none focus:border-[#FFFFFF]"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-2.5 py-1.5 text-xs text-content-base placeholder-[#666666] outline-none focus:border-gold-base"
             />
           </div>
         </div>
@@ -377,7 +377,7 @@ export const ServicesManagement: React.FC = () => {
             onClick={() => { setSelectedCategory('all'); setFilterType('all'); }}
             className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
               selectedCategory === 'all' && filterType === 'all'
-                ? 'bg-gold-base text-surface-base border-[#FFFFFF]'
+                ? 'bg-gold-base text-surface-base border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
@@ -399,7 +399,7 @@ export const ServicesManagement: React.FC = () => {
             onClick={() => setFilterType(filterType === 'popular' ? 'all' : 'popular')}
             className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
               filterType === 'popular'
-                ? 'bg-gold-base text-surface-base border-[#FFFFFF]'
+                ? 'bg-gold-base text-surface-base border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
@@ -412,7 +412,7 @@ export const ServicesManagement: React.FC = () => {
               onClick={() => { setSelectedCategory(cat.id); setFilterType('all'); }}
               className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
                 selectedCategory === cat.id && filterType === 'all'
-                  ? 'bg-gold-base text-surface-base border-[#FFFFFF]'
+                  ? 'bg-gold-base text-surface-base border-gold-base'
                   : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
               }`}
             >
@@ -527,7 +527,7 @@ export const ServicesManagement: React.FC = () => {
       <div className="bg-surface-card p-4 rounded-2xl border border-border-subtle flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
         {/* Search */}
         <div className="relative w-full lg:w-72">
-          <Search className="w-4 h-4 text-[#8B8B8B] absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-content-muted absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
@@ -559,7 +559,7 @@ export const ServicesManagement: React.FC = () => {
             <button
               onClick={() => setFilterType('all')}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
-                filterType === 'all' ? 'bg-gold-base text-surface-base shadow' : 'text-[#8B8B8B] hover:text-content-base'
+                filterType === 'all' ? 'bg-gold-base text-surface-base shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
               Todos
@@ -567,7 +567,7 @@ export const ServicesManagement: React.FC = () => {
             <button
               onClick={() => setFilterType('combos')}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
-                filterType === 'combos' ? 'bg-status-success text-surface-base shadow' : 'text-[#8B8B8B] hover:text-content-base'
+                filterType === 'combos' ? 'bg-status-success text-surface-base shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
               Combos VIP
@@ -575,7 +575,7 @@ export const ServicesManagement: React.FC = () => {
             <button
               onClick={() => setFilterType('popular')}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
-                filterType === 'popular' ? 'bg-gold-base/30 text-gold-base shadow' : 'text-[#8B8B8B] hover:text-content-base'
+                filterType === 'popular' ? 'bg-gold-base/30 text-gold-base shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
               Mais Pedidos
@@ -583,7 +583,7 @@ export const ServicesManagement: React.FC = () => {
             <button
               onClick={() => setFilterType('gallery')}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
-                filterType === 'gallery' ? 'bg-blue-500/30 text-blue-300 shadow' : 'text-[#8B8B8B] hover:text-content-base'
+                filterType === 'gallery' ? 'bg-blue-500/30 text-blue-300 shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
               Com Galeria
@@ -595,7 +595,7 @@ export const ServicesManagement: React.FC = () => {
             <button
               onClick={() => setViewMode('table')}
               className={`p-1.5 rounded-lg text-xs transition-all ${
-                viewMode === 'table' ? 'bg-surface-card text-gold-base' : 'text-[#8B8B8B] hover:text-content-base'
+                viewMode === 'table' ? 'bg-surface-card text-gold-base' : 'text-content-muted hover:text-content-base'
               }`}
               title="Visualização em Tabela"
             >
@@ -604,7 +604,7 @@ export const ServicesManagement: React.FC = () => {
             <button
               onClick={() => setViewMode('cards')}
               className={`p-1.5 rounded-lg text-xs transition-all ${
-                viewMode === 'cards' ? 'bg-surface-card text-gold-base' : 'text-[#8B8B8B] hover:text-content-base'
+                viewMode === 'cards' ? 'bg-surface-card text-gold-base' : 'text-content-muted hover:text-content-base'
               }`}
               title="Visualização em Cards"
             >
@@ -632,7 +632,7 @@ export const ServicesManagement: React.FC = () => {
             <tbody className="divide-y divide-[#2A2A2A] text-xs">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-[#8B8B8B]">
+                  <td colSpan={7} className="py-12 text-center text-content-muted">
                     <div className="flex items-center justify-center space-x-2">
                       <Scissors className="w-5 h-5 text-gold-base animate-spin" />
                       <span>Carregando cardápio de serviços...</span>
@@ -641,7 +641,7 @@ export const ServicesManagement: React.FC = () => {
                 </tr>
               ) : filteredServices.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-[#8B8B8B]">
+                  <td colSpan={7} className="py-12 text-center text-content-muted">
                     Nenhum serviço encontrado com os filtros atuais.
                   </td>
                 </tr>
@@ -653,7 +653,7 @@ export const ServicesManagement: React.FC = () => {
                     : service.image_url ? [service.image_url] : [];
 
                   return (
-                    <tr key={service.id} className="hover:bg-[#242424] transition-colors group">
+                    <tr key={service.id} className="hover:bg-surface-card transition-colors group">
                       {/* Photo Thumbnail & Lightbox Click */}
                       <td className="py-3 px-4 whitespace-nowrap">
                         <div
@@ -690,7 +690,7 @@ export const ServicesManagement: React.FC = () => {
                           <span className="font-serif text-content-base font-semibold text-sm block group-hover:text-gold-base transition-colors truncate">
                             {service.title}
                           </span>
-                          <span className="text-[11px] text-[#8B8B8B] block truncate" title={service.description}>
+                          <span className="text-[11px] text-content-muted block truncate" title={service.description}>
                             {service.description || 'Sem descrição cadastrada'}
                           </span>
                         </div>
@@ -698,14 +698,14 @@ export const ServicesManagement: React.FC = () => {
 
                       {/* Category */}
                       <td className="py-3 px-4 whitespace-nowrap">
-                        <span className="px-2.5 py-1 rounded-lg bg-surface-card text-[#E6D4B5] text-[10px] font-bold border border-border-subtle">
+                        <span className="px-2.5 py-1 rounded-lg bg-surface-card text-gold-base text-[10px] font-bold border border-border-subtle">
                           {categoryName}
                         </span>
                       </td>
 
                       {/* Duration */}
                       <td className="py-3 px-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-1.5 text-[#E6D4B5] font-semibold">
+                        <div className="flex items-center space-x-1.5 text-gold-base font-semibold">
                           <Clock className="w-3.5 h-3.5 text-gold-base" />
                           <span>{service.duration_minutes} min</span>
                         </div>
@@ -719,7 +719,7 @@ export const ServicesManagement: React.FC = () => {
                               R$ {service.price.toFixed(2)}
                             </span>
                             {service.original_price && service.original_price > service.price && (
-                              <span className="text-[10px] text-[#8B8B8B] line-through">
+                              <span className="text-[10px] text-content-muted line-through">
                                 R$ {service.original_price.toFixed(2)}
                               </span>
                             )}
@@ -742,7 +742,7 @@ export const ServicesManagement: React.FC = () => {
                             className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all border ${
                               service.is_combo
                                 ? 'bg-status-success text-surface-base border-[#00A86B] shadow-sm'
-                                : 'bg-surface-card text-[#8B8B8B] border-border-subtle hover:text-content-base'
+                                : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
                             }`}
                           >
                             {service.is_combo ? '🔥 Combo VIP' : '+ Combo'}
@@ -755,7 +755,7 @@ export const ServicesManagement: React.FC = () => {
                             className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase transition-all border ${
                               service.popular
                                 ? 'bg-gold-base/20 text-gold-base border-gold-base/40 shadow-sm'
-                                : 'bg-surface-card text-[#8B8B8B] border-border-subtle hover:text-content-base'
+                                : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
                             }`}
                           >
                             {service.popular ? '⭐ Destaque' : '+ Destaque'}
@@ -769,7 +769,7 @@ export const ServicesManagement: React.FC = () => {
                           {/* Duplicate */}
                           <button
                             onClick={() => handleDuplicate(service)}
-                            className="p-1.5 rounded-lg bg-surface-card hover:bg-[#333333] text-[#8B8B8B] hover:text-content-base border border-border-subtle"
+                            className="p-1.5 rounded-lg bg-surface-card hover:bg-surface-base text-content-muted hover:text-content-base border border-border-subtle"
                             title="Duplicar / Clonar Serviço"
                           >
                             <Copy className="w-3.5 h-3.5" />
@@ -778,7 +778,7 @@ export const ServicesManagement: React.FC = () => {
                           {/* Edit */}
                           <button
                             onClick={() => handleOpenEdit(service)}
-                            className="px-2.5 py-1.5 rounded-lg bg-surface-card hover:bg-[#333333] text-content-base text-xs font-bold flex items-center space-x-1 border border-border-subtle"
+                            className="px-2.5 py-1.5 rounded-lg bg-surface-card hover:bg-surface-base text-content-base text-xs font-bold flex items-center space-x-1 border border-border-subtle"
                             title="Editar Serviço"
                           >
                             <Edit2 className="w-3.5 h-3.5 text-gold-base" />
@@ -902,7 +902,7 @@ export const ServicesManagement: React.FC = () => {
             {/* Modal Top Header */}
             <div className="p-3.5 sm:p-4 bg-surface-base border-b border-border-subtle flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
+                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-hover">
                   <Scissors className="w-4 h-4" />
                 </div>
                 <div>
@@ -983,7 +983,7 @@ export const ServicesManagement: React.FC = () => {
                           value={formData.title}
                           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                           placeholder="Ex: Corte Degradê Navalhado + Barba"
-                          className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                          className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2.5 text-xs text-content-base focus:border-gold-base outline-none"
                           required
                         />
                       </div>
@@ -996,7 +996,7 @@ export const ServicesManagement: React.FC = () => {
                           <select
                             value={formData.category_id}
                             onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-                            className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                            className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2.5 text-xs text-content-base focus:border-gold-base outline-none"
                           >
                             {DEFAULT_CATEGORIES.map((cat) => (
                               <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -1015,7 +1015,7 @@ export const ServicesManagement: React.FC = () => {
                               value={formData.duration_minutes}
                               onChange={(e) => setFormData({ ...formData, duration_minutes: Number(e.target.value) })}
                               placeholder="35"
-                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-gold-base outline-none"
                               required
                             />
                           </div>
@@ -1031,7 +1031,7 @@ export const ServicesManagement: React.FC = () => {
                           value={formData.description}
                           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                           placeholder="Descreva as etapas, produtos e o resultado..."
-                          className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:border-[#FFFFFF] outline-none resize-none"
+                          className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:border-gold-base outline-none resize-none"
                         />
                       </div>
 
@@ -1052,12 +1052,12 @@ export const ServicesManagement: React.FC = () => {
                             </div>
                           </label>
 
-                          <label className="flex items-center gap-2 p-2 rounded-xl bg-surface-card border border-border-subtle cursor-pointer hover:border-[#FFFFFF]/40">
+                          <label className="flex items-center gap-2 p-2 rounded-xl bg-surface-card border border-border-subtle cursor-pointer hover:border-gold-base/40">
                             <input
                               type="checkbox"
                               checked={formData.popular}
                               onChange={(e) => setFormData({ ...formData, popular: e.target.checked })}
-                              className="w-3.5 h-3.5 accent-[#FFFFFF]"
+                              className="w-3.5 h-3.5 accent-gold-base"
                             />
                             <div>
                               <span className="text-xs font-bold text-content-base block">⭐ Mais Pedido</span>
@@ -1085,7 +1085,7 @@ export const ServicesManagement: React.FC = () => {
                               value={formData.price}
                               onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                               placeholder="60.00"
-                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold text-content-base focus:border-[#FFFFFF] outline-none"
+                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold text-content-base focus:border-gold-base outline-none"
                               required
                             />
                           </div>
@@ -1103,7 +1103,7 @@ export const ServicesManagement: React.FC = () => {
                               value={formData.original_price || ''}
                               onChange={(e) => setFormData({ ...formData, original_price: e.target.value ? Number(e.target.value) : undefined })}
                               placeholder="75.00"
-                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-gold-base outline-none"
                             />
                           </div>
                         </div>
@@ -1147,7 +1147,7 @@ export const ServicesManagement: React.FC = () => {
                           value={formData.image_url || ''}
                           onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                           placeholder="https://..."
-                          className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                          className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:border-gold-base outline-none"
                         />
                       </div>
 
@@ -1161,7 +1161,7 @@ export const ServicesManagement: React.FC = () => {
                             value={newGalleryUrlInput}
                             onChange={(e) => setNewGalleryUrlInput(e.target.value)}
                             placeholder="Cole URL da foto..."
-                            className="flex-1 bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base outline-none focus:border-[#FFFFFF]"
+                            className="flex-1 bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base outline-none focus:border-gold-base"
                           />
                           <button
                             type="button"
@@ -1180,7 +1180,7 @@ export const ServicesManagement: React.FC = () => {
                                 key={idx}
                                 type="button"
                                 onClick={() => handleAddPresetImage(preset.url)}
-                                className="relative rounded-lg overflow-hidden h-12 border border-border-subtle hover:border-[#FFFFFF] text-left"
+                                className="relative rounded-lg overflow-hidden h-12 border border-border-subtle hover:border-gold-base text-left"
                               >
                                 <img src={preset.url} alt={preset.title} className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-surface-base/40 p-1 flex items-end">

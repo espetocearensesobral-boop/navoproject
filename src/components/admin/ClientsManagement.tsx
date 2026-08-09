@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Search, Edit2, Trash2, Plus, Star, Award, ShieldCheck, Mail, Phone, Calendar, CheckCircle2, X } from 'lucide-react';
 import { authFetch } from '../../lib/api';
+import { formatPhone } from '../../utils/masks';
+import { handleEnterAsTab } from '../../utils/formUtils';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 
 interface Profile {
@@ -168,7 +170,7 @@ export const ClientsManagement: React.FC = () => {
             placeholder="Buscar por nome, email ou telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-2 text-xs text-content-base placeholder-[#666666] focus:outline-none focus:border-[#FFFFFF]"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-2 text-xs text-content-base placeholder-[#666666] focus:outline-none focus:border-gold-base"
           />
         </div>
 
@@ -197,7 +199,7 @@ export const ClientsManagement: React.FC = () => {
             onClick={() => setSelectedTier(pill.id)}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
               selectedTier === pill.id
-                ? 'bg-gold-base text-surface-base border-[#FFFFFF]'
+                ? 'bg-gold-base text-surface-base border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base hover:border-border-subtle'
             }`}
           >
@@ -222,7 +224,7 @@ export const ClientsManagement: React.FC = () => {
             placeholder="Buscar por nome, email ou telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
           />
         </div>
         <p className="text-xs text-content-muted font-bold">
@@ -239,7 +241,7 @@ export const ClientsManagement: React.FC = () => {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-6 h-6 border-2 border-[#FFFFFF] border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-gold-base border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <>
@@ -352,7 +354,7 @@ export const ClientsManagement: React.FC = () => {
                       </td>
                       <td className="p-3.5">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold w-fit ${
-                          client.role === 'admin' ? 'bg-[#9C27B0]/15 text-[#9C27B0]' : 'bg-surface-card text-content-muted border border-border-subtle'
+                          client.role === 'admin' ? 'bg-purple-500/15 text-purple-400' : 'bg-surface-card text-content-muted border border-border-subtle'
                         }`}>
                           {client.role === 'admin' ? <ShieldCheck className="w-3 h-3" /> : <Users className="w-3 h-3" />}
                           <span className="capitalize">{client.role}</span>
@@ -393,11 +395,11 @@ export const ClientsManagement: React.FC = () => {
       {/* COMPACT MODULAR CLIENT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
+          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
             {/* Header */}
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center gap-2 shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-hover shrink-0">
                   <Users className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
@@ -424,7 +426,7 @@ export const ClientsManagement: React.FC = () => {
                 </div>
               )}
 
-              <form id="clientForm" onSubmit={handleSave} className="space-y-3">
+              <form id="clientForm" onSubmit={handleSave} className="space-y-3" onKeyDown={handleEnterAsTab}>
                 <div>
                   <label className="text-[11px] font-bold text-gold-hover block mb-1">Nome Completo *</label>
                   <input
@@ -433,7 +435,7 @@ export const ClientsManagement: React.FC = () => {
                     value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Ex: Carlos Silva"
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                   />
                 </div>
 
@@ -446,7 +448,7 @@ export const ClientsManagement: React.FC = () => {
                       value={formData.email}
                       onChange={e => setFormData({ ...formData, email: e.target.value })}
                       placeholder="carlos@email.com"
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                     />
                   </div>
                   <div>
@@ -454,9 +456,9 @@ export const ClientsManagement: React.FC = () => {
                     <input
                       type="tel"
                       value={formData.phone}
-                      onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={e => setFormData({ ...formData, phone: formatPhone(e.target.value) })}
                       placeholder="(11) 99999-9999"
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                     />
                   </div>
                 </div>
@@ -471,7 +473,7 @@ export const ClientsManagement: React.FC = () => {
                     value={formData.password}
                     onChange={e => setFormData({ ...formData, password: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                   />
                 </div>
 
@@ -484,7 +486,7 @@ export const ClientsManagement: React.FC = () => {
                       <select
                         value={formData.role}
                         onChange={e => setFormData({ ...formData, role: e.target.value })}
-                        className="w-full bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
                       >
                         <option value="client">Cliente</option>
                         <option value="admin">Administrador</option>
@@ -496,7 +498,7 @@ export const ClientsManagement: React.FC = () => {
                       <select
                         value={formData.loyaltyTier}
                         onChange={e => setFormData({ ...formData, loyaltyTier: e.target.value })}
-                        className="w-full bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
                       >
                         <option value="Bronze">Bronze</option>
                         <option value="Prata">Prata</option>
@@ -513,7 +515,7 @@ export const ClientsManagement: React.FC = () => {
                       min="0"
                       value={formData.loyaltyPoints}
                       onChange={e => setFormData({ ...formData, loyaltyPoints: parseInt(e.target.value) || 0 })}
-                      className="w-full bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                      className="w-full bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
                     />
                   </div>
                 </div>

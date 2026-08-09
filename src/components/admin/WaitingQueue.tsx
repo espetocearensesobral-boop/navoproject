@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { WaitingQueueItem, Professional, ServiceItem } from '../../types';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   getQueueFromSupabase,
   updateQueueStatusInSupabase,
@@ -322,7 +323,7 @@ export const WaitingQueue: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar cliente, serviço ou barbeiro..."
-            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
           />
         </div>
 
@@ -519,7 +520,7 @@ export const WaitingQueue: React.FC = () => {
                         <div className="flex items-center gap-1.5">
                           <h4 className="font-bold text-content-base text-xs truncate">{item.client_name}</h4>
                           {item.notes && (
-                            <span className="px-1.5 py-0.5 bg-gold-base/10 text-gold-hover text-[9px] font-bold rounded-xl border border-[#FFFFFF]/20">
+                            <span className="px-1.5 py-0.5 bg-gold-base/10 text-gold-hover text-[9px] font-bold rounded-xl border border-gold-base/20">
                               Encaixe
                             </span>
                           )}
@@ -619,7 +620,7 @@ export const WaitingQueue: React.FC = () => {
       {/* MODAL: ADD WALK-IN */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
+          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/30 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
@@ -635,7 +636,7 @@ export const WaitingQueue: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleAddWalkInSubmit} className="p-4 space-y-3 text-xs">
+            <form onKeyDown={handleEnterAsTab} onSubmit={handleAddWalkInSubmit} className="p-4 space-y-3 text-xs">
               <div>
                 <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
                   Nome do Cliente *
@@ -645,7 +646,7 @@ export const WaitingQueue: React.FC = () => {
                   value={newClientName}
                   onChange={(e) => setNewClientName(e.target.value)}
                   placeholder="Ex: Gabriel Santos"
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
                   required
                 />
               </div>
@@ -659,7 +660,7 @@ export const WaitingQueue: React.FC = () => {
                   value={newClientPhone}
                   onChange={(e) => setNewClientPhone(e.target.value)}
                   placeholder="(11) 99887-1122"
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
                 />
               </div>
 
@@ -676,7 +677,7 @@ export const WaitingQueue: React.FC = () => {
                       const found = services.find((s) => s.title === title);
                       if (found) setNewServicePrice(found.price);
                     }}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] cursor-pointer"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base cursor-pointer"
                   >
                     {services.map((svc) => (
                       <option key={svc.id} value={svc.title} className="bg-surface-card">
@@ -698,7 +699,7 @@ export const WaitingQueue: React.FC = () => {
                       const found = professionals.find((p) => p.id === id);
                       if (found) setNewProfessionalName(found.name);
                     }}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] cursor-pointer"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base cursor-pointer"
                   >
                     {professionals.map((p) => (
                       <option key={p.id} value={p.id} className="bg-surface-card">
@@ -718,7 +719,7 @@ export const WaitingQueue: React.FC = () => {
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
                   placeholder="Ex: Aceitou aguardar 15 min"
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
                 />
               </div>
 

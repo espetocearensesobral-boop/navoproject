@@ -298,7 +298,7 @@ export const AccountsPayableManagement: React.FC = () => {
       {/* CREATE ACCOUNT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <form onSubmit={handleCreateAccount} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in">
+          <form onSubmit={handleCreateAccount} className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-sm p-5 text-content-base space-y-4 relative shadow-2xl animate-fade-in" onKeyDown={handleEnterAsTab}>
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
@@ -344,7 +344,7 @@ export const AccountsPayableManagement: React.FC = () => {
               <div>
                 <label className="text-xs font-bold text-content-muted uppercase block mb-1">Valor (R$)</label>
                 <input
-                  type="number"
+              type="number"
                   required
                   min="1"
                   step="0.01"

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   fetchNavoRewardsAdminDashboard,
   triggerInactiveClientsCampaign,
@@ -465,7 +466,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       {/* TAB 2: CLUBE DE FIDELIDADE & NÍVEIS */}
       {activeTab === 'loyalty' && (
         <div className="space-y-4 min-w-0">
-          <form onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-4">
+          <form onKeyDown={handleEnterAsTab} onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
               <div>
                 <h3 className="text-sm font-serif font-bold text-content-base flex items-center gap-2">
@@ -622,7 +623,7 @@ export const NavoRewardsAdmin: React.FC = () => {
               <span>Ajuste Manual de Pontuação de Clientes</span>
             </h3>
 
-            <form onSubmit={handleManualPointsSubmit} className="space-y-3 max-w-xl text-xs">
+            <form onKeyDown={handleEnterAsTab} onSubmit={handleManualPointsSubmit} className="space-y-3 max-w-xl text-xs">
               <div>
                 <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Selecione o Cliente</label>
                 <select
@@ -756,7 +757,7 @@ export const NavoRewardsAdmin: React.FC = () => {
               <div className="w-full max-w-md bg-surface-card rounded-xl border border-border-subtle p-5 space-y-4 shadow-lg">
                 <h3 className="text-sm font-serif font-bold text-content-base">Adicionar Oferta ou Cupom</h3>
 
-                <form onSubmit={handleCreateReward} className="space-y-3 text-xs">
+                <form onKeyDown={handleEnterAsTab} onSubmit={handleCreateReward} className="space-y-3 text-xs">
                   <div>
                     <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Título</label>
                     <input
@@ -831,7 +832,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       {/* TAB 4: MOTOR DE INDICAÇÕES */}
       {activeTab === 'referrals' && (
         <div className="space-y-4 min-w-0">
-          <form onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-4">
+          <form onKeyDown={handleEnterAsTab} onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
               <div>
                 <h3 className="text-sm font-serif font-bold text-content-base flex items-center gap-2">

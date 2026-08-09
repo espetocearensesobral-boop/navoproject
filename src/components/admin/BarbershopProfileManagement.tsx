@@ -195,7 +195,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
       {/* TAB CONTENT: IDENTIDADE */}
       {activeTab === 'info' && (
-        <div className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-5">
+        <form className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-5" onKeyDown={handleEnterAsTab}>
           <div className="flex items-center gap-2 pb-3 border-b border-border-subtle">
             <Store className="w-4 h-4 text-gold-base" />
             <h2 className="text-sm font-serif font-bold text-content-base">Informações da Marca e Unidade</h2>
@@ -270,12 +270,12 @@ export const BarbershopProfileManagement: React.FC = () => {
               Se deixado em branco, a plataforma usará o ícone padrão estilizado.
             </span>
           </div>
-        </div>
+        </form>
       )}
 
       {/* TAB CONTENT: HORÁRIOS */}
       {activeTab === 'hours' && (
-        <div className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-5">
+        <form className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-5" onKeyDown={handleEnterAsTab} onSubmit={e => e.preventDefault()}>
           <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-gold-base" />
@@ -441,12 +441,12 @@ export const BarbershopProfileManagement: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </form>
       )}
 
       {/* TAB CONTENT: ENDEREÇO & CONTATOS */}
       {activeTab === 'address' && (
-        <div className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-5">
+        <form className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-5" onKeyDown={handleEnterAsTab} onSubmit={e => e.preventDefault()}>
           <div className="flex items-center gap-2 pb-3 border-b border-border-subtle">
             <MapPin className="w-4 h-4 text-gold-base" />
             <h2 className="text-sm font-serif font-bold text-content-base">Endereço & Canais de Comunicação</h2>
@@ -486,7 +486,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               <input
                 type="text"
                 value={profile.phone}
-                onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))}
+                onChange={e => setProfile(p => ({ ...p, phone: formatPhone(e.target.value) }))}
                 placeholder="(11) 99999-8888"
                 className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
               />
@@ -499,7 +499,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               <input
                 type="text"
                 value={profile.whatsapp}
-                onChange={e => setProfile(p => ({ ...p, whatsapp: e.target.value }))}
+                onChange={e => setProfile(p => ({ ...p, whatsapp: formatPhone(e.target.value) }))}
                 placeholder="5511999998888"
                 className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
               />
@@ -518,7 +518,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
             />
           </div>
-        </div>
+        </form>
       )}
 
       {/* TAB CONTENT: PREVISUALIZAR */}
