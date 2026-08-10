@@ -289,12 +289,12 @@ export const AdminLayout: React.FC = () => {
         <div className="flex items-center h-[56px] px-4 border-b border-white/10 relative overflow-hidden shrink-0 bg-[#12131A]">
           <div className="absolute top-0 left-0 right-0 h-0.5 barber-pole-line" />
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 bg-[#D4AF5A] text-stone-950 rounded-xl flex items-center justify-center shadow-sm shrink-0 font-bold">
+            <div className="w-8 h-8 bg-gold-base text-stone-950 rounded-xl flex items-center justify-center shadow-sm shrink-0 font-bold">
               <Scissors className="w-4 h-4" />
             </div>
             <div className="min-w-0">
               <h1 className="text-sm font-serif font-bold text-stone-100 tracking-tight truncate">Navo Premium</h1>
-              <p className="text-[9px] text-[#D4AF5A] font-bold uppercase tracking-widest truncate">Heritage Barber & Club</p>
+              <p className="text-[9px] text-gold-base font-bold uppercase tracking-widest truncate">Heritage Barber & Club</p>
             </div>
           </div>
         </div>
@@ -320,14 +320,14 @@ export const AdminLayout: React.FC = () => {
                       onClick={() => setActiveTab(item.id)}
                       className={`w-full h-10 px-3 rounded-xl text-xs font-semibold flex items-center gap-2.5 transition-colors group min-w-0 ${
                         isActive
-                          ? 'bg-[#D4AF5A]/15 text-[#D4AF5A] border border-[#D4AF5A]/30'
+                          ? 'bg-gold-base/15 text-gold-base border border-gold-base/30'
                           : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#D4AF5A]' : 'text-stone-400 group-hover:text-stone-100'}`} />
+                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold-base' : 'text-stone-400 group-hover:text-stone-100'}`} />
                       <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
                       {isActive && (
-                        <ChevronRight className="w-3.5 h-3.5 text-[#D4AF5A] shrink-0" />
+                        <ChevronRight className="w-3.5 h-3.5 text-gold-base shrink-0" />
                       )}
                     </button>
                   );
@@ -340,7 +340,7 @@ export const AdminLayout: React.FC = () => {
         {/* User Profile Footer */}
         <div className="p-3 border-t border-white/10 shrink-0 bg-[#12131A]">
           <div className="flex items-center gap-2.5 px-3 h-12 rounded-xl bg-stone-900/90 border border-white/10">
-            <div className="w-7 h-7 rounded-xl bg-[#D4AF5A] flex items-center justify-center text-stone-950 font-bold text-xs uppercase shrink-0">
+            <div className="w-7 h-7 rounded-xl bg-gold-base flex items-center justify-center text-stone-950 font-bold text-xs uppercase shrink-0">
               {adminName.substring(0, 2)}
             </div>
             <div className="flex-1 min-w-0">
@@ -349,7 +349,7 @@ export const AdminLayout: React.FC = () => {
             </div>
             <button 
               onClick={handleLogout}
-              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-800 text-stone-400 hover:text-[#D4AF5A] active:bg-stone-800 transition-colors shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-800 text-stone-400 hover:text-gold-base active:bg-stone-800 transition-colors shrink-0"
               title="Sair"
               aria-label="Sair"
             >
@@ -424,7 +424,7 @@ export const AdminLayout: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between h-[56px] px-4 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 bg-[#D4AF5A] text-stone-950 rounded-xl flex items-center justify-center shrink-0 font-bold">
+                <div className="w-7 h-7 bg-gold-base text-stone-950 rounded-xl flex items-center justify-center shrink-0 font-bold">
                   <Scissors className="w-3.5 h-3.5" />
                 </div>
                 <h1 className="text-sm font-serif font-bold text-stone-100 truncate">Navo Premium</h1>
@@ -462,11 +462,11 @@ export const AdminLayout: React.FC = () => {
                           }}
                           className={`w-full h-11 px-3 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors ${
                             isActive
-                              ? 'bg-[#D4AF5A]/15 text-[#D4AF5A] border border-[#D4AF5A]/30'
+                              ? 'bg-gold-base/15 text-gold-base border border-gold-base/30'
                               : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
                           }`}
                         >
-                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#D4AF5A]' : 'text-stone-400'}`} />
+                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold-base' : 'text-stone-400'}`} />
                           <span className="truncate flex-1 text-left min-w-0">{item.label}</span>
                         </button>
                       );
