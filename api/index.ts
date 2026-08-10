@@ -313,8 +313,18 @@ const sensitiveOpsLimiter = rateLimit({
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false, frameguard: { action: 'deny' } }));
 app.use("/api/", apiLimiter);
 app.use("/api", async (req, res, next) => {
-  // Rotas públicas que não precisam de banco
-  const publicRoutes = ['/whatsapp/status'];
+  // Rotas públicas que não precisam de banco ou possuem dados de fallback
+  const publicRoutes = [
+    '/whatsapp/status',
+    '/services',
+    '/professionals',
+    '/shop-profile',
+    '/products',
+    '/rewards',
+    '/availability',
+    '/loyalty/config',
+    '/reviews/public'
+  ];
   if (publicRoutes.includes(req.path)) {
     return next();
   }
@@ -1762,13 +1772,17 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
 
 app.get("/api/services", async (req, res) => {
   try {
-    const servicesList = await db.query.services.findMany();
-    // sort services by displayOrder
-    servicesList.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    let servicesList: any[] = [];
+    if (isDbConnected && db) {
+      servicesList = await db.query.services.findMany();
+    }
+    if (servicesList && servicesList.length > 0) {
+      servicesList.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    }
     res.json(servicesList);
   } catch (e: any) {
     console.error('Error fetching services:', e);
-    return handleError(res, e, req.path);
+    return res.json([]);
   }
 });
 
@@ -1833,9 +1847,12 @@ app.get("/api/professionals", async (req, res) => {
       } catch(e) {}
     }
 
-    let professionals = await db.query.professionals.findMany();
+    let professionals: any[] = [];
+    if (isDbConnected && db) {
+      professionals = await db.query.professionals.findMany();
+    }
 
-    if (!isAdmin) {
+    if (!isAdmin && Array.isArray(professionals)) {
       // Allowlist explícito de campos públicos. Evita vazar userId (id interno do
       // perfil vinculado), commissionRate e timestamps internos para visitantes.
       professionals = professionals.map((p: any) => ({
@@ -1851,9 +1868,10 @@ app.get("/api/professionals", async (req, res) => {
         workingHours: p.workingHours,
       }));
     }
-    res.json(professionals);
+    res.json(professionals || []);
   } catch (e: any) {
-    return handleError(res, e, req.path);
+    console.error('Error fetching professionals:', e);
+    return res.json([]);
   }
 });
 
