@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Professional, ServiceItem } from '../../types';
-import { Calendar as CalendarIcon, Clock, ArrowLeft, ArrowRight, Loader2, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, ArrowLeft, ArrowRight, Loader2, ChevronLeft, ChevronRight, AlertTriangle, Sun, Sunset } from 'lucide-react';
 import { authFetch } from '../../lib/api';
 import { 
   ShopProfile, 
@@ -126,6 +126,14 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   const baseSlots = useMemo(() => {
     return generateTimeSlotsFromProfile(shopProfile, selectedDate, totalDurationMinutes);
   }, [shopProfile, selectedDate, totalDurationMinutes]);
+
+  const morningSlots = useMemo(() => {
+    return baseSlots.filter((time) => timeToMinutes(time) < 720);
+  }, [baseSlots]);
+
+  const afternoonSlots = useMemo(() => {
+    return baseSlots.filter((time) => timeToMinutes(time) >= 720);
+  }, [baseSlots]);
 
   const monthYearHeader = useMemo(() => {
     const monthNames = [
@@ -275,52 +283,115 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
             <Loader2 className="w-6 h-6 text-gold-base animate-spin" />
             <span>Carregando horários para {formatDateBR(selectedDate)}...</span>
           </div>
+        ) : baseSlots.length === 0 ? (
+          <div className="p-6 bg-surface-card border border-border-subtle rounded-card text-center text-xs text-content-muted">
+            Nenhum horário disponível para esta data.
+          </div>
         ) : (
-          <>
-            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-              {baseSlots.map((time) => {
-                const isSelected = selectedTimeSlot === time;
-                
-                // Validar se o horário já passou na data de hoje usando Fuso BRT
-                const currTimeBRT = getCurrentTimeBRT();
-                const slotMins = timeToMinutes(time);
-                const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
-                
-                const isBusy = busySlots.includes(time) || isPastTime;
-                const isReqApproval = requiresApprovalSlots.includes(time);
-                const isAvailable = !isBusy;
+          <div className="space-y-6">
+            {/* Seção Manhã */}
+            {morningSlots.length > 0 && (
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-1.5 px-0.5">
+                  <Sun className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span className="text-xs font-bold text-content-base uppercase tracking-wider">Manhã</span>
+                  <span className="text-[11px] text-content-muted font-normal">(Até 12:00)</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                  {morningSlots.map((time) => {
+                    const isSelected = selectedTimeSlot === time;
+                    const currTimeBRT = getCurrentTimeBRT();
+                    const slotMins = timeToMinutes(time);
+                    const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
+                    const isBusy = busySlots.includes(time) || isPastTime;
+                    const isReqApproval = requiresApprovalSlots.includes(time);
+                    const isAvailable = !isBusy;
 
-                return (
-                  <button
-                    key={time}
-                    type="button"
-                    disabled={!isAvailable}
-                    onClick={() => {
-                      if ('vibrate' in navigator) navigator.vibrate(40);
-                      onSelectTimeSlot(time);
-                    }}
-                    className={`py-3.5 px-2 rounded-btn text-center text-sm sm:text-base transition-all duration-200 focus:outline-none select-none flex flex-col items-center justify-center ${
-                      isSelected
-                        ? isReqApproval
-                          ? 'bg-amber-500 text-surface-base font-extrabold shadow-lg scale-[1.02]'
-                          : 'bg-gold-base text-surface-base font-extrabold shadow-lg scale-[1.02]'
-                        : isReqApproval
-                        ? 'bg-amber-500/10 border border-amber-500/40 text-amber-300 font-bold hover:bg-amber-500/20 active:scale-95'
-                        : isAvailable
-                        ? 'bg-surface-card border border-border-subtle hover:border-border-subtle text-content-base font-bold hover:bg-surface-card active:scale-95'
-                        : 'bg-surface-base text-content-muted line-through cursor-not-allowed opacity-40 border border-transparent'
-                    }`}
-                  >
-                    <span>{time}</span>
-                    {isReqApproval && (
-                      <span className="text-[9px] font-medium tracking-tight uppercase opacity-90 mt-0.5">
-                        Fora Expediente
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+                    return (
+                      <button
+                        key={time}
+                        type="button"
+                        disabled={!isAvailable}
+                        onClick={() => {
+                          if ('vibrate' in navigator) navigator.vibrate(40);
+                          onSelectTimeSlot(time);
+                        }}
+                        className={`py-3.5 px-2 rounded-btn text-center text-sm sm:text-base transition-all duration-200 focus:outline-none select-none flex flex-col items-center justify-center ${
+                          isSelected
+                            ? isReqApproval
+                              ? 'bg-amber-500 text-surface-base font-extrabold shadow-lg scale-[1.02]'
+                              : 'bg-gold-base text-surface-base font-extrabold shadow-lg scale-[1.02]'
+                            : isReqApproval
+                            ? 'bg-amber-500/10 border border-amber-500/40 text-amber-300 font-bold hover:bg-amber-500/20 active:scale-95'
+                            : isAvailable
+                            ? 'bg-surface-card border border-border-subtle hover:border-border-subtle text-content-base font-bold hover:bg-surface-card active:scale-95'
+                            : 'bg-surface-base text-content-muted line-through cursor-not-allowed opacity-40 border border-transparent'
+                        }`}
+                      >
+                        <span>{time}</span>
+                        {isReqApproval && (
+                          <span className="text-[9px] font-medium tracking-tight uppercase opacity-90 mt-0.5">
+                            Fora Expediente
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Seção Tarde */}
+            {afternoonSlots.length > 0 && (
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-1.5 px-0.5">
+                  <Sunset className="w-4 h-4 text-gold-base shrink-0" />
+                  <span className="text-xs font-bold text-content-base uppercase tracking-wider">Tarde / Noite</span>
+                  <span className="text-[11px] text-content-muted font-normal">(A partir das 12:00)</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                  {afternoonSlots.map((time) => {
+                    const isSelected = selectedTimeSlot === time;
+                    const currTimeBRT = getCurrentTimeBRT();
+                    const slotMins = timeToMinutes(time);
+                    const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
+                    const isBusy = busySlots.includes(time) || isPastTime;
+                    const isReqApproval = requiresApprovalSlots.includes(time);
+                    const isAvailable = !isBusy;
+
+                    return (
+                      <button
+                        key={time}
+                        type="button"
+                        disabled={!isAvailable}
+                        onClick={() => {
+                          if ('vibrate' in navigator) navigator.vibrate(40);
+                          onSelectTimeSlot(time);
+                        }}
+                        className={`py-3.5 px-2 rounded-btn text-center text-sm sm:text-base transition-all duration-200 focus:outline-none select-none flex flex-col items-center justify-center ${
+                          isSelected
+                            ? isReqApproval
+                              ? 'bg-amber-500 text-surface-base font-extrabold shadow-lg scale-[1.02]'
+                              : 'bg-gold-base text-surface-base font-extrabold shadow-lg scale-[1.02]'
+                            : isReqApproval
+                            ? 'bg-amber-500/10 border border-amber-500/40 text-amber-300 font-bold hover:bg-amber-500/20 active:scale-95'
+                            : isAvailable
+                            ? 'bg-surface-card border border-border-subtle hover:border-border-subtle text-content-base font-bold hover:bg-surface-card active:scale-95'
+                            : 'bg-surface-base text-content-muted line-through cursor-not-allowed opacity-40 border border-transparent'
+                        }`}
+                      >
+                        <span>{time}</span>
+                        {isReqApproval && (
+                          <span className="text-[9px] font-medium tracking-tight uppercase opacity-90 mt-0.5">
+                            Fora Expediente
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {selectedTimeSlot && requiresApprovalSlots.includes(selectedTimeSlot) && (
               <div className="mt-3 p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/35 text-amber-300 text-xs flex items-start gap-2.5 animate-fade-in shadow-sm">
@@ -333,7 +404,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                 </div>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
 

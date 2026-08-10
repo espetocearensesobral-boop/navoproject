@@ -17,7 +17,9 @@ import {
   XCircle,
   Loader2,
   Phone,
-  CalendarX
+  CalendarX,
+  Sun,
+  Sunset
 } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { Star } from 'lucide-react';
@@ -776,30 +778,78 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                     Nenhum horário disponível para esta data.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto pr-1">
-                    {dynamicSlots.map((slotTime) => {
-                      const slotMins = timeToMinutes(slotTime);
-                      const isPast = rescheduleDate === todayStrBRT && slotMins <= currTimeBRT.totalMinutes;
-                      const isBusy = busySlots.includes(slotTime) || isPast;
-                      const isSelected = rescheduleTimeSlot === slotTime;
-                      return (
-                        <button
-                          key={slotTime}
-                          type="button"
-                          disabled={isBusy}
-                          onClick={() => setRescheduleTimeSlot(slotTime)}
-                          className={`py-2 rounded-lg text-center font-bold text-xs transition-all border ${
-                            isSelected
-                              ? 'bg-gold-base text-surface-base border-gold-base shadow-md font-extrabold scale-[1.02]'
-                              : isBusy
-                              ? 'bg-border-subtle/50 border-transparent text-content-muted opacity-40 cursor-not-allowed line-through'
-                              : 'bg-surface-base border-border-subtle text-content-base hover:border-gold-base/50 hover:bg-surface-card'
-                          }`}
-                        >
-                          {slotTime}
-                        </button>
-                      );
-                    })}
+                  <div className="space-y-3 max-h-52 overflow-y-auto pr-1">
+                    {/* Morning slots */}
+                    {dynamicSlots.filter((s) => timeToMinutes(s) < 720).length > 0 && (
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-content-base uppercase tracking-wider">
+                          <Sun className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span>Manhã</span>
+                          <span className="text-[10px] text-content-muted font-normal lowercase">(Até 12h)</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2">
+                          {dynamicSlots.filter((s) => timeToMinutes(s) < 720).map((slotTime) => {
+                            const slotMins = timeToMinutes(slotTime);
+                            const isPast = rescheduleDate === todayStrBRT && slotMins <= currTimeBRT.totalMinutes;
+                            const isBusy = busySlots.includes(slotTime) || isPast;
+                            const isSelected = rescheduleTimeSlot === slotTime;
+                            return (
+                              <button
+                                key={slotTime}
+                                type="button"
+                                disabled={isBusy}
+                                onClick={() => setRescheduleTimeSlot(slotTime)}
+                                className={`py-2 rounded-lg text-center font-bold text-xs transition-all border ${
+                                  isSelected
+                                    ? 'bg-gold-base text-surface-base border-gold-base shadow-md font-extrabold scale-[1.02]'
+                                    : isBusy
+                                    ? 'bg-border-subtle/50 border-transparent text-content-muted opacity-40 cursor-not-allowed line-through'
+                                    : 'bg-surface-base border-border-subtle text-content-base hover:border-gold-base/50 hover:bg-surface-card'
+                                }`}
+                              >
+                                {slotTime}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Afternoon/Evening slots */}
+                    {dynamicSlots.filter((s) => timeToMinutes(s) >= 720).length > 0 && (
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-content-base uppercase tracking-wider">
+                          <Sunset className="w-3.5 h-3.5 text-gold-base shrink-0" />
+                          <span>Tarde / Noite</span>
+                          <span className="text-[10px] text-content-muted font-normal lowercase">(A partir das 12h)</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2">
+                          {dynamicSlots.filter((s) => timeToMinutes(s) >= 720).map((slotTime) => {
+                            const slotMins = timeToMinutes(slotTime);
+                            const isPast = rescheduleDate === todayStrBRT && slotMins <= currTimeBRT.totalMinutes;
+                            const isBusy = busySlots.includes(slotTime) || isPast;
+                            const isSelected = rescheduleTimeSlot === slotTime;
+                            return (
+                              <button
+                                key={slotTime}
+                                type="button"
+                                disabled={isBusy}
+                                onClick={() => setRescheduleTimeSlot(slotTime)}
+                                className={`py-2 rounded-lg text-center font-bold text-xs transition-all border ${
+                                  isSelected
+                                    ? 'bg-gold-base text-surface-base border-gold-base shadow-md font-extrabold scale-[1.02]'
+                                    : isBusy
+                                    ? 'bg-border-subtle/50 border-transparent text-content-muted opacity-40 cursor-not-allowed line-through'
+                                    : 'bg-surface-base border-border-subtle text-content-base hover:border-gold-base/50 hover:bg-surface-card'
+                                }`}
+                              >
+                                {slotTime}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
