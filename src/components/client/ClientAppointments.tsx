@@ -54,12 +54,24 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     if (!digits1 || !digits2) return false;
     if (digits1 === digits2) return true;
 
-    const norm1 = digits1.length > 11 && digits1.startsWith('55') ? digits1.slice(2) : digits1;
-    const norm2 = digits2.length > 11 && digits2.startsWith('55') ? digits2.slice(2) : digits2;
+    const norm1 = digits1.length >= 12 && digits1.startsWith('55') ? digits1.slice(2) : digits1;
+    const norm2 = digits2.length >= 12 && digits2.startsWith('55') ? digits2.slice(2) : digits2;
     if (norm1 === norm2) return true;
 
+    if (norm1.length >= 10 && norm2.length >= 10) {
+      const ddd1 = norm1.slice(0, 2);
+      const ddd2 = norm2.slice(0, 2);
+      if (ddd1 !== ddd2) return false;
+
+      const rest1 = norm1.slice(2);
+      const rest2 = norm2.slice(2);
+      if (rest1 === rest2) return true;
+      if (rest1.slice(-8) === rest2.slice(-8)) return true;
+      return false;
+    }
+
     if (norm1.length >= 8 && norm2.length >= 8) {
-      return norm1.endsWith(norm2) || norm2.endsWith(norm1);
+      return norm1.slice(-8) === norm2.slice(-8);
     }
     return false;
   };
@@ -101,9 +113,11 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
           return true;
         }
 
-        // Guest matching appointment created in current session
+        // Guest matching appointment created in current session matching searched phone or session
         if (isGuest && localCombined.some(loc => loc.id === a.id)) {
-          return true;
+          if (!searchedPhone || matchPhoneNumbers(searchedPhone, a.client_phone)) {
+            return true;
+          }
         }
 
         return false;
@@ -111,7 +125,11 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
       // Merge local session appointments and server data
       const fetchedIds = new Set(userApts.map((a: Appointment) => a.id));
-      const uniqueLocal = localCombined.filter(a => !fetchedIds.has(a.id));
+      const uniqueLocal = localCombined.filter(a => {
+        if (fetchedIds.has(a.id)) return false;
+        if (searchedPhone && !matchPhoneNumbers(searchedPhone, a.client_phone)) return false;
+        return true;
+      });
 
       const merged = [...uniqueLocal, ...userApts].sort(
         (a, b) => new Date(b.date || b.created_at || '').getTime() - new Date(a.date || a.created_at || '').getTime()
@@ -140,6 +158,23 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
   useEffect(() => {
     loadAppointments();
   }, [isGuest, customAppointments, currentUser]);
+
+  // Limpeza de estado do visitante ao desmontar/sair da tela
+  useEffect(() => {
+    return () => {
+      if (isGuest) {
+        fetch('/api/appointments/lookup/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+        setSearchedPhone('');
+        setVerifiedVoucher('');
+        setGuestPhoneInput('');
+        setGuestPhoneError('');
+        setVoucherInput('');
+        setVoucherError('');
+        setIsVoucherVerificationMode(false);
+        setAppointments([]);
+      }
+    };
+  }, [isGuest]);
 
   // Current appointment is the most recent active or non-cancelled one, or simply the first
   const currentAppointment = appointments.find(

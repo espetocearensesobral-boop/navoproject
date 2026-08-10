@@ -34,6 +34,20 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
     avatar_url: userProfile?.avatar_url || ''
   });
   
+  React.useEffect(() => {
+    if (isOpen && userProfile) {
+      setFormData({
+        name: userProfile.name || '',
+        email: userProfile.email || '',
+        phone: userProfile.phone || '',
+        avatar_url: userProfile.avatar_url || userProfile.avatarUrl || ''
+      });
+      setIsEditing(false);
+      setErrorMsg('');
+      setSuccessMsg('');
+    }
+  }, [isOpen, userProfile]);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen || !userProfile) return null;

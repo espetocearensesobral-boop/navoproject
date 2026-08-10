@@ -26,7 +26,7 @@ import { usePullToRefresh } from '../../hooks/usePullToRefresh';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Calendar, Crown, Award, Clock, Home, Menu, Smartphone, User, Sparkles, Scissors, Loader2, Sun, Moon, CheckCircle2, Info, AlertTriangle, Sliders, Download } from 'lucide-react';
 
-import { authFetch } from '../../lib/api';
+import { authFetch, setStoredToken, clearStoredToken } from '../../lib/api';
 
 export const ClientApp: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -88,19 +88,38 @@ export const ClientApp: React.FC = () => {
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(true);
   
   useEffect(() => {
-    // Sync current user profile from server if logged in
-    if (!isGuest && currentUser && currentUser.id !== 'guest') {
-      authFetch('/api/auth/me')
-        .then(res => res.ok ? res.json() : null)
-        .then(me => {
-          if (me && me.id) {
-            setCurrentUser(me);
-          }
-        })
-        .catch(() => {});
-    }
+    // Restaura sessão no carregamento/recarregamento da página
+    authFetch('/api/auth/me')
+      .then(res => res.ok ? res.json() : null)
+      .then(me => {
+        if (me && me.id) {
+          setCurrentUser(me);
+          setIsGuest(false);
+          if (me.token) setStoredToken(me.token);
+        } else {
+          setIsGuest(true);
+          setCurrentUser({ id: 'guest', name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
+          clearStoredToken();
+        }
+      })
+      .catch(() => {
+        setIsGuest(true);
+        setCurrentUser({ id: 'guest', name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
+        clearStoredToken();
+      });
+  }, []);
 
-  }, [isGuest]);
+  const handleLogout = async () => {
+    try {
+      await authFetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/appointments/lookup/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+    } catch (e) {}
+    clearStoredToken();
+    setUserCreatedAppointments([]);
+    setIsGuest(true);
+    setCurrentUser({ id: `guest_${Date.now()}`, name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
+    executeResetBooking();
+  };
 
 
 
@@ -664,11 +683,7 @@ export const ClientApp: React.FC = () => {
           setLoginModalView('login');
           setIsLoginModalOpen(true);
         }}
-        onLogout={() => {
-          setUserCreatedAppointments([]);
-          setIsGuest(true);
-          setCurrentUser({ id: `guest_${Date.now()}`, name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
-        }}
+        onLogout={handleLogout}
         onOpenInstall={() => setIsPwaModalOpen(true)}
       />
 
@@ -677,10 +692,8 @@ export const ClientApp: React.FC = () => {
         onClose={() => setIsProfileModalOpen(false)}
         userProfile={currentUser}
         onLogout={() => {
-          setUserCreatedAppointments([]);
-          setIsGuest(true);
-          setCurrentUser({ id: `guest_${Date.now()}`, name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
           setIsProfileModalOpen(false);
+          handleLogout();
         }}
         onUpdateProfile={async (updates) => {
           try {
@@ -700,6 +713,10 @@ export const ClientApp: React.FC = () => {
           setIsLoginModalOpen(false);
           setIsGuest(false);
           setCurrentUser(user);
+          setUserCreatedAppointments([]);
+          if (user.token) {
+            setStoredToken(user.token);
+          }
           if (user.role === 'admin') {
             window.location.href = '/admin';
             return;

@@ -193,49 +193,45 @@ const generateBookingCode = (): string => {
 };
 
 // Função auxiliar para comparar números de telefone
-function matchPhoneNumbers(phone1: string, phone2: string): boolean {
+function normalizePhone(phone: string | undefined | null): string {
+  if (!phone) return '';
+  let digits = phone.replace(/\D/g, '');
+  if (digits.length >= 12 && digits.startsWith('55')) {
+    digits = digits.slice(2);
+  }
+  return digits;
+}
+
+function matchPhoneNumbers(phone1: string | undefined | null, phone2: string | undefined | null): boolean {
   if (!phone1 || !phone2) return false;
-  
-  const digits1 = phone1.replace(/\D/g, '');
-  const digits2 = phone2.replace(/\D/g, '');
-  
-  if (!digits1 || !digits2) return false;
-  if (digits1 === digits2) return true;
-
-  // Normalizar: remover código do país (55)
-  let norm1 = digits1;
-  if (norm1.length >= 12 && norm1.startsWith('55')) {
-    norm1 = norm1.slice(2);
-  } else if (norm1.length === 11 && norm1.startsWith('55') && !norm1.startsWith('559')) {
-    norm1 = norm1.slice(2);
-  }
-
-  let norm2 = digits2;
-  if (norm2.length >= 12 && norm2.startsWith('55')) {
-    norm2 = norm2.slice(2);
-  } else if (norm2.length === 11 && norm2.startsWith('55') && !norm2.startsWith('559')) {
-    norm2 = norm2.slice(2);
-  }
-
+  const norm1 = normalizePhone(phone1);
+  const norm2 = normalizePhone(phone2);
+  if (!norm1 || !norm2) return false;
   if (norm1 === norm2) return true;
 
-  // Se um for de 10 dígitos (sem 9º dígito extra) e o outro de 11 dígitos (com 9º dígito)
-  if (Math.abs(norm1.length - norm2.length) === 1 && norm1.length >= 10 && norm2.length >= 10) {
-    if (norm1.slice(0, 2) === norm2.slice(0, 2) && norm1.slice(-8) === norm2.slice(-8)) {
+  // Se ambos possuem DDD (pelo menos 10 dígitos)
+  if (norm1.length >= 10 && norm2.length >= 10) {
+    const ddd1 = norm1.slice(0, 2);
+    const ddd2 = norm2.slice(0, 2);
+    // Se o DDD for diferente, NUNCA correspondem
+    if (ddd1 !== ddd2) return false;
+
+    const rest1 = norm1.slice(2);
+    const rest2 = norm2.slice(2);
+    if (rest1 === rest2) return true;
+
+    // Trata variação do 9º dígito (ex: 988887777 vs 88887777)
+    if (rest1.slice(-8) === rest2.slice(-8)) {
       return true;
     }
+    return false;
   }
 
-  // Comparação de sufixos (últimos 8 e 9 dígitos)
+  // Se um dos dois não possui DDD (ex: número digitado sem DDD)
   if (norm1.length >= 8 && norm2.length >= 8) {
-    if (norm1.slice(-9) === norm2.slice(-9)) return true;
-    if (norm1.slice(-8) === norm2.slice(-8)) {
-      if (norm1.length <= 9 || norm2.length <= 9) return true;
-      if (norm1.slice(0, 2) === norm2.slice(0, 2)) return true;
-    }
-    if (norm1.endsWith(norm2) || norm2.endsWith(norm1)) return true;
+    return norm1.slice(-8) === norm2.slice(-8);
   }
-  
+
   return false;
 }
 
@@ -2590,6 +2586,22 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
 
     const safeUser = formatProfile(user);
     
+    // Vincula agendamentos de visitante pendentes com o mesmo telefone do usuário ao logar
+    if (user.phone) {
+      try {
+        const allApts = await db.select().from(schema.appointments);
+        const unlinked = allApts.filter((apt: any) => 
+          (!apt.clientId || apt.clientId === 'usr_guest' || apt.clientId.startsWith('guest_')) &&
+          matchPhoneNumbers(apt.clientPhone, user.phone)
+        );
+        for (const apt of unlinked) {
+          await db.update(schema.appointments)
+            .set({ clientId: user.id, updatedAt: new Date() })
+            .where(eq(schema.appointments.id, apt.id));
+        }
+      } catch (e) {}
+    }
+
     // Generate JWT Token
     const token = jwt.sign(
       { id: user.id, role: user.role, email: user.email, phone: user.phone }, 
@@ -2759,10 +2771,29 @@ app.post("/api/profiles", authLimiter, async (req, res) => {
     };
     await db.insert(schema.profiles).values(dbProfile);
 
+    // VINCULAÇÃO AUTOMÁTICA DE REGISTROS DE VISITANTE:
+    // Se o telefone cadastrado possuir agendamentos anteriores feitos como visitante, vincula-os ao perfil do usuário
+    if (cleanPhone) {
+      try {
+        const allApts = await db.select().from(schema.appointments);
+        const guestAptsToLink = allApts.filter((apt: any) => 
+          (!apt.clientId || apt.clientId === 'usr_guest' || apt.clientId.startsWith('guest_')) &&
+          matchPhoneNumbers(apt.clientPhone, cleanPhone)
+        );
+        for (const apt of guestAptsToLink) {
+          await db.update(schema.appointments)
+            .set({ clientId: newId, updatedAt: new Date() })
+            .where(eq(schema.appointments.id, apt.id));
+        }
+      } catch (errLink) {
+        console.error('Error linking visitor appointments to new profile:', errLink);
+      }
+    }
+
     const safeProfile = formatProfile(dbProfile);
     
     const token = jwt.sign(
-      { id: safeProfile.id, role: safeProfile.role, email: safeProfile.email }, 
+      { id: safeProfile.id, role: safeProfile.role, email: safeProfile.email, phone: safeProfile.phone }, 
       JWT_SECRET, 
       { expiresIn: '7d' }
     );

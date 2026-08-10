@@ -25,6 +25,18 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, appoi
   const [success, setSuccess] = useState(false);
   const [pointsEarned, setPointsEarned] = useState(20);
 
+  React.useEffect(() => {
+    if (!isOpen) {
+      setRating(5);
+      setComment('');
+      setPhotoUrl('');
+      setHasPhoto(false);
+      setError(null);
+      setSuccess(false);
+      setIsSubmitting(false);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {

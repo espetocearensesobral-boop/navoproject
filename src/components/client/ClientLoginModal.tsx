@@ -116,6 +116,34 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
     loginId: false,
   });
 
+  React.useEffect(() => {
+    if (!isOpen) {
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        loginId: '',
+        lgpdConsent: false
+      });
+      setTouched({
+        name: false,
+        email: false,
+        phone: false,
+        password: false,
+        loginId: false,
+      });
+      setErrorMsg('');
+      setSuccessMsg('');
+      setForgotSuccess(false);
+      setResetCode('');
+      setResetNewPassword('');
+      setResetDone(false);
+    } else {
+      setMode(initialView);
+    }
+  }, [isOpen, initialView]);
+
   const pwVal = validatePassword(formData.password);
   const pwScore = (pwVal.minLength ? 1 : 0) + (pwVal.hasNumber ? 1 : 0) + (pwVal.hasUpperCase ? 1 : 0);
   const isEmailValid = validateEmail(formData.email);
