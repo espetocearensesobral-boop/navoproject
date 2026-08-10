@@ -692,6 +692,66 @@ app.use('/api/whatsapp/reconnect', requireAuth, requireAdmin);
 app.use('/api/whatsapp/logout', requireAuth, requireAdmin);
 app.use('/api/whatsapp', whatsappRouter);
 
+// --- Email Notification Service (SMTP via nodemailer) ---
+import { createEmailModule } from './email.js';
+const { router: emailRouter, sendEmail } = createEmailModule(() => db, schema, eq);
+app.use('/api/email/config', requireAuth, requireAdmin);
+app.use('/api/email/test', requireAuth, requireAdmin);
+app.use('/api/email', emailRouter);
+
+/** Busca o e-mail do cliente pelo clientId (perfil), sem derrubar o fluxo principal se falhar. */
+async function getClientEmail(clientId: string | undefined | null): Promise<string | null> {
+  if (!clientId || clientId === 'usr_guest') return null;
+  try {
+    const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, clientId) });
+    return profile?.email || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function buildBookingConfirmationEmail(apt: any) {
+  const subject = `Agendamento confirmado — ${apt.date} às ${apt.timeSlot}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #1a1a1a;">
+      <h2 style="color: #b8860b;">💈 Navo Barber &amp; Club</h2>
+      <p>Olá, <strong>${apt.clientName || 'Cliente'}</strong>!</p>
+      <p>Seu agendamento foi <strong>confirmado</strong> com sucesso:</p>
+      <ul style="line-height: 1.8;">
+        <li><strong>Código:</strong> ${apt.bookingCode || apt.id}</li>
+        <li><strong>Data:</strong> ${apt.date}</li>
+        <li><strong>Horário:</strong> ${apt.timeSlot}</li>
+        <li><strong>Profissional:</strong> ${apt.professionalName || 'Profissional Navo Barber'}</li>
+      </ul>
+      <p>Te esperamos com o café pronto! ☕</p>
+    </div>`;
+  return { subject, html };
+}
+
+function buildBookingCancellationEmail(apt: any) {
+  const subject = `Agendamento cancelado — ${apt.date} às ${apt.timeSlot}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #1a1a1a;">
+      <h2 style="color: #b8860b;">💈 Navo Barber &amp; Club</h2>
+      <p>Olá, <strong>${apt.clientName || 'Cliente'}</strong>!</p>
+      <p>Seu agendamento para <strong>${apt.date}</strong> às <strong>${apt.timeSlot}</strong> foi <strong>cancelado</strong>.</p>
+      <p>Ficamos à disposição para remarcar quando desejar! 💈</p>
+    </div>`;
+  return { subject, html };
+}
+
+/** Busca o e-mail do cliente e dispara o envio, sem nunca lançar (mesmo padrão do sendWhatsAppMessage). */
+async function notifyClientByEmail(clientId: string | undefined | null, apt: any, kind: 'booking' | 'cancel') {
+  try {
+    const email = await getClientEmail(clientId);
+    if (!email) return;
+    const { subject, html } = kind === 'booking' ? buildBookingConfirmationEmail(apt) : buildBookingCancellationEmail(apt);
+    sendEmail(email, subject, html, undefined, kind).catch(() => {});
+  } catch (e) {
+    // Nunca deixa uma falha no envio de e-mail derrubar o fluxo principal.
+  }
+}
+
 // =====================================
 // Guest Appointments Lookup API (2 Etapas)
 // =====================================
@@ -965,6 +1025,7 @@ app.patch("/api/appointments/lookup/cancel", sensitiveOpsLimiter, optionalAuth, 
       `Ficamos à disposição para remarcar quando desejar! 💈`;
     
     sendWhatsAppMessage(appointment.clientPhone || inputPhone, msg).catch(() => {});
+    notifyClientByEmail(appointment.clientId, appointment, 'cancel');
 
     return res.json({ 
       success: true, 
@@ -1389,9 +1450,11 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
     if (newApt.status === 'cancelled') {
       const msg = `❌ *BARBERX PREMIUM*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\nSeu agendamento para *${newApt.date}* às *${newApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
       sendWhatsAppMessage(phone, msg).catch(() => {});
+      notifyClientByEmail(newApt.clientId, newApt, 'cancel');
     } else {
       const msg = `💈 *BARBERX PREMIUM*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *confirmado* com sucesso:\n\n🔑 *Código:* ${newApt.bookingCode || newApt.id}\n📅 *Data:* ${newApt.date}\n⏰ *Horário:* ${newApt.timeSlot}\n✂️ *Barbeiro:* ${newApt.professionalName || 'Profissional BarberX'}\n\n📍 *Local:* BarberX Premium - Rua dos Barões, 1420 - Jardins\n\nTe esperamos com o café pronto! ☕`;
       sendWhatsAppMessage(phone, msg).catch(() => {});
+      notifyClientByEmail(newApt.clientId, newApt, 'booking');
     }
 
     res.json(newApt);
@@ -1511,6 +1574,7 @@ app.patch("/api/appointments/:id/cancel", sensitiveOpsLimiter, optionalAuth, asy
       const msg = `❌ *BARBERX PREMIUM*\n\nOlá, *${updatedApt.clientName || 'Cliente'}*!\nSeu agendamento para *${updatedApt.date}* às *${updatedApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
 
       sendWhatsAppMessage(phone, msg).catch(() => {});
+      notifyClientByEmail(updatedApt.clientId, updatedApt, 'cancel');
     }
 
     res.json({ success: true, updated: updatedApt });

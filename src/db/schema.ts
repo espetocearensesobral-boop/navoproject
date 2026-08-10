@@ -280,3 +280,24 @@ export const shopSettings = pgTable('shop_settings', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// Configuração de envio de e-mails (SMTP) — singleton, id fixo 'default'.
+// Guardado em tabela separada (não em shop_settings) porque contém uma
+// credencial sensível (smtpPassword) e shop_settings é lido publicamente
+// pelo endpoint GET /api/shop-profile (sem auth).
+export const emailSettings = pgTable('email_settings', {
+  id: text('id').primaryKey().default('default'),
+  enabled: boolean('enabled').notNull().default(false),
+  smtpHost: text('smtp_host').default(''),
+  smtpPort: integer('smtp_port').notNull().default(587),
+  // true = conexão TLS implícita (porta 465). false = STARTTLS (porta 587/25).
+  smtpSecure: boolean('smtp_secure').notNull().default(false),
+  smtpUser: text('smtp_user').default(''),
+  smtpPassword: text('smtp_password').default(''),
+  fromName: text('from_name').notNull().default('Navo Barber & Club'),
+  fromEmail: text('from_email').default(''),
+  replyTo: text('reply_to').default(''),
+  notifyOnBooking: boolean('notify_on_booking').notNull().default(true),
+  notifyOnCancel: boolean('notify_on_cancel').notNull().default(false),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
