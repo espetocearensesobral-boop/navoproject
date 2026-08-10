@@ -318,9 +318,9 @@ export const AdminLayout: React.FC = () => {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full h-10 px-3 rounded-xl text-xs font-semibold flex items-center gap-2.5 transition-colors group min-w-0 ${
+                      className={`w-full h-10 px-3 rounded-xl text-xs font-bold flex items-center gap-2.5 transition-colors group min-w-0 ${
                         isActive
-                          ? 'bg-gold-base/15 text-gold-base border border-gold-base/30'
+                          ? 'bg-gold-base/25 text-gold-base border border-gold-base/60 shadow-sm'
                           : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
                       }`}
                     >
@@ -460,9 +460,9 @@ export const AdminLayout: React.FC = () => {
                             setActiveTab(item.id);
                             setSidebarOpen(false);
                           }}
-                          className={`w-full h-11 px-3 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors ${
+                          className={`w-full h-11 px-3 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors ${
                             isActive
-                              ? 'bg-gold-base/15 text-gold-base border border-gold-base/30'
+                              ? 'bg-gold-base/25 text-gold-base border border-gold-base/60 shadow-sm'
                               : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
                           }`}
                         >
