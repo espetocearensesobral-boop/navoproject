@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ServiceItem, Professional, UserProfile } from '../../types';
+import { TermsAndPrivacyModal } from '../shared/TermsAndPrivacyModal';
 import {
   Award,
   ArrowLeft,
@@ -38,6 +39,7 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
 }) => {
   const [useLoyaltyPoints, setUseLoyaltyPoints] = useState<boolean>(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [modalTab, setModalTab] = useState<'terms' | 'privacy' | null>(null);
 
   const [clientName, setClientName] = useState<string>(
     userProfile?.name && userProfile.name !== 'Visitante' ? userProfile.name : ''
@@ -322,12 +324,30 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
       <div className="mt-4 text-center px-4 mb-20">
         <p className="text-[11px] text-content-muted leading-relaxed">
           Ao confirmar, seu agendamento será processado de acordo com a nossa{' '}
-          <a href="#" onClick={(e) => e.preventDefault()} className="text-gold-base underline hover:text-gold-hover">
+          <button
+            type="button"
+            onClick={() => setModalTab('privacy')}
+            className="text-gold-base underline hover:text-gold-hover font-semibold"
+          >
             Política de Privacidade
-          </a>{' '}
-          e os Termos de Uso do sistema.
+          </button>{' '}
+          e os{' '}
+          <button
+            type="button"
+            onClick={() => setModalTab('terms')}
+            className="text-gold-base underline hover:text-gold-hover font-semibold"
+          >
+            Termos de Serviço
+          </button>{' '}
+          do sistema.
         </p>
       </div>
+
+      <TermsAndPrivacyModal
+        isOpen={!!modalTab}
+        defaultTab={modalTab || 'privacy'}
+        onClose={() => setModalTab(null)}
+      />
 
       {/* Floating Bottom Tray */}
       <div className="sticky bottom-3 left-0 right-0 px-5 z-40 flex justify-center pointer-events-none animate-fade-in my-3">

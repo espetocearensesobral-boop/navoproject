@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { TermsAndPrivacyModal } from '../shared/TermsAndPrivacyModal';
 import { 
   ShopProfile, 
   defaultShopProfile, 
@@ -78,6 +79,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   }, [scrollContainerRef]);
   const [activeCategory, setActiveCategory] = useState<'todos' | 'cabelo' | 'barba'>('todos');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [termsPrivacyTab, setTermsPrivacyTab] = useState<'terms' | 'privacy' | null>(null);
   const [isHoursModalOpen, setIsHoursModalOpen] = useState(false);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
   const [dbServices, setDbServices] = useState<any[]>([]);
@@ -1073,8 +1075,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               <span className="text-gray-400">{scheduleSummary}</span>
             </div>
             <div className="flex flex-wrap gap-4 sm:gap-6">
-              <a href="#" className="hover:text-white transition-colors">Privacidade</a>
-              <a href="#" className="hover:text-white transition-colors">Termos</a>
+              <button
+                type="button"
+                onClick={() => setTermsPrivacyTab('privacy')}
+                className="hover:text-white transition-colors cursor-pointer text-left"
+              >
+                Privacidade
+              </button>
+              <button
+                type="button"
+                onClick={() => setTermsPrivacyTab('terms')}
+                className="hover:text-white transition-colors cursor-pointer text-left"
+              >
+                Termos
+              </button>
               {shopProfile.instagramUrl && (
                 <a href={shopProfile.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
                   <Instagram className="w-3.5 h-3.5" /> Instagram
@@ -1092,6 +1106,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </div>
         </footer>
       </section>
+
+      <TermsAndPrivacyModal
+        isOpen={!!termsPrivacyTab}
+        defaultTab={termsPrivacyTab || 'privacy'}
+        onClose={() => setTermsPrivacyTab(null)}
+      />
 
       {/* MODAL FULLSCREEN CARROSSEL DE FOTOS DOS CORTES REAIS */}
       <AnimatePresence>

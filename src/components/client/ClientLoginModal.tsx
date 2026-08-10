@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { authFetch } from '../../lib/api';
 import { X, Mail, Lock, User, Phone, Eye, EyeOff, KeyRound, CheckCircle, ArrowLeft, XCircle } from 'lucide-react';
+import { TermsAndPrivacyModal } from '../shared/TermsAndPrivacyModal';
 
 interface ClientLoginModalProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [isSubmittingForgot, setIsSubmittingForgot] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [modalTab, setModalTab] = useState<'terms' | 'privacy' | null>(null);
 
   // Reset-password step (after the WhatsApp code was requested)
   const [resetCode, setResetCode] = useState('');
@@ -589,7 +591,30 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
                   onChange={(e) => setFormData({ ...formData, lgpdConsent: e.target.checked })}
                 />
                 <label htmlFor="lgpdConsent" className="text-[10px] text-content-muted leading-tight cursor-pointer">
-                  Declaro que li e concordo com os Termos de Uso e a Política de Privacidade (LGPD). Aceito o armazenamento seguro dos meus dados para uso exclusivo no agendamento e prestação de serviços.
+                  Ao criar uma conta, eu concordo com os{' '}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setModalTab('terms');
+                    }}
+                    className="text-gold-base underline hover:text-gold-hover font-semibold inline-block"
+                  >
+                    Termos de Serviço
+                  </button>{' '}
+                  e{' '}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setModalTab('privacy');
+                    }}
+                    className="text-gold-base underline hover:text-gold-hover font-semibold inline-block"
+                  >
+                    Política de privacidade
+                  </button>.
                 </label>
               </div>
             )}
@@ -613,6 +638,12 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
             {mode === 'register' ? 'Já tenho uma conta. Entrar' : mode === 'forgot' ? 'Voltar para o Entrar' : 'Não tem conta? Criar uma'}
           </button>
         </div>
+
+        <TermsAndPrivacyModal
+          isOpen={!!modalTab}
+          defaultTab={modalTab || 'terms'}
+          onClose={() => setModalTab(null)}
+        />
       </div>
     </div>
   );
