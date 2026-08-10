@@ -2753,21 +2753,21 @@ app.post("/api/profiles", authLimiter, async (req, res) => {
 
     const dbProfiles = await db.query.profiles.findMany();
 
-    // Filtra para verificar se já existe uma CONTA REAL (com senha cadastrada)
-    const dbExisting = dbProfiles.find((p: any) => {
-      const isGuestProfile = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
-      if (isGuestProfile) return false;
+    // 1. Verificação de E-mail Único
+    const existingEmailUser = cleanEmail 
+      ? dbProfiles.find((p: any) => p.email && p.email.toLowerCase().trim() === cleanEmail && !p.email.endsWith('@guest.barberx.app'))
+      : null;
 
-      const emailMatch = cleanEmail && p.email && p.email.toLowerCase().trim() === cleanEmail;
-      const phoneMatch = cleanPhone && p.phone && matchPhoneNumbers(p.phone, cleanPhone);
+    if (existingEmailUser) {
+      return res.status(400).json({ error: 'E-mail já cadastrado. Por favor faça login.' });
+    }
 
-      return emailMatch || phoneMatch;
-    });
+    // 2. Verificação de Telefone já cadastrado em outra CONTA COM SENHA
+    const existingPhoneUser = cleanPhone 
+      ? dbProfiles.find((p: any) => p.phone && matchPhoneNumbers(p.phone, cleanPhone) && p.password && p.id !== 'usr_guest' && !p.id.startsWith('guest_'))
+      : null;
 
-    if (dbExisting) {
-      if (cleanEmail && dbExisting.email && dbExisting.email.toLowerCase().trim() === cleanEmail) {
-        return res.status(400).json({ error: 'E-mail já cadastrado. Por favor faça login.' });
-      }
+    if (existingPhoneUser) {
       return res.status(400).json({ error: 'Telefone já cadastrado em outra conta. Por favor faça login.' });
     }
 
