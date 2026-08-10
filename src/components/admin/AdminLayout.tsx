@@ -18,6 +18,7 @@ import { SettingsManagement } from './SettingsManagement';
 import { NavoRewardsAdmin } from './NavoRewardsAdmin';
 import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { authFetch } from '../../lib/api';
+import { useTheme } from '../../contexts/ThemeContext';
 import { 
   Calendar,
   Clock,
@@ -39,7 +40,9 @@ import {
   Wallet,
   ShieldCheck,
   MessageSquare,
-  QrCode
+  QrCode,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export type AdminTab = 
@@ -63,6 +66,7 @@ export type AdminTab =
 export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionamento' | 'sistema';
 
 export const AdminLayout: React.FC = () => {
+  const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -347,9 +351,17 @@ export const AdminLayout: React.FC = () => {
               <p className="text-xs font-bold text-stone-100 truncate">{adminName}</p>
               <p className="text-[9px] font-bold text-stone-400 uppercase tracking-wider">Admin</p>
             </div>
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-800 text-stone-400 hover:text-gold-base active:bg-stone-800 transition-colors shrink-0"
+              title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+              aria-label="Alternar tema"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-stone-300" />}
+            </button>
             <button 
               onClick={handleLogout}
-              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-800 text-stone-400 hover:text-gold-base active:bg-stone-800 transition-colors shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-800 text-stone-400 hover:text-red-400 active:bg-stone-800 transition-colors shrink-0"
               title="Sair"
               aria-label="Sair"
             >
@@ -477,13 +489,21 @@ export const AdminLayout: React.FC = () => {
             </nav>
             
             {/* Mobile Footer */}
-            <div className="p-3 border-t border-white/10 shrink-0 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+            <div className="p-3 border-t border-white/10 shrink-0 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center gap-2">
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="w-11 h-11 flex items-center justify-center rounded-xl bg-stone-900/90 text-stone-300 hover:text-gold-base border border-white/10 font-semibold text-xs active:scale-95 transition-colors shrink-0"
+                title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+                aria-label="Alternar tema"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-stone-300" />}
+              </button>
               <button 
                 onClick={handleLogout}
-                className="w-full h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-stone-900/90 text-stone-300 hover:text-red-400 border border-white/10 font-semibold text-xs active:scale-95"
+                className="flex-1 h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-stone-900/90 text-stone-300 hover:text-red-400 border border-white/10 font-semibold text-xs active:scale-95 transition-colors min-w-0"
               >
-                <LogOut className="w-4 h-4" />
-                <span>Sair do sistema</span>
+                <LogOut className="w-4 h-4 shrink-0" />
+                <span className="truncate">Sair do sistema</span>
               </button>
             </div>
           </aside>
