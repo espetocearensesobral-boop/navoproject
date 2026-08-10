@@ -2567,12 +2567,17 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
     }
 
     const cleanLoginId = sanitizePhone(loginId);
+    const cleanEmail = loginId.toString().toLowerCase().trim();
 
-    const user = await db.query.profiles.findFirst({
-      where: or(
-        eq(schema.profiles.email, loginId.toLowerCase()),
-        cleanLoginId ? eq(schema.profiles.phone, cleanLoginId) : undefined
-      )
+    const allProfiles = await db.query.profiles.findMany();
+    const user = allProfiles.find((p: any) => {
+      const isGuest = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
+      if (isGuest) return false;
+
+      const emailMatches = p.email && p.email.toLowerCase().trim() === cleanEmail;
+      const phoneMatches = cleanLoginId && p.phone && matchPhoneNumbers(p.phone, cleanLoginId);
+
+      return emailMatches || phoneMatches;
     });
 
     if (!user || !user.password) {
@@ -2628,11 +2633,17 @@ app.post("/api/auth/forgot-password", authLimiter, async (req, res) => {
       return res.status(400).json({ error: 'E-mail ou telefone é obrigatório.' });
     }
     const cleanLoginId = sanitizePhone(loginId);
-    const user = await db.query.profiles.findFirst({
-      where: or(
-        eq(schema.profiles.email, loginId.toLowerCase()),
-        cleanLoginId ? eq(schema.profiles.phone, cleanLoginId) : undefined
-      )
+    const cleanEmail = loginId.toString().toLowerCase().trim();
+
+    const allProfiles = await db.query.profiles.findMany();
+    const user = allProfiles.find((p: any) => {
+      const isGuest = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
+      if (isGuest) return false;
+
+      const emailMatches = p.email && p.email.toLowerCase().trim() === cleanEmail;
+      const phoneMatches = cleanLoginId && p.phone && matchPhoneNumbers(p.phone, cleanLoginId);
+
+      return emailMatches || phoneMatches;
     });
 
     if (user && user.phone) {
@@ -2648,8 +2659,6 @@ app.post("/api/auth/forgot-password", authLimiter, async (req, res) => {
       sendWhatsAppMessage(user.phone, msg).catch(() => {});
     }
 
-    // Sempre responde sucesso (mesmo se o usuário não existir) para não vazar
-    // quais e-mails/telefones estão cadastrados.
     res.json({
       success: true,
       message: 'Se o cadastro existir, um código de verificação foi enviado por WhatsApp.'
@@ -2670,15 +2679,19 @@ app.post("/api/auth/reset-password", authLimiter, async (req, res) => {
     }
 
     const cleanLoginId = sanitizePhone(loginId);
-    const user = await db.query.profiles.findFirst({
-      where: or(
-        eq(schema.profiles.email, loginId.toLowerCase()),
-        cleanLoginId ? eq(schema.profiles.phone, cleanLoginId) : undefined
-      )
+    const cleanEmail = loginId.toString().toLowerCase().trim();
+
+    const allProfiles = await db.query.profiles.findMany();
+    const user = allProfiles.find((p: any) => {
+      const isGuest = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
+      if (isGuest) return false;
+
+      const emailMatches = p.email && p.email.toLowerCase().trim() === cleanEmail;
+      const phoneMatches = cleanLoginId && p.phone && matchPhoneNumbers(p.phone, cleanLoginId);
+
+      return emailMatches || phoneMatches;
     });
 
-    // Resposta genérica em caso de usuário/código inválido, para não vazar
-    // se o e-mail/telefone existe na base.
     const invalidResponse = () => res.status(400).json({ error: 'Código inválido ou expirado.' });
 
     if (!user || !user.resetCodeHash || !user.resetCodeExpiresAt) {
@@ -2715,6 +2728,8 @@ app.get("/api/profiles", requireAuth, async (req: any, res) => {
         let safe = dbProfiles.map((p: any) => formatProfile(p));
         if (!isAdmin) {
           safe = safe.filter((p: any) => p.id === userId);
+        } else {
+          safe = safe.filter((p: any) => p.password || (!p.id.startsWith('guest_') && p.id !== 'usr_guest'));
         }
         return res.json(safe);
       } catch (err) {}
@@ -2736,14 +2751,37 @@ app.post("/api/profiles", authLimiter, async (req, res) => {
     const cleanPhone = sanitizePhone(phone);
     const cleanEmail = email ? email.toLowerCase().trim() : '';
 
-    const dbExisting = await db.query.profiles.findFirst({
-      where: or(
-        cleanEmail ? eq(schema.profiles.email, cleanEmail) : undefined,
-        cleanPhone ? eq(schema.profiles.phone, cleanPhone) : undefined
-      )
+    const dbProfiles = await db.query.profiles.findMany();
+
+    // Filtra para verificar se já existe uma CONTA REAL (com senha cadastrada)
+    const dbExisting = dbProfiles.find((p: any) => {
+      const isGuestProfile = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
+      if (isGuestProfile) return false;
+
+      const emailMatch = cleanEmail && p.email && p.email.toLowerCase().trim() === cleanEmail;
+      const phoneMatch = cleanPhone && p.phone && matchPhoneNumbers(p.phone, cleanPhone);
+
+      return emailMatch || phoneMatch;
     });
+
     if (dbExisting) {
-      return res.status(400).json({ error: 'E-mail ou telefone já cadastrado.' });
+      if (cleanEmail && dbExisting.email && dbExisting.email.toLowerCase().trim() === cleanEmail) {
+        return res.status(400).json({ error: 'E-mail já cadastrado. Por favor faça login.' });
+      }
+      return res.status(400).json({ error: 'Telefone já cadastrado em outra conta. Por favor faça login.' });
+    }
+
+    // Se houver perfis temporários de visitante com o mesmo telefone, podemos limpá-los para evitar duplicidade
+    if (cleanPhone) {
+      try {
+        const guestProfilesToDelete = dbProfiles.filter((p: any) => 
+          (!p.password || p.id.startsWith('guest_') || p.id === 'usr_guest') &&
+          matchPhoneNumbers(p.phone, cleanPhone)
+        );
+        for (const gp of guestProfilesToDelete) {
+          await db.delete(schema.profiles).where(eq(schema.profiles.id, gp.id)).catch(() => {});
+        }
+      } catch (eClean) {}
     }
 
     let hashedPassword = password;
@@ -2772,7 +2810,7 @@ app.post("/api/profiles", authLimiter, async (req, res) => {
     await db.insert(schema.profiles).values(dbProfile);
 
     // VINCULAÇÃO AUTOMÁTICA DE REGISTROS DE VISITANTE:
-    // Se o telefone cadastrado possuir agendamentos anteriores feitos como visitante, vincula-os ao perfil do usuário
+    // Vincula todos os agendamentos de visitante anteriores com o mesmo telefone ao novo perfil
     if (cleanPhone) {
       try {
         const allApts = await db.select().from(schema.appointments);
