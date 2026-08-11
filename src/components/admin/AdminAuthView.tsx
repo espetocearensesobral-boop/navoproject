@@ -34,8 +34,8 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
     authFetch('/api/shop-profile')
       .then(res => res.json())
       .then(data => {
-        if (data.logoBase64) {
-          setShopLogo(data.logoBase64);
+        if (data.logoUrl) {
+          setShopLogo(data.logoUrl);
         }
         if (data.name) {
           setShopName(data.name);
