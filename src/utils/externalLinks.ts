@@ -59,6 +59,11 @@ export function openPhoneDirect(phone?: string) {
   window.location.href = `tel:${clean}`;
 }
 
+export function openInstagramDirect(instagramHandle?: string) {
+  const clean = instagramHandle ? instagramHandle.replace('@', '').trim() : 'barbearianavo';
+  window.open(`https://instagram.com/${clean}`, '_blank', 'noopener,noreferrer');
+}
+
 export interface ShopStatusInfo {
   status: 'open' | 'closing_soon' | 'closed';
   label: string; // "Aberto", "Fechará em breve", "Fechado"

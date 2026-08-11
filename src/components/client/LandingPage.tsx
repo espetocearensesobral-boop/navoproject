@@ -8,7 +8,7 @@ import {
   daysOfWeekMap 
 } from '../../services/shopProfileService';
 import { fetchServicesFromSupabase } from '../../services/supabaseDataService';
-import { openWhatsAppDirect, openMapsDirect, openWazeDirect, getShopStatusInfo } from '../../utils/externalLinks';
+import { openWhatsAppDirect, openMapsDirect, openWazeDirect, openInstagramDirect, getShopStatusInfo } from '../../utils/externalLinks';
 import { 
   Clock, 
   MapPin, 
@@ -518,16 +518,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         </motion.header>
 
         {/* HERO CONTENT */}
-        <div className="relative z-10 p-5 pb-6 flex flex-col justify-end items-start my-auto min-h-0 w-full max-w-md md:max-w-2xl mx-auto">
-          {/* RATING BADGE */}
+        <div className="relative z-10 p-5 pb-6 flex flex-col justify-end items-center text-center my-auto min-h-0 w-full max-w-md md:max-w-2xl mx-auto">
+          {/* LOGO DA BARBEARIA (ESTILO INSTAGRAM CIRCULAR) */}
           <motion.div 
-            initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
-            className="inline-flex items-center gap-2 bg-gold-base/12 border border-gold-base/25 px-3.5 py-1.5 rounded-full text-xs font-semibold text-gold-base mb-4 backdrop-blur-xs"
+            initial={reducedMotion ? {} : { opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
+            className="mb-3.5 flex flex-col items-center justify-center shrink-0 cursor-pointer group"
+            onClick={() => {
+              hapticLight();
+              openInstagramDirect(shopProfile.instagram);
+            }}
+            title={shopProfile.instagram ? `Ver ${shopProfile.instagram} no Instagram` : 'Instagram da Barbearia'}
           >
-            <span className="tracking-widest text-[0.7rem] font-bold">★★★★★</span>
-            <span>4.9 · 1.2k avaliações</span>
+            {/* Anel de Gradiente Estilo Stories do Instagram */}
+            <div className="relative p-[3px] rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-amber-300 shadow-xl group-hover:scale-105 transition-transform duration-300">
+              <div className="p-[2.5px] bg-[#0a0a0a] rounded-full">
+                <div className="w-[120px] h-[120px] rounded-full overflow-hidden bg-neutral-900 flex items-center justify-center relative shadow-inner">
+                  {shopProfile.logoUrl ? (
+                    <img 
+                      src={shopProfile.logoUrl} 
+                      alt={shopProfile.name || 'Logo Barbearia'} 
+                      className="w-full h-full object-cover rounded-full"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                        if (e.currentTarget.parentElement) {
+                          const fallback = e.currentTarget.parentElement.querySelector('.logo-fallback');
+                          if (fallback) fallback.classList.remove('hidden');
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div className={`logo-fallback ${shopProfile.logoUrl ? 'hidden' : ''} flex flex-col items-center justify-center w-full h-full bg-neutral-900 text-gold-base`}>
+                    <Scissors className="w-11 h-11 text-gold-base stroke-[1.8]" />
+                  </div>
+                </div>
+              </div>
+              {/* Ícone do Instagram em destaque no canto */}
+              <div className="absolute -bottom-0.5 -right-0.5 bg-gradient-to-tr from-amber-500 to-rose-500 p-1.5 sm:p-2 rounded-full text-white shadow-md border border-[#0a0a0a]">
+                <Instagram className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              </div>
+            </div>
           </motion.div>
 
           {/* TITLE */}
