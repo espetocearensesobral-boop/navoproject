@@ -255,13 +255,13 @@ export const AdminLayout: React.FC = () => {
       case 'financeiro':
         return <FinanceiroManagement />;
       case 'audit':
-        return <AuditLogsManagement />;
+        return <SettingsManagement initialTab="audit" />;
       case 'subscriptions':
         return <SubscriptionsManagement />;
       case 'whatsapp':
-        return <WhatsAppManagement />;
+        return <SettingsManagement initialTab="whatsapp" />;
       case 'qrcode':
-        return <QrCodeManagement />;
+        return <SettingsManagement initialTab="qrcode" />;
       case 'agenda':
         return <ScheduleGrid />;
       case 'queue':

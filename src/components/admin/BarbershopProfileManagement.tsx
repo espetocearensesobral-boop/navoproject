@@ -16,8 +16,11 @@ import {
   Upload,
   Scissors,
   Trash2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Palette,
+  Check
 } from 'lucide-react';
+import { PALETTES, useTheme } from '../../contexts/ThemeContext';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { 
   ShopProfile, 
@@ -34,7 +37,7 @@ export const BarbershopProfileManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'address' | 'hours'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'address' | 'hours' | 'appearance'>('info');
 
   useEffect(() => {
     loadProfile();
@@ -198,6 +201,18 @@ export const BarbershopProfileManagement: React.FC = () => {
         >
           <MapPin className="w-3.5 h-3.5" />
           <span>Endereço e Contatos</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('appearance')}
+          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+            activeTab === 'appearance' 
+              ? 'bg-gold-base text-surface-base' 
+              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
+          }`}
+        >
+          <Palette className="w-3.5 h-3.5" />
+          <span>Aparência e Paleta</span>
         </button>
       </div>
 
@@ -608,6 +623,11 @@ export const BarbershopProfileManagement: React.FC = () => {
         </form>
       )}
 
+      {/* TAB CONTENT: APARÊNCIA E PALETA */}
+      {activeTab === 'appearance' && (
+        <AppearanceTabContent />
+      )}
+
       {/* FOOTER SAVE ACTION */}
       <div className="pt-4 border-t border-border-subtle flex justify-end">
         <button
@@ -618,6 +638,60 @@ export const BarbershopProfileManagement: React.FC = () => {
           <Save className="w-4 h-4" />
           <span>{isSaving ? 'Salvando...' : 'Salvar Perfil da Barbearia'}</span>
         </button>
+      </div>
+    </div>
+  );
+};
+
+const AppearanceTabContent: React.FC = () => {
+  const { palette, setPalette } = useTheme();
+
+  return (
+    <div className="bg-surface-card border border-border-subtle p-5 rounded-xl space-y-6 text-xs min-w-0">
+      <div>
+        <div className="flex items-center gap-2 pb-2 border-b border-border-subtle mb-3">
+          <Palette className="w-4 h-4 text-gold-base" />
+          <h2 className="text-sm font-serif font-bold text-content-base">Paleta e Identidade Visual do Sistema</h2>
+        </div>
+        <p className="text-[11px] text-content-muted max-w-xl">
+          Personalize a cor de destaque da sua unidade sem alterar o contraste e legibilidade. A escolha é salva neste dispositivo e aplicada instantaneamente a todo o sistema e aplicativo dos clientes.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+        {PALETTES.map((item) => {
+          const selected = palette === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setPalette(item.id)}
+              aria-pressed={selected}
+              className={`group text-left rounded-xl border p-3 transition-all active:scale-[0.98] ${selected ? 'border-gold-base bg-gold-base/10 shadow-sm' : 'border-border-subtle bg-surface-base hover:border-gold-base/50 hover:bg-surface-elevated'}`}
+            >
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-8 h-8 rounded-xl shrink-0 border border-white/10 shadow-inner" style={{ background: `linear-gradient(135deg, ${item.accentSoft}, ${item.deep})` }} />
+                  <span className="min-w-0">
+                    <span className="block text-xs font-bold text-content-base truncate">{item.name}</span>
+                    <span className="block text-[10px] text-content-muted truncate">{item.description}</span>
+                  </span>
+                </div>
+                {selected && <span className="w-5 h-5 rounded-full flex items-center justify-center bg-gold-base text-surface-base"><Check className="w-3 h-3" /></span>}
+              </div>
+              <div className="flex gap-1.5" aria-hidden="true">
+                <span className="h-1.5 flex-1 rounded-full" style={{ backgroundColor: item.deep }} />
+                <span className="h-1.5 flex-1 rounded-full" style={{ backgroundColor: item.accent }} />
+                <span className="h-1.5 flex-1 rounded-full" style={{ backgroundColor: item.accentSoft }} />
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="pt-4 border-t border-border-subtle flex items-start gap-2 text-[11px] text-content-muted">
+        <Palette className="w-4 h-4 text-gold-base shrink-0 mt-0.5" />
+        <p>O Dourado Heritage permanece como padrão original. As demais opções alteram os elementos de realce (botões, ícones, seleções) mantendo a estrutura limpa e fluida da plataforma.</p>
       </div>
     </div>
   );
