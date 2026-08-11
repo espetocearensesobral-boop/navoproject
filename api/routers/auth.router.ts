@@ -183,80 +183,8 @@ const handleAdminLogin = async (req: express.Request, res: express.Response) => 
   }
 };
 
-const handleAdminRegister = async (req: express.Request, res: express.Response) => {
-  try {
-    const { name, email, phone, password } = req.body;
-
-    if (!name || name.trim().length < 3) {
-      return res.status(400).json({ error: 'Nome completo é obrigatório (mínimo 3 caracteres).' });
-    }
-
-    if (!email || !email.includes('@')) {
-      return res.status(400).json({ error: 'E-mail corporativo válido é obrigatório.' });
-    }
-
-    if (!password || password.length < 6) {
-      return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres.' });
-    }
-
-    const cleanPhone = sanitizePhone(phone);
-    const cleanEmail = email.toLowerCase().trim();
-
-    const dbProfiles = await db.query.profiles.findMany();
-
-    const existingEmailUser = dbProfiles.find((p: any) => p.email && p.email.toLowerCase().trim() === cleanEmail && !p.email.endsWith('@guest.barberx.app'));
-    if (existingEmailUser) {
-      return res.status(400).json({ error: 'E-mail já cadastrado no sistema.' });
-    }
-
-    if (cleanPhone) {
-      const existingPhoneUser = dbProfiles.find((p: any) => p.phone && matchPhoneNumbers(p.phone, cleanPhone) && p.password && p.id !== 'usr_guest');
-      if (existingPhoneUser) {
-        return res.status(400).json({ error: 'Telefone já cadastrado no sistema.' });
-      }
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newId = `admin_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-
-    const newAdmin = {
-      id: newId,
-      name: name.trim(),
-      email: cleanEmail,
-      phone: cleanPhone || '',
-      password: hashedPassword,
-      role: 'admin',
-      loyaltyTier: 'VIP',
-      lgpdConsent: true,
-      lgpdConsentDate: new Date(),
-    };
-
-    await db.insert(schema.profiles).values(newAdmin);
-
-    const safeUser = formatProfile(newAdmin);
-
-    const token = jwt.sign(
-      { id: newAdmin.id, role: 'admin', email: newAdmin.email, phone: newAdmin.phone },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    setAuthCookie(res, token);
-
-    return res.json({
-      ...safeUser,
-      token,
-    });
-  } catch (e: any) {
-    console.error('Error in POST admin register:', e);
-    return res.status(500).json({ error: 'Erro ao cadastrar administrador.' });
-  }
-};
-
 authRouter.post("/admin/login", authLimiter, handleAdminLogin);
 authRouter.post("/admin-login", authLimiter, handleAdminLogin);
-authRouter.post("/admin/register", authLimiter, handleAdminRegister);
-authRouter.post("/admin-register", authLimiter, handleAdminRegister);
 
 authRouter.post("/forgot-password", authLimiter, async (req, res) => {
   try {

@@ -1,19 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { authFetch, setStoredToken } from '../../lib/api';
 import { 
   ShieldCheck, 
   Lock, 
-  Mail, 
   User, 
-  Phone, 
   Eye, 
   EyeOff, 
   ArrowLeft, 
   Scissors, 
   CheckCircle2, 
-  AlertCircle,
-  Sparkles,
-  KeyRound
+  AlertCircle
 } from 'lucide-react';
 
 interface AdminAuthViewProps {
@@ -21,11 +17,12 @@ interface AdminAuthViewProps {
 }
 
 export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) => {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [shopLogo, setShopLogo] = useState<string | null>(null);
+  const [shopName, setShopName] = useState<string>('Management System');
 
   // Form State
   const [loginData, setLoginData] = useState({
@@ -33,27 +30,19 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
     password: ''
   });
 
-  const [registerData, setRegisterData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: ''
-  });
-
-  // Phone masking
-  const handlePhoneChange = (val: string) => {
-    let digits = val.replace(/\D/g, '');
-    if (digits.length > 11) digits = digits.slice(0, 11);
-    let masked = val;
-    if (digits.length > 0) {
-      if (digits.length <= 2) masked = digits;
-      else if (digits.length <= 6) masked = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-      else if (digits.length <= 10) masked = `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-      else masked = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
-    }
-    setRegisterData(prev => ({ ...prev, phone: masked }));
-  };
+  useEffect(() => {
+    authFetch('/api/shop-profile')
+      .then(res => res.json())
+      .then(data => {
+        if (data.logoBase64) {
+          setShopLogo(data.logoBase64);
+        }
+        if (data.name) {
+          setShopName(data.name);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,346 +91,138 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
     }
   };
 
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
-
-    if (registerData.name.trim().length < 3) {
-      setErrorMsg('Informe o nome completo do administrador (mínimo 3 letras).');
-      return;
-    }
-    if (!registerData.email || !registerData.email.includes('@')) {
-      setErrorMsg('Informe um e-mail válido.');
-      return;
-    }
-    if (registerData.password.length < 6) {
-      setErrorMsg('A senha deve conter pelo menos 6 caracteres.');
-      return;
-    }
-    if (registerData.password !== registerData.confirmPassword) {
-      setErrorMsg('As senhas digitadas não conferem.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const res = await authFetch('/api/auth/admin/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: registerData.name.trim(),
-          email: registerData.email.trim(),
-          phone: registerData.phone.trim(),
-          password: registerData.password
-        })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Não foi possível cadastrar o administrador.');
-      }
-
-      if (data.token) {
-        setStoredToken(data.token);
-      }
-
-      setSuccessMsg('Conta de administrador criada com sucesso!');
-      setTimeout(() => {
-        onLoginSuccess(data);
-      }, 500);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Erro ao cadastrar administrador.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-[100dvh] w-full bg-[#0B0C10] text-stone-100 flex flex-col justify-between items-center p-4 sm:p-6 relative overflow-hidden font-sans">
+    <div className="min-h-[100dvh] w-full bg-surface-base text-content-base flex flex-col justify-between items-center p-4 sm:p-6 relative overflow-hidden font-sans">
       {/* Dynamic Background Accents */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-gradient-to-b from-amber-500/10 via-amber-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-gold-base/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-gold-base/5 rounded-full blur-2xl pointer-events-none" />
 
       {/* Header Bar */}
       <header className="w-full max-w-md flex items-center justify-between py-2 z-10">
         <button
           onClick={() => { window.location.href = '/'; }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-900/80 hover:bg-stone-800 text-stone-300 hover:text-gold-base text-xs font-semibold border border-white/10 transition-all active:scale-95"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-base border border-surface-border text-content-muted hover:text-gold-base text-xs font-semibold transition-all active:scale-95 shadow-sm"
           title="Voltar para a área do cliente"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Área de Clientes</span>
         </button>
 
-        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-400/90 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full">
-          <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold-base bg-gold-base/10 border border-gold-base/20 px-2.5 py-1 rounded-full">
+          <ShieldCheck className="w-3.5 h-3.5 text-gold-base" />
           <span>Acesso Restrito</span>
         </div>
       </header>
 
       {/* Main Card */}
       <main className="w-full max-w-md my-auto py-6 z-10">
-        <div className="bg-[#12131A] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
+        <div className="bg-surface-base border border-surface-border rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
           
           {/* Logo & Portal Header */}
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-gold-base to-amber-600 flex items-center justify-center text-stone-950 shadow-lg shadow-amber-500/20 mb-3.5">
-              <Scissors className="w-7 h-7" />
-            </div>
-            <h1 className="text-xl font-serif font-extrabold text-stone-100 tracking-tight flex items-center gap-2">
+            {shopLogo ? (
+              <img src={shopLogo} alt={shopName} className="w-20 h-20 rounded-2xl object-cover mb-4 shadow-lg shadow-gold-base/10 border border-surface-border" />
+            ) : (
+              <div className="w-16 h-16 rounded-2xl bg-gold-base/10 border border-gold-base/20 flex items-center justify-center text-gold-base shadow-lg mb-4">
+                <Scissors className="w-8 h-8" />
+              </div>
+            )}
+            <h1 className="text-xl font-serif font-extrabold text-content-base tracking-tight flex items-center gap-2">
               Painel Administrativo
             </h1>
-            <p className="text-xs text-stone-400 mt-1">
-              BarberX Management • Gestão e Controle
+            <p className="text-xs text-content-muted mt-1">
+              {shopName} • Gestão e Controle
             </p>
-          </div>
-
-          {/* Mode Switcher Tabs */}
-          <div className="grid grid-cols-2 p-1 bg-stone-900/90 rounded-xl border border-white/10 mb-6">
-            <button
-              type="button"
-              onClick={() => { setMode('login'); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-                mode === 'login'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-md'
-                  : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Login Admin</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => { setMode('register'); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-                mode === 'register'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-md'
-                  : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Novo Admin</span>
-            </button>
           </div>
 
           {/* Alert Messages */}
           {errorMsg && (
-            <div className="mb-5 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium flex items-start gap-2.5 animate-fadeIn">
+            <div className="mb-5 p-3 rounded-xl bg-status-error/10 border border-status-error/20 text-status-error text-xs font-medium flex items-start gap-2.5 animate-fadeIn">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="mb-5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium flex items-start gap-2.5 animate-fadeIn">
+            <div className="mb-5 p-3 rounded-xl bg-status-success/10 border border-status-success/20 text-status-success text-xs font-medium flex items-start gap-2.5 animate-fadeIn">
               <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{successMsg}</span>
             </div>
           )}
 
           {/* LOGIN FORM */}
-          {mode === 'login' && (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-stone-300 mb-1.5">
-                  E-mail ou Telefone
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    placeholder="admin@barberx.app ou telefone"
-                    value={loginData.loginId}
-                    onChange={(e) => setLoginData({ ...loginData, loginId: e.target.value })}
-                    className="w-full pl-10 pr-3.5 py-2.5 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/80 focus:ring-1 focus:ring-amber-500/50 transition-all"
-                  />
+          <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-content-base mb-1.5">
+                E-mail ou Telefone
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-content-muted">
+                  <User className="w-4 h-4" />
                 </div>
+                <input
+                  type="text"
+                  required
+                  placeholder="admin@exemplo.com ou telefone"
+                  value={loginData.loginId}
+                  onChange={(e) => setLoginData({ ...loginData, loginId: e.target.value })}
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-surface-base border border-surface-border rounded-xl text-content-base text-xs placeholder:text-content-muted focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all"
+                />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-stone-300 mb-1.5">
-                  Senha
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder="••••••••"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    className="w-full pl-10 pr-10 py-2.5 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/80 focus:ring-1 focus:ring-amber-500/50 transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-500 hover:text-stone-300"
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+            <div>
+              <label className="block text-xs font-semibold text-content-base mb-1.5">
+                Senha
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-content-muted">
+                  <Lock className="w-4 h-4" />
                 </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="••••••••"
+                  value={loginData.password}
+                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                  className="w-full pl-10 pr-10 py-2.5 bg-surface-base border border-surface-border rounded-xl text-content-base text-xs placeholder:text-content-muted focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-content-muted hover:text-content-base"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-gold-base to-amber-600 hover:brightness-110 text-stone-950 font-extrabold text-xs shadow-lg shadow-amber-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-stone-950/30 border-t-stone-950 rounded-full animate-spin" />
-                    <span>Entrando...</span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>Acessar Painel Admin</span>
-                  </>
-                )}
-              </button>
-            </form>
-          )}
-
-          {/* REGISTER FORM */}
-          {mode === 'register' && (
-            <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-semibold text-stone-300 mb-1">
-                  Nome Completo
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ex: Carlos Andrade"
-                    value={registerData.name}
-                    onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
-                    className="w-full pl-10 pr-3.5 py-2 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/80 focus:ring-1 focus:ring-amber-500/50 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-stone-300 mb-1">
-                  E-mail Corporativo
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="email"
-                    required
-                    placeholder="admin@barberx.app"
-                    value={registerData.email}
-                    onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                    className="w-full pl-10 pr-3.5 py-2 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/80 focus:ring-1 focus:ring-amber-500/50 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-stone-300 mb-1">
-                  Telefone / WhatsApp
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
-                    <Phone className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="tel"
-                    placeholder="(11) 99999-9999"
-                    value={registerData.phone}
-                    onChange={(e) => handlePhoneChange(e.target.value)}
-                    className="w-full pl-10 pr-3.5 py-2 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/80 focus:ring-1 focus:ring-amber-500/50 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-stone-300 mb-1">
-                  Senha
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder="Mínimo 6 caracteres"
-                    value={registerData.password}
-                    onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                    className="w-full pl-10 pr-10 py-2 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/80 focus:ring-1 focus:ring-amber-500/50 transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-500 hover:text-stone-300"
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-stone-300 mb-1">
-                  Confirmar Senha
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder="Repita a senha"
-                    value={registerData.confirmPassword}
-                    onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                    className="w-full pl-10 pr-3.5 py-2 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-amber-500/80 focus:ring-1 focus:ring-amber-500/50 transition-all"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-gold-base to-amber-600 hover:brightness-110 text-stone-950 font-extrabold text-xs shadow-lg shadow-amber-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-stone-950/30 border-t-stone-950 rounded-full animate-spin" />
-                    <span>Cadastrando Admin...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    <span>Cadastrar e Acessar Painel</span>
-                  </>
-                )}
-              </button>
-            </form>
-          )}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full mt-2 py-3 px-4 rounded-xl bg-gold-base hover:brightness-110 text-surface-base font-extrabold text-xs shadow-lg shadow-gold-base/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-surface-base/30 border-t-surface-base rounded-full animate-spin" />
+                  <span>Entrando...</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Acessar Painel Admin</span>
+                </>
+              )}
+            </button>
+          </form>
         </div>
       </main>
 
       {/* Footer info */}
       <footer className="w-full max-w-md text-center py-2 z-10">
-        <p className="text-[11px] text-stone-500 font-medium">
-          BarberX Management System &copy; {new Date().getFullYear()} • Todos os direitos reservados.
+        <p className="text-[11px] text-content-muted font-medium">
+          {shopName} &copy; {new Date().getFullYear()} • Todos os direitos reservados.
         </p>
       </footer>
     </div>
