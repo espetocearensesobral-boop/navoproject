@@ -531,8 +531,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             }}
             title={shopProfile.instagram ? `Ver ${shopProfile.instagram} no Instagram` : 'Instagram da Barbearia'}
           >
-            {/* Anel de Gradiente Estilo Stories do Instagram */}
-            <div className="relative p-[3px] rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-amber-300 shadow-xl group-hover:scale-105 transition-transform duration-300">
+            {/* Anel de Gradiente no Padrão Dourado do Sistema */}
+            <div className="relative p-[3px] rounded-full bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 shadow-xl group-hover:scale-105 transition-transform duration-300">
               <div className="p-[2.5px] bg-[#0a0a0a] rounded-full">
                 <div className="w-[120px] h-[120px] rounded-full overflow-hidden bg-neutral-900 flex items-center justify-center relative shadow-inner">
                   {shopProfile.logoUrl ? (
@@ -553,10 +553,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                     <Scissors className="w-11 h-11 text-gold-base stroke-[1.8]" />
                   </div>
                 </div>
-              </div>
-              {/* Ícone do Instagram em destaque no canto */}
-              <div className="absolute -bottom-0.5 -right-0.5 bg-gradient-to-tr from-amber-500 to-rose-500 p-1.5 sm:p-2 rounded-full text-white shadow-md border border-[#0a0a0a]">
-                <Instagram className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </div>
             </div>
           </motion.div>

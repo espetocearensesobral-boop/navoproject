@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { playConfirmationChime } from '../../lib/audio';
 import { LottieIcon } from '../ui/LottieIcon';
@@ -9,8 +9,10 @@ import {
   PlusCircle,
   Ticket,
   Copy,
-  Check
+  Check,
+  Scissors
 } from 'lucide-react';
+import { fetchShopProfile, ShopProfile, defaultShopProfile } from '../../services/shopProfileService';
 
 interface BookingStep5Props {
   selectedServices: ServiceItem[];
@@ -28,7 +30,14 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
   onResetBooking,
   onViewAppointments
 }) => {
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = useState(false);
+  const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+
+  useEffect(() => {
+    fetchShopProfile().then(p => {
+      if (p) setShopProfile(p);
+    });
+  }, []);
 
   useEffect(() => {
     try {
@@ -54,8 +63,19 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
 
   return (
     <div className="space-y-5 text-center pb-8 px-4 max-w-md mx-auto animate-in fade-in duration-300 mt-6">
-      {/* Minimalist Icon & Plain Text Title */}
+      {/* Logo da Barbearia e Ícone de Confirmação */}
       <div className="pt-2 flex flex-col items-center justify-center space-y-2">
+        {shopProfile.logoUrl ? (
+          <div className="w-16 h-16 rounded-full p-[2.5px] bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 shadow-xl overflow-hidden flex items-center justify-center mb-1">
+            <img 
+              src={shopProfile.logoUrl} 
+              alt={shopProfile.name || 'Logo Barbearia'} 
+              className="w-full h-full object-cover rounded-full bg-neutral-900"
+              onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+            />
+          </div>
+        ) : null}
+
         <div className="w-12 h-12 rounded-full bg-status-success/10 border border-status-success/20 flex items-center justify-center text-status-success">
           <LottieIcon 
             fallbackIcon={<CheckCircle2 className="w-7 h-7 stroke-[2]" />}

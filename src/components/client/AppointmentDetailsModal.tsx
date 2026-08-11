@@ -447,10 +447,32 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
               {/* Brand Strip */}
               <div className="text-center px-5 pt-4 pb-3">
-                <div className="w-10 h-10 rounded-xl bg-gold-base flex items-center justify-center text-surface-base mx-auto mb-2 shadow-[0_3px_12px_color-mix(in_srgb,var(--color-gold-base)_30%,transparent)]">
-                  <Scissors className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <h1 className="text-xl font-bold tracking-[0.1em] text-[#2d2a26] mb-0.5 uppercase font-serif">NAVO PREMIUM</h1>
+                {shopProfile.logoUrl ? (
+                  <div className="w-14 h-14 rounded-full p-[2.5px] bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 mx-auto mb-2 shadow-md overflow-hidden flex items-center justify-center">
+                    <img 
+                      src={shopProfile.logoUrl} 
+                      alt={shopProfile.name || 'Logo Barbearia'} 
+                      className="w-full h-full object-cover rounded-full bg-neutral-900"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                        if (e.currentTarget.parentElement) {
+                          const fb = e.currentTarget.parentElement.querySelector('.voucher-logo-fallback');
+                          if (fb) fb.classList.remove('hidden');
+                        }
+                      }}
+                    />
+                    <div className="voucher-logo-fallback hidden w-full h-full bg-gold-base flex items-center justify-center text-surface-base">
+                      <Scissors className="w-6 h-6 stroke-[2.5]" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-gold-base flex items-center justify-center text-surface-base mx-auto mb-2 shadow-[0_3px_12px_color-mix(in_srgb,var(--color-gold-base)_30%,transparent)]">
+                    <Scissors className="w-5 h-5 stroke-[2.5]" />
+                  </div>
+                )}
+                <h1 className="text-xl font-bold tracking-[0.1em] text-[#2d2a26] mb-0.5 uppercase font-serif">
+                  {shopProfile.name || 'NAVO PREMIUM'}
+                </h1>
                 <div className="text-[10px] text-[#b0a898] tracking-[0.08em] font-mono uppercase">
                   VOUCHER #{currentApt.id.replace('apt_', '').substring(0, 8).toUpperCase()}
                 </div>

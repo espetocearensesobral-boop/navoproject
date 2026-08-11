@@ -31,6 +31,12 @@ import {
   Sparkles
 } from 'lucide-react';
 
+import { 
+  fetchShopProfile, 
+  ShopProfile, 
+  defaultShopProfile 
+} from '../../services/shopProfileService';
+
 export interface ComandaItem {
   id: string;
   type: 'service' | 'product';
@@ -61,6 +67,12 @@ export interface Comanda {
 }
 
 export const ComandasManagement: React.FC = () => {
+  const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+
+  useEffect(() => {
+    fetchShopProfile().then(p => { if (p) setShopProfile(p); });
+  }, []);
+
   const [comandas, setComandas] = useState<Comanda[]>(() => {
     // Load initial comandas from localStorage if present
     const saved = localStorage.getItem('navo_comandas_v1');
@@ -886,8 +898,18 @@ export const ComandasManagement: React.FC = () => {
             </button>
 
             <div className="text-center border-b border-border-subtle pb-4 space-y-1">
-              <h2 className="text-lg font-bold text-content-base tracking-widest uppercase">NAVO PREMIUM</h2>
-              <p className="text-[10px] text-gold-base font-bold uppercase tracking-widest">Heritage Barber & Club</p>
+              {shopProfile.logoUrl ? (
+                <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 mx-auto mb-2 shadow-md overflow-hidden flex items-center justify-center">
+                  <img 
+                    src={shopProfile.logoUrl} 
+                    alt={shopProfile.name || 'Logo'} 
+                    className="w-full h-full object-cover rounded-full bg-neutral-900" 
+                    onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+                  />
+                </div>
+              ) : null}
+              <h2 className="text-lg font-bold text-content-base tracking-widest uppercase">{shopProfile.name || 'NAVO PREMIUM'}</h2>
+              <p className="text-[10px] text-gold-base font-bold uppercase tracking-widest">{shopProfile.slogan || 'Heritage Barber & Club'}</p>
               <p className="text-[10px] text-content-muted font-sans">Comprovante de Atendimento #{receiptModalComanda.code}</p>
             </div>
 

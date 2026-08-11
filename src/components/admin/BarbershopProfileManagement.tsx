@@ -12,7 +12,11 @@ import {
   Instagram, 
   Navigation,
   Info,
-  AlertTriangle
+  AlertTriangle,
+  Upload,
+  Scissors,
+  Trash2,
+  Image as ImageIcon
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { 
@@ -46,6 +50,24 @@ export const BarbershopProfileManagement: React.FC = () => {
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 4000);
+  };
+
+  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      showToast('A imagem da logo deve ter no máximo 3MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setProfile(p => ({ ...p, logoUrl: result }));
+        showToast('Logo carregada! Clique em "Salvar Alterações" para salvar.');
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async () => {
@@ -241,20 +263,99 @@ export const BarbershopProfileManagement: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
-              URL da Logomarca ou Imagem Principal
-            </label>
-            <input
-              type="text"
-              value={profile.logoUrl || ''}
-              onChange={e => setProfile(p => ({ ...p, logoUrl: e.target.value }))}
-              placeholder="https://suaimagem.com/logo.png"
-              className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
-            />
-            <span className="text-[10px] text-content-muted mt-1 block">
-              Se deixado em branco, a plataforma usará o ícone padrão estilizado.
-            </span>
+          {/* LOGO DA BARBEARIA / IDENTIDADE VISUAL */}
+          <div className="bg-surface-base border border-border-subtle rounded-2xl p-4 sm:p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-[11px] font-bold text-content-base uppercase tracking-wider block">
+                  Logomarca Oficial da Unidade
+                </label>
+                <p className="text-[10px] text-content-muted mt-0.5">
+                  Exibida na Landing Page (no anel circular estilo Instagram), nos comprovantes de agendamento e no cabeçalho do app.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pt-1">
+              {/* Preview Circular estilo Instagram com Anel Gradiente Dourado */}
+              <div className="flex flex-col items-center shrink-0">
+                <div className="relative p-[3px] rounded-full bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 shadow-lg">
+                  <div className="p-[2px] bg-[#0a0a0a] rounded-full">
+                    <div className="w-[100px] h-[100px] rounded-full overflow-hidden bg-neutral-900 flex items-center justify-center relative shadow-inner">
+                      {profile.logoUrl ? (
+                        <img 
+                          src={profile.logoUrl} 
+                          alt="Pré-visualização da Logo" 
+                          className="w-full h-full object-cover rounded-full"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.display = 'none';
+                            if (e.currentTarget.parentElement) {
+                              const fb = e.currentTarget.parentElement.querySelector('.admin-logo-fallback');
+                              if (fb) fb.classList.remove('hidden');
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <div className={`admin-logo-fallback ${profile.logoUrl ? 'hidden' : ''} flex flex-col items-center justify-center w-full h-full bg-neutral-900 text-gold-base`}>
+                        <Scissors className="w-9 h-9 text-gold-base stroke-[1.8]" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-0.5 -right-0.5 bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 p-1.5 rounded-full text-surface-base shadow-md border border-[#0a0a0a]">
+                    <Instagram className="w-3 h-3" />
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold text-content-muted uppercase tracking-wider mt-2">
+                  Pré-visualização
+                </span>
+              </div>
+
+              {/* Upload & Link Controls */}
+              <div className="flex-1 w-full space-y-3 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="cursor-pointer h-9 px-3.5 bg-gold-base hover:opacity-90 text-surface-base rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-sm">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Carregar Imagem do Dispositivo</span>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleLogoFileUpload} 
+                      className="hidden" 
+                    />
+                  </label>
+
+                  {profile.logoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfile(p => ({ ...p, logoUrl: '' }));
+                        showToast('Logo removida. Clique em "Salvar Alterações" para confirmar.');
+                      }}
+                      className="h-9 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remover</span>
+                    </button>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+                    Ou Cole o Link Direto da Imagem (URL HTTPS)
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.logoUrl || ''}
+                    onChange={e => setProfile(p => ({ ...p, logoUrl: e.target.value }))}
+                    placeholder="https://exemplo.com/sua-logomarca.png"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                  />
+                  <span className="text-[10px] text-content-muted mt-1 block">
+                    Formatos suportados: PNG, JPG, WEBP ou SVG (Recomendado: Imagem quadrada com fundo escuro ou transparente).
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </form>
       )}

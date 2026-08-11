@@ -38,6 +38,12 @@ import {
   ArrowRight
 } from 'lucide-react';
 
+import { 
+  fetchShopProfile, 
+  ShopProfile, 
+  defaultShopProfile 
+} from '../../services/shopProfileService';
+
 export interface CartItem {
   id: string;
   type: 'service' | 'product';
@@ -72,6 +78,11 @@ export const PdvInteligente: React.FC = () => {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [queue, setQueue] = useState<WaitingQueueItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+
+  useEffect(() => {
+    fetchShopProfile().then(p => { if (p) setShopProfile(p); });
+  }, []);
 
   // PDV Active Sale State
   const [activeTab, setActiveTab] = useState<'agendamentos' | 'servicos' | 'produtos' | 'fila'>('agendamentos');
@@ -393,9 +404,10 @@ export const PdvInteligente: React.FC = () => {
       </head>
       <body>
         <div class="header">
-          <div class="brand">BARBEARIA NAVO</div>
-          <div class="subbrand">Unidade Jardins • São Paulo / SP</div>
-          <div style="font-size: 8px; margin-top: 2px; color: #57534e;">CNPJ: 45.892.102/0001-90 | TEL: (11) 99999-8888</div>
+          ${shopProfile.logoUrl ? `<div style="text-align: center; margin-bottom: 6px;"><img src="${shopProfile.logoUrl}" style="width: 50px; h-auto; max-height: 50px; border-radius: 50%; object-fit: cover; display: inline-block;" /></div>` : ''}
+          <div class="brand">${(shopProfile.name || 'BARBEARIA NAVO').toUpperCase()}</div>
+          <div class="subbrand">${shopProfile.address || 'Sobral / CE'}</div>
+          ${shopProfile.phone ? `<div style="font-size: 8px; margin-top: 2px; color: #57534e;">TEL: ${shopProfile.phone}</div>` : ''}
           <div class="badge">COMPROVANTE DE VENDA</div>
         </div>
 
