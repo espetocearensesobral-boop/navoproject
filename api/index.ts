@@ -266,9 +266,16 @@ app.use((req, res, next) => {
   next();
 });
 
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  // Em produção (especialmente serverless), um segredo gerado em memória muda a
+  // cada cold start e invalida sessões de usuários aleatoriamente. Falhar cedo
+  // e de forma explícita é mais seguro do que operar com esse comportamento.
+  console.error("FATAL: JWT_SECRET não está definido. Configure a variável de ambiente JWT_SECRET antes de iniciar em produção.");
+  process.exit(1);
+}
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 if (!process.env.JWT_SECRET) {
-  console.warn("WARNING: JWT_SECRET environment variable is not defined. Using auto-generated secure key in memory.");
+  console.warn("WARNING: JWT_SECRET environment variable is not defined. Using auto-generated secure key in memory (apenas aceitável em desenvolvimento).");
 }
 
 if (!process.env.DATABASE_URL && !process.env.SQL_HOST) {
@@ -496,7 +503,9 @@ async function initializeDb(): Promise<void> {
 
     const queryClient = postgres(connectionString, { 
       max: 10, 
-      ssl: connectionString.includes('supabase') ? { rejectUnauthorized: false } : undefined,
+      // 'require' habilita TLS e mantém a verificação do certificado do servidor,
+      // evitando exposição a ataques man-in-the-middle na conexão com o banco.
+      ssl: connectionString.includes('supabase') ? 'require' : undefined,
       connect_timeout: 10,
     });
     
@@ -3252,8 +3261,19 @@ app.get("/api/admin/validate-keys", requireAuth, requireAdmin, async (req: any, 
 
 
 async function seedDatabase() {
-  const defaultPasswordHash = await bcrypt.hash('client123', 10);
-  const adminPasswordHash = await bcrypt.hash('admin123', 10);
+  // Evita senhas padrão previsíveis (admin123/client123) em bancos que rodam
+  // o auto-seed em produção. Permite definir via env; caso contrário gera uma
+  // senha aleatória segura e a exibe uma única vez no log do servidor.
+  const seedClientPassword = process.env.SEED_CLIENT_PASSWORD || crypto.randomBytes(9).toString('base64url');
+  const seedAdminPassword = process.env.SEED_ADMIN_PASSWORD || crypto.randomBytes(9).toString('base64url');
+  if (!process.env.SEED_CLIENT_PASSWORD || !process.env.SEED_ADMIN_PASSWORD) {
+    console.warn('[API] ⚠️  SEED_ADMIN_PASSWORD/SEED_CLIENT_PASSWORD não definidas. Senhas geradas automaticamente para os usuários de seed:');
+    if (!process.env.SEED_ADMIN_PASSWORD) console.warn(`[API]   admin@barberx.app -> ${seedAdminPassword}`);
+    if (!process.env.SEED_CLIENT_PASSWORD) console.warn(`[API]   cliente de teste -> ${seedClientPassword}`);
+    console.warn('[API]   Troque essas senhas imediatamente se este ambiente for produção.');
+  }
+  const defaultPasswordHash = await bcrypt.hash(seedClientPassword, 10);
+  const adminPasswordHash = await bcrypt.hash(seedAdminPassword, 10);
   const todayStr = getTodayStringBRT();
 
   const seedProfiles = [
@@ -3779,15 +3799,6 @@ async function seedDatabase() {
     queue: seedWaitingQueue.length
   };
 }
-
-app.post("/api/seed", requireAuth, requireAdmin, async (req: any, res: any) => {
-  try {
-    const result = await seedDatabase();
-    res.json({ success: true, seeded: result });
-  } catch (e: any) {
-    return handleError(res, e, 'POST /api/seed');
-  }
-});
 
 app.get("/api/system/status", requireAuth, requireAdmin, (req, res) => {
   res.json({
