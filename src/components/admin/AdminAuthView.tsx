@@ -92,7 +92,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#0a0b0e] text-stone-100 flex flex-col justify-between items-center p-4 sm:p-6 relative overflow-hidden font-sans box-border">
+    <div className="min-h-[100dvh] w-full bg-[#0a0b0e] text-stone-100 flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden font-sans box-border">
       {/* Background Image with Dark Overlay */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none"
@@ -101,38 +101,28 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
         }}
       />
 
-      {/* Header Bar */}
-      <header className="w-full max-w-md flex items-center justify-between py-2 z-10">
-        <button
-          onClick={() => { window.location.href = '/'; }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-900/80 border border-white/10 backdrop-blur-md text-stone-400 hover:text-gold-base text-xs font-semibold transition-all active:scale-95 shadow-sm"
-          title="Voltar para a área do cliente"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Área de Clientes</span>
-        </button>
-
-        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold-base bg-gold-base/10 border border-gold-base/20 px-2.5 py-1 rounded-full backdrop-blur-md">
-          <ShieldCheck className="w-3.5 h-3.5 text-gold-base" />
-          <span>Acesso Restrito</span>
-        </div>
-      </header>
-
       {/* Main Card */}
       <main className="w-full max-w-md my-auto py-6 z-10">
         <div className="bg-[#12131A]/90 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
           
           {/* Logo & Portal Header */}
           <div className="flex flex-col items-center text-center mb-6">
-            {shopLogo ? (
-              <img src={shopLogo} alt={shopName} className="w-20 h-20 rounded-full object-cover mb-4 shadow-lg shadow-gold-base/10 border border-white/10" />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-gold-base/10 border border-gold-base/20 flex items-center justify-center text-gold-base shadow-lg mb-4">
-                <Scissors className="w-8 h-8" />
+            <div className="relative p-[3px] rounded-full bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 shadow-xl mb-4">
+              <div className="p-[2.5px] bg-[#12131A] rounded-full">
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-neutral-900 flex items-center justify-center relative shadow-inner">
+                  {shopLogo ? (
+                    <img src={shopLogo} alt={shopName} className="w-full h-full object-cover rounded-full" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gold-base">
+                      <Scissors className="w-8 h-8" />
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
+            
             <h1 className="text-xl font-serif font-extrabold text-stone-100 tracking-tight flex items-center gap-2">
-              Painel Administrativo
+              Painel <span className="text-gold-base">Administrativo</span>
             </h1>
             <p className="text-xs text-stone-400 mt-1">
               {shopName} • Gestão e Controle
