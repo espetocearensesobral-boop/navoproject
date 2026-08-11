@@ -92,7 +92,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#0a0b0e] text-content-base flex flex-col justify-between items-center p-4 sm:p-6 relative overflow-hidden font-sans box-border">
+    <div className="min-h-[100dvh] w-full bg-[#0a0b0e] text-stone-100 flex flex-col justify-between items-center p-4 sm:p-6 relative overflow-hidden font-sans box-border">
       {/* Background Image with Dark Overlay */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none"
@@ -105,7 +105,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
       <header className="w-full max-w-md flex items-center justify-between py-2 z-10">
         <button
           onClick={() => { window.location.href = '/'; }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-base/80 border border-surface-border backdrop-blur-md text-content-muted hover:text-gold-base text-xs font-semibold transition-all active:scale-95 shadow-sm"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-900/80 border border-white/10 backdrop-blur-md text-stone-400 hover:text-gold-base text-xs font-semibold transition-all active:scale-95 shadow-sm"
           title="Voltar para a área do cliente"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -120,21 +120,21 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
 
       {/* Main Card */}
       <main className="w-full max-w-md my-auto py-6 z-10">
-        <div className="bg-surface-base/90 border border-surface-border rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
+        <div className="bg-[#12131A]/90 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
           
           {/* Logo & Portal Header */}
           <div className="flex flex-col items-center text-center mb-6">
             {shopLogo ? (
-              <img src={shopLogo} alt={shopName} className="w-20 h-20 rounded-2xl object-cover mb-4 shadow-lg shadow-gold-base/10 border border-surface-border" />
+              <img src={shopLogo} alt={shopName} className="w-20 h-20 rounded-2xl object-cover mb-4 shadow-lg shadow-gold-base/10 border border-white/10" />
             ) : (
               <div className="w-16 h-16 rounded-2xl bg-gold-base/10 border border-gold-base/20 flex items-center justify-center text-gold-base shadow-lg mb-4">
                 <Scissors className="w-8 h-8" />
               </div>
             )}
-            <h1 className="text-xl font-serif font-extrabold text-content-base tracking-tight flex items-center gap-2">
+            <h1 className="text-xl font-serif font-extrabold text-stone-100 tracking-tight flex items-center gap-2">
               Painel Administrativo
             </h1>
-            <p className="text-xs text-content-muted mt-1">
+            <p className="text-xs text-stone-400 mt-1">
               {shopName} • Gestão e Controle
             </p>
           </div>
@@ -157,11 +157,11 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
           {/* LOGIN FORM */}
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-content-base mb-1.5">
+              <label className="block text-xs font-semibold text-stone-100 mb-1.5">
                 E-mail ou Telefone
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-content-muted">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -170,17 +170,17 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
                   placeholder="admin@exemplo.com ou telefone"
                   value={loginData.loginId}
                   onChange={(e) => setLoginData({ ...loginData, loginId: e.target.value })}
-                  className="w-full pl-10 pr-3.5 py-2.5 bg-surface-base border border-surface-border rounded-xl text-content-base text-xs placeholder:text-content-muted focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all shadow-inner"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all shadow-inner"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-content-base mb-1.5">
+              <label className="block text-xs font-semibold text-stone-100 mb-1.5">
                 Senha
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-content-muted">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -189,12 +189,12 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
                   placeholder="••••••••"
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  className="w-full pl-10 pr-10 py-2.5 bg-surface-base border border-surface-border rounded-xl text-content-base text-xs placeholder:text-content-muted focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all shadow-inner"
+                  className="w-full pl-10 pr-10 py-2.5 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all shadow-inner"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-content-muted hover:text-content-base"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-500 hover:text-stone-300"
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -205,11 +205,11 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-gold-base hover:brightness-110 text-surface-base font-extrabold text-xs shadow-lg shadow-gold-base/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full mt-2 py-3 px-4 rounded-xl bg-gold-base hover:brightness-110 text-stone-950 font-extrabold text-xs shadow-lg shadow-gold-base/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-surface-base/30 border-t-surface-base rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-stone-950/30 border-t-stone-950 rounded-full animate-spin" />
                   <span>Entrando...</span>
                 </>
               ) : (
@@ -225,7 +225,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
 
       {/* Footer info */}
       <footer className="w-full max-w-md text-center py-2 z-10">
-        <p className="text-[11px] text-content-muted font-medium">
+        <p className="text-[11px] text-stone-500 font-medium">
           {shopName} &copy; {new Date().getFullYear()} • Todos os direitos reservados.
         </p>
       </footer>
