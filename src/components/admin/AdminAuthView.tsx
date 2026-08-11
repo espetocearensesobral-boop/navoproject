@@ -92,23 +92,27 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-surface-base text-content-base flex flex-col justify-between items-center p-4 sm:p-6 relative overflow-hidden font-sans">
-      {/* Dynamic Background Accents */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-gold-base/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-gold-base/5 rounded-full blur-2xl pointer-events-none" />
+    <div className="min-h-[100dvh] w-full bg-[#0a0b0e] text-content-base flex flex-col justify-between items-center p-4 sm:p-6 relative overflow-hidden font-sans box-border">
+      {/* Background Image with Dark Overlay */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(180deg, rgba(10,11,14,0.85) 0%, rgba(10,11,14,0.95) 50%, #06070a 100%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1200&q=80')`
+        }}
+      />
 
       {/* Header Bar */}
       <header className="w-full max-w-md flex items-center justify-between py-2 z-10">
         <button
           onClick={() => { window.location.href = '/'; }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-base border border-surface-border text-content-muted hover:text-gold-base text-xs font-semibold transition-all active:scale-95 shadow-sm"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-base/80 border border-surface-border backdrop-blur-md text-content-muted hover:text-gold-base text-xs font-semibold transition-all active:scale-95 shadow-sm"
           title="Voltar para a área do cliente"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Área de Clientes</span>
         </button>
 
-        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold-base bg-gold-base/10 border border-gold-base/20 px-2.5 py-1 rounded-full">
+        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold-base bg-gold-base/10 border border-gold-base/20 px-2.5 py-1 rounded-full backdrop-blur-md">
           <ShieldCheck className="w-3.5 h-3.5 text-gold-base" />
           <span>Acesso Restrito</span>
         </div>
@@ -116,7 +120,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
 
       {/* Main Card */}
       <main className="w-full max-w-md my-auto py-6 z-10">
-        <div className="bg-surface-base border border-surface-border rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
+        <div className="bg-surface-base/90 border border-surface-border rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
           
           {/* Logo & Portal Header */}
           <div className="flex flex-col items-center text-center mb-6">
@@ -166,7 +170,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
                   placeholder="admin@exemplo.com ou telefone"
                   value={loginData.loginId}
                   onChange={(e) => setLoginData({ ...loginData, loginId: e.target.value })}
-                  className="w-full pl-10 pr-3.5 py-2.5 bg-surface-base border border-surface-border rounded-xl text-content-base text-xs placeholder:text-content-muted focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-surface-base border border-surface-border rounded-xl text-content-base text-xs placeholder:text-content-muted focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all shadow-inner"
                 />
               </div>
             </div>
@@ -185,7 +189,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
                   placeholder="••••••••"
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  className="w-full pl-10 pr-10 py-2.5 bg-surface-base border border-surface-border rounded-xl text-content-base text-xs placeholder:text-content-muted focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all"
+                  className="w-full pl-10 pr-10 py-2.5 bg-surface-base border border-surface-border rounded-xl text-content-base text-xs placeholder:text-content-muted focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all shadow-inner"
                 />
                 <button
                   type="button"
