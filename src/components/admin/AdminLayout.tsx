@@ -185,31 +185,10 @@ export const AdminLayout: React.FC = () => {
       section: 'relacionamento' as AdminSection,
     },
     { 
-      id: 'whatsapp' as AdminTab, 
-      label: 'Painel WhatsApp', 
-      icon: MessageSquare,
-      description: 'Notificações e saldo',
-      section: 'relacionamento' as AdminSection,
-    },
-    { 
-      id: 'qrcode' as AdminTab, 
-      label: 'QR Code & Balcão', 
-      icon: QrCode,
-      description: 'Totens de agendamento',
-      section: 'relacionamento' as AdminSection,
-    },
-    { 
       id: 'barbearia' as AdminTab, 
       label: 'Perfil & Unidade', 
       icon: Store,
       description: 'Endereço, horários e dados',
-      section: 'sistema' as AdminSection,
-    },
-    { 
-      id: 'audit' as AdminTab, 
-      label: 'Logs & Auditoria', 
-      icon: ShieldCheck,
-      description: 'Rastreio de ações',
       section: 'sistema' as AdminSection,
     },
     { 
