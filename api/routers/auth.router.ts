@@ -78,6 +78,13 @@ authRouter.post("/login", authLimiter, async (req, res) => {
       return res.status(401).json({ error: 'Dados não encontrados ou credenciais inválidas.' });
     }
 
+    // Bloqueia login de admin pela área do visitante
+    if (user.role === 'admin') {
+      return res.status(403).json({ 
+        error: 'Acesso de administrador não é permitido nesta área. Utilize o painel /admin para entrar.' 
+      });
+    }
+
     const safeUser = formatProfile(user);
     
     // Vincula agendamentos de visitante pendentes com o mesmo telefone do usuário ao logar
@@ -114,6 +121,142 @@ authRouter.post("/login", authLimiter, async (req, res) => {
     res.status(500).json({ error: 'Erro ao fazer login. Tente novamente.' });
   }
 });
+
+// =====================================
+// ADMIN AUTH ENDPOINTS
+// =====================================
+
+const handleAdminLogin = async (req: express.Request, res: express.Response) => {
+  try {
+    const { loginId, password } = req.body;
+    
+    if (!loginId || !password) {
+      return res.status(400).json({ error: 'E-mail/telefone e senha são obrigatórios.' });
+    }
+
+    const cleanLoginId = sanitizePhone(loginId);
+    const cleanEmail = loginId.toString().toLowerCase().trim();
+
+    const allProfiles = await db.query.profiles.findMany();
+    const user = allProfiles.find((p: any) => {
+      const isGuest = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
+      if (isGuest) return false;
+
+      const emailMatches = p.email && p.email.toLowerCase().trim() === cleanEmail;
+      const phoneMatches = cleanLoginId && p.phone && matchPhoneNumbers(p.phone, cleanLoginId);
+
+      return emailMatches || phoneMatches;
+    });
+
+    if (!user || !user.password) {
+      return res.status(401).json({ error: 'Credenciais de administrador inválidas.' });
+    }
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Credenciais de administrador inválidas.' });
+    }
+
+    if (user.role !== 'admin') {
+      return res.status(403).json({ 
+        error: 'Esta conta não possui permissões de administrador. Utilize a área de clientes para acessar.' 
+      });
+    }
+
+    const safeUser = formatProfile(user);
+
+    const token = jwt.sign(
+      { id: user.id, role: user.role, email: user.email, phone: user.phone }, 
+      JWT_SECRET, 
+      { expiresIn: '7d' }
+    );
+    
+    setAuthCookie(res, token);
+
+    return res.json({
+      ...safeUser,
+      token,
+    });
+  } catch (e: any) {
+    console.error('Error in POST admin login:', e);
+    return res.status(500).json({ error: 'Erro ao realizar login administrativo.' });
+  }
+};
+
+const handleAdminRegister = async (req: express.Request, res: express.Response) => {
+  try {
+    const { name, email, phone, password } = req.body;
+
+    if (!name || name.trim().length < 3) {
+      return res.status(400).json({ error: 'Nome completo é obrigatório (mínimo 3 caracteres).' });
+    }
+
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'E-mail corporativo válido é obrigatório.' });
+    }
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres.' });
+    }
+
+    const cleanPhone = sanitizePhone(phone);
+    const cleanEmail = email.toLowerCase().trim();
+
+    const dbProfiles = await db.query.profiles.findMany();
+
+    const existingEmailUser = dbProfiles.find((p: any) => p.email && p.email.toLowerCase().trim() === cleanEmail && !p.email.endsWith('@guest.barberx.app'));
+    if (existingEmailUser) {
+      return res.status(400).json({ error: 'E-mail já cadastrado no sistema.' });
+    }
+
+    if (cleanPhone) {
+      const existingPhoneUser = dbProfiles.find((p: any) => p.phone && matchPhoneNumbers(p.phone, cleanPhone) && p.password && p.id !== 'usr_guest');
+      if (existingPhoneUser) {
+        return res.status(400).json({ error: 'Telefone já cadastrado no sistema.' });
+      }
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newId = `admin_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+    const newAdmin = {
+      id: newId,
+      name: name.trim(),
+      email: cleanEmail,
+      phone: cleanPhone || '',
+      password: hashedPassword,
+      role: 'admin',
+      loyaltyTier: 'VIP',
+      lgpdConsent: true,
+      lgpdConsentDate: new Date(),
+    };
+
+    await db.insert(schema.profiles).values(newAdmin);
+
+    const safeUser = formatProfile(newAdmin);
+
+    const token = jwt.sign(
+      { id: newAdmin.id, role: 'admin', email: newAdmin.email, phone: newAdmin.phone },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    setAuthCookie(res, token);
+
+    return res.json({
+      ...safeUser,
+      token,
+    });
+  } catch (e: any) {
+    console.error('Error in POST admin register:', e);
+    return res.status(500).json({ error: 'Erro ao cadastrar administrador.' });
+  }
+};
+
+authRouter.post("/admin/login", authLimiter, handleAdminLogin);
+authRouter.post("/admin-login", authLimiter, handleAdminLogin);
+authRouter.post("/admin/register", authLimiter, handleAdminRegister);
+authRouter.post("/admin-register", authLimiter, handleAdminRegister);
 
 authRouter.post("/forgot-password", authLimiter, async (req, res) => {
   try {

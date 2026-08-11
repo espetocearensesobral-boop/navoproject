@@ -17,6 +17,7 @@ import { WaitingQueue } from './WaitingQueue';
 import { SettingsManagement } from './SettingsManagement';
 import { NavoRewardsAdmin } from './NavoRewardsAdmin';
 import { BarbershopProfileManagement } from './BarbershopProfileManagement';
+import { AdminAuthView } from './AdminAuthView';
 import { authFetch } from '../../lib/api';
 import { useTheme } from '../../contexts/ThemeContext';
 import { 
@@ -70,6 +71,7 @@ export const AdminLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [adminName, setAdminName] = useState('Admin');
 
   const mainRef = useRef<HTMLElement>(null);
@@ -85,6 +87,7 @@ export const AdminLayout: React.FC = () => {
 
   // A autorização vem exclusivamente da sessão HTTP e do perfil no banco.
   React.useEffect(() => {
+    setIsLoadingAuth(true);
     authFetch('/api/auth/me')
       .then(async (res) => {
         if (!res.ok) throw new Error('Sessão inválida');
@@ -95,14 +98,30 @@ export const AdminLayout: React.FC = () => {
         setIsAuthorized(true);
         setAdminName(user.name || 'Admin');
       })
-      .catch(() => { window.location.href = '/'; });
+      .catch(() => { 
+        setIsAuthorized(false); 
+      })
+      .finally(() => {
+        setIsLoadingAuth(false);
+      });
   }, []);
 
-  if (!isAuthorized) {
+  if (isLoadingAuth) {
     return (
       <div className="flex h-[100dvh] items-center justify-center bg-surface-base">
         <div className="w-8 h-8 border-4 border-gold-base/20 border-t-gold-base rounded-full animate-spin" />
       </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <AdminAuthView 
+        onLoginSuccess={(user) => {
+          setIsAuthorized(true);
+          setAdminName(user.name || 'Admin');
+        }} 
+      />
     );
   }
 
@@ -217,8 +236,11 @@ export const AdminLayout: React.FC = () => {
     { id: 'clientes' as AdminTab, label: 'Clientes', icon: UserCheck },
   ];
 
-  const handleLogout = () => {
-    window.location.href = '/';
+  const handleLogout = async () => {
+    try {
+      await authFetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {}
+    setIsAuthorized(false);
   };
 
   
