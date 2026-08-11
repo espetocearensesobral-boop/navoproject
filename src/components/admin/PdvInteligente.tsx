@@ -105,6 +105,9 @@ export const PdvInteligente: React.FC = () => {
   const [lastTransaction, setLastTransaction] = useState<PdvTransaction | null>(null);
   const [todaysSales, setTodaysSales] = useState<PdvTransaction[]>([]);
   const [showSalesHistory, setShowSalesHistory] = useState(false);
+  // Trava contra duplo clique/duplo toque: sem isso, um segundo tap durante o
+  // POST em /api/cash-transactions gerava duas vendas idênticas gravadas.
+  const [isFinalizing, setIsFinalizing] = useState(false);
 
   // Load Data
   const loadData = async () => {
@@ -296,7 +299,8 @@ export const PdvInteligente: React.FC = () => {
 
   // Checkout Completion
   const handleFinalizeSale = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || isFinalizing) return;
+    setIsFinalizing(true);
 
     const tx: PdvTransaction = {
       id: `TX-${Date.now().toString().slice(-6)}`,
@@ -335,7 +339,25 @@ export const PdvInteligente: React.FC = () => {
       setTodaysSales(updatedSales);
     } catch (error) {
       console.error('Erro ao gravar venda no banco:', error);
+      setIsFinalizing(false);
       return;
+    }
+
+    // Baixa de estoque dos produtos vendidos (best-effort: a venda já foi
+    // gravada acima, então uma falha aqui não deve travar o recibo — mas
+    // fica registrada no console para auditoria manual do estoque).
+    const productItems = tx.items.filter(i => i.type === 'product');
+    if (productItems.length > 0) {
+      await Promise.all(productItems.map(item =>
+        authFetch(`/api/products/${item.id}/decrement-stock`, {
+          method: 'PATCH',
+          body: JSON.stringify({ quantity: item.quantity })
+        }).catch(err => console.error(`Erro ao baixar estoque do produto ${item.id}:`, err))
+      ));
+      setProducts(prev => prev.map(p => {
+        const sold = productItems.find(i => i.id === p.id);
+        return sold ? { ...p, stock_quantity: Math.max(0, p.stock_quantity - sold.quantity) } : p;
+      }));
     }
 
     if (linkedAppointmentId) {
@@ -345,6 +367,7 @@ export const PdvInteligente: React.FC = () => {
     setLastTransaction(tx);
     setShowReceiptModal(true);
     handleClearCart();
+    setIsFinalizing(false);
   };
 
   // Print Receipt Handler
@@ -1216,11 +1239,15 @@ export const PdvInteligente: React.FC = () => {
               {/* FINAL CHECKOUT ACTION BUTTON (DESKTOP) */}
               <button
                 onClick={handleFinalizeSale}
-                disabled={cart.length === 0 || !isCaixaOpen}
+                disabled={cart.length === 0 || !isCaixaOpen || isFinalizing}
                 className="hidden md:flex w-full h-11 px-4 rounded-xl bg-gold-base hover:bg-gold-hover disabled:opacity-40 text-surface-base font-bold text-xs items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>FINALIZAR E EMITIR RECIBO (R$ {finalTotal.toFixed(2)})</span>
+                {isFinalizing ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="w-4 h-4" />
+                )}
+                <span>{isFinalizing ? 'PROCESSANDO...' : `FINALIZAR E EMITIR RECIBO (R$ ${finalTotal.toFixed(2)})`}</span>
               </button>
 
             </div>
@@ -1242,11 +1269,15 @@ export const PdvInteligente: React.FC = () => {
 
         <button
           onClick={handleFinalizeSale}
-          disabled={cart.length === 0 || !isCaixaOpen}
+          disabled={cart.length === 0 || !isCaixaOpen || isFinalizing}
           className="h-11 px-4 bg-gold-base text-surface-base font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shrink-0 hover:bg-gold-hover active:scale-95 disabled:opacity-40 shadow-lg whitespace-nowrap"
         >
-          <CheckCircle2 className="w-4 h-4" />
-          <span>Finalizar Venda</span>
+          {isFinalizing ? (
+            <RefreshCw className="w-4 h-4 animate-spin" />
+          ) : (
+            <CheckCircle2 className="w-4 h-4" />
+          )}
+          <span>{isFinalizing ? 'Processando...' : 'Finalizar Venda'}</span>
         </button>
       </div>
 

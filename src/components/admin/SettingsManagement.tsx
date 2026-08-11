@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, CheckCircle2, Settings, Mail, Send, AlertCircle, Eye, EyeOff, MessageSquare, QrCode, ShieldCheck } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminTabs } from './shared/AdminTabs';
 import { fetchEmailSettings, saveEmailSettings, sendTestEmail, defaultEmailSettings, type EmailSettings } from '../../services/emailSettingsService';
 import { WhatsAppManagement } from './WhatsAppManagement';
 import { QrCodeManagement } from './QrCodeManagement';
@@ -81,12 +82,16 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
       )}
 
       {/* TAB BAR */}
-      <div className="bg-surface-card border border-border-subtle rounded-xl p-1 flex items-center gap-1 overflow-x-auto custom-scrollbar">
-        <TabButton active={activeTab === 'email'} onClick={() => setActiveTab('email')} icon={Mail} label="E-mail (SMTP)" />
-        <TabButton active={activeTab === 'whatsapp'} onClick={() => setActiveTab('whatsapp')} icon={MessageSquare} label="Painel WhatsApp" />
-        <TabButton active={activeTab === 'qrcode'} onClick={() => setActiveTab('qrcode')} icon={QrCode} label="QR Code & Balcão" />
-        <TabButton active={activeTab === 'audit'} onClick={() => setActiveTab('audit')} icon={ShieldCheck} label="Logs & Auditoria" />
-      </div>
+      <AdminTabs
+        tabs={[
+          { id: 'email', label: 'E-mail (SMTP)', icon: Mail },
+          { id: 'whatsapp', label: 'Painel WhatsApp', icon: MessageSquare },
+          { id: 'qrcode', label: 'QR Code & Balcão', icon: QrCode },
+          { id: 'audit', label: 'Logs & Auditoria', icon: ShieldCheck },
+        ]}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as SettingsTab)}
+      />
 
       {/* MAIN CONTENT AREA */}
       <div className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-6 min-w-0">
@@ -95,20 +100,6 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
     </div>
   );
 };
-
-
-const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
-  <button
-    onClick={onClick}
-    className={`
-      h-10 sm:h-9 px-3.5 flex items-center justify-center gap-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 active:scale-95
-      ${active ? 'bg-gold-base text-surface-base' : 'text-content-muted hover:text-content-base bg-surface-card/60 hover:bg-surface-base'}
-    `}
-  >
-    <Icon className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
-    <span>{label}</span>
-  </button>
-);
 
 // --- Subcomponents for each tab ---
 

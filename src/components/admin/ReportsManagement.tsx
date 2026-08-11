@@ -25,6 +25,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminTabs } from './shared/AdminTabs';
 
 export const ReportsManagement: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -266,43 +267,15 @@ export const ReportsManagement: React.FC = () => {
       </div>
 
       {/* Report Type Selector Tabs */}
-      <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">
-        <button
-          onClick={() => setActiveReportTab('services')}
-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeReportTab === 'services'
-              ? 'border-gold-base text-gold-base'
-              : 'border-transparent text-content-muted hover:text-content-base'
-          }`}
-        >
-          <Scissors className="w-4 h-4" />
-          <span>Relatório por Serviço</span>
-        </button>
-
-        <button
-          onClick={() => setActiveReportTab('clients')}
-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeReportTab === 'clients'
-              ? 'border-gold-base text-gold-base'
-              : 'border-transparent text-content-muted hover:text-content-base'
-          }`}
-        >
-          <UserCheck className="w-4 h-4" />
-          <span>Relatório por Cliente</span>
-        </button>
-
-        <button
-          onClick={() => setActiveReportTab('professionals')}
-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeReportTab === 'professionals'
-              ? 'border-gold-base text-gold-base'
-              : 'border-transparent text-content-muted hover:text-content-base'
-          }`}
-        >
-          <Users className="w-4 h-4" />
-          <span>Relatório por Profissional</span>
-        </button>
-      </div>
+      <AdminTabs
+        tabs={[
+          { id: 'services', label: 'Relatório por Serviço', icon: Scissors },
+          { id: 'clients', label: 'Relatório por Cliente', icon: UserCheck },
+          { id: 'professionals', label: 'Relatório por Profissional', icon: Users },
+        ]}
+        activeId={activeReportTab}
+        onChange={(id) => setActiveReportTab(id as typeof activeReportTab)}
+      />
 
       {/* SECTION 1: SERVICES REPORT */}
       {activeReportTab === 'services' && (

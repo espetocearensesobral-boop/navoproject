@@ -5,6 +5,7 @@ import { FinancialStatementManagement } from './FinancialStatementManagement';
 import { FinancialHealthManagement } from './FinancialHealthManagement';
 import { AccountsPayableManagement } from './AccountsPayableManagement';
 import { ReportsManagement } from './ReportsManagement';
+import { AdminTabs } from './shared/AdminTabs';
 
 type FinanceiroSubTab = 'caixa' | 'extrato' | 'pagar' | 'saude' | 'relatorios';
 
@@ -52,26 +53,7 @@ export const FinanceiroManagement: React.FC<FinanceiroManagementProps> = ({ init
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
       {/* Sub-navegação do módulo Financeiro */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1">
-        {subTabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = subTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setSubTab(tab.id)}
-              className={`shrink-0 h-9 px-3.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-95 ${
-                isActive
-                  ? 'bg-gold-base text-surface-base shadow-sm'
-                  : 'bg-surface-card text-content-muted border border-border-subtle hover:text-content-base'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      <AdminTabs tabs={subTabs} activeId={subTab} onChange={(id) => setSubTab(id as FinanceiroSubTab)} />
 
       {/* Conteúdo da sub-aba ativa */}
       <div className="animate-fade-in min-w-0">

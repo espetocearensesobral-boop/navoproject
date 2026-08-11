@@ -18,6 +18,7 @@ import {
   CreditCard
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminTabs } from './shared/AdminTabs';
 
 export interface SubscriptionPlan {
   id: string;
@@ -221,43 +222,15 @@ export const SubscriptionsManagement: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">
-        <button
-          onClick={() => setActiveTab('members')}
-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'members'
-              ? 'border-gold-base text-gold-base'
-              : 'border-transparent text-content-muted hover:text-content-base'
-          }`}
-        >
-          <UserCheck className="w-4 h-4" />
-          <span>Assinantes Ativos</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('plans')}
-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'plans'
-              ? 'border-gold-base text-gold-base'
-              : 'border-transparent text-content-muted hover:text-content-base'
-          }`}
-        >
-          <Award className="w-4 h-4" />
-          <span>Planos Configurados</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('commissions')}
-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'commissions'
-              ? 'border-gold-base text-gold-base'
-              : 'border-transparent text-content-muted hover:text-content-base'
-          }`}
-        >
-          <DollarSign className="w-4 h-4" />
-          <span>Regras de Comissões de Clube</span>
-        </button>
-      </div>
+      <AdminTabs
+        tabs={[
+          { id: 'members', label: 'Assinantes Ativos', icon: UserCheck },
+          { id: 'plans', label: 'Planos Configurados', icon: Award },
+          { id: 'commissions', label: 'Regras de Comissões de Clube', icon: DollarSign },
+        ]}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as typeof activeTab)}
+      />
 
       {/* TAB 1: MEMBERS */}
       {activeTab === 'members' && (

@@ -1,0 +1,655 @@
+diff --git a/api/routers/products.router.ts b/api/routers/products.router.ts
+index aa71b33..cf02eba 100644
+--- a/api/routers/products.router.ts
++++ b/api/routers/products.router.ts
+@@ -1,5 +1,5 @@
+ import express from 'express';
+-import { eq } from 'drizzle-orm';
++import { eq, sql, and, gte } from 'drizzle-orm';
+ import jwt from 'jsonwebtoken';
+ import { db } from '../index.js';
+ import * as schema from '../../src/db/schema.js';
+@@ -61,6 +61,38 @@ productsRouter.put("/:id", requireAuth, requireAdmin, async (req, res) => {
+   }
+ });
+ 
++// Baixa atômica de estoque, usada pelo PDV ao finalizar uma venda de produto.
++// Antes desta rota o estoque exibido no PDV nunca era atualizado após uma
++// venda — o `stock_quantity` só mudava se alguém editasse o produto na mão.
++// O filtro `stockQuantity >= quantity` no WHERE garante que duas vendas
++// concorrentes do mesmo produto não derrubem o estoque para negativo: se o
++// saldo já não for suficiente, a query não atualiza nenhuma linha e a rota
++// responde 409 para o cliente decidir o que fazer.
++productsRouter.patch("/:id/decrement-stock", requireAuth, requireAdmin, async (req, res) => {
++  try {
++    const quantity = Number(req.body?.quantity);
++    if (!Number.isFinite(quantity) || quantity <= 0) {
++      return res.status(400).json({ error: 'Quantidade inválida.' });
++    }
++
++    const updated = await db.update(schema.products)
++      .set({
++        stockQuantity: sql`${schema.products.stockQuantity} - ${quantity}`,
++        updatedAt: new Date()
++      })
++      .where(and(eq(schema.products.id, req.params.id), gte(schema.products.stockQuantity, quantity)))
++      .returning();
++
++    if (updated.length === 0) {
++      return res.status(409).json({ error: 'Estoque insuficiente para baixar esta quantidade.' });
++    }
++
++    res.json(updated[0]);
++  } catch (e: any) {
++    return handleError(res, e, req.path);
++  }
++});
++
+ productsRouter.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
+   try {
+     await db.delete(schema.products).where(eq(schema.products.id, req.params.id));
+diff --git a/src/components/admin/AccountsPayableManagement.tsx b/src/components/admin/AccountsPayableManagement.tsx
+index 72470c7..ce365dc 100644
+--- a/src/components/admin/AccountsPayableManagement.tsx
++++ b/src/components/admin/AccountsPayableManagement.tsx
+@@ -16,6 +16,7 @@ import {
+   X 
+ } from 'lucide-react';
+ import { AdminPageHeader } from './shared/AdminPageHeader';
++import { AdminTabs } from './shared/AdminTabs';
+ 
+ export interface PayableAccount {
+   id: string;
+@@ -197,26 +198,16 @@ export const AccountsPayableManagement: React.FC = () => {
+       </div>
+ 
+       {/* Filter Tabs */}
+-      <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">
+-        {[
++      <AdminTabs
++        tabs={[
+           { id: 'all', label: 'Todas' },
+           { id: 'pending', label: 'A Vencer' },
+           { id: 'overdue', label: 'Vencidas' },
+           { id: 'paid', label: 'Pagas' }
+-        ].map(f => (
+-          <button
+-            key={f.id}
+-            onClick={() => setFilterStatus(f.id)}
+-            className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all whitespace-nowrap shrink-0 ${
+-              filterStatus === f.id
+-                ? 'border-gold-base text-gold-base'
+-                : 'border-transparent text-content-muted hover:text-content-base'
+-            }`}
+-          >
+-            {f.label}
+-          </button>
+-        ))}
+-      </div>
++        ]}
++        activeId={filterStatus}
++        onChange={setFilterStatus}
++      />
+ 
+       {/* Accounts List */}
+       <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xs">
+diff --git a/src/components/admin/BarbershopProfileManagement.tsx b/src/components/admin/BarbershopProfileManagement.tsx
+index 1cd0628..bd29dcf 100644
+--- a/src/components/admin/BarbershopProfileManagement.tsx
++++ b/src/components/admin/BarbershopProfileManagement.tsx
+@@ -25,6 +25,7 @@ import {
+ } from 'lucide-react';
+ import { PALETTES, useTheme } from '../../contexts/ThemeContext';
+ import { AdminPageHeader } from './shared/AdminPageHeader';
++import { AdminTabs } from './shared/AdminTabs';
+ import { 
+   ShopProfile, 
+   defaultShopProfile, 
+@@ -169,67 +170,17 @@ export const BarbershopProfileManagement: React.FC = () => {
+       )}
+ 
+       {/* NAVIGATION TABS */}
+-      <div className="flex items-center gap-1.5 border-b border-border-subtle pb-2 overflow-x-auto custom-scrollbar">
+-        <button
+-          onClick={() => setActiveTab('info')}
+-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+-            activeTab === 'info' 
+-              ? 'bg-gold-base text-surface-base' 
+-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
+-          }`}
+-        >
+-          <Store className="w-3.5 h-3.5" />
+-          <span>Identidade e Dados</span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveTab('hours')}
+-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+-            activeTab === 'hours' 
+-              ? 'bg-gold-base text-surface-base' 
+-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
+-          }`}
+-        >
+-          <Clock className="w-3.5 h-3.5" />
+-          <span>Horários de Funcionamento</span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveTab('contacts')}
+-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+-            activeTab === 'contacts' 
+-              ? 'bg-gold-base text-surface-base' 
+-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
+-          }`}
+-        >
+-          <Phone className="w-3.5 h-3.5" />
+-          <span>Canais de Contato</span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveTab('links')}
+-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+-            activeTab === 'links' 
+-              ? 'bg-gold-base text-surface-base' 
+-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
+-          }`}
+-        >
+-          <LinkIcon className="w-3.5 h-3.5" />
+-          <span>Links & Redes</span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveTab('appearance')}
+-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+-            activeTab === 'appearance' 
+-              ? 'bg-gold-base text-surface-base' 
+-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
+-          }`}
+-        >
+-          <Palette className="w-3.5 h-3.5" />
+-          <span>Aparência e Paleta</span>
+-        </button>
+-      </div>
++      <AdminTabs
++        tabs={[
++          { id: 'info', label: 'Identidade e Dados', icon: Store },
++          { id: 'hours', label: 'Horários de Funcionamento', icon: Clock },
++          { id: 'contacts', label: 'Canais de Contato', icon: Phone },
++          { id: 'links', label: 'Links & Redes', icon: LinkIcon },
++          { id: 'appearance', label: 'Aparência e Paleta', icon: Palette },
++        ]}
++        activeId={activeTab}
++        onChange={(id) => setActiveTab(id as typeof activeTab)}
++      />
+ 
+       {/* TAB CONTENT: IDENTIDADE */}
+       {activeTab === 'info' && (
+diff --git a/src/components/admin/ComandasManagement.tsx b/src/components/admin/ComandasManagement.tsx
+index b12ef01..34ab207 100644
+--- a/src/components/admin/ComandasManagement.tsx
++++ b/src/components/admin/ComandasManagement.tsx
+@@ -8,6 +8,7 @@ import {
+ } from '../../services/supabaseDataService';
+ import { Appointment, ServiceItem, ProductItem, Professional } from '../../types';
+ import { AdminPageHeader } from './shared/AdminPageHeader';
++import { AdminTabs } from './shared/AdminTabs';
+ import { 
+   Receipt, 
+   Plus, 
+@@ -392,47 +393,15 @@ export const ComandasManagement: React.FC = () => {
+       </button>
+ 
+       {/* Navigation Tabs */}
+-      <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">
+-        <button
+-          onClick={() => setActiveTab('open')}
+-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+-            activeTab === 'open'
+-              ? 'border-gold-base text-gold-base'
+-              : 'border-transparent text-content-muted hover:text-content-base'
+-          }`}
+-        >
+-          <span>Comandas Abertas</span>
+-          <span className="w-5 h-5 rounded-full bg-gold-base/10 text-gold-base text-[10px] flex items-center justify-center font-extrabold">
+-            {comandas.filter(c => c.status === 'open').length}
+-          </span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveTab('closed')}
+-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+-            activeTab === 'closed'
+-              ? 'border-gold-base text-gold-base'
+-              : 'border-transparent text-content-muted hover:text-content-base'
+-          }`}
+-        >
+-          <span>Comandas Fechadas</span>
+-          <span className="w-5 h-5 rounded-full bg-surface-card text-content-muted text-[10px] flex items-center justify-center font-bold">
+-            {comandas.filter(c => c.status === 'closed').length}
+-          </span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveTab('new')}
+-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+-            activeTab === 'new'
+-              ? 'border-gold-base text-gold-base'
+-              : 'border-transparent text-content-muted hover:text-content-base'
+-          }`}
+-        >
+-          <Plus className="w-3.5 h-3.5 text-gold-base" />
+-          <span>Nova Comanda</span>
+-        </button>
+-      </div>
++      <AdminTabs
++        tabs={[
++          { id: 'open', label: 'Comandas Abertas', count: comandas.filter(c => c.status === 'open').length },
++          { id: 'closed', label: 'Comandas Fechadas', count: comandas.filter(c => c.status === 'closed').length },
++          { id: 'new', label: 'Nova Comanda', icon: Plus },
++        ]}
++        activeId={activeTab}
++        onChange={(id) => setActiveTab(id as typeof activeTab)}
++      />
+ 
+       {/* Search Bar */}
+       {activeTab !== 'new' && (
+diff --git a/src/components/admin/FinanceiroManagement.tsx b/src/components/admin/FinanceiroManagement.tsx
+index 7932c37..cb0cec3 100644
+--- a/src/components/admin/FinanceiroManagement.tsx
++++ b/src/components/admin/FinanceiroManagement.tsx
+@@ -5,6 +5,7 @@ import { FinancialStatementManagement } from './FinancialStatementManagement';
+ import { FinancialHealthManagement } from './FinancialHealthManagement';
+ import { AccountsPayableManagement } from './AccountsPayableManagement';
+ import { ReportsManagement } from './ReportsManagement';
++import { AdminTabs } from './shared/AdminTabs';
+ 
+ type FinanceiroSubTab = 'caixa' | 'extrato' | 'pagar' | 'saude' | 'relatorios';
+ 
+@@ -52,26 +53,7 @@ export const FinanceiroManagement: React.FC<FinanceiroManagementProps> = ({ init
+   return (
+     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
+       {/* Sub-navegação do módulo Financeiro */}
+-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1">
+-        {subTabs.map((tab) => {
+-          const Icon = tab.icon;
+-          const isActive = subTab === tab.id;
+-          return (
+-            <button
+-              key={tab.id}
+-              onClick={() => setSubTab(tab.id)}
+-              className={`shrink-0 h-9 px-3.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-95 ${
+-                isActive
+-                  ? 'bg-gold-base text-surface-base shadow-sm'
+-                  : 'bg-surface-card text-content-muted border border-border-subtle hover:text-content-base'
+-              }`}
+-            >
+-              <Icon className="w-3.5 h-3.5 shrink-0" />
+-              <span className="whitespace-nowrap">{tab.label}</span>
+-            </button>
+-          );
+-        })}
+-      </div>
++      <AdminTabs tabs={subTabs} activeId={subTab} onChange={(id) => setSubTab(id as FinanceiroSubTab)} />
+ 
+       {/* Conteúdo da sub-aba ativa */}
+       <div className="animate-fade-in min-w-0">
+diff --git a/src/components/admin/PdvInteligente.tsx b/src/components/admin/PdvInteligente.tsx
+index d6b2e0e..faf7a80 100644
+--- a/src/components/admin/PdvInteligente.tsx
++++ b/src/components/admin/PdvInteligente.tsx
+@@ -105,6 +105,9 @@ export const PdvInteligente: React.FC = () => {
+   const [lastTransaction, setLastTransaction] = useState<PdvTransaction | null>(null);
+   const [todaysSales, setTodaysSales] = useState<PdvTransaction[]>([]);
+   const [showSalesHistory, setShowSalesHistory] = useState(false);
++  // Trava contra duplo clique/duplo toque: sem isso, um segundo tap durante o
++  // POST em /api/cash-transactions gerava duas vendas idênticas gravadas.
++  const [isFinalizing, setIsFinalizing] = useState(false);
+ 
+   // Load Data
+   const loadData = async () => {
+@@ -296,7 +299,8 @@ export const PdvInteligente: React.FC = () => {
+ 
+   // Checkout Completion
+   const handleFinalizeSale = async () => {
+-    if (cart.length === 0) return;
++    if (cart.length === 0 || isFinalizing) return;
++    setIsFinalizing(true);
+ 
+     const tx: PdvTransaction = {
+       id: `TX-${Date.now().toString().slice(-6)}`,
+@@ -335,9 +339,27 @@ export const PdvInteligente: React.FC = () => {
+       setTodaysSales(updatedSales);
+     } catch (error) {
+       console.error('Erro ao gravar venda no banco:', error);
++      setIsFinalizing(false);
+       return;
+     }
+ 
++    // Baixa de estoque dos produtos vendidos (best-effort: a venda já foi
++    // gravada acima, então uma falha aqui não deve travar o recibo — mas
++    // fica registrada no console para auditoria manual do estoque).
++    const productItems = tx.items.filter(i => i.type === 'product');
++    if (productItems.length > 0) {
++      await Promise.all(productItems.map(item =>
++        authFetch(`/api/products/${item.id}/decrement-stock`, {
++          method: 'PATCH',
++          body: JSON.stringify({ quantity: item.quantity })
++        }).catch(err => console.error(`Erro ao baixar estoque do produto ${item.id}:`, err))
++      ));
++      setProducts(prev => prev.map(p => {
++        const sold = productItems.find(i => i.id === p.id);
++        return sold ? { ...p, stock_quantity: Math.max(0, p.stock_quantity - sold.quantity) } : p;
++      }));
++    }
++
+     if (linkedAppointmentId) {
+       setAppointments(prev => prev.map(a => a.id === linkedAppointmentId ? { ...a, status: 'completed' } : a));
+     }
+@@ -345,6 +367,7 @@ export const PdvInteligente: React.FC = () => {
+     setLastTransaction(tx);
+     setShowReceiptModal(true);
+     handleClearCart();
++    setIsFinalizing(false);
+   };
+ 
+   // Print Receipt Handler
+@@ -1216,11 +1239,15 @@ export const PdvInteligente: React.FC = () => {
+               {/* FINAL CHECKOUT ACTION BUTTON (DESKTOP) */}
+               <button
+                 onClick={handleFinalizeSale}
+-                disabled={cart.length === 0 || !isCaixaOpen}
++                disabled={cart.length === 0 || !isCaixaOpen || isFinalizing}
+                 className="hidden md:flex w-full h-11 px-4 rounded-xl bg-gold-base hover:bg-gold-hover disabled:opacity-40 text-surface-base font-bold text-xs items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
+               >
+-                <CheckCircle2 className="w-4 h-4" />
+-                <span>FINALIZAR E EMITIR RECIBO (R$ {finalTotal.toFixed(2)})</span>
++                {isFinalizing ? (
++                  <RefreshCw className="w-4 h-4 animate-spin" />
++                ) : (
++                  <CheckCircle2 className="w-4 h-4" />
++                )}
++                <span>{isFinalizing ? 'PROCESSANDO...' : `FINALIZAR E EMITIR RECIBO (R$ ${finalTotal.toFixed(2)})`}</span>
+               </button>
+ 
+             </div>
+@@ -1242,11 +1269,15 @@ export const PdvInteligente: React.FC = () => {
+ 
+         <button
+           onClick={handleFinalizeSale}
+-          disabled={cart.length === 0 || !isCaixaOpen}
++          disabled={cart.length === 0 || !isCaixaOpen || isFinalizing}
+           className="h-11 px-4 bg-gold-base text-surface-base font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shrink-0 hover:bg-gold-hover active:scale-95 disabled:opacity-40 shadow-lg whitespace-nowrap"
+         >
+-          <CheckCircle2 className="w-4 h-4" />
+-          <span>Finalizar Venda</span>
++          {isFinalizing ? (
++            <RefreshCw className="w-4 h-4 animate-spin" />
++          ) : (
++            <CheckCircle2 className="w-4 h-4" />
++          )}
++          <span>{isFinalizing ? 'Processando...' : 'Finalizar Venda'}</span>
+         </button>
+       </div>
+ 
+diff --git a/src/components/admin/ReportsManagement.tsx b/src/components/admin/ReportsManagement.tsx
+index 7bf4369..33c7554 100644
+--- a/src/components/admin/ReportsManagement.tsx
++++ b/src/components/admin/ReportsManagement.tsx
+@@ -25,6 +25,7 @@ import {
+   AlertCircle
+ } from 'lucide-react';
+ import { AdminPageHeader } from './shared/AdminPageHeader';
++import { AdminTabs } from './shared/AdminTabs';
+ 
+ export const ReportsManagement: React.FC = () => {
+   const [appointments, setAppointments] = useState<Appointment[]>([]);
+@@ -266,43 +267,15 @@ export const ReportsManagement: React.FC = () => {
+       </div>
+ 
+       {/* Report Type Selector Tabs */}
+-      <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">
+-        <button
+-          onClick={() => setActiveReportTab('services')}
+-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+-            activeReportTab === 'services'
+-              ? 'border-gold-base text-gold-base'
+-              : 'border-transparent text-content-muted hover:text-content-base'
+-          }`}
+-        >
+-          <Scissors className="w-4 h-4" />
+-          <span>Relatório por Serviço</span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveReportTab('clients')}
+-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+-            activeReportTab === 'clients'
+-              ? 'border-gold-base text-gold-base'
+-              : 'border-transparent text-content-muted hover:text-content-base'
+-          }`}
+-        >
+-          <UserCheck className="w-4 h-4" />
+-          <span>Relatório por Cliente</span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveReportTab('professionals')}
+-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+-            activeReportTab === 'professionals'
+-              ? 'border-gold-base text-gold-base'
+-              : 'border-transparent text-content-muted hover:text-content-base'
+-          }`}
+-        >
+-          <Users className="w-4 h-4" />
+-          <span>Relatório por Profissional</span>
+-        </button>
+-      </div>
++      <AdminTabs
++        tabs={[
++          { id: 'services', label: 'Relatório por Serviço', icon: Scissors },
++          { id: 'clients', label: 'Relatório por Cliente', icon: UserCheck },
++          { id: 'professionals', label: 'Relatório por Profissional', icon: Users },
++        ]}
++        activeId={activeReportTab}
++        onChange={(id) => setActiveReportTab(id as typeof activeReportTab)}
++      />
+ 
+       {/* SECTION 1: SERVICES REPORT */}
+       {activeReportTab === 'services' && (
+diff --git a/src/components/admin/SettingsManagement.tsx b/src/components/admin/SettingsManagement.tsx
+index b5df4f0..b92a5d1 100644
+--- a/src/components/admin/SettingsManagement.tsx
++++ b/src/components/admin/SettingsManagement.tsx
+@@ -1,6 +1,7 @@
+ import React, { useState, useEffect } from 'react';
+ import { Save, CheckCircle2, Settings, Mail, Send, AlertCircle, Eye, EyeOff, MessageSquare, QrCode, ShieldCheck } from 'lucide-react';
+ import { AdminPageHeader } from './shared/AdminPageHeader';
++import { AdminTabs } from './shared/AdminTabs';
+ import { fetchEmailSettings, saveEmailSettings, sendTestEmail, defaultEmailSettings, type EmailSettings } from '../../services/emailSettingsService';
+ import { WhatsAppManagement } from './WhatsAppManagement';
+ import { QrCodeManagement } from './QrCodeManagement';
+@@ -81,12 +82,16 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
+       )}
+ 
+       {/* TAB BAR */}
+-      <div className="bg-surface-card border border-border-subtle rounded-xl p-1 flex items-center gap-1 overflow-x-auto custom-scrollbar">
+-        <TabButton active={activeTab === 'email'} onClick={() => setActiveTab('email')} icon={Mail} label="E-mail (SMTP)" />
+-        <TabButton active={activeTab === 'whatsapp'} onClick={() => setActiveTab('whatsapp')} icon={MessageSquare} label="Painel WhatsApp" />
+-        <TabButton active={activeTab === 'qrcode'} onClick={() => setActiveTab('qrcode')} icon={QrCode} label="QR Code & Balcão" />
+-        <TabButton active={activeTab === 'audit'} onClick={() => setActiveTab('audit')} icon={ShieldCheck} label="Logs & Auditoria" />
+-      </div>
++      <AdminTabs
++        tabs={[
++          { id: 'email', label: 'E-mail (SMTP)', icon: Mail },
++          { id: 'whatsapp', label: 'Painel WhatsApp', icon: MessageSquare },
++          { id: 'qrcode', label: 'QR Code & Balcão', icon: QrCode },
++          { id: 'audit', label: 'Logs & Auditoria', icon: ShieldCheck },
++        ]}
++        activeId={activeTab}
++        onChange={(id) => setActiveTab(id as SettingsTab)}
++      />
+ 
+       {/* MAIN CONTENT AREA */}
+       <div className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-6 min-w-0">
+@@ -96,20 +101,6 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
+   );
+ };
+ 
+-
+-const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
+-  <button
+-    onClick={onClick}
+-    className={`
+-      h-10 sm:h-9 px-3.5 flex items-center justify-center gap-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 active:scale-95
+-      ${active ? 'bg-gold-base text-surface-base' : 'text-content-muted hover:text-content-base bg-surface-card/60 hover:bg-surface-base'}
+-    `}
+-  >
+-    <Icon className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+-    <span>{label}</span>
+-  </button>
+-);
+-
+ // --- Subcomponents for each tab ---
+ 
+ const EmailSettingsTab: React.FC = () => {
+diff --git a/src/components/admin/SubscriptionsManagement.tsx b/src/components/admin/SubscriptionsManagement.tsx
+index 721be4f..22792fe 100644
+--- a/src/components/admin/SubscriptionsManagement.tsx
++++ b/src/components/admin/SubscriptionsManagement.tsx
+@@ -18,6 +18,7 @@ import {
+   CreditCard
+ } from 'lucide-react';
+ import { AdminPageHeader } from './shared/AdminPageHeader';
++import { AdminTabs } from './shared/AdminTabs';
+ 
+ export interface SubscriptionPlan {
+   id: string;
+@@ -221,43 +222,15 @@ export const SubscriptionsManagement: React.FC = () => {
+       </div>
+ 
+       {/* Tabs */}
+-      <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">
+-        <button
+-          onClick={() => setActiveTab('members')}
+-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+-            activeTab === 'members'
+-              ? 'border-gold-base text-gold-base'
+-              : 'border-transparent text-content-muted hover:text-content-base'
+-          }`}
+-        >
+-          <UserCheck className="w-4 h-4" />
+-          <span>Assinantes Ativos</span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveTab('plans')}
+-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+-            activeTab === 'plans'
+-              ? 'border-gold-base text-gold-base'
+-              : 'border-transparent text-content-muted hover:text-content-base'
+-          }`}
+-        >
+-          <Award className="w-4 h-4" />
+-          <span>Planos Configurados</span>
+-        </button>
+-
+-        <button
+-          onClick={() => setActiveTab('commissions')}
+-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+-            activeTab === 'commissions'
+-              ? 'border-gold-base text-gold-base'
+-              : 'border-transparent text-content-muted hover:text-content-base'
+-          }`}
+-        >
+-          <DollarSign className="w-4 h-4" />
+-          <span>Regras de Comissões de Clube</span>
+-        </button>
+-      </div>
++      <AdminTabs
++        tabs={[
++          { id: 'members', label: 'Assinantes Ativos', icon: UserCheck },
++          { id: 'plans', label: 'Planos Configurados', icon: Award },
++          { id: 'commissions', label: 'Regras de Comissões de Clube', icon: DollarSign },
++        ]}
++        activeId={activeTab}
++        onChange={(id) => setActiveTab(id as typeof activeTab)}
++      />
+ 
+       {/* TAB 1: MEMBERS */}
+       {activeTab === 'members' && (
+diff --git a/src/components/admin/shared/AdminTabs.tsx b/src/components/admin/shared/AdminTabs.tsx
+new file mode 100644
+index 0000000..0723a04
+--- /dev/null
++++ b/src/components/admin/shared/AdminTabs.tsx
+@@ -0,0 +1,70 @@
++import React from 'react';
++import { LucideIcon } from 'lucide-react';
++
++/**
++ * Padrão único de abas (navegação secundária) para todas as telas do /admin.
++ *
++ * Antes desta unificação, cada tela reimplementava sua própria lista de
++ * botões de aba com estilos visuais diferentes (algumas em "pílula" dourada,
++ * outras com sublinhado, outras com cantos arredondados só em cima) e a
++ * mesma string de className duplicada em cada `<button>`. Isso fazia o app
++ * parecer inconsistente ao navegar entre módulos e multiplicava o trabalho
++ * de manutenção. Agora existe um único componente: qualquer tela com abas
++ * (Financeiro, Contas a Pagar, Comandas, Assinaturas, Relatórios, Perfil da
++ * Barbearia, Configurações, etc.) usa <AdminTabs /> e herda o mesmo visual,
++ * o mesmo comportamento de rolagem horizontal no mobile e o mesmo contrato
++ * de props.
++ */
++
++export interface AdminTabItem {
++  id: string;
++  label: string;
++  icon?: LucideIcon;
++  /** Contador opcional (ex: nº de comandas abertas) exibido como badge. */
++  count?: number;
++}
++
++interface AdminTabsProps {
++  tabs: AdminTabItem[];
++  activeId: string;
++  onChange: (id: string) => void;
++  /** Classes extras opcionais (ex: espaçamento específico da tela). */
++  className?: string;
++}
++
++export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, className = '' }) => {
++  return (
++    <div className={`flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1 ${className}`}>
++      {tabs.map((tab) => {
++        const Icon = tab.icon;
++        const isActive = activeId === tab.id;
++        return (
++          <button
++            key={tab.id}
++            type="button"
++            onClick={() => onChange(tab.id)}
++            className={`shrink-0 h-9 px-3.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-95 ${
++              isActive
++                ? 'bg-gold-base text-surface-base shadow-sm'
++                : 'bg-surface-card text-content-muted border border-border-subtle hover:text-content-base'
++            }`}
++          >
++            {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
++            <span className="whitespace-nowrap">{tab.label}</span>
++            {typeof tab.count === 'number' && (
++              <span
++                className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-extrabold shrink-0 ${
++                  isActive ? 'bg-surface-base/25 text-surface-base' : 'bg-gold-base/10 text-gold-base'
++                }`}
++              >
++                {tab.count}
++              </span>
++            )}
++          </button>
++        );
++      })}
++    </div>
++  );
++};
++
++export default AdminTabs;

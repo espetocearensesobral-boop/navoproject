@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { PALETTES, useTheme } from '../../contexts/ThemeContext';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminTabs } from './shared/AdminTabs';
 import { 
   ShopProfile, 
   defaultShopProfile, 
@@ -169,67 +170,17 @@ export const BarbershopProfileManagement: React.FC = () => {
       )}
 
       {/* NAVIGATION TABS */}
-      <div className="flex items-center gap-1.5 border-b border-border-subtle pb-2 overflow-x-auto custom-scrollbar">
-        <button
-          onClick={() => setActiveTab('info')}
-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
-            activeTab === 'info' 
-              ? 'bg-gold-base text-surface-base' 
-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
-          }`}
-        >
-          <Store className="w-3.5 h-3.5" />
-          <span>Identidade e Dados</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('hours')}
-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
-            activeTab === 'hours' 
-              ? 'bg-gold-base text-surface-base' 
-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
-          }`}
-        >
-          <Clock className="w-3.5 h-3.5" />
-          <span>Horários de Funcionamento</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('contacts')}
-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
-            activeTab === 'contacts' 
-              ? 'bg-gold-base text-surface-base' 
-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
-          }`}
-        >
-          <Phone className="w-3.5 h-3.5" />
-          <span>Canais de Contato</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('links')}
-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
-            activeTab === 'links' 
-              ? 'bg-gold-base text-surface-base' 
-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
-          }`}
-        >
-          <LinkIcon className="w-3.5 h-3.5" />
-          <span>Links & Redes</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('appearance')}
-          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
-            activeTab === 'appearance' 
-              ? 'bg-gold-base text-surface-base' 
-              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
-          }`}
-        >
-          <Palette className="w-3.5 h-3.5" />
-          <span>Aparência e Paleta</span>
-        </button>
-      </div>
+      <AdminTabs
+        tabs={[
+          { id: 'info', label: 'Identidade e Dados', icon: Store },
+          { id: 'hours', label: 'Horários de Funcionamento', icon: Clock },
+          { id: 'contacts', label: 'Canais de Contato', icon: Phone },
+          { id: 'links', label: 'Links & Redes', icon: LinkIcon },
+          { id: 'appearance', label: 'Aparência e Paleta', icon: Palette },
+        ]}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as typeof activeTab)}
+      />
 
       {/* TAB CONTENT: IDENTIDADE */}
       {activeTab === 'info' && (

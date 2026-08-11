@@ -16,6 +16,7 @@ import {
   X 
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminTabs } from './shared/AdminTabs';
 
 export interface PayableAccount {
   id: string;
@@ -197,26 +198,16 @@ export const AccountsPayableManagement: React.FC = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">
-        {[
+      <AdminTabs
+        tabs={[
           { id: 'all', label: 'Todas' },
           { id: 'pending', label: 'A Vencer' },
           { id: 'overdue', label: 'Vencidas' },
           { id: 'paid', label: 'Pagas' }
-        ].map(f => (
-          <button
-            key={f.id}
-            onClick={() => setFilterStatus(f.id)}
-            className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all whitespace-nowrap shrink-0 ${
-              filterStatus === f.id
-                ? 'border-gold-base text-gold-base'
-                : 'border-transparent text-content-muted hover:text-content-base'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+        ]}
+        activeId={filterStatus}
+        onChange={setFilterStatus}
+      />
 
       {/* Accounts List */}
       <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xs">

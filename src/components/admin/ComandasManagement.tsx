@@ -8,6 +8,7 @@ import {
 } from '../../services/supabaseDataService';
 import { Appointment, ServiceItem, ProductItem, Professional } from '../../types';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminTabs } from './shared/AdminTabs';
 import { 
   Receipt, 
   Plus, 
@@ -392,47 +393,15 @@ export const ComandasManagement: React.FC = () => {
       </button>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-border-subtle gap-2 overflow-x-auto no-scrollbar">
-        <button
-          onClick={() => setActiveTab('open')}
-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'open'
-              ? 'border-gold-base text-gold-base'
-              : 'border-transparent text-content-muted hover:text-content-base'
-          }`}
-        >
-          <span>Comandas Abertas</span>
-          <span className="w-5 h-5 rounded-full bg-gold-base/10 text-gold-base text-[10px] flex items-center justify-center font-extrabold">
-            {comandas.filter(c => c.status === 'open').length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('closed')}
-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'closed'
-              ? 'border-gold-base text-gold-base'
-              : 'border-transparent text-content-muted hover:text-content-base'
-          }`}
-        >
-          <span>Comandas Fechadas</span>
-          <span className="w-5 h-5 rounded-full bg-surface-card text-content-muted text-[10px] flex items-center justify-center font-bold">
-            {comandas.filter(c => c.status === 'closed').length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('new')}
-          className={`py-2.5 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'new'
-              ? 'border-gold-base text-gold-base'
-              : 'border-transparent text-content-muted hover:text-content-base'
-          }`}
-        >
-          <Plus className="w-3.5 h-3.5 text-gold-base" />
-          <span>Nova Comanda</span>
-        </button>
-      </div>
+      <AdminTabs
+        tabs={[
+          { id: 'open', label: 'Comandas Abertas', count: comandas.filter(c => c.status === 'open').length },
+          { id: 'closed', label: 'Comandas Fechadas', count: comandas.filter(c => c.status === 'closed').length },
+          { id: 'new', label: 'Nova Comanda', icon: Plus },
+        ]}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as typeof activeTab)}
+      />
 
       {/* Search Bar */}
       {activeTab !== 'new' && (

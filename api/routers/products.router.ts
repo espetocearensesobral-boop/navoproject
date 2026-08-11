@@ -1,5 +1,5 @@
 import express from 'express';
-import { eq } from 'drizzle-orm';
+import { eq, sql, and, gte } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
@@ -56,6 +56,38 @@ productsRouter.put("/:id", requireAuth, requireAdmin, async (req, res) => {
       set: { ...req.body, updatedAt: new Date() }
     });
     res.json(prodData);
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+// Baixa atômica de estoque, usada pelo PDV ao finalizar uma venda de produto.
+// Antes desta rota o estoque exibido no PDV nunca era atualizado após uma
+// venda — o `stock_quantity` só mudava se alguém editasse o produto na mão.
+// O filtro `stockQuantity >= quantity` no WHERE garante que duas vendas
+// concorrentes do mesmo produto não derrubem o estoque para negativo: se o
+// saldo já não for suficiente, a query não atualiza nenhuma linha e a rota
+// responde 409 para o cliente decidir o que fazer.
+productsRouter.patch("/:id/decrement-stock", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const quantity = Number(req.body?.quantity);
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      return res.status(400).json({ error: 'Quantidade inválida.' });
+    }
+
+    const updated = await db.update(schema.products)
+      .set({
+        stockQuantity: sql`${schema.products.stockQuantity} - ${quantity}`,
+        updatedAt: new Date()
+      })
+      .where(and(eq(schema.products.id, req.params.id), gte(schema.products.stockQuantity, quantity)))
+      .returning();
+
+    if (updated.length === 0) {
+      return res.status(409).json({ error: 'Estoque insuficiente para baixar esta quantidade.' });
+    }
+
+    res.json(updated[0]);
   } catch (e: any) {
     return handleError(res, e, req.path);
   }
