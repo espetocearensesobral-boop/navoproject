@@ -125,9 +125,9 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
           {/* Logo & Portal Header */}
           <div className="flex flex-col items-center text-center mb-6">
             {shopLogo ? (
-              <img src={shopLogo} alt={shopName} className="w-20 h-20 rounded-2xl object-cover mb-4 shadow-lg shadow-gold-base/10 border border-white/10" />
+              <img src={shopLogo} alt={shopName} className="w-20 h-20 rounded-full object-cover mb-4 shadow-lg shadow-gold-base/10 border border-white/10" />
             ) : (
-              <div className="w-16 h-16 rounded-2xl bg-gold-base/10 border border-gold-base/20 flex items-center justify-center text-gold-base shadow-lg mb-4">
+              <div className="w-16 h-16 rounded-full bg-gold-base/10 border border-gold-base/20 flex items-center justify-center text-gold-base shadow-lg mb-4">
                 <Scissors className="w-8 h-8" />
               </div>
             )}
