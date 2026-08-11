@@ -18,7 +18,10 @@ import {
   Trash2,
   Image as ImageIcon,
   Palette,
-  Check
+  Check,
+  Mail,
+  Link as LinkIcon,
+  MessageSquare
 } from 'lucide-react';
 import { PALETTES, useTheme } from '../../contexts/ThemeContext';
 import { AdminPageHeader } from './shared/AdminPageHeader';
@@ -37,7 +40,7 @@ export const BarbershopProfileManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'address' | 'hours' | 'appearance'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'hours' | 'contacts' | 'links' | 'appearance'>('info');
 
   useEffect(() => {
     loadProfile();
@@ -192,15 +195,27 @@ export const BarbershopProfileManagement: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setActiveTab('address')}
+          onClick={() => setActiveTab('contacts')}
           className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
-            activeTab === 'address' 
+            activeTab === 'contacts' 
               ? 'bg-gold-base text-surface-base' 
               : 'text-content-muted hover:text-content-base hover:bg-surface-card'
           }`}
         >
-          <MapPin className="w-3.5 h-3.5" />
-          <span>Endereço e Contatos</span>
+          <Phone className="w-3.5 h-3.5" />
+          <span>Canais de Contato</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('links')}
+          className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+            activeTab === 'links' 
+              ? 'bg-gold-base text-surface-base' 
+              : 'text-content-muted hover:text-content-base hover:bg-surface-card'
+          }`}
+        >
+          <LinkIcon className="w-3.5 h-3.5" />
+          <span>Links & Redes</span>
         </button>
 
         <button
@@ -546,12 +561,12 @@ export const BarbershopProfileManagement: React.FC = () => {
         </form>
       )}
 
-      {/* TAB CONTENT: ENDEREÇO & CONTATOS */}
-      {activeTab === 'address' && (
+      {/* TAB CONTENT: CANAIS DE CONTATO */}
+      {activeTab === 'contacts' && (
         <form className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-5" onKeyDown={handleEnterAsTab} onSubmit={e => e.preventDefault()}>
           <div className="flex items-center gap-2 pb-3 border-b border-border-subtle">
-            <MapPin className="w-4 h-4 text-gold-base" />
-            <h2 className="text-sm font-serif font-bold text-content-base">Endereço & Canais de Comunicação</h2>
+            <Phone className="w-4 h-4 text-gold-base" />
+            <h2 className="text-sm font-serif font-bold text-content-base">Canais de Contato & Endereço</h2>
           </div>
 
           <div>
@@ -567,23 +582,10 @@ export const BarbershopProfileManagement: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
-              Link de Localização (Google Maps / Waze)
-            </label>
-            <input
-              type="text"
-              value={profile.mapsUrl}
-              onChange={e => setProfile(p => ({ ...p, mapsUrl: e.target.value }))}
-              placeholder="https://maps.google.com/?q=..."
-              className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
-            />
-          </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
-                Telefone Principal
+                Telefone Principal / Celular
               </label>
               <input
                 type="text"
@@ -596,7 +598,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
             <div>
               <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
-                WhatsApp de Atendimento
+                WhatsApp Oficial de Atendimento
               </label>
               <input
                 type="text"
@@ -608,15 +610,84 @@ export const BarbershopProfileManagement: React.FC = () => {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+                Telefone Fixo da Recepção
+              </label>
+              <input
+                type="text"
+                value={profile.landline || ''}
+                onChange={e => setProfile(p => ({ ...p, landline: formatPhone(e.target.value) }))}
+                placeholder="(11) 3211-0000"
+                className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+              />
+            </div>
+
+            <div>
+              <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+                E-mail de Suporte e Atendimento
+              </label>
+              <input
+                type="email"
+                value={profile.email || ''}
+                onChange={e => setProfile(p => ({ ...p, email: e.target.value }))}
+                placeholder="contato@barbearianavo.com.br"
+                className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+              />
+            </div>
+          </div>
+        </form>
+      )}
+
+      {/* TAB CONTENT: LINKS & REDES SOCIAIS */}
+      {activeTab === 'links' && (
+        <form className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-5" onKeyDown={handleEnterAsTab} onSubmit={e => e.preventDefault()}>
+          <div className="flex items-center gap-2 pb-3 border-b border-border-subtle">
+            <LinkIcon className="w-4 h-4 text-gold-base" />
+            <h2 className="text-sm font-serif font-bold text-content-base">Redes Sociais & Links Externos</h2>
+          </div>
+
           <div>
             <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
-              Perfil no Instagram
+              Perfil no Instagram (@usuario)
+            </label>
+            <div className="flex min-w-0">
+              <span className="bg-surface-base border border-r-0 border-border-subtle rounded-l-xl px-3 py-2.5 text-content-muted font-bold text-xs shrink-0 flex items-center">
+                @
+              </span>
+              <input
+                type="text"
+                value={(profile.instagram || '').replace(/^@/, '')}
+                onChange={e => setProfile(p => ({ ...p, instagram: `@${e.target.value.replace(/^@/, '')}` }))}
+                placeholder="barbearianavo"
+                className="flex-1 min-w-0 bg-surface-base border border-border-subtle rounded-r-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              Página do Facebook (URL)
             </label>
             <input
               type="text"
-              value={profile.instagram}
-              onChange={e => setProfile(p => ({ ...p, instagram: e.target.value }))}
-              placeholder="@barbearianavo"
+              value={profile.facebookUrl || ''}
+              onChange={e => setProfile(p => ({ ...p, facebookUrl: e.target.value }))}
+              placeholder="https://facebook.com/barbearianavo"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+            />
+          </div>
+
+          <div>
+            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              Link de Localização e Avaliações (Google Maps)
+            </label>
+            <input
+              type="text"
+              value={profile.mapsUrl}
+              onChange={e => setProfile(p => ({ ...p, mapsUrl: e.target.value }))}
+              placeholder="https://maps.google.com/?q=..."
               className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
             />
           </div>

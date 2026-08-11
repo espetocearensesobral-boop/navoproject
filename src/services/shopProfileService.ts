@@ -29,6 +29,9 @@ export interface ShopProfile {
   };
   mapsUrl: string;
   instagram: string;
+  facebookUrl?: string;
+  landline?: string;
+  email?: string;
   logoUrl?: string;
   description: string;
   // Se true, um horário que ultrapassa o fechamento pode ser solicitado e fica
@@ -43,7 +46,9 @@ export const defaultShopProfile: ShopProfile = {
   slogan: 'Estilo, Tradição e Excelência na Medida Certa',
   address: 'Rua Fortaleza, 1420 - Expectativa, Sobral - CE',
   phone: '(88) 99834-0085',
+  landline: '(88) 3611-0000',
   whatsapp: '5588998340085',
+  email: 'contato@barbearianavo.com.br',
   openTime: '09:00',
   closeTime: '20:00',
   operatingDays: [1, 2, 3, 4, 5, 6],
@@ -58,6 +63,7 @@ export const defaultShopProfile: ShopProfile = {
   },
   mapsUrl: 'https://maps.app.goo.gl/2uCakwEHwA6bbXq97',
   instagram: '@barbearianavo',
+  facebookUrl: 'https://facebook.com/barbearianavo',
   logoUrl: '',
   description: 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.',
   allowOutsideHoursApproval: false
