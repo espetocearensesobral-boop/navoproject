@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { authFetch } from '../../lib/api';
+import { authFetch, setStoredToken } from '../../lib/api';
 import { 
   ShieldCheck, 
   Lock, 
@@ -87,6 +87,10 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
         throw new Error(data.error || 'Credenciais de administrador inválidas.');
       }
 
+      if (data.token) {
+        setStoredToken(data.token);
+      }
+
       setSuccessMsg('Acesso autorizado! Carregando painel...');
       setTimeout(() => {
         onLoginSuccess(data);
@@ -138,6 +142,10 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
 
       if (!res.ok) {
         throw new Error(data.error || 'Não foi possível cadastrar o administrador.');
+      }
+
+      if (data.token) {
+        setStoredToken(data.token);
       }
 
       setSuccessMsg('Conta de administrador criada com sucesso!');

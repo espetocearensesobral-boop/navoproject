@@ -9,12 +9,19 @@ export default function App() {
   const [route, setRoute] = useState<'client' | 'admin'>('client');
 
   useEffect(() => {
-    const path = window.location.pathname;
-    if (path.startsWith('/admin')) {
-      setRoute('admin');
-    } else {
-      setRoute('client');
-    }
+    const handlePathChange = () => {
+      const path = window.location.pathname;
+      if (path.startsWith('/admin')) {
+        setRoute('admin');
+      } else {
+        setRoute('client');
+      }
+    };
+
+    handlePathChange();
+
+    window.addEventListener('popstate', handlePathChange);
+    return () => window.removeEventListener('popstate', handlePathChange);
   }, []);
 
   return (

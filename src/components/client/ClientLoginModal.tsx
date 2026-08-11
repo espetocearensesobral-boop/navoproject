@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { authFetch } from '../../lib/api';
-import { X, Mail, Lock, User, Phone, Eye, EyeOff, KeyRound, CheckCircle, ArrowLeft, XCircle } from 'lucide-react';
+import { X, Mail, Lock, User, Phone, Eye, EyeOff, KeyRound, CheckCircle, ArrowLeft, XCircle, ShieldCheck } from 'lucide-react';
 import { TermsAndPrivacyModal } from '../shared/TermsAndPrivacyModal';
 
 interface ClientLoginModalProps {
@@ -327,7 +327,21 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
           {mode === 'register' ? 'Criar Conta' : mode === 'forgot' ? 'Recuperar Senha' : 'Acessar Conta'}
         </h2>
 
-        {errorMsg && <div id="login-error-msg" role="alert" className="mb-4 p-3 rounded-xl bg-status-error/10 border border-status-error/20 text-status-error text-sm font-medium">{errorMsg}</div>}
+        {errorMsg && (
+          <div id="login-error-msg" role="alert" className="mb-4 p-3.5 rounded-xl bg-status-error/10 border border-status-error/20 text-status-error text-xs font-medium space-y-2">
+            <div>{errorMsg}</div>
+            {(errorMsg.includes('/admin') || errorMsg.includes('administrador')) && (
+              <button
+                type="button"
+                onClick={() => { window.location.href = '/admin'; }}
+                className="w-full mt-1.5 py-2 px-3 rounded-lg bg-gold-base text-surface-base font-bold text-xs hover:brightness-110 transition-all flex items-center justify-center gap-1.5 shadow-md active:scale-95"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>Ir para Painel Administrativo (/admin)</span>
+              </button>
+            )}
+          </div>
+        )}
         {successMsg && <div className="mb-4 p-3 rounded-xl bg-status-success/10 border border-status-success/20 text-status-success text-sm font-medium flex items-center gap-2"><CheckCircle className="w-4 h-4 shrink-0" /><span>{successMsg}</span></div>}
 
         {mode === 'forgot' && forgotSuccess && resetDone ? (

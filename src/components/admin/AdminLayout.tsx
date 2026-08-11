@@ -18,7 +18,7 @@ import { SettingsManagement } from './SettingsManagement';
 import { NavoRewardsAdmin } from './NavoRewardsAdmin';
 import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { AdminAuthView } from './AdminAuthView';
-import { authFetch } from '../../lib/api';
+import { authFetch, setStoredToken, clearStoredToken } from '../../lib/api';
 import { useTheme } from '../../contexts/ThemeContext';
 import { 
   Calendar,
@@ -118,6 +118,9 @@ export const AdminLayout: React.FC = () => {
     return (
       <AdminAuthView 
         onLoginSuccess={(user) => {
+          if (user?.token) {
+            setStoredToken(user.token);
+          }
           setIsAuthorized(true);
           setAdminName(user.name || 'Admin');
         }} 
@@ -240,6 +243,7 @@ export const AdminLayout: React.FC = () => {
     try {
       await authFetch('/api/auth/logout', { method: 'POST' });
     } catch (e) {}
+    clearStoredToken();
     setIsAuthorized(false);
   };
 
