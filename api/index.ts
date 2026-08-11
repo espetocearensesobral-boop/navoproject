@@ -163,6 +163,7 @@ async function initializeDb(): Promise<void> {
     console.log('[API] ✅ Conectado ao Banco de Dados Supabase com sucesso.');
 
     try {
+      await queryClient`SET client_min_messages TO WARNING;`;
       await queryClient`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS booking_code text;`;
       await queryClient`
         CREATE TABLE IF NOT EXISTS schedule_blocks (
