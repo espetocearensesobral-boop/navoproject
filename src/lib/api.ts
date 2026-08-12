@@ -51,6 +51,32 @@ export const clearStoredToken = () => {
   safeLocalStorage.removeItem('auth_token');
 };
 
+export async function readApiJson<T>(response: Response): Promise<T> {
+  const contentType = response.headers.get('content-type') ?? '';
+  const body = await response.text();
+
+  if (!contentType.includes('application/json')) {
+    throw new Error(
+      `A API respondeu HTML/texto em ${response.url || 'rota desconhecida'} ` +
+      `(HTTP ${response.status}). Verifique se o endpoint existe e se o rewrite /api está correto.`
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = JSON.parse(body);
+  } catch {
+    throw new Error(`A API retornou JSON inválido (HTTP ${response.status}).`);
+  }
+
+  if (!response.ok) {
+    const error = payload as { error?: string; message?: string };
+    throw new Error(error.error || error.message || `Falha na API (HTTP ${response.status}).`);
+  }
+
+  return payload as T;
+}
+
 export const authFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = getStoredToken();
   const headers: any = {
@@ -69,20 +95,6 @@ export const authFetch = async (endpoint: string, options: RequestInit = {}) => 
     // Stale token, clear token storage
     clearStoredToken();
   }
-
-  // Intercept response.json() to safely parse HTML errors (like Vite 404s/500s) as {}
-  const originalJson = response.json.bind(response);
-  response.json = async () => {
-    try {
-      const contentType = response.headers.get('content-type');
-      if (contentType && !contentType.includes('application/json')) {
-        return {};
-      }
-      return await originalJson();
-    } catch {
-      return {};
-    }
-  };
   
   return response;
 };

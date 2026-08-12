@@ -697,12 +697,8 @@ app.get("/api/shop-profile", async (req: any, res: any) => {
 
 
 // Fallback for missing API routes to ensure JSON response
-app.use((req: any, res: any) => {
-  if (req.path.startsWith('/api')) {
-    res.status(404).json({ error: `Endpoint não encontrado: ${req.method} ${req.path}` });
-  } else {
-    res.status(404).json({ error: 'Not Found' });
-  }
+app.use('/api', (req: any, res: any) => {
+  res.status(404).json({ error: `Endpoint não encontrado: ${req.method} ${req.originalUrl}` });
 });
 
 export default app;
