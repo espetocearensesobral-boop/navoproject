@@ -402,33 +402,17 @@ export const ClientApp: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Theme Toggle Button in Header */}
               <button
                 onClick={() => {
                   hapticLight();
-                  setTheme(theme === 'dark' ? 'light' : 'dark');
+                  setIsMoreDrawerOpen(true);
                 }}
-                title={theme === 'dark' ? 'Tema Escuro' : 'Tema Claro'}
-                aria-label="Alternar tema"
+                title="Menu"
+                aria-label="Menu Principal"
                 className="p-2 rounded-xl text-content-base hover:text-content-base transition-all active:scale-95 flex items-center justify-center shrink-0"
               >
-                {theme === 'dark' ? (
-                  <Moon className="w-5 h-5 text-gold-base" />
-                ) : (
-                  <Sun className="w-5 h-5 text-gold-base" />
-                )}
+                <Menu className="w-6 h-6 text-gold-base" />
               </button>
-
-              {/* Install PWA Button in Header */}
-              <button
-                onClick={() => setIsPwaModalOpen(true)}
-                title="Instalar App"
-                aria-label="Instalar App"
-                className="p-2 rounded-xl text-content-base hover:text-content-base transition-all active:scale-95 flex items-center justify-center shrink-0"
-              >
-                <Download className="w-5 h-5 text-gold-base" />
-              </button>
-
             </div>
           </header>
         )}
@@ -498,6 +482,7 @@ export const ClientApp: React.FC = () => {
                     setIsLoginModalOpen(true);
                   }}
                   onOpenProfile={() => setIsProfileModalOpen(true)}
+                  onOpenMenu={() => setIsMoreDrawerOpen(true)}
                   scrollContainerRef={landingScrollRef}
                 />
               )}
@@ -625,50 +610,7 @@ export const ClientApp: React.FC = () => {
           )}
         </main>
 
-        {/* Bottom Navigation */}
-        {activeTab !== 'home' && (
-          <div className="bg-surface-base border-t border-border-subtle px-2 py-1.5 flex justify-around items-center pb-safe shrink-0 z-30">
-            {[
-              { id: 'home' as const, label: 'Início', icon: Home },
-              { id: 'booking' as const, label: 'Agendar', icon: Calendar },
-              { id: 'appointments' as const, label: 'Meus Cortes', icon: Clock },
-              { id: 'more' as const, label: 'Mais', icon: Menu },
-            ].map((tab) => {
-              const isActive = activeTab === tab.id || (tab.id === 'more' && (activeTab === 'subscriptions' || activeTab === 'loyalty'));
-              const Icon = tab.icon;
-              const upcomingBadgeCount = userCreatedAppointments.length || (isGuest ? 0 : 1);
-              
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabChange(tab.id)}
-                  className={`relative flex-1 flex flex-col items-center justify-center gap-1 py-1.5 sm:py-2 rounded-lg transition-all duration-200 select-none ${
-                    isActive 
-                      ? 'text-gold-base font-bold' 
-                      : 'text-content-muted hover:text-content-base font-medium'
-                  }`}
-                >
-                  {/* Pill indicador superior */}
-                  {isActive && (
-                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gold-base rounded-full shadow-[0_0_8px_rgba(201,169,110,0.8)]" />
-                  )}
-                  
-                  {/* Badge de notificação (só em Meus Cortes) */}
-                  {tab.id === 'appointments' && upcomingBadgeCount > 0 && !isActive && (
-                    <div className="absolute top-1 right-3 sm:right-6 w-3.5 h-3.5 bg-gold-base text-surface-base font-black text-[8px] rounded-full flex items-center justify-center shadow-md">
-                      {upcomingBadgeCount}
-                    </div>
-                  )}
-                  
-                  <Icon className="w-5 h-5 relative z-10" strokeWidth={isActive ? 2.5 : 2} />
-                  <span className={`text-[10px] relative z-10 ${isActive ? 'font-black' : 'font-medium'}`}>
-                    {tab.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        )}
+        {/* Bottom Navigation REMOVIDO EM FAVOR DO MENU LATERAL */}
       </div>
 
       <ClientMoreDrawer
@@ -676,6 +618,7 @@ export const ClientApp: React.FC = () => {
         onClose={() => setIsMoreDrawerOpen(false)}
         currentUser={currentUser}
         isGuest={isGuest}
+        onNavigate={(tab) => handleTabChange(tab as any)}
         onOpenProfile={() => setIsProfileModalOpen(true)}
         onOpenSubscriptions={() => setActiveTab('subscriptions')}
         onOpenLoyalty={() => setActiveTab('loyalty')}

@@ -60,11 +60,12 @@ interface LandingPageProps {
   currentUser?: any;
   onOpenLogin?: () => void;
   onOpenProfile?: () => void;
+  onOpenMenu: () => void;
   /** Recebe a referência do container real de scroll (snap-scroll de seções), usado pelo pull-to-refresh do componente pai. */
   scrollContainerRef?: React.MutableRefObject<HTMLElement | null>;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments, isGuest = true, currentUser, onOpenLogin, onOpenProfile, scrollContainerRef }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments, isGuest = true, currentUser, onOpenLogin, onOpenProfile, onOpenMenu, scrollContainerRef }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Expõe o container de scroll interno (a landing page rola dentro de si mesma,
@@ -78,7 +79,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     };
   }, [scrollContainerRef]);
   const [activeCategory, setActiveCategory] = useState<'todos' | 'cabelo' | 'barba'>('todos');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [termsPrivacyTab, setTermsPrivacyTab] = useState<'terms' | 'privacy' | null>(null);
   const [isHoursModalOpen, setIsHoursModalOpen] = useState(false);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
@@ -104,7 +104,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
   const toggleMenu = () => {
     hapticLight();
-    setIsMenuOpen(prev => !prev);
+    onOpenMenu();
   };
 
   const toggleHoursModal = () => {
@@ -395,97 +395,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         )}
       </AnimatePresence>
 
-      {/* MENU OVERLAY */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center gap-8 p-4"
-          >
-            <button 
-              onClick={toggleMenu} 
-              className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/8 border border-white/10 text-white text-xl flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
-              aria-label="Fechar menu"
-            >
-              ✕
-            </button>
-            <motion.a 
-              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              href="#agendar" 
-              onClick={(e) => { e.preventDefault(); toggleMenu(); onGoToBooking(); }} 
-              className="text-gold-base text-2xl font-semibold hover:opacity-100 transition-opacity"
-            >
-              Agendar Agora
-            </motion.a>
-            <motion.button 
-              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              onClick={() => { 
-                toggleMenu(); 
-                if (onGoToAppointments) onGoToAppointments(); 
-              }} 
-              className="text-gold-base text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer"
-            >
-              Meus Cortes
-            </motion.button>
-            <motion.button 
-              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              onClick={() => {
-                toggleMenu();
-                if (isGuest) {
-                  if (onOpenLogin) onOpenLogin();
-                } else {
-                  if (onOpenProfile) onOpenProfile();
-                }
-              }}
-              className="text-gold-base text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer"
-            >
-              {isGuest ? 'Entrar / Criar Conta' : `Olá, ${currentUser?.name?.split(' ')[0] || 'Minha Conta'}`}
-            </motion.button>
-
-            <div className="w-16 h-px bg-white/15 my-1" />
-
-            <motion.a 
-              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              href="#diferenciais" 
-              onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(1); }} 
-              className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
-            >
-              Diferenciais
-            </motion.a>
-            <motion.a 
-              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              href="#galeria" 
-              onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(2); }} 
-              className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
-            >
-              Galeria
-            </motion.a>
-            <motion.a 
-              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              href="#contato" 
-              onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(4); }} 
-              className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
-            >
-              Contato
-            </motion.a>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* MENU OVERLAY REMOVIDO EM FAVOR DO DRAWER COMPARTILHADO */}
 
       {/* SECTION 0: HERO */}
       <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 bg-[#0a0a0a] text-[#f5f5f5] overflow-hidden flex flex-col justify-between box-border">
