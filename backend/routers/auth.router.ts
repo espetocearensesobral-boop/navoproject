@@ -1,7 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { eq } from 'drizzle-orm';
+import { eq, or } from 'drizzle-orm';
 import { db, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { JWT_SECRET } from '../config/env.js';
@@ -61,16 +61,24 @@ authRouter.post("/login", authLimiter, async (req, res) => {
     const cleanLoginId = sanitizePhone(loginId);
     const cleanEmail = loginId.toString().toLowerCase().trim();
 
-    const allProfiles = await db.query.profiles.findMany();
-    const user = allProfiles.find((p: any) => {
-      const isGuest = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
-      if (isGuest) return false;
-
-      const emailMatches = p.email && p.email.toLowerCase().trim() === cleanEmail;
-      const phoneMatches = cleanLoginId && p.phone && matchPhoneNumbers(p.phone, cleanLoginId);
-
-      return emailMatches || phoneMatches;
+    let user = await db.query.profiles.findFirst({
+      where: cleanLoginId
+        ? or(eq(schema.profiles.email, cleanEmail), eq(schema.profiles.phone, cleanLoginId))
+        : eq(schema.profiles.email, cleanEmail)
     });
+
+    if (!user) {
+      const allProfiles = await db.query.profiles.findMany().catch(() => []);
+      user = allProfiles.find((p: any) => {
+        const isGuest = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
+        if (isGuest) return false;
+
+        const emailMatches = p.email && p.email.toLowerCase().trim() === cleanEmail;
+        const phoneMatches = cleanLoginId && p.phone && matchPhoneNumbers(p.phone, cleanLoginId);
+
+        return emailMatches || phoneMatches;
+      });
+    }
 
     if (!user || !user.password) {
       return res.status(401).json({ error: 'Dados não encontrados ou credenciais inválidas.' });
@@ -142,16 +150,24 @@ const handleAdminLogin = async (req: express.Request, res: express.Response) => 
     const cleanLoginId = sanitizePhone(loginId);
     const cleanEmail = loginId.toString().toLowerCase().trim();
 
-    const allProfiles = await db.query.profiles.findMany();
-    const user = allProfiles.find((p: any) => {
-      const isGuest = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
-      if (isGuest) return false;
-
-      const emailMatches = p.email && p.email.toLowerCase().trim() === cleanEmail;
-      const phoneMatches = cleanLoginId && p.phone && matchPhoneNumbers(p.phone, cleanLoginId);
-
-      return emailMatches || phoneMatches;
+    let user = await db.query.profiles.findFirst({
+      where: cleanLoginId
+        ? or(eq(schema.profiles.email, cleanEmail), eq(schema.profiles.phone, cleanLoginId))
+        : eq(schema.profiles.email, cleanEmail)
     });
+
+    if (!user) {
+      const allProfiles = await db.query.profiles.findMany().catch(() => []);
+      user = allProfiles.find((p: any) => {
+        const isGuest = !p.password || p.id === 'usr_guest' || p.id.startsWith('guest_') || (p.email && p.email.endsWith('@guest.barberx.app'));
+        if (isGuest) return false;
+
+        const emailMatches = p.email && p.email.toLowerCase().trim() === cleanEmail;
+        const phoneMatches = cleanLoginId && p.phone && matchPhoneNumbers(p.phone, cleanLoginId);
+
+        return emailMatches || phoneMatches;
+      });
+    }
 
     if (!user || !user.password) {
       return res.status(401).json({ error: 'Credenciais de administrador inválidas.' });

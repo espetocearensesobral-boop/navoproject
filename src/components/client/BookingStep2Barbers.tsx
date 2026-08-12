@@ -87,14 +87,14 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
     async function loadBarbersAvailability() {
       try {
         const newMap: Record<string, string[]> = {};
-        for (const b of barbers) {
-          if (b.id === 'prof_any') continue;
+        await Promise.all(barbers.map(async (b) => {
+          if (b.id === 'prof_any') return;
           const res = await authFetch(`/api/availability?professionalId=${b.id}&date=${selectedDate}&duration=${totalDurationMinutes}`);
           if (res.ok) {
             const data = await res.json();
-            newMap[b.id] = Array.isArray(data) ? data.map((item: any) => item?.timeSlot).filter(Boolean) : [];
+            newMap[b.id] = Array.isArray(data) ? data.map((item: any) => item?.timeSlot).filter(Boolean) : (data.busySlots || []);
           }
-        }
+        }));
         if (isMounted) {
           setBusyMap(newMap);
         }

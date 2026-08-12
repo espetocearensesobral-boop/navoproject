@@ -75,10 +75,17 @@ export async function initializeDb(): Promise<void> {
 
     if (dbUrl || sqlHost) {
       const connectionString = dbUrl || `postgres://${process.env.SQL_USER}:${process.env.SQL_PASSWORD}@${sqlHost}:5432/${process.env.SQL_DB_NAME}`;
-      const sqlClient = postgres(connectionString, { max: 5 });
+      const sqlClient = postgres(connectionString, { 
+        max: 20, 
+        idle_timeout: 30,
+        connect_timeout: 10,
+        prepare: false
+      });
       db = drizzle(sqlClient, { schema });
       isDbConnected = true;
       console.log('[API] ✅ Conexão com Supabase estabelecida com sucesso.');
+      // Warm up connection pool asynchronously
+      db.query.shopSettings.findFirst({ where: eq(schema.shopSettings.id, 'default') }).catch(() => {});
     } else {
       throw new Error('Variáveis de ambiente do banco de dados não estão configuradas.');
     }

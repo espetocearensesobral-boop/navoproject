@@ -46,24 +46,22 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
     const cleanPhone = sanitizePhone(phone);
     const cleanEmail = email ? email.toLowerCase().trim() : '';
 
-    const dbProfiles = await db.query.profiles.findMany();
-
-    // 1. Verificação de E-mail Único (se o e-mail foi preenchido)
-    const existingEmailUser = cleanEmail 
-      ? dbProfiles.find((p: any) => p.email && p.email.toLowerCase().trim() === cleanEmail)
-      : null;
-
-    if (existingEmailUser) {
-      return res.status(400).json({ error: 'E-mail já cadastrado. Por favor faça login.' });
+    if (cleanEmail) {
+      const existingEmailUser = await db.query.profiles.findFirst({
+        where: eq(schema.profiles.email, cleanEmail)
+      });
+      if (existingEmailUser) {
+        return res.status(400).json({ error: 'E-mail já cadastrado. Por favor faça login.' });
+      }
     }
 
-    // 2. Verificação de Telefone já cadastrado em outra CONTA COM SENHA
-    const existingPhoneUser = cleanPhone 
-      ? dbProfiles.find((p: any) => p.phone && matchPhoneNumbers(p.phone, cleanPhone) && p.password)
-      : null;
-
-    if (existingPhoneUser) {
-      return res.status(400).json({ error: 'Telefone já cadastrado em outra conta. Por favor faça login.' });
+    if (cleanPhone) {
+      const existingPhoneUser = await db.query.profiles.findFirst({
+        where: eq(schema.profiles.phone, cleanPhone)
+      });
+      if (existingPhoneUser && existingPhoneUser.password) {
+        return res.status(400).json({ error: 'Telefone já cadastrado em outra conta. Por favor faça login.' });
+      }
     }
 
     let hashedPassword = password;
@@ -78,7 +76,7 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
     let finalEmail = cleanEmail;
     if (!finalEmail) {
       const baseEmail = `${cleanPhone || newId.slice(0, 8)}@client.barberx.app`;
-      const emailExists = dbProfiles.some((p: any) => p.email && p.email.toLowerCase() === baseEmail.toLowerCase());
+      const emailExists = await db.query.profiles.findFirst({ where: eq(schema.profiles.email, baseEmail) });
       finalEmail = emailExists ? `${cleanPhone || newId.slice(0, 8)}_${newId.slice(0, 4)}@client.barberx.app` : baseEmail;
     }
 

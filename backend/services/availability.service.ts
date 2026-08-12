@@ -33,38 +33,56 @@ interface DaySlotContext {
   allProfessionals: any[];
 }
 
+let cachedShopSettings: { data: any; timestamp: number } | null = null;
+let cachedProfessionals: { data: any[]; timestamp: number } | null = null;
+const CACHE_TTL_MS = 20000;
+
+export function invalidateAvailabilityCache() {
+  cachedShopSettings = null;
+  cachedProfessionals = null;
+}
+
 export async function fetchDaySlotContext(dateStr: string, excludeAptId?: string): Promise<DaySlotContext> {
   let shopProf: any = { id: 'shop', name: 'Barbearia', roleTitle: 'System', workingHours: {} };
-  let allAppointments: any[] = [];
-  let allBlocks: any[] = [];
-  let allProfessionals: any[] = [];
+  const now = Date.now();
 
-  const shopSettings = await db.query.shopSettings.findFirst({ where: eq(schema.shopSettings.id, 'default') }).catch(() => null);
+  const getShopSettings = async () => {
+    if (cachedShopSettings && (now - cachedShopSettings.timestamp) < CACHE_TTL_MS) {
+      return cachedShopSettings.data;
+    }
+    const res = await db.query.shopSettings.findFirst({ where: eq(schema.shopSettings.id, 'default') }).catch(() => null);
+    if (res) cachedShopSettings = { data: res, timestamp: now };
+    return res;
+  };
+
+  const getProfessionals = async () => {
+    if (cachedProfessionals && (now - cachedProfessionals.timestamp) < CACHE_TTL_MS) {
+      return cachedProfessionals.data;
+    }
+    const res = await db.query.professionals.findMany({ where: eq(schema.professionals.isActive, true) }).catch(() => []);
+    if (res && res.length > 0) cachedProfessionals = { data: res, timestamp: now };
+    return res;
+  };
+
+  const [shopSettings, rawAppointments, rawBlocks, professionalsList] = await Promise.all([
+    getShopSettings(),
+    db.query.appointments.findMany({ where: eq(schema.appointments.date, dateStr) }).catch(() => []),
+    db.query.scheduleBlocks.findMany({ where: eq(schema.scheduleBlocks.date, dateStr) }).catch(() => []),
+    getProfessionals()
+  ]);
+
   if (shopSettings) {
     shopProf.workingHours = shopSettings.workingHours || {};
     shopProf.operatingSchedule = shopSettings.operatingSchedule || {};
     shopProf.allowOutsideHoursApproval = shopSettings.allowOutsideHoursApproval;
   }
 
-  allAppointments = await db.query.appointments.findMany({
-    where: eq(schema.appointments.date, dateStr)
-  }).catch(() => []);
-
+  let allAppointments = rawAppointments.filter((apt: any) => apt.status !== 'cancelled');
   if (excludeAptId) {
     allAppointments = allAppointments.filter((apt: any) => apt.id !== excludeAptId);
   }
-  
-  allAppointments = allAppointments.filter((apt: any) => apt.status !== 'cancelled');
 
-  allBlocks = await db.query.scheduleBlocks.findMany({
-    where: eq(schema.scheduleBlocks.date, dateStr)
-  }).catch(() => []);
-
-  allProfessionals = await db.query.professionals.findMany({
-    where: eq(schema.professionals.isActive, true)
-  }).catch(() => []);
-
-  return { shopProf, allAppointments, allBlocks, allProfessionals };
+  return { shopProf, allAppointments, allBlocks: rawBlocks, allProfessionals: professionalsList };
 }
 
 export async function checkSlotAvailability(params: CheckSlotParams): Promise<CheckSlotResult> {
