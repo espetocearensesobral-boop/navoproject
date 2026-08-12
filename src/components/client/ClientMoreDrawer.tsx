@@ -90,33 +90,6 @@ export const ClientMoreDrawer: React.FC<ClientMoreDrawerProps> = ({
             </button>
           </div>
 
-          {/* User Card */}
-          {!isGuest && (
-            <div 
-              onClick={() => {
-                onClose();
-                onOpenProfile();
-              }}
-              className="bg-surface-base/80 p-4 rounded-card border border-border-subtle flex items-center justify-between cursor-pointer hover:border-gold-base/50 transition-all"
-            >
-              <div className="flex items-center gap-3">
-                <img
-                  src={currentUser.avatar_url || currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=75&w=150'}
-                  alt={currentUser.name}
-                  className="w-11 h-11 rounded-full object-cover border border-gold-base/50"
-                />
-                <div>
-                  <h3 className="text-sm font-serif text-content-base font-semibold">{currentUser.name}</h3>
-                  <span className="text-[10px] text-content-muted font-medium flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-gold-base" />
-                    <span>{currentUser.loyalty_points || 0} Pts • {currentUser.loyalty_tier || 'Bronze'}</span>
-                  </span>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-content-muted" />
-            </div>
-          )}
-
           {/* Navigation Options List */}
           <div className="space-y-2">
             <button
