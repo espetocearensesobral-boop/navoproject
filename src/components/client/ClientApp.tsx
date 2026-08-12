@@ -404,6 +404,15 @@ export const ClientApp: React.FC = () => {
               <button
                 onClick={() => {
                   hapticLight();
+                  setTheme(theme === 'dark' ? 'light' : 'dark');
+                }}
+                className="p-2 rounded-xl text-content-base hover:text-content-base transition-all active:scale-95 flex items-center justify-center shrink-0"
+              >
+                {theme === 'dark' ? <Moon className="w-6 h-6 text-gold-base" /> : <Sun className="w-6 h-6 text-gold-base" />}
+              </button>
+              <button
+                onClick={() => {
+                  hapticLight();
                   setIsMoreDrawerOpen(true);
                 }}
                 title="Menu"

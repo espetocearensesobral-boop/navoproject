@@ -39,9 +39,12 @@ import {
   Eye,
   Plus,
   ZoomIn,
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
+import { useTheme } from '../../contexts/ThemeContext';
 import { trackEvent } from '../../lib/analytics';
 import { authFetch } from '../../lib/api';
 import { 
@@ -66,6 +69,7 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments, isGuest = true, currentUser, onOpenLogin, onOpenProfile, onOpenMenu, scrollContainerRef }) => {
+  const { theme, setTheme } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Expõe o container de scroll interno (a landing page rola dentro de si mesma,
@@ -417,14 +421,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           <div className="font-serif font-bold text-lg tracking-tight text-white flex items-center gap-1">
             <span>NAVO</span><span className="text-gold-base">PREMIUM</span>
           </div>
-          <motion.button 
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleMenu} 
-            className="w-10 h-10 rounded-full bg-white/8 border border-white/10 text-white flex items-center justify-center backdrop-blur-md cursor-pointer"
-            aria-label="Menu"
-          >
-            <Menu className="w-5 h-5 text-white" />
-          </motion.button>
+          <div className="flex items-center gap-2">
+            <motion.button 
+              whileTap={{ scale: 0.95 }}
+              onClick={toggleMenu} 
+              className="w-10 h-10 rounded-full bg-white/8 border border-white/10 text-white flex items-center justify-center backdrop-blur-md cursor-pointer"
+              aria-label="Menu"
+            >
+              <Menu className="w-5 h-5 text-white" />
+            </motion.button>
+          </div>
         </motion.header>
 
         {/* HERO CONTENT */}
