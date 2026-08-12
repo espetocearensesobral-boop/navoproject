@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Professional, ServiceItem } from '../../types';
 import { fetchProfessionalsFromSupabase } from '../../services/supabaseDataService';
 import { UserCheck, Star, Zap, CheckCircle, ArrowLeft, ArrowRight, User, Loader2, Calendar, Clock, AlertCircle } from 'lucide-react';
@@ -50,6 +51,8 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
   onBack,
   onNext
 }) => {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   const [barbers, setBarbers] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
@@ -256,22 +259,32 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
 
       {/* Floating Bottom Action Bar */}
       <div className="sticky bottom-2 z-40 px-4 my-2 flex justify-center pointer-events-none animate-fade-in">
-        <div className="pointer-events-auto w-full max-w-[440px] bg-surface-base/95 backdrop-blur-xl border border-border-subtle p-3 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex items-center justify-between">
+        <div className={`pointer-events-auto w-full max-w-[440px] p-3 rounded-full border flex items-center justify-between transition-colors ${
+          isLight
+            ? 'bg-zinc-900 border-zinc-800 text-white'
+            : 'bg-white border-stone-200 text-stone-900'
+        }`}>
           {showBackConfirm ? (
             <div className="flex-1 flex flex-col items-center animate-fade-in w-full px-2">
-              <span className="text-[11px] font-bold text-content-base mb-2 uppercase tracking-wider">Deseja voltar aos serviços?</span>
+              <span className={`text-[11px] font-bold mb-2 uppercase tracking-wider ${isLight ? 'text-zinc-200' : 'text-stone-800'}`}>
+                Deseja voltar aos serviços?
+              </span>
               <div className="flex items-center space-x-2 w-full">
                 <button
                   type="button"
                   onClick={() => setShowBackConfirm(false)}
-                  className="flex-1 py-2 rounded-full bg-border-subtle hover:bg-content-muted/30 text-content-base font-bold text-[11px] transition-all"
+                  className={`flex-1 py-2 rounded-full font-bold text-[11px] transition-all ${
+                    isLight ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300' : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                  }`}
                 >
                   Não
                 </button>
                 <button
                   type="button"
                   onClick={onBack}
-                  className="flex-1 py-2 rounded-full bg-border-subtle hover:bg-surface-card border border-border-subtle text-content-base font-bold text-[11px] transition-all active:scale-95"
+                  className={`flex-1 py-2 rounded-full border font-bold text-[11px] transition-all active:scale-95 ${
+                    isLight ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-white' : 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-900'
+                  }`}
                 >
                   Sim, voltar
                 </button>
@@ -280,17 +293,19 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
           ) : (
             <>
               <div className="flex flex-col pl-3.5 min-w-0 pr-2">
-                <span className="text-[10px] text-content-muted font-bold uppercase tracking-wider block truncate">
+                <span className={`text-[10px] font-bold uppercase tracking-wider block truncate ${isLight ? 'text-zinc-400' : 'text-stone-500'}`}>
                   {servicesSummaryText}
                 </span>
-                <div className="text-xs font-serif text-content-base font-semibold flex items-center space-x-1.5 truncate">
+                <div className={`text-xs font-serif font-semibold flex items-center space-x-1.5 truncate ${isLight ? 'text-white' : 'text-stone-900'}`}>
                   {selectedBarber ? (
                     <>
                       <User className="w-3.5 h-3.5 text-gold-base shrink-0" />
                       <span className="truncate">{selectedBarber.name}</span>
                     </>
                   ) : (
-                    <span className="text-content-muted font-medium italic">Selecione um barbeiro</span>
+                    <span className={`font-medium italic ${isLight ? 'text-zinc-400' : 'text-stone-400'}`}>
+                      Selecione um barbeiro
+                    </span>
                   )}
                 </div>
               </div>
@@ -299,7 +314,11 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                 <button
                   type="button"
                   onClick={() => selectedBarber ? setShowBackConfirm(true) : onBack()}
-                  className="w-10 h-10 rounded-full bg-border-subtle hover:bg-surface-card border border-border-subtle flex items-center justify-center text-content-base transition-all active:scale-95 shrink-0"
+                  className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all active:scale-95 shrink-0 ${
+                    isLight
+                      ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-white'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-900'
+                  }`}
                   title="Voltar"
                 >
                   <ArrowLeft className="w-5 h-5" />
@@ -316,8 +335,8 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                   disabled={!selectedBarber || isAdvancing}
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shrink-0 ${
                     selectedBarber
-                      ? 'bg-gold-base text-surface-base shadow-lg shadow-gold-base/20 active:scale-95'
-                      : 'bg-surface-card text-content-muted cursor-not-allowed opacity-50'
+                      ? 'bg-gold-base text-surface-base active:scale-95'
+                      : isLight ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-50' : 'bg-stone-200 text-stone-400 cursor-not-allowed opacity-50'
                   }`}
                   title="Avançar"
                 >

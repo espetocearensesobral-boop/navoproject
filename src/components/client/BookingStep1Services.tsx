@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
 import { ServiceItem } from '../../types';
 import { DEFAULT_CATEGORIES, getCategoryName } from '../../data/categories';
 import { fetchServicesFromSupabase } from '../../services/supabaseDataService';
@@ -47,6 +48,8 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
   onClearServices,
   onNext
 }) => {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   const [activeCategory, setActiveCategory] = useState<string>('cat_all');
   const [isCategoryOpen, setIsCategoryOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -523,17 +526,27 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
       {/* Sticky Bottom Tray with Clear ("Limpar") button */}
       {selectedServices.length > 0 && (
         <div className="sticky bottom-2 z-40 px-4 my-2 flex justify-center pointer-events-none animate-fade-in">
-          <div className="pointer-events-auto w-full max-w-[440px] bg-surface-base/95 backdrop-blur-xl border border-border-subtle p-3.5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex items-center justify-between">
+          <div className={`pointer-events-auto w-full max-w-[440px] p-3.5 rounded-3xl border flex items-center justify-between transition-colors ${
+            isLight
+              ? 'bg-zinc-900 border-zinc-800 text-white'
+              : 'bg-white border-stone-200 text-stone-900'
+          }`}>
             <div className="flex flex-col pl-2">
               <div className="flex items-center space-x-1.5 mb-0.5">
-                <span className="w-5 h-5 rounded-full bg-gold-base/20 flex items-center justify-center text-gold-base font-black text-[10px]">
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center font-black text-[10px] ${
+                  isLight ? 'bg-gold-base/20 text-gold-base' : 'bg-gold-base/20 text-gold-deep'
+                }`}>
                   {selectedServices.length}
                 </span>
-                <span className="text-[10px] text-content-muted font-bold uppercase tracking-wider">
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                  isLight ? 'text-zinc-400' : 'text-stone-500'
+                }`}>
                   {selectedServices.length === 1 ? 'Serviço' : 'Serviços'}
                 </span>
               </div>
-              <div className="text-xl font-mono num-tabular text-content-base font-semibold leading-tight">
+              <div className={`text-xl font-mono num-tabular font-semibold leading-tight ${
+                isLight ? 'text-white' : 'text-stone-900'
+              }`}>
                 R$ {totalPrice.toFixed(2)}
               </div>
             </div>
@@ -546,10 +559,14 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                     hapticMedium();
                     onClearServices();
                   }}
-                  className="w-10 h-10 flex-shrink-0 rounded-full bg-border-subtle hover:bg-surface-card border border-border-subtle flex items-center justify-center text-content-base transition-all active:scale-95"
+                  className={`w-10 h-10 flex-shrink-0 rounded-full border flex items-center justify-center transition-all active:scale-95 ${
+                    isLight
+                      ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300 hover:text-red-400'
+                      : 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-700 hover:text-red-500'
+                  }`}
                   title="Limpar seleção"
                 >
-                  <Trash2 className="w-4 h-4 text-content-muted hover:text-red-400 transition-colors" />
+                  <Trash2 className="w-4 h-4 transition-colors" />
                 </button>
               )}
 
@@ -563,7 +580,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                   }
                 }}
                 disabled={isAdvancing}
-                className={`px-5 py-2.5 rounded-full bg-gold-base text-surface-base font-bold text-xs sm:text-sm flex flex-shrink-0 items-center justify-center space-x-1.5 hover:opacity-95 transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-gold-base focus:ring-offset-2 focus:ring-offset-surface-base ${
+                className={`px-5 py-2.5 rounded-full bg-gold-base text-surface-base font-bold text-xs sm:text-sm flex flex-shrink-0 items-center justify-center space-x-1.5 hover:opacity-95 transition-all focus:outline-none ${
                   isAdvancing ? 'opacity-80 cursor-wait' : 'active:scale-95'
                 }`}
                 title="Avançar para escolha de profissional"
