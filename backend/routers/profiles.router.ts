@@ -50,7 +50,7 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
 
     // 1. Verificação de E-mail Único (se o e-mail foi preenchido)
     const existingEmailUser = cleanEmail 
-      ? dbProfiles.find((p: any) => p.email && p.email.toLowerCase().trim() === cleanEmail && !p.email.endsWith('@guest.barberx.app'))
+      ? dbProfiles.find((p: any) => p.email && p.email.toLowerCase().trim() === cleanEmail)
       : null;
 
     if (existingEmailUser) {
@@ -59,23 +59,11 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
 
     // 2. Verificação de Telefone já cadastrado em outra CONTA COM SENHA
     const existingPhoneUser = cleanPhone 
-      ? dbProfiles.find((p: any) => p.phone && matchPhoneNumbers(p.phone, cleanPhone) && p.password && p.id !== 'usr_guest' && !p.id.startsWith('guest_'))
+      ? dbProfiles.find((p: any) => p.phone && matchPhoneNumbers(p.phone, cleanPhone) && p.password)
       : null;
 
     if (existingPhoneUser) {
       return res.status(400).json({ error: 'Telefone já cadastrado em outra conta. Por favor faça login.' });
-    }
-
-    // Se houver perfis temporários de visitante com o mesmo telefone (ex: guest_xxx), limpa apenas id guest_ e NUNCA usr_guest
-    if (cleanPhone) {
-      try {
-        const guestProfilesToDelete = dbProfiles.filter((p: any) => 
-          p.id.startsWith('guest_') && p.id !== 'usr_guest' && matchPhoneNumbers(p.phone, cleanPhone)
-        );
-        for (const gp of guestProfilesToDelete) {
-          await db.delete(schema.profiles).where(eq(schema.profiles.id, gp.id)).catch(() => {});
-        }
-      } catch (eClean) {}
     }
 
     let hashedPassword = password;
@@ -85,7 +73,25 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
 
     const newId = crypto.randomUUID();
     const avatar = avatar_url || avatarUrl || rest.avatar_url || rest.avatarUrl || null;
-    const finalEmail = cleanEmail || `${cleanPhone || newId.slice(0, 8)}@client.barberx.app`;
+    
+    // Email padrão se não fornecido, garantindo unicidade no banco de dados
+    let finalEmail = cleanEmail;
+    if (!finalEmail) {
+      const baseEmail = `${cleanPhone || newId.slice(0, 8)}@client.barberx.app`;
+      const emailExists = dbProfiles.some((p: any) => p.email && p.email.toLowerCase() === baseEmail.toLowerCase());
+      finalEmail = emailExists ? `${cleanPhone || newId.slice(0, 8)}_${newId.slice(0, 4)}@client.barberx.app` : baseEmail;
+    }
+
+    // Tratamento seguro de data LGPD
+    let parsedLgpdDate: Date | null = null;
+    if (lgpdConsent) {
+      if (lgpdConsentDate && typeof lgpdConsentDate === 'string') {
+        const d = new Date(lgpdConsentDate);
+        parsedLgpdDate = isNaN(d.getTime()) ? new Date() : d;
+      } else {
+        parsedLgpdDate = new Date();
+      }
+    }
 
     const dbProfile = {
       id: newId,
@@ -98,14 +104,14 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
       loyaltyPoints: 0,
       loyaltyTier: 'Bronze',
       lgpdConsent: Boolean(lgpdConsent),
-      lgpdConsentDate: lgpdConsent ? (lgpdConsentDate ? new Date(lgpdConsentDate) : new Date()) : null,
+      lgpdConsentDate: parsedLgpdDate,
       createdAt: new Date(),
       updatedAt: new Date()
     };
     await db.insert(schema.profiles).values(dbProfile);
 
     // VINCULAÇÃO AUTOMÁTICA DE REGISTROS DE VISITANTE:
-    // Vincula todos os agendamentos de visitante anteriores com o mesmo telefone ao novo perfil
+    // Vincula todos os agendamentos e fila de espera de visitante anteriores com o mesmo telefone ao novo perfil
     if (cleanPhone) {
       try {
         const allApts = await db.select().from(schema.appointments);
@@ -116,7 +122,17 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
         for (const apt of guestAptsToLink) {
           await db.update(schema.appointments)
             .set({ clientId: newId, updatedAt: new Date() })
-            .where(eq(schema.appointments.id, apt.id));
+            .where(eq(schema.appointments.id, apt.id)).catch(() => {});
+        }
+
+        const allQueue = await db.select().from(schema.waitingQueue);
+        const guestQueueToLink = allQueue.filter((q: any) =>
+          (!q.clientId || q.clientId === 'usr_guest' || q.clientId.startsWith('guest_'))
+        );
+        for (const q of guestQueueToLink) {
+          await db.update(schema.waitingQueue)
+            .set({ clientId: newId, updatedAt: new Date() })
+            .where(eq(schema.waitingQueue.id, q.id)).catch(() => {});
         }
       } catch (errLink) {
         console.error('Error linking visitor appointments to new profile:', errLink);

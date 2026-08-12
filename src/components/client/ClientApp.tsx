@@ -26,7 +26,7 @@ import { usePullToRefresh } from '../../hooks/usePullToRefresh';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Calendar, Crown, Award, Clock, Home, Menu, Smartphone, User, Sparkles, Scissors, Loader2, Sun, Moon, CheckCircle2, Info, AlertTriangle, Sliders, Download } from 'lucide-react';
 
-import { authFetch, setStoredToken, clearStoredToken } from '../../lib/api';
+import { authFetch, setStoredToken, clearStoredToken, getStoredToken } from '../../lib/api';
 
 export const ClientApp: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -88,7 +88,14 @@ export const ClientApp: React.FC = () => {
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(true);
   
   useEffect(() => {
-    // Restaura sessão no carregamento/recarregamento da página
+    // Restaura sessão no carregamento/recarregamento da página apenas se houver token salvo
+    const token = getStoredToken();
+    if (!token) {
+      setIsGuest(true);
+      setCurrentUser({ id: 'guest', name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
+      return;
+    }
+
     authFetch('/api/auth/me')
       .then(res => res.ok ? res.json() : null)
       .then(me => {
