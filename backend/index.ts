@@ -167,6 +167,8 @@ import { scheduleBlocksRouter } from './routers/schedule-blocks.router.js';
 import { cashTransactionsRouter } from './routers/cash-transactions.router.js';
 import { availabilityRouter } from './routers/availability.router.js';
 import { appointmentsRouter } from './routers/appointments.router.js';
+import { loyaltyRouter } from './routers/loyalty.router.js';
+import { referralsRouter } from './routers/referrals.router.js';
 import { rewardsRouter } from './routers/rewards.router.js';
 import { reviewsRouter } from './routers/reviews.router.js';
 
@@ -183,6 +185,8 @@ app.use('/api/schedule-blocks', scheduleBlocksRouter);
 app.use('/api/cash-transactions', cashTransactionsRouter);
 app.use('/api/availability', availabilityRouter);
 app.use('/api/appointments', appointmentsRouter);
+app.use('/api/loyalty', loyaltyRouter);
+app.use('/api/referrals', referralsRouter);
 app.use('/api/rewards', rewardsRouter);
 app.use('/api/reviews', reviewsRouter);
 
@@ -691,6 +695,15 @@ app.get("/api/shop-profile", async (req: any, res: any) => {
   }
 });
 
+
+// Fallback for missing API routes to ensure JSON response
+app.use((req: any, res: any) => {
+  if (req.path.startsWith('/api')) {
+    res.status(404).json({ error: `Endpoint não encontrado: ${req.method} ${req.path}` });
+  } else {
+    res.status(404).json({ error: 'Not Found' });
+  }
+});
 
 export default app;
 export async function processAppointmentCompletion(appointment: any) {

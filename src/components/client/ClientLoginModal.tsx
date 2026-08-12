@@ -256,12 +256,18 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
         const data = await res.json();
         if (pendingRef) {
           try {
-            await authFetch('/api/referrals/apply-code', {
+            const refRes = await authFetch('/api/referrals/apply-code', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ referralCode: pendingRef })
             });
-          } catch (e) {}
+            if (!refRes.ok) {
+              const err = await refRes.json().catch(() => ({}));
+              console.warn('Falha ao aplicar código de indicação no cadastro:', err);
+            }
+          } catch (e) {
+            console.error('Erro de rede ao aplicar indicação:', e);
+          }
         }
         onLoginSuccess(data);
       } catch (err: any) {
