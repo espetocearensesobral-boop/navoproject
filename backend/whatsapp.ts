@@ -82,12 +82,12 @@ router.get('/status', requireAuth, requireAdmin, (req, res) => {
   });
 });
 
-router.post('/reconnect', (req, res) => {
+router.post('/reconnect', requireAuth, requireAdmin, (req, res) => {
   connectionState = WHATSAPP_TOKEN && WHATSAPP_PHONE_NUMBER_ID ? 'open' : 'close';
   res.json({ success: connectionState === 'open', state: connectionState });
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', requireAuth, requireAdmin, (req, res) => {
   connectionState = 'close';
   res.json({ success: true, message: 'Envio de WhatsApp desativado nesta instância.' });
 });
