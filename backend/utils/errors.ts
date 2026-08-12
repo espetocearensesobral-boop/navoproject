@@ -23,6 +23,30 @@ export const handleError = (res: any, e: any, context: string) => {
     return res.status(pgErrors[e.code].status).json({ error: pgErrors[e.code].message });
   }
 
-  // Erro genérico
+  const statusCode = e?.status || e?.statusCode || 400;
+
+  // Extrai a mensagem de erro fornecida
+  const errorMsg = typeof e === 'string' ? e : (e?.message || e?.error);
+
+  if (typeof errorMsg === 'string' && errorMsg.trim().length > 0) {
+    const trimmed = errorMsg.trim();
+    // Filtra mensagens técnicas internas para não expor stacktraces ao cliente
+    const isTechnicalInternal = 
+      trimmed.includes('drizzle') || 
+      trimmed.includes('postgres') || 
+      trimmed.includes('pg_') || 
+      trimmed.includes('ECONNREFUSED') || 
+      trimmed.includes('ENOTFOUND') || 
+      trimmed.includes('TypeError') || 
+      trimmed.includes('ReferenceError') || 
+      trimmed.includes('SyntaxError');
+
+    if (!isTechnicalInternal) {
+      return res.status(statusCode).json({ error: trimmed });
+    }
+  }
+
+  // Erro genérico para exceções internas de sistema não tratadas
   return res.status(500).json({ error: userErrors.generic });
 };
+
