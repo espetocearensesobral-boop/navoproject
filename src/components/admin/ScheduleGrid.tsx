@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Appointment, Professional } from '../../types';
 import { handleEnterAsTab } from '../../utils/formUtils';
+import { authFetch } from '../../lib/api';
 import {
   fetchAppointmentsFromSupabase,
   fetchProfessionalsFromSupabase,
@@ -119,7 +120,7 @@ export const ScheduleGrid: React.FC = () => {
 
   const handleAcceptPendingAppointment = async (aptId: string) => {
     try {
-      const res = await fetch(`/api/appointments/${aptId}`, {
+      const res = await authFetch(`/api/appointments/${aptId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'confirmed' })
@@ -128,7 +129,7 @@ export const ScheduleGrid: React.FC = () => {
         showNotification('Agendamento fora do expediente aprovado com sucesso!');
         await loadData();
       } else {
-        const errData = await res.json();
+        const errData = await res.json().catch(() => ({}));
         showNotification(`Erro ao aprovar agendamento: ${errData.error || 'Erro desconhecido'}`);
       }
     } catch (err) {

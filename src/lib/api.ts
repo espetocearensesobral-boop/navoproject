@@ -69,6 +69,20 @@ export const authFetch = async (endpoint: string, options: RequestInit = {}) => 
     // Stale token, clear token storage
     clearStoredToken();
   }
+
+  // Intercept response.json() to safely parse HTML errors (like Vite 404s/500s) as {}
+  const originalJson = response.json.bind(response);
+  response.json = async () => {
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && !contentType.includes('application/json')) {
+        return {};
+      }
+      return await originalJson();
+    } catch {
+      return {};
+    }
+  };
   
   return response;
 };

@@ -191,7 +191,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     fetch('/api/preferences/theme', { credentials: 'include' })
       .then(async (response) => {
         if (!response.ok) return null;
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         return PALETTES.some((item) => item.id === data?.palette) ? (data.palette as ThemePalette) : null;
       })
       .then((remotePalette) => {

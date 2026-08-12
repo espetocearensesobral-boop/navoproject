@@ -10,6 +10,11 @@ async function startServer() {
   // Mount API
   app.use(apiApp);
 
+  // Catch-all para rotas de API inexistentes (evita retornar o HTML do Vite em endpoints errados)
+  app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'Endpoint não encontrado' });
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
