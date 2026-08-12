@@ -491,7 +491,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
             className="text-[clamp(0.95rem,1.7vh,1.15rem)] leading-relaxed text-[#e5e7eb] mb-6 max-w-xs sm:max-w-md font-medium"
           >
-            Agende online, chegue na hora certa e saia renovado. Sem filas, sem espera, sem complicação.
+            Agende online, evite filas e saia renovado. Rápido, fácil e sem complicação.
           </motion.p>
 
           {/* CTA GROUP */}
@@ -521,7 +521,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               onClick={() => onGoToAppointments && onGoToAppointments()}
               className="mt-1 flex items-center justify-center gap-1.5 text-[0.85rem] font-bold text-gold-base border border-gold-base/40 hover:border-gold-base hover:bg-gold-base/10 px-5 py-2.5 rounded-full cursor-pointer transition-all active:scale-95"
             >
-              <span>Já possui agendamento? Clique aqui.</span>
+              <span>Já marcou seu corte? Clique aqui</span>
             </button>
 
 
