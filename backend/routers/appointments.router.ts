@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import { db, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin, optionalAuth, authLimiter, sensitiveOpsLimiter, apiLimiter, setAuthCookie } from '../middleware/index.js';
-import { handleError, sanitizePhone, matchPhoneNumbers, generateBookingCode, bookingSchema } from '../utils/index.js';
+import { handleError, userErrors, sanitizePhone, matchPhoneNumbers, generateBookingCode, bookingSchema } from '../utils/index.js';
 import { timeToMinutes, minutesToTime, getDayOfWeekKey, getTodayStringBRT, getCurrentTimeBRT } from '../utils/datetime.js';
 import { JWT_SECRET } from '../config/env.js';
 import { checkSlotAvailability } from '../services/availability.service.js';
@@ -25,6 +25,9 @@ export const appointmentsRouter = express.Router();
 // GET /api/appointments/lookup/step1 — Verifica se há agendamentos ativos para o telefone
 appointmentsRouter.get("/lookup/step1", sensitiveOpsLimiter, async (req: any, res) => {
   try {
+    if (!db) {
+      return res.status(503).json({ error: userErrors.dbDisconnected });
+    }
     const { phone } = req.query;
 
     if (!phone) {
@@ -65,14 +68,16 @@ appointmentsRouter.get("/lookup/step1", sensitiveOpsLimiter, async (req: any, re
     });
 
   } catch (e: any) {
-    console.error('[API] Erro em lookup/step1:', e);
-    return res.status(500).json({ error: 'Erro ao buscar. Tente novamente.' });
+    return handleError(res, e, 'GET /api/appointments/lookup/step1');
   }
 });
 
 // POST /api/appointments/lookup/verify — Valida código e gera sessão (cookie HTTP-only)
 appointmentsRouter.post("/lookup/verify", sensitiveOpsLimiter, async (req: any, res) => {
   try {
+    if (!db) {
+      return res.status(503).json({ error: userErrors.dbDisconnected });
+    }
     const { phone, code } = req.body;
     if (!phone || !code) {
       return res.status(400).json({ error: 'Informe telefone e código.' });
@@ -112,8 +117,7 @@ appointmentsRouter.post("/lookup/verify", sensitiveOpsLimiter, async (req: any, 
 
     return res.json({ success: true, message: 'Validado com sucesso.' });
   } catch (e: any) {
-    console.error('[API] Erro em lookup/verify:', e);
-    return res.status(500).json({ error: 'Erro ao validar código. Tente novamente.' });
+    return handleError(res, e, 'POST /api/appointments/lookup/verify');
   }
 });
 

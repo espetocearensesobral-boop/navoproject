@@ -157,6 +157,8 @@ import { scheduleBlocksRouter } from './routers/schedule-blocks.router.js';
 import { cashTransactionsRouter } from './routers/cash-transactions.router.js';
 import { availabilityRouter } from './routers/availability.router.js';
 import { appointmentsRouter } from './routers/appointments.router.js';
+import { rewardsRouter } from './routers/rewards.router.js';
+import { reviewsRouter } from './routers/reviews.router.js';
 
 app.use('/api/system', systemRouter);
 app.use('/api/seed', seedRouter);
@@ -171,6 +173,8 @@ app.use('/api/schedule-blocks', scheduleBlocksRouter);
 app.use('/api/cash-transactions', cashTransactionsRouter);
 app.use('/api/availability', availabilityRouter);
 app.use('/api/appointments', appointmentsRouter);
+app.use('/api/rewards', rewardsRouter);
+app.use('/api/reviews', reviewsRouter);
 
 // Migrate moved to setup.js execution or manual script if needed, or keeping it but it's rarely used from API directly. Wait, the user request says to modularize. Let's create a migrate router just to be safe. Actually, I can just mount seedRouter and remove the local seed route.
 
