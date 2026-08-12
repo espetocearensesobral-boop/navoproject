@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { authFetch } from '../../lib/api';
+import { authFetch, readApiJson } from '../../lib/api';
 import { X, Mail, Lock, User, Phone, Eye, EyeOff, KeyRound, CheckCircle, ArrowLeft, XCircle, ShieldCheck } from 'lucide-react';
 import { TermsAndPrivacyModal } from '../shared/TermsAndPrivacyModal';
 
@@ -169,10 +169,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ loginId: formData.loginId || formData.email })
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Não foi possível solicitar a redefinição de senha.');
-      }
+      const data = await readApiJson<any>(res);
       setForgotSuccess(true);
       setSuccessMsg(data.message || 'Instruções enviadas para o seu e-mail / WhatsApp!');
     } catch (err: any) {
@@ -205,10 +202,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
           newPassword: resetNewPassword
         })
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Código inválido ou expirado.');
-      }
+      const data = await readApiJson<any>(res);
       setResetDone(true);
     } catch (err: any) {
       setErrorMsg(err.message || 'Erro ao redefinir senha.');
@@ -249,11 +243,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
           })
         });
 
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || 'Não foi possível criar a conta. Tente novamente mais tarde.');
-        }
-        const data = await res.json();
+        const data = await readApiJson<any>(res);
         if (pendingRef) {
           try {
             const refRes = await authFetch('/api/referrals/apply-code', {
@@ -289,11 +279,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
           })
         });
 
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || 'E-mail/telefone ou senha incorretos.');
-        }
-        const user = await res.json();
+        const user = await readApiJson<any>(res);
         onLoginSuccess(user);
       } catch (err: any) {
         console.warn('Login failed:', err);
