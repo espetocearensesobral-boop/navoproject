@@ -79,26 +79,56 @@ export const PALETTES: PaletteItem[] = [
 
 interface ThemeContextType {
   theme: ThemeMode;
-  setTheme: (theme: ThemeMode) => void;
+  setTheme: (theme: ThemeMode, targetScope?: 'client' | 'admin') => void;
+  clientTheme: ThemeMode;
+  setClientTheme: (theme: ThemeMode) => void;
+  adminTheme: ThemeMode;
+  setAdminTheme: (theme: ThemeMode) => void;
+  scope: 'client' | 'admin';
   palette: ThemePalette;
   setPalette: (palette: ThemePalette) => void;
   paletteDefinition: PaletteItem;
 }
 
 const STORAGE_KEY = 'navo_theme_palette';
-const THEME_STORAGE_KEY = 'navo_theme_mode';
+const CLIENT_THEME_KEY = 'navo_theme_mode_client';
+const ADMIN_THEME_KEY = 'navo_theme_mode_admin';
+const LEGACY_THEME_KEY = 'navo_theme_mode';
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'dark',
   setTheme: () => {},
+  clientTheme: 'dark',
+  setClientTheme: () => {},
+  adminTheme: 'dark',
+  setAdminTheme: () => {},
+  scope: 'client',
   palette: 'heritage',
   setPalette: () => {},
   paletteDefinition: PALETTES[0],
 });
 
-function getInitialTheme(): ThemeMode {
+function getScopeFromPath(): 'admin' | 'client' {
+  if (typeof window === 'undefined') return 'client';
+  return window.location.pathname.startsWith('/admin') ? 'admin' : 'client';
+}
+
+function getInitialClientTheme(): ThemeMode {
   if (typeof window === 'undefined') return 'dark';
-  return localStorage.getItem(THEME_STORAGE_KEY) === 'light' ? 'light' : 'dark';
+  const saved = localStorage.getItem(CLIENT_THEME_KEY);
+  if (saved === 'light' || saved === 'dark') return saved;
+  const legacy = localStorage.getItem(LEGACY_THEME_KEY);
+  if (legacy === 'light' || legacy === 'dark') return legacy;
+  return 'dark';
+}
+
+function getInitialAdminTheme(): ThemeMode {
+  if (typeof window === 'undefined') return 'dark';
+  const saved = localStorage.getItem(ADMIN_THEME_KEY);
+  if (saved === 'light' || saved === 'dark') return saved;
+  const legacy = localStorage.getItem(LEGACY_THEME_KEY);
+  if (legacy === 'light' || legacy === 'dark') return legacy;
+  return 'dark';
 }
 
 function getInitialPalette(): ThemePalette {
@@ -108,20 +138,52 @@ function getInitialPalette(): ThemePalette {
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<ThemeMode>(getInitialTheme);
+  const [scope, setScope] = useState<'admin' | 'client'>(getScopeFromPath);
+  const [clientTheme, setClientThemeState] = useState<ThemeMode>(getInitialClientTheme);
+  const [adminTheme, setAdminThemeState] = useState<ThemeMode>(getInitialAdminTheme);
   const [palette, setPaletteState] = useState<ThemePalette>(getInitialPalette);
   const hasUserChangedPalette = useRef(false);
 
+  // Synchronize route scope on location changes
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    const handleLocationChange = () => {
+      setScope(getScopeFromPath());
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+
+    const originalPushState = window.history.pushState;
+    const originalReplaceState = window.history.replaceState;
+
+    window.history.pushState = function (...args) {
+      originalPushState.apply(this, args);
+      handleLocationChange();
+    };
+
+    window.history.replaceState = function (...args) {
+      originalReplaceState.apply(this, args);
+      handleLocationChange();
+    };
+
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.history.pushState = originalPushState;
+      window.history.replaceState = originalReplaceState;
+    };
+  }, []);
+
+  // Update DOM attribute data-theme according to current scope
+  useEffect(() => {
+    const activeTheme = scope === 'admin' ? adminTheme : clientTheme;
+    document.documentElement.setAttribute('data-theme', activeTheme);
+
     if (palette && palette !== 'heritage') {
       document.documentElement.setAttribute('data-palette', palette);
     } else {
       document.documentElement.removeAttribute('data-palette');
     }
     localStorage.setItem(STORAGE_KEY, palette);
-  }, [theme, palette]);
+  }, [scope, clientTheme, adminTheme, palette]);
 
   useEffect(() => {
     let cancelled = false;
@@ -146,8 +208,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
-  const setTheme = (nextTheme: ThemeMode) => {
-    setThemeState(nextTheme);
+  const setClientTheme = (nextTheme: ThemeMode) => {
+    setClientThemeState(nextTheme);
+    localStorage.setItem(CLIENT_THEME_KEY, nextTheme);
+  };
+
+  const setAdminTheme = (nextTheme: ThemeMode) => {
+    setAdminThemeState(nextTheme);
+    localStorage.setItem(ADMIN_THEME_KEY, nextTheme);
+  };
+
+  const setTheme = (nextTheme: ThemeMode, targetScope?: 'client' | 'admin') => {
+    const target = targetScope || scope;
+    if (target === 'admin') {
+      setAdminTheme(nextTheme);
+    } else {
+      setClientTheme(nextTheme);
+    }
   };
 
   const setPalette = (nextPalette: ThemePalette) => {
@@ -162,10 +239,24 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   };
 
+  const currentTheme = scope === 'admin' ? adminTheme : clientTheme;
   const paletteDefinition = PALETTES.find((item) => item.id === palette) || PALETTES[0];
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, palette, setPalette, paletteDefinition }}>
+    <ThemeContext.Provider
+      value={{
+        theme: currentTheme,
+        setTheme,
+        clientTheme,
+        setClientTheme,
+        adminTheme,
+        setAdminTheme,
+        scope,
+        palette,
+        setPalette,
+        paletteDefinition,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

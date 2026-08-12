@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminTabs } from './shared/AdminTabs';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   fetchNavoRewardsAdminDashboard,
@@ -357,14 +358,18 @@ export const NavoRewardsAdmin: React.FC = () => {
         </div>
       )}
 
-      {/* 4. TABS UNDERLINE (Com scroll horizontal, sem cortar) */}
-      <div className="bg-surface-card border border-border-subtle rounded-xl px-3 flex items-center gap-6 overflow-x-auto custom-scrollbar no-scrollbar min-w-0">
-        <TabNavButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={TrendingUp} label="Dashboard Geral" />
-        <TabNavButton active={activeTab === 'loyalty'} onClick={() => setActiveTab('loyalty')} icon={Crown} label="Clube de Fidelidade & Níveis" />
-        <TabNavButton active={activeTab === 'rewards'} onClick={() => setActiveTab('rewards')} icon={Gift} label="Prêmios & Cupons Desconto" />
-        <TabNavButton active={activeTab === 'referrals'} onClick={() => setActiveTab('referrals')} icon={Users} label="Motor de Indicações" />
-        <TabNavButton active={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')} icon={Star} label="Avaliações & NPS" />
-      </div>
+      {/* 4. TABS SECUNDÁRIAS */}
+      <AdminTabs
+        tabs={[
+          { id: 'dashboard', label: 'Dashboard Geral', icon: TrendingUp },
+          { id: 'loyalty', label: 'Clube de Fidelidade & Níveis', icon: Crown },
+          { id: 'rewards', label: 'Prêmios & Cupons Desconto', icon: Gift },
+          { id: 'referrals', label: 'Motor de Indicações', icon: Users },
+          { id: 'reviews', label: 'Avaliações & NPS', icon: Star },
+        ]}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as NavoRewardsTab)}
+      />
 
       {/* 5. CONTEÚDO DA TAB */}
       {/* TAB 1: DASHBOARD GERAL */}
@@ -1094,15 +1099,4 @@ export const NavoRewardsAdmin: React.FC = () => {
   );
 };
 
-const TabNavButton = ({ active, onClick, icon: Icon, label }: any) => (
-  <button
-    onClick={onClick}
-    className={`
-      py-3 text-xs font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap shrink-0 active:scale-95
-      ${active ? 'border-gold-base text-gold-base' : 'border-transparent text-content-muted hover:text-content-base'}
-    `}
-  >
-    <Icon className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
-    <span>{label}</span>
-  </button>
-);
+

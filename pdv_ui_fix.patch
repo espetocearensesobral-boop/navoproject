@@ -1,0 +1,137 @@
+--- /tmp/pdv-pre-fix.tsx	2026-08-11 13:04:53.743938623 +0000
++++ src/components/admin/PdvInteligente.tsx	2026-08-11 13:07:33.499637359 +0000
+@@ -1,6 +1,7 @@
+ import React, { useState, useEffect } from 'react';
+ import { authFetch } from '../../lib/api';
+ import { AdminPageHeader } from './shared/AdminPageHeader';
++import { AdminTabs } from './shared/AdminTabs';
+ import { 
+   fetchAppointmentsFromSupabase, 
+   fetchServicesFromSupabase, 
+@@ -10,7 +11,7 @@
+ } from '../../services/supabaseDataService';
+ import { Appointment, ServiceItem, ProductItem, Professional, WaitingQueueItem } from '../../types';
+ import { 
+-  Receipt, CreditCard, DollarSign, QrCode, ShoppingBag, Plus, Minus, Trash2, CheckCircle2,
++  Receipt, CreditCard, DollarSign, QrCode, ShoppingBag, Plus, Minus, Trash2, CheckCircle2, Check,
+   Search, User, Scissors, Percent, Clock, AlertCircle, RefreshCw, Printer, Share2, Wallet, X, Calendar, ChevronRight, ChevronLeft, HandCoins, ArrowRight
+ } from 'lucide-react';
+ import { fetchShopProfile, ShopProfile, defaultShopProfile } from '../../services/shopProfileService';
+@@ -450,55 +451,37 @@
+   const totalRevenueToday = todaysSales.reduce((acc, sale) => acc + sale.total, 0);
+ 
+   return (
+-    <div className="flex flex-col h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+-      {/* Header */}
+-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+-        <div>
+-          <h1 className="text-2xl font-black text-content-base flex items-center gap-2">
+-            <Wallet className="w-7 h-7 text-gold-base" />
+-            PDV Rápido
+-          </h1>
+-          <p className="text-content-muted text-sm mt-1">Finalize vendas, cobre serviços e emita comprovantes</p>
+-        </div>
+-        
+-        <div className="flex items-center gap-3">
+-          <div className="flex items-center gap-2 bg-surface-card px-4 py-2 rounded-xl border border-border-subtle shadow-sm">
+-            <span className={`w-2.5 h-2.5 rounded-full ${isCaixaOpen ? 'bg-status-success animate-pulse' : 'bg-status-error'}`} />
+-            <span className="text-xs font-bold text-content-base">{isCaixaOpen ? 'CAIXA ABERTO' : 'CAIXA FECHADO'}</span>
+-          </div>
+-          <button
+-            onClick={() => setShowSalesHistory(true)}
+-            className="h-9 px-4 rounded-xl bg-surface-card border border-border-subtle text-content-base hover:text-gold-base font-bold text-xs transition-colors flex items-center gap-2 active:scale-95 shadow-sm"
+-          >
+-            <Receipt className="w-4 h-4" />
+-            <span className="hidden sm:inline">Histórico de Hoje</span>
+-          </button>
+-        </div>
+-      </div>
+-
+-      {/* Progress Steps */}
+-      <div className="mb-6 flex items-center gap-2 bg-surface-card p-2 rounded-xl border border-border-subtle max-w-2xl mx-auto w-full">
+-        {[1, 2, 3].map((step) => (
+-          <React.Fragment key={step}>
+-            <div 
+-              className={`flex-1 flex flex-col items-center justify-center p-2 rounded-lg transition-colors ${currentStep === step ? 'bg-gold-base text-surface-base' : currentStep > step ? 'text-gold-base' : 'text-content-muted'}`}
+-            >
+-              <span className="text-[10px] font-bold uppercase tracking-wider mb-0.5">Etapa {step}</span>
+-              <span className={`text-xs font-bold ${currentStep === step ? 'text-surface-base' : 'text-content-base'}`}>
+-                {step === 1 ? 'Origem' : step === 2 ? 'Carrinho' : 'Pagamento'}
+-              </span>
+-            </div>
+-            {step < 3 && <ChevronRight className={`w-4 h-4 shrink-0 ${currentStep > step ? 'text-gold-base' : 'text-border-subtle'}`} />}
+-          </React.Fragment>
+-        ))}
+-      </div>
++    <div className="flex flex-col h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in space-y-6">
++      <AdminPageHeader
++        title="PDV Rápido"
++        icon={Wallet}
++        stats={[
++          { label: 'Caixa', value: isCaixaOpen ? 'ABERTO' : 'FECHADO', tone: isCaixaOpen ? 'success' : 'warning' },
++          { label: 'Faturamento', value: `R$ ${totalRevenueToday.toFixed(2)}`, tone: 'success' },
++        ]}
++        action={{
++          label: 'Histórico de Hoje',
++          icon: Receipt,
++          onClick: () => setShowSalesHistory(true)
++        }}
++      />
++
++      <AdminTabs
++        tabs={[
++          { id: '1', label: '1. Origem', icon: Calendar },
++          { id: '2', label: '2. Carrinho', icon: ShoppingBag },
++          { id: '3', label: '3. Pagamento', icon: CreditCard },
++        ]}
++        activeId={currentStep.toString()}
++        onChange={(id) => setCurrentStep(Number(id) as 1 | 2 | 3)}
++      />
+ 
+       {/* Main Content Area */}
+-      <div className="flex-1 min-h-0 bg-surface-card border border-border-subtle rounded-2xl shadow-sm p-4 sm:p-6 overflow-hidden flex flex-col">
++      <div className="flex-1 min-h-0 bg-transparent flex flex-col">
+         
+         {/* STEP 1: ORIGEM DA VENDA */}
+         {currentStep === 1 && (
+-          <div className="flex-1 flex flex-col space-y-6 overflow-y-auto custom-scrollbar pr-2">
++          <div className="flex-1 flex flex-col space-y-6 overflow-y-auto custom-scrollbar p-6 bg-surface-card border border-border-subtle rounded-2xl shadow-sm">
+             
+             {/* Header Action */}
+             <div className="flex items-center justify-between">
+@@ -592,7 +575,7 @@
+         {currentStep === 2 && (
+           <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
+             {/* Esquerda: Adicionar Itens */}
+-            <div className="flex-1 flex flex-col min-h-0 border border-border-subtle rounded-xl bg-surface-base">
++            <div className="flex-1 flex flex-col min-h-0 border border-border-subtle rounded-2xl bg-surface-card shadow-sm">
+               <div className="p-3 border-b border-border-subtle flex gap-2">
+                 <div className="relative flex-1">
+                   <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
+@@ -634,7 +617,7 @@
+             </div>
+ 
+             {/* Direita: Carrinho */}
+-            <div className="w-full lg:w-96 flex flex-col min-h-0 bg-surface-base border border-border-subtle rounded-xl">
++            <div className="w-full lg:w-96 flex flex-col min-h-0 bg-surface-card border border-border-subtle rounded-2xl shadow-sm">
+               <div className="p-4 border-b border-border-subtle flex flex-col space-y-3">
+                 <h3 className="text-sm font-bold text-content-base flex items-center gap-2">
+                   <ShoppingBag className="w-4 h-4 text-gold-base" /> Carrinho da Venda
+@@ -726,7 +709,7 @@
+         {currentStep === 3 && (
+           <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
+             {/* Esquerda: Ajustes de Valores e Metodos */}
+-            <div className="flex-[2] flex flex-col space-y-4 overflow-y-auto custom-scrollbar pr-2">
++            <div className="flex-[2] flex flex-col space-y-4 overflow-y-auto custom-scrollbar p-6 bg-surface-card border border-border-subtle rounded-2xl shadow-sm">
+               <h3 className="text-sm font-bold text-content-base mb-2">Finalização e Pagamento</h3>
+               
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+@@ -836,7 +819,7 @@
+             </div>
+ 
+             {/* Direita: Resumo */}
+-            <div className="flex-1 flex flex-col min-h-0 bg-surface-base border border-border-subtle rounded-xl p-4">
++            <div className="flex-1 flex flex-col min-h-0 bg-surface-card border border-border-subtle rounded-2xl shadow-sm p-6">
+               <h3 className="text-sm font-bold text-content-base mb-4 flex items-center gap-2">
+                 <Receipt className="w-4 h-4 text-gold-base" /> Resumo da Venda
+               </h3>

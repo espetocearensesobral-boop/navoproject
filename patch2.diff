@@ -1,0 +1,37 @@
+--- src/components/admin/NavoRewardsAdmin.tsx
++++ src/components/admin/NavoRewardsAdmin.tsx
+@@ -19,6 +19,7 @@
+   X
+ } from 'lucide-react';
+ import { AdminPageHeader } from './shared/AdminPageHeader';
++import { AdminTabs } from './shared/AdminTabs';
+ import { 
+   getRewardsConfig, 
+   saveRewardsConfig,
+@@ -357,14 +358,15 @@
+         </div>
+       )}
+ 
+-      {/* 4. TABS UNDERLINE (Com scroll horizontal, sem cortar) */}
+-      <div className="bg-surface-card border border-border-subtle rounded-xl px-3 flex items-center gap-6 overflow-x-auto custom-scrollbar no-scrollbar min-w-0">
+-        <TabNavButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={TrendingUp} label="Dashboard Geral" />
+-        <TabNavButton active={activeTab === 'loyalty'} onClick={() => setActiveTab('loyalty')} icon={Crown} label="Clube de Fidelidade & Níveis" />
+-        <TabNavButton active={activeTab === 'rewards'} onClick={() => setActiveTab('rewards')} icon={Gift} label="Prêmios & Cupons Desconto" />
+-        <TabNavButton active={activeTab === 'referrals'} onClick={() => setActiveTab('referrals')} icon={Users} label="Motor de Indicações" />
+-        <TabNavButton active={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')} icon={Star} label="Avaliações & NPS" />
+-      </div>
++      {/* 4. TABS SECUNDÁRIAS */}
++      <AdminTabs
++        tabs={[
++          { id: 'dashboard', label: 'Dashboard Geral', icon: TrendingUp },
++          { id: 'loyalty', label: 'Clube de Fidelidade & Níveis', icon: Crown },
++          { id: 'rewards', label: 'Prêmios & Cupons Desconto', icon: Gift },
++          { id: 'referrals', label: 'Motor de Indicações', icon: Users },
++          { id: 'reviews', label: 'Avaliações & NPS', icon: Star },
++        ]}
++        activeId={activeTab}
++        onChange={(id) => setActiveTab(id as RewardsTab)}
++      />
+ 
+       {/* 5. CONTEÚDO DA TAB */}
+       {/* TAB 1: DASHBOARD GERAL */}

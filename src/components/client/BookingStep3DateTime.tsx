@@ -175,7 +175,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     : `R$ ${totalPrice.toFixed(2)}`;
 
   return (
-    <div className="space-y-5 px-4 pb-28">
+    <div className="space-y-6 px-4 pt-4 sm:pt-6 pb-28">
       {/* SECTION 1: CALENDAR */}
       <div>
         <div className="bg-surface-card border border-border-subtle rounded-card p-5 shadow-sm space-y-4">

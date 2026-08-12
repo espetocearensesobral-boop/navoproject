@@ -1,0 +1,1835 @@
+--- /tmp/PdvInteligente.tsx.bak	2026-08-11 12:57:52.454853976 +0000
++++ src/components/admin/PdvInteligente.tsx	2026-08-11 12:59:33.994981515 +0000
+@@ -10,39 +10,10 @@
+ } from '../../services/supabaseDataService';
+ import { Appointment, ServiceItem, ProductItem, Professional, WaitingQueueItem } from '../../types';
+ import { 
+-  Receipt, 
+-  CreditCard, 
+-  DollarSign, 
+-  QrCode, 
+-  ShoppingBag, 
+-  Plus, 
+-  Minus, 
+-  Trash2, 
+-  CheckCircle2, 
+-  Search, 
+-  User, 
+-  Scissors, 
+-  Percent, 
+-  Clock, 
+-  AlertCircle, 
+-  RefreshCw, 
+-  Printer, 
+-  Share2, 
+-  Sparkles, 
+-  Wallet, 
+-  Check, 
+-  X,
+-  Phone,
+-  Calendar,
+-  Gift,
+-  ArrowRight
++  Receipt, CreditCard, DollarSign, QrCode, ShoppingBag, Plus, Minus, Trash2, CheckCircle2,
++  Search, User, Scissors, Percent, Clock, AlertCircle, RefreshCw, Printer, Share2, Wallet, X, Calendar, ChevronRight, ChevronLeft, HandCoins, ArrowRight
+ } from 'lucide-react';
+-
+-import { 
+-  fetchShopProfile, 
+-  ShopProfile, 
+-  defaultShopProfile 
+-} from '../../services/shopProfileService';
++import { fetchShopProfile, ShopProfile, defaultShopProfile } from '../../services/shopProfileService';
+ 
+ export interface CartItem {
+   id: string;
+@@ -84,9 +55,12 @@
+     fetchShopProfile().then(p => { if (p) setShopProfile(p); });
+   }, []);
+ 
++  // Step-by-Step State
++  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
++
+   // PDV Active Sale State
+-  const [activeTab, setActiveTab] = useState<'agendamentos' | 'servicos' | 'produtos' | 'fila'>('agendamentos');
+   const [searchQuery, setSearchQuery] = useState('');
++  const [searchCatalog, setSearchCatalog] = useState('');
+   
+   // Cart State
+   const [selectedClientName, setSelectedClientName] = useState('Cliente Avulso');
+@@ -105,8 +79,6 @@
+   const [lastTransaction, setLastTransaction] = useState<PdvTransaction | null>(null);
+   const [todaysSales, setTodaysSales] = useState<PdvTransaction[]>([]);
+   const [showSalesHistory, setShowSalesHistory] = useState(false);
+-  // Trava contra duplo clique/duplo toque: sem isso, um segundo tap durante o
+-  // POST em /api/cash-transactions gerava duas vendas idênticas gravadas.
+   const [isFinalizing, setIsFinalizing] = useState(false);
+ 
+   // Load Data
+@@ -125,7 +97,6 @@
+       setProducts(prods);
+       setProfessionals(profs);
+       setQueue(q);
+-
+       if (profs.length > 0 && !selectedBarber) {
+         setSelectedBarber(profs[0]);
+       }
+@@ -166,8 +137,8 @@
+     a.status !== 'completed'
+   );
+ 
+-  // Select Appointment for Checkout
+-  const handleSelectAppointmentForCheckout = (apt: Appointment) => {
++  // Flow Handlers
++  const handleStartFromAppointment = (apt: Appointment) => {
+     setLinkedAppointmentId(apt.id);
+     setSelectedClientName(apt.client_name || 'Cliente');
+     setSelectedClientPhone(apt.client_phone || '');
+@@ -187,10 +158,10 @@
+ 
+     setCart(items);
+     setDiscountAmount(apt.discount_amount || 0);
++    setCurrentStep(2);
+   };
+ 
+-  // Select Queue Item for Checkout
+-  const handleSelectQueueItemForCheckout = (qItem: WaitingQueueItem) => {
++  const handleStartFromQueue = (qItem: WaitingQueueItem) => {
+     setSelectedClientName(qItem.client_name || 'Cliente');
+     setSelectedClientPhone(qItem.client_phone || '');
+     
+@@ -208,6 +179,12 @@
+     };
+ 
+     setCart([item]);
++    setCurrentStep(2);
++  };
++
++  const handleStartAvulso = () => {
++    handleClearCart();
++    setCurrentStep(2);
+   };
+ 
+   // Cart Handlers
+@@ -273,7 +250,6 @@
+   const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+   const finalTotal = Math.max(0, subtotal - discountAmount + tipAmount);
+   
+-  // Barber Commission Estimation
+   const estimatedCommission = cart.reduce((acc, item) => {
+     if (item.type === 'service') {
+       const rate = selectedBarber?.commission_rate || 0.40;
+@@ -283,11 +259,9 @@
+     }
+   }, 0);
+ 
+-  // Troco Calculation
+   const cashNum = parseFloat(cashAmountGiven.replace(',', '.')) || 0;
+   const changeAmount = cashNum > finalTotal ? cashNum - finalTotal : 0;
+ 
+-  // Preset cash setter
+   const handleSetCashPreset = (value: number) => {
+     setCashAmountGiven(value.toFixed(2));
+   };
+@@ -299,21 +273,22 @@
+ 
+   // Checkout Completion
+   const handleFinalizeSale = async () => {
+-    if (cart.length === 0 || isFinalizing) return;
+-    setIsFinalizing(true);
++    if (cart.length === 0) return alert('O carrinho está vazio.');
++    if (!isCaixaOpen) return alert('O caixa está fechado.');
++    if (isFinalizing) return;
+ 
++    setIsFinalizing(true);
+     const tx: PdvTransaction = {
+-      id: `TX-${Date.now().toString().slice(-6)}`,
++      id: `TRX-${Date.now().toString().slice(-6)}`,
+       clientName: selectedClientName || 'Cliente Avulso',
+       clientPhone: selectedClientPhone,
+-      professionalName: selectedBarber?.name || 'Profissional',
++      professionalName: selectedBarber?.name || 'Não Informado',
+       items: [...cart],
+       subtotal,
+       discount: discountAmount,
+       tip: tipAmount,
+       total: finalTotal,
+       paymentMethod,
+-      paymentDetails: paymentMethod === 'cash' ? `Recebido R$ ${cashNum.toFixed(2)} (Troco R$ ${changeAmount.toFixed(2)})` : undefined,
+       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+       appointmentId: linkedAppointmentId || undefined
+     };
+@@ -322,173 +297,100 @@
+       const response = await authFetch('/api/cash-transactions', {
+         method: 'POST',
+         body: JSON.stringify({
+-          id: tx.id,
++          amount: tx.total,
+           type: 'income',
+           description: tx.clientName,
+-          amount: tx.total.toFixed(2),
+-          category: 'pdv',
++          category: 'Serviços/Produtos',
+           paymentMethod: tx.paymentMethod,
+-          date: new Date().toISOString().split('T')[0],
+-          status: 'completed',
++          professionalId: selectedBarber?.id,
+           professionalName: tx.professionalName,
+           notes: JSON.stringify(tx.items)
+         })
+       });
+-      if (!response.ok) throw new Error('Não foi possível gravar a venda no banco.');
+-      const updatedSales = [tx, ...todaysSales];
+-      setTodaysSales(updatedSales);
+-    } catch (error) {
+-      console.error('Erro ao gravar venda no banco:', error);
+-      setIsFinalizing(false);
+-      return;
+-    }
+-
+-    // Baixa de estoque dos produtos vendidos (best-effort: a venda já foi
+-    // gravada acima, então uma falha aqui não deve travar o recibo — mas
+-    // fica registrada no console para auditoria manual do estoque).
+-    const productItems = tx.items.filter(i => i.type === 'product');
+-    if (productItems.length > 0) {
+-      await Promise.all(productItems.map(item =>
+-        authFetch(`/api/products/${item.id}/decrement-stock`, {
+-          method: 'PATCH',
+-          body: JSON.stringify({ quantity: item.quantity })
+-        }).catch(err => console.error(`Erro ao baixar estoque do produto ${item.id}:`, err))
+-      ));
+-      setProducts(prev => prev.map(p => {
+-        const sold = productItems.find(i => i.id === p.id);
+-        return sold ? { ...p, stock_quantity: Math.max(0, p.stock_quantity - sold.quantity) } : p;
+-      }));
+-    }
+ 
+-    if (linkedAppointmentId) {
+-      setAppointments(prev => prev.map(a => a.id === linkedAppointmentId ? { ...a, status: 'completed' } : a));
++      if (response.ok) {
++        const updatedSales = [tx, ...todaysSales];
++        setTodaysSales(updatedSales);
++        setLastTransaction(tx);
++        setShowReceiptModal(true);
++        handleClearCart();
++        setCurrentStep(1); // Go back to start
++        loadData(); // Refresh queue/appointments
++      } else {
++        alert('Erro ao registrar venda. Tente novamente.');
++      }
++    } catch (err) {
++      console.error(err);
++      alert('Erro ao finalizar venda.');
++    } finally {
++      setIsFinalizing(false);
+     }
+-
+-    setLastTransaction(tx);
+-    setShowReceiptModal(true);
+-    handleClearCart();
+-    setIsFinalizing(false);
+   };
+ 
+-  // Print Receipt Handler
+   const handlePrintReceipt = (tx: PdvTransaction) => {
+     const paymentMap: Record<string, string> = {
+-      pix: 'PIX (Instantâneo)',
+-      credit_card: 'Cartão de Crédito',
+-      debit_card: 'Cartão de Débito',
+-      cash: 'Dinheiro',
+-      split: 'Pagamento Misto'
++      'pix': 'PIX',
++      'credit_card': 'Cartão de Crédito',
++      'debit_card': 'Cartão de Débito',
++      'cash': 'Dinheiro',
++      'split': 'Dividido'
+     };
+ 
+     const itemsRows = tx.items.map(it => `
+-      <tr style="border-bottom: 1px dashed #d6d3d1;">
+-        <td style="padding: 5px 0; text-align: left; vertical-align: top;">
+-          <div style="font-weight: 700;">${it.quantity}x ${it.title}</div>
+-        </td>
+-        <td style="padding: 5px 0; text-align: right; font-weight: 700; font-family: monospace; vertical-align: top; white-space: nowrap;">
+-          R$ ${(it.price * it.quantity).toFixed(2)}
+-        </td>
++      <tr>
++        <td style="padding: 4px 0; border-bottom: 1px dashed #ccc;">${it.quantity}x ${it.title}</td>
++        <td style="padding: 4px 0; border-bottom: 1px dashed #ccc; text-align: right;">R$ ${(it.price * it.quantity).toFixed(2)}</td>
+       </tr>
+     `).join('');
+ 
+     const receiptHtml = `
+-      <!DOCTYPE html>
+       <html>
+-      <head>
+-        <meta charset="utf-8">
+-        <title>Comprovante de Venda - Barbearia Navo</title>
+-        <style>
+-          @page { size: 80mm auto; margin: 0; }
+-          * { box-sizing: border-box; }
+-          body {
+-            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+-            width: 280px;
+-            margin: 0 auto;
+-            padding: 16px 12px;
+-            color: #1c1917;
+-            background: #ffffff;
+-            font-size: 11px;
+-            line-height: 1.35;
+-          }
+-          .text-center { text-align: center; }
+-          .header { border-bottom: 2px dashed #1c1917; padding-bottom: 8px; margin-bottom: 10px; text-align: center; }
+-          .brand { font-size: 16px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
+-          .subbrand { font-size: 9px; text-transform: uppercase; font-weight: 600; color: #44403c; }
+-          .badge { display: inline-block; padding: 2px 8px; background: #1c1917; color: #ffffff; font-size: 9px; font-weight: bold; margin-top: 6px; letter-spacing: 1px; }
+-          .info-box { font-size: 11px; line-height: 1.4; margin: 8px 0; }
+-          .info-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+-          .divider { border-top: 1px dashed #1c1917; margin: 8px 0; }
+-          .items-table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 11px; }
+-          .totals-box { margin-top: 6px; font-size: 11px; }
+-          .total-final { font-size: 15px; font-weight: 900; border-top: 2px solid #1c1917; border-bottom: 2px solid #1c1917; padding: 6px 0; margin-top: 6px; display: flex; justify-content: space-between; }
+-          .footer { margin-top: 15px; text-align: center; font-size: 9px; border-top: 1px dashed #1c1917; padding-top: 8px; }
+-          .barcode { font-size: 18px; letter-spacing: 3px; font-weight: bold; margin-top: 8px; }
+-        </style>
+-      </head>
+-      <body>
+-        <div class="header">
+-          ${shopProfile.logoUrl ? `<div style="text-align: center; margin-bottom: 6px;"><img src="${shopProfile.logoUrl}" style="width: 50px; h-auto; max-height: 50px; border-radius: 50%; object-fit: cover; display: inline-block;" /></div>` : ''}
+-          <div class="brand">${(shopProfile.name || 'BARBEARIA NAVO').toUpperCase()}</div>
+-          <div class="subbrand">${shopProfile.address || 'Sobral / CE'}</div>
+-          ${shopProfile.phone ? `<div style="font-size: 8px; margin-top: 2px; color: #57534e;">TEL: ${shopProfile.phone}</div>` : ''}
+-          <div class="badge">COMPROVANTE DE VENDA</div>
+-        </div>
+-
+-        <div class="info-box">
+-          <div class="info-row"><span>COMPROVANTE:</span> <strong>#${tx.id}</strong></div>
+-          <div class="info-row"><span>DATA/HORA:</span> <strong>${new Date().toLocaleDateString('pt-BR')} ${tx.timestamp}</strong></div>
+-          <div class="info-row"><span>CLIENTE:</span> <strong>${tx.clientName}</strong></div>
+-          ${tx.clientPhone ? `<div class="info-row"><span>TELEFONE:</span> <span>${tx.clientPhone}</span></div>` : ''}
+-          <div class="info-row"><span>ATENDENTE:</span> <strong>${tx.professionalName}</strong></div>
+-        </div>
+-
+-        <div class="divider"></div>
+-
+-        <table class="items-table">
+-          <thead>
+-            <tr style="border-bottom: 1px solid #1c1917; font-size: 10px; text-align: left;">
+-              <th style="padding-bottom: 4px;">QTD ITEM</th>
+-              <th style="padding-bottom: 4px; text-align: right;">VALOR (R$)</th>
+-            </tr>
+-          </thead>
+-          <tbody>
+-            ${itemsRows}
+-          </tbody>
+-        </table>
+-
+-        <div class="divider"></div>
+-
+-        <div class="totals-box">
+-          <div class="info-row"><span>Subtotal:</span> <span>R$ ${tx.subtotal.toFixed(2)}</span></div>
+-          ${tx.discount > 0 ? `<div class="info-row" style="color: #059669;"><span>Desconto:</span> <span>- R$ ${tx.discount.toFixed(2)}</span></div>` : ''}
+-          ${tx.tip > 0 ? `<div class="info-row" style="color: #d97706;"><span>Gorjeta:</span> <span>+ R$ ${tx.tip.toFixed(2)}</span></div>` : ''}
+-          
+-          <div class="total-final">
+-            <span>TOTAL PAGO</span>
+-            <span>R$ ${tx.total.toFixed(2)}</span>
+-          </div>
+-
+-          <div style="margin-top: 8px;">
+-            <div class="info-row"><span>Forma de Pagamento:</span> <strong>${paymentMap[tx.paymentMethod] || tx.paymentMethod.toUpperCase()}</strong></div>
+-            ${tx.paymentDetails ? `<div style="font-size: 10px; color: #57534e; margin-top: 2px;">${tx.paymentDetails}</div>` : ''}
+-          </div>
+-        </div>
+-
+-        <div class="footer">
+-          <div style="font-weight: bold; font-size: 11px; margin-bottom: 2px;">OBRIGADO PELA PREFERÊNCIA!</div>
+-          <div>Corte, Barba e Estilo com Tradição</div>
+-          <div class="barcode">|||| ||||| ||| |||||||</div>
+-          <div style="font-size: 8px; margin-top: 2px; color: #78716c;">AUTENTICAÇÃO: ${tx.id}-${Date.now().toString().slice(-4)}</div>
+-          <div style="font-size: 9px; margin-top: 6px; font-weight: bold;">www.barbearianavo.com.br</div>
+-        </div>
+-
+-        <script>
+-          window.onload = function() {
+-            window.focus();
+-            window.print();
+-          };
+-        </script>
+-      </body>
++        <head>
++          <title>Comprovante de Venda</title>
++          <style>
++            body { font-family: 'Courier New', Courier, monospace; font-size: 12px; margin: 0; padding: 20px; color: #000; width: 300px; }
++            h2 { font-size: 16px; margin: 0 0 5px 0; text-align: center; text-transform: uppercase; }
++            p { margin: 2px 0; }
++            .divider { border-bottom: 1px dashed #000; margin: 10px 0; }
++            table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
++            .totals { font-weight: bold; }
++            .center { text-align: center; }
++            .right { text-align: right; }
++          </style>
++        </head>
++        <body>
++          <h2>${shopProfile.name}</h2>
++          <p class="center">${shopProfile.address || ''}</p>
++          <p class="center">${shopProfile.phone || ''}</p>
++          <div class="divider"></div>
++          <p><strong>Recibo:</strong> ${tx.id}</p>
++          <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')} ${tx.timestamp}</p>
++          <p><strong>Cliente:</strong> ${tx.clientName}</p>
++          <p><strong>Profissional:</strong> ${tx.professionalName}</p>
++          <div class="divider"></div>
++          <table>
++            <thead>
++              <tr>
++                <th style="text-align: left; border-bottom: 1px solid #000;">Item</th>
++                <th style="text-align: right; border-bottom: 1px solid #000;">Valor</th>
++              </tr>
++            </thead>
++            <tbody>
++              ${itemsRows}
++            </tbody>
++          </table>
++          <div class="right totals">
++            <p>Subtotal: R$ ${tx.subtotal.toFixed(2)}</p>
++            ${tx.discount > 0 ? `<p>Desconto: - R$ ${tx.discount.toFixed(2)}</p>` : ''}
++            ${tx.tip > 0 ? `<p>Gorjeta: + R$ ${tx.tip.toFixed(2)}</p>` : ''}
++            <p style="font-size: 14px; margin-top: 5px;">TOTAL: R$ ${tx.total.toFixed(2)}</p>
++          </div>
++          <div class="divider"></div>
++          <p><strong>Forma de Pagto:</strong> ${paymentMap[tx.paymentMethod]}</p>
++          <div class="divider"></div>
++          <p class="center">Obrigado pela preferência!</p>
++          <p class="center">Volte sempre.</p>
++        </body>
+       </html>
+     `;
+ 
+@@ -498,9 +400,7 @@
+ 
+       const printFrame = document.createElement('iframe');
+       printFrame.id = 'pdv-print-frame';
+-      printFrame.style.position = 'fixed';
+-      printFrame.style.right = '0';
+-      printFrame.style.bottom = '0';
++      printFrame.style.position = 'absolute';
+       printFrame.style.width = '0px';
+       printFrame.style.height = '0px';
+       printFrame.style.border = 'none';
+@@ -511,1005 +411,567 @@
+         doc.open();
+         doc.write(receiptHtml);
+         doc.close();
+-
+         setTimeout(() => {
+-          if (printFrame.contentWindow) {
+-            printFrame.contentWindow.focus();
+-            printFrame.contentWindow.print();
+-          }
+-        }, 300);
++          printFrame.contentWindow?.focus();
++          printFrame.contentWindow?.print();
++        }, 500);
+       }
+     } catch (e) {
+-      console.error('Erro ao imprimir via iframe:', e);
+-      window.print();
++      console.error('Print falhou:', e);
++      alert('Não foi possível iniciar a impressão. Verifique se o navegador bloqueou o pop-up.');
+     }
+   };
+ 
+-  // WhatsApp Share Handler
+   const handleShareWhatsApp = (tx: PdvTransaction) => {
+     const cleanPhone = (tx.clientPhone || '').replace(/\D/g, '');
+     const itemsText = tx.items.map(i => `• ${i.quantity}x ${i.title} (R$ ${(i.price * i.quantity).toFixed(2)})`).join('\n');
+     
+     const message = 
+-      `💈 *BARBEARIA NAVO - COMPROVANTE DE VENDA*\n\n` +
+-      `*Comprovante:* #${tx.id}\n` +
+-      `*Data:* ${new Date().toLocaleDateString('pt-BR')} ${tx.timestamp}\n` +
+-      `*Cliente:* ${tx.clientName}\n` +
+-      `*Atendente:* ${tx.professionalName}\n\n` +
+-      `*ITENS DO ATENDIMENTO:*\n${itemsText}\n\n` +
+-      `--------------------------------\n` +
+-      `*TOTAL PAGO:* R$ ${tx.total.toFixed(2)} (${tx.paymentMethod.toUpperCase()})\n` +
+-      `--------------------------------\n\n` +
+-      `Obrigado pela preferência! Agende seu próximo horário em navobarber.com.br ✂️`;
++`*${shopProfile.name} - Comprovante*
++Recibo: ${tx.id}
++Data: ${new Date().toLocaleDateString('pt-BR')} ${tx.timestamp}
++
++*Itens:*
++${itemsText}
++
++*Total Pago: R$ ${tx.total.toFixed(2)}*
++Forma: ${tx.paymentMethod.toUpperCase()}
++Profissional: ${tx.professionalName}
++
++Obrigado pela preferência!`;
+ 
+     const url = cleanPhone 
+-      ? `https://api.whatsapp.com/send?phone=55${cleanPhone}&text=${encodeURIComponent(message)}`
++      ? `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(message)}`
+       : `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+-
++      
+     window.open(url, '_blank');
+   };
+ 
+   const totalRevenueToday = todaysSales.reduce((acc, sale) => acc + sale.total, 0);
+ 
+   return (
+-    <div className="space-y-4 pb-28 md:pb-6 animate-fade-in text-content-base min-w-0">
+-      {/* Header (desktop) */}
+-      <AdminPageHeader
+-        icon={Receipt}
+-        title="PDV Inteligente"
+-        stats={[
+-          { label: isCaixaOpen ? 'caixa aberto' : 'caixa fechado', value: '', tone: isCaixaOpen ? 'success' : 'muted' },
+-        ]}
+-        action={{
+-          label: isCaixaOpen ? 'Fechar Caixa' : 'Abrir Caixa',
+-          onClick: () => setIsCaixaOpen(!isCaixaOpen),
+-        }}
+-      >
+-        <button
+-          onClick={() => setShowSalesHistory(true)}
+-          className="h-9 px-3 rounded-xl bg-surface-base border border-border-subtle hover:bg-surface-card text-content-base text-xs font-bold flex items-center gap-2 transition-all shrink-0 active:scale-95"
+-        >
+-          <Receipt className="w-3.5 h-3.5 text-gold-hover" />
+-          <span>Vendas Hoje ({todaysSales.length})</span>
+-        </button>
+-      </AdminPageHeader>
+-
+-      {/* Ações (mobile) */}
+-      <div className="md:hidden flex items-center gap-2">
+-        <button
+-          onClick={() => setShowSalesHistory(true)}
+-          className="flex-1 h-10 rounded-xl bg-surface-base border border-border-subtle hover:bg-surface-card text-content-base text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
+-        >
+-          <Receipt className="w-3.5 h-3.5 text-gold-hover" />
+-          <span>Vendas ({todaysSales.length})</span>
+-        </button>
+-
+-        <button
+-          onClick={() => setIsCaixaOpen(!isCaixaOpen)}
+-          className={`flex-1 h-10 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+-            isCaixaOpen 
+-              ? 'bg-status-error/10 hover:bg-status-error/20 text-status-error border border-status-error/30' 
+-              : 'bg-status-success/10 hover:bg-status-success/20 text-status-success border border-status-success/30'
+-          }`}
+-        >
+-          {isCaixaOpen ? 'Fechar Caixa' : 'Abrir Caixa'}
+-        </button>
+-      </div>
+-
+-      {/* Quick Metrics Cards */}
+-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-emerald-400 mb-1">
+-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Hoje</span>
+-            <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+-              <DollarSign className="w-3.5 h-3.5" />
+-            </div>
+-          </div>
+-          <p className="text-lg font-black text-content-base tabular-nums truncate">R$ {totalRevenueToday.toFixed(2)}</p>
+-        </div>
+-
+-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-blue-400 mb-1">
+-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Checkouts</span>
+-            <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+-              <CheckCircle2 className="w-3.5 h-3.5" />
+-            </div>
+-          </div>
+-          <p className="text-lg font-black text-content-base tabular-nums truncate">{todaysSales.length} vendas</p>
++    <div className="flex flex-col h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
++      {/* Header */}
++      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
++        <div>
++          <h1 className="text-2xl font-black text-content-base flex items-center gap-2">
++            <Wallet className="w-7 h-7 text-gold-base" />
++            PDV Rápido
++          </h1>
++          <p className="text-content-muted text-sm mt-1">Finalize vendas, cobre serviços e emita comprovantes</p>
+         </div>
+-
+-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-amber-400 mb-1">
+-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Pendentes</span>
+-            <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+-              <Clock className="w-3.5 h-3.5" />
+-            </div>
+-          </div>
+-          <p className="text-lg font-black text-content-base tabular-nums truncate">{pendingAppointments.length} horários</p>
++        
++        <div className="flex items-center gap-3">
++          <div className="flex items-center gap-2 bg-surface-card px-4 py-2 rounded-xl border border-border-subtle shadow-sm">
++            <span className={`w-2.5 h-2.5 rounded-full ${isCaixaOpen ? 'bg-status-success animate-pulse' : 'bg-status-error'}`} />
++            <span className="text-xs font-bold text-content-base">{isCaixaOpen ? 'CAIXA ABERTO' : 'CAIXA FECHADO'}</span>
++          </div>
++          <button
++            onClick={() => setShowSalesHistory(true)}
++            className="h-9 px-4 rounded-xl bg-surface-card border border-border-subtle text-content-base hover:text-gold-base font-bold text-xs transition-colors flex items-center gap-2 active:scale-95 shadow-sm"
++          >
++            <Receipt className="w-4 h-4" />
++            <span className="hidden sm:inline">Histórico de Hoje</span>
++          </button>
+         </div>
++      </div>
+ 
+-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+-          <div className="flex items-center justify-between text-purple-400 mb-1">
+-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Produtos</span>
+-            <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
+-              <ShoppingBag className="w-3.5 h-3.5" />
+-            </div>
+-          </div>
+-          <p className="text-lg font-black text-content-base tabular-nums truncate">{products.length} itens</p>
+-        </div>
++      {/* Progress Steps */}
++      <div className="mb-6 flex items-center gap-2 bg-surface-card p-2 rounded-xl border border-border-subtle max-w-2xl mx-auto w-full">
++        {[1, 2, 3].map((step) => (
++          <React.Fragment key={step}>
++            <div 
++              className={`flex-1 flex flex-col items-center justify-center p-2 rounded-lg transition-colors ${currentStep === step ? 'bg-gold-base text-surface-base' : currentStep > step ? 'text-gold-base' : 'text-content-muted'}`}
++            >
++              <span className="text-[10px] font-bold uppercase tracking-wider mb-0.5">Etapa {step}</span>
++              <span className={`text-xs font-bold ${currentStep === step ? 'text-surface-base' : 'text-content-base'}`}>
++                {step === 1 ? 'Origem' : step === 2 ? 'Carrinho' : 'Pagamento'}
++              </span>
++            </div>
++            {step < 3 && <ChevronRight className={`w-4 h-4 shrink-0 ${currentStep > step ? 'text-gold-base' : 'text-border-subtle'}`} />}
++          </React.Fragment>
++        ))}
+       </div>
+ 
+-      {/* MAIN WORKSPACE GRID */}
+-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
++      {/* Main Content Area */}
++      <div className="flex-1 min-h-0 bg-surface-card border border-border-subtle rounded-2xl shadow-sm p-4 sm:p-6 overflow-hidden flex flex-col">
+         
+-        {/* LEFT CATALOG & PENDING APPOINTMENTS (7 COLS) */}
+-        <div className="lg:col-span-7 space-y-3 min-w-0">
+-          
+-          {/* Tabs & Search */}
+-          <div className="bg-surface-card rounded-xl border border-border-subtle p-3 space-y-2.5 min-w-0">
+-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-subtle pb-2.5">
+-              <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar no-scrollbar min-w-0">
+-                <button
+-                  onClick={() => setActiveTab('agendamentos')}
+-                  className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+-                    activeTab === 'agendamentos'
+-                      ? 'bg-gold-base text-surface-base shadow-sm'
+-                      : 'text-content-muted hover:text-content-base hover:bg-surface-base'
+-                  }`}
+-                >
+-                  <Calendar className="w-3.5 h-3.5" />
+-                  <span>Hoje ({pendingAppointments.length})</span>
+-                </button>
+-
+-                <button
+-                  onClick={() => setActiveTab('servicos')}
+-                  className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+-                    activeTab === 'servicos'
+-                      ? 'bg-gold-base text-surface-base shadow-sm'
+-                      : 'text-content-muted hover:text-content-base hover:bg-surface-base'
+-                  }`}
+-                >
+-                  <Scissors className="w-3.5 h-3.5" />
+-                  <span>Serviços ({services.length})</span>
+-                </button>
+-
+-                <button
+-                  onClick={() => setActiveTab('produtos')}
+-                  className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+-                    activeTab === 'produtos'
+-                      ? 'bg-gold-base text-surface-base shadow-sm'
+-                      : 'text-content-muted hover:text-content-base hover:bg-surface-base'
+-                  }`}
+-                >
+-                  <ShoppingBag className="w-3.5 h-3.5" />
+-                  <span>Produtos ({products.length})</span>
+-                </button>
+-
+-                <button
+-                  onClick={() => setActiveTab('fila')}
+-                  className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+-                    activeTab === 'fila'
+-                      ? 'bg-gold-base text-surface-base shadow-sm'
+-                      : 'text-content-muted hover:text-content-base hover:bg-surface-base'
+-                  }`}
+-                >
+-                  <Clock className="w-3.5 h-3.5" />
+-                  <span>Fila ({queue.length})</span>
+-                </button>
++        {/* STEP 1: ORIGEM DA VENDA */}
++        {currentStep === 1 && (
++          <div className="flex-1 flex flex-col space-y-6 overflow-y-auto custom-scrollbar pr-2">
++            
++            {/* Header Action */}
++            <div className="flex items-center justify-between">
++              <div>
++                <h2 className="text-sm font-bold text-content-base">Iniciar Nova Venda</h2>
++                <p className="text-xs text-content-muted">Selecione de onde importar os itens ou inicie avulsa.</p>
+               </div>
+-
+-              <button
+-                onClick={loadData}
+-                className="w-8 h-8 rounded-xl text-content-muted hover:text-content-base hover:bg-surface-base transition-colors flex items-center justify-center shrink-0"
+-                title="Atualizar dados"
++              <button 
++                onClick={handleStartAvulso}
++                className="h-10 px-5 bg-gold-base hover:bg-gold-hover text-surface-base rounded-xl text-xs font-bold transition-all active:scale-95 shadow-sm flex items-center gap-2"
+               >
+-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
++                <Plus className="w-4 h-4" />
++                Venda Avulsa
+               </button>
+             </div>
+ 
+-            {/* Search Input */}
+-            <div className="relative">
+-              <Search className="w-3.5 h-3.5 text-content-muted absolute left-3 top-1/2 -translate-y-1/2" />
+-              <input
+-                type="text"
+-                placeholder="Buscar cliente, serviço ou produto..."
+-                value={searchQuery}
+-                onChange={e => setSearchQuery(e.target.value)}
+-                className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-8 py-1.5 text-xs text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base transition-colors"
+-              />
+-              {searchQuery && (
+-                <button 
+-                  onClick={() => setSearchQuery('')}
+-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-base"
+-                >
+-                  <X className="w-3.5 h-3.5" />
+-                </button>
+-              )}
+-            </div>
+-          </div>
+-
+-          {/* TAB CONTENT PANELS */}
+-          <div className="bg-surface-card rounded-xl border border-border-subtle p-3 min-h-[360px] max-h-[500px] overflow-y-auto custom-scrollbar no-scrollbar min-w-0">
+-            
+-            {/* TAB 1: AGENDAMENTOS DO DIA */}
+-            {activeTab === 'agendamentos' && (
+-              <div className="space-y-2">
+-                <div className="flex items-center justify-between text-[10px] text-content-muted font-bold uppercase tracking-wider mb-1">
+-                  <span>Agendamentos Pendentes de Cobrança</span>
+-                  <span>{pendingAppointments.length} itens</span>
++            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
++              {/* Coluna Agendamentos */}
++              <div className="space-y-3">
++                <div className="flex items-center justify-between border-b border-border-subtle pb-2">
++                  <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-1.5">
++                    <Calendar className="w-4 h-4 text-gold-base" /> Agendamentos do Dia
++                  </h3>
++                  <span className="text-[10px] bg-surface-base px-2 py-0.5 rounded-full text-content-muted font-bold">{pendingAppointments.length}</span>
+                 </div>
+-
++                
+                 {pendingAppointments.length === 0 ? (
+-                  <div className="text-center py-12 text-content-muted space-y-2">
+-                    <CheckCircle2 className="w-8 h-8 text-status-success mx-auto opacity-80" />
+-                    <p className="text-xs font-bold text-content-base">Nenhum agendamento pendente para hoje!</p>
+-                    <p className="text-[11px]">Todos os agendamentos já foram liquidados ou inicie uma venda avulsa.</p>
++                  <div className="py-8 text-center text-content-muted border border-dashed border-border-subtle rounded-xl bg-surface-base/50">
++                    <p className="text-xs">Nenhum agendamento pendente.</p>
+                   </div>
+                 ) : (
+-                  <div className="grid grid-cols-1 gap-2">
+-                    {pendingAppointments
+-                      .filter(a => 
+-                        a.client_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+-                        a.professional_name.toLowerCase().includes(searchQuery.toLowerCase())
+-                      )
+-                      .map(apt => (
+-                        <div
+-                          key={apt.id}
+-                          className={`p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 min-w-0 ${
+-                            linkedAppointmentId === apt.id
+-                              ? 'bg-gold-base/10 border-gold-base shadow-sm'
+-                              : 'bg-surface-base border-border-subtle hover:border-gold-base/50'
+-                          }`}
+-                        >
+-                          <div className="min-w-0 flex-1 space-y-1">
+-                            <div className="flex items-center gap-2 min-w-0">
+-                              <span className="px-1.5 py-0.5 rounded-xl bg-gold-base/20 text-gold-hover font-bold text-[10px] shrink-0 font-mono">
+-                                {apt.time_slot}
+-                              </span>
+-                              <h3 className="font-bold text-content-base text-xs truncate min-w-0">{apt.client_name}</h3>
+-                              {apt.client_phone && (
+-                                <span className="text-[10px] text-content-muted shrink-0 hidden sm:inline">({apt.client_phone})</span>
+-                              )}
+-                            </div>
+-
+-                            <div className="flex items-center gap-2 text-[11px] text-content-muted min-w-0">
+-                              <span className="flex items-center gap-1 font-medium text-content-base shrink-0">
+-                                <Scissors className="w-3 h-3 text-gold-hover" />
+-                                {apt.professional_name}
+-                              </span>
+-                              <span>•</span>
+-                              <span className="truncate">{(apt.services || []).map(s => s.title).join(', ')}</span>
+-                            </div>
+-                          </div>
+-
+-                          <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-border-subtle">
+-                            <div className="text-right whitespace-nowrap">
+-                              <span className="block text-[9px] text-content-muted font-bold uppercase">Total</span>
+-                              <span className="text-xs font-bold text-status-success font-mono num-tabular">
+-                                R$ {apt.final_amount.toFixed(2)}
+-                              </span>
+-                            </div>
+-
+-                            <button
+-                              onClick={() => handleSelectAppointmentForCheckout(apt)}
+-                              className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 active:scale-95 ${
+-                                linkedAppointmentId === apt.id
+-                                  ? 'bg-gold-base text-surface-base shadow'
+-                                  : 'bg-gold-base/10 text-gold-hover hover:bg-gold-base hover:text-surface-base'
+-                              }`}
+-                            >
+-                              <span>{linkedAppointmentId === apt.id ? 'Carregado' : 'Carregar'}</span>
+-                              <ArrowRight className="w-3 h-3" />
+-                            </button>
++                  <div className="space-y-2">
++                    {pendingAppointments.map(apt => (
++                      <div key={apt.id} className="p-3 bg-surface-base border border-border-subtle rounded-xl flex items-center justify-between hover:border-gold-base/50 transition-colors">
++                        <div className="min-w-0 flex-1">
++                          <div className="flex items-center gap-2">
++                            <span className="text-[10px] font-mono bg-surface-card px-1.5 py-0.5 rounded border border-border-subtle text-content-muted">{apt.time_slot}</span>
++                            <span className="text-xs font-bold text-content-base truncate">{apt.client_name}</span>
+                           </div>
++                          <p className="text-[11px] text-content-muted mt-1 truncate">{apt.professional_name} • {(apt.services||[]).map(s=>s.title).join(', ')}</p>
+                         </div>
+-                      ))}
++                        <button 
++                          onClick={() => handleStartFromAppointment(apt)}
++                          className="ml-3 h-8 px-3 bg-gold-base/10 text-gold-hover hover:bg-gold-base hover:text-surface-base rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors shrink-0"
++                        >
++                          Importar
++                        </button>
++                      </div>
++                    ))}
+                   </div>
+                 )}
+               </div>
+-            )}
+-
+-            {/* TAB 2: CATÁLOGO DE SERVIÇOS (Formatado com valores fixos à direita) */}
+-            {activeTab === 'servicos' && (
+-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+-                {services
+-                  .filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()))
+-                  .map(srv => (
+-                    <div
+-                      key={srv.id}
+-                      onClick={() => handleAddServiceToCart(srv)}
+-                      className="p-3 rounded-xl bg-surface-base border border-border-subtle hover:border-gold-base/60 transition-all cursor-pointer flex items-center justify-between gap-3 group active:scale-[0.99] min-w-0"
+-                    >
+-                      <div className="min-w-0 flex-1 pr-1">
+-                        <h4 className="font-bold text-content-base text-xs group-hover:text-gold-hover transition-colors truncate">
+-                          {srv.title}
+-                        </h4>
+-                        <p className="text-[10px] text-content-muted truncate">
+-                          {srv.duration_minutes} min • {srv.description || 'Serviço de alta precisão'}
+-                        </p>
+-                      </div>
+-
+-                      <div className="shrink-0 text-right whitespace-nowrap">
+-                        <span className="block font-bold text-status-success text-xs font-mono num-tabular">
+-                          R$ {srv.price.toFixed(2)}
+-                        </span>
+-                        <span className="text-[10px] text-gold-hover font-bold inline-flex items-center gap-0.5">
+-                          <Plus className="w-3 h-3" /> Add
+-                        </span>
+-                      </div>
+-                    </div>
+-                  ))}
+-              </div>
+-            )}
+-
+-            {/* TAB 3: CATÁLOGO DE PRODUTOS */}
+-            {activeTab === 'produtos' && (
+-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+-                {products
+-                  .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase()))
+-                  .map(prod => (
+-                    <div
+-                      key={prod.id}
+-                      onClick={() => handleAddProductToCart(prod)}
+-                      className="p-3 rounded-xl bg-surface-base border border-border-subtle hover:border-gold-base/60 transition-all cursor-pointer flex items-center justify-between gap-3 group active:scale-[0.99] min-w-0"
+-                    >
+-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+-                        <div className="w-8 h-8 rounded-xl bg-gold-base/10 text-gold-hover flex items-center justify-center font-bold text-xs shrink-0">
+-                          <ShoppingBag className="w-4 h-4" />
+-                        </div>
+-                        <div className="min-w-0 flex-1">
+-                          <span className="text-[9px] font-bold text-content-muted uppercase tracking-wider block truncate">
+-                            {prod.brand}
+-                          </span>
+-                          <h4 className="font-bold text-content-base text-xs group-hover:text-gold-hover transition-colors truncate">
+-                            {prod.name}
+-                          </h4>
+-                          <span className="text-[10px] text-content-muted block truncate">Estoque: {prod.stock_quantity} un</span>
+-                        </div>
+-                      </div>
+ 
+-                      <div className="shrink-0 text-right whitespace-nowrap">
+-                        <span className="block font-bold text-status-success text-xs font-mono num-tabular">
+-                          R$ {prod.price.toFixed(2)}
+-                        </span>
+-                        <span className="text-[10px] text-gold-hover font-bold inline-flex items-center gap-0.5">
+-                          <Plus className="w-3 h-3" /> Add
+-                        </span>
+-                      </div>
+-                    </div>
+-                  ))}
+-              </div>
+-            )}
++              {/* Coluna Fila */}
++              <div className="space-y-3">
++                <div className="flex items-center justify-between border-b border-border-subtle pb-2">
++                  <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-1.5">
++                    <Clock className="w-4 h-4 text-gold-base" /> Fila de Espera
++                  </h3>
++                  <span className="text-[10px] bg-surface-base px-2 py-0.5 rounded-full text-content-muted font-bold">{queue.length}</span>
++                </div>
+ 
+-            {/* TAB 4: FILA DE ESPERA */}
+-            {activeTab === 'fila' && (
+-              <div className="space-y-2">
+                 {queue.length === 0 ? (
+-                  <div className="text-center py-10 text-content-muted text-xs">
+-                    Nenhum cliente na fila de espera no momento.
++                  <div className="py-8 text-center text-content-muted border border-dashed border-border-subtle rounded-xl bg-surface-base/50">
++                    <p className="text-xs">Ninguém na fila de espera.</p>
+                   </div>
+                 ) : (
+-                  queue.map(q => (
+-                    <div
+-                      key={q.id}
+-                      className="p-3 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-between gap-3 min-w-0"
+-                    >
+-                      <div className="min-w-0 flex-1">
+-                        <div className="flex items-center gap-2 min-w-0">
+-                          <h4 className="font-bold text-content-base text-xs truncate">{q.client_name}</h4>
+-                          <span className="px-1.5 py-0.5 rounded-xl text-[10px] font-bold bg-amber-500/10 text-amber-400 shrink-0">
+-                            Fila
+-                          </span>
++                  <div className="space-y-2">
++                    {queue.map(q => (
++                      <div key={q.id} className="p-3 bg-surface-base border border-border-subtle rounded-xl flex items-center justify-between hover:border-gold-base/50 transition-colors">
++                        <div className="min-w-0 flex-1">
++                          <span className="text-xs font-bold text-content-base block truncate">{q.client_name}</span>
++                          <p className="text-[11px] text-content-muted mt-0.5 truncate">{q.service_title}</p>
+                         </div>
+-                        <p className="text-[11px] text-content-muted mt-0.5 truncate">
+-                          {q.service_title} • Barbeiro: {q.professional_name}
+-                        </p>
++                        <button 
++                          onClick={() => handleStartFromQueue(q)}
++                          className="ml-3 h-8 px-3 bg-gold-base/10 text-gold-hover hover:bg-gold-base hover:text-surface-base rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors shrink-0"
++                        >
++                          Importar
++                        </button>
+                       </div>
+-
+-                      <button
+-                        onClick={() => handleSelectQueueItemForCheckout(q)}
+-                        className="h-8 px-3 rounded-xl bg-gold-base/10 hover:bg-gold-base text-gold-hover hover:text-surface-base text-xs font-bold transition-all shrink-0 active:scale-95 whitespace-nowrap"
+-                      >
+-                        Cobrar
+-                      </button>
+-                    </div>
+-                  ))
++                    ))}
++                  </div>
+                 )}
+               </div>
+-            )}
+-
++            </div>
+           </div>
+-        </div>
++        )}
+ 
+-        {/* RIGHT PANEL: CARRINHO E CHECKOUT DO CAIXA (5 COLS) */}
+-        <div className="lg:col-span-5 space-y-3 min-w-0">
+-          <div className="bg-surface-card rounded-xl border border-border-subtle p-3.5 sm:p-4 shadow-sm flex flex-col justify-between min-h-[540px] min-w-0">
+-            
+-            {/* Header / Client & Barber Selector */}
+-            <div className="space-y-2.5 pb-2.5 border-b border-border-subtle">
+-              <div className="flex items-center justify-between">
+-                <div className="flex items-center gap-2">
+-                  <Receipt className="w-4 h-4 text-gold-hover" />
+-                  <h2 className="font-serif font-bold text-content-base text-sm">Checkout de Caixa</h2>
++        {/* STEP 2: CARRINHO E SERVIÇOS */}
++        {currentStep === 2 && (
++          <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
++            {/* Esquerda: Adicionar Itens */}
++            <div className="flex-1 flex flex-col min-h-0 border border-border-subtle rounded-xl bg-surface-base">
++              <div className="p-3 border-b border-border-subtle flex gap-2">
++                <div className="relative flex-1">
++                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
++                  <input 
++                    type="text" 
++                    placeholder="Buscar serviço ou produto..."
++                    value={searchCatalog}
++                    onChange={e => setSearchCatalog(e.target.value)}
++                    className="w-full bg-surface-card border border-border-subtle rounded-xl pl-9 pr-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base transition-colors"
++                  />
+                 </div>
+-                {cart.length > 0 && (
+-                  <button
+-                    onClick={handleClearCart}
+-                    className="text-[11px] text-status-error hover:underline font-bold"
+-                  >
+-                    Limpar
+-                  </button>
+-                )}
+               </div>
+-
+-              {/* Client Name Input */}
+-              <div className="grid grid-cols-2 gap-2 text-xs">
++              <div className="flex-1 overflow-y-auto p-3 space-y-4 custom-scrollbar">
++                {/* Serviços */}
+                 <div>
+-                  <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">
+-                    Cliente
+-                  </label>
+-                  <input
+-                    type="text"
+-                    value={selectedClientName}
+-                    onChange={e => setSelectedClientName(e.target.value)}
+-                    placeholder="Nome do cliente"
+-                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base"
+-                  />
++                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-content-muted mb-2">Serviços Disponíveis</h4>
++                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
++                    {services.filter(s => s.title.toLowerCase().includes(searchCatalog.toLowerCase())).map(s => (
++                      <div key={s.id} onClick={() => handleAddServiceToCart(s)} className="p-2 border border-border-subtle rounded-lg flex items-center justify-between cursor-pointer hover:border-gold-base hover:bg-surface-card transition-colors">
++                        <span className="text-xs font-bold text-content-base truncate flex-1">{s.title}</span>
++                        <span className="text-[10px] font-bold text-gold-hover font-mono bg-gold-base/10 px-1.5 py-0.5 rounded">R$ {s.price.toFixed(2)}</span>
++                      </div>
++                    ))}
++                  </div>
+                 </div>
+-
++                {/* Produtos */}
+                 <div>
+-                  <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">
+-                    Telefone
+-                  </label>
+-                  <input
+-                    type="text"
+-                    value={selectedClientPhone}
+-                    onChange={e => setSelectedClientPhone(e.target.value)}
+-                    placeholder="(11) 99999-9999"
+-                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+-                  />
++                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-content-muted mb-2">Produtos</h4>
++                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
++                    {products.filter(p => p.name.toLowerCase().includes(searchCatalog.toLowerCase())).map(p => (
++                      <div key={p.id} onClick={() => handleAddProductToCart(p)} className="p-2 border border-border-subtle rounded-lg flex items-center justify-between cursor-pointer hover:border-gold-base hover:bg-surface-card transition-colors">
++                        <span className="text-xs font-bold text-content-base truncate flex-1">{p.name}</span>
++                        <span className="text-[10px] font-bold text-gold-hover font-mono bg-gold-base/10 px-1.5 py-0.5 rounded">R$ {p.price.toFixed(2)}</span>
++                      </div>
++                    ))}
++                  </div>
+                 </div>
+               </div>
+-
+-              {/* Professional Barbeiro Selector */}
+-              <div>
+-                <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">
+-                  Profissional Atendente
+-                </label>
+-                <select
+-                  value={selectedBarber?.id || ''}
+-                  onChange={e => {
+-                    const prof = professionals.find(p => p.id === e.target.value);
+-                    if (prof) setSelectedBarber(prof);
+-                  }}
+-                  className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base"
+-                >
+-                  {professionals.map(p => (
+-                    <option key={p.id} value={p.id}>
+-                      {p.name} ({p.nickname || p.role}) — {Math.round(p.commission_rate * 100)}% comissão
+-                    </option>
+-                  ))}
+-                </select>
+-              </div>
+             </div>
+ 
+-            {/* CART ITEMS LIST */}
+-            <div className="flex-1 py-2 my-1 overflow-y-auto max-h-[200px] space-y-2 custom-scrollbar no-scrollbar min-w-0">
+-              {cart.length === 0 ? (
+-                <div className="text-center py-8 text-content-muted space-y-1.5">
+-                  <ShoppingBag className="w-7 h-7 mx-auto opacity-50 text-gold-hover" />
+-                  <p className="text-xs font-bold text-content-base">Seu carrinho está vazio.</p>
+-                  <p className="text-[10px]">Selecione um agendamento do dia ou adicione itens ao lado.</p>
+-                </div>
+-              ) : (
+-                cart.map(item => (
+-                  <div
+-                    key={item.id}
+-                    className="p-2 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-between gap-2 min-w-0"
++            {/* Direita: Carrinho */}
++            <div className="w-full lg:w-96 flex flex-col min-h-0 bg-surface-base border border-border-subtle rounded-xl">
++              <div className="p-4 border-b border-border-subtle flex flex-col space-y-3">
++                <h3 className="text-sm font-bold text-content-base flex items-center gap-2">
++                  <ShoppingBag className="w-4 h-4 text-gold-base" /> Carrinho da Venda
++                </h3>
++                <div className="space-y-2">
++                  <input 
++                    type="text" 
++                    placeholder="Nome do Cliente (Opcional)"
++                    value={selectedClientName}
++                    onChange={e => setSelectedClientName(e.target.value)}
++                    className="w-full bg-surface-card border border-border-subtle rounded-lg px-3 py-1.5 text-xs text-content-base"
++                  />
++                  <select 
++                    value={selectedBarber?.id || ''}
++                    onChange={(e) => {
++                      const prof = professionals.find(p => p.id === e.target.value);
++                      setSelectedBarber(prof || null);
++                      // Update items with new barber
++                      if (prof) {
++                        setCart(cart.map(i => ({ ...i, barberId: prof.id, barberName: prof.name })));
++                      }
++                    }}
++                    className="w-full bg-surface-card border border-border-subtle rounded-lg px-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                   >
+-                    <div className="min-w-0 flex-1 pr-1">
+-                      <div className="flex items-center gap-1.5 min-w-0">
+-                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${item.type === 'service' ? 'bg-gold-hover' : 'bg-emerald-400'}`} />
+-                        <h4 className="font-bold text-content-base text-xs truncate min-w-0">{item.title}</h4>
+-                      </div>
+-                      <span className="text-[10px] text-content-muted block font-mono num-tabular truncate">
+-                        R$ {item.price.toFixed(2)} cada
+-                      </span>
+-                    </div>
++                    <option value="" disabled>Selecionar Profissional Padrão</option>
++                    {professionals.map(p => (
++                      <option key={p.id} value={p.id}>{p.name}</option>
++                    ))}
++                  </select>
++                </div>
++              </div>
+ 
+-                    <div className="flex items-center gap-1.5 shrink-0">
+-                      <div className="flex items-center gap-1 bg-surface-card border border-border-subtle rounded-xl p-0.5">
+-                        <button
+-                          onClick={() => handleQuantityChange(item.id, -1)}
+-                          className="w-5 h-5 rounded-xl hover:bg-white/10 flex items-center justify-center text-content-muted active:scale-95"
+-                        >
+-                          <Minus className="w-3 h-3" />
+-                        </button>
+-                        <span className="text-xs font-bold text-content-base px-1 font-mono num-tabular">{item.quantity}</span>
+-                        <button
+-                          onClick={() => handleQuantityChange(item.id, 1)}
+-                          className="w-5 h-5 rounded-xl hover:bg-white/10 flex items-center justify-center text-content-muted active:scale-95"
+-                        >
+-                          <Plus className="w-3 h-3" />
+-                        </button>
++              <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
++                {cart.length === 0 ? (
++                  <div className="h-full flex flex-col items-center justify-center text-content-muted p-4 text-center">
++                    <ShoppingBag className="w-8 h-8 mb-2 opacity-50" />
++                    <p className="text-xs">Carrinho vazio.</p>
++                  </div>
++                ) : (
++                  cart.map(item => (
++                    <div key={item.id} className="p-2 bg-surface-card border border-border-subtle rounded-lg flex items-center gap-3">
++                      <div className="flex-1 min-w-0">
++                        <p className="text-xs font-bold text-content-base truncate">{item.title}</p>
++                        <p className="text-[10px] text-content-muted">R$ {item.price.toFixed(2)} un.</p>
+                       </div>
+-
+-                      <span className="text-xs font-bold text-content-base w-16 text-right whitespace-nowrap font-mono num-tabular">
+-                        R$ {(item.price * item.quantity).toFixed(2)}
+-                      </span>
+-
+-                      <button
+-                        onClick={() => handleRemoveItem(item.id)}
+-                        className="text-content-muted hover:text-status-error transition-colors p-1 rounded-xl"
+-                        title="Remover"
+-                      >
+-                        <Trash2 className="w-3.5 h-3.5" />
+-                      </button>
++                      <div className="flex items-center gap-2 bg-surface-base rounded-lg border border-border-subtle p-0.5">
++                        <button onClick={() => handleQuantityChange(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-content-muted hover:text-content-base rounded"><Minus className="w-3 h-3"/></button>
++                        <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
++                        <button onClick={() => handleQuantityChange(item.id, 1)} className="w-6 h-6 flex items-center justify-center text-content-muted hover:text-content-base rounded"><Plus className="w-3 h-3"/></button>
++                      </div>
++                      <div className="text-right shrink-0 min-w-[50px]">
++                        <p className="text-xs font-bold text-content-base">R$ {(item.price * item.quantity).toFixed(2)}</p>
++                      </div>
++                      <button onClick={() => handleRemoveItem(item.id)} className="w-6 h-6 flex items-center justify-center text-status-error/70 hover:text-status-error hover:bg-status-error/10 rounded transition-colors"><Trash2 className="w-3.5 h-3.5"/></button>
+                     </div>
+-                  </div>
+-                ))
+-              )}
++                  ))
++                )}
++              </div>
++              
++              <div className="p-4 border-t border-border-subtle bg-surface-card rounded-b-xl space-y-3">
++                <div className="flex justify-between items-center font-bold text-content-base">
++                  <span className="text-xs">Subtotal:</span>
++                  <span className="text-sm font-mono text-status-success">R$ {subtotal.toFixed(2)}</span>
++                </div>
++                <div className="flex gap-2">
++                  <button 
++                    onClick={() => setCurrentStep(1)}
++                    className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted hover:text-content-base text-xs font-bold flex items-center justify-center gap-1 transition-colors"
++                  >
++                    <ChevronLeft className="w-4 h-4" /> Voltar
++                  </button>
++                  <button 
++                    onClick={() => {
++                      if (cart.length === 0) return alert('Adicione itens ao carrinho primeiro.');
++                      if (!selectedBarber) return alert('Selecione um profissional.');
++                      setCurrentStep(3);
++                    }}
++                    className="flex-[2] h-10 rounded-xl bg-gold-base hover:bg-gold-hover text-surface-base text-xs font-bold flex items-center justify-center gap-1 transition-colors shadow-sm active:scale-95 disabled:opacity-50"
++                  >
++                    Avançar Pagamento <ArrowRight className="w-4 h-4" />
++                  </button>
++                </div>
++              </div>
+             </div>
++          </div>
++        )}
+ 
+-            {/* FINANCIAL BREAKDOWN & DISCOUNTS */}
+-            <div className="pt-2.5 border-t border-border-subtle space-y-2 text-xs">
++        {/* STEP 3: PAGAMENTO E FINALIZAÇÃO */}
++        {currentStep === 3 && (
++          <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
++            {/* Esquerda: Ajustes de Valores e Metodos */}
++            <div className="flex-[2] flex flex-col space-y-4 overflow-y-auto custom-scrollbar pr-2">
++              <h3 className="text-sm font-bold text-content-base mb-2">Finalização e Pagamento</h3>
+               
+-              {/* Discounts & Tip controls */}
+-              <div className="grid grid-cols-2 gap-2">
+-                <div>
+-                  <label className="block text-[10px] font-bold text-content-muted uppercase mb-1">
+-                    Desconto (R$)
++              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
++                {/* Desconto */}
++                <div className="p-4 bg-surface-base border border-border-subtle rounded-xl space-y-2">
++                  <label className="text-[10px] font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5">
++                    <Percent className="w-3.5 h-3.5 text-gold-base" /> Desconto (R$)
+                   </label>
+                   <input
+                     type="number"
+                     min="0"
++                    step="0.01"
+                     value={discountAmount || ''}
+-                    onChange={e => setDiscountAmount(Math.max(0, parseFloat(e.target.value) || 0))}
++                    onChange={(e) => setDiscountAmount(Number(e.target.value))}
+                     placeholder="0.00"
+-                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-1.5 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base num-tabular"
++                    className="w-full bg-surface-card border border-border-subtle rounded-lg px-3 py-2 text-sm text-content-base font-mono focus:outline-none focus:border-gold-base"
+                   />
+                 </div>
+ 
+-                <div>
+-                  <label className="block text-[10px] font-bold text-content-muted uppercase mb-1">
+-                    Gorjeta Barbeiro
++                {/* Gorjeta */}
++                <div className="p-4 bg-surface-base border border-border-subtle rounded-xl space-y-2">
++                  <label className="text-[10px] font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5">
++                    <HandCoins className="w-3.5 h-3.5 text-amber-500" /> Gorjeta / Adicional (R$)
+                   </label>
+                   <input
+                     type="number"
+                     min="0"
++                    step="0.01"
+                     value={tipAmount || ''}
+-                    onChange={e => setTipAmount(Math.max(0, parseFloat(e.target.value) || 0))}
++                    onChange={(e) => setTipAmount(Number(e.target.value))}
+                     placeholder="0.00"
+-                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-1.5 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base num-tabular"
++                    className="w-full bg-surface-card border border-border-subtle rounded-lg px-3 py-2 text-sm text-content-base font-mono focus:outline-none focus:border-gold-base"
+                   />
+                 </div>
+               </div>
+ 
+-              {/* Subtotal, Discount & Total Row */}
+-              <div className="space-y-1 py-1">
+-                <div className="flex justify-between text-content-muted text-xs">
+-                  <span>Subtotal</span>
+-                  <span className="font-mono num-tabular">R$ {subtotal.toFixed(2)}</span>
+-                </div>
+-                {discountAmount > 0 && (
+-                  <div className="flex justify-between text-status-success text-xs font-semibold">
+-                    <span>Desconto Aplicado</span>
+-                    <span className="font-mono num-tabular">- R$ {discountAmount.toFixed(2)}</span>
+-                  </div>
+-                )}
+-                {tipAmount > 0 && (
+-                  <div className="flex justify-between text-gold-hover text-xs font-semibold">
+-                    <span>Gorjeta Profissional</span>
+-                    <span className="font-mono num-tabular">+ R$ {tipAmount.toFixed(2)}</span>
+-                  </div>
+-                )}
+-                <div className="flex justify-between text-content-muted text-[10px] italic">
+-                  <span>Comissão est. ({selectedBarber?.name.split(' ')[0]})</span>
+-                  <span className="font-mono num-tabular">R$ {estimatedCommission.toFixed(2)}</span>
+-                </div>
+-
+-                <div className="flex justify-between items-center text-sm font-bold text-content-base pt-2 border-t border-border-subtle">
+-                  <span>TOTAL FINAL</span>
+-                  <span className="text-lg font-bold text-status-success font-mono num-tabular">
+-                    R$ {finalTotal.toFixed(2)}
+-                  </span>
+-                </div>
+-              </div>
+-
+-              {/* PAYMENT METHOD KEYBOARD (Touch-friendly & fast selection) */}
+-              <div className="space-y-1.5 pt-1">
+-                <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider">
+-                  Forma de Pagamento Rápida
+-                </label>
+-                <div className="grid grid-cols-4 gap-1.5">
+-                  <button
+-                    onClick={() => setPaymentMethod('pix')}
+-                    className={`h-11 rounded-xl text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
+-                      paymentMethod === 'pix'
+-                        ? 'bg-gold-base/15 text-gold-hover border-gold-base'
+-                        : 'bg-surface-base border-border-subtle text-content-muted hover:text-content-base'
+-                    }`}
+-                  >
+-                    <QrCode className="w-4 h-4" />
+-                    <span>PIX</span>
+-                  </button>
+-
+-                  <button
+-                    onClick={() => setPaymentMethod('credit_card')}
+-                    className={`h-11 rounded-xl text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
+-                      paymentMethod === 'credit_card'
+-                        ? 'bg-gold-base/15 text-gold-hover border-gold-base'
+-                        : 'bg-surface-base border-border-subtle text-content-muted hover:text-content-base'
+-                    }`}
+-                  >
+-                    <CreditCard className="w-4 h-4" />
+-                    <span>Crédito</span>
+-                  </button>
+-
+-                  <button
+-                    onClick={() => setPaymentMethod('debit_card')}
+-                    className={`h-11 rounded-xl text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
+-                      paymentMethod === 'debit_card'
+-                        ? 'bg-gold-base/15 text-gold-hover border-gold-base'
+-                        : 'bg-surface-base border-border-subtle text-content-muted hover:text-content-base'
+-                    }`}
+-                  >
+-                    <CreditCard className="w-4 h-4" />
+-                    <span>Débito</span>
+-                  </button>
+-
+-                  <button
+-                    onClick={() => setPaymentMethod('cash')}
+-                    className={`h-11 rounded-xl text-xs font-bold border flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95 ${
+-                      paymentMethod === 'cash'
+-                        ? 'bg-gold-base/15 text-gold-hover border-gold-base'
+-                        : 'bg-surface-base border-border-subtle text-content-muted hover:text-content-base'
+-                    }`}
+-                  >
+-                    <DollarSign className="w-4 h-4" />
+-                    <span>Dinheiro</span>
+-                  </button>
++              {/* Forma de Pagamento */}
++              <div className="space-y-3">
++                <label className="text-[10px] font-bold uppercase tracking-wider text-content-muted">Forma de Pagamento Principal</label>
++                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
++                  {[
++                    { id: 'pix', label: 'PIX', icon: QrCode },
++                    { id: 'credit_card', label: 'Crédito', icon: CreditCard },
++                    { id: 'debit_card', label: 'Débito', icon: CreditCard },
++                    { id: 'cash', label: 'Dinheiro', icon: DollarSign },
++                  ].map(method => (
++                    <button
++                      key={method.id}
++                      onClick={() => setPaymentMethod(method.id as any)}
++                      className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition-colors ${
++                        paymentMethod === method.id 
++                          ? 'bg-gold-base/10 border-gold-base text-gold-hover shadow-sm' 
++                          : 'bg-surface-base border-border-subtle text-content-muted hover:text-content-base hover:border-border-strong'
++                      }`}
++                    >
++                      <method.icon className="w-5 h-5" />
++                      <span className="text-[11px] font-bold">{method.label}</span>
++                    </button>
++                  ))}
+                 </div>
+               </div>
+ 
+-              {/* CASH TROCO CALCULATOR & QUICK KEYPAD */}
++              {/* Troco (Apenas Dinheiro) */}
+               {paymentMethod === 'cash' && (
+-                <div className="p-2.5 rounded-xl bg-surface-base border border-border-subtle space-y-2 animate-fade-in">
+-                  <div className="flex items-center justify-between gap-2">
+-                    <span className="text-[11px] font-bold text-content-muted">Valor Recebido (R$):</span>
+-                    <input
+-                      type="text"
+-                      value={cashAmountGiven}
+-                      onChange={e => setCashAmountGiven(e.target.value)}
+-                      placeholder={finalTotal.toFixed(2)}
+-                      className="w-28 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-xs font-bold text-right text-content-base focus:outline-none focus:border-gold-base font-mono num-tabular"
+-                    />
++                <div className="p-4 bg-surface-base border border-border-subtle rounded-xl space-y-4 animate-fade-in">
++                  <label className="text-[10px] font-bold uppercase tracking-wider text-content-muted">Cálculo de Troco</label>
++                  <div className="flex gap-3">
++                    <div className="flex-1">
++                      <span className="text-[10px] text-content-muted block mb-1">Valor Recebido (R$)</span>
++                      <input
++                        type="number"
++                        min="0"
++                        step="0.01"
++                        value={cashAmountGiven}
++                        onChange={(e) => setCashAmountGiven(e.target.value)}
++                        placeholder="0.00"
++                        className="w-full bg-surface-card border border-border-subtle rounded-lg px-3 py-2 text-sm text-content-base font-mono focus:outline-none focus:border-gold-base"
++                      />
++                    </div>
++                    <div className="flex-1">
++                      <span className="text-[10px] text-content-muted block mb-1">Troco (R$)</span>
++                      <div className={`w-full bg-surface-card border rounded-lg px-3 py-2 text-sm font-mono font-bold ${changeAmount > 0 ? 'text-amber-500 border-amber-500/30' : 'text-content-muted border-border-subtle'}`}>
++                        {changeAmount > 0 ? changeAmount.toFixed(2) : '0.00'}
++                      </div>
++                    </div>
+                   </div>
+-
+-                  {/* Teclado rápido de cédulas */}
+-                  <div className="grid grid-cols-5 gap-1 pt-1">
++                  {/* Presets */}
++                  <div className="flex flex-wrap gap-2">
++                    {[10, 20, 50, 100, 200].map(val => (
++                      <button
++                        key={val}
++                        onClick={() => handleSetCashPreset(val)}
++                        className="px-3 py-1 rounded-lg bg-surface-card border border-border-subtle text-[11px] font-bold text-content-base hover:bg-gold-base/10 hover:border-gold-base hover:text-gold-hover transition-colors"
++                      >
++                        R$ {val}
++                      </button>
++                    ))}
+                     <button
+-                      type="button"
+                       onClick={() => handleSetCashPreset(finalTotal)}
+-                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-gold-hover hover:border-gold-base/50 active:scale-95 truncate"
++                      className="px-3 py-1 rounded-lg bg-surface-card border border-border-subtle text-[11px] font-bold text-status-success hover:bg-status-success/10 hover:border-status-success transition-colors ml-auto"
+                     >
+-                      Exato
+-                    </button>
+-                    <button
+-                      type="button"
+-                      onClick={() => handleSetCashPreset(50)}
+-                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
+-                    >
+-                      R$ 50
+-                    </button>
+-                    <button
+-                      type="button"
+-                      onClick={() => handleSetCashPreset(100)}
+-                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
+-                    >
+-                      R$ 100
+-                    </button>
+-                    <button
+-                      type="button"
+-                      onClick={() => handleSetCashPreset(150)}
+-                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
+-                    >
+-                      R$ 150
+-                    </button>
+-                    <button
+-                      type="button"
+-                      onClick={() => handleSetCashPreset(200)}
+-                      className="h-8 rounded-xl bg-surface-card border border-border-subtle text-[10px] font-bold text-content-base hover:border-gold-base/50 active:scale-95"
+-                    >
+-                      R$ 200
++                      Valor Exato
+                     </button>
+                   </div>
+-
+-                  {cashNum > 0 && (
+-                    <div className="flex justify-between items-center text-xs font-bold pt-1 border-t border-border-subtle">
+-                      <span className="text-content-muted">Troco a devolver:</span>
+-                      <span className={changeAmount >= 0 ? 'text-status-success font-bold font-mono num-tabular' : 'text-status-error font-mono num-tabular'}>
+-                        R$ {changeAmount.toFixed(2)}
+-                      </span>
+-                    </div>
+-                  )}
+                 </div>
+               )}
+-
+-              {/* FINAL CHECKOUT ACTION BUTTON (DESKTOP) */}
+-              <button
+-                onClick={handleFinalizeSale}
+-                disabled={cart.length === 0 || !isCaixaOpen || isFinalizing}
+-                className="hidden md:flex w-full h-11 px-4 rounded-xl bg-gold-base hover:bg-gold-hover disabled:opacity-40 text-surface-base font-bold text-xs items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
+-              >
+-                {isFinalizing ? (
+-                  <RefreshCw className="w-4 h-4 animate-spin" />
+-                ) : (
+-                  <CheckCircle2 className="w-4 h-4" />
+-                )}
+-                <span>{isFinalizing ? 'PROCESSANDO...' : `FINALIZAR E EMITIR RECIBO (R$ ${finalTotal.toFixed(2)})`}</span>
+-              </button>
+-
+-            </div>
+-          </div>
+-        </div>
+-
+-      </div>
+-
+-      {/* FIXED MOBILE BOTTOM CHECKOUT SUMMARY BAR (Acima da Bottom Bar no Mobile) */}
+-      <div className="fixed bottom-16 left-0 right-0 z-40 bg-surface-card border-t border-border-subtle p-3 shadow-2xl md:hidden animate-fade-in flex items-center justify-between gap-3">
+-        <div className="min-w-0 flex-1">
+-          <span className="text-[10px] text-content-muted font-bold uppercase block truncate">
+-            {cart.length} {cart.length === 1 ? 'item selecionado' : 'itens selecionados'}
+-          </span>
+-          <div className="text-base font-bold text-status-success font-mono num-tabular truncate">
+-            R$ {finalTotal.toFixed(2)}
+-          </div>
+-        </div>
+-
+-        <button
+-          onClick={handleFinalizeSale}
+-          disabled={cart.length === 0 || !isCaixaOpen || isFinalizing}
+-          className="h-11 px-4 bg-gold-base text-surface-base font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shrink-0 hover:bg-gold-hover active:scale-95 disabled:opacity-40 shadow-lg whitespace-nowrap"
+-        >
+-          {isFinalizing ? (
+-            <RefreshCw className="w-4 h-4 animate-spin" />
+-          ) : (
+-            <CheckCircle2 className="w-4 h-4" />
+-          )}
+-          <span>{isFinalizing ? 'Processando...' : 'Finalizar Venda'}</span>
+-        </button>
+-      </div>
+-
+-      {/* RECEIPT / COMPROVANTE MODAL */}
+-      {showReceiptModal && lastTransaction && (
+-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+-          <div className="w-full max-w-sm my-auto bg-stone-900 rounded-lg p-3 sm:p-4 border border-stone-800 shadow-2xl space-y-3 relative">
+-            
+-            {/* Modal Header */}
+-            <div className="flex items-center justify-between pb-2 border-b border-stone-800">
+-              <div className="flex items-center gap-2">
+-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+-                <h3 className="text-xs font-serif font-bold text-stone-200">Venda Finalizada</h3>
+-              </div>
+-              <button
+-                onClick={() => setShowReceiptModal(false)}
+-                className="w-7 h-7 rounded-xl bg-stone-800 hover:bg-stone-700 flex items-center justify-center text-stone-400 hover:text-white transition-colors"
+-              >
+-                <X className="w-3.5 h-3.5" />
+-              </button>
+             </div>
+ 
+-            {/* REALISTIC THERMAL PAPER TICKET */}
+-            <div className="bg-[#FAF8F5] text-stone-900 p-4 rounded-lg shadow-inner font-mono text-xs space-y-3 relative overflow-hidden border border-stone-200 select-text">
++            {/* Direita: Resumo */}
++            <div className="flex-1 flex flex-col min-h-0 bg-surface-base border border-border-subtle rounded-xl p-4">
++              <h3 className="text-sm font-bold text-content-base mb-4 flex items-center gap-2">
++                <Receipt className="w-4 h-4 text-gold-base" /> Resumo da Venda
++              </h3>
+               
+-              {/* Serrated Top Edge simulation */}
+-              <div className="absolute top-0 left-0 right-0 h-1 bg-stone-300 border-b border-dashed border-stone-400 opacity-60" />
+-
+-              {/* Receipt Header */}
+-              <div className="text-center pt-1 border-b-2 border-dashed border-stone-800 pb-3 space-y-1">
+-                <div className="w-8 h-8 rounded-xl bg-stone-900 text-amber-400 flex items-center justify-center mx-auto mb-1">
+-                  <Scissors className="w-4 h-4" />
+-                </div>
+-                <h2 className="text-base font-bold font-serif tracking-wider text-stone-900 uppercase">BARBEARIA NAVO</h2>
+-                <p className="text-[9px] uppercase tracking-widest text-stone-600">Unidade Jardins • São Paulo/SP</p>
+-                <p className="text-[8px] text-stone-500">CNPJ: 45.892.102/0001-90 | TEL: (11) 99999-8888</p>
+-                <div className="inline-block mt-1 px-2 py-0.5 bg-stone-900 text-stone-100 text-[9px] font-bold tracking-widest uppercase rounded-lg">
+-                  COMPROVANTE DE VENDA
+-                </div>
+-              </div>
+-
+-              {/* Transaction Metadata */}
+-              <div className="space-y-1 text-[11px] py-1 border-b border-dashed border-stone-400">
+-                <div className="flex justify-between">
+-                  <span className="text-stone-600">Comprovante:</span>
+-                  <span className="font-bold">#{lastTransaction.id}</span>
+-                </div>
+-                <div className="flex justify-between">
+-                  <span className="text-stone-600">Data/Hora:</span>
+-                  <span>{new Date().toLocaleDateString('pt-BR')} {lastTransaction.timestamp}</span>
+-                </div>
+-                <div className="flex justify-between">
+-                  <span className="text-stone-600">Cliente:</span>
+-                  <span className="font-bold truncate max-w-[170px] text-right">{lastTransaction.clientName}</span>
+-                </div>
+-                {lastTransaction.clientPhone && (
+-                  <div className="flex justify-between">
+-                    <span className="text-stone-600">Telefone:</span>
+-                    <span>{lastTransaction.clientPhone}</span>
+-                  </div>
+-                )}
+-                <div className="flex justify-between">
+-                  <span className="text-stone-600">Atendente:</span>
+-                  <span className="font-bold">{lastTransaction.professionalName}</span>
++              <div className="space-y-3 mb-6">
++                <div className="flex justify-between text-xs text-content-base">
++                  <span>Subtotal ({cart.reduce((a,b)=>a+b.quantity,0)} itens)</span>
++                  <span className="font-mono">R$ {subtotal.toFixed(2)}</span>
+                 </div>
+-              </div>
+-
+-              {/* Line Items Table */}
+-              <div className="space-y-1.5 py-1">
+-                <div className="flex justify-between text-[10px] font-bold text-stone-600 uppercase border-b border-stone-800 pb-1">
+-                  <span>Qtd Item</span>
+-                  <span>Valor</span>
+-                </div>
+-
+-                {lastTransaction.items.map((it, idx) => (
+-                  <div key={idx} className="flex justify-between items-start text-[11px] gap-2">
+-                    <span className="truncate pr-1">{it.quantity}x {it.title}</span>
+-                    <span className="font-bold shrink-0 font-mono">R$ {(it.price * it.quantity).toFixed(2)}</span>
+-                  </div>
+-                ))}
+-              </div>
+-
+-              {/* Totals & Financial Breakdown */}
+-              <div className="border-t-2 border-dashed border-stone-800 pt-2 space-y-1 text-[11px]">
+-                <div className="flex justify-between text-stone-600">
+-                  <span>Subtotal:</span>
+-                  <span>R$ {lastTransaction.subtotal.toFixed(2)}</span>
+-                </div>
+-
+-                {lastTransaction.discount > 0 && (
+-                  <div className="flex justify-between text-emerald-700 font-semibold">
+-                    <span>Desconto:</span>
+-                    <span>- R$ {lastTransaction.discount.toFixed(2)}</span>
++                {discountAmount > 0 && (
++                  <div className="flex justify-between text-xs text-status-error font-medium">
++                    <span>Desconto</span>
++                    <span className="font-mono">- R$ {discountAmount.toFixed(2)}</span>
+                   </div>
+                 )}
+-
+-                {lastTransaction.tip > 0 && (
+-                  <div className="flex justify-between text-amber-700 font-semibold">
+-                    <span>Gorjeta Barbeiro:</span>
+-                    <span>+ R$ {lastTransaction.tip.toFixed(2)}</span>
++                {tipAmount > 0 && (
++                  <div className="flex justify-between text-xs text-amber-500 font-medium">
++                    <span>Gorjeta / Extra</span>
++                    <span className="font-mono">+ R$ {tipAmount.toFixed(2)}</span>
+                   </div>
+                 )}
+-
+-                <div className="flex justify-between items-center text-sm font-bold pt-2 border-t-2 border-stone-900 border-b-2 py-1 my-1">
+-                  <span>TOTAL PAGO</span>
+-                  <span className="text-base text-emerald-800 font-mono font-black">
+-                    R$ {lastTransaction.total.toFixed(2)}
++                <div className="pt-3 border-t border-dashed border-border-subtle flex justify-between items-center">
++                  <span className="font-bold text-content-base">TOTAL A PAGAR</span>
++                  <span className="text-xl font-black text-status-success font-mono">
++                    R$ {finalTotal.toFixed(2)}
+                   </span>
+                 </div>
+-
+-                <div className="flex justify-between pt-1">
+-                  <span className="text-stone-600">Forma Pagto:</span>
+-                  <span className="font-bold uppercase">{lastTransaction.paymentMethod}</span>
+-                </div>
+-
+-                {lastTransaction.paymentDetails && (
+-                  <div className="text-[10px] text-stone-600 italic text-right">
+-                    {lastTransaction.paymentDetails}
+-                  </div>
+-                )}
+               </div>
+ 
+-              {/* Receipt Footer */}
+-              <div className="text-center pt-3 border-t border-dashed border-stone-400 space-y-1">
+-                <p className="font-bold text-[10px] text-stone-900 uppercase tracking-wider">OBRIGADO PELA PREFERÊNCIA!</p>
+-                <p className="text-[9px] text-stone-600">Corte, Barba e Estilo com Tradição</p>
+-                <div className="font-mono text-xs tracking-[0.3em] font-bold pt-1 select-none opacity-80">
+-                  |||| ||||| ||| |||||||
+-                </div>
+-                <p className="text-[8px] text-stone-500 tracking-wider font-mono">
+-                  AUT: {lastTransaction.id}-{Date.now().toString().slice(-4)}
+-                </p>
++              <div className="mt-auto space-y-2">
++                <button
++                  onClick={handleFinalizeSale}
++                  disabled={isFinalizing || !isCaixaOpen}
++                  className="w-full h-12 rounded-xl bg-status-success hover:bg-[#168a48] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 shadow-md"
++                >
++                  <CheckCircle2 className="w-5 h-5" />
++                  {isFinalizing ? 'Registrando...' : 'Finalizar Venda'}
++                </button>
++                <button
++                  onClick={() => setCurrentStep(2)}
++                  disabled={isFinalizing}
++                  className="w-full h-10 rounded-xl bg-transparent border border-border-subtle text-content-muted hover:text-content-base font-bold text-xs flex items-center justify-center transition-colors"
++                >
++                  Voltar para o Carrinho
++                </button>
+               </div>
++            </div>
++          </div>
++        )}
++      </div>
+ 
+-              {/* Serrated Bottom Edge simulation */}
+-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-stone-300 border-t border-dashed border-stone-400 opacity-60" />
++      {/* RECEIPT MODAL */}
++      {showReceiptModal && lastTransaction && (
++        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-sm animate-fade-in">
++          <div className="w-full max-w-sm bg-surface-card border border-border-subtle rounded-2xl shadow-2xl p-5 flex flex-col gap-4 relative overflow-hidden">
++            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gold-base via-amber-500 to-gold-base" />
++            
++            <div className="text-center space-y-1 pt-2">
++              <div className="w-12 h-12 bg-status-success/20 text-status-success rounded-full flex items-center justify-center mx-auto mb-2 shadow-inner">
++                <Check className="w-6 h-6" />
++              </div>
++              <h3 className="font-serif font-bold text-content-base text-lg">Venda Concluída!</h3>
++              <p className="text-xs text-content-muted">Recibo <strong>{lastTransaction.id}</strong> gerado com sucesso.</p>
+             </div>
+ 
+-            {/* ACTION BUTTONS (IMPRIMIR, WHATSAPP, CONCLUIR) */}
+-            <div className="grid grid-cols-3 gap-2 pt-1">
++            <div className="grid grid-cols-2 gap-2 pt-4 border-t border-border-subtle">
+               <button
+                 onClick={() => handlePrintReceipt(lastTransaction)}
+-                className="h-10 rounded-xl bg-gold-base hover:bg-gold-hover text-surface-base font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all cursor-pointer"
+-                title="Imprimir Comprovante"
++                className="h-10 rounded-xl bg-gold-base hover:bg-gold-hover text-surface-base font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all"
+               >
+                 <Printer className="w-4 h-4" />
+-                <span>Imprimir</span>
++                Imprimir
+               </button>
+-
+               <button
+                 onClick={() => handleShareWhatsApp(lastTransaction)}
+-                className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all cursor-pointer"
+-                title="Enviar por WhatsApp"
++                className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all"
+               >
+                 <Share2 className="w-4 h-4" />
+-                <span>WhatsApp</span>
+-              </button>
+-
+-              <button
+-                onClick={() => setShowReceiptModal(false)}
+-                className="h-10 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
+-              >
+-                <span>Concluir</span>
++                WhatsApp
+               </button>
+             </div>
+-
++            
++            <button
++              onClick={() => setShowReceiptModal(false)}
++              className="w-full h-10 rounded-xl border border-border-subtle text-content-base hover:bg-surface-base font-bold text-xs flex items-center justify-center transition-colors"
++            >
++              Nova Venda
++            </button>
+           </div>
+         </div>
+       )}
+ 
+-      {/* HISTÓRICO DE VENDAS DO DIA MODAL */}
++      {/* HISTÓRICO DE VENDAS MODAL */}
+       {showSalesHistory && (
+         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-sm animate-fade-in">
+-          <div className="w-full max-w-2xl bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5 shadow-2xl space-y-3 max-h-[85vh] flex flex-col">
+-            <div className="flex items-center justify-between pb-2.5 border-b border-border-subtle">
++          <div className="w-full max-w-2xl bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5 shadow-2xl flex flex-col h-[85vh]">
++            <div className="flex items-center justify-between pb-3 border-b border-border-subtle mb-3 shrink-0">
+               <div className="flex items-center gap-2">
+-                <Receipt className="w-4 h-4 text-gold-hover" />
+-                <h3 className="font-serif font-bold text-content-base text-sm">Vendas e Recebimentos de Hoje</h3>
++                <Receipt className="w-5 h-5 text-gold-base" />
++                <h3 className="font-bold text-content-base text-sm">Vendas de Hoje</h3>
+               </div>
+-              <button
+-                onClick={() => setShowSalesHistory(false)}
+-                className="w-7 h-7 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-center text-content-muted hover:text-content-base"
+-              >
+-                <X className="w-4 h-4" />
+-              </button>
++              <button onClick={() => setShowSalesHistory(false)} className="text-content-muted hover:text-content-base"><X className="w-5 h-5"/></button>
+             </div>
+-
+-            <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar no-scrollbar min-w-0">
++            
++            <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-2 min-h-0">
+               {todaysSales.length === 0 ? (
+-                <div className="text-center py-12 text-content-muted text-xs">
+-                  Nenhuma venda realizada hoje ainda.
++                <div className="text-center py-12 text-content-muted text-xs border border-dashed border-border-subtle rounded-xl">
++                  Nenhuma venda realizada hoje.
+                 </div>
+               ) : (
+                 todaysSales.map((sale) => (
+-                  <div
+-                    key={sale.id}
+-                    className="p-3 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-between gap-3 min-w-0"
+-                  >
++                  <div key={sale.id} className="p-3 rounded-xl bg-surface-base border border-border-subtle flex items-center justify-between gap-3">
+                     <div className="space-y-1 min-w-0 flex-1">
+-                      <div className="flex items-center gap-2 min-w-0">
+-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-xl bg-gold-base/15 text-gold-hover font-mono shrink-0">
+-                          {sale.timestamp}
+-                        </span>
+-                        <h4 className="font-bold text-content-base text-xs truncate min-w-0">{sale.clientName}</h4>
+-                        <span className="text-[10px] text-content-muted shrink-0 hidden sm:inline">({sale.professionalName})</span>
++                      <div className="flex items-center gap-2">
++                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gold-base/10 text-gold-hover font-mono shrink-0">{sale.timestamp}</span>
++                        <h4 className="font-bold text-content-base text-xs truncate">{sale.clientName}</h4>
+                       </div>
+-                      <p className="text-[11px] text-content-muted truncate">
+-                        {sale.items.map(i => `${i.quantity}x ${i.title}`).join(', ')}
+-                      </p>
++                      <p className="text-[11px] text-content-muted truncate">{sale.professionalName} • {sale.items.map(i => `${i.quantity}x ${i.title}`).join(', ')}</p>
+                     </div>
+-
+-                    <div className="text-right shrink-0 whitespace-nowrap">
+-                      <span className="block font-bold text-status-success text-xs font-mono num-tabular">
+-                        R$ {sale.total.toFixed(2)}
+-                      </span>
+-                      <span className="text-[10px] font-bold text-content-muted uppercase">
+-                        {sale.paymentMethod}
+-                      </span>
++                    <div className="text-right shrink-0">
++                      <span className="block font-bold text-status-success text-sm font-mono">R$ {sale.total.toFixed(2)}</span>
++                      <span className="text-[10px] font-bold text-content-muted uppercase">{sale.paymentMethod}</span>
+                     </div>
+                   </div>
+                 ))
+               )}
+             </div>
+ 
+-            <div className="pt-2.5 border-t border-border-subtle flex justify-between items-center text-xs">
+-              <span className="text-content-muted">{todaysSales.length} transação(ões)</span>
+-              <span className="font-bold text-content-base">Faturamento: <strong className="text-status-success text-xs font-mono font-bold num-tabular">R$ {totalRevenueToday.toFixed(2)}</strong></span>
++            <div className="pt-3 border-t border-border-subtle flex justify-between items-center text-xs shrink-0 mt-3">
++              <span className="text-content-muted font-bold">{todaysSales.length} vendas</span>
++              <span className="font-bold text-content-base">Total Faturado: <strong className="text-status-success text-sm font-mono">R$ {totalRevenueToday.toFixed(2)}</strong></span>
+             </div>
+           </div>
+         </div>
+       )}
+-
+     </div>
+   );
+ };
