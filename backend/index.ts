@@ -105,14 +105,7 @@ app.use("/api", async (req, res, next) => {
   // Rotas públicas que não precisam de banco ou possuem dados de fallback
   const publicRoutes = [
     '/whatsapp/status',
-    '/services',
-    '/professionals',
-    '/shop-profile',
-    '/products',
-    '/rewards',
-    '/availability',
-    '/loyalty/config',
-    '/reviews/public'
+    '/health'
   ];
   if (publicRoutes.includes(req.path)) {
     return next();

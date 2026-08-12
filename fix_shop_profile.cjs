@@ -1,4 +1,6 @@
-import { authFetch } from '../lib/api';
+const fs = require('fs');
+
+const content = `import { authFetch } from '../lib/api';
 import { getDayOfWeekKey, timeToMinutes, minutesToTime, getTodayStringBRT } from '../utils/dateUtils';
 
 export interface OperatingDaySchedule {
@@ -187,3 +189,7 @@ export function generateTimeSlotsFromProfile(
   }
   return slots;
 }
+`;
+
+fs.writeFileSync('src/services/shopProfileService.ts', content);
+console.log('Fixed shopProfileService.ts');
