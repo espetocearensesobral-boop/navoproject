@@ -88,17 +88,17 @@ appointmentsRouter.post("/lookup/verify", sensitiveOpsLimiter, async (req: any, 
       
     const candidates = allApts.filter((apt: any) => matchPhoneNumbers(apt.clientPhone, inputPhone));
     
-    const isMatch = candidates.some((apt: any) => {
+    const matchedApt = candidates.find((apt: any) => {
       const aptCode = (apt.bookingCode || apt.id || '').toUpperCase();
-      return aptCode === cleanCode || aptCode.endsWith(cleanCode) || cleanCode.endsWith(aptCode) || apt.id.toUpperCase().includes(cleanCode);
+      return aptCode === cleanCode;
     });
 
-    if (!isMatch) {
+    if (!matchedApt) {
       return res.status(401).json({ error: 'Código de confirmação incorreto para o telefone informado.' });
     }
 
     const token = jwt.sign(
-      { role: 'guest_auth', phone: inputPhone, id: `guest_${Date.now()}` },
+      { role: 'guest_auth', phone: inputPhone, appointmentId: matchedApt.id, id: `guest_${Date.now()}` },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
@@ -154,6 +154,9 @@ appointmentsRouter.get("/lookup/step2", optionalAuth, async (req: any, res) => {
       try {
         const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
         if (guestDecoded.phone && matchPhoneNumbers(guestDecoded.phone, inputPhone)) {
+          // Extra security: ensure the guest token is bound to this specific appointment
+          // We will verify this further down when we find the appointment
+          req.user = { ...req.user, guestAppointmentId: guestDecoded.appointmentId };
           isAuthorized = true;
         }
       } catch (e) {
@@ -177,8 +180,15 @@ appointmentsRouter.get("/lookup/step2", optionalAuth, async (req: any, res) => {
 
     const appointment = candidates.find((apt: any) => {
       const aptCode = (apt.bookingCode || apt.id || '').toUpperCase();
-      return aptCode === cleanCode || aptCode.endsWith(cleanCode) || cleanCode.endsWith(aptCode) || apt.id.toUpperCase().includes(cleanCode);
+      return aptCode === cleanCode;
     });
+
+    // Validar também o vínculo exato do token com o agendamento
+    if (appointment && !isAdmin && req.cookies?.guest_token) {
+      if (req.user?.guestAppointmentId && req.user.guestAppointmentId !== appointment.id) {
+        return res.status(403).json({ error: 'Acesso negado: Sessão não autorizada para este agendamento.' });
+      }
+    }
 
     if (!appointment) {
       return res.status(404).json({ 
@@ -243,6 +253,9 @@ appointmentsRouter.patch("/lookup/cancel", sensitiveOpsLimiter, optionalAuth, as
       try {
         const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
         if (guestDecoded.phone && matchPhoneNumbers(guestDecoded.phone, inputPhone)) {
+          // Extra security: ensure the guest token is bound to this specific appointment
+          // We will verify this further down when we find the appointment
+          req.user = { ...req.user, guestAppointmentId: guestDecoded.appointmentId };
           isAuthorized = true;
         }
       } catch (e) {
@@ -266,8 +279,15 @@ appointmentsRouter.patch("/lookup/cancel", sensitiveOpsLimiter, optionalAuth, as
 
     const appointment = candidates.find((apt: any) => {
       const aptCode = (apt.bookingCode || apt.id || '').toUpperCase();
-      return aptCode === cleanCode || aptCode.endsWith(cleanCode) || cleanCode.endsWith(aptCode) || apt.id.toUpperCase().includes(cleanCode);
+      return aptCode === cleanCode;
     });
+
+    // Validar também o vínculo exato do token com o agendamento
+    if (appointment && !isAdmin && req.cookies?.guest_token) {
+      if (req.user?.guestAppointmentId && req.user.guestAppointmentId !== appointment.id) {
+        return res.status(403).json({ error: 'Acesso negado: Sessão não autorizada para este agendamento.' });
+      }
+    }
 
     if (!appointment) {
       return res.status(404).json({ error: 'Reserva não encontrada. Verifique os dados.' });
@@ -334,6 +354,8 @@ appointmentsRouter.get("/", optionalAuth, async (req: any, res) => {
           const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
           if (guestDecoded.phone && matchPhoneNumbers(guestDecoded.phone, searchPhone)) {
             isAuthorized = true;
+            // Restrict search to only the appointment authorized by this guest token
+            req.user = { ...req.user, guestAppointmentId: guestDecoded.appointmentId };
           }
         } catch (e) {
           // Token inválido ou expirado
@@ -344,7 +366,10 @@ appointmentsRouter.get("/", optionalAuth, async (req: any, res) => {
         return res.status(401).json({ error: 'Sessão expirada ou não autorizada. Valide o código novamente.' });
       }
 
-      const filtered = dbApts.filter(a => matchPhoneNumbers(a.clientPhone, searchPhone));
+      let filtered = dbApts.filter(a => matchPhoneNumbers(a.clientPhone, searchPhone));
+      if (!isAdmin && !(req.user?.phone && matchPhoneNumbers(req.user.phone, searchPhone)) && req.user?.guestAppointmentId) {
+        filtered = filtered.filter(a => a.id === req.user.guestAppointmentId);
+      }
       return res.json(filtered);
     }
 
@@ -808,7 +833,9 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
         try {
           const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
           if (guestDecoded.phone && dbApt.clientPhone && matchPhoneNumbers(guestDecoded.phone, dbApt.clientPhone)) {
-            isGuestTokenMatch = true;
+            if (guestDecoded.appointmentId === dbApt.id) {
+              isGuestTokenMatch = true;
+            }
           }
         } catch (e) {}
       }
@@ -880,7 +907,9 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
         try {
           const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
           if (guestDecoded.phone && dbApt.clientPhone && matchPhoneNumbers(guestDecoded.phone, dbApt.clientPhone)) {
-            isGuestTokenMatch = true;
+            if (guestDecoded.appointmentId === dbApt.id) {
+              isGuestTokenMatch = true;
+            }
           }
         } catch (e) {}
       }

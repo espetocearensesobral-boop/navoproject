@@ -58,6 +58,45 @@ if (!process.env.DATABASE_URL && !process.env.SQL_HOST) {
   console.warn("NOTICE: DATABASE_URL or SQL_HOST not defined. Ensure Supabase credentials are configured.");
 }
 
+export let db: any = null;
+export let isDbConnected = false;
+export let dbReadyPromise: any = null;
+
+const MAX_INIT_ATTEMPTS = 5;
+let dbInitAttempts = 0;
+
+export async function initializeDb(): Promise<void> {
+  try {
+    const dbUrl = process.env.DATABASE_URL;
+    const sqlHost = process.env.SQL_HOST;
+
+    if (dbUrl || sqlHost) {
+      const connectionString = dbUrl || `postgres://${process.env.SQL_USER}:${process.env.SQL_PASSWORD}@${sqlHost}:5432/${process.env.SQL_DB_NAME}`;
+      const sqlClient = postgres(connectionString, { max: 5 });
+      db = drizzle(sqlClient, { schema });
+      isDbConnected = true;
+      console.log('[API] ✅ Conexão com Supabase estabelecida com sucesso.');
+    } else {
+      throw new Error('Variáveis de ambiente do banco de dados não estão configuradas.');
+    }
+  } catch (err: any) {
+    console.error('[API] ❌ Falha ao conectar ao banco:', err.message);
+    if (dbInitAttempts < MAX_INIT_ATTEMPTS) {
+      dbInitAttempts++;
+      const delay = dbInitAttempts * 1000;
+      console.log(`[API] Tentativa ${dbInitAttempts}/${MAX_INIT_ATTEMPTS} de reconexão em ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return initializeDb();
+    }
+    db = null;
+    isDbConnected = false;
+    console.error('[API] ❌ Não foi possível conectar ao banco de dados Supabase.');
+  }
+}
+
+dbReadyPromise = initializeDb();
+
+
 app.use(validateOrigin);
 
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false, frameguard: { action: 'deny' } }));
@@ -99,212 +138,8 @@ app.use("/api", async (req, res, next) => {
 
   // Verificação final
   if (!isDbConnected || !db) {
-    return res.status(503).json({ 
-      error: userErrors.dbDisconnected 
-    });
-  }
-
-  next();
-});
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ limit: "2mb", extended: true }));
-app.use(cookieParser());
-
-// JSON malformado no corpo da requisição: resposta JSON uniforme,
-// em vez da página HTML de erro padrão do Express.
-app.use((err: any, req: any, res: any, next: any) => {
-  if (err?.type === 'entity.parse.failed' || err instanceof SyntaxError) {
-    return res.status(400).json({ error: 'Corpo da requisição em formato inválido.' });
-  }
-  next(err);
-});
-
-
-
-
-// =====================================================================
-// INICIALIZAÇÃO DO BANCO DE DADOS SUPABASE COM RETRY
-// =====================================================================
-export let db: any = null;
-export let isDbConnected = false;
-export let dbInitAttempts = 0;
-export const MAX_INIT_ATTEMPTS = 2;
-
-async function initializeDb(): Promise<void> {
-  try {
-    const connectionString = process.env.DATABASE_URL;
-    
-    if (!connectionString) {
-      db = null;
-      isDbConnected = false;
-      console.error('[API] ❌ DATABASE_URL não foi configurada no ambiente.');
-      return;
-    }
-
-    if (!connectionString.startsWith('postgres://') && !connectionString.startsWith('postgresql://')) {
-      db = null;
-      isDbConnected = false;
-      console.error('[API] ❌ DATABASE_URL possui formato inválido.');
-      return;
-    }
-
-    const queryClient = postgres(connectionString, { 
-      max: 10, 
-      // 'require' habilita TLS e mantém a verificação do certificado do servidor,
-      // evitando exposição a ataques man-in-the-middle na conexão com o banco.
-      ssl: connectionString.includes('supabase') ? 'require' : undefined,
-      connect_timeout: 10,
-    });
-    
-    await queryClient`SELECT 1`;
-    db = drizzle(queryClient, { schema });
-    isDbConnected = true;
-    dbInitAttempts = 0;
-    console.log('[API] ✅ Conectado ao Banco de Dados Supabase com sucesso.');
-
-    try {
-      await queryClient`SET client_min_messages TO WARNING;`;
-      await queryClient`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS booking_code text;`;
-      await queryClient`
-        CREATE TABLE IF NOT EXISTS schedule_blocks (
-          id text PRIMARY KEY,
-          professional_id text NOT NULL,
-          date text NOT NULL,
-          start_time text NOT NULL,
-          end_time text NOT NULL,
-          reason text,
-          created_at timestamp DEFAULT now() NOT NULL
-        );
-      `;
-      await queryClient`
-        CREATE TABLE IF NOT EXISTS cash_transactions (
-          id text PRIMARY KEY,
-          type text NOT NULL,
-          description text NOT NULL,
-          amount numeric(10, 2) NOT NULL,
-          category text NOT NULL,
-          payment_method text NOT NULL,
-          date text NOT NULL,
-          status text NOT NULL DEFAULT 'completed',
-          professional_name text,
-          notes text,
-          created_at timestamp DEFAULT now() NOT NULL
-        );
-      `;
-      await queryClient`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS referral_code text;`;
-      await queryClient`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS referred_by text;`;
-      await queryClient`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS birthday text;`;
-      await queryClient`
-        CREATE TABLE IF NOT EXISTS point_transactions (
-          id text PRIMARY KEY,
-          client_id text NOT NULL,
-          amount integer NOT NULL,
-          type text NOT NULL,
-          description text NOT NULL,
-          created_at timestamp DEFAULT now() NOT NULL
-        );
-      `;
-      await queryClient`
-        CREATE TABLE IF NOT EXISTS referrals (
-          id text PRIMARY KEY,
-          referrer_id text NOT NULL,
-          referred_id text NOT NULL,
-          status text NOT NULL DEFAULT 'pending',
-          points_awarded integer NOT NULL DEFAULT 0,
-          created_at timestamp DEFAULT now() NOT NULL
-        );
-      `;
-      await queryClient`
-        CREATE TABLE IF NOT EXISTS rewards (
-          id text PRIMARY KEY,
-          title text NOT NULL,
-          points_required integer NOT NULL,
-          reward_type text NOT NULL,
-          value_description text NOT NULL,
-          icon text,
-          is_active boolean NOT NULL DEFAULT true,
-          created_at timestamp DEFAULT now() NOT NULL
-        );
-      `;
-      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS client_id text;`;
-      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS understood_request text;`;
-      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS wait_time_acceptable text;`;
-      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS would_recommend text;`;
-      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS has_photo boolean DEFAULT false;`;
-      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS photo_url text;`;
-      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS points_awarded integer DEFAULT 0;`;
-      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS admin_response text;`;
-      await queryClient`
-        CREATE TABLE IF NOT EXISTS shop_settings (
-          id text PRIMARY KEY DEFAULT 'default',
-          name text NOT NULL DEFAULT 'Navo Barber & Club',
-          unit_name text NOT NULL DEFAULT 'Unidade Jardins',
-          slogan text NOT NULL DEFAULT 'Estilo, Tradição e Excelência na Medida Certa',
-          address text NOT NULL DEFAULT 'Rua Augusta, 1420 - Jardins, São Paulo - SP',
-          phone text NOT NULL DEFAULT '(11) 99999-8888',
-          whatsapp text NOT NULL DEFAULT '5511999998888',
-          open_time text NOT NULL DEFAULT '09:00',
-          close_time text NOT NULL DEFAULT '20:00',
-          operating_days jsonb NOT NULL DEFAULT '[1,2,3,4,5,6]'::jsonb,
-          operating_schedule jsonb NOT NULL DEFAULT '{"sunday":{"active":false,"open":"10:00","close":"16:00"},"monday":{"active":true,"open":"09:00","close":"20:00"},"tuesday":{"active":true,"open":"09:00","close":"20:00"},"wednesday":{"active":true,"open":"09:00","close":"20:00"},"thursday":{"active":true,"open":"09:00","close":"20:00"},"friday":{"active":true,"open":"09:00","close":"21:00"},"saturday":{"active":true,"open":"09:00","close":"20:00"}}'::jsonb,
-          maps_url text DEFAULT 'https://maps.google.com/?q=Rua+Augusta+1420+Jardins+Sao+Paulo',
-          instagram text DEFAULT '@barbearianavo',
-          logo_url text,
-          description text DEFAULT 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.',
-          updated_at timestamp DEFAULT NOW()
-        );
-      `;
-
-      // Auto-seed inicial se a tabela de serviços estiver vazia no Supabase
-      try {
-        const servicesCount = await queryClient`SELECT count(*)::int FROM services;`;
-        if (servicesCount && servicesCount[0] && Number(servicesCount[0].count) === 0) {
-          console.log('[API] 📦 Tabela de serviços vazia no Supabase.');
-          // Auto-seed removed from initialization, please call /api/seed route explicitly.
-        }
-      } catch (seedErr: any) {
-        console.warn('[API] Aviso ao verificar auto-seed:', seedErr.message);
-      }
-    } catch (migErr: any) {
-      console.warn('[API] Aviso na migração de tabelas:', migErr.message);
-    }
-
-  } catch (err: any) {
-    console.error('[API] ❌ Falha ao conectar ao banco:', err.message);
-    
-    if (dbInitAttempts < MAX_INIT_ATTEMPTS) {
-      dbInitAttempts++;
-      const delay = dbInitAttempts * 1000;
-      console.log(`[API] Tentativa ${dbInitAttempts}/${MAX_INIT_ATTEMPTS} de reconexão em ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      return initializeDb();
-    }
-
-    db = null;
-    isDbConnected = false;
-    console.error('[API] ❌ Não foi possível conectar ao banco de dados Supabase.');
-  }
-}
-
-const dbReadyPromise = initializeDb();
-
-// Middleware de verificação de conexão com o banco de dados
-app.use(async (req: any, res: any, next: any) => {
-  if (!req.path.startsWith('/api')) {
-    return next();
-  }
-
-  await dbReadyPromise.catch(() => {});
-
-  if (req.path === '/api/health' || req.path === '/api/whatsapp/status') {
-    return next();
-  }
-
-  if (!isDbConnected || !db) {
     return res.status(503).json({
-      error: 'Serviço temporariamente indisponível',
-      message: 'Não foi possível comunicar com o banco de dados Supabase. Por favor, verifique sua conexão e tente novamente.',
-      code: 'DATABASE_UNAVAILABLE'
+      error: userErrors.dbDisconnected
     });
   }
 

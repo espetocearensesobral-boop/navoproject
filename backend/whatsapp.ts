@@ -70,7 +70,9 @@ export async function sendWhatsAppMessage(phone: string, message: string) {
 }
 
 // API Endpoints para o Frontend
-router.get('/status', (req, res) => {
+import { requireAuth, requireAdmin } from './middleware/auth.js';
+
+router.get('/status', requireAuth, requireAdmin, (req, res) => {
   res.json({
     state: connectionState,
     configured: connectionState === 'open',
