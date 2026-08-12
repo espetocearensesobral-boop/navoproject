@@ -393,7 +393,6 @@ export const ClientApp: React.FC = () => {
                   <div className="text-left">
                     <h1 className="text-sm font-semibold text-content-base">Olá, {currentUser.name}</h1>
                     <span className="text-[10px] font-bold bg-gradient-to-r from-content-base to-content-base bg-clip-text text-transparent flex items-center space-x-1">
-                      <Sparkles className="w-3 h-3 text-gold-base" />
                       <span>{currentUser.loyalty_points || 0} Pts • {currentUser.loyalty_tier || 'Bronze'}</span>
                     </span>
                   </div>
