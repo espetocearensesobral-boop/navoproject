@@ -6,7 +6,7 @@ import { db, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { JWT_SECRET } from '../config/env.js';
 import { authLimiter, requireAuth, setAuthCookie } from '../middleware/index.js';
-import { sanitizePhone, matchPhoneNumbers, handleError, formatProfile } from '../utils/index.js';
+import { sanitizePhone, matchPhoneNumbers, handleError, formatProfile, userErrors } from '../utils/index.js';
 import { sendWhatsAppMessage } from '../whatsapp.js';
 import { z } from 'zod';
 
@@ -49,6 +49,9 @@ authRouter.post("/logout", (req, res) => {
 // /api/auth/login
 authRouter.post("/login", authLimiter, async (req, res) => {
   try {
+    if (!isDbConnected || !db) {
+      return res.status(503).json({ error: userErrors.dbDisconnected });
+    }
     const { loginId, password } = req.body;
     
     if (!loginId || !password) {
@@ -117,8 +120,7 @@ authRouter.post("/login", authLimiter, async (req, res) => {
       token: token,
     });
   } catch (e: any) {
-    console.error('Error in POST /api/auth/login:', e);
-    res.status(500).json({ error: 'Erro ao fazer login. Tente novamente.' });
+    return handleError(res, e, 'POST /api/auth/login');
   }
 });
 
@@ -128,6 +130,9 @@ authRouter.post("/login", authLimiter, async (req, res) => {
 
 const handleAdminLogin = async (req: express.Request, res: express.Response) => {
   try {
+    if (!isDbConnected || !db) {
+      return res.status(503).json({ error: userErrors.dbDisconnected });
+    }
     const { loginId, password } = req.body;
     
     if (!loginId || !password) {
@@ -313,7 +318,7 @@ preferencesRouter.get("/theme", async (req: any, res) => {
     const shop = await db.query.shopSettings.findFirst({
       where: eq(schema.shopSettings.id, 'default'),
       columns: { themePalette: true },
-    });
+    }).catch(() => null);
 
     return res.json({ palette: shop?.themePalette || 'heritage' });
   } catch (e: any) {

@@ -53,6 +53,9 @@ app.disable('x-powered-by');
 app.set("trust proxy", 1);
 
 app.use(corsMiddleware);
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cookieParser());
 
 if (!process.env.DATABASE_URL && !process.env.SQL_HOST) {
   console.warn("NOTICE: DATABASE_URL or SQL_HOST not defined. Ensure Supabase credentials are configured.");

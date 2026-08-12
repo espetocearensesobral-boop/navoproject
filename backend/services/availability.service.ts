@@ -39,7 +39,7 @@ export async function fetchDaySlotContext(dateStr: string, excludeAptId?: string
   let allBlocks: any[] = [];
   let allProfessionals: any[] = [];
 
-  const shopSettings = await db.query.shopSettings.findFirst({ where: eq(schema.shopSettings.id, 'default') });
+  const shopSettings = await db.query.shopSettings.findFirst({ where: eq(schema.shopSettings.id, 'default') }).catch(() => null);
   if (shopSettings) {
     shopProf.workingHours = shopSettings.workingHours || {};
     shopProf.operatingSchedule = shopSettings.operatingSchedule || {};
@@ -48,21 +48,21 @@ export async function fetchDaySlotContext(dateStr: string, excludeAptId?: string
 
   allAppointments = await db.query.appointments.findMany({
     where: eq(schema.appointments.date, dateStr)
-  });
+  }).catch(() => []);
 
   if (excludeAptId) {
-    allAppointments = allAppointments.filter(apt => apt.id !== excludeAptId);
+    allAppointments = allAppointments.filter((apt: any) => apt.id !== excludeAptId);
   }
   
-  allAppointments = allAppointments.filter(apt => apt.status !== 'cancelled');
+  allAppointments = allAppointments.filter((apt: any) => apt.status !== 'cancelled');
 
   allBlocks = await db.query.scheduleBlocks.findMany({
     where: eq(schema.scheduleBlocks.date, dateStr)
-  });
+  }).catch(() => []);
 
   allProfessionals = await db.query.professionals.findMany({
     where: eq(schema.professionals.isActive, true)
-  });
+  }).catch(() => []);
 
   return { shopProf, allAppointments, allBlocks, allProfessionals };
 }

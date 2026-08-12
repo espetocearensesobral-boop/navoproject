@@ -1,4 +1,7 @@
 import express from 'express';
+import { eq } from 'drizzle-orm';
+import { db, isDbConnected } from '../index.js';
+import { userErrors } from '../utils/index.js';
 import { fetchDaySlotContext, checkSlotAvailability } from '../services/availability.service.js';
 import { timeToMinutes, minutesToTime, getDayOfWeekKey, getTodayStringBRT, getCurrentTimeBRT } from '../utils/datetime.js';
 
@@ -6,6 +9,9 @@ export const availabilityRouter = express.Router();
 
 availabilityRouter.get("/", async (req, res) => {
   try {
+    if (!isDbConnected || !db) {
+      return res.status(503).json({ error: userErrors.dbDisconnected });
+    }
     const { professionalId, date, duration, excludeAppointmentId, debug } = req.query;
     if (!date) {
       return res.status(400).json({ error: 'Data não informada' });

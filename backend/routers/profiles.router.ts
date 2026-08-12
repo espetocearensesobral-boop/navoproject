@@ -7,28 +7,26 @@ import { db, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { JWT_SECRET } from '../config/env.js';
 import { authLimiter, requireAuth, setAuthCookie } from '../middleware/index.js';
-import { sanitizePhone, matchPhoneNumbers, handleError, formatProfile } from '../utils/index.js';
+import { sanitizePhone, matchPhoneNumbers, handleError, formatProfile, userErrors } from '../utils/index.js';
 
 export const profilesRouter = express.Router();
 
 profilesRouter.get("/", requireAuth, async (req: any, res) => {
   try {
+    if (!isDbConnected || !db) {
+      return res.status(503).json({ error: userErrors.dbDisconnected });
+    }
     const isAdmin = req.user.role === 'admin';
     const userId = req.user.id;
 
-    if (isDbConnected && db) {
-      try {
-        const dbProfiles = await db.query.profiles.findMany();
-        let safe = dbProfiles.map((p: any) => formatProfile(p));
-        if (!isAdmin) {
-          safe = safe.filter((p: any) => p.id === userId);
-        } else {
-          safe = safe.filter((p: any) => p.password || (!p.id.startsWith('guest_') && p.id !== 'usr_guest'));
-        }
-        return res.json(safe);
-      } catch (err) {}
+    const dbProfiles = await db.query.profiles.findMany();
+    let safe = dbProfiles.map((p: any) => formatProfile(p));
+    if (!isAdmin) {
+      safe = safe.filter((p: any) => p.id === userId);
+    } else {
+      safe = safe.filter((p: any) => p.password || (!p.id.startsWith('guest_') && p.id !== 'usr_guest'));
     }
-    
+    return res.json(safe);
   } catch (e: any) {
     return handleError(res, e, req.path);
   }
@@ -36,6 +34,9 @@ profilesRouter.get("/", requireAuth, async (req: any, res) => {
 
 profilesRouter.post("/", authLimiter, async (req, res) => {
   try {
+    if (!isDbConnected || !db) {
+      return res.status(503).json({ error: userErrors.dbDisconnected });
+    }
     const { name, email, phone, password, role, id, avatar_url, avatarUrl, lgpdConsent, lgpdConsentDate, ...rest } = req.body;
 
     if (!name) {
@@ -47,7 +48,7 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
 
     const dbProfiles = await db.query.profiles.findMany();
 
-    // 1. Verificação de E-mail Único
+    // 1. Verificação de E-mail Único (se o e-mail foi preenchido)
     const existingEmailUser = cleanEmail 
       ? dbProfiles.find((p: any) => p.email && p.email.toLowerCase().trim() === cleanEmail && !p.email.endsWith('@guest.barberx.app'))
       : null;
@@ -85,11 +86,12 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
 
     const newId = crypto.randomUUID();
     const avatar = avatar_url || avatarUrl || rest.avatar_url || rest.avatarUrl || null;
+    const finalEmail = cleanEmail || `${cleanPhone || newId.slice(0, 8)}@client.barberx.app`;
 
     const dbProfile = {
       id: newId,
       name,
-      email: cleanEmail,
+      email: finalEmail,
       phone: cleanPhone || '',
       password: hashedPassword,
       role: 'client',
