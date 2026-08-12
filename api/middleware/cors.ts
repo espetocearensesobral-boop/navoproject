@@ -1,27 +1,31 @@
 export const corsMiddleware = (req: any, res: any, next: any) => {
-  const allowedOrigins = [
-    'https://navopremium.vercel.app',
-    'https://www.navopremium.vercel.app',
-    'https://navobarber-premium.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:4173',
-  ];
-  
   const origin = req.headers.origin;
-  
-  if (origin && allowedOrigins.includes(origin)) {
+  const host = req.headers.host || '';
+
+  const isAllowedOrigin = 
+    !origin ||
+    origin.includes('navopremium.vercel.app') ||
+    origin.endsWith('.vercel.app') ||
+    origin.endsWith('.run.app') ||
+    origin.includes('localhost') ||
+    origin.includes('127.0.0.1') ||
+    (host && origin.includes(host));
+
+  if (origin && isAllowedOrigin) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Auth-Token');
     res.setHeader('Access-Control-Expose-Headers', 'X-Auth-Token');
   }
-  
+
   if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+    if (origin && isAllowedOrigin) {
+      return res.status(204).end();
+    }
+    return res.status(403).end();
   }
-  
+
   next();
 };
 
@@ -49,6 +53,6 @@ export const validateOrigin = (req: any, res: any, next: any) => {
       return res.status(403).json({ error: 'Origem não autorizada' });
     }
   }
-  
+
   next();
 };
