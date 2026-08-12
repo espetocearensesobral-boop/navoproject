@@ -30,23 +30,33 @@ export const handleError = (res: any, e: any, context: string) => {
 
   if (typeof errorMsg === 'string' && errorMsg.trim().length > 0) {
     const trimmed = errorMsg.trim();
-    // Filtra mensagens técnicas internas para não expor stacktraces ao cliente
+    // Filtra rigorosamente mensagens técnicas internas e consultas SQL vazadas
+    const lowerMsg = trimmed.toLowerCase();
     const isTechnicalInternal = 
-      trimmed.includes('drizzle') || 
-      trimmed.includes('postgres') || 
-      trimmed.includes('pg_') || 
-      trimmed.includes('ECONNREFUSED') || 
-      trimmed.includes('ENOTFOUND') || 
-      trimmed.includes('TypeError') || 
-      trimmed.includes('ReferenceError') || 
-      trimmed.includes('SyntaxError');
+      lowerMsg.includes('failed query') ||
+      lowerMsg.includes('select ') ||
+      lowerMsg.includes('insert ') ||
+      lowerMsg.includes('update ') ||
+      lowerMsg.includes('delete ') ||
+      lowerMsg.includes('params:') ||
+      lowerMsg.includes('from "') ||
+      lowerMsg.includes('relation ') ||
+      lowerMsg.includes('column ') ||
+      lowerMsg.includes('drizzle') || 
+      lowerMsg.includes('postgres') || 
+      lowerMsg.includes('pg_') || 
+      lowerMsg.includes('econnrefused') || 
+      lowerMsg.includes('enotfound') || 
+      lowerMsg.includes('typeerror') || 
+      lowerMsg.includes('referenceerror') || 
+      lowerMsg.includes('syntaxerror');
 
     if (!isTechnicalInternal) {
       return res.status(statusCode).json({ error: trimmed });
     }
   }
 
-  // Erro genérico para exceções internas de sistema não tratadas
-  return res.status(500).json({ error: userErrors.generic });
+  // Erro genérico para exceções internas de sistema não tratadas (ex: falhas de banco ou SQL)
+  return res.status(500).json({ error: 'Não foi possível concluir a solicitação. Tente novamente mais tarde.' });
 };
 

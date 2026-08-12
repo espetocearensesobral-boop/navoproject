@@ -251,7 +251,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
 
         if (!res.ok) {
           const errData = await res.json();
-          throw new Error(errData.error || 'Erro ao cadastrar. Tente novamente.');
+          throw new Error(errData.error || 'Não foi possível criar a conta. Tente novamente mais tarde.');
         }
         const data = await res.json();
         if (pendingRef) {

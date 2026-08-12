@@ -66,12 +66,11 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Telefone já cadastrado em outra conta. Por favor faça login.' });
     }
 
-    // Se houver perfis temporários de visitante com o mesmo telefone, podemos limpá-los para evitar duplicidade
+    // Se houver perfis temporários de visitante com o mesmo telefone (ex: guest_xxx), limpa apenas id guest_ e NUNCA usr_guest
     if (cleanPhone) {
       try {
         const guestProfilesToDelete = dbProfiles.filter((p: any) => 
-          (!p.password || p.id.startsWith('guest_') || p.id === 'usr_guest') &&
-          matchPhoneNumbers(p.phone, cleanPhone)
+          p.id.startsWith('guest_') && p.id !== 'usr_guest' && matchPhoneNumbers(p.phone, cleanPhone)
         );
         for (const gp of guestProfilesToDelete) {
           await db.delete(schema.profiles).where(eq(schema.profiles.id, gp.id)).catch(() => {});
