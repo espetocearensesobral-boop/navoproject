@@ -333,8 +333,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   }, [shopProfile]);
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-gold-base/20 selection:text-neutral-900 no-scrollbar">
+    <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-auto bg-white text-neutral-900 font-sans antialiased relative selection:bg-gold-base/20 selection:text-neutral-900 no-scrollbar">
       {/* HOURS MODAL OVERLAY */}
+
+      {/* FLOATING CTA MOBILE */}
+      <div className="fixed bottom-6 left-0 right-0 z-40 md:hidden pointer-events-none flex justify-center px-4">
+        <button 
+          onClick={(e) => {
+             e.preventDefault();
+             hapticMedium();
+             onGoToBooking();
+          }} 
+          className="pointer-events-auto w-full max-w-sm bg-gold-base text-[#0a0a0a] font-extrabold text-base py-3.5 px-6 rounded-2xl shadow-[0_8px_30px_color-mix(in_srgb,var(--color-gold-base)_35%,transparent)] border border-gold-base flex items-center justify-center gap-2 hover:bg-gold-deep active:scale-95 transition-all"
+        >
+          <CalendarCheck className="w-5 h-5" />
+          Agendar agora
+        </button>
+      </div>
+
       <AnimatePresence>
         {isHoursModalOpen && (
           <motion.div 
@@ -395,7 +411,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       {/* MENU OVERLAY REMOVIDO EM FAVOR DO DRAWER COMPARTILHADO */}
 
       {/* SECTION 0: HERO */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 bg-[#0a0a0a] text-[#f5f5f5] overflow-hidden flex flex-col justify-between box-border">
+      <section className="relative w-full min-h-full shrink-0 bg-[#0a0a0a] text-[#f5f5f5] overflow-hidden flex flex-col justify-between box-border">
         {/* Background Image with Gradient Overlay */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center"
@@ -484,7 +500,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
             className="text-[clamp(0.95rem,1.7vh,1.15rem)] leading-relaxed text-[#e5e7eb] mb-6 max-w-xs sm:max-w-md font-medium"
           >
-            Agende online, evite filas e saia renovado. Rápido, fácil e sem complicação.
+            Agende seu corte em menos de 30 segundos, escolha o barbeiro e receba a confirmação pelo WhatsApp.
           </motion.p>
 
           {/* CTA GROUP */}
@@ -505,8 +521,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               className="w-full bg-gold-base hover:bg-gold-deep text-[#0a0a0a] font-bold text-lg py-[1.15rem] px-8 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-[0_6px_35px_color-mix(in_srgb,var(--color-gold-base)_40%,transparent)] hover:shadow-[0_8px_45px_color-mix(in_srgb,var(--color-gold-base)_50%,transparent)] transition-all shrink-0 cursor-pointer"
             >
               <span className="flex items-center gap-2 font-extrabold tracking-wide">
-                Ver horários disponíveis
+                Agendar meu horário
                 <ArrowRight className="w-[1.35rem] h-[1.35rem] text-[#0a0a0a]" />
+              </span>
+              <span className="text-xs font-medium text-[#0a0a0a]/70">
+                Escolha serviço, barbeiro e horário em segundos
               </span>
             </motion.button>
 
@@ -525,30 +544,172 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         <div className="relative z-10 w-full max-w-md md:max-w-2xl mx-auto px-5 pb-6 shrink-0 mt-auto">
           <div className="w-full h-px bg-white/10 mb-6"></div>
 
-          <div className="flex justify-around items-center w-full px-2">
-            <button onClick={toggleHoursModal} className="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition-transform hover:opacity-80">
-              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">STATUS DA LOJA</span>
-              <div className="flex items-center gap-1.5">
-                <span className={`font-semibold text-sm whitespace-nowrap ${shopStatusInfo.status === 'open' ? 'text-green-500' : shopStatusInfo.status === 'closing_soon' ? 'text-amber-400' : 'text-white'}`}>
-                  {shopStatusInfo.status === 'closed' ? (nextAvailableTimeSlot ? `Abre ${nextAvailableTimeSlot.startsWith('0') || nextAvailableTimeSlot.startsWith('1') || nextAvailableTimeSlot.startsWith('2') ? 'hoje às ' + nextAvailableTimeSlot : nextAvailableTimeSlot}` : 'Fechado hoje') : shopStatusInfo.label}
-                </span>
-              </div>
-            </button>
+          <div className="w-full flex justify-center mt-2 pb-4">
+             <button onClick={() => {
+                hapticLight();
+                onGoToBooking();
+             }} className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors max-w-sm sm:max-w-none text-center">
+               <span className={`w-2 h-2 shrink-0 rounded-full ${shopStatusInfo.status === 'open' ? 'bg-green-500 animate-pulse' : shopStatusInfo.status === 'closing_soon' ? 'bg-amber-400' : 'bg-neutral-500'}`} />
+               <span className="text-xs sm:text-sm font-medium text-white/90">
+                 {shopStatusInfo.status === 'closed' 
+                   ? `Fechado no momento · Próximo horário `
+                   : `Aberto agora · Próximo horário `}
+                   {nextAvailableTimeSlot || '...'}
+               </span>
+               <span className="hidden sm:inline-block text-white/40 px-1">•</span>
+               <span className="text-xs sm:text-sm font-bold text-gold-base underline underline-offset-4 decoration-gold-base/30 hover:decoration-gold-base w-full sm:w-auto">
+                 {shopStatusInfo.status === 'closed' ? 'Reservar próximo' : 'Agendar meu horário'}
+               </span>
+             </button>
+          </div>
+        </div>
+      </section>
 
-            {shopStatusInfo.status !== 'closed' && (
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO HORÁRIO</span>
-                <span className="text-white font-bold text-sm">
-                  {nextAvailableTimeSlot ? nextAvailableTimeSlot : <span className="opacity-50">...</span>}
-                </span>
+
+      {/* SECTION: CONFIANÇA IMEDIATA */}
+      <section className="w-full bg-neutral-900 border-b border-white/5 py-4 px-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center text-gold-base">
+            <Star className="w-4 h-4 fill-current" />
+            <Star className="w-4 h-4 fill-current" />
+            <Star className="w-4 h-4 fill-current" />
+            <Star className="w-4 h-4 fill-current" />
+            <Star className="w-4 h-4 fill-current" />
+          </div>
+          <span className="text-white/90 text-sm font-medium">4.9/5 <span className="text-white/50">(500+ avaliações)</span></span>
+        </div>
+        <div className="hidden sm:block w-px h-6 bg-white/10" />
+        <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
+          <CalendarCheck className="w-4 h-4 text-gold-base" />
+          <span>Confirmação imediata via WhatsApp</span>
+        </div>
+      </section>
+
+
+      {/* SECTION: SERVIÇOS MAIS PROCURADOS */}
+      <section className="relative w-full py-16 px-[clamp(1rem,3vh,2rem)] bg-neutral-50 flex flex-col items-center shrink-0">
+        <div className="max-w-5xl w-full mx-auto space-y-10">
+          <div className="text-center space-y-3">
+            <h2 className="font-serif text-[clamp(1.75rem,3vh,2.25rem)] font-bold text-neutral-900 tracking-tight">
+              Serviços mais agendados
+            </h2>
+            <p className="text-neutral-500 font-medium text-sm">
+              Escolha seu estilo e deixe o resto com nossos especialistas.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: 'Corte Navo Premium',
+                duration: '45 min',
+                price: 'R$ 60,00',
+                tag: 'Mais agendado',
+                image: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=600'
+              },
+              {
+                title: 'Combo Corte + Barba',
+                duration: '1h 20 min',
+                price: 'R$ 100,00',
+                tag: 'Ideal para primeira visita',
+                image: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=80&w=600'
+              },
+              {
+                title: 'Barba Clássica',
+                duration: '30 min',
+                price: 'R$ 45,00',
+                tag: 'Ritual com toalha quente',
+                image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600'
+              }
+            ].map((srv, idx) => (
+              <div key={idx} onClick={onGoToBooking} className="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-neutral-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                <div className="h-48 relative overflow-hidden bg-neutral-100">
+                  <div className="absolute top-3 left-3 z-10 bg-gold-base text-neutral-900 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    {srv.tag}
+                  </div>
+                  <img src={srv.image} alt={srv.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                </div>
+                <div className="p-5 flex flex-col flex-1 justify-between">
+                  <div>
+                    <h3 className="font-bold text-lg text-neutral-900">{srv.title}</h3>
+                    <div className="flex items-center gap-2 mt-2 text-neutral-500 text-sm">
+                      <Clock className="w-4 h-4" />
+                      <span>{srv.duration}</span>
+                    </div>
+                  </div>
+                  <div className="mt-5 flex items-center justify-between">
+                    <span className="font-extrabold text-neutral-900">{srv.price}</span>
+                    <button className="bg-neutral-900 text-white text-xs font-bold px-4 py-2 rounded-xl group-hover:bg-gold-base group-hover:text-neutral-900 transition-colors">
+                      Agendar
+                    </button>
+                  </div>
+                </div>
               </div>
-            )}
+            ))}
+          </div>
+
+          <div className="flex justify-center pt-4">
+            <button onClick={onGoToBooking} className="text-neutral-900 border border-neutral-300 hover:border-neutral-900 bg-white hover:bg-neutral-50 px-6 py-3 rounded-full font-bold text-sm transition-all flex items-center gap-2 shadow-2xs cursor-pointer">
+              Ver todos os serviços
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+      {/* SECTION: COMO FUNCIONA */}
+      <section className="relative w-full py-16 px-[clamp(1rem,3vh,2rem)] bg-white flex flex-col items-center shrink-0 border-t border-neutral-100">
+        <div className="max-w-5xl w-full mx-auto space-y-12">
+          <div className="text-center space-y-3">
+            <h2 className="font-serif text-[clamp(1.75rem,3vh,2.25rem)] font-bold text-neutral-900 tracking-tight">
+              Como funciona
+            </h2>
+            <p className="text-neutral-500 font-medium text-sm">
+              Sem ligar, sem esperar. Resolva seu agendamento em três passos simples.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {/* Connecting Line (Desktop only) */}
+            <div className="hidden md:block absolute top-8 left-[16.66%] right-[16.66%] h-px bg-neutral-200" />
+            
+            <div className="flex flex-col items-center text-center relative z-10 space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-gold-base/10 border border-gold-base flex items-center justify-center text-gold-deep shadow-sm">
+                <Scissors className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="font-bold text-neutral-900 mb-1">1. Escolha o serviço</h3>
+                <p className="text-sm text-neutral-500 leading-relaxed max-w-[250px]">Corte, barba ou química. Veja os detalhes e tempo de duração.</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-center text-center relative z-10 space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-gold-base/10 border border-gold-base flex items-center justify-center text-gold-deep shadow-sm">
+                <CalendarCheck className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="font-bold text-neutral-900 mb-1">2. Selecione o horário</h3>
+                <p className="text-sm text-neutral-500 leading-relaxed max-w-[250px]">Escolha seu barbeiro favorito e a data perfeita na agenda dele.</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center text-center relative z-10 space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-gold-base/10 border border-gold-base flex items-center justify-center text-gold-deep shadow-sm">
+                <MessageCircle className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="font-bold text-neutral-900 mb-1">3. Receba confirmação</h3>
+                <p className="text-sm text-neutral-500 leading-relaxed max-w-[250px]">Tudo pronto! Seu comprovante chega na hora no WhatsApp.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* SECTION 1: POR QUE A NAVO */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+      <section className="relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <motion.div 
           initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -610,7 +771,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 3: GALERIA */}
-      <section id="galeria" className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+      <section id="galeria" className="relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <motion.div 
           initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -700,7 +861,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 4: DEPOIMENTOS - VERTICAL LAYOUT */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-center p-[clamp(0.75rem,2vh,2rem)] bg-neutral-900 overflow-hidden box-border">
+      <section className="relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-center p-[clamp(0.75rem,2vh,2rem)] bg-neutral-900 overflow-hidden box-border">
         <motion.div 
           initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -845,7 +1006,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 5: LOCALIZAÇÃO */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+      <section className="relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <motion.div 
           initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -986,7 +1147,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 6: FINAL CTA & FOOTER */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between bg-[#0a0b0e] text-white overflow-hidden box-border">
+      <section className="relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between bg-[#0a0b0e] text-white overflow-hidden box-border">
         
         {/* Background Image with Dark Overlay */}
         <div 
@@ -1116,6 +1277,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       />
 
       {/* MODAL FULLSCREEN CARROSSEL DE FOTOS DOS CORTES REAIS */}
+
+      {/* FLOATING CTA MOBILE */}
+      <div className="fixed bottom-6 left-0 right-0 z-40 md:hidden pointer-events-none flex justify-center px-4">
+        <button 
+          onClick={(e) => {
+             e.preventDefault();
+             hapticMedium();
+             onGoToBooking();
+          }} 
+          className="pointer-events-auto w-full max-w-sm bg-gold-base text-[#0a0a0a] font-extrabold text-base py-3.5 px-6 rounded-2xl shadow-[0_8px_30px_color-mix(in_srgb,var(--color-gold-base)_35%,transparent)] border border-gold-base flex items-center justify-center gap-2 hover:bg-gold-deep active:scale-95 transition-all"
+        >
+          <CalendarCheck className="w-5 h-5" />
+          Agendar agora
+        </button>
+      </div>
+
       <AnimatePresence>
         {selectedGalleryIndex !== null && galleryFeaturedItems[selectedGalleryIndex] && (
           <motion.div 
