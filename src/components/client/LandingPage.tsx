@@ -356,7 +356,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                  hapticMedium();
                  onGoToBooking();
               }} 
-              className="pointer-events-auto w-full max-w-xs bg-gold-base text-[#0a0a0a] font-extrabold text-base py-3 px-6 rounded-xl shadow-[0_8px_30px_color-mix(in_srgb,var(--color-gold-base)_35%,transparent)] border border-gold-base flex items-center justify-center gap-2 hover:bg-gold-deep active:scale-95 transition-all"
+              className="pointer-events-auto w-full max-w-xs bg-gold-base text-content-on-accent font-extrabold text-base py-3 px-6 rounded-xl shadow-[0_8px_30px_color-mix(in_srgb,var(--color-gold-base)_35%,transparent)] border border-gold-base flex items-center justify-center gap-2 hover:bg-gold-deep active:scale-95 transition-all"
             >
               <CalendarCheck className="w-5 h-5" />
               Agendar agora
@@ -534,11 +534,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_horario_hero');
                 onGoToBooking(); 
               }}
-              className="w-full bg-gold-base hover:bg-gold-deep text-[#0a0a0a] font-bold text-base py-3 px-8 rounded-2xl flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer"
+              className="w-full bg-gold-base hover:bg-gold-deep text-content-on-accent font-bold text-base py-3 px-8 rounded-2xl flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer"
             >
               <span className="flex items-center gap-2 font-extrabold tracking-wide">
                 Agendar meu horário
-                <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
+                <ArrowRight className="w-5 h-5 text-content-on-accent" />
               </span>
             </motion.button>
             <button 
@@ -1072,10 +1072,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_online_footer');
                 onGoToBooking();
               }}
-              className="w-full bg-gold-base hover:bg-gold-deep text-[#0a0a0a] font-extrabold text-[clamp(1rem,2vh,1.15rem)] py-[clamp(1rem,2.2vh,1.25rem)] px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-gold-base shadow-lg shadow-gold-base/10"
+              className="w-full bg-gold-base hover:bg-gold-deep text-content-on-accent font-extrabold text-[clamp(1rem,2vh,1.15rem)] py-[clamp(1rem,2.2vh,1.25rem)] px-6 rounded-2xl flex items-center justify-center gap-2 transition-colors cursor-pointer border border-gold-base shadow-lg shadow-gold-base/10"
             >
               <span className="tracking-wide">Agendar meu horário agora</span>
-              <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
+              <ArrowRight className="w-5 h-5 text-content-on-accent" />
             </motion.button>
 
             {/* SECONDARY CTA - WHATSAPP LINK */}
