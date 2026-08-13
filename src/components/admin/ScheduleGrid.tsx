@@ -5,6 +5,7 @@ import { authFetch } from '../../lib/api';
 import {
   fetchAppointmentsFromSupabase,
   fetchProfessionalsFromSupabase,
+  fetchServicesFromSupabase,
   fetchScheduleBlocks,
   addScheduleBlock,
   deleteScheduleBlock,
@@ -18,13 +19,15 @@ import {
   generateTimeSlotsFromProfile 
 } from '../../services/shopProfileService';
 import { Calendar, Clock, Plus, Lock, Unlock, UserCheck, ShieldAlert, CheckCircle2, X, Save, RefreshCw, Scissors } from 'lucide-react';
+import { getTodayStringBRT, timeToMinutes } from '../../utils/dateUtils';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export const ScheduleGrid: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(() => getTodayStringBRT());
   const [selectedBarberId, setSelectedBarberId] = useState<string>('all');
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [barbers, setBarbers] = useState<Professional[]>([]);
+  const [services, setServices] = useState<any[]>([]);
   const [blocks, setBlocks] = useState<ScheduleBlock[]>([]);
   const [loading, setLoading] = useState(true);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
@@ -43,79 +46,92 @@ export const ScheduleGrid: React.FC = () => {
   // Block Form State
   const [blockForm, setBlockForm] = useState({
     professional_id: '',
-    time_slot: '12:00',
+    start_time: '12:00',
+    end_time: '13:00',
     reason: 'Pausa para Almoço / Lanche'
   });
 
   // Manual Booking State
   const [manualBookingForm, setManualBookingForm] = useState({
     client_name: '',
-    client_phone: '(11) 9',
+    client_phone: '',
     professional_id: '',
-    service_title: 'Corte Moderno / Fade',
-    amount: 60,
+    service_id: '',
     time_slot: '10:00'
   });
 
-  const timeSlots = useMemo(() => {
-    const slots = generateTimeSlotsFromProfile(shopProfile, selectedDate);
-    if (slots.length > 0) return slots;
-    return [
-      '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
-      '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
-      '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-      '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'
-    ];
-  }, [shopProfile, selectedDate]);
+  const timeSlots = useMemo(
+    () => generateTimeSlotsFromProfile(shopProfile, selectedDate),
+    [shopProfile, selectedDate]
+  );
 
   useEffect(() => {
     loadData();
+    const handleRefresh = () => loadData();
+    window.addEventListener('adminRefresh', handleRefresh);
+    return () => window.removeEventListener('adminRefresh', handleRefresh);
   }, [selectedDate]);
 
   const loadData = async () => {
     setLoading(true);
-    const [apts, profs, blks] = await Promise.all([
-      fetchAppointmentsFromSupabase(),
-      fetchProfessionalsFromSupabase(),
-      fetchScheduleBlocks()
-    ]);
+    try {
+      const [apts, profs, srvs, blks] = await Promise.all([
+        fetchAppointmentsFromSupabase(undefined, { strict: true }),
+        fetchProfessionalsFromSupabase(true),
+        fetchServicesFromSupabase(),
+        fetchScheduleBlocks()
+      ]);
 
-    setAppointments(apts);
-    const filteredProfs = profs.filter(p => p.id !== 'prof_any');
-    setBarbers(filteredProfs);
-    setBlocks(blks);
+      setAppointments(apts);
+      const filteredProfs = profs.filter(p => p.id !== 'prof_any' && p.is_active !== false);
+      setBarbers(filteredProfs);
+      setServices(srvs);
+      setBlocks(blks);
 
-    if (filteredProfs.length > 0 && !blockForm.professional_id) {
-      setBlockForm(prev => ({ ...prev, professional_id: filteredProfs[0].id }));
-      setManualBookingForm(prev => ({ ...prev, professional_id: filteredProfs[0].id }));
+      if (filteredProfs.length > 0 && !blockForm.professional_id) {
+        setBlockForm(prev => ({ ...prev, professional_id: filteredProfs[0].id }));
+        setManualBookingForm(prev => ({ ...prev, professional_id: filteredProfs[0].id, service_id: prev.service_id || srvs[0]?.id || '' }));
+      }
+    } catch (err: any) {
+      showNotification(err?.message || 'Não foi possível carregar a agenda. Tente atualizar.');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const handleAddBlock = async (e: React.FormEvent) => {
     e.preventDefault();
     const prof = barbers.find(b => b.id === blockForm.professional_id);
     if (!prof) return;
+    if (timeToMinutes(blockForm.start_time) >= timeToMinutes(blockForm.end_time)) {
+      showNotification('O início do bloqueio deve ser anterior ao fim.');
+      return;
+    }
 
-    const updatedBlocks = await addScheduleBlock({
-      professional_id: prof.id,
-      
-      date: selectedDate,
-      start_time: blockForm.time_slot,
-      end_time: blockForm.time_slot,
-      reason: blockForm.reason
-    });
-
-    setBlocks(updatedBlocks);
-    setIsBlockModalOpen(false);
-    showNotification(`Horário das ${blockForm.time_slot} bloqueado com sucesso para ${prof.name}!`);
+    try {
+      const updatedBlocks = await addScheduleBlock({
+        professional_id: prof.id,
+        date: selectedDate,
+        start_time: blockForm.start_time,
+        end_time: blockForm.end_time,
+        reason: blockForm.reason
+      });
+      setBlocks(updatedBlocks);
+      setIsBlockModalOpen(false);
+      showNotification(`${blockForm.start_time}–${blockForm.end_time} bloqueado para ${prof.name}.`);
+    } catch (err: any) {
+      showNotification(err?.message || 'Não foi possível criar o bloqueio.');
+    }
   };
 
   const handleUnblock = async (id: string) => {
-    const updated = await deleteScheduleBlock(id);
-    setBlocks(updated);
-    showNotification('Bloqueio removido da agenda!');
+    try {
+      const updated = await deleteScheduleBlock(id);
+      setBlocks(updated);
+      showNotification('Bloqueio removido da agenda.');
+    } catch (err: any) {
+      showNotification(err?.message || 'Não foi possível remover o bloqueio.');
+    }
   };
 
   const handleAcceptPendingAppointment = async (aptId: string) => {
@@ -140,29 +156,26 @@ export const ScheduleGrid: React.FC = () => {
   const handleManualBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const prof = barbers.find(b => b.id === manualBookingForm.professional_id);
-    if (!prof || !manualBookingForm.client_name) return;
+    const service = services.find(s => s.id === manualBookingForm.service_id);
+    if (!prof || !service || !manualBookingForm.client_name.trim()) {
+      showNotification('Informe cliente, profissional e serviço real.');
+      return;
+    }
 
+    const servicePrice = Number(service.price || 0);
+    const serviceDuration = Number(service.duration_minutes || 30);
     const newApt: Appointment = {
       id: `apt_m_${Date.now()}`,
       client_id: 'usr_manual',
-      client_name: manualBookingForm.client_name,
+      client_name: manualBookingForm.client_name.trim(),
       client_phone: manualBookingForm.client_phone,
       professional_id: prof.id,
       professional_name: prof.name,
-      services: [
-        {
-          id: 'srv_manual',
-          category_id: 'cat_cortes',
-          title: manualBookingForm.service_title,
-          description: 'Agendamento direto na recepção',
-          price: Number(manualBookingForm.amount),
-          duration_minutes: 35
-        }
-      ],
-      total_duration_minutes: 35,
-      original_amount: Number(manualBookingForm.amount),
+      services: [service],
+      total_duration_minutes: serviceDuration,
+      original_amount: servicePrice,
       discount_amount: 0,
-      final_amount: Number(manualBookingForm.amount),
+      final_amount: servicePrice,
       loyalty_points_used: 0,
       date: selectedDate,
       time_slot: manualBookingForm.time_slot,
@@ -171,15 +184,26 @@ export const ScheduleGrid: React.FC = () => {
       created_at: new Date().toISOString()
     };
 
-    await createAppointmentInSupabase(newApt);
-    await loadData();
-    setIsManualBookingOpen(false);
-    showNotification(`Agendamento presencial criado para ${manualBookingForm.client_name}!`);
+    try {
+      await createAppointmentInSupabase(newApt);
+      await loadData();
+      setIsManualBookingOpen(false);
+      showNotification(`Encaixe criado para ${newApt.client_name}.`);
+    } catch (err: any) {
+      showNotification(err?.message || 'Não foi possível criar o encaixe.');
+    }
   };
 
   const showNotification = (msg: string) => {
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(null), 3500);
+  };
+
+  const isBlockCoveringSlot = (block: ScheduleBlock, slot: string) => {
+    return block.date === selectedDate
+      && block.professional_id !== ''
+      && timeToMinutes(block.start_time) <= timeToMinutes(slot)
+      && timeToMinutes(slot) < timeToMinutes(block.end_time);
   };
 
   const activeBarbers = selectedBarberId === 'all'
@@ -278,9 +302,7 @@ export const ScheduleGrid: React.FC = () => {
                      a.status !== 'cancelled'
               );
               const block = blocks.find(
-                b => b.professional_id === barber.id &&
-                     b.date === selectedDate &&
-                     b.time_slot === slot
+                b => b.professional_id === barber.id && isBlockCoveringSlot(b, slot)
               );
               return { barber, apt, block };
             }).filter(item => item.apt || item.block);
@@ -466,9 +488,7 @@ export const ScheduleGrid: React.FC = () => {
                         );
 
                         const block = blocks.find(
-                          b => b.professional_id === barber.id &&
-                               b.date === selectedDate &&
-                               b.time_slot === slot
+                          b => b.professional_id === barber.id && isBlockCoveringSlot(b, slot)
                         );
 
                         return (
@@ -543,17 +563,27 @@ export const ScheduleGrid: React.FC = () => {
                 </select>
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-gold-base block mb-1">Horário a Bloquear *</label>
-                <select
-                  value={blockForm.time_slot}
-                  onChange={(e) => setBlockForm({ ...blockForm, time_slot: e.target.value })}
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-red-400"
-                >
-                  {timeSlots.map(ts => (
-                    <option key={ts} value={ts}>{ts}</option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-gold-base block mb-1">Início *</label>
+                  <select
+                    value={blockForm.start_time}
+                    onChange={(e) => setBlockForm({ ...blockForm, start_time: e.target.value, end_time: timeToMinutes(e.target.value) >= timeToMinutes(blockForm.end_time) ? timeSlots.find(ts => timeToMinutes(ts) > timeToMinutes(e.target.value)) || blockForm.end_time : blockForm.end_time })}
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-red-400"
+                  >
+                    {timeSlots.map(ts => <option key={ts} value={ts}>{ts}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gold-base block mb-1">Fim *</label>
+                  <select
+                    value={blockForm.end_time}
+                    onChange={(e) => setBlockForm({ ...blockForm, end_time: e.target.value })}
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-red-400"
+                  >
+                    {timeSlots.filter(ts => timeToMinutes(ts) > timeToMinutes(blockForm.start_time)).map(ts => <option key={ts} value={ts}>{ts}</option>)}
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -643,13 +673,16 @@ export const ScheduleGrid: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-gold-base block mb-1">Serviço</label>
-                  <input
-                    type="text"
-                    value={manualBookingForm.service_title}
-                    onChange={(e) => setManualBookingForm({ ...manualBookingForm, service_title: e.target.value })}
+                  <label className="text-xs font-bold text-gold-base block mb-1">Serviço real *</label>
+                  <select
+                    value={manualBookingForm.service_id}
+                    onChange={(e) => setManualBookingForm({ ...manualBookingForm, service_id: e.target.value })}
                     className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
-                  />
+                    required
+                  >
+                    <option value="">Selecione</option>
+                    {services.map(service => <option key={service.id} value={service.id}>{service.title} — R$ {Number(service.price || 0).toFixed(2)}</option>)}
+                  </select>
                 </div>
 
                 <div>
@@ -658,25 +691,17 @@ export const ScheduleGrid: React.FC = () => {
                     value={manualBookingForm.time_slot}
                     onChange={(e) => setManualBookingForm({ ...manualBookingForm, time_slot: e.target.value })}
                     className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
+                    required
                   >
-                    {timeSlots.map(ts => (
-                      <option key={ts} value={ts}>{ts}</option>
-                    ))}
+                    {timeSlots.map(ts => <option key={ts} value={ts}>{ts}</option>)}
                   </select>
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-gold-base block mb-1">Valor Cobrado (R$) *</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={manualBookingForm.amount}
-                  onChange={(e) => setManualBookingForm({ ...manualBookingForm, amount: Number(e.target.value) })}
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
-                  required
-                />
-              </div>
+              {manualBookingForm.service_id && (() => {
+                const selectedService = services.find(service => service.id === manualBookingForm.service_id);
+                return selectedService ? <p className="text-[11px] text-content-muted">Duração real: <strong className="text-gold-base">{selectedService.duration_minutes} min</strong>. O valor será recalculado pelo servidor.</p> : null;
+              })()}
 
               <div className="pt-3 border-t border-border-subtle flex justify-end space-x-3">
                 <button

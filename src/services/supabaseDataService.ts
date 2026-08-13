@@ -125,7 +125,7 @@ export async function fetchProfessionalsFromSupabase(forceRefresh = false): Prom
   return professionalsFetchPromise;
 }
 
-export async function fetchAppointmentsFromSupabase(phone?: string): Promise<Appointment[]> {
+export async function fetchAppointmentsFromSupabase(phone?: string, options?: { strict?: boolean }): Promise<Appointment[]> {
   try {
     const url = phone ? `${API_BASE}/appointments?phone=${encodeURIComponent(phone)}` : `${API_BASE}/appointments`;
     const res = await authFetch(url);
@@ -158,11 +158,11 @@ export async function fetchAppointmentsFromSupabase(phone?: string): Promise<App
       created_at: a.createdAt || a.created_at || new Date().toISOString(),
       services: a.services || []
     }));
-  } catch (err) {
+    } catch (err) {
+    if (options?.strict) throw err;
     return [];
   }
 }
-
 export async function createAppointmentInSupabase(apt: Appointment): Promise<Appointment> {
   const res = await authFetch(`${API_BASE}/appointments`, {
     method: 'POST',
