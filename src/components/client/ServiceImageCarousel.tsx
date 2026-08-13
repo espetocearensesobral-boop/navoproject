@@ -113,8 +113,6 @@ export const ServiceImageCarousel: React.FC<ServiceImageCarouselProps> = ({
         key={currentIndex}
         src={photoList[currentIndex]}
         alt={`${title} - foto ${currentIndex + 1}`}
-        decoding="async"
-        loading="eager"
         className="w-full h-full object-cover transition-all duration-500 ease-out animate-in fade-in group-hover/carousel:scale-105"
       />
 

@@ -16,6 +16,11 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   const [imgSrc, setImgSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
 
+  React.useEffect(() => {
+    setImgSrc(src);
+    setHasError(false);
+  }, [src]);
+
   return (
     <img
       src={imgSrc}
@@ -27,7 +32,6 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
           setHasError(true);
         }
       }}
-      loading="lazy"
       {...props}
     />
   );
