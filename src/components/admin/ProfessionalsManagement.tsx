@@ -5,6 +5,8 @@ import { AdminPageHeader } from './shared/AdminPageHeader';
 import {
   Users,
   Plus,
+  ChevronDown,
+  ChevronUp,
   Edit2,
   Trash2,
   Star,
@@ -81,7 +83,8 @@ export const ProfessionalsManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
+  const [viewMode, setViewMode] = useState<'list' | 'table'>('list');
+  const [expandedBarberId, setExpandedBarberId] = useState<string | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeFormTab, setActiveFormTab] = useState<'profile' | 'specialties' | 'commission' | 'schedule'>('profile');
@@ -373,11 +376,11 @@ export const ProfessionalsManagement: React.FC = () => {
           />
         </div>
 
-        <div className="flex items-center gap-1.5 justify-between sm:justify-end">
-          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 justify-between sm:justify-end min-w-0">
+            <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar min-w-0">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-colors ${
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
                 statusFilter === 'all'
                   ? 'bg-gold-base text-surface-base'
                   : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
@@ -387,7 +390,7 @@ export const ProfessionalsManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setStatusFilter('active')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-colors ${
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
                 statusFilter === 'active'
                   ? 'bg-gold-base text-surface-base'
                   : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
@@ -397,7 +400,7 @@ export const ProfessionalsManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setStatusFilter('inactive')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-colors ${
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
                 statusFilter === 'inactive'
                   ? 'bg-gold-base text-surface-base'
                   : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
@@ -409,184 +412,121 @@ export const ProfessionalsManagement: React.FC = () => {
 
           <div className="flex items-center bg-surface-card p-0.5 rounded-lg border border-border-subtle shrink-0">
             <button
-              onClick={() => setViewMode('cards')}
-              className={`p-1 rounded-xl text-xs transition-colors ${
-                viewMode === 'cards' ? 'bg-surface-card text-gold-hover' : 'text-content-muted'
+              onClick={() => setViewMode('list')}
+              className={`min-h-9 px-2 rounded-lg text-xs transition-colors ${
+                viewMode === 'list' ? 'bg-gold-base/15 text-gold-hover' : 'text-content-muted'
               }`}
-              title="Cards"
+              title="Lista"
             >
-              <LayoutGrid className="w-3.5 h-3.5" />
+              <List className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`p-1 rounded-xl text-xs transition-colors ${
-                viewMode === 'table' ? 'bg-surface-card text-gold-hover' : 'text-content-muted'
+              className={`min-h-9 px-2 rounded-lg text-xs transition-colors ${
+                viewMode === 'table' ? 'bg-gold-base/15 text-gold-hover' : 'text-content-muted'
               }`}
               title="Tabela"
             >
-              <List className="w-3.5 h-3.5" />
+              <LayoutGrid className="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
 
       {/* CARDS VIEW */}
-      {viewMode === 'cards' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {viewMode === 'list' ? (
+        <div className="space-y-2">
           {loading ? (
-            <div className="col-span-full py-8 text-center text-xs text-content-muted bg-surface-card rounded-xl border border-border-subtle">
+            <div className="py-8 text-center text-sm text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
               Carregando barbeiros...
             </div>
           ) : filteredBarbers.length === 0 ? (
-            <div className="col-span-full py-8 text-center text-xs text-content-muted bg-surface-card rounded-xl border border-border-subtle">
+            <div className="py-8 text-center text-sm text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
               Nenhum profissional encontrado.
             </div>
           ) : (
             filteredBarbers.map((barber) => {
               const isActive = barber.is_active ?? true;
+              const isExpanded = expandedBarberId === barber.id;
               const commissionPercent = Math.round((barber.commission_rate || 0.45) * 100);
 
               return (
-                <div
+                <article
                   key={barber.id}
-                  className={`bg-surface-card rounded-2xl border p-3.5 flex flex-col justify-between transition-all space-y-3 ${
-                    isActive ? 'border-border-subtle hover:border-border-subtle' : 'border-red-500/20 opacity-70'
+                  className={`overflow-hidden rounded-2xl border bg-surface-card transition-colors ${
+                    isExpanded ? 'border-gold-base/50' : isActive ? 'border-border-subtle' : 'border-red-500/25 opacity-75'
                   }`}
                 >
-                  <div className="space-y-3">
-                    {/* Header info */}
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <img
-                            src={barber.photo_url}
-                            alt={barber.name}
-                            className="w-12 h-12 rounded-xl object-cover border border-gold-base/40"
-                          />
-                          <button
-                            onClick={() => handleToggleStatus(barber)}
-                            title={isActive ? 'Pausar Atendimentos' : 'Ativar na Agenda'}
-                            className={`absolute -bottom-1 -right-1 p-0.5 rounded-full border border-black shadow ${
-                              isActive ? 'bg-status-success text-surface-base' : 'bg-red-500 text-content-base'
-                            }`}
-                          >
-                            <Power className="w-3 h-3" />
-                          </button>
-                        </div>
-
-                        <div className="min-w-0">
-                          <h3 className="font-bold text-content-base text-xs truncate">{barber.name}</h3>
-                          <p className="text-[10px] text-gold-hover font-semibold">{barber.role}</p>
-                          <div className="flex items-center gap-1 text-[10px] text-amber-400 font-bold mt-0.5">
-                            <Star className="w-3 h-3 fill-amber-400" />
-                            <span>{(barber.rating || 5.0).toFixed(1)}</span>
-                            <span className="text-content-muted font-normal">({barber.reviews_count || 10})</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="text-right shrink-0">
-                        <span className="px-2 py-0.5 rounded-xl bg-surface-card border border-border-subtle text-gold-hover font-extrabold text-[10px]">
-                          {commissionPercent}% Com.
+                  <button
+                    type="button"
+                    onClick={() => setExpandedBarberId(isExpanded ? null : barber.id)}
+                    aria-expanded={isExpanded}
+                    className="w-full min-h-[82px] p-3.5 sm:p-4 text-left flex items-center gap-3 sm:gap-4 hover:bg-surface-base/40"
+                  >
+                    <div className="relative shrink-0">
+                      <img
+                        src={barber.photo_url}
+                        alt={barber.name}
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-gold-base/40"
+                      />
+                      <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-surface-card ${isActive ? 'bg-status-success' : 'bg-red-500'}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h3 className="font-bold text-content-base text-sm sm:text-base truncate">{barber.name}</h3>
+                        <span className={`shrink-0 px-2 py-1 rounded-md text-[10px] font-bold ${isActive ? 'bg-status-success/15 text-status-success' : 'bg-red-500/15 text-red-300'}`}>
+                          {isActive ? 'Ativo' : 'Pausado'}
                         </span>
                       </div>
-                    </div>
-
-                    {/* Contact & Bio */}
-                    {barber.bio && (
-                      <p className="text-[11px] text-content-muted line-clamp-2 leading-relaxed">
-                        {barber.bio}
-                      </p>
-                    )}
-
-                    {/* Specialties */}
-                    <div>
-                      <span className="text-[9px] text-content-muted font-bold uppercase block mb-1">
-                        Especialidades:
-                      </span>
-                      <div className="flex flex-wrap gap-1">
-                        {barber.specialties && barber.specialties.length > 0 ? (
-                          barber.specialties.slice(0, 3).map((spec, i) => (
-                            <span
-                              key={i}
-                              className="px-2 py-0.5 rounded-xl bg-surface-card text-gold-hover text-[9px] font-semibold border border-border-subtle"
-                            >
-                              {spec}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-[9px] text-content-muted">Geral</span>
-                        )}
-                        {barber.specialties && barber.specialties.length > 3 && (
-                          <span className="text-[9px] text-content-muted self-center">
-                            +{barber.specialties.length - 3}
-                          </span>
-                        )}
+                      <p className="text-xs text-gold-hover font-semibold truncate">{barber.role}</p>
+                      <div className="flex items-center gap-1 text-xs text-amber-400 font-bold mt-1">
+                        <Star className="w-3.5 h-3.5 fill-amber-400" />
+                        <span>{(barber.rating || 5.0).toFixed(1)}</span>
+                        <span className="text-content-muted font-normal">({barber.reviews_count || 10})</span>
                       </div>
                     </div>
+                    <div className="hidden md:block text-right shrink-0">
+                      <p className="text-xs text-content-muted">Comissão</p>
+                      <p className="text-sm font-bold text-content-base">{commissionPercent}%</p>
+                    </div>
+                    <div className="hidden sm:block text-right shrink-0 min-w-[104px]">
+                      <p className="text-xs text-content-muted">Turno</p>
+                      <p className="text-xs font-semibold text-content-base">{barber.working_hours?.start || '08:00'}–{barber.working_hours?.end || '19:00'}</p>
+                    </div>
+                    {isExpanded ? <ChevronUp className="w-5 h-5 text-gold-base shrink-0" /> : <ChevronDown className="w-5 h-5 text-content-muted shrink-0" />}
+                  </button>
 
-                    {/* Schedule */}
-                    <div className="p-2 bg-surface-card border border-border-subtle rounded-xl text-[10px] text-content-muted flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-gold-hover" />
-                        <span>{barber.working_hours?.start || '08:00'} - {barber.working_hours?.end || '19:00'}</span>
+                  {isExpanded && (
+                    <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div className="rounded-xl bg-surface-base p-3">
+                          <p className="text-[10px] text-content-muted uppercase tracking-wider">Especialidades</p>
+                          <p className="mt-1 text-content-base font-semibold leading-relaxed">{barber.specialties?.join(', ') || 'Geral'}</p>
+                        </div>
+                        <div className="rounded-xl bg-surface-base p-3">
+                          <p className="text-[10px] text-content-muted uppercase tracking-wider">Horários semanais</p>
+                          <p className="mt-1 text-content-base font-semibold">{barber.working_hours?.days?.map((day) => dayLabels[day] || day).join(', ') || 'Seg-Sáb'}</p>
+                          <p className="text-content-muted">{barber.working_hours?.start || '08:00'}–{barber.working_hours?.end || '19:00'}</p>
+                        </div>
+                        <div className="rounded-xl bg-surface-base p-3">
+                          <p className="text-[10px] text-content-muted uppercase tracking-wider">Contato</p>
+                          <p className="mt-1 text-content-base font-semibold truncate">{barber.phone || 'Não informado'}</p>
+                          <p className="text-content-muted truncate">{barber.pix_key || 'PIX não informado'}</p>
+                        </div>
                       </div>
-                      <span className="text-content-base font-semibold">
-                        {barber.working_hours?.days?.map((d) => dayLabels[d] || d).join(', ') || 'Seg-Sáb'}
-                      </span>
+                      {barber.bio && <p className="text-sm text-content-muted leading-relaxed">{barber.bio}</p>}
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <button type="button" onClick={() => handleToggleStatus(barber)} className={`min-h-10 px-4 rounded-xl border text-sm font-semibold flex items-center gap-1.5 ${isActive ? 'border-status-success/30 text-status-success' : 'border-red-500/30 text-red-300'}`}>
+                          <Power className="w-4 h-4" /> {isActive ? 'Pausar agenda' : 'Ativar agenda'}
+                        </button>
+                        {barber.phone && <a href={`https://wa.me/55${barber.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="min-h-10 px-4 rounded-xl border border-status-success/30 text-status-success text-sm font-semibold flex items-center gap-1.5"><MessageCircle className="w-4 h-4" /> WhatsApp</a>}
+                        <button type="button" onClick={() => handleDuplicate(barber)} className="min-h-10 px-4 rounded-xl border border-border-subtle text-content-muted text-sm font-semibold flex items-center gap-1.5"><Copy className="w-4 h-4" /> Duplicar</button>
+                        <button type="button" onClick={() => handleOpenEdit(barber)} className="min-h-10 px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center gap-1.5"><Edit2 className="w-4 h-4" /> Editar</button>
+                        <button type="button" onClick={() => handleDelete(barber.id)} className="min-h-10 px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center gap-1.5"><Trash2 className="w-4 h-4" /> Excluir</button>
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Actions Footer */}
-                  <div className="pt-2 border-t border-border-subtle flex items-center justify-between text-xs">
-                    <button
-                      onClick={() => handleToggleStatus(barber)}
-                      className={`font-bold text-[10px] flex items-center gap-1 ${
-                        isActive ? 'text-status-success' : 'text-red-400'
-                      }`}
-                    >
-                      <Power className="w-3 h-3" />
-                      <span>{isActive ? 'Ativo' : 'Pausado'}</span>
-                    </button>
-
-                    <div className="flex items-center gap-1">
-                      {barber.phone && (
-                        <a
-                          href={`https://wa.me/55${barber.phone.replace(/\D/g, '')}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-1.5 rounded-lg bg-surface-card text-status-success hover:bg-surface-card"
-                          title="WhatsApp"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-
-                      <button
-                        onClick={() => handleDuplicate(barber)}
-                        className="p-1.5 rounded-lg bg-surface-card text-content-muted hover:text-content-base"
-                        title="Duplicar"
-                      >
-                        <Copy className="w-3.5 h-3.5" />
-                      </button>
-
-                      <button
-                        onClick={() => handleOpenEdit(barber)}
-                        className="px-2.5 py-1 rounded-lg bg-gold-base text-surface-base font-extrabold text-[10px]"
-                      >
-                        Editar
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(barber.id)}
-                        className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                        title="Excluir"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  )}
+                </article>
               );
             })
           )}

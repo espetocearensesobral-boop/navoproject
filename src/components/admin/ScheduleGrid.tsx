@@ -277,10 +277,10 @@ export const ScheduleGrid: React.FC = () => {
         </div>
 
         {/* Repositioned Barber Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+        <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar -mx-1 px-1">
           <button
             onClick={() => setSelectedBarberId('all')}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
               selectedBarberId === 'all'
                 ? 'bg-gold-base text-surface-base border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
@@ -292,7 +292,7 @@ export const ScheduleGrid: React.FC = () => {
             <button
               key={b.id}
               onClick={() => setSelectedBarberId(b.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 border ${
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 border ${
                 selectedBarberId === b.id
                   ? 'bg-gold-base text-surface-base border-gold-base'
                   : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
