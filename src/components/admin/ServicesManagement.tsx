@@ -336,10 +336,12 @@ export const ServicesManagement: React.FC = () => {
       {/* Ação (mobile) */}
       <button
         onClick={handleOpenCreate}
-        className="md:hidden w-full bg-gold-base text-surface-base px-3.5 py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+        title="Cadastrar novo serviço"
+        aria-label="Cadastrar novo serviço"
+        className="admin-create-icon md:hidden ml-auto w-11 h-11 rounded-full flex items-center justify-center shadow-md active:scale-95 shrink-0"
       >
-        <Plus className="w-4 h-4" />
-        <span>Cadastrar Novo Serviço</span>
+        <Plus className="w-5 h-5 stroke-[2.5]" />
+        <span className="sr-only">Cadastrar Novo Serviço</span>
       </button>
 
       {/* Success Notification Banner */}

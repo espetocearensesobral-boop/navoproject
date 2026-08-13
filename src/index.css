@@ -681,3 +681,18 @@ button, a, input, select, textarea {
   border-color: var(--color-gold-base) !important;
   color: var(--color-content-on-accent) !important;
 }
+
+/* Mobile create CTA: filled circular plus button for the main admin records. */
+.admin-shell .admin-create-icon {
+  background: var(--color-gold-base) !important;
+  border: 1px solid var(--color-gold-base) !important;
+  color: var(--color-content-on-accent) !important;
+}
+
+.admin-shell .admin-create-icon:hover,
+.admin-shell .admin-create-icon:focus-visible {
+  background: var(--color-gold-hover) !important;
+  border-color: var(--color-gold-hover) !important;
+  outline: 2px solid color-mix(in srgb, var(--color-gold-base) 55%, transparent);
+  outline-offset: 2px;
+}

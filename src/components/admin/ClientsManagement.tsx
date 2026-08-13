@@ -183,10 +183,12 @@ export const ClientsManagement: React.FC = () => {
 
         <button
           onClick={() => handleOpenModal()}
-          className="bg-gold-base text-surface-base px-3 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1 shrink-0 shadow-sm active:scale-95"
+          title="Cadastrar novo cliente"
+          aria-label="Cadastrar novo cliente"
+          className="admin-create-icon w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-sm active:scale-95"
         >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Novo</span>
+          <Plus className="w-5 h-5 stroke-[2.5]" />
+          <span className="sr-only">Novo cliente</span>
         </button>
       </div>
 
