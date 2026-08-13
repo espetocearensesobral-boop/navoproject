@@ -550,3 +550,36 @@ button, a, input, select, textarea {
 .gesture-scroll-x::-webkit-scrollbar {
   display: none;
 }
+
+/* Admin radius hierarchy — intentionally scoped and isolated from the public client app. */
+.admin-shell [class*="bg-surface-card"][class*="rounded-2xl"],
+.admin-shell [class*="bg-surface-card"][class*="rounded-xl"]:not(button):not(a),
+.admin-shell [class*="border-border-subtle"][class*="rounded-2xl"]:not(button):not(a) {
+  border-radius: 12px !important;
+}
+
+.admin-shell input[class*="rounded-"],
+.admin-shell select[class*="rounded-"],
+.admin-shell textarea[class*="rounded-"] {
+  border-radius: 18px !important;
+}
+
+.admin-shell button[class*="rounded-xl"],
+.admin-shell a[class*="rounded-xl"] {
+  border-radius: 18px !important;
+}
+
+.admin-shell .admin-category-scroll button,
+.admin-shell [data-gesture-scroll="horizontal"] > button {
+  border-radius: 9999px !important;
+}
+
+.admin-shell .admin-modal,
+.admin-shell [class*="max-w-"][class*="rounded-2xl"] {
+  border-radius: 16px !important;
+}
+
+.admin-shell .admin-modal button[class*="rounded-xl"],
+.admin-shell .admin-modal a[class*="rounded-xl"] {
+  border-radius: 18px !important;
+}
