@@ -251,44 +251,64 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
   const testimonials = [
     {
-      name: 'Rafael M.',
-      service: 'Corte Degradê & Barba VIP',
-      rating: 5,
-      date: 'Há 2 dias',
-      text: 'Melhor barbearia de São Paulo sem dúvidas! O atendimento é personalizado do início ao fim, o café artesanal é excelente e o acabamento na navalha ficou impecável.',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150'
+      name: "Rafael M.",
+      initials: "RM",
+      since: "Cliente desde 2023",
+      service: "Corte Degradê & Barba VIP",
+      rating: 5.0,
+      text: "Melhor barbearia de São Paulo sem dúvidas! O atendimento é personalizado do início ao fim, o café artesanal é excelente e o acabamento na navalha ficou impecável.",
+      gradient: "from-emerald-500 to-teal-600",
+      avatarGradient: "from-emerald-500/20 to-amber-500/20",
+      borderColor: "border-emerald-500/30",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150"
     },
     {
-      name: 'Lucas S.',
-      service: 'Corte Masculino & Toalha Quente',
-      rating: 5,
-      date: 'Há 1 semana',
-      text: 'Ambiente sensacional, climatizado e muito refinado. O barbeiro entendeu exatamente o estilo que eu queria e a experiência com a toalha quente é inigualável. Recomendo demais!',
-      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150'
+      name: "João Lucas",
+      initials: "JL",
+      since: "Cliente desde 2022",
+      service: "Corte Social & Barba",
+      rating: 5.0,
+      text: "Ambiente incrível, música boa e profissionais que realmente entendem do ofício. Sempre saio satisfeito e já indiquei para todos os meus amigos da firma.",
+      gradient: "from-amber-500 to-orange-600",
+      avatarGradient: "from-amber-500/20 to-orange-500/20",
+      borderColor: "border-amber-500/30",
+      avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150"
     },
     {
-      name: 'Felipe C.',
-      service: 'Combo Completo Navo Premium',
-      rating: 5,
-      date: 'Há 3 semanas',
-      text: 'Experiência 5 estrelas do começo ao fim! Agendei pelo site em segundos com confirmação instantânea no WhatsApp, fui atendido no horário e o resultado do visual superou todas as expectativas.',
-      avatar: 'https://images.unsplash.com/photo-1600486913747-55e5470d6f40?auto=format&fit=crop&q=80&w=150'
+      name: "Marcos C.",
+      initials: "MC",
+      since: "Cliente desde 2024",
+      service: "Platinado & Design de Barba",
+      rating: 5.0,
+      text: "Fiz o platinado aqui e o resultado superou todas as expectativas. O cuidado com os detalhes é impressionante. Vale cada centavo investido no visual.",
+      gradient: "from-blue-500 to-indigo-600",
+      avatarGradient: "from-blue-500/20 to-indigo-500/20",
+      borderColor: "border-blue-500/30",
+      avatar: "https://images.unsplash.com/photo-1600486913747-55e5470d6f40?auto=format&fit=crop&q=80&w=150"
     },
     {
-      name: 'Marcos P.',
-      service: 'Corte Social',
-      rating: 5,
-      date: 'Há 1 mês',
-      text: 'Excelente profissionalismo. A atenção aos detalhes é fantástica, o ambiente é muito agradável e o sistema de agendamento online é super prático.',
-      avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=150'
+      name: "André P.",
+      initials: "AP",
+      since: "Cliente desde 2021",
+      service: "Corte Clássico & Hot Towel",
+      rating: 4.9,
+      text: "Tradição e modernidade no mesmo lugar. O serviço de toalha quente no final é um diferencial que não encontro em lugar nenhum. Recomendo de olhos fechados.",
+      gradient: "from-rose-500 to-pink-600",
+      avatarGradient: "from-rose-500/20 to-pink-500/20",
+      borderColor: "border-rose-500/30",
+      avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=150"
     },
     {
-      name: 'Thiago B.',
-      service: 'Barba Terapia',
-      rating: 5,
-      date: 'Há 2 meses',
-      text: 'A melhor barba que já fiz. Produtos de primeira linha e um cuidado especial. Sem contar a cerveja gelada de cortesia. Voltarei sempre!',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150'
+      name: "Tiago F.",
+      initials: "TF",
+      since: "Cliente desde 2023",
+      service: "Corte Militar & Sobrancelha",
+      rating: 5.0,
+      text: "Pontualidade e qualidade definem esse lugar. Nunca precisei esperar e o corte sempre sai exatamente como peço. O atendimento é nota 10.",
+      gradient: "from-violet-500 to-purple-600",
+      avatarGradient: "from-violet-500/20 to-purple-500/20",
+      borderColor: "border-violet-500/30",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150"
     }
   ];
 
@@ -679,109 +699,146 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 4: DEPOIMENTOS - VERTICAL LAYOUT */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-center p-[clamp(0.75rem,2vh,2rem)] bg-neutral-900 overflow-hidden box-border">
         <motion.div 
           initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto"
+          className="max-w-4xl mx-auto w-full h-full flex flex-col justify-center items-stretch min-h-0 my-auto"
         >
-          <div className="shrink-0 mb-[clamp(1rem,2.5vh,2rem)] flex flex-col gap-[clamp(1.5rem,3vh,2rem)]">
-            <div className="text-left">
-              <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
-                DEPOIMENTOS
-              </span>
-              <h2 className="font-serif text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
-                Quem usa, vira fã
-                <br className="hidden md:block" />
-              </h2>
-            </div>
-            
-            {/* The Green/Gold Pill Banner matching visual */}
-            <div className="w-full flex justify-center">
-              <div className="bg-emerald-500 text-white rounded-[1.25rem] flex items-center py-2.5 px-6 shadow-sm w-fit shrink-0 divide-x divide-white/30">
-                 <div className="flex flex-col items-center pr-5">
-                   <span className="text-xl md:text-2xl font-black leading-none tracking-tight">4.9/5</span>
-                   <span className="text-[0.65rem] font-bold uppercase tracking-wide mt-0.5">NPS DE SATISFAÇÃO</span>
-                 </div>
-                 <div className="flex flex-col items-center pl-5">
-                   <span className="text-xl md:text-2xl font-black leading-none tracking-tight">+1.2k</span>
-                   <span className="text-[0.65rem] font-bold uppercase tracking-wide mt-0.5">AVALIAÇÕES</span>
-                 </div>
-              </div>
-            </div>
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-[clamp(1rem,3vh,2.5rem)] gap-4 shrink-0">
+             <div>
+                <p className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase mb-2">Depoimentos</p>
+                <h2 className="font-serif text-[clamp(1.75rem,4vh,2.5rem)] font-bold text-white tracking-tight leading-tight">
+                    Quem usa,<span className="text-gold-base">vira fã</span>
+                </h2>
+             </div>
+
           </div>
 
-          <div className="flex-1 min-h-0 flex flex-col justify-center items-center w-full py-[clamp(0.25rem,1vh,0.75rem)]">
-            <div className="relative w-full max-w-sm md:max-w-2xl lg:max-w-3xl">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={testimonialIndex}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full bg-white border border-neutral-100 rounded-[1.5rem] p-[clamp(1.5rem,3vh,2rem)] shadow-lg shadow-neutral-200/50 flex flex-col gap-4 md:gap-6"
-                >
-                  <div className="flex text-amber-400 gap-1">
-                    {[...Array(testimonials[testimonialIndex].rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 md:w-6 md:h-6 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-[clamp(0.9rem,1.6vh,1.125rem)] text-neutral-700 leading-relaxed font-medium md:min-h-[80px]">
-                    "{testimonials[testimonialIndex].text}"
-                  </p>
-                  
-                  <div className="flex items-center gap-3 md:gap-4 mt-2">
-                    <img 
-                      src={testimonials[testimonialIndex].avatar} 
-                      alt={testimonials[testimonialIndex].name}
-                      className="w-12 h-12 md:w-14 md:h-14 rounded-2xl object-cover shrink-0 border border-neutral-100 shadow-sm"
-                    />
-                    <div className="flex flex-col">
-                      <span className="font-bold text-neutral-900 text-sm md:text-base">{testimonials[testimonialIndex].name}</span>
-                      <span className="text-xs md:text-sm text-neutral-500 font-medium">{testimonials[testimonialIndex].service}</span>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            
-            {/* Carousel Controls */}
-            <div className="flex items-center justify-center gap-4 mt-6 md:mt-8">
-              <button 
-                onClick={() => setTestimonialIndex(prev => prev === 0 ? testimonials.length - 1 : prev - 1)}
-                className="p-1.5 text-neutral-800 hover:text-black transition-colors"
-                aria-label="Anterior"
-              >
-                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-              </button>
-              <div className="flex items-center gap-2">
-                {testimonials.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setTestimonialIndex(idx)}
-                    className={`transition-all duration-300 rounded-full ${idx === testimonialIndex ? 'w-6 h-2 md:w-8 bg-neutral-900' : 'w-2 h-2 bg-neutral-300 hover:bg-neutral-400'}`}
-                    aria-label={`Ir para depoimento ${idx + 1}`}
-                  />
-                ))}
-              </div>
-              <button 
-                onClick={() => setTestimonialIndex(prev => (prev + 1) % testimonials.length)}
-                className="p-1.5 text-neutral-800 hover:text-black transition-colors"
-                aria-label="Próximo"
-              >
-                <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-              </button>
-            </div>
+          {/* Main Testimonial Card */}
+          <div className="relative bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-[clamp(1.5rem,3vh,2rem)] overflow-hidden border border-neutral-700/30 shadow-2xl shadow-black/40 flex-1 min-h-0 flex flex-col">
+             {/* Decorative Elements */}
+             <div className="absolute top-0 right-0 w-64 h-64 bg-gold-base/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+             <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 pointer-events-none"></div>
+
+             <div className="relative flex flex-col md:flex-row flex-1 min-h-0 h-full">
+                {/* Left: Client Photo Area */}
+                <div className="md:w-2/5 relative shrink-0 h-[35%] md:h-full">
+                   <div className="absolute inset-0 bg-neutral-800 overflow-hidden">
+                      <AnimatePresence mode="wait">
+                         <motion.img 
+                            key={testimonialIndex}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.4 }}
+                            src={testimonials[testimonialIndex].avatar} 
+                            alt={testimonials[testimonialIndex].name}
+                            className="absolute inset-0 w-full h-full object-cover"
+                         />
+                      </AnimatePresence>
+                   </div>
+                </div>
+
+                {/* Right: Testimonial Content */}
+                <div className="md:w-3/5 p-[clamp(1.25rem,2.5vh,2.5rem)] flex flex-col justify-between flex-1 min-h-0 overflow-y-auto no-scrollbar">
+                   <div>
+                       {/* Stars */}
+                       <div className="flex items-center gap-1 mb-[clamp(0.75rem,2vh,1.5rem)]">
+                           <div className="flex gap-0.5">
+                              {[...Array(Math.floor(testimonials[testimonialIndex].rating))].map((_, i) => (
+                                 <svg key={i} className="w-4 h-4 md:w-5 md:h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                              ))}
+                           </div>
+                           <span className="text-neutral-400 text-sm ml-2">{testimonials[testimonialIndex].rating.toFixed(1)}</span>
+                       </div>
+
+                       {/* Quote */}
+                       <div className="mb-[clamp(1rem,2.5vh,2rem)] relative">
+                          <svg className="w-6 h-6 md:w-8 md:h-8 text-gold-base/30 mb-2 md:mb-3" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                          </svg>
+                          <AnimatePresence mode="wait">
+                            <motion.p
+                               key={testimonialIndex}
+                               initial={{ opacity: 0, y: 8 }}
+                               animate={{ opacity: 1, y: 0 }}
+                               exit={{ opacity: 0, y: -8 }}
+                               transition={{ duration: 0.3 }}
+                               className="text-white text-[clamp(0.9rem,1.8vh,1.25rem)] leading-relaxed font-light"
+                            >
+                               {testimonials[testimonialIndex].text}
+                            </motion.p>
+                          </AnimatePresence>
+                       </div>
+                   </div>
+
+                   <div className="mt-auto">
+                       {/* Client Info */}
+                       <AnimatePresence mode="wait">
+                          <motion.div
+                             key={testimonialIndex}
+                             initial={{ opacity: 0, x: 8 }}
+                             animate={{ opacity: 1, x: 0 }}
+                             exit={{ opacity: 0, x: -8 }}
+                             transition={{ duration: 0.3 }}
+                             className="flex items-center gap-3 md:gap-4 mb-[clamp(1rem,2.5vh,2rem)]"
+                          >
+                              <img 
+                                 src={testimonials[testimonialIndex].avatar} 
+                                 alt={testimonials[testimonialIndex].name}
+                                 className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover shrink-0 border-2 border-neutral-700/50"
+                              />
+                              <div>
+                                 <div className="text-white font-semibold text-sm md:text-base">{testimonials[testimonialIndex].name}</div>
+                                 <div className="text-neutral-400 text-xs md:text-sm">{testimonials[testimonialIndex].since}</div>
+                              </div>
+                          </motion.div>
+                       </AnimatePresence>
+
+                       {/* Navigation */}
+                       <div className="flex items-center justify-between pt-[clamp(0.75rem,2vh,1.5rem)] border-t border-neutral-700/50">
+                           <div className="flex items-center gap-2 md:gap-3 w-full">
+                               <button onClick={() => setTestimonialIndex(prev => prev === 0 ? testimonials.length - 1 : prev - 1)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-neutral-700/50 hover:bg-neutral-600/50 border border-neutral-600/30 flex items-center justify-center text-white transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0">
+                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
+                               </button>
+
+                               <div className="flex items-center justify-center gap-2 flex-1">
+                                  {testimonials.map((_, idx) => (
+                                     <button
+                                        key={idx}
+                                        onClick={() => setTestimonialIndex(idx)}
+                                        className={`transition-all duration-300 rounded-full cursor-pointer shrink-0 ${idx === testimonialIndex ? 'w-6 h-2 md:w-8 md:h-2 bg-gold-base' : 'w-2 h-2 bg-neutral-600 hover:bg-neutral-500'}`}
+                                     />
+                                  ))}
+                               </div>
+
+                               <button onClick={() => setTestimonialIndex(prev => (prev + 1) % testimonials.length)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-neutral-700/50 hover:bg-neutral-600/50 border border-neutral-600/30 flex items-center justify-center text-white transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0">
+                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+                               </button>
+                           </div>
+                       </div>
+                   </div>
+                </div>
+             </div>
           </div>
 
-          <div className="flex justify-center pt-2 shrink-0">
-            <button onClick={handleOpenGoogleMaps} className="text-[clamp(0.75rem,1.5vh,0.875rem)] font-bold text-gold-base hover:text-gold-deep transition-colors flex items-center gap-1.5 cursor-pointer group">
-              <span className="border-b border-gold-base/40 group-hover:border-gold-deep">Ver mais avaliações no Google (4.9 · 1.2k avaliações)</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+          {/* Google Reviews Link */}
+          <div className="mt-[clamp(0.75rem,2vh,1.5rem)] flex justify-center shrink-0">
+              <button onClick={handleOpenGoogleMaps} className="group inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors text-[clamp(0.75rem,1.5vh,0.875rem)] font-medium">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Ver mais avaliações no Google 
+                  <span className="text-neutral-400">(4.9 · 1.2k avaliações)</span>
+                  <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              </button>
           </div>
         </motion.div>
       </section>
