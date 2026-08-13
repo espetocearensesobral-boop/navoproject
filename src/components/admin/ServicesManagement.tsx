@@ -16,7 +16,6 @@ import {
   Search,
   Filter,
   Image as ImageIcon,
-  Copy,
   ChevronDown,
   ChevronUp,
   Star,
@@ -157,19 +156,6 @@ export const ServicesManagement: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDuplicate = (service: ServiceItem) => {
-    const duplicated: Partial<ServiceItem> = {
-      ...service,
-      id: undefined,
-      title: `${service.title} (Cópia)`,
-    };
-    setEditingService(null);
-    setFormData(duplicated);
-    setNewGalleryUrlInput('');
-    setActiveFormTab('general');
-    setIsModalOpen(true);
-    showNotification('Serviço duplicado! Ajuste os dados e salve.');
-  };
 
   const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este serviço do cardápio?')) {
@@ -485,7 +471,6 @@ export const ServicesManagement: React.FC = () => {
                       <div className="admin-action-group">
                         <button type="button" onClick={() => handleToggleCombo(service)} title={service.is_combo ? 'Desativar Combo VIP' : 'Ativar Combo VIP'} aria-label={service.is_combo ? 'Desativar Combo VIP' : 'Ativar Combo VIP'} className={`admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-1.5 ${service.is_combo ? 'border-status-success/30 text-status-success' : 'border-border-subtle text-content-muted'}`}><Flame className="w-4 h-4" /><span className="hidden sm:inline">{service.is_combo ? 'Combo ativo' : 'Combo VIP'}</span></button>
                         <button type="button" onClick={() => handleTogglePopular(service)} title={service.popular ? 'Remover destaque' : 'Marcar como destaque'} aria-label={service.popular ? 'Remover destaque' : 'Marcar como destaque'} className={`admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-1.5 ${service.popular ? 'border-gold-base/40 text-gold-base' : 'border-border-subtle text-content-muted'}`}><Star className="w-4 h-4" /><span className="hidden sm:inline">{service.popular ? 'Destaque ativo' : 'Destaque'}</span>                        </button>
-                        <button type="button" onClick={() => handleDuplicate(service)} title="Duplicar serviço" aria-label="Duplicar serviço" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border border-border-subtle text-content-muted text-sm font-semibold flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" /><span className="hidden sm:inline">Duplicar</span></button>
                         <button type="button" onClick={() => handleOpenEdit(service)} title="Editar serviço" aria-label="Editar serviço" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
                         <button type="button" onClick={() => handleDelete(service.id)} title="Excluir serviço" aria-label="Excluir serviço" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5"><Trash2 className="w-4 h-4" /><span className="hidden sm:inline">Excluir</span></button>
                       </div>
@@ -757,15 +742,6 @@ export const ServicesManagement: React.FC = () => {
                       {/* Actions */}
                       <td className="py-3 px-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end space-x-1.5">
-                          {/* Duplicate */}
-                          <button
-                            onClick={() => handleDuplicate(service)}
-                            className="p-1.5 rounded-lg bg-surface-card hover:bg-surface-base text-content-muted hover:text-content-base border border-border-subtle"
-                            title="Duplicar / Clonar Serviço"
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                          </button>
-
                           {/* Edit */}
                           <button
                             onClick={() => handleOpenEdit(service)}
@@ -863,7 +839,6 @@ export const ServicesManagement: React.FC = () => {
                         <button type="button" onClick={() => handleTogglePopular(service)} className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.popular ? 'border-gold-base/40 text-gold-base' : 'border-border-subtle text-content-muted'}`}>{service.popular ? '⭐ Destaque ativo' : '+ Marcar destaque'}</button>
                       </div>
                       <div className="flex flex-wrap gap-2 pt-1">
-                        <button type="button" onClick={() => handleDuplicate(service)} className="min-h-10 px-4 rounded-xl border border-border-subtle text-content-muted text-sm font-semibold flex items-center gap-1.5"><Copy className="w-4 h-4" /> Duplicar</button>
                         <button type="button" onClick={() => handleOpenEdit(service)} className="min-h-10 px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center gap-1.5"><Edit2 className="w-4 h-4" /> Editar</button>
                         <button type="button" onClick={() => handleDelete(service.id)} className="min-h-10 px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center gap-1.5"><Trash2 className="w-4 h-4" /> Excluir</button>
                       </div>

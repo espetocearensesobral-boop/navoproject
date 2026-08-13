@@ -15,7 +15,6 @@ import {
   X,
   Save,
   Search,
-  Copy,
   Award,
   DollarSign,
   TrendingUp,
@@ -163,20 +162,6 @@ export const ProfessionalsManagement: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDuplicate = (barber: Professional) => {
-    const duplicated: Partial<Professional> = {
-      ...barber,
-      id: undefined,
-      name: `${barber.name} (Cópia)`,
-      nickname: `${barber.nickname || barber.name} - Novo`
-    };
-    setEditingBarber(null);
-    setFormData(duplicated);
-    setSpecialtiesText(barber.specialties ? barber.specialties.join(', ') : '');
-    setActiveFormTab('profile');
-    setIsModalOpen(true);
-    showToast('Profissional duplicado! Ajuste os dados e salve.');
-  };
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Tem certeza que deseja excluir este barbeiro da equipe?')) {
@@ -522,7 +507,6 @@ export const ProfessionalsManagement: React.FC = () => {
                           <Power className="w-4 h-4" /><span className="hidden sm:inline">{isActive ? 'Pausar agenda' : 'Ativar agenda'}</span>
                         </button>
                         {barber.phone && <a href={`https://wa.me/55${barber.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" title="Abrir WhatsApp" aria-label="Abrir WhatsApp" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-success/30 text-status-success text-sm font-semibold flex items-center justify-center gap-1.5"><MessageCircle className="w-4 h-4" /><span className="hidden sm:inline">WhatsApp</span></a>}
-                        <button type="button" onClick={() => handleDuplicate(barber)} title="Duplicar profissional" aria-label="Duplicar profissional" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-border-subtle text-content-muted text-sm font-semibold flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" /><span className="hidden sm:inline">Duplicar</span></button>
                         <button type="button" onClick={() => handleOpenEdit(barber)} title="Editar profissional" aria-label="Editar profissional" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
                         <button type="button" onClick={() => handleDelete(barber.id)} title="Excluir profissional" aria-label="Excluir profissional" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5"><Trash2 className="w-4 h-4" /><span className="hidden sm:inline">Excluir</span></button>
                       </div>
