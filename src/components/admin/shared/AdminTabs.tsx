@@ -22,6 +22,7 @@ export interface AdminTabItem {
   icon?: LucideIcon;
   /** Contador opcional (ex: nº de comandas abertas) exibido como badge. */
   count?: number;
+  disabled?: boolean;
 }
 
 interface AdminTabsProps {
@@ -42,11 +43,15 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, 
           <button
             key={tab.id}
             type="button"
-            onClick={() => onChange(tab.id)}
+            onClick={() => !tab.disabled && onChange(tab.id)}
+            disabled={tab.disabled}
+            aria-disabled={tab.disabled || undefined}
             className={`shrink-0 h-9 px-3.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-95 ${
-              isActive
-                ? 'bg-gold-base text-surface-base shadow-sm'
-                : 'bg-surface-card text-content-muted border border-border-subtle hover:text-content-base'
+              tab.disabled
+                ? 'bg-surface-base/60 text-content-muted/50 border border-border-subtle/60 cursor-not-allowed'
+                : isActive
+                  ? 'bg-gold-base text-surface-base shadow-sm'
+                  : 'bg-surface-card text-content-muted border border-border-subtle hover:text-content-base'
             }`}
           >
             {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}

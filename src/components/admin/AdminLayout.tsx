@@ -3,11 +3,8 @@ import { usePullToRefresh } from '../../hooks/usePullToRefresh';
 import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
 import { NavoHomeView } from './NavoHomeView';
 import { ScheduleGrid } from './ScheduleGrid';
-import { PdvInteligente } from './PdvInteligente';
-import { ComandasManagement } from './ComandasManagement';
 import { FinanceiroManagement } from './FinanceiroManagement';
 import { AuditLogsManagement } from './AuditLogsManagement';
-import { SubscriptionsManagement } from './SubscriptionsManagement';
 import { WhatsAppManagement } from './WhatsAppManagement';
 import { QrCodeManagement } from './QrCodeManagement';
 import { ServicesManagement } from './ServicesManagement';
@@ -49,11 +46,8 @@ import {
 export type AdminTab = 
   | 'dashboard' 
   | 'agenda' 
-  | 'pdv'
-  | 'comandas'
   | 'financeiro'
   | 'audit'
-  | 'subscriptions'
   | 'whatsapp'
   | 'qrcode'
   | 'queue' 
@@ -151,24 +145,10 @@ export const AdminLayout: React.FC = () => {
       section: 'operacao' as AdminSection,
     },
     { 
-      id: 'pdv' as AdminTab, 
-      label: 'PDV Rápido', 
-      icon: Receipt,
-      description: 'Checkout instantâneo',
-      section: 'operacao' as AdminSection,
-    },
-    { 
-      id: 'comandas' as AdminTab, 
-      label: 'Comandas', 
-      icon: FileText,
-      description: 'Fechamento de conta',
-      section: 'operacao' as AdminSection,
-    },
-    { 
       id: 'financeiro' as AdminTab, 
       label: 'Financeiro', 
       icon: Wallet,
-      description: 'Caixa, extrato, contas a pagar, saúde e relatórios',
+      description: 'PDV, extrato real e controles financeiros',
       section: 'financeiro' as AdminSection,
     },
     { 
@@ -191,13 +171,6 @@ export const AdminLayout: React.FC = () => {
       icon: UserCheck,
       description: 'Base de clientes',
       section: 'cadastros' as AdminSection,
-    },
-    { 
-      id: 'subscriptions' as AdminTab, 
-      label: 'Assinaturas & Clube', 
-      icon: Award,
-      description: 'Planos e comissões de clube',
-      section: 'relacionamento' as AdminSection,
     },
     { 
       id: 'rewards' as AdminTab, 
@@ -253,16 +226,10 @@ export const AdminLayout: React.FC = () => {
     switch (activeTab) {
       case 'dashboard':
         return <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />;
-      case 'pdv':
-        return <PdvInteligente />;
-      case 'comandas':
-        return <ComandasManagement />;
       case 'financeiro':
         return <FinanceiroManagement />;
       case 'audit':
         return <SettingsManagement initialTab="audit" />;
-      case 'subscriptions':
-        return <SubscriptionsManagement />;
       case 'whatsapp':
         return <SettingsManagement initialTab="whatsapp" />;
       case 'qrcode':
