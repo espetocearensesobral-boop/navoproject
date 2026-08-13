@@ -400,16 +400,11 @@ appointmentsRouter.get("/", optionalAuth, async (req: any, res) => {
       return res.json(dbApts);
     }
 
-    // Se for usuário autenticado (não convidado)
+    // Usuários autenticados só podem consultar registros vinculados ao próprio clientId.
+    // O telefone não é um identificador de posse: pode ser compartilhado entre contas,
+    // reciclado ou informado por outra pessoa.
     if (!isGuest && userId) {
-      let userPhone = req.user?.phone || '';
-      if (!userPhone) {
-        const dbUser = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) });
-        if (dbUser) userPhone = dbUser.phone || '';
-      }
-      const filtered = dbApts.filter(a => 
-        a.clientId === userId || (userPhone && matchPhoneNumbers(a.clientPhone, userPhone))
-      );
+      const filtered = dbApts.filter(a => a.clientId === userId);
       return res.json(filtered);
     }
 

@@ -144,6 +144,18 @@ export const ClientApp: React.FC = () => {
   // O histórico é sempre carregado da API; este estado contém apenas a resposta da sessão atual.
   const [userCreatedAppointments, setUserCreatedAppointments] = useState<Appointment[]>([]);
   const [isConfirmingBooking, setIsConfirmingBooking] = useState(false);
+  const previousSessionUserId = useRef<string>(currentUser?.id || 'guest');
+
+  // O estado efêmero da confirmação não pode atravessar uma troca de conta.
+  // O histórico definitivo continua sendo carregado da API para o usuário atual.
+  useEffect(() => {
+    const nextUserId = currentUser?.id || 'guest';
+    if (previousSessionUserId.current !== nextUserId) {
+      setUserCreatedAppointments([]);
+      setCreatedBookingCode('');
+    }
+    previousSessionUserId.current = nextUserId;
+  }, [currentUser?.id]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {

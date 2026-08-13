@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { ServiceItem, Professional, UserProfile } from '../../types';
 import { TermsAndPrivacyModal } from '../shared/TermsAndPrivacyModal';
+import { BookingActionDock } from './BookingActionDock';
 import { formatCurrencyBRL } from '../../utils/masks';
 import {
   Award,
@@ -352,77 +353,35 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
         onClose={() => setModalTab(null)}
       />
 
-      {/* Floating Bottom Tray */}
-      <div className="sticky bottom-3 left-0 right-0 px-5 z-40 flex justify-center pointer-events-none animate-fade-in my-3">
-        <div className={`pointer-events-auto w-full max-w-[400px] p-3.5 rounded-3xl border flex items-center justify-between space-x-3 transition-colors ${
-          'bg-surface-inverse border-border-strong text-content-inverse'
-        }`}>
-          {showCancelConfirm ? (
-            <div className="flex-1 flex flex-col items-center animate-fade-in">
-              <span className={`text-[11px] font-bold mb-2 uppercase tracking-wider ${'text-content-inverse/90'}`}>
-                Cancelar agendamento?
-              </span>
-              <div className="flex items-center space-x-2 w-full">
-                <button
-                  type="button"
-                  onClick={() => setShowCancelConfirm(false)}
-                  className={`flex-1 py-2.5 rounded-full font-bold text-[11px] transition-all ${
-                    'bg-content-inverse/10 hover:bg-content-inverse/20 text-content-inverse/80'
-                  }`}
-                >
-                  Não
-                </button>
-                <button
-                  type="button"
-                  onClick={onCancel}
-                  className={`flex-1 py-2.5 rounded-full border font-bold text-[11px] transition-all active:scale-95 ${
-                    'bg-content-inverse/10 hover:bg-content-inverse/20 border-content-inverse/20 text-content-inverse'
-                  }`}
-                >
-                  Sim, cancelar
-                </button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => setShowCancelConfirm(true)}
-                disabled={isSubmitting}
-                className={`flex-1 px-5 py-3 rounded-full border flex items-center justify-center space-x-1.5 transition-all focus:outline-none active:scale-95 ${
-                  'bg-content-inverse/10 hover:bg-content-inverse/20 border-content-inverse/20 text-content-inverse'
-                }`}
-                title="Cancelar"
-              >
-                <span className="text-[11px] font-bold uppercase tracking-wider">
-                  Cancelar
-                </span>
-                <X className="w-4 h-4" />
-              </button>
-
-              <button
-                id="confirm-booking-btn"
-                type="button"
-                onClick={handleNext}
-                disabled={isSubmitting}
-                className={`flex-1 px-5 py-3 rounded-full bg-gold-base text-surface-base hover:opacity-95 flex items-center justify-center space-x-1.5 transition-all focus:outline-none ${
-                  isSubmitting ? 'opacity-70 cursor-not-allowed scale-95' : 'active:scale-95'
-                }`}
-                title="Confirmar Agendamento"
-              >
-                <span className="text-[11px] font-bold uppercase tracking-wider">
-                  {isSubmitting ? '...' : 'Confirmar'}
-                </span>
-                {isSubmitting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <CheckCircle2 className="w-4 h-4" />
-                )}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
+      <BookingActionDock
+        summaryLabel="Revisão do agendamento"
+        summaryValue={(
+          <>
+            <Calendar className="h-3.5 w-3.5 shrink-0 text-gold-base" />
+            <span className="truncate">{formattedDate} às {selectedTimeSlot}</span>
+          </>
+        )}
+        backAction={{
+          label: 'Cancelar',
+          onClick: () => setShowCancelConfirm(true),
+          disabled: isSubmitting,
+          title: 'Cancelar agendamento'
+        }}
+        primaryAction={{
+          label: 'Confirmar',
+          onClick: handleNext,
+          disabled: isSubmitting,
+          loading: isSubmitting,
+          title: 'Confirmar agendamento',
+          icon: <CheckCircle2 className="h-4 w-4" />
+        }}
+        confirmation={showCancelConfirm ? {
+          message: 'Cancelar agendamento?',
+          onCancel: () => setShowCancelConfirm(false),
+          onConfirm: onCancel,
+          confirmLabel: 'Sim, cancelar'
+        } : undefined}
+      />
     </div>
   );
 };

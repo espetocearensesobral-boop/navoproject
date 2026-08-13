@@ -4,6 +4,7 @@ import { ServiceItem } from '../../types';
 import { DEFAULT_CATEGORIES, getCategoryName } from '../../data/categories';
 import { fetchServicesFromSupabase } from '../../services/supabaseDataService';
 import { ServiceImageCarousel } from './ServiceImageCarousel';
+import { BookingActionDock } from './BookingActionDock';
 import { ImageWithFallback } from '../ui/ImageWithFallback';
 import { hapticLight, hapticMedium, hapticSuccess } from '../../lib/haptics';
 import { optimizeImageUrl } from '../../lib/imageUtils';
@@ -520,74 +521,30 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
         </div>
       )}
 
-      {/* Sticky Bottom Tray with Clear ("Limpar") button */}
       {selectedServices.length > 0 && (
-        <div className="sticky bottom-2 z-40 px-4 my-2 flex justify-center pointer-events-none animate-fade-in">
-          <div className={`pointer-events-auto w-full max-w-[440px] p-3.5 rounded-3xl border flex items-center justify-between transition-colors ${
-            'bg-surface-inverse border-border-strong text-content-inverse'
-          }`}>
-            <div className="flex flex-col pl-2">
-              <div className="flex items-center space-x-1.5 mb-0.5">
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center font-black text-[10px] ${
-                  'bg-accent-solid/20 text-accent-text'
-                }`}>
-                  {selectedServices.length}
-                </span>
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                  'text-content-inverse/60'
-                }`}>
-                  {selectedServices.length === 1 ? 'Serviço' : 'Serviços'}
-                </span>
-              </div>
-              <div className={`text-xl font-mono num-tabular font-semibold leading-tight ${
-                'text-content-inverse'
-              }`}>
-                R$ {totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
-              {onClearServices && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    hapticMedium();
-                    onClearServices();
-                  }}
-                  className={`w-10 h-10 flex-shrink-0 rounded-full border flex items-center justify-center transition-all active:scale-95 ${
-                    'bg-content-inverse/10 hover:bg-content-inverse/20 border-content-inverse/20 text-content-inverse/70 hover:text-status-error'
-                  }`}
-                  title="Limpar seleção"
-                >
-                  <Trash2 className="w-4 h-4 transition-colors" />
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (!isAdvancing) {
-                    hapticSuccess();
-                    setIsAdvancing(true);
-                    onNext();
-                  }
-                }}
-                disabled={isAdvancing}
-                className={`px-5 py-2.5 rounded-full bg-gold-base text-surface-base font-bold text-xs sm:text-sm flex flex-shrink-0 items-center justify-center space-x-1.5 hover:opacity-95 transition-all focus:outline-none ${
-                  isAdvancing ? 'opacity-80 cursor-wait' : 'active:scale-95'
-                }`}
-                title="Avançar para escolha de profissional"
-              >
-                <span>{isAdvancing ? 'Avançando...' : 'Avançar'}</span>
-                {isAdvancing ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ArrowRight className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
+        <BookingActionDock
+          summaryLabel={`${selectedServices.length} ${selectedServices.length === 1 ? 'serviço selecionado' : 'serviços selecionados'}`}
+          summaryValue={<span className="font-mono num-tabular">{totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>}
+          clearAction={onClearServices ? {
+            onClick: () => {
+              hapticMedium();
+              onClearServices();
+            }
+          } : undefined}
+          primaryAction={{
+            label: 'Continuar',
+            onClick: () => {
+              if (!isAdvancing) {
+                hapticSuccess();
+                setIsAdvancing(true);
+                onNext();
+              }
+            },
+            disabled: isAdvancing,
+            loading: isAdvancing,
+            title: 'Continuar para escolha de profissional'
+          }}
+        />
       )}
 
       {/* Service Detail Bottom Sheet Modal */}

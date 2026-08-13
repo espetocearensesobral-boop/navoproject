@@ -81,16 +81,20 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     setHasError(false);
     setIsLoading(true);
 
-    // Registros persistentes são consultados somente pela API/banco.
-    const allLocal = [...customAppointments];
+    // Visitantes não recebem histórico local: para consultar qualquer reserva
+    // precisam validar telefone + voucher, inclusive no mesmo dispositivo.
+    // Usuários autenticados só podem reutilizar o cache local do próprio client_id.
+    const sessionOwnerId = currentUser?.id && currentUser.id !== 'guest' ? currentUser.id : '';
+    const allLocal = isGuest
+      ? []
+      : customAppointments.filter((apt) => !sessionOwnerId || apt.client_id === sessionOwnerId);
     const uniqueLocalMap = new Map<string, Appointment>();
     allLocal.forEach(apt => {
       if (apt && apt.id) uniqueLocalMap.set(apt.id, apt);
     });
     const localCombined = Array.from(uniqueLocalMap.values());
 
-    // For visitors (guests) with no searched phone and no in-session custom booking:
-    if (isGuest && !searchedPhone && localCombined.length === 0) {
+    if (isGuest && !searchedPhone) {
       setAppointments([]);
       setIsLoading(false);
       return;
