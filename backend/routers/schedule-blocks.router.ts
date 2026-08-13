@@ -4,6 +4,7 @@ import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
+import { invalidateAvailabilityCache } from './availability.router.js';
 
 export const scheduleBlocksRouter = express.Router();
 
@@ -23,6 +24,7 @@ scheduleBlocksRouter.post("/", requireAuth, requireAdmin, async (req, res) => {
       target: schema.scheduleBlocks.id,
       set: { ...req.body }
     });
+    invalidateAvailabilityCache();
     res.json(newBlock);
   } catch (e: any) {
     return handleError(res, e, req.path);
@@ -32,6 +34,7 @@ scheduleBlocksRouter.post("/", requireAuth, requireAdmin, async (req, res) => {
 scheduleBlocksRouter.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
     await db.delete(schema.scheduleBlocks).where(eq(schema.scheduleBlocks.id, req.params.id));
+    invalidateAvailabilityCache();
     res.json({ success: true });
   } catch (e: any) {
     return handleError(res, e, req.path);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { ServiceItem, Professional, Appointment } from '../../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { hapticLight, hapticMedium, hapticSuccess } from '../../lib/haptics';
@@ -11,22 +11,23 @@ import { BookingStep2Barbers } from './BookingStep2Barbers';
 import { BookingStep3DateTime } from './BookingStep3DateTime';
 import { BookingStep4Review } from "./BookingStep4Review";
 import { BookingStep5Confirmation } from "./BookingStep5Confirmation";
-import { ClientSubscriptions } from './ClientSubscriptions';
-import { ClientLoyalty } from './ClientLoyalty';
-import { ClientAppointments } from './ClientAppointments';
-import { ClientProfileModal } from './ClientProfileModal';
-import { ClientLoginModal } from './ClientLoginModal';
-import { PaymentChoiceModal } from './PaymentChoiceModal';
-import { GuestSignupPromptModal } from './GuestSignupPromptModal';
 import { LandingPage } from './LandingPage';
-import { ClientMoreDrawer } from './ClientMoreDrawer';
-import { PWAInstallModal } from '../pwa/PWAInstallModal';
 import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
 import { usePullToRefresh } from '../../hooks/usePullToRefresh';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Calendar, Crown, Award, Clock, Home, Menu, Smartphone, User, Sparkles, Scissors, Loader2, Sun, Moon, CheckCircle2, Info, AlertTriangle, Sliders, Download } from 'lucide-react';
 
 import { authFetch, setStoredToken, clearStoredToken, getStoredToken } from '../../lib/api';
+
+const ClientSubscriptions = lazy(() => import('./ClientSubscriptions').then(m => ({ default: m.ClientSubscriptions })));
+const ClientLoyalty = lazy(() => import('./ClientLoyalty').then(m => ({ default: m.ClientLoyalty })));
+const ClientAppointments = lazy(() => import('./ClientAppointments').then(m => ({ default: m.ClientAppointments })));
+const ClientProfileModal = lazy(() => import('./ClientProfileModal').then(m => ({ default: m.ClientProfileModal })));
+const ClientLoginModal = lazy(() => import('./ClientLoginModal').then(m => ({ default: m.ClientLoginModal })));
+const PaymentChoiceModal = lazy(() => import('./PaymentChoiceModal').then(m => ({ default: m.PaymentChoiceModal })));
+const GuestSignupPromptModal = lazy(() => import('./GuestSignupPromptModal').then(m => ({ default: m.GuestSignupPromptModal })));
+const ClientMoreDrawer = lazy(() => import('./ClientMoreDrawer').then(m => ({ default: m.ClientMoreDrawer })));
+const PWAInstallModal = lazy(() => import('../pwa/PWAInstallModal').then(m => ({ default: m.PWAInstallModal })));
 
 export const ClientApp: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -612,9 +613,10 @@ export const ClientApp: React.FC = () => {
             </>
           )}
 
-          {activeTab === 'subscriptions' && <ClientSubscriptions />}
-          {activeTab === 'loyalty' && <ClientLoyalty currentUser={currentUser} />}
+          {activeTab === 'subscriptions' && <Suspense fallback={null}><ClientSubscriptions /></Suspense>}
+          {activeTab === 'loyalty' && <Suspense fallback={null}><ClientLoyalty currentUser={currentUser} /></Suspense>}
           {activeTab === 'appointments' && (
+            <Suspense fallback={null}>
             <ClientAppointments 
               key={appointmentsRefreshKey}
               customAppointments={userCreatedAppointments} 
@@ -622,12 +624,14 @@ export const ClientApp: React.FC = () => {
               currentUser={currentUser} 
               onGoToBooking={() => handleTabChange('booking')}
             />
+            </Suspense>
           )}
         </main>
 
         {/* Bottom Navigation REMOVIDO EM FAVOR DO MENU LATERAL */}
       </div>
 
+      <Suspense fallback={null}>
       <ClientMoreDrawer
         isOpen={isMoreDrawerOpen}
         onClose={() => setIsMoreDrawerOpen(false)}
@@ -644,7 +648,9 @@ export const ClientApp: React.FC = () => {
         onLogout={handleLogout}
         onOpenInstall={() => setIsPwaModalOpen(true)}
       />
+      </Suspense>
 
+      <Suspense fallback={null}>
       <ClientProfileModal
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
@@ -662,7 +668,9 @@ export const ClientApp: React.FC = () => {
           }
         }}
       />
+      </Suspense>
 
+      <Suspense fallback={null}>
       <ClientLoginModal
         isOpen={isLoginModalOpen}
         initialView={loginModalView}
@@ -686,14 +694,18 @@ export const ClientApp: React.FC = () => {
           }
         }}
       />
+      </Suspense>
 
+      <Suspense fallback={null}>
       <GuestSignupPromptModal
         isOpen={showGuestSignupPrompt}
         onClose={handleGuestSignupDecline}
         onAccept={handleGuestSignupAccept}
         onDecline={handleGuestSignupDecline}
       />
+      </Suspense>
 
+      <Suspense fallback={null}>
       <PaymentChoiceModal
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
@@ -711,12 +723,15 @@ export const ClientApp: React.FC = () => {
           });
         }}
       />
+      </Suspense>
 
+      <Suspense fallback={null}>
       <PWAInstallModal
         isOpen={isPwaModalOpen}
         onClose={() => setIsPwaModalOpen(false)}
         onShowToast={showToast}
       />
+      </Suspense>
     </div>
   );
 };

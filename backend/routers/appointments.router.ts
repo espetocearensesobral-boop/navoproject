@@ -10,6 +10,7 @@ import { handleError, userErrors, sanitizePhone, matchPhoneNumbers, generateBook
 import { timeToMinutes, minutesToTime, getDayOfWeekKey, getTodayStringBRT, getCurrentTimeBRT } from '../utils/datetime.js';
 import { JWT_SECRET } from '../config/env.js';
 import { checkSlotAvailability } from '../services/availability.service.js';
+import { invalidateAvailabilityCache } from './availability.router.js';
 
 
 
@@ -752,6 +753,7 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
       notifyClientByEmail(newApt.clientId, newApt, 'booking');
     }
 
+    invalidateAvailabilityCache();
     res.json(newApt);
   } catch (e: any) {
     console.error('Error in POST /api/appointments:', e);
@@ -1049,6 +1051,7 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
           sendWhatsAppMessage(phone, msg).catch(() => {});
         }
 
+        invalidateAvailabilityCache();
         return res.json(updatedApt);
       } catch (err: any) {
         console.warn('[API] Could not update appointment in Postgres:', err);
