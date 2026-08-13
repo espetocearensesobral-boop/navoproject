@@ -519,9 +519,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-            className="text-[clamp(0.95rem,1.7vh,1.15rem)] leading-relaxed text-[#e5e7eb] mb-6 max-w-xs sm:max-w-md font-medium"
+            className="text-[clamp(0.875rem,1.45vh,1rem)] leading-snug text-[#e5e7eb] mb-5 max-w-[19rem] sm:max-w-md font-medium"
           >
-            Agende seu corte em menos de 30 segundos, escolha o barbeiro e receba a confirmação pelo WhatsApp.
+            Escolha serviço, barbeiro e horário. Confirmação imediata pelo WhatsApp.
           </motion.p>
 
           {/* CTA GROUP */}
@@ -546,10 +546,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
               </span>
             </motion.button>
-            <p className="text-xs font-medium text-white/60 -mt-2">
-              Escolha serviço, barbeiro e horário em segundos.
-            </p>
-
             <button 
               onClick={() => onGoToAppointments && onGoToAppointments()}
               className="mt-1 flex items-center justify-center gap-1.5 text-[0.85rem] font-bold text-gold-base border border-gold-base/40 hover:border-gold-base hover:bg-gold-base/10 px-5 py-2.5 rounded-full cursor-pointer transition-all active:scale-95"
