@@ -61,7 +61,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
   const totalPrice = selectedServices.reduce((a, b) => a + (b.price || 0), 0);
   const totalDurationMinutes = selectedServices.reduce((a, b) => a + (b.durationMinutes || b.duration_minutes || 30), 0) || 30;
   const servicesSummaryText = selectedServices.length > 0
-    ? `${selectedServices.length} ${selectedServices.length === 1 ? 'serviço' : 'serviços'} • R$ ${totalPrice.toFixed(2)}`
+    ? `${selectedServices.length} ${selectedServices.length === 1 ? 'serviço' : 'serviços'} • R$ ${totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : 'Profissional';
 
   useEffect(() => {

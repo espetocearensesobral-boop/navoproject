@@ -110,13 +110,13 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
 
   // Group services into Netflix style horizontal rows (Memoized)
   const netflixRows = useMemo(() => {
-    // If active search query or filtered category is set (other than cat_all), show unified section
-    if (searchQuery.trim() !== '' || activeCategory !== 'cat_all') {
+    // 1. Busca ativa
+    if (searchQuery.trim() !== '') {
       return [
         {
           id: 'filtered',
           categoryId: activeCategory,
-          title: activeCategory !== 'cat_all' ? `Catálogo: ${getCategoryName(activeCategory)}` : 'Resultados da busca',
+          title: 'Resultados da busca',
           icon: <Filter className="w-4 h-4 text-gold-base" />,
           services: filteredServices,
         },
@@ -125,9 +125,9 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
 
     const rows: { id: string; categoryId?: string; title: string; icon: React.ReactNode; services: ServiceItem[] }[] = [];
 
-    // 1. Mais Vendidos & Combos
-    const popularServices = services.filter((s) => s.popular || s.is_combo);
-    if (popularServices.length > 0) {
+    // Destaques (se em cat_all ou na página inicial)
+    const popularServices = services.filter((s) => s.popular || s.is_combo).slice(0, 6);
+    if (popularServices.length > 0 && activeCategory === 'cat_all') {
       rows.push({
         id: 'row_popular',
         categoryId: 'cat_all',
@@ -137,78 +137,28 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
       });
     }
 
-    // 2. Cortes & Cabelo
-    const cortesServices = services.filter(
-      (s) =>
-        s.category_id === 'cat_cabelo' ||
-        s.category_id === 'cabelo' ||
-        s.title.toLowerCase().includes('corte') ||
-        s.title.toLowerCase().includes('degrade') ||
-        s.title.toLowerCase().includes('cabelo')
-    );
-    if (cortesServices.length > 0) {
-      rows.push({
-        id: 'row_cortes',
-        categoryId: 'cat_cabelo',
-        title: 'Cortes & Cabelo',
-        icon: <Scissors className="w-4 h-4 text-gold-base" />,
-        services: cortesServices,
-      });
-    }
-
-    // 3. Barba & Cuidados
-    const barbaServices = services.filter(
-      (s) =>
-        s.category_id === 'cat_barba' ||
-        s.category_id === 'barba' ||
-        s.title.toLowerCase().includes('barba') ||
-        s.title.toLowerCase().includes('toalha')
-    );
-    if (barbaServices.length > 0) {
-      rows.push({
-        id: 'row_barba',
-        categoryId: 'cat_barba',
-        title: 'Barba & Barbaterapia',
-        icon: <Sparkles className="w-4 h-4 text-amber-400" />,
-        services: barbaServices,
-      });
-    }
-
-    // 4. Combos VIP
-    const comboServices = services.filter((s) => s.is_combo || s.category_id === 'cat_combos');
-    if (comboServices.length > 0) {
-      rows.push({
-        id: 'row_combos',
-        categoryId: 'cat_combos',
-        title: 'Combos VIP',
-        icon: <Tag className="w-4 h-4 text-emerald-400" />,
-        services: comboServices,
-      });
-    }
-
-    // 5. Additional Categories
-    DEFAULT_CATEGORIES.forEach((cat) => {
-      if (['cat_cabelo', 'cat_barba', 'cat_combos'].includes(cat.id)) return;
-      const catServices = services.filter((s) => s.category_id === cat.id);
-      if (catServices.length > 0) {
+    // Categoria ativa (ou Todos)
+    if (activeCategory === 'cat_all') {
+      // Avoid duplicate rendering by filtering out popular ones from 'Todos'
+      const remainingServices = services.filter(s => !(s.popular || s.is_combo));
+      if (remainingServices.length > 0) {
         rows.push({
-          id: `row_${cat.id}`,
-          categoryId: cat.id,
-          title: cat.name,
-          icon: <Star className="w-4 h-4 text-gold-base" />,
-          services: catServices,
+          id: 'row_all',
+          categoryId: 'cat_all',
+          title: 'Todos os Serviços',
+          icon: <Scissors className="w-4 h-4 text-gold-base" />,
+          services: remainingServices,
         });
       }
-    });
-
-    // Fallback if no matching rows
-    if (rows.length === 0) {
+    } else {
+      const activeCatData = DEFAULT_CATEGORIES.find(c => c.id === activeCategory);
+      const catName = activeCatData ? activeCatData.name : 'Categoria';
       rows.push({
-        id: 'all',
-        categoryId: 'cat_all',
-        title: 'Todos os Serviços',
-        icon: <Scissors className="w-4 h-4 text-gold-base" />,
-        services: services,
+        id: `row_${activeCategory}`,
+        categoryId: activeCategory,
+        title: catName,
+        icon: <Filter className="w-4 h-4 text-gold-base" />,
+        services: filteredServices,
       });
     }
 
@@ -447,7 +397,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
 
                               <div className="flex items-center justify-between pt-1">
                                 <span className="text-lg sm:text-xl font-black text-gold-base tracking-tight drop-shadow-md">
-                                  R$ {service.price.toFixed(2)}
+                                  R$ {service.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                                 <span className="text-[10px] text-white/90 font-bold backdrop-blur-md bg-black/70 px-2 py-0.5 rounded-full border border-white/20">
                                   {service.duration_minutes} min
@@ -513,7 +463,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
 
                               <div className="flex items-center justify-between pt-0.5">
                                 <span className="text-base sm:text-lg font-black text-gold-base tracking-tight drop-shadow-md">
-                                  R$ {service.price.toFixed(2)}
+                                  R$ {service.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                                 <span className="text-[10px] text-white/90 font-bold backdrop-blur-md bg-black/70 px-2 py-0.5 rounded-full border border-white/20">
                                   {service.duration_minutes}m
@@ -554,7 +504,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
               <div className={`text-xl font-mono num-tabular font-semibold leading-tight ${
                 'text-content-inverse'
               }`}>
-                R$ {totalPrice.toFixed(2)}
+                R$ {totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
 
@@ -699,7 +649,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                 <div>
                   <span className="text-[10px] text-content-muted font-bold uppercase tracking-wider block">Valor</span>
                   <span className="text-2xl font-black text-gold-base">
-                    R$ {modalService.price.toFixed(2)}
+                    R$ {modalService.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
 

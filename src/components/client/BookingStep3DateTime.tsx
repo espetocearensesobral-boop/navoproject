@@ -1,3 +1,4 @@
+import { CalendarOff } from 'lucide-react';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Professional, ServiceItem } from '../../types';
@@ -54,9 +55,9 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const [unavailabilityReason, setUnavailabilityReason] = useState<string | null>(null);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
-  const autoJumpCount = useRef(0);
-
+  
   const totalDurationMinutes = useMemo(() => {
     return calculateTotalServicesDuration(selectedServices);
   }, [selectedServices]);
@@ -101,6 +102,12 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
           const resData = await response.json();
           let newBusySlots: string[] = [];
           
+          if (resData.statusCode === 'PROFESSIONAL_UNAVAILABLE') {
+            if (isMounted) setUnavailabilityReason('Nenhum profissional disponível para o serviço e duração selecionados.');
+          } else {
+            if (isMounted) setUnavailabilityReason(null);
+          }
+          
           if (Array.isArray(resData)) {
             newBusySlots = resData.map((apt: any) => apt?.timeSlot || apt).filter(Boolean);
             if (isMounted) {
@@ -114,33 +121,13 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
               setRequiresApprovalSlots(resData.requiresApprovalSlots || []);
             }
           }
-
-          if (isMounted && autoJumpCount.current < 7) {
-            const currentBaseSlots = generateTimeSlotsFromProfile(shopProfile, selectedDate, totalDurationMinutes);
-            const currTimeBRT = getCurrentTimeBRT();
-            
-            const availableCount = currentBaseSlots.filter(time => {
-              const slotMins = timeToMinutes(time);
-              const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
-              return !newBusySlots.includes(time) && !isPastTime;
-            }).length;
-            
-            if (availableCount === 0) {
-              autoJumpCount.current += 1;
-              const nextDayStr = addDaysBRT(selectedDate, 1);
-              onSelectDate(nextDayStr);
-              const { year, month } = getTodayYearMonthBRT(nextDayStr);
-              setCalendarMonth(new Date(year, month, 1));
-            }
-          }
         }
-      } catch (err) {
-        console.warn('Failed to fetch availability:', err);
+      } catch (error) {
+        console.error('Error fetching availability:', error);
       } finally {
         if (isMounted) setIsLoadingSlots(false);
       }
     };
-
     fetchAvailability();
 
     return () => {
@@ -197,8 +184,8 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
 
   const totalPrice = selectedServices.reduce((a, b) => a + (b.price || 0), 0);
   const choicesSummaryText = selectedBarber 
-    ? `${selectedBarber.name} • R$ ${totalPrice.toFixed(2)}`
-    : `R$ ${totalPrice.toFixed(2)}`;
+    ? `${selectedBarber.name} • R$ ${totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    : `R$ ${totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
     <div className="space-y-6 px-4 pt-4 sm:pt-6 pb-28">
@@ -268,8 +255,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                   disabled={isPast || isClosed}
                   onClick={() => {
                     if ('vibrate' in navigator) navigator.vibrate(40);
-                    autoJumpCount.current = 14;
-                    onSelectDate(isoDate);
+                                        onSelectDate(isoDate);
                     onSelectTimeSlot(''); // Clear selected time when date changes
                     setTimeout(() => {
                       timeSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -313,6 +299,16 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
         ) : baseSlots.length === 0 ? (
           <div className="p-6 bg-surface-card border border-border-subtle rounded-card text-center text-xs text-content-muted">
             Nenhum horário disponível para esta data.
+          </div>
+        ) : unavailabilityReason ? (
+          <div className="p-6 bg-surface-card border border-border-subtle rounded-card text-center flex flex-col items-center justify-center space-y-4 animate-fade-in shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-status-warning/10 flex items-center justify-center mb-1">
+              <CalendarOff className="w-6 h-6 text-status-warning" />
+            </div>
+            <div>
+              <h4 className="font-bold text-content-base text-lg">Sem horários</h4>
+              <p className="text-sm text-content-muted mt-1 max-w-[250px] mx-auto leading-relaxed">{unavailabilityReason}</p>
+            </div>
           </div>
         ) : (
           <div className="space-y-6">

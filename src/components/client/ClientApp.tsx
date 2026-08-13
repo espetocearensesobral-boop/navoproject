@@ -1,3 +1,4 @@
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { ServiceItem, Professional, Appointment } from '../../types';
 import { motion, AnimatePresence } from 'motion/react';
@@ -40,6 +41,7 @@ export const ClientApp: React.FC = () => {
   const [loginModalView, setLoginModalView] = useState<'login' | 'register'>('login');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
+  const [pendingTabChange, setPendingTabChange] = useState<string | null>(null);
   const [showGuestSignupPrompt, setShowGuestSignupPrompt] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
@@ -329,48 +331,48 @@ export const ClientApp: React.FC = () => {
     }
   );
 
-  const handleTabChange = async (tabId: 'home' | 'booking' | 'appointments' | 'more' | 'subscriptions' | 'loyalty' | string) => {
-    hapticLight();
-    
-    // Se o usuário está saindo da aba atual e é um convidado
-    if (activeTab !== tabId && isGuest) {
+  const confirmAndExecuteTabChange = async (targetTab: string) => {
+    if (activeTab !== targetTab && isGuest) {
       try {
-        // Limpa o cookie de convidado
-        await fetch('/api/appointments/lookup/logout', {
-          method: 'POST',
-          credentials: 'include'
-        });
-        console.log('Sessão de convidado limpa ao mudar de aba');
+        await fetch('/api/appointments/lookup/logout', { method: 'POST', credentials: 'include' });
       } catch (error) {
         console.error('Erro ao limpar sessão:', error);
       }
     }
-
-    // Proteção: se está no meio do booking e vai sair
-    if (activeTab === 'booking' && bookingStep >= 1 && bookingStep <= 4 && tabId !== 'booking') {
-      if (selectedServices.length > 0 || selectedBarber || selectedDate) {
-        const confirmLeave = window.confirm(
-          'Você tem um agendamento em andamento. Se sair, perderá o progresso. Deseja continuar?'
-        );
-        if (!confirmLeave) return;
-        executeResetBooking();
-      }
-    }
     
-    // Se clica em "Agendar" e já confirmou, reseta para novo agendamento
-    if (tabId === 'booking' && bookingStep > 4) {
+    if (activeTab === 'booking' && bookingStep >= 1 && bookingStep <= 4 && targetTab !== 'booking') {
       executeResetBooking();
     }
-    
-    // Se clica em "Mais", abre o drawer em vez de mudar tab
-    if (tabId === 'more') {
+
+    if (targetTab === 'booking' && bookingStep > 4) {
+      executeResetBooking();
+    }
+
+    if (targetTab === 'more') {
       setIsMoreDrawerOpen(true);
       return;
     }
     
-    if (tabId !== activeTab) {
-      setActiveTab(tabId);
+    if (targetTab !== activeTab) {
+      setActiveTab(targetTab as any);
+      setBookingStep(1); // Ou resetar conforme a regra
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
+  };
+
+  const handleTabChange = async (tabId: 'home' | 'booking' | 'appointments' | 'more' | 'subscriptions' | 'loyalty' | string) => {
+    hapticLight();
+    
+    if (activeTab === 'booking' && bookingStep >= 1 && bookingStep <= 4 && tabId !== 'booking') {
+      if (selectedServices.length > 0 || selectedBarber || selectedDate) {
+        setPendingTabChange(tabId);
+        return;
+      }
+    }
+    
+    await confirmAndExecuteTabChange(tabId);
   };
 
   const handleStartBookingWithService = (service?: ServiceItem) => {
@@ -724,6 +726,22 @@ export const ClientApp: React.FC = () => {
         onLogout={handleLogout}
         onOpenInstall={() => setIsPwaModalOpen(true)}
       />
+      
+      <ConfirmDialog
+        isOpen={pendingTabChange !== null}
+        onClose={() => setPendingTabChange(null)}
+        onConfirm={() => {
+          if (pendingTabChange) {
+            confirmAndExecuteTabChange(pendingTabChange);
+            setPendingTabChange(null);
+          }
+        }}
+        title="Cancelar agendamento?"
+        description="Você tem um agendamento em andamento. Se sair, perderá o progresso. Deseja continuar?"
+        confirmText="Sim, sair"
+        cancelText="Ficar"
+      />
+
       </Suspense>
 
       <Suspense fallback={null}>

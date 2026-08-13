@@ -55,6 +55,8 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   const [cancelError, setCancelError] = useState<string | null>(null);
 
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (isOpen) modalRef.current?.focus(); }, [isOpen]);
   const [cancelReason, setCancelReason] = useState('Compromisso inesperado');
   const [cancelOtherReason, setCancelOtherReason] = useState('');
 
@@ -414,13 +416,13 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   return (
     <>
       {/* Main Voucher/Receipt Modal */}
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-surface-inverse/70 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
         <div className="w-full max-w-[380px] my-auto flex flex-col items-center animate-in zoom-in-95 duration-200">
           
           {/* VOUCHER TICKET CARD */}
           <div
             ref={receiptRef}
-            className="w-full bg-[#faf8f4] text-[#1a1a1a] rounded-modal overflow-hidden shadow-2xl border border-[#e8e0d4] relative select-none"
+            className="w-full bg-surface-card text-content-base rounded-modal overflow-hidden shadow-2xl border border-[#e8e0d4] relative select-none"
           >
             {/* Watermark Background */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
@@ -431,17 +433,17 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
             <div className="relative z-10">
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#ede8e0]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border-subtle">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-gold-base flex items-center justify-center text-surface-base shadow-sm">
                     <Scissors className="w-4 h-4 stroke-[2.5]" />
                   </div>
-                  <h2 className="text-[15px] font-semibold text-[#2d2a26]">Comprovante</h2>
+                  <h2 className="text-[15px] font-semibold text-content-base">Comprovante</h2>
                 </div>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-7 h-7 rounded-full bg-[#f0ebe3] hover:bg-[#e5ddd2] flex items-center justify-center text-[#9a9188] hover:text-[#2d2a26] transition-colors cursor-pointer"
+                  className="w-7 h-7 rounded-full bg-[#f0ebe3] hover:bg-[#e5ddd2] flex items-center justify-center text-[#9a9188] hover:text-content-base transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -472,10 +474,10 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                     <Scissors className="w-5 h-5 stroke-[2.5]" />
                   </div>
                 )}
-                <h1 className="text-xl font-bold tracking-[0.1em] text-[#2d2a26] mb-0.5 uppercase font-serif">
+                <h1 className="text-xl font-bold tracking-[0.1em] text-content-base mb-0.5 uppercase font-serif">
                   {shopProfile.name || 'NAVO PREMIUM'}
                 </h1>
-                <div className="text-[10px] text-[#b0a898] tracking-[0.08em] font-mono uppercase">
+                <div className="text-[10px] text-content-muted tracking-[0.08em] font-mono uppercase">
                   VOUCHER #{currentApt.id.replace('apt_', '').substring(0, 8).toUpperCase()}
                 </div>
               </div>
@@ -513,43 +515,43 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
               {/* Perforation Line */}
               <div className="relative my-0.5 mx-4 h-4 flex items-center justify-center">
                 <div className="w-full border-t-[1.5px] border-dashed border-[#ddd5c8]" />
-                <div className="absolute -left-[26px] w-[20px] h-[20px] bg-[#1a1a1a] rounded-full" />
-                <div className="absolute -right-[26px] w-[20px] h-[20px] bg-[#1a1a1a] rounded-full" />
+                <div className="absolute -left-[26px] w-[20px] h-[20px] bg-surface-inverse rounded-full" />
+                <div className="absolute -right-[26px] w-[20px] h-[20px] bg-surface-inverse rounded-full" />
               </div>
 
               {/* Details Grid */}
               <div className="px-5 py-3.5 grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Profissional</span>
-                  <span className="text-[13px] font-semibold text-[#2d2a26] leading-tight">{currentApt.professional_name}</span>
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-content-muted font-semibold">Profissional</span>
+                  <span className="text-[13px] font-semibold text-content-base leading-tight">{currentApt.professional_name}</span>
                 </div>
 
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Cliente</span>
-                  <span className="text-[13px] font-semibold text-[#2d2a26] leading-tight">{currentApt.client_name || 'Cliente'}</span>
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-content-muted font-semibold">Cliente</span>
+                  <span className="text-[13px] font-semibold text-content-base leading-tight">{currentApt.client_name || 'Cliente'}</span>
                   {currentApt.client_phone && (
                     <span className="text-[11px] font-normal text-[#7a7268]">{currentApt.client_phone}</span>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Data</span>
-                  <span className="text-[13px] font-semibold text-[#2d2a26] capitalize leading-tight">{formatDateDisplay(currentApt.date)}</span>
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-content-muted font-semibold">Data</span>
+                  <span className="text-[13px] font-semibold text-content-base capitalize leading-tight">{formatDateDisplay(currentApt.date)}</span>
                 </div>
 
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Horário</span>
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-content-muted font-semibold">Horário</span>
                   <span className="text-[15px] font-bold text-gold-base leading-tight">{currentApt.time_slot}</span>
                 </div>
 
                 <div className="col-span-2 flex flex-col gap-0.5 pt-0.5">
-                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Localização</span>
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-content-muted font-semibold">Localização</span>
                   <div className="flex items-start gap-2 mt-0.5">
                     <div className="w-6.5 h-6.5 rounded-lg bg-gold-base/10 flex items-center justify-center text-gold-base shrink-0 mt-0.5">
                       <MapPin className="w-3.5 h-3.5" />
                     </div>
                     <div>
-                      <div className="text-[13px] font-semibold text-[#2d2a26] leading-tight">Navo Premium</div>
+                      <div className="text-[13px] font-semibold text-content-base leading-tight">Navo Premium</div>
                       <div className="text-[11px] text-[#7a7268]">Rua Fortaleza, 1420 — Expectativa, Sobral</div>
                     </div>
                   </div>
@@ -559,13 +561,13 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
               {/* Perforation Line */}
               <div className="relative my-0.5 mx-4 h-4 flex items-center justify-center">
                 <div className="w-full border-t-[1.5px] border-dashed border-[#ddd5c8]" />
-                <div className="absolute -left-[26px] w-[20px] h-[20px] bg-[#1a1a1a] rounded-full" />
-                <div className="absolute -right-[26px] w-[20px] h-[20px] bg-[#1a1a1a] rounded-full" />
+                <div className="absolute -left-[26px] w-[20px] h-[20px] bg-surface-inverse rounded-full" />
+                <div className="absolute -right-[26px] w-[20px] h-[20px] bg-surface-inverse rounded-full" />
               </div>
 
               {/* Services */}
               <div className="px-5 pb-3">
-                <div className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold mb-2">
+                <div className="text-[9px] uppercase tracking-[0.12em] text-content-muted font-semibold mb-2">
                   Serviços · {currentApt.total_duration_minutes || 60} min
                 </div>
                 <div className="space-y-0">
@@ -574,12 +576,12 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                       key={index}
                       className="flex justify-between items-center py-2 border-b border-[#f0ebe3] last:border-b-0"
                     >
-                      <div className="text-[13px] font-medium text-[#2d2a26] flex items-center gap-2">
+                      <div className="text-[13px] font-medium text-content-base flex items-center gap-2">
                         <span className="w-1 h-1 rounded-full bg-gold-base" />
                         {service.title}
                       </div>
-                      <span className="text-[13px] font-bold text-[#2d2a26] tabular-nums">
-                        R$ {service.price.toFixed(2)}
+                      <span className="text-[13px] font-bold text-content-base tabular-nums">
+                        R$ {service.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   ))}
@@ -587,29 +589,29 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
               </div>
 
               {/* Total Section */}
-              <div className="px-5 py-3 bg-[#f5f2ec] border-t border-[#ede8e0]">
+              <div className="px-5 py-3 bg-surface-base border-t border-border-subtle">
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] text-[#7a7268]">Subtotal</span>
                   <span className="text-xs text-[#7a7268] tabular-nums">
-                    R$ {(currentApt.original_amount || currentApt.final_amount).toFixed(2)}
+                    R$ {(currentApt.original_amount || currentApt.final_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 {Number(currentApt.discount_amount) > 0 && (
                   <div className="flex justify-between items-center mt-1">
                     <span className="text-[11px] text-[#16a34a]">Desconto</span>
                     <span className="text-xs text-[#16a34a] font-semibold tabular-nums">
-                      - R$ {Number(currentApt.discount_amount).toFixed(2)}
+                      - R$ {Number(currentApt.discount_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 )}
                 <div className="flex justify-between items-center mt-1">
-                  <span className="text-[13px] font-semibold text-[#2d2a26]">Total</span>
+                  <span className="text-[13px] font-semibold text-content-base">Total</span>
                   <span className="text-[18px] font-bold text-[#16a34a] tabular-nums">
-                    R$ {Number(currentApt.final_amount).toFixed(2)}
+                    R$ {Number(currentApt.final_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-2 pt-2 border-t-[1.5px] border-dashed border-[#ddd5c8]">
-                  <span className="text-[10px] text-[#b0a898]">Pagamento</span>
+                  <span className="text-[10px] text-content-muted">Pagamento</span>
                   <span className="text-[10px] font-bold text-[#7a7268] uppercase tracking-[0.08em]">
                     {getPaymentMethodText(currentApt.payment_method)}
                   </span>
@@ -617,8 +619,8 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
               </div>
 
               {/* Footer */}
-              <div className="px-5 py-3 text-center border-t border-[#ede8e0] bg-[#f5f2ec]">
-                <p className="text-[10px] text-[#b0a898] leading-relaxed">
+              <div className="px-5 py-3 text-center border-t border-border-subtle bg-surface-base">
+                <p className="text-[10px] text-content-muted leading-relaxed">
                   Válido apenas para o dia e horário agendado. Chegue com 10 min de antecedência.
                 </p>
               </div>
@@ -672,7 +674,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                 rel="noopener noreferrer"
                 title="Enviar via WhatsApp"
                 aria-label="Enviar via WhatsApp"
-                className="w-11 h-11 rounded-full bg-[#25d366] hover:bg-[#1ebd5a] text-white flex items-center justify-center transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
+                className="w-11 h-11 rounded-full bg-[#25d366] hover:bg-[#1ebd5a] text-content-inverse flex items-center justify-center transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
               >
                 <MessageCircle className="w-5 h-5" />
               </a>
@@ -701,7 +703,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                     setRescheduleTimeSlot(currentApt?.time_slot || currentApt?.timeSlot || '');
                     setShowRescheduleModal(true);
                   }}
-                  className="w-full flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-[#2d2a26] hover:bg-[#1a1815] text-white font-semibold text-xs sm:text-[13px] transition-all cursor-pointer"
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-[#2d2a26] hover:bg-[#1a1815] text-content-inverse font-semibold text-xs sm:text-[13px] transition-all cursor-pointer"
                 >
                   <Calendar className="w-3.5 h-3.5 shrink-0" />
                   <span className="truncate">Reagendar</span>
