@@ -118,15 +118,39 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
     fetchShopProfile().then(data => {
-      if (data) setShopProfile(data);
+      if (isMounted && data) setShopProfile(data);
     });
-    fetchServicesFromSupabase()
-      .then(data => setDbServices(Array.isArray(data) ? data : []))
-      .catch(() => setDbServices([]));
+
+    const loadServices = async () => {
+      try {
+        const data = await fetchServicesFromSupabase(true);
+        if (!isMounted) return;
+        const services = Array.isArray(data) ? data : [];
+        setDbServices(services);
+        if (services.length === 0) {
+          retryTimer = setTimeout(async () => {
+            const retryData = await fetchServicesFromSupabase(true).catch(() => []);
+            if (isMounted) setDbServices(Array.isArray(retryData) ? retryData : []);
+          }, 800);
+        }
+      } catch {
+        if (isMounted) setDbServices([]);
+      }
+    };
+
+    loadServices();
     fetchPublicReviews()
-      .then(data => setPublicReviews(Array.isArray(data) ? data : []))
-      .catch(() => setPublicReviews([]));
+      .then(data => { if (isMounted) setPublicReviews(Array.isArray(data) ? data : []); })
+      .catch(() => { if (isMounted) setPublicReviews([]); });
+
+    return () => {
+      isMounted = false;
+      if (retryTimer) clearTimeout(retryTimer);
+    };
   }, []);
 
   const toggleMenu = () => {
