@@ -284,17 +284,6 @@ export const ProfessionalsManagement: React.FC = () => {
         action={{ label: 'Cadastrar Barbeiro', onClick: handleOpenCreate, icon: Plus }}
       />
 
-      {/* Ação (mobile) */}
-      <button
-        onClick={handleOpenCreate}
-        title="Cadastrar profissional"
-        aria-label="Cadastrar profissional"
-        className="admin-create-icon md:hidden ml-auto w-11 h-11 rounded-full flex items-center justify-center shadow-md active:scale-95 shrink-0"
-      >
-        <Plus className="w-5 h-5 stroke-[2.5]" />
-        <span className="sr-only">Cadastrar Barbeiro</span>
-      </button>
-
       {/* TOAST MESSAGE */}
       {toastMsg && (
         <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
@@ -304,7 +293,7 @@ export const ProfessionalsManagement: React.FC = () => {
       )}
 
       {/* COMPACT KPI CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+      <div className="hidden md:grid grid-cols-2 md:grid-cols-4 gap-2.5">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Total Equipe</span>
@@ -350,8 +339,41 @@ export const ProfessionalsManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* SEARCH AND FILTERS BAR */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
+      {/* MOBILE: CTA, SEARCH AND FILTERS */}
+      <div className="md:hidden space-y-2 mb-3">
+        <div className="flex items-center justify-end">
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            title="Cadastrar profissional"
+            aria-label="Cadastrar profissional"
+            className="admin-create-icon w-11 h-11 rounded-full flex items-center justify-center shadow-md active:scale-95 shrink-0"
+          >
+            <Plus className="w-5 h-5 stroke-[2.5]" />
+            <span className="sr-only">Cadastrar profissional</span>
+          </button>
+        </div>
+        <div className="bg-surface-card p-3 rounded-2xl border border-border-subtle">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar profissional..."
+              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-10 pr-3 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base"
+            />
+          </div>
+        </div>
+        <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          <button type="button" onClick={() => setStatusFilter('all')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'all' ? 'bg-gold-base text-surface-base' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Todos ({totalBarbers})</button>
+          <button type="button" onClick={() => setStatusFilter('active')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'active' ? 'bg-status-success text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Ativos ({activeBarbers})</button>
+          <button type="button" onClick={() => setStatusFilter('inactive')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'inactive' ? 'bg-red-500 text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Pausados ({totalBarbers - activeBarbers})</button>
+        </div>
+      </div>
+
+      {/* DESKTOP SEARCH AND FILTERS */}
+      <div className="hidden md:flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
         <div className="relative flex-1">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
           <input
