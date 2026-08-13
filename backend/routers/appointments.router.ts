@@ -110,6 +110,7 @@ appointmentsRouter.post("/lookup/verify", sensitiveOpsLimiter, async (req: any, 
     );
 
     res.cookie('guest_token', token, {
+      path: '/',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

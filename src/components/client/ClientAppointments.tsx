@@ -163,7 +163,10 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
   useEffect(() => {
     return () => {
       if (isGuest) {
-        fetch('/api/appointments/lookup/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+        navigator.sendBeacon(
+          '/api/appointments/lookup/logout',
+          new Blob([JSON.stringify({})], { type: 'application/json' })
+        );
         setSearchedPhone('');
         setVerifiedVoucher('');
         setGuestPhoneInput('');

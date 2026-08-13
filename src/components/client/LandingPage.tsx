@@ -694,7 +694,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               </span>
               <h2 className="font-serif text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
                 Quem usa, vira fã
-                <br className="hidden md:block" /> (e sobe de nível)
+                <br className="hidden md:block" />
               </h2>
             </div>
             

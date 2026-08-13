@@ -145,8 +145,8 @@ export const ClientApp: React.FC = () => {
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      // Se é um convidado com um agendamento recente, limpa a sessão
-      if (isGuest && createdBookingCode) {
+      // Se é um convidado, limpa a sessão ao sair/recarregar
+      if (isGuest) {
         // Usa sendBeacon para garantir que a requisição seja enviada antes de fechar
         navigator.sendBeacon(
           '/api/appointments/lookup/logout',
@@ -160,7 +160,7 @@ export const ClientApp: React.FC = () => {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [isGuest, createdBookingCode]);
+  }, [isGuest]);
 
   useEffect(() => {
     let inactivityTimer: NodeJS.Timeout;
@@ -332,8 +332,8 @@ export const ClientApp: React.FC = () => {
   const handleTabChange = async (tabId: 'home' | 'booking' | 'appointments' | 'more' | 'subscriptions' | 'loyalty' | string) => {
     hapticLight();
     
-    // Se o usuário está saindo da aba de agendamento e é um convidado
-    if (activeTab === 'booking' && tabId !== 'booking' && isGuest) {
+    // Se o usuário está saindo da aba atual e é um convidado
+    if (activeTab !== tabId && isGuest) {
       try {
         // Limpa o cookie de convidado
         await fetch('/api/appointments/lookup/logout', {
