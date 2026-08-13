@@ -195,12 +195,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     const activeDays = days.filter(d => shopProfile.operatingSchedule[d.key]?.active);
     if (activeDays.length === 0) return 'Fechado temporariamente';
 
-    const firstActive = activeDays[0];
-    const lastActive = activeDays[activeDays.length - 1];
-    const sch = shopProfile.operatingSchedule[firstActive.key];
-    
-    if (activeDays.length === 1) return `${firstActive.label}: ${sch.open} às ${sch.close}`;
-    return `${firstActive.label} a ${lastActive.label}: ${sch.open} às ${sch.close}`;
+    const groups: Array<{ startIndex: number; endIndex: number; open: string; close: string }> = [];
+    activeDays.forEach((day) => {
+      const schedule = shopProfile.operatingSchedule[day.key];
+      if (!schedule) return;
+      const dayIndex = days.findIndex(item => item.key === day.key);
+      const previous = groups[groups.length - 1];
+      if (previous && dayIndex === previous.endIndex + 1 && previous.open === schedule.open && previous.close === schedule.close) {
+        previous.endIndex = dayIndex;
+      } else {
+        groups.push({ startIndex: dayIndex, endIndex: dayIndex, open: schedule.open, close: schedule.close });
+      }
+    });
+
+    return groups.map((group) => {
+      const startLabel = days[group.startIndex].label;
+      const endLabel = days[group.endIndex].label;
+      const rangeLabel = group.startIndex === group.endIndex ? startLabel : `${startLabel} a ${endLabel}`;
+      return `${rangeLabel}: ${group.open} às ${group.close}`;
+    }).join(' · ');
   }, [shopProfile]);
 
   useEffect(() => {

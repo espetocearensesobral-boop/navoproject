@@ -37,6 +37,69 @@ let cachedShopSettings: { data: any; timestamp: number } | null = null;
 let cachedProfessionals: { data: any[]; timestamp: number } | null = null;
 const CACHE_TTL_MS = 20000;
 
+type NormalizedProfessionalDay = {
+  closed: boolean;
+  start: number;
+  end: number;
+};
+
+const professionalDayAliases: Record<string, string[]> = {
+  sunday: ['sunday', 'sun'],
+  monday: ['monday', 'mon'],
+  tuesday: ['tuesday', 'tue'],
+  wednesday: ['wednesday', 'wed'],
+  thursday: ['thursday', 'thu'],
+  friday: ['friday', 'fri'],
+  saturday: ['saturday', 'sat'],
+};
+
+function parseProfessionalDay(value: unknown): NormalizedProfessionalDay | null {
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['off', 'closed', 'fechado', 'folga'].includes(normalized)) {
+      return { closed: true, start: 0, end: 0 };
+    }
+    const match = normalized.match(/^(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})$/);
+    if (!match) return null;
+    const start = timeToMinutes(match[1]);
+    const end = timeToMinutes(match[2]);
+    return end > start ? { closed: false, start, end } : { closed: true, start, end };
+  }
+
+  if (!value || typeof value !== 'object') return null;
+  const day = value as Record<string, unknown>;
+  if (day.isOff === true || day.closed === true || day.active === false) {
+    return { closed: true, start: 0, end: 0 };
+  }
+
+  const startValue = day.start ?? day.open;
+  const endValue = day.end ?? day.close;
+  if (typeof startValue !== 'string' || typeof endValue !== 'string') return null;
+  const start = timeToMinutes(startValue);
+  const end = timeToMinutes(endValue);
+  return end > start ? { closed: false, start, end } : { closed: true, start, end };
+}
+
+function getProfessionalDaySchedule(professional: any, dayKey: string): NormalizedProfessionalDay | null {
+  const workingHours = professional?.workingHours;
+  if (!workingHours || typeof workingHours !== 'object') return null;
+
+  const aliases = professionalDayAliases[dayKey] || [dayKey];
+  const directKey = aliases.find((key) => Object.prototype.hasOwnProperty.call(workingHours, key));
+  if (directKey) {
+    return parseProfessionalDay(workingHours[directKey]);
+  }
+
+  // Compatibilidade com o formato legado { days: ['mon', ...], start, end }.
+  if (Array.isArray(workingHours.days)) {
+    const worksThatDay = aliases.some((key) => workingHours.days.includes(key));
+    if (!worksThatDay) return { closed: true, start: 0, end: 0 };
+    return parseProfessionalDay({ start: workingHours.start, end: workingHours.end });
+  }
+
+  return null;
+}
+
 export function invalidateAvailabilityCache() {
   cachedShopSettings = null;
   cachedProfessionals = null;
@@ -87,7 +150,8 @@ export async function fetchDaySlotContext(dateStr: string, excludeAptId?: string
 
 export async function checkSlotAvailability(params: CheckSlotParams): Promise<CheckSlotResult> {
   const { dateStr, startMins, reqDuration, profId, excludeAptId, todayBRT, currTimeBRT, debug, preloaded } = params;
-  const endMins = startMins + reqDuration;
+  const safeDuration = Number.isInteger(reqDuration) && reqDuration >= 5 && reqDuration <= 480 ? reqDuration : 30;
+  const endMins = startMins + safeDuration;
   
   const ctx = preloaded || await fetchDaySlotContext(dateStr, excludeAptId);
   const { shopProf, allAppointments, allBlocks, allProfessionals } = ctx;
@@ -117,7 +181,7 @@ export async function checkSlotAvailability(params: CheckSlotParams): Promise<Ch
          return { statusCode: 'SHOP_CLOSED', available: false, reason: 'Horário muito fora do expediente' };
       }
       let possibleProf = null;
-      if (profId) possibleProf = allProfessionals.find((p: any) => p.id === profId);
+      if (profId && profId !== 'prof_any') possibleProf = allProfessionals.find((p: any) => p.id === profId);
       else if (allProfessionals.length > 0) possibleProf = allProfessionals[0];
 
       return {
@@ -133,7 +197,12 @@ export async function checkSlotAvailability(params: CheckSlotParams): Promise<Ch
     }
   }
 
-  let profsToCheck = profId ? allProfessionals.filter((p: any) => p.id === profId) : allProfessionals;
+  // `prof_any` é uma opção virtual da UI, não um registro no banco.
+  // Sem um profissional específico, a disponibilidade é a união dos profissionais ativos.
+  const requestedProfId = profId && profId !== 'prof_any' ? profId : '';
+  const profsToCheck = requestedProfId
+    ? allProfessionals.filter((p: any) => p.id === requestedProfId)
+    : allProfessionals;
 
   if (profsToCheck.length === 0) {
     return { statusCode: 'PROFESSIONAL_UNAVAILABLE', available: false, reason: 'Nenhum profissional disponível' };
@@ -143,20 +212,11 @@ export async function checkSlotAvailability(params: CheckSlotParams): Promise<Ch
   let requireApprov = false;
 
   for (const prof of profsToCheck) {
-    const pWorkingHours = prof.workingHours || {};
-    const pDay = pWorkingHours[dayKey];
-    let isProfOutside = false;
+    const pDay = getProfessionalDaySchedule(prof, dayKey);
+    // Folga individual nunca pode ser liberada pela aprovação fora do expediente.
+    if (pDay?.closed) continue;
 
-    if (pDay && !pDay.isOff) {
-       const pStart = timeToMinutes(pDay.start || '09:00');
-       const pEnd = timeToMinutes(pDay.end || '21:00');
-       if (startMins < pStart || endMins > pEnd) {
-          isProfOutside = true;
-       }
-    } else if (pDay && pDay.isOff) {
-       isProfOutside = true;
-    }
-
+    const isProfOutside = !!pDay && (startMins < pDay.start || endMins > pDay.end);
     if (isProfOutside && !shopProf.allowOutsideHoursApproval) {
       continue;
     }
@@ -164,7 +224,8 @@ export async function checkSlotAvailability(params: CheckSlotParams): Promise<Ch
     const profApts = allAppointments.filter((a: any) => a.professionalId === prof.id);
     const hasAptConflict = profApts.some((a: any) => {
       const aStart = timeToMinutes(a.timeSlot);
-      const aEnd = aStart + Number(a.totalDurationMinutes || 30);
+      const aDuration = Number(a.totalDurationMinutes || 30);
+      const aEnd = aStart + (Number.isFinite(aDuration) && aDuration > 0 ? aDuration : 30);
       return Math.max(startMins, aStart) < Math.min(endMins, aEnd);
     });
 

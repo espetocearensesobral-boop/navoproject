@@ -926,7 +926,8 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
 
     const newDate = data.date || dbApt.date;
     const newTimeSlot = data.timeSlot || data.time_slot || dbApt.timeSlot;
-    const newProfessionalId = data.professionalId || data.professional_id || dbApt.professionalId;
+    let newProfessionalId = data.professionalId || data.professional_id || dbApt.professionalId;
+    let resolvedProfessionalName = dbApt.professionalName;
     let durationMins = Number(data.totalDurationMinutes || data.total_duration_minutes || dbApt.totalDurationMinutes || 30);
     if (!dateSchema.safeParse(newDate).success || !timeSchema.safeParse(newTimeSlot).success) {
       return res.status(400).json({ error: 'Data ou horário inválidos.' });
@@ -954,6 +955,18 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
       if (!checkRes.available) {
         return res.status(409).json({ error: checkRes.reason || 'Este horário conflita com outro agendamento ou bloqueio de agenda.' });
       }
+
+      if (newProfessionalId === 'prof_any') {
+        if (!checkRes.chosenProf) {
+          return res.status(409).json({ error: 'Nenhum profissional disponível para este horário.' });
+        }
+        newProfessionalId = checkRes.chosenProf.id;
+      }
+      const selectedProfessional = checkRes.chosenProf || await db.query.professionals.findFirst({ where: eq(schema.professionals.id, newProfessionalId) });
+      if (!selectedProfessional || !selectedProfessional.isActive) {
+        return res.status(400).json({ error: 'Profissional não encontrado ou inativo.' });
+      }
+      resolvedProfessionalName = selectedProfessional.name;
     }
 
     if (isDbConnected && db) {
@@ -969,10 +982,10 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
         if (data.client_phone !== undefined) updateData.clientPhone = sanitizePhone(data.client_phone);
         if (data.clientName !== undefined) updateData.clientName = data.clientName;
         if (data.client_name !== undefined) updateData.clientName = data.client_name;
-        if (data.professionalId !== undefined) updateData.professionalId = data.professionalId;
-        if (data.professional_id !== undefined) updateData.professionalId = data.professional_id;
-        if (data.professionalName !== undefined) updateData.professionalName = data.professionalName;
-        if (data.professional_name !== undefined) updateData.professionalName = data.professional_name;
+        if (data.professionalId !== undefined || data.professional_id !== undefined) {
+          updateData.professionalId = newProfessionalId;
+          updateData.professionalName = data.professionalName || data.professional_name || resolvedProfessionalName;
+        }
         // Price fields (originalAmount/discountAmount/finalAmount) are NEVER taken verbatim
         // from the request body. They are recalculated server-side below, the same way
         // POST /api/appointments does it, so a caller cannot forge or zero out the price

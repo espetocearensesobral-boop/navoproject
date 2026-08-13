@@ -2,8 +2,8 @@ import express from 'express';
 import { eq } from 'drizzle-orm';
 import { db, isDbConnected } from '../index.js';
 import { userErrors } from '../utils/index.js';
-import { fetchDaySlotContext, checkSlotAvailability } from '../services/availability.service.js';
-import { timeToMinutes, minutesToTime, getDayOfWeekKey, getTodayStringBRT, getCurrentTimeBRT } from '../utils/datetime.js';
+import { fetchDaySlotContext, checkSlotAvailability, invalidateAvailabilityCache as invalidateServiceAvailabilityCache } from '../services/availability.service.js';
+import { timeToMinutes, minutesToTime, getDayOfWeekKey, getTodayStringBRT, getCurrentTimeBRT, addDaysBRT } from '../utils/datetime.js';
 
 export const availabilityRouter = express.Router();
 
@@ -13,6 +13,7 @@ const CACHE_TTL_MS = 15000; // 15 seconds
 
 export function invalidateAvailabilityCache() {
   availabilityCache.clear();
+  invalidateServiceAvailabilityCache();
 }
 
 availabilityRouter.get("/next", async (req, res) => {
@@ -24,10 +25,7 @@ availabilityRouter.get("/next", async (req, res) => {
     
     // We check up to 3 days to find a slot fast
     for (let i = 0; i < 3; i++) {
-      const d = new Date();
-      d.setUTCHours(d.getUTCHours() - 3);
-      d.setDate(d.getDate() + i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = addDaysBRT(todayBRT, i);
       
       const daySlotContext = await fetchDaySlotContext(dateStr, '');
       const shopProf = daySlotContext.shopProf;
@@ -99,7 +97,11 @@ availabilityRouter.get("/", async (req, res) => {
     }
 
     const excludeAptId = excludeAppointmentId ? String(excludeAppointmentId) : '';
-    const reqDuration = Math.max(30, Number(duration || 30));
+    const parsedDuration = Number(duration || 30);
+    if (!Number.isInteger(parsedDuration) || parsedDuration < 5 || parsedDuration > 480) {
+      return res.status(400).json({ error: 'Duração inválida. Use um valor inteiro entre 5 e 480 minutos.' });
+    }
+    const reqDuration = parsedDuration;
     const todayBRT = getTodayStringBRT();
     const currTimeBRT = getCurrentTimeBRT();
 

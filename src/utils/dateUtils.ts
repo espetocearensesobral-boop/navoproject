@@ -135,8 +135,8 @@ export type DayOfWeekKey = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thur
 export function getDayOfWeekKey(dateStr: string): DayOfWeekKey {
   if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return 'monday';
   const [y, m, d] = dateStr.split('-').map(Number);
-  const dateObj = new Date(y, m - 1, d);
-  const dayIndex = dateObj.getDay();
+  const dateObj = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+  const dayIndex = dateObj.getUTCDay();
   const keys: DayOfWeekKey[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   return keys[dayIndex] || 'monday';
 }

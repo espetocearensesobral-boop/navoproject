@@ -52,7 +52,10 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
 }) => {
   const { theme } = useTheme();
   const [busySlots, setBusySlots] = useState<string[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [requiresApprovalSlots, setRequiresApprovalSlots] = useState<string[]>([]);
+  const [availabilitySource, setAvailabilitySource] = useState<'server' | 'legacy' | null>(null);
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
@@ -96,6 +99,12 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     const fetchAvailability = async () => {
       if (!selectedDate) return;
       setIsLoadingSlots(true);
+      setAvailabilityError(null);
+      setAvailabilitySource(null);
+      setBusySlots([]);
+      setAvailableSlots([]);
+      setRequiresApprovalSlots([]);
+      setUnavailabilityReason(null);
       try {
         const profId = selectedBarber?.id || 'prof_any';
         const response = await authFetch(`/api/availability?professionalId=${profId}&date=${selectedDate}&duration=${totalDurationMinutes}`);
@@ -113,18 +122,37 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
             newBusySlots = resData.map((apt: any) => apt?.timeSlot || apt).filter(Boolean);
             if (isMounted) {
               setBusySlots(newBusySlots);
+              setAvailableSlots([]);
               setRequiresApprovalSlots([]);
+              setAvailabilitySource('legacy');
             }
           } else {
-            newBusySlots = resData.busySlots || [];
+            newBusySlots = Array.isArray(resData.busySlots) ? resData.busySlots : [];
+            const serverAvailableSlots = Array.isArray(resData.availableSlots) ? resData.availableSlots : [];
+            const serverApprovalSlots = Array.isArray(resData.requiresApprovalSlots) ? resData.requiresApprovalSlots : [];
+            const statusReason = Array.isArray(resData.slots)
+              ? resData.slots.find((slot: any) => ['PROFESSIONAL_UNAVAILABLE', 'SHOP_CLOSED'].includes(slot?.statusCode))?.reason
+              : null;
             if (isMounted) {
               setBusySlots(newBusySlots);
-              setRequiresApprovalSlots(resData.requiresApprovalSlots || []);
+              setAvailableSlots(serverAvailableSlots);
+              setRequiresApprovalSlots(serverApprovalSlots);
+              setAvailabilitySource('server');
+              setUnavailabilityReason(statusReason || null);
             }
           }
+        } else {
+          throw new Error(`Disponibilidade indisponível (HTTP ${response.status})`);
         }
       } catch (error) {
         console.error('Error fetching availability:', error);
+        if (isMounted) {
+          setAvailabilityError('Não foi possível validar os horários agora. Tente novamente.');
+          setBusySlots([]);
+          setAvailableSlots([]);
+          setRequiresApprovalSlots([]);
+          setAvailabilitySource(null);
+        }
       } finally {
         if (isMounted) setIsLoadingSlots(false);
       }
@@ -297,6 +325,10 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
             <Loader2 className="w-6 h-6 text-gold-base animate-spin" />
             <span>Carregando horários para {formatDateBR(selectedDate)}...</span>
           </div>
+        ) : availabilityError ? (
+          <div className="p-6 bg-surface-card border border-status-warning/30 rounded-card text-center text-xs text-content-muted">
+            {availabilityError}
+          </div>
         ) : baseSlots.length === 0 ? (
           <div className="p-6 bg-surface-card border border-border-subtle rounded-card text-center text-xs text-content-muted">
             Nenhum horário disponível para esta data.
@@ -327,8 +359,9 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                     const currTimeBRT = getCurrentTimeBRT();
                     const slotMins = timeToMinutes(time);
                     const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
-                    const isBusy = busySlots.includes(time) || isPastTime;
                     const isReqApproval = requiresApprovalSlots.includes(time);
+                    const serverAllowsSlot = availableSlots.includes(time) || isReqApproval;
+                    const isBusy = (availabilitySource === 'server' ? !serverAllowsSlot : busySlots.includes(time)) || isPastTime;
                     const isAvailable = !isBusy;
 
                     return (
@@ -379,8 +412,9 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                     const currTimeBRT = getCurrentTimeBRT();
                     const slotMins = timeToMinutes(time);
                     const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
-                    const isBusy = busySlots.includes(time) || isPastTime;
                     const isReqApproval = requiresApprovalSlots.includes(time);
+                    const serverAllowsSlot = availableSlots.includes(time) || isReqApproval;
+                    const isBusy = (availabilitySource === 'server' ? !serverAllowsSlot : busySlots.includes(time)) || isPastTime;
                     const isAvailable = !isBusy;
 
                     return (

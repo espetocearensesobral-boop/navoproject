@@ -20,7 +20,9 @@ professionalsRouter.get('/', async (req: any, res) => {
     if (token) {
       try { isAdmin = (jwt.verify(token, JWT_SECRET) as any).role === 'admin'; } catch {}
     }
-    const professionals = isDbConnected && db ? await db.query.professionals.findMany() : [];
+    const professionals = isDbConnected && db
+      ? await db.query.professionals.findMany(isAdmin ? undefined : { where: eq(schema.professionals.isActive, true) })
+      : [];
     const safe = isAdmin ? professionals : professionals.map((p: any) => ({
       id: p.id,
       name: p.name,

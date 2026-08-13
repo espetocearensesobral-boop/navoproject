@@ -165,7 +165,7 @@ import { servicesRouter } from './routers/services.router.js';
 import { professionalsRouter } from './routers/professionals.router.js';
 import { scheduleBlocksRouter } from './routers/schedule-blocks.router.js';
 import { cashTransactionsRouter } from './routers/cash-transactions.router.js';
-import { availabilityRouter } from './routers/availability.router.js';
+import { availabilityRouter, invalidateAvailabilityCache } from './routers/availability.router.js';
 import { appointmentsRouter } from './routers/appointments.router.js';
 import { loyaltyRouter } from './routers/loyalty.router.js';
 import { referralsRouter } from './routers/referrals.router.js';
@@ -704,6 +704,40 @@ const DEFAULT_SHOP_PROFILE = {
 };
 
 const PUBLIC_PROFILE_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400';
+const profileTimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Horário inválido. Use HH:mm.');
+const profileScheduleDaySchema = z.object({
+  active: z.boolean(),
+  open: profileTimeSchema,
+  close: profileTimeSchema,
+}).refine((value) => value.active ? value.open < value.close : true, {
+  message: 'O horário de abertura deve ser anterior ao fechamento.',
+  path: ['close'],
+});
+const profilePayloadSchema = z.object({
+  name: z.string().trim().min(1).max(120).optional(),
+  unitName: z.string().trim().min(1).max(120).optional(),
+  slogan: z.string().trim().max(300).optional(),
+  address: z.string().trim().max(300).optional(),
+  phone: z.string().trim().max(30).optional(),
+  whatsapp: z.string().trim().max(30).optional(),
+  openTime: profileTimeSchema.optional(),
+  closeTime: profileTimeSchema.optional(),
+  operatingDays: z.array(z.number().int().min(0).max(6)).max(7).optional(),
+  operatingSchedule: z.object({
+    sunday: profileScheduleDaySchema,
+    monday: profileScheduleDaySchema,
+    tuesday: profileScheduleDaySchema,
+    wednesday: profileScheduleDaySchema,
+    thursday: profileScheduleDaySchema,
+    friday: profileScheduleDaySchema,
+    saturday: profileScheduleDaySchema,
+  }).partial().optional(),
+  mapsUrl: z.string().url().max(2000).optional(),
+  instagram: z.string().trim().max(120).optional(),
+  logoUrl: z.string().max(10000000).nullable().optional(),
+  description: z.string().trim().max(2000).optional(),
+  allowOutsideHoursApproval: z.boolean().optional(),
+});
 
 function publicLogoUrl(value: unknown): string {
   if (typeof value !== 'string' || value.length === 0) return '';
@@ -762,6 +796,82 @@ app.get("/api/shop-profile", async (_req: any, res: any) => {
   }
 });
 
+app.post("/api/shop-profile", requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    if (!isDbConnected || !db) return res.status(503).json({ error: userErrors.dbDisconnected });
+
+    const parsed = profilePayloadSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Dados do perfil ou horários inválidos.', details: parsed.error.flatten() });
+    }
+
+    const current = await db.query.shopSettings.findFirst({ where: eq(schema.shopSettings.id, 'default') });
+    const input = parsed.data;
+    const currentSchedule = current?.operatingSchedule && typeof current.operatingSchedule === 'object'
+      ? current.operatingSchedule as Record<string, any>
+      : DEFAULT_SHOP_PROFILE.operatingSchedule;
+    const operatingSchedule = {
+      ...DEFAULT_SHOP_PROFILE.operatingSchedule,
+      ...currentSchedule,
+      ...(input.operatingSchedule || {}),
+    };
+    const scheduleKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+    const operatingDays = input.operatingDays ?? scheduleKeys.reduce<number[]>((days, key, index) => {
+      if (operatingSchedule[key]?.active) days.push(index);
+      return days;
+    }, []);
+    const values = {
+      id: 'default',
+      name: input.name ?? current?.name ?? DEFAULT_SHOP_PROFILE.name,
+      unitName: input.unitName ?? current?.unitName ?? DEFAULT_SHOP_PROFILE.unitName,
+      slogan: input.slogan ?? current?.slogan ?? DEFAULT_SHOP_PROFILE.slogan,
+      address: input.address ?? current?.address ?? DEFAULT_SHOP_PROFILE.address,
+      phone: input.phone ?? current?.phone ?? DEFAULT_SHOP_PROFILE.phone,
+      whatsapp: input.whatsapp ?? current?.whatsapp ?? DEFAULT_SHOP_PROFILE.whatsapp,
+      openTime: input.openTime ?? current?.openTime ?? DEFAULT_SHOP_PROFILE.openTime,
+      closeTime: input.closeTime ?? current?.closeTime ?? DEFAULT_SHOP_PROFILE.closeTime,
+      operatingDays,
+      operatingSchedule,
+      mapsUrl: input.mapsUrl ?? current?.mapsUrl ?? DEFAULT_SHOP_PROFILE.mapsUrl,
+      instagram: input.instagram ?? current?.instagram ?? DEFAULT_SHOP_PROFILE.instagram,
+      logoUrl: input.logoUrl !== undefined ? input.logoUrl : (current?.logoUrl ?? null),
+      description: input.description ?? current?.description ?? DEFAULT_SHOP_PROFILE.description,
+      allowOutsideHoursApproval: input.allowOutsideHoursApproval ?? current?.allowOutsideHoursApproval ?? DEFAULT_SHOP_PROFILE.allowOutsideHoursApproval,
+      themePalette: current?.themePalette ?? 'heritage',
+      updatedAt: new Date(),
+    };
+    const [saved] = await db.insert(schema.shopSettings)
+      .values(values)
+      .onConflictDoUpdate({
+        target: schema.shopSettings.id,
+        set: {
+          name: values.name,
+          unitName: values.unitName,
+          slogan: values.slogan,
+          address: values.address,
+          phone: values.phone,
+          whatsapp: values.whatsapp,
+          openTime: values.openTime,
+          closeTime: values.closeTime,
+          operatingDays: values.operatingDays,
+          operatingSchedule: values.operatingSchedule,
+          mapsUrl: values.mapsUrl,
+          instagram: values.instagram,
+          logoUrl: values.logoUrl,
+          description: values.description,
+          allowOutsideHoursApproval: values.allowOutsideHoursApproval,
+          themePalette: values.themePalette,
+          updatedAt: values.updatedAt,
+        },
+      })
+      .returning();
+
+    invalidateAvailabilityCache();
+    return res.json({ profile: { ...saved, logoUrl: publicLogoUrl(saved.logoUrl) } });
+  } catch (e: any) {
+    return handleError(res, e, 'POST /api/shop-profile');
+  }
+});
 
 // Fallback for missing API routes to ensure JSON response
 app.use('/api', (req: any, res: any) => {
