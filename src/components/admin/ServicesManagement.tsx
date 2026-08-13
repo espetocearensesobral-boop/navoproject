@@ -17,6 +17,8 @@ import {
   Filter,
   Image as ImageIcon,
   Copy,
+  ChevronDown,
+  ChevronUp,
   Star,
   Flame,
   LayoutGrid,
@@ -80,7 +82,8 @@ export const ServicesManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [filterType, setFilterType] = useState<'all' | 'combos' | 'popular' | 'gallery'>('all');
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
+  const [viewMode, setViewMode] = useState<'table' | 'list'>('list');
+  const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeFormTab, setActiveFormTab] = useState<'general' | 'pricing' | 'gallery'>('general');
@@ -594,21 +597,21 @@ export const ServicesManagement: React.FC = () => {
           <div className="flex items-center bg-surface-card p-1 rounded-xl border border-border-subtle">
             <button
               onClick={() => setViewMode('table')}
-              className={`p-1.5 rounded-lg text-xs transition-all ${
-                viewMode === 'table' ? 'bg-surface-card text-gold-base' : 'text-content-muted hover:text-content-base'
+              className={`min-h-10 px-2 rounded-lg text-xs transition-all ${
+                viewMode === 'table' ? 'bg-gold-base/15 text-gold-base' : 'text-content-muted hover:text-content-base'
               }`}
               title="Visualização em Tabela"
             >
-              <List className="w-4 h-4" />
+              <LayoutGrid className="w-4 h-4" />
             </button>
             <button
-              onClick={() => setViewMode('cards')}
-              className={`p-1.5 rounded-lg text-xs transition-all ${
-                viewMode === 'cards' ? 'bg-surface-card text-gold-base' : 'text-content-muted hover:text-content-base'
+              onClick={() => setViewMode('list')}
+              className={`min-h-10 px-2 rounded-lg text-xs transition-all ${
+                viewMode === 'list' ? 'bg-gold-base/15 text-gold-base' : 'text-content-muted hover:text-content-base'
               }`}
-              title="Visualização em Cards"
+              title="Visualização em Lista"
             >
-              <LayoutGrid className="w-4 h-4" />
+              <List className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -804,94 +807,85 @@ export const ServicesManagement: React.FC = () => {
         </div>
       ) : (
         /* Grid Mode (Compact Blocks) */
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {filteredServices.map((service) => {
-            const categoryName = getCategoryName(service.category_id);
-            const servicePhotos = Array.isArray(service.gallery_urls) && service.gallery_urls.length > 0
-              ? service.gallery_urls
-              : service.image_url ? [service.image_url] : [];
+        <div className="space-y-2">
+          {loading ? (
+            <div className="py-10 text-center text-sm text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
+              <Scissors className="w-5 h-5 text-gold-base animate-spin mx-auto mb-2" />
+              Carregando cardápio de serviços...
+            </div>
+          ) : filteredServices.length === 0 ? (
+            <div className="py-10 text-center text-sm text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
+              Nenhum serviço encontrado com os filtros atuais.
+            </div>
+          ) : (
+            filteredServices.map((service) => {
+              const categoryName = getCategoryName(service.category_id);
+              const servicePhotos = Array.isArray(service.gallery_urls) && service.gallery_urls.length > 0
+                ? service.gallery_urls
+                : service.image_url ? [service.image_url] : [];
+              const isExpanded = expandedServiceId === service.id;
 
-            return (
-              <div
-                key={service.id}
-                className="bg-surface-card rounded-2xl border border-border-subtle p-3 hover:border-gold-base/50 transition-all group flex flex-col justify-between shadow-lg"
-              >
-                <div className="flex items-center gap-3">
-                  {/* Compact Header Image */}
-                  <div className="relative w-20 h-20 rounded-xl bg-surface-base overflow-hidden shrink-0 border border-border-subtle flex items-center justify-center">
-                    {service.image_url || servicePhotos[0] ? (
-                      <img
-                        src={service.image_url || servicePhotos[0]}
-                        alt={service.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <Scissors className="w-8 h-8 text-gold-base/40" />
-                    )}
-                    {service.is_combo && (
-                      <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-xl bg-status-success text-surface-base text-[8px] font-black uppercase shadow">
-                        Combo
-                      </span>
-                    )}
-                    {service.popular && !service.is_combo && (
-                      <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-xl bg-gold-base text-surface-base text-[8px] font-black uppercase shadow">
-                        Destaque
-                      </span>
-                    )}
-                  </div>
+              return (
+                <article key={service.id} className={`overflow-hidden rounded-2xl border bg-surface-card transition-colors ${isExpanded ? 'border-gold-base/50' : 'border-border-subtle'}`}>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                    aria-expanded={isExpanded}
+                    className="w-full min-h-[82px] p-3.5 sm:p-4 text-left flex items-center gap-3 sm:gap-4 hover:bg-surface-base/40"
+                  >
+                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-surface-base border border-border-subtle overflow-hidden flex items-center justify-center shrink-0">
+                      {service.image_url || servicePhotos[0] ? (
+                        <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <Scissors className="w-6 h-6 text-gold-base/60" />
+                      )}
+                      {servicePhotos.length > 0 && <span className="absolute -bottom-0.5 -right-0.5 px-1.5 py-0.5 rounded-md bg-surface-base/90 text-content-base text-[10px] font-bold border border-gold-base/40 flex items-center gap-1"><ImageIcon className="w-3 h-3" />{servicePhotos.length}</span>}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/10 text-gold-base text-[10px] font-bold border border-gold-base/20 truncate max-w-[42%]">{categoryName}</span>
+                        {service.is_combo && <span className="shrink-0 px-2 py-1 rounded-md bg-status-success/15 text-status-success text-[10px] font-bold">Combo</span>}
+                        {service.popular && <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/15 text-gold-base text-[10px] font-bold">Destaque</span>}
+                      </div>
+                      <h3 className="mt-1 text-sm sm:text-base font-bold text-content-base truncate">{service.title}</h3>
+                      <p className="text-xs text-content-muted truncate">{service.description || 'Sem descrição cadastrada'}</p>
+                    </div>
+                    <div className="hidden sm:block text-right shrink-0 min-w-[80px]">
+                      <p className="text-xs text-content-muted">Duração</p>
+                      <p className="text-sm font-semibold text-content-base">{service.duration_minutes} min</p>
+                    </div>
+                    <div className="text-right shrink-0 min-w-[72px]">
+                      <p className="text-xs text-content-muted">Preço</p>
+                      <p className="text-sm sm:text-base font-bold text-gold-base">R$ {service.price.toFixed(2)}</p>
+                    </div>
+                    {isExpanded ? <ChevronUp className="w-5 h-5 text-gold-base shrink-0" /> : <ChevronDown className="w-5 h-5 text-content-muted shrink-0" />}
+                  </button>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <span className="px-2 py-0.5 rounded-xl bg-surface-base text-gold-base text-[10px] font-bold border border-border-subtle">
-                        {categoryName}
-                      </span>
-                      <div className="flex items-center space-x-1 text-[11px] text-content-muted font-medium">
-                        <Clock className="w-3 h-3 text-gold-base" />
-                        <span>{service.duration_minutes} min</span>
+                  {isExpanded && (
+                    <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Categoria</p><p className="mt-1 font-semibold text-content-base">{categoryName}</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Duração</p><p className="mt-1 font-semibold text-content-base">{service.duration_minutes} minutos</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Preço original</p><p className="mt-1 font-semibold text-content-base">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Desconto</p><p className="mt-1 font-semibold text-status-success">{service.discount_percentage ? `${service.discount_percentage}% OFF` : 'Sem desconto'}</p></div>
+                      </div>
+                      {service.description && <p className="text-sm text-content-muted leading-relaxed">{service.description}</p>}
+                      <div className="flex flex-wrap gap-2">
+                        <button type="button" onClick={() => handleToggleCombo(service)} className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.is_combo ? 'border-status-success/30 text-status-success' : 'border-border-subtle text-content-muted'}`}>{service.is_combo ? '🔥 Combo VIP ativo' : '+ Ativar Combo VIP'}</button>
+                        <button type="button" onClick={() => handleTogglePopular(service)} className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.popular ? 'border-gold-base/40 text-gold-base' : 'border-border-subtle text-content-muted'}`}>{service.popular ? '⭐ Destaque ativo' : '+ Marcar destaque'}</button>
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <button type="button" onClick={() => handleDuplicate(service)} className="min-h-10 px-4 rounded-xl border border-border-subtle text-content-muted text-sm font-semibold flex items-center gap-1.5"><Copy className="w-4 h-4" /> Duplicar</button>
+                        <button type="button" onClick={() => handleOpenEdit(service)} className="min-h-10 px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center gap-1.5"><Edit2 className="w-4 h-4" /> Editar</button>
+                        <button type="button" onClick={() => handleDelete(service.id)} className="min-h-10 px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center gap-1.5"><Trash2 className="w-4 h-4" /> Excluir</button>
                       </div>
                     </div>
-
-                    <h3 className="font-extrabold text-content-base text-sm leading-snug group-hover:text-gold-base transition-colors truncate">
-                      {service.title}
-                    </h3>
-
-                    <p className="text-xs text-content-muted line-clamp-1 mt-0.5">
-                      {service.description || 'Sem descrição cadastrada'}
-                    </p>
-                  </div>
+                  )}
+                </article>
+              );
+            })
+          )}
                 </div>
-
-                {/* Card Footer */}
-                <div className="pt-2.5 mt-2.5 border-t border-border-subtle/60 flex items-center justify-between">
-                  <div>
-                    <span className="text-base font-black text-gold-base">
-                      R$ {service.price.toFixed(2)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center space-x-1.5">
-                    <button
-                      onClick={() => handleDuplicate(service)}
-                      className="p-1.5 rounded-xl bg-surface-base hover:bg-surface-card text-content-base border border-border-subtle"
-                      title="Duplicar"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-
-                    <button
-                      onClick={() => handleOpenEdit(service)}
-                      className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base text-xs font-extrabold flex items-center space-x-1 hover:opacity-95 shadow-sm"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                      <span>Editar</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
       )}
       </div>
 
