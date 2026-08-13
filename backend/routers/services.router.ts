@@ -8,6 +8,7 @@ import { handleError } from '../utils/index.js';
 export const servicesRouter = express.Router();
 
 servicesRouter.get("/", async (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
   try {
     let servicesList: any[] = [];
     if (isDbConnected && db) {

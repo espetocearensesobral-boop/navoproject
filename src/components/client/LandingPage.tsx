@@ -47,6 +47,7 @@ import { hapticMedium, hapticLight } from '../../lib/haptics';
 import { useTheme } from '../../contexts/ThemeContext';
 import { trackEvent } from '../../lib/analytics';
 import { authFetch } from '../../lib/api';
+import { optimizeImageUrl } from '../../lib/imageUtils';
 import { 
   getTodayStringBRT, 
   getCurrentTimeBRT, 
@@ -665,7 +666,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   {/* Photo image */}
                   <img
                     loading="lazy"
-                    src={item.src}
+                    src={optimizeImageUrl(item.src, isHero ? 800 : 400, 75)}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   />

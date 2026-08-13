@@ -673,7 +673,44 @@ const DEFAULT_SHOP_PROFILE = {
   allowOutsideHoursApproval: false
 };
 
-app.get("/api/shop-profile", async (req: any, res: any) => {
+const PUBLIC_PROFILE_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400';
+
+function publicLogoUrl(value: unknown): string {
+  if (typeof value !== 'string' || value.length === 0) return '';
+  return value.startsWith('data:image/') ? '/api/shop-profile/logo' : value;
+}
+
+app.get("/api/shop-profile/logo", async (_req: any, res: any) => {
+  try {
+    if (!isDbConnected || !db) return res.status(404).end();
+
+    const rows = await db.select({ logoUrl: schema.shopSettings.logoUrl })
+      .from(schema.shopSettings)
+      .where(eq(schema.shopSettings.id, 'default'));
+    const logoUrl = rows[0]?.logoUrl;
+
+    if (typeof logoUrl !== 'string' || logoUrl.length === 0) {
+      return res.status(404).end();
+    }
+
+    if (!logoUrl.startsWith('data:')) {
+      return res.redirect(302, logoUrl);
+    }
+
+    const match = logoUrl.match(/^data:([^;]+);base64,(.+)$/);
+    if (!match) return res.status(404).end();
+
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400');
+    res.setHeader('Content-Type', match[1]);
+    return res.send(Buffer.from(match[2], 'base64'));
+  } catch (error) {
+    console.error('[API] Falha ao servir o logo público:', error);
+    return res.status(404).end();
+  }
+});
+
+app.get("/api/shop-profile", async (_req: any, res: any) => {
+  res.setHeader('Cache-Control', PUBLIC_PROFILE_CACHE_CONTROL);
   try {
     if (isDbConnected && db) {
       const rows = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
@@ -684,7 +721,7 @@ app.get("/api/shop-profile", async (req: any, res: any) => {
           address: row.address, phone: row.phone, whatsapp: row.whatsapp,
           openTime: row.openTime, closeTime: row.closeTime,
           operatingDays: row.operatingDays, operatingSchedule: row.operatingSchedule,
-          mapsUrl: row.mapsUrl, instagram: row.instagram, logoUrl: row.logoUrl || '',
+          mapsUrl: row.mapsUrl, instagram: row.instagram, logoUrl: publicLogoUrl(row.logoUrl),
           description: row.description, allowOutsideHoursApproval: !!row.allowOutsideHoursApproval
         });
       }

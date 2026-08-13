@@ -10,10 +10,14 @@ import { JWT_SECRET } from '../config/env.js';
 export const professionalsRouter = express.Router();
 
 professionalsRouter.get("/", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = req.cookies?.token || (authHeader && authHeader.split(' ')[1]);
+  const hasAuthenticatedRequest = Boolean(token);
+  if (!hasAuthenticatedRequest) {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+  }
   try {
     let isAdmin = false;
-    const authHeader = req.headers.authorization;
-    const token = req.cookies?.token || (authHeader && authHeader.split(' ')[1]);
     if (token) {
       try {
         const decoded = jwt.verify(token, JWT_SECRET) as any;

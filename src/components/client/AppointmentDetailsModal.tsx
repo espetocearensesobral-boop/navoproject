@@ -21,9 +21,7 @@ import {
   Sun,
   Sunset
 } from 'lucide-react';
-import { toPng } from 'html-to-image';
 import { Star } from 'lucide-react';
-import { jsPDF } from 'jspdf';
 import { createAppointmentInSupabase, cancelAppointmentInSupabase } from '../../services/supabaseDataService';
 import { useToast } from '../ui/Toast';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
@@ -257,6 +255,10 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
     if (!receiptRef.current) return;
     setIsDownloading(true);
     try {
+      const [{ toPng }, { jsPDF }] = await Promise.all([
+        import('html-to-image'),
+        import('jspdf'),
+      ]);
       const imgData = await toPng(receiptRef.current, {
         pixelRatio: 3,
         backgroundColor: '#faf8f4',

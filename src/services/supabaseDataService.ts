@@ -68,14 +68,20 @@ const DEFAULT_SERVICES_FALLBACK: ServiceItem[] = [
 ];
 
 let servicesFetchPromise: Promise<ServiceItem[]> | null = null;
+let cachedServices: ServiceItem[] | null = null;
+let servicesCachedAt = 0;
+const SERVICES_CACHE_TTL_MS = 5 * 60 * 1000;
 
 export async function fetchServicesFromSupabase(forceRefresh = false): Promise<ServiceItem[]> {
+  if (!forceRefresh && cachedServices && Date.now() - servicesCachedAt < SERVICES_CACHE_TTL_MS) {
+    return cachedServices;
+  }
   if (servicesFetchPromise && !forceRefresh) {
     return servicesFetchPromise;
   }
   servicesFetchPromise = (async () => {
     try {
-      const res = await authFetch(`${API_BASE}/services?_t=${Date.now()}`);
+      const res = await authFetch(`${API_BASE}/services`);
       if (!res.ok) throw new Error('Falha ao buscar serviços');
       const data = await res.json();
       if (!Array.isArray(data)) {
@@ -99,10 +105,14 @@ export async function fetchServicesFromSupabase(forceRefresh = false): Promise<S
           gallery_urls: Array.isArray(s.galleryUrls) && s.galleryUrls.length > 0 ? s.galleryUrls : (s.imageUrl ? [s.imageUrl] : [])
         };
       });
-      return mapped.length > 0 ? mapped : DEFAULT_SERVICES_FALLBACK;
+      cachedServices = mapped.length > 0 ? mapped : DEFAULT_SERVICES_FALLBACK;
+      servicesCachedAt = Date.now();
+      return cachedServices;
     } catch (err) {
       console.warn('Aviso ao carregar serviços do servidor, usando fallback local:', err);
-      return DEFAULT_SERVICES_FALLBACK;
+      cachedServices = DEFAULT_SERVICES_FALLBACK;
+      servicesCachedAt = Date.now();
+      return cachedServices;
     } finally {
       servicesFetchPromise = null;
     }
@@ -123,8 +133,14 @@ export async function deleteAllServicesInSupabase(): Promise<boolean> {
 }
 
 let professionalsFetchPromise: Promise<Professional[]> | null = null;
+let cachedProfessionals: Professional[] | null = null;
+let professionalsCachedAt = 0;
+const PROFESSIONALS_CACHE_TTL_MS = 5 * 60 * 1000;
 
 export async function fetchProfessionalsFromSupabase(forceRefresh = false): Promise<Professional[]> {
+  if (!forceRefresh && cachedProfessionals && Date.now() - professionalsCachedAt < PROFESSIONALS_CACHE_TTL_MS) {
+    return cachedProfessionals;
+  }
   if (professionalsFetchPromise && !forceRefresh) {
     return professionalsFetchPromise;
   }
@@ -149,10 +165,14 @@ export async function fetchProfessionalsFromSupabase(forceRefresh = false): Prom
         working_hours: p.workingHours,
         is_active: p.isActive ?? true
       }));
-      return mapped;
+      cachedProfessionals = mapped;
+      professionalsCachedAt = Date.now();
+      return cachedProfessionals;
     } catch (err) {
       console.error('Erro ao carregar profissionais do Supabase:', err);
-      return [];
+      cachedProfessionals = [];
+      professionalsCachedAt = Date.now();
+      return cachedProfessionals;
     } finally {
       professionalsFetchPromise = null;
     }

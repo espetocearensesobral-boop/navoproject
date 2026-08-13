@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { Appointment } from '../../types';
 import { fetchAppointmentsFromSupabase } from '../../services/supabaseDataService';
 import { motion, AnimatePresence } from 'motion/react';
@@ -26,9 +26,10 @@ import {
   KeyRound,
   Check
 } from 'lucide-react';
-import { AppointmentDetailsModal } from './AppointmentDetailsModal';
 import { ReviewModal } from './ReviewModal';
 import { FullHistoryModal } from './FullHistoryModal';
+
+const AppointmentDetailsModal = lazy(() => import('./AppointmentDetailsModal').then(m => ({ default: m.AppointmentDetailsModal })));
 
 interface ClientAppointmentsProps {
   customAppointments?: Appointment[];
@@ -776,16 +777,19 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
           setReviewAppointment(null);
         }}
       />
-      <AppointmentDetailsModal
-
-        isOpen={!!selectedAppointment}
-        onClose={() => setSelectedAppointment(null)}
-        appointment={selectedAppointment}
-        onAppointmentUpdated={updated => {
-          setSelectedAppointment(updated);
-          setAppointments(prev => prev.map(a => (a.id === updated.id ? updated : a)));
-        }}
-      />
+      {selectedAppointment && (
+        <Suspense fallback={null}>
+          <AppointmentDetailsModal
+            isOpen
+            onClose={() => setSelectedAppointment(null)}
+            appointment={selectedAppointment}
+            onAppointmentUpdated={updated => {
+              setSelectedAppointment(updated);
+              setAppointments(prev => prev.map(a => (a.id === updated.id ? updated : a)));
+            }}
+          />
+        </Suspense>
+      )}
 
       <FullHistoryModal
         isOpen={isFullHistoryOpen}

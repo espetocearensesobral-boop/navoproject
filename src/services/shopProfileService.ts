@@ -68,13 +68,16 @@ export const defaultShopProfile: ShopProfile = {
 
 let cachedProfile: ShopProfile = { ...defaultShopProfile };
 let profileFetchPromise: Promise<ShopProfile> | null = null;
+let profileLoadedAt = 0;
+const PROFILE_CACHE_TTL_MS = 5 * 60 * 1000;
 
 export function getCachedShopProfile(): ShopProfile {
   return cachedProfile;
 }
 
 export async function fetchShopProfile(forceRefresh = false): Promise<ShopProfile> {
-  if (!forceRefresh && cachedProfile && cachedProfile.name !== 'Navo Barber & Club') {
+  const cacheIsFresh = profileLoadedAt > 0 && Date.now() - profileLoadedAt < PROFILE_CACHE_TTL_MS;
+  if (!forceRefresh && cacheIsFresh) {
     return cachedProfile;
   }
   if (profileFetchPromise && !forceRefresh) {
@@ -97,6 +100,7 @@ export async function fetchShopProfile(forceRefresh = false): Promise<ShopProfil
             ...(data.operatingSchedule || {})
           }
         };
+        profileLoadedAt = Date.now();
         return cachedProfile;
       }
       throw new Error('Dados inválidos do perfil da barbearia retornados pelo banco de dados');
@@ -121,6 +125,7 @@ export async function saveShopProfile(data: Partial<ShopProfile>): Promise<ShopP
     const resData = await res.json();
     if (resData.profile) {
       cachedProfile = { ...defaultShopProfile, ...resData.profile };
+      profileLoadedAt = Date.now();
       return cachedProfile;
     }
   }

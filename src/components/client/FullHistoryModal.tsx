@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { lazy, Suspense, useState, useMemo } from 'react';
 import { Appointment } from '../../types';
 import { X, Search, FileText, Calendar, Clock } from 'lucide-react';
-import { AppointmentDetailsModal } from './AppointmentDetailsModal';
+const AppointmentDetailsModal = lazy(() => import('./AppointmentDetailsModal').then(m => ({ default: m.AppointmentDetailsModal })));
 
 interface FullHistoryModalProps {
   isOpen: boolean;
@@ -124,22 +124,26 @@ export const FullHistoryModal: React.FC<FullHistoryModalProps> = ({
         </div>
       </div>
       
-      <AppointmentDetailsModal
-        isOpen={!!selectedAppointment}
-        onClose={() => setSelectedAppointment(null)}
-        appointment={selectedAppointment}
-        onAppointmentUpdated={(updated) => {
-          setSelectedAppointment(updated);
-          if (onAppointmentUpdated) {
-            onAppointmentUpdated(updated);
-          }
-        }}
-        onReviewClick={() => {
-          if (selectedAppointment && onReviewClick) {
-            onReviewClick(selectedAppointment);
-          }
-        }}
-      />
+      {selectedAppointment && (
+        <Suspense fallback={null}>
+          <AppointmentDetailsModal
+            isOpen
+            onClose={() => setSelectedAppointment(null)}
+            appointment={selectedAppointment}
+            onAppointmentUpdated={(updated) => {
+              setSelectedAppointment(updated);
+              if (onAppointmentUpdated) {
+                onAppointmentUpdated(updated);
+              }
+            }}
+            onReviewClick={() => {
+              if (selectedAppointment && onReviewClick) {
+                onReviewClick(selectedAppointment);
+              }
+            }}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

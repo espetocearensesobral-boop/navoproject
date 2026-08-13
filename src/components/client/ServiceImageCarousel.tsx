@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Scissors } from 'lucide-react';
 import { hapticLight } from '../../lib/haptics';
+import { ImageWithFallback } from '../ui/ImageWithFallback';
 import { optimizeImageUrl } from '../../lib/imageUtils';
 
 interface ServiceImageCarouselProps {
@@ -19,33 +20,13 @@ export const ServiceImageCarousel: React.FC<ServiceImageCarouselProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
-  const samplePool = [
-    'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=75&w=600',
-    'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=75&w=600',
-    'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=75&w=600',
-    'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&q=75&w=600',
-    'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=75&w=600',
-    'https://images.unsplash.com/photo-1517832606299-7ae9b720a186?auto=format&fit=crop&q=75&w=600',
-    'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=75&w=600',
-    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=75&w=600'
-  ];
-
-  let basePhotos: string[] = Array.isArray(images) && images.length > 0
-    ? [...images]
+  const basePhotos: string[] = Array.isArray(images) && images.length > 0
+    ? images.slice(0, 5)
     : fallbackUrl
     ? [fallbackUrl]
     : [];
 
-  if (basePhotos.length > 0 && basePhotos.length < 5) {
-    for (const sample of samplePool) {
-      if (basePhotos.length >= 5) break;
-      if (!basePhotos.includes(sample)) {
-        basePhotos.push(sample);
-      }
-    }
-  }
-
-  const photoList = basePhotos.slice(0, 5).map((url) => optimizeImageUrl(url, 600, 75));
+  const photoList = basePhotos.map((url) => optimizeImageUrl(url, 600, 75));
   const totalPhotos = photoList.length;
 
   // Auto-play interval
@@ -109,9 +90,10 @@ export const ServiceImageCarousel: React.FC<ServiceImageCarouselProps> = ({
       onTouchEnd={handleTouchEnd}
     >
       {/* Current Photo with smooth transition */}
-      <img
+      <ImageWithFallback
         key={currentIndex}
         src={photoList[currentIndex]}
+        fallbackSrc={fallbackUrl ? optimizeImageUrl(fallbackUrl, 600, 75) : '/placeholder-service.svg'}
         alt={`${title} - foto ${currentIndex + 1}`}
         className="w-full h-full object-cover transition-all duration-500 ease-out animate-in fade-in group-hover/carousel:scale-105"
       />
