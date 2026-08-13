@@ -614,7 +614,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </div>
 
           {galleryFeaturedItems.length > 0 ? (
-            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0 scrollbar-none">
+            <div data-gesture-scroll="horizontal" className="gesture-scroll-x flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0 scrollbar-none">
               {galleryFeaturedItems.map((item, idx) => {
                 const image = item.src || '/placeholder-service.svg';
                 const durationLabel = item.duration > 0 ? `${item.duration} min` : 'Consulte a duração';

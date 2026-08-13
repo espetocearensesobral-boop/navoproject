@@ -47,6 +47,7 @@ export function usePullToRefresh(
   const touchStartY = useRef<number | null>(null);
   const touchStartX = useRef<number | null>(null);
   const gestureDirection = useRef<'vertical' | 'horizontal' | null>(null);
+  const touchStartedInHorizontalScroller = useRef(false);
 
   const isAtTop = useCallback(() => {
     const el = containerRef.current;
@@ -60,6 +61,8 @@ export function usePullToRefresh(
       touchStartY.current = e.touches[0].clientY;
       touchStartX.current = e.touches[0].clientX;
       gestureDirection.current = null;
+      touchStartedInHorizontalScroller.current = e.target instanceof Element
+        && Boolean(e.target.closest('[data-gesture-scroll="horizontal"]'));
     },
     [enabled, isRefreshing, isAtTop]
   );
@@ -67,6 +70,11 @@ export function usePullToRefresh(
   const onTouchMove = useCallback(
     (e: React.TouchEvent) => {
       if (!enabled || isRefreshing || touchStartY.current === null || touchStartX.current === null) return;
+      if (touchStartedInHorizontalScroller.current) {
+        gestureDirection.current = 'horizontal';
+        setPullDistance(0);
+        return;
+      }
       if (!isAtTop()) {
         touchStartY.current = null;
         touchStartX.current = null;
@@ -116,6 +124,7 @@ export function usePullToRefresh(
     touchStartY.current = null;
     touchStartX.current = null;
     gestureDirection.current = null;
+    touchStartedInHorizontalScroller.current = false;
     setPullDistance(0);
   }, [enabled, pullDistance, threshold, onRefresh, minRefreshDuration]);
 

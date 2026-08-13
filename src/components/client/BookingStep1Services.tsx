@@ -234,14 +234,14 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
           </div>
 
           {/* Horizontal Scrollable Categories Chips */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 pt-0.5">
+          <div data-gesture-scroll="horizontal" className="gesture-scroll-x flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 pt-1">
             <button
               type="button"
               onClick={() => {
                 hapticLight();
                 setActiveCategory('cat_all');
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
+              className={`shrink-0 min-h-10 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
                 activeCategory === 'cat_all'
                   ? 'bg-gold-base text-surface-base shadow-sm'
                   : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
@@ -259,7 +259,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                     hapticLight();
                     setActiveCategory(cat.id);
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
+                  className={`shrink-0 min-h-10 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
                     isActive
                       ? 'bg-gold-base text-surface-base shadow-sm'
                       : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
@@ -362,7 +362,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
 
                 {/* Destaque (Mais Vendidos) em Carrossel Horizontal com cards mais largos */}
                 {isFeaturedCarousel ? (
-                  <div className="flex items-stretch overflow-x-auto no-scrollbar gap-3.5 sm:gap-4 pb-2 pt-0.5 -mx-4 px-4 scroll-smooth">
+                  <div data-gesture-scroll="horizontal" className="gesture-scroll-x flex items-stretch overflow-x-auto no-scrollbar gap-3.5 sm:gap-4 pb-2 pt-0.5 -mx-4 px-4 scroll-smooth">
                     {row.services.map((service) => {
                       const isSelected = selectedServices.some((s) => s.id === service.id);
                       const images = getServiceImages(service);

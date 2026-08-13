@@ -85,7 +85,8 @@ export const ServiceImageCarousel: React.FC<ServiceImageCarouselProps> = ({
 
   return (
     <div
-      className={`relative w-full ${heightClass} bg-surface-card overflow-hidden group/carousel select-none`}
+      data-gesture-scroll="horizontal"
+      className={`gesture-scroll-x relative w-full ${heightClass} bg-surface-card overflow-hidden group/carousel select-none`}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
