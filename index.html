@@ -54,11 +54,8 @@
     <script>
       (function() {
         try {
-          var theme = null;
-          if (!theme) {
-            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            theme = prefersDark ? 'dark' : 'light';
-          }
+          var saved = localStorage.getItem('navo_theme_mode_client') || localStorage.getItem('navo_theme_mode');
+          var theme = saved === 'light' || saved === 'dark' ? saved : 'dark';
           document.documentElement.setAttribute('data-theme', theme);
         } catch (e) {}
       })();

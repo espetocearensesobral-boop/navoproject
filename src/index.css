@@ -39,6 +39,7 @@
 :root,
 [data-theme="dark"] {
   /* Heritage Modern Dark Theme (Default) */
+  color-scheme: dark;
   --color-surface-base: #12131A;
   --color-surface-card: #1A1D26;
   --color-surface-elevated: #21252F;

@@ -40,7 +40,7 @@ availabilityRouter.get("/next", async (req, res) => {
       
       for (let m = openMins; m < closeMins; m += 30) {
         const slot = minutesToTime(m);
-        if (dateStr === todayBRT && slot <= currTimeBRT) continue;
+        if (dateStr === todayBRT && slot <= currTimeBRT.timeStr) continue;
         
         const checkRes = await checkSlotAvailability({
           dateStr,

@@ -15,7 +15,8 @@ import {
   getCurrentTimeBRT, 
   formatDateBR, 
   calculateTotalServicesDuration,
-  timeToMinutes
+  timeToMinutes,
+  addDaysBRT
 } from '../../utils/dateUtils';
 
 // Deriva ano/mês "de hoje" a partir da string BRT (não de `new Date()` local),
@@ -55,6 +56,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+  const autoJumpCount = useRef(0);
 
   const totalDurationMinutes = useMemo(() => {
     return calculateTotalServicesDuration(selectedServices);
@@ -98,16 +100,38 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
         const response = await authFetch(`/api/availability?professionalId=${profId}&date=${selectedDate}&duration=${totalDurationMinutes}`);
         if (response.ok) {
           const resData = await response.json();
+          let newBusySlots: string[] = [];
+          
           if (Array.isArray(resData)) {
-            const bookedTimes = resData.map((apt: any) => apt?.timeSlot || apt).filter(Boolean);
+            newBusySlots = resData.map((apt: any) => apt?.timeSlot || apt).filter(Boolean);
             if (isMounted) {
-              setBusySlots(bookedTimes);
+              setBusySlots(newBusySlots);
               setRequiresApprovalSlots([]);
             }
           } else {
+            newBusySlots = resData.busySlots || [];
             if (isMounted) {
-              setBusySlots(resData.busySlots || []);
+              setBusySlots(newBusySlots);
               setRequiresApprovalSlots(resData.requiresApprovalSlots || []);
+            }
+          }
+
+          if (isMounted && autoJumpCount.current < 7) {
+            const currentBaseSlots = generateTimeSlotsFromProfile(shopProfile, selectedDate, totalDurationMinutes);
+            const currTimeBRT = getCurrentTimeBRT();
+            
+            const availableCount = currentBaseSlots.filter(time => {
+              const slotMins = timeToMinutes(time);
+              const isPastTime = selectedDate === todayStr && slotMins <= currTimeBRT.totalMinutes;
+              return !newBusySlots.includes(time) && !isPastTime;
+            }).length;
+            
+            if (availableCount === 0) {
+              autoJumpCount.current += 1;
+              const nextDayStr = addDaysBRT(selectedDate, 1);
+              onSelectDate(nextDayStr);
+              const { year, month } = getTodayYearMonthBRT(nextDayStr);
+              setCalendarMonth(new Date(year, month, 1));
             }
           }
         }
@@ -123,7 +147,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     return () => {
       isMounted = false;
     };
-  }, [selectedDate, selectedBarber, totalDurationMinutes]);
+  }, [selectedDate, selectedBarber, totalDurationMinutes, shopProfile, todayStr, onSelectDate]);
 
   // Base Time Slots list dynamically generated from shopProfile and duration
   const baseSlots = useMemo(() => {
@@ -245,6 +269,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                   disabled={isPast || isClosed}
                   onClick={() => {
                     if ('vibrate' in navigator) navigator.vibrate(40);
+                    autoJumpCount.current = 14;
                     onSelectDate(isoDate);
                     onSelectTimeSlot(''); // Clear selected time when date changes
                     setTimeout(() => {
