@@ -629,3 +629,55 @@ button, a, input, select, textarea {
     border-radius: 18px !important;
   }
 }
+
+/* Filled mobile action buttons: semantic color, right alignment, no accidental wrapping. */
+.admin-shell .admin-action-group {
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  margin-left: auto;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.admin-shell .admin-action-group::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-shell .admin-action-icon[class*="border-status-success"] {
+  background: #00a86b !important;
+  border-color: #00a86b !important;
+  color: #ffffff !important;
+}
+
+.admin-shell .admin-action-icon[class*="border-status-error"],
+.admin-shell .admin-action-icon[class*="border-red-500"] {
+  background: #c94040 !important;
+  border-color: #c94040 !important;
+  color: #ffffff !important;
+}
+
+.admin-shell .admin-action-icon[class*="bg-gold-base"] {
+  background: var(--color-gold-base) !important;
+  border-color: var(--color-gold-base) !important;
+  color: var(--color-content-on-accent) !important;
+}
+
+.admin-shell .admin-action-icon[class*="bg-purple-500"] {
+  background: #6d4cc2 !important;
+  border-color: #6d4cc2 !important;
+  color: #ffffff !important;
+}
+
+.admin-shell .admin-action-icon[class*="border-border-subtle"] {
+  background: var(--color-surface-card) !important;
+  border-color: var(--color-border-subtle) !important;
+  color: var(--color-content-base) !important;
+}
+
+.admin-shell .admin-action-icon[class*="border-gold-base"] {
+  background: var(--color-gold-base) !important;
+  border-color: var(--color-gold-base) !important;
+  color: var(--color-content-on-accent) !important;
+}
