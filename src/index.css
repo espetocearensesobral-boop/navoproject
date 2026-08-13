@@ -583,3 +583,49 @@ button, a, input, select, textarea {
 .admin-shell .admin-modal a[class*="rounded-xl"] {
   border-radius: 18px !important;
 }
+
+/* Compact admin action controls: circular on mobile, labeled on sm+ screens. */
+.admin-shell .admin-action-icon {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 !important;
+  border-radius: 9999px !important;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.admin-shell .admin-action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+@media (min-width: 640px) {
+  .admin-shell .admin-action-icon {
+    width: auto;
+    min-width: auto;
+    height: 2.75rem;
+    padding-inline: 1rem !important;
+    border-radius: 18px !important;
+  }
+}
+
+/* Keep compact action controls circular after the broader admin radius rules above. */
+.admin-shell button.admin-action-icon,
+.admin-shell a.admin-action-icon,
+.admin-shell span.admin-action-icon {
+  border-radius: 9999px !important;
+}
+
+@media (min-width: 640px) {
+  .admin-shell button.admin-action-icon,
+  .admin-shell a.admin-action-icon,
+  .admin-shell span.admin-action-icon {
+    border-radius: 18px !important;
+  }
+}
