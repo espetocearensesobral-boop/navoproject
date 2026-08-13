@@ -45,6 +45,8 @@ export function usePullToRefresh(
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const touchStartY = useRef<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const gestureDirection = useRef<'vertical' | 'horizontal' | null>(null);
 
   const isAtTop = useCallback(() => {
     const el = containerRef.current;
@@ -54,30 +56,52 @@ export function usePullToRefresh(
 
   const onTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      if (!enabled || isRefreshing) return;
-      if (isAtTop()) {
-        touchStartY.current = e.touches[0].clientY;
-      }
+      if (!enabled || isRefreshing || !isAtTop()) return;
+      touchStartY.current = e.touches[0].clientY;
+      touchStartX.current = e.touches[0].clientX;
+      gestureDirection.current = null;
     },
     [enabled, isRefreshing, isAtTop]
   );
 
   const onTouchMove = useCallback(
     (e: React.TouchEvent) => {
-      if (!enabled || isRefreshing || touchStartY.current === null) return;
-      if (!isAtTop()) return;
-      const currentY = e.touches[0].clientY;
-      const distance = Math.max(0, (currentY - touchStartY.current) * resistance);
-      if (distance > 0 && distance < maxPull) {
-        setPullDistance(distance);
+      if (!enabled || isRefreshing || touchStartY.current === null || touchStartX.current === null) return;
+      if (!isAtTop()) {
+        touchStartY.current = null;
+        touchStartX.current = null;
+        gestureDirection.current = null;
+        setPullDistance(0);
+        return;
       }
+
+      const currentY = e.touches[0].clientY;
+      const currentX = e.touches[0].clientX;
+      const deltaY = currentY - touchStartY.current;
+      const deltaX = currentX - touchStartX.current;
+
+      // Decide a direção uma única vez. Gestos horizontais (incluindo filtros
+      // roláveis) não podem virar pull-to-refresh por causa de um pequeno
+      // deslocamento diagonal.
+      if (!gestureDirection.current && (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8)) {
+        gestureDirection.current = Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
+      }
+
+      if (gestureDirection.current !== 'vertical' || deltaY <= 0) {
+        setPullDistance(0);
+        return;
+      }
+
+      const distance = Math.min(maxPull, deltaY * resistance);
+      setPullDistance(distance);
     },
     [enabled, isRefreshing, isAtTop, resistance, maxPull]
   );
 
   const onTouchEnd = useCallback(() => {
     if (!enabled) return;
-    if (pullDistance >= threshold) {
+    const shouldRefresh = gestureDirection.current === 'vertical' && pullDistance >= threshold;
+    if (shouldRefresh) {
       setIsRefreshing(true);
       const start = Date.now();
       Promise.resolve(onRefresh()).finally(() => {
@@ -90,6 +114,8 @@ export function usePullToRefresh(
       });
     }
     touchStartY.current = null;
+    touchStartX.current = null;
+    gestureDirection.current = null;
     setPullDistance(0);
   }, [enabled, pullDistance, threshold, onRefresh, minRefreshDuration]);
 

@@ -372,10 +372,10 @@ export const ServicesManagement: React.FC = () => {
         </div>
 
         {/* Repositioned Category & Quick Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+        <div className="admin-category-scroll flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar -mx-1 px-1">
           <button
             onClick={() => { setSelectedCategory('all'); setFilterType('all'); }}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
               selectedCategory === 'all' && filterType === 'all'
                 ? 'bg-gold-base text-surface-base border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
@@ -386,7 +386,7 @@ export const ServicesManagement: React.FC = () => {
 
           <button
             onClick={() => setFilterType(filterType === 'combos' ? 'all' : 'combos')}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
               filterType === 'combos'
                 ? 'bg-status-success text-surface-base border-status-success'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
@@ -397,7 +397,7 @@ export const ServicesManagement: React.FC = () => {
 
           <button
             onClick={() => setFilterType(filterType === 'popular' ? 'all' : 'popular')}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
               filterType === 'popular'
                 ? 'bg-gold-base text-surface-base border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
@@ -410,7 +410,7 @@ export const ServicesManagement: React.FC = () => {
             <button
               key={cat.id}
               onClick={() => { setSelectedCategory(cat.id); setFilterType('all'); }}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
                 selectedCategory === cat.id && filterType === 'all'
                   ? 'bg-gold-base text-surface-base border-gold-base'
                   : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'

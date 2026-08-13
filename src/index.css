@@ -530,3 +530,13 @@ button, a, input, select, textarea {
 .admin-table-wrap table {
   min-width: 42rem;
 }
+
+.admin-category-scroll {
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.admin-category-scroll::-webkit-scrollbar {
+  display: none;
+}
