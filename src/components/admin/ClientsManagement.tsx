@@ -168,7 +168,19 @@ export const ClientsManagement: React.FC = () => {
         action={{ label: 'Novo Cliente', onClick: () => handleOpenModal() }}
       />
 
-      {/* MOBILE TOP BAR (COMPACT MINIMALIST MD:HIDDEN) */}
+      {/* MOBILE CTA + TOP BAR: mesmo padrão de Produtos & Estoque */}
+      <div className="md:hidden space-y-2">
+        <button
+          type="button"
+          onClick={() => handleOpenModal()}
+          title="Cadastrar novo cliente"
+          aria-label="Cadastrar novo cliente"
+          className="w-full h-10 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Novo Cliente</span>
+        </button>
+      </div>
       <div className="md:hidden flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
@@ -181,15 +193,6 @@ export const ClientsManagement: React.FC = () => {
           />
         </div>
 
-        <button
-          onClick={() => handleOpenModal()}
-          title="Cadastrar novo cliente"
-          aria-label="Cadastrar novo cliente"
-          className="admin-create-icon w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-sm active:scale-95"
-        >
-          <Plus className="w-5 h-5 stroke-[2.5]" />
-          <span className="sr-only">Novo cliente</span>
-        </button>
       </div>
 
       {/* HORIZONTAL FILTER PILLS */}

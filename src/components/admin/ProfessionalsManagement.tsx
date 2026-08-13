@@ -341,18 +341,16 @@ export const ProfessionalsManagement: React.FC = () => {
 
       {/* MOBILE: CTA, SEARCH AND FILTERS */}
       <div className="md:hidden space-y-2 mb-3">
-        <div className="flex items-center justify-end">
-          <button
-            type="button"
-            onClick={handleOpenCreate}
-            title="Cadastrar profissional"
-            aria-label="Cadastrar profissional"
-            className="admin-create-icon w-11 h-11 rounded-full flex items-center justify-center shadow-md active:scale-95 shrink-0"
-          >
-            <Plus className="w-5 h-5 stroke-[2.5]" />
-            <span className="sr-only">Cadastrar profissional</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleOpenCreate}
+          title="Cadastrar profissional"
+          aria-label="Cadastrar profissional"
+          className="w-full h-10 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Cadastrar Barbeiro</span>
+        </button>
         <div className="bg-surface-card p-3 rounded-2xl border border-border-subtle">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />

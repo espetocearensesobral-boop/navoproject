@@ -319,15 +319,15 @@ export const ServicesManagement: React.FC = () => {
         action={{ label: 'Cadastrar Novo Serviço', onClick: handleOpenCreate, icon: Plus }}
       />
 
-      {/* Ação (mobile) */}
+      {/* Ação mobile: mesmo padrão de Produtos & Estoque */}
       <button
         onClick={handleOpenCreate}
         title="Cadastrar novo serviço"
         aria-label="Cadastrar novo serviço"
-        className="admin-create-icon md:hidden ml-auto w-11 h-11 rounded-full flex items-center justify-center shadow-md active:scale-95 shrink-0"
+        className="md:hidden w-full h-10 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
       >
-        <Plus className="w-5 h-5 stroke-[2.5]" />
-        <span className="sr-only">Cadastrar Novo Serviço</span>
+        <Plus className="w-4 h-4" />
+        <span>Cadastrar Novo Serviço</span>
       </button>
 
       {/* Success Notification Banner */}
