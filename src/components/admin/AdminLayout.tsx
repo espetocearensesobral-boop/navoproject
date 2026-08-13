@@ -8,6 +8,7 @@ import { AuditLogsManagement } from './AuditLogsManagement';
 import { WhatsAppManagement } from './WhatsAppManagement';
 import { QrCodeManagement } from './QrCodeManagement';
 import { ServicesManagement } from './ServicesManagement';
+import { ProductsManagement } from './ProductsManagement';
 import { ProfessionalsManagement } from './ProfessionalsManagement';
 import { ClientsManagement } from './ClientsManagement';
 import { WaitingQueue } from './WaitingQueue';
@@ -35,6 +36,7 @@ import {
   MoreHorizontal,
   LayoutGrid,
   FileText,
+  Package,
   Wallet,
   ShieldCheck,
   MessageSquare,
@@ -52,7 +54,8 @@ export type AdminTab =
   | 'qrcode'
   | 'queue' 
   | 'rewards'
-  | 'servicos' 
+  | 'servicos'
+  | 'produtos'
   | 'profissionais' 
   | 'clientes' 
   | 'barbearia'
@@ -158,6 +161,13 @@ export const AdminLayout: React.FC = () => {
       description: 'Catálogo de serviços',
       section: 'cadastros' as AdminSection,
     },
+    {
+      id: 'produtos' as AdminTab,
+      label: 'Produtos & Estoque',
+      icon: Package,
+      description: 'Catálogo do PDV e alertas',
+      section: 'cadastros' as AdminSection,
+    },
     { 
       id: 'profissionais' as AdminTab, 
       label: 'Profissionais', 
@@ -242,6 +252,8 @@ export const AdminLayout: React.FC = () => {
         return <NavoRewardsAdmin />;
       case 'servicos':
         return <ServicesManagement />;
+      case 'produtos':
+        return <ProductsManagement />;
       case 'profissionais':
         return <ProfessionalsManagement />;
       case 'clientes':

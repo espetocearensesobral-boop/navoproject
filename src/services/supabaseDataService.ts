@@ -335,10 +335,14 @@ export async function removeFromQueueInSupabase(id: string): Promise<WaitingQueu
 export function subscribeToAppointmentsRealtime(onUpdate: (appointments: Appointment[]) => void) { return () => {}; }
 export async function seedSupabaseDatabase(): Promise<{ success: boolean; message: string }> { return { success: true, message: 'Seeded in server' }; }
 
-export async function fetchProductsFromSupabase(): Promise<ProductItem[]> {
+export async function fetchProductsFromSupabase(options?: { strict?: boolean }): Promise<ProductItem[]> {
   try {
     const res = await authFetch(`${API_BASE}/products`);
-    if (!res.ok) throw new Error('Falha ao buscar produtos do Supabase');
+    if (!res.ok) {
+      const error = new Error(`Falha ao carregar produtos (${res.status}).`);
+      if (options?.strict) throw error;
+      return [];
+    }
     const data = await res.json();
     if (!Array.isArray(data)) {
       return [];
@@ -357,6 +361,7 @@ export async function fetchProductsFromSupabase(): Promise<ProductItem[]> {
     }));
   } catch (err) {
     console.error('Erro ao buscar produtos do Supabase:', err);
+    if (options?.strict) throw err;
     return [];
   }
 }
