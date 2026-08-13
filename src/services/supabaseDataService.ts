@@ -163,7 +163,10 @@ export async function fetchAppointmentsFromSupabase(phone?: string, options?: { 
     return [];
   }
 }
-export async function createAppointmentInSupabase(apt: Appointment): Promise<Appointment> {
+export async function createAppointmentInSupabase(
+  apt: Appointment,
+  options?: { adminManual?: boolean }
+): Promise<Appointment> {
   const res = await authFetch(`${API_BASE}/appointments`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -183,7 +186,8 @@ export async function createAppointmentInSupabase(apt: Appointment): Promise<App
       finalAmount: (apt.final_amount ?? 0).toString(),
       paymentMethod: apt.payment_method,
       bookingCode: apt.booking_code,
-      services: apt.services
+      services: apt.services,
+      ...(options?.adminManual ? { adminManual: true } : {})
     })
   });
   if (!res.ok) {

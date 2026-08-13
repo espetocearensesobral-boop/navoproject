@@ -438,12 +438,12 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
     const todayBRT = getTodayStringBRT();
     const currTimeBRT = getCurrentTimeBRT();
     const reqStart = timeToMinutes(timeSlot);
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isAdminManual = isAdmin && data.adminManual === true;
 
-    if (date < todayBRT || (date === todayBRT && reqStart <= currTimeBRT.totalMinutes)) {
+    if (!isAdminManual && (date < todayBRT || (date === todayBRT && reqStart <= currTimeBRT.totalMinutes))) {
       return res.status(400).json({ error: 'Não é possível agendar para uma data ou horário que já passou.' });
     }
-
-    const isAdmin = req.user && req.user.role === 'admin';
 
     // Calculate total price and total duration from services on the server side.
     let calculatedTotal = 0;
@@ -488,6 +488,7 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
       profId: professionalId,
       todayBRT,
       currTimeBRT,
+      allowPast: isAdminManual,
     });
 
     if (!checkRes.available) {
@@ -609,6 +610,7 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
             profId: resolvedProfessionalId,
             todayBRT,
             currTimeBRT,
+            allowPast: isAdminManual,
           });
           if (!lockedCheck.available) throw new Error('BOOKING_CONFLICT');
 

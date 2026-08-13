@@ -12,6 +12,7 @@ interface CheckSlotParams {
   todayBRT: string;
   currTimeBRT: { totalMinutes: number; timeStr: string };
   debug?: boolean;
+  allowPast?: boolean;
   preloaded?: DaySlotContext;
 }
 
@@ -149,7 +150,7 @@ export async function fetchDaySlotContext(dateStr: string, excludeAptId?: string
 }
 
 export async function checkSlotAvailability(params: CheckSlotParams): Promise<CheckSlotResult> {
-  const { dateStr, startMins, reqDuration, profId, excludeAptId, todayBRT, currTimeBRT, debug, preloaded } = params;
+  const { dateStr, startMins, reqDuration, profId, excludeAptId, todayBRT, currTimeBRT, debug, allowPast = false, preloaded } = params;
   const safeDuration = Number.isInteger(reqDuration) && reqDuration >= 5 && reqDuration <= 480 ? reqDuration : 30;
   const endMins = startMins + safeDuration;
   
@@ -169,7 +170,7 @@ export async function checkSlotAvailability(params: CheckSlotParams): Promise<Ch
   const closeMins = timeToMinutes(closeStr);
 
   const isPast = (dateStr < todayBRT) || (dateStr === todayBRT && startMins < currTimeBRT.totalMinutes);
-  if (isPast) {
+  if (isPast && !allowPast) {
     return { statusCode: 'PAST_TIME', available: false, reason: 'Horário no passado' };
   }
 

@@ -5,7 +5,7 @@ import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
-import { scheduleBlockPayloadSchema } from '../utils/validation.js';
+import { scheduleBlockMutationSchema } from '../utils/validation.js';
 import { invalidateAvailabilityCache } from './availability.router.js';
 
 export const scheduleBlocksRouter = express.Router();
@@ -20,7 +20,7 @@ scheduleBlocksRouter.get('/', async (_req, res) => {
 
 scheduleBlocksRouter.post('/', requireAuth, requireAdmin, async (req: any, res) => {
   try {
-    const parsed = scheduleBlockPayloadSchema.omit({ id: true }).safeParse(req.body);
+    const parsed = scheduleBlockMutationSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Dados de bloqueio inválidos.', details: parsed.error.flatten() });
     const id = typeof req.body?.id === 'string' && req.body.id.trim() ? req.body.id.trim() : `blk_${crypto.randomUUID()}`;
     const [created] = await db.insert(schema.scheduleBlocks)
@@ -37,7 +37,7 @@ scheduleBlocksRouter.post('/', requireAuth, requireAdmin, async (req: any, res) 
 
 scheduleBlocksRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
   try {
-    const parsed = scheduleBlockPayloadSchema.omit({ id: true }).safeParse(req.body);
+    const parsed = scheduleBlockMutationSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Dados de bloqueio inválidos.', details: parsed.error.flatten() });
     const [updated] = await db.update(schema.scheduleBlocks)
       .set({ ...parsed.data })

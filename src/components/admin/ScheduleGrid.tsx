@@ -42,6 +42,9 @@ export const ScheduleGrid: React.FC = () => {
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
   const [isManualBookingOpen, setIsManualBookingOpen] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [notificationTone, setNotificationTone] = useState<'success' | 'error'>('success');
+  const [savingBlock, setSavingBlock] = useState(false);
+  const [savingManualBooking, setSavingManualBooking] = useState(false);
 
   // Block Form State
   const [blockForm, setBlockForm] = useState({
@@ -102,12 +105,16 @@ export const ScheduleGrid: React.FC = () => {
   const handleAddBlock = async (e: React.FormEvent) => {
     e.preventDefault();
     const prof = barbers.find(b => b.id === blockForm.professional_id);
-    if (!prof) return;
+    if (!prof) {
+      showNotification('Selecione um profissional ativo para bloquear o horário.', 'error');
+      return;
+    }
     if (timeToMinutes(blockForm.start_time) >= timeToMinutes(blockForm.end_time)) {
-      showNotification('O início do bloqueio deve ser anterior ao fim.');
+      showNotification('O início do bloqueio deve ser anterior ao fim.', 'error');
       return;
     }
 
+    setSavingBlock(true);
     try {
       const updatedBlocks = await addScheduleBlock({
         professional_id: prof.id,
@@ -120,7 +127,9 @@ export const ScheduleGrid: React.FC = () => {
       setIsBlockModalOpen(false);
       showNotification(`${blockForm.start_time}–${blockForm.end_time} bloqueado para ${prof.name}.`);
     } catch (err: any) {
-      showNotification(err?.message || 'Não foi possível criar o bloqueio.');
+      showNotification(err?.message || 'Não foi possível criar o bloqueio.', 'error');
+    } finally {
+      setSavingBlock(false);
     }
   };
 
@@ -158,7 +167,7 @@ export const ScheduleGrid: React.FC = () => {
     const prof = barbers.find(b => b.id === manualBookingForm.professional_id);
     const service = services.find(s => s.id === manualBookingForm.service_id);
     if (!prof || !service || !manualBookingForm.client_name.trim()) {
-      showNotification('Informe cliente, profissional e serviço real.');
+      showNotification('Informe cliente, profissional, serviço e horário válidos.', 'error');
       return;
     }
 
@@ -184,17 +193,21 @@ export const ScheduleGrid: React.FC = () => {
       created_at: new Date().toISOString()
     };
 
+    setSavingManualBooking(true);
     try {
-      await createAppointmentInSupabase(newApt);
+      await createAppointmentInSupabase(newApt, { adminManual: true });
       await loadData();
       setIsManualBookingOpen(false);
       showNotification(`Encaixe criado para ${newApt.client_name}.`);
     } catch (err: any) {
-      showNotification(err?.message || 'Não foi possível criar o encaixe.');
+      showNotification(err?.message || 'Não foi possível criar o encaixe.', 'error');
+    } finally {
+      setSavingManualBooking(false);
     }
   };
 
-  const showNotification = (msg: string) => {
+  const showNotification = (msg: string, tone: 'success' | 'error' = 'success') => {
+    setNotificationTone(tone);
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(null), 3500);
   };
@@ -214,7 +227,7 @@ export const ScheduleGrid: React.FC = () => {
     <div className="space-y-4">
       {/* SUCCESS NOTIFICATION */}
       {successMsg && (
-        <div className="p-3 bg-status-success/15 border border-status-success/30 text-status-success rounded-xl text-xs font-bold flex items-center justify-between animate-fade-in">
+        <div className={`p-3 rounded-xl text-sm font-semibold flex items-center justify-between animate-fade-in ${notificationTone === 'error' ? 'bg-status-error/15 border border-status-error/30 text-status-error' : 'bg-status-success/15 border border-status-success/30 text-status-success'}`}>
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4" />
             <span>{successMsg}</span>
@@ -608,9 +621,10 @@ export const ScheduleGrid: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-red-600 text-content-base text-xs font-extrabold shadow-md hover:bg-red-700"
+                  disabled={savingBlock}
+                  className="px-5 py-2 rounded-xl bg-red-600 text-content-base text-xs font-extrabold shadow-md hover:bg-red-700 disabled:opacity-60 disabled:cursor-wait"
                 >
-                  Confirmar Bloqueio
+                  {savingBlock ? 'Salvando...' : 'Confirmar Bloqueio'}
                 </button>
               </div>
             </form>
@@ -713,9 +727,10 @@ export const ScheduleGrid: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gold-base text-surface-base text-xs font-extrabold shadow-md"
+                  disabled={savingManualBooking}
+                  className="px-5 py-2 rounded-xl bg-gold-base text-surface-base text-xs font-extrabold shadow-md disabled:opacity-60 disabled:cursor-wait"
                 >
-                  Confirmar Agendamento
+                  {savingManualBooking ? 'Salvando...' : 'Confirmar Agendamento'}
                 </button>
               </div>
             </form>

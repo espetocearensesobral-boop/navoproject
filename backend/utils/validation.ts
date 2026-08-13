@@ -80,17 +80,29 @@ export const queuePayloadSchema = z.object({
   completedAt: z.string().trim().max(40).nullable().optional(),
 });
 
-export const scheduleBlockPayloadSchema = z.object({
-  id: idSchema.optional(),
+const scheduleBlockFields = {
   professionalId: idSchema,
   date: dateSchema,
   startTime: timeSchema,
   endTime: timeSchema,
   reason: z.string().trim().max(300).nullable().optional(),
-}).refine((value) => value.startTime < value.endTime, {
+};
+
+const scheduleBlockTimeRefinement = (value: { startTime: string; endTime: string }) => value.startTime < value.endTime;
+const scheduleBlockTimeError = {
   message: 'O início do bloqueio deve ser anterior ao fim.',
   path: ['endTime'],
-});
+};
+
+export const scheduleBlockPayloadSchema = z.object({
+  id: idSchema.optional(),
+  ...scheduleBlockFields,
+}).refine(scheduleBlockTimeRefinement, scheduleBlockTimeError);
+
+// Zod não permite `.omit()` em um objeto que já possui refinements.
+// Este schema representa explicitamente o payload de criação/edição sem `id`.
+export const scheduleBlockMutationSchema = z.object(scheduleBlockFields)
+  .refine(scheduleBlockTimeRefinement, scheduleBlockTimeError);
 
 export const rewardPayloadSchema = z.object({
   id: idSchema.optional(),
