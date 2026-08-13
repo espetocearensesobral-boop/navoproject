@@ -528,10 +528,14 @@ export interface CashTransactionItem {
   notes?: string;
 }
 
-export async function fetchCashTransactionsFromSupabase(): Promise<CashTransactionItem[]> {
+export async function fetchCashTransactionsFromSupabase(options?: { strict?: boolean }): Promise<CashTransactionItem[]> {
   try {
     const res = await authFetch(`${API_BASE}/cash-transactions`);
-    if (!res.ok) return [];
+    if (!res.ok) {
+      const error = new Error(`Falha ao carregar lançamentos financeiros (${res.status}).`);
+      if (options?.strict) throw error;
+      return [];
+    }
     const data = await res.json();
     return Array.isArray(data) ? data.map((t: any) => ({
       id: t.id,
@@ -547,6 +551,7 @@ export async function fetchCashTransactionsFromSupabase(): Promise<CashTransacti
     })) : [];
   } catch (err) {
     console.error('Erro ao buscar lançamentos financeiros:', err);
+    if (options?.strict) throw err;
     return [];
   }
 }

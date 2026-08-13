@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   DollarSign, 
   ArrowUpRight, 
@@ -13,6 +13,8 @@ import {
   PieChart 
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { fetchCashTransactionsFromSupabase } from '../../services/supabaseDataService';
+import { getTodayStringBRT } from '../../utils/dateUtils';
 
 export interface FinancialTransaction {
   id: string;
@@ -23,72 +25,59 @@ export interface FinancialTransaction {
   paymentMethod: string;
   date: string;
   operatorName: string;
+  status?: 'completed' | 'pending' | 'cancelled';
 }
 
 export const FinancialStatementManagement: React.FC = () => {
-  const [transactions] = useState<FinancialTransaction[]>(() => {
-    return [
-      {
-        id: 'tx_01',
-        type: 'income',
-        category: 'Comanda / Atendimento',
-        description: 'Fechamento Comanda #CMD-001 (Corte + Pomada) - Marcos Oliveira',
-        amount: 100.00,
-        paymentMethod: 'PIX',
-        date: new Date().toISOString(),
-        operatorName: 'Gerente Carlos'
-      },
-      {
-        id: 'tx_02',
-        type: 'income',
-        category: 'Clube de Assinaturas',
-        description: 'Renovação Mensalidade Clube Gold - Fernando Henrique',
-        amount: 159.90,
-        paymentMethod: 'Cartão Recorrente',
-        date: new Date(Date.now() - 2 * 3600000).toISOString(),
-        operatorName: 'Sistema'
-      },
-      {
-        id: 'tx_03',
-        type: 'expense',
-        category: 'Contas a Pagar',
-        description: 'Anúncios Instagram & Google Ads',
-        amount: 400.00,
-        paymentMethod: 'Boleto',
-        date: new Date(Date.now() - 24 * 3600000).toISOString(),
-        operatorName: 'Gerente Carlos'
-      },
-      {
-        id: 'tx_04',
-        type: 'income',
-        category: 'Comanda / Atendimento',
-        description: 'Fechamento Comanda #CMD-002 (Barba Imperial) - Lucas Mendes',
-        amount: 60.00,
-        paymentMethod: 'Dinheiro',
-        date: new Date(Date.now() - 28 * 3600000).toISOString(),
-        operatorName: 'Gerente Carlos'
-      },
-      {
-        id: 'tx_05',
-        type: 'expense',
-        category: 'Sangria de Caixa',
-        description: 'Pagamento Mota Entregador',
-        amount: 30.00,
-        paymentMethod: 'Dinheiro',
-        date: new Date(Date.now() - 30 * 3600000).toISOString(),
-        operatorName: 'Gerente Carlos'
-      }
-    ];
-  });
+  const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadTransactions = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchCashTransactionsFromSupabase({ strict: true });
+      setTransactions(data.map((transaction) => ({
+        id: transaction.id,
+        type: transaction.type,
+        category: transaction.category,
+        description: transaction.description,
+        amount: Number(transaction.amount || 0),
+        paymentMethod: transaction.paymentMethod,
+        date: transaction.date,
+        operatorName: transaction.professionalName || 'Sistema',
+        status: transaction.status
+      })));
+    } catch (err: any) {
+      setTransactions([]);
+      setError(err?.message || 'Não foi possível carregar o extrato real.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTransactions();
+    const handleRefresh = () => loadTransactions();
+    window.addEventListener('adminRefresh', handleRefresh);
+    return () => window.removeEventListener('adminRefresh', handleRefresh);
+  }, []);
+
+  const formatTransactionDate = (value: string) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value.split('-').reverse().join('/');
+    return new Date(value).toLocaleString('pt-BR');
+  };
 
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [search, setSearch] = useState('');
 
-  const totalIncomes = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
-  const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+  const visibleTransactions = transactions.filter(t => t.status !== 'cancelled');
+  const totalIncomes = visibleTransactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+  const totalExpenses = visibleTransactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
   const netBalance = totalIncomes - totalExpenses;
 
-  const filtered = transactions.filter(t => {
+  const filtered = visibleTransactions.filter(t => {
     const matchesType = filterType === 'all' || t.type === filterType;
     const matchesSearch = t.description.toLowerCase().includes(search.toLowerCase()) ||
                           t.category.toLowerCase().includes(search.toLowerCase());
@@ -97,12 +86,12 @@ export const FinancialStatementManagement: React.FC = () => {
 
   const handleExportCsv = () => {
     const csv = 'Data,Tipo,Categoria,Descrição,Valor,Forma Pagamento\n' +
-      filtered.map(t => `"${new Date(t.date).toLocaleString('pt-BR')}","${t.type}","${t.category}","${t.description}",${t.amount},"${t.paymentMethod}"`).join('\n');
+      filtered.map(t => `"${formatTransactionDate(t.date)}","${t.type}","${t.category}","${t.description}",${t.amount},"${t.paymentMethod}"`).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `extrato_financeiro_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `extrato_financeiro_${getTodayStringBRT()}.csv`;
     a.click();
   };
 
@@ -124,6 +113,14 @@ export const FinancialStatementManagement: React.FC = () => {
         <span>Baixar Extrato CSV</span>
       </button>
 
+      {loading && <div className="p-3 rounded-xl border border-border-subtle bg-surface-card text-xs text-content-muted">Carregando lançamentos reais...</div>}
+      {error && (
+        <div className="p-3 rounded-xl border border-status-error/30 bg-status-error/10 text-status-error text-xs font-semibold flex items-center justify-between gap-3">
+          <span>{error}</span>
+          <button type="button" onClick={loadTransactions} className="shrink-0 underline">Tentar novamente</button>
+        </div>
+      )}
+
       {/* Metrics Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
@@ -134,7 +131,7 @@ export const FinancialStatementManagement: React.FC = () => {
             </div>
           </div>
           <p className="text-lg font-black text-status-success tabular-nums truncate">+ R$ {totalIncomes.toFixed(2)}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Comandas e assinaturas</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Lançamentos persistidos</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
@@ -145,7 +142,7 @@ export const FinancialStatementManagement: React.FC = () => {
             </div>
           </div>
           <p className="text-lg font-black text-status-error tabular-nums truncate">- R$ {totalExpenses.toFixed(2)}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Despesas e contas pagas</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Saídas persistidas</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
@@ -158,7 +155,7 @@ export const FinancialStatementManagement: React.FC = () => {
           <p className={`text-lg font-black tabular-nums truncate ${netBalance >= 0 ? 'text-gold-base' : 'text-status-error'}`}>
              R$ {netBalance.toFixed(2)}
           </p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Lucro acumulado</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Saldo do extrato</p>
         </div>
       </div>
 
@@ -212,7 +209,7 @@ export const FinancialStatementManagement: React.FC = () => {
               {filtered.map((t) => (
                 <tr key={t.id} className="hover:bg-surface-base/50 transition-colors">
                   <td className="p-3 font-mono text-[11px] text-content-muted whitespace-nowrap">
-                    {new Date(t.date).toLocaleString('pt-BR')}
+                    {formatTransactionDate(t.date)}
                   </td>
                   <td className="p-3 whitespace-nowrap">
                     {t.type === 'income' ? (

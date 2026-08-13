@@ -15,6 +15,7 @@ import {
   Search, User, Scissors, Percent, Clock, AlertCircle, RefreshCw, Printer, Share2, Wallet, X, Calendar, ChevronRight, ChevronLeft, HandCoins, ArrowRight
 } from 'lucide-react';
 import { fetchShopProfile, ShopProfile, defaultShopProfile } from '../../services/shopProfileService';
+import { getTodayStringBRT } from '../../utils/dateUtils';
 
 export interface CartItem {
   id: string;
@@ -131,7 +132,7 @@ export const PdvInteligente: React.FC = () => {
   }, []);
 
   // Filter Today's Pending Appointments
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getTodayStringBRT();
   const pendingAppointments = appointments.filter(a => 
     (a.date === todayStr || a.status === 'confirmed' || a.status === 'in_service' || a.status === 'in_queue') &&
     a.status !== 'cancelled' &&
@@ -298,11 +299,14 @@ export const PdvInteligente: React.FC = () => {
       const response = await authFetch('/api/cash-transactions', {
         method: 'POST',
         body: JSON.stringify({
+          id: tx.id,
           amount: tx.total,
           type: 'income',
           description: tx.clientName,
           category: 'Serviços/Produtos',
           paymentMethod: tx.paymentMethod,
+          date: todayStr,
+          status: 'completed',
           professionalId: selectedBarber?.id,
           professionalName: tx.professionalName,
           notes: JSON.stringify(tx.items)
@@ -318,7 +322,8 @@ export const PdvInteligente: React.FC = () => {
         setCurrentStep(1); // Go back to start
         loadData(); // Refresh queue/appointments
       } else {
-        alert('Erro ao registrar venda. Tente novamente.');
+        const errorData = await response.json().catch(() => ({}));
+        alert(errorData.error || 'Erro ao registrar venda. Tente novamente.');
       }
     } catch (err) {
       console.error(err);
