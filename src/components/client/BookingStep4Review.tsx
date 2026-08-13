@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { ServiceItem, Professional, UserProfile } from '../../types';
 import { TermsAndPrivacyModal } from '../shared/TermsAndPrivacyModal';
+import { formatCurrencyBRL } from '../../utils/masks';
 import {
   Award,
   ArrowLeft,
@@ -168,7 +169,7 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
           <div className="flex flex-col text-left">
             <span className="text-sm font-bold text-content-base">Resumo do Agendamento</span>
             <span className="text-xs text-content-muted">
-              {selectedServices.length} serviço{selectedServices.length > 1 ? 's' : ''} • <strong className="text-gold-base font-extrabold">R$ {finalTotal.toFixed(2)}</strong>
+              {selectedServices.length} serviço{selectedServices.length > 1 ? 's' : ''} • <strong className="text-gold-base font-extrabold">{formatCurrencyBRL(finalTotal)}</strong>
             </span>
           </div>
         </div>
@@ -201,7 +202,7 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
             {selectedServices.map((srv) => (
               <div key={srv.id} className="flex items-center justify-between text-xs sm:text-sm py-0.5">
                 <span className="text-content-base font-medium">• {srv.title}</span>
-                <span className="text-content-base font-bold">R$ {srv.price.toFixed(2)}</span>
+                <span className="text-content-base font-bold">{formatCurrencyBRL(srv.price)}</span>
               </div>
             ))}
           </div>
@@ -210,11 +211,11 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
           <div className="space-y-2 text-xs sm:text-sm">
             <div className="flex justify-between text-content-muted">
               <span>Subtotal</span>
-              <span className="font-semibold text-content-base">R$ {subtotal.toFixed(2)}</span>
+              <span className="font-semibold text-content-base">{formatCurrencyBRL(subtotal)}</span>
             </div>
             <div className="flex justify-between items-center text-sm sm:text-base text-content-base font-semibold pt-2 border-t border-border-subtle">
               <span>Total</span>
-              <span className="font-mono num-tabular text-base sm:text-lg font-bold text-gold-base">R$ {finalTotal.toFixed(2)}</span>
+              <span className="font-mono num-tabular text-base sm:text-lg font-bold text-gold-base">{formatCurrencyBRL(finalTotal)}</span>
             </div>
           </div>
         </div>

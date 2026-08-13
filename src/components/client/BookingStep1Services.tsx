@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { ServiceItem } from '../../types';
 import { DEFAULT_CATEGORIES, getCategoryName } from '../../data/categories';
@@ -58,6 +58,22 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [modalService, setModalService] = useState<ServiceItem | null>(null);
+  const serviceModalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!modalService) return;
+    const previousActive = document.activeElement as HTMLElement | null;
+    const focusTimer = window.setTimeout(() => serviceModalRef.current?.focus(), 0);
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setModalService(null);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener('keydown', handleEscape);
+      previousActive?.focus?.();
+    };
+  }, [modalService]);
 
   const getServiceImages = (s: ServiceItem): string[] => {
     if (s.gallery_urls && s.gallery_urls.length > 0) {
@@ -355,11 +371,22 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                       return (
                         <div
                           key={service.id}
+                          role="button"
+                          tabIndex={0}
+                          aria-pressed={isSelected}
+                          aria-label={`Ver detalhes de ${service.title}`}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              hapticLight();
+                              setModalService(service);
+                            }
+                          }}
                           onClick={() => {
                             hapticLight();
                             setModalService(service);
                           }}
-                          className={`w-48 sm:w-60 shrink-0 rounded-2xl border cursor-pointer relative overflow-hidden transition-all duration-300 group flex flex-col justify-between shadow-xl hover:scale-[1.02] ${
+                          className={`w-48 sm:w-60 shrink-0 rounded-2xl border cursor-pointer relative overflow-hidden transition-all duration-300 group focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base flex flex-col justify-between shadow-xl hover:scale-[1.02] ${
                             isSelected
                               ? 'bg-surface-card border-gold-base ring-2 ring-gold-base shadow-gold-base/20'
                               : 'bg-surface-card border-border-subtle hover:border-gold-base/60'
@@ -421,11 +448,22 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                       return (
                         <div
                           key={service.id}
+                          role="button"
+                          tabIndex={0}
+                          aria-pressed={isSelected}
+                          aria-label={`Ver detalhes de ${service.title}`}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              hapticLight();
+                              setModalService(service);
+                            }
+                          }}
                           onClick={() => {
                             hapticLight();
                             setModalService(service);
                           }}
-                          className={`w-full rounded-2xl border cursor-pointer relative overflow-hidden transition-all duration-300 group flex flex-col justify-between shadow-md hover:shadow-xl hover:scale-[1.02] ${
+                          className={`w-full rounded-2xl border cursor-pointer relative overflow-hidden transition-all duration-300 group focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base flex flex-col justify-between shadow-md hover:shadow-xl hover:scale-[1.02] ${
                             isSelected
                               ? 'bg-surface-card border-gold-base ring-2 ring-gold-base shadow-gold-base/20'
                               : 'bg-surface-card border-border-subtle hover:border-gold-base/60'
@@ -556,6 +594,8 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
       {modalService && (
         <div
           className="fixed inset-0 bg-surface-base/80 backdrop-blur-[2px] z-50 flex items-end sm:items-center justify-center animate-fade-in p-0 sm:p-4"
+          ref={serviceModalRef}
+          tabIndex={-1}
           role="dialog"
           aria-modal="true"
           aria-labelledby="service-modal-title"

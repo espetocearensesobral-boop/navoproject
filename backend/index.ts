@@ -288,13 +288,13 @@ app.post("/api/bot/chat", requireAuth, async (req: any, res: any) => {
        appointments = appointments.filter((a: any) => a.clientId === req.user.id || a.clientPhone === req.user.phone);
     }
     
-    let contextText = `Você é o assistente virtual da barbearia BarberX, que atende 24/7.
+    let contextText = `Você é o assistente virtual da Navo Barber & Club, que atende 24/7.
 Seja educado, prestativo e profissional. Responda de forma concisa.
 Se um cliente perguntar sobre serviços, mostre o que temos disponível e os preços.
 Se quiserem agendar, instrua o cliente a usar o botão "Agendar" na interface.
 Você tem acesso aos agendamentos do cliente logado. O nome dele é ${req.user.name || req.user.email}.
 
-Contexto da Barbearia BarberX:
+Contexto da Navo Barber & Club:
 Serviços:
 `;
     services.forEach((s: any) => {
@@ -649,9 +649,9 @@ app.post("/api/loyalty/config", requireAuth, requireAdmin, async (req: any, res:
 const DEFAULT_SHOP_PROFILE = {
   id: 'default',
   name: 'Navo Barber & Club',
-  unitName: 'Unidade Jardins',
+  unitName: 'Unidade Expectativa',
   slogan: 'Estilo, Tradição e Excelência na Medida Certa',
-  address: 'Rua Augusta, 1420 - Jardins, São Paulo - SP',
+  address: 'Rua Fortaleza, 1420 - Expectativa, Sobral - CE',
   phone: '(11) 99999-8888',
   whatsapp: '5511999998888',
   openTime: '09:00',
@@ -666,7 +666,7 @@ const DEFAULT_SHOP_PROFILE = {
     saturday: { active: true, open: '09:00', close: '20:00' },
     sunday: { active: false, open: '10:00', close: '16:00' }
   },
-  mapsUrl: 'https://maps.google.com/?q=Rua+Augusta+1420+Jardins+Sao+Paulo',
+  mapsUrl: 'https://maps.google.com/?q=Rua+Fortaleza+1420+Expectativa+Sobral+CE',
   instagram: '@barbearianavo',
   logoUrl: '',
   description: 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.',

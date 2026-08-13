@@ -58,6 +58,11 @@
   --color-gold-hover: #E4C372;
   --color-content-base: #F2EDE4;
   --color-content-on-accent: #12131A;
+  --color-accent-solid: var(--color-gold-base);
+  --color-on-accent: var(--color-content-on-accent);
+  --color-accent-text: var(--color-gold-hover);
+  --color-accent-soft: color-mix(in srgb, var(--color-gold-base) 15%, transparent);
+  --color-accent-strong: var(--color-gold-deep);
   --color-surface-inverse: #FFFFFF;
   --color-content-inverse: #12131A;
   --color-border-strong: #FFFFFF;
@@ -101,6 +106,11 @@
   --color-gold-hover: #E5CD9A;
   --color-content-base: #1A1C1E;
   --color-content-on-accent: #FFFFFF;
+  --color-accent-solid: var(--color-gold-base);
+  --color-on-accent: var(--color-content-on-accent);
+  --color-accent-text: var(--color-gold-deep);
+  --color-accent-soft: color-mix(in srgb, var(--color-gold-base) 15%, transparent);
+  --color-accent-strong: var(--color-gold-deep);
   --color-surface-inverse: #12131A;
   --color-content-inverse: #FFFFFF;
   --color-border-strong: #12131A;

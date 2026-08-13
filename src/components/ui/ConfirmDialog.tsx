@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import { LoadingButton } from './LoadingButton';
 
@@ -27,6 +27,23 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   variant = 'danger',
   icon,
 }) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousActive = document.activeElement as HTMLElement | null;
+    const focusTimer = window.setTimeout(() => dialogRef.current?.focus(), 0);
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isLoading) onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener('keydown', handleEscape);
+      previousActive?.focus?.();
+    };
+  }, [isOpen, isLoading, onClose]);
+
   if (!isOpen) return null;
 
   return (
@@ -38,7 +55,15 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       />
 
       {/* Dialog */}
-      <div className="relative w-full max-w-md bg-surface-inverse border border-content-inverse/10 rounded-2xl shadow-2xl animate-success-pop overflow-hidden">
+      <div
+        ref={dialogRef}
+        tabIndex={-1}
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
+        className="relative w-full max-w-md bg-surface-inverse border border-content-inverse/10 rounded-2xl shadow-2xl animate-success-pop overflow-hidden outline-none"
+      >
         {/* Header */}
         <div className="p-6 pb-4 flex items-start justify-between">
           <div className="flex items-start gap-4">
@@ -51,13 +76,15 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               {icon || <AlertTriangle className="w-6 h-6" />}
             </div>
             <div>
-              <h3 className="text-lg font-bold text-content-inverse">{title}</h3>
-              <p className="text-sm text-content-inverse/60 mt-1 leading-relaxed">{description}</p>
+              <h3 id="confirm-dialog-title" className="text-lg font-bold text-content-inverse">{title}</h3>
+              <p id="confirm-dialog-description" className="text-sm text-content-inverse/60 mt-1 leading-relaxed">{description}</p>
             </div>
           </div>
           {!isLoading && (
             <button
+              type="button"
               onClick={onClose}
+              aria-label="Fechar confirmação"
               className="p-1.5 rounded-lg text-content-inverse/60 hover:text-content-inverse hover:bg-content-inverse/10 transition-colors"
             >
               <X className="w-5 h-5" />

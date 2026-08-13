@@ -17,3 +17,13 @@ export const parseMoney = (value: string) => {
   const digits = value.replace(/\D/g, '');
   return parseInt(digits, 10) / 100 || 0;
 };
+
+export const formatCurrencyBRL = (value: number | string) => {
+  const numericValue = typeof value === 'number' ? value : Number(value);
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number.isFinite(numericValue) ? numericValue : 0);
+};

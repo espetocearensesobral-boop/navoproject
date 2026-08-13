@@ -212,7 +212,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 type="text"
                 value={profile.unitName}
                 onChange={e => setProfile(p => ({ ...p, unitName: e.target.value }))}
-                placeholder="Ex: Unidade Jardins"
+                placeholder="Ex: Unidade Expectativa"
                 className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
               />
             </div>
@@ -528,7 +528,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               type="text"
               value={profile.address}
               onChange={e => setProfile(p => ({ ...p, address: e.target.value }))}
-              placeholder="Ex: Rua Augusta, 1420 - Jardins, São Paulo - SP"
+              placeholder="Ex: Rua Fortaleza, 1420 - Expectativa, Sobral - CE"
               className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
             />
           </div>

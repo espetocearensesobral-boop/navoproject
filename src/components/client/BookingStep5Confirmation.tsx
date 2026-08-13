@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { playConfirmationChime } from '../../lib/audio';
 import { LottieIcon } from '../ui/LottieIcon';
@@ -29,6 +29,12 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
   onViewAppointments
 }) => {
   const [copied, setCopied] = useState(false);
+  const confirmationTitleRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const focusTimer = window.setTimeout(() => confirmationTitleRef.current?.focus(), 0);
+    return () => window.clearTimeout(focusTimer);
+  }, []);
 
   useEffect(() => {
     try {
@@ -63,7 +69,13 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
             loop={false}
           />
         </div>
-        <span className="text-xs font-bold text-status-success uppercase tracking-widest">
+        <span
+          ref={confirmationTitleRef}
+          tabIndex={-1}
+          role="status"
+          aria-live="polite"
+          className="text-xs font-bold text-status-success uppercase tracking-widest outline-none"
+        >
           Agendamento Confirmado!
         </span>
       </div>

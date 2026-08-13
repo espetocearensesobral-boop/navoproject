@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { X, FileText, ShieldCheck } from 'lucide-react';
 
 interface TermsAndPrivacyModalProps {
@@ -13,8 +13,24 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
   defaultTab = 'terms',
 }) => {
   const [activeTab, setActiveTab] = useState<'terms' | 'privacy'>(defaultTab);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousActive = document.activeElement as HTMLElement | null;
+    const focusTimer = window.setTimeout(() => modalRef.current?.focus(), 0);
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener('keydown', handleEscape);
+      previousActive?.focus?.();
+    };
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
     setActiveTab(defaultTab);
   }, [defaultTab, isOpen]);
 
@@ -22,7 +38,14 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-fade-in">
-      <div className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-2xl h-[85vh] max-h-[700px] flex flex-col shadow-2xl overflow-hidden relative">
+      <div
+        ref={modalRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="terms-modal-title"
+        className="bg-surface-card border border-border-subtle rounded-2xl w-full max-w-2xl h-[85vh] max-h-[700px] flex flex-col shadow-2xl overflow-hidden relative outline-none"
+      >
         {/* Modal Header */}
         <div className="p-4 sm:p-5 border-b border-border-subtle flex items-center justify-between shrink-0 bg-surface-base">
           <div className="flex items-center gap-2">
@@ -30,7 +53,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
               {activeTab === 'terms' ? <FileText className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
             </div>
             <div>
-              <h2 className="text-sm font-serif font-bold text-content-base">
+              <h2 id="terms-modal-title" className="text-sm font-serif font-bold text-content-base">
                 {activeTab === 'terms' ? 'Termos de Serviço' : 'Política de Privacidade'}
               </h2>
               <p className="text-[10px] text-content-muted">Navo Barber & Club — Última atualização: 10 de agosto de 2026</p>
@@ -38,6 +61,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
           </div>
 
           <button
+            type="button"
             onClick={onClose}
             className="w-8 h-8 rounded-xl bg-surface-card hover:bg-surface-elevated text-content-muted hover:text-content-base flex items-center justify-center transition-colors border border-border-subtle"
             aria-label="Fechar modal"
@@ -204,6 +228,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
         {/* Modal Footer */}
         <div className="p-4 border-t border-border-subtle bg-surface-base flex justify-end shrink-0">
           <button
+            type="button"
             onClick={onClose}
             className="h-10 px-6 bg-gold-base hover:bg-gold-base/90 text-surface-base font-bold text-xs rounded-xl transition-all active:scale-95 shadow-xs"
           >

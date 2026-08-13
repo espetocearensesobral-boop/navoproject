@@ -316,7 +316,7 @@ appointmentsRouter.patch("/lookup/cancel", sensitiveOpsLimiter, optionalAuth, as
       .set({ status: 'abandoned', updatedAt: new Date() })
       .where(eq(schema.waitingQueue.appointmentId, appointment.id));
 
-    const msg = `❌ *BARBERX PREMIUM*\n\n` +
+    const msg = `❌ *NAVO BARBER & CLUB*\n\n` +
       `Olá, *${appointment.clientName}*!\n\n` +
       `Seu agendamento para *${appointment.date}* às *${appointment.timeSlot}* foi *CANCELADO*.\n\n` +
       `Ficamos à disposição para remarcar quando desejar! 💈`;
@@ -750,11 +750,11 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
       phone = '5511999999999'; 
     }
     if (newApt.status === 'cancelled') {
-      const msg = `❌ *BARBERX PREMIUM*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\nSeu agendamento para *${newApt.date}* às *${newApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
+      const msg = `❌ *NAVO BARBER & CLUB*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\nSeu agendamento para *${newApt.date}* às *${newApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
       sendWhatsAppMessage(phone, msg).catch(() => {});
       notifyClientByEmail(newApt.clientId, newApt, 'cancel');
     } else {
-      const msg = `💈 *BARBERX PREMIUM*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *confirmado* com sucesso:\n\n🔑 *Código:* ${newApt.bookingCode || newApt.id}\n📅 *Data:* ${newApt.date}\n⏰ *Horário:* ${newApt.timeSlot}\n✂️ *Barbeiro:* ${newApt.professionalName || 'Profissional BarberX'}\n\n📍 *Local:* BarberX Premium - Rua dos Barões, 1420 - Jardins\n\nTe esperamos com o café pronto! ☕`;
+      const msg = `💈 *NAVO BARBER & CLUB*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *confirmado* com sucesso:\n\n🔑 *Código:* ${newApt.bookingCode || newApt.id}\n📅 *Data:* ${newApt.date}\n⏰ *Horário:* ${newApt.timeSlot}\n✂️ *Barbeiro:* ${newApt.professionalName || 'Profissional Navo'}\n\n📍 *Local:* Navo Barber & Club - Rua Fortaleza, 1420 - Expectativa, Sobral - CE\n\nTe esperamos com o café pronto! ☕`;
       sendWhatsAppMessage(phone, msg).catch(() => {});
       notifyClientByEmail(newApt.clientId, newApt, 'booking');
     }
@@ -876,7 +876,7 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
         const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, updatedApt.clientId) });
         if (profile && profile.phone) phone = profile.phone;
       }
-      const msg = `❌ *BARBERX PREMIUM*\n\nOlá, *${updatedApt.clientName || 'Cliente'}*!\nSeu agendamento para *${updatedApt.date}* às *${updatedApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
+      const msg = `❌ *NAVO BARBER & CLUB*\n\nOlá, *${updatedApt.clientName || 'Cliente'}*!\nSeu agendamento para *${updatedApt.date}* às *${updatedApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
 
       sendWhatsAppMessage(phone, msg).catch(() => {});
       notifyClientByEmail(updatedApt.clientId, updatedApt, 'cancel');
@@ -1052,7 +1052,7 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
             const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, updatedApt.clientId) });
             if (profile && profile.phone) phone = profile.phone;
           }
-          const msg = `🔄 *BARBERX PREMIUM*\n\nOlá, *${updatedApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *REAGENDADO* com sucesso:\n\n📅 *Nova Data:* ${updatedApt.date}\n⏰ *Novo Horário:* ${updatedApt.timeSlot}\n✂️ *Barbeiro:* ${updatedApt.professionalName || 'Profissional BarberX'}\n\n📍 *Local:* BarberX Premium - Rua dos Barões, 1420 - Jardins\n\nTe esperamos com o café pronto! ☕`;
+          const msg = `🔄 *NAVO BARBER & CLUB*\n\nOlá, *${updatedApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *REAGENDADO* com sucesso:\n\n📅 *Nova Data:* ${updatedApt.date}\n⏰ *Novo Horário:* ${updatedApt.timeSlot}\n✂️ *Barbeiro:* ${updatedApt.professionalName || 'Profissional Navo'}\n\n📍 *Local:* Navo Barber & Club - Rua Fortaleza, 1420 - Expectativa, Sobral - CE\n\nTe esperamos com o café pronto! ☕`;
 
           sendWhatsAppMessage(phone, msg).catch(() => {});
         }

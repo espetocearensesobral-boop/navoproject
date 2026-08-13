@@ -167,12 +167,25 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
             return (
               <div
                 key={barber.id}
+                role="button"
+                tabIndex={isOccupiedAtSlot ? -1 : 0}
+                aria-pressed={isSelected}
+                aria-disabled={isOccupiedAtSlot}
+                aria-label={`${barber.name}${isOccupiedAtSlot ? ', ocupado' : ''}`}
+                onKeyDown={(event) => {
+                  if (isOccupiedAtSlot) return;
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    if ('vibrate' in navigator) navigator.vibrate(50);
+                    onSelectBarber(barber);
+                  }
+                }}
                 onClick={() => {
                   if (isOccupiedAtSlot) return;
                   if ('vibrate' in navigator) navigator.vibrate(50);
                   onSelectBarber(barber);
                 }}
-                className={`flex items-center justify-between p-3.5 sm:p-4 rounded-card cursor-pointer transition-all duration-200 select-none relative overflow-hidden ${
+                className={`flex items-center justify-between p-3.5 sm:p-4 rounded-card cursor-pointer transition-all duration-200 select-none relative overflow-hidden focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base ${
                   isOccupiedAtSlot
                     ? 'opacity-50 cursor-not-allowed bg-surface-card border border-status-danger/30'
                     : isSelected
