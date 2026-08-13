@@ -49,7 +49,6 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   onNext
 }) => {
   const { theme } = useTheme();
-  const isLight = theme === 'light';
   const [busySlots, setBusySlots] = useState<string[]>([]);
   const [requiresApprovalSlots, setRequiresApprovalSlots] = useState<string[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
@@ -439,13 +438,11 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
       {/* Floating Bottom Action Bar */}
       <div className="sticky bottom-2 z-40 px-4 my-2 flex justify-center pointer-events-none animate-fade-in">
         <div className={`pointer-events-auto w-full max-w-[440px] p-3 rounded-full border flex items-center justify-between transition-colors ${
-          isLight
-            ? 'bg-zinc-900 border-zinc-800 text-white'
-            : 'bg-white border-stone-200 text-stone-900'
+          'bg-surface-inverse border-border-strong text-content-inverse'
         }`}>
           {showBackConfirm ? (
             <div className="flex-1 flex flex-col items-center animate-fade-in w-full px-2">
-              <span className={`text-[11px] font-bold mb-2 uppercase tracking-wider ${isLight ? 'text-zinc-200' : 'text-stone-800'}`}>
+              <span className={`text-[11px] font-bold mb-2 uppercase tracking-wider ${'text-content-inverse/90'}`}>
                 Deseja voltar aos profissionais?
               </span>
               <div className="flex items-center space-x-2 w-full">
@@ -453,7 +450,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                   type="button"
                   onClick={() => setShowBackConfirm(false)}
                   className={`flex-1 py-2 rounded-full font-bold text-[11px] transition-all ${
-                    isLight ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300' : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                    'bg-content-inverse/10 hover:bg-content-inverse/20 text-content-inverse/80'
                   }`}
                 >
                   Não
@@ -462,7 +459,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                   type="button"
                   onClick={onBack}
                   className={`flex-1 py-2 rounded-full border font-bold text-[11px] transition-all active:scale-95 ${
-                    isLight ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-white' : 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-900'
+                    'bg-content-inverse/10 hover:bg-content-inverse/20 border-content-inverse/20 text-content-inverse'
                   }`}
                 >
                   Sim, voltar
@@ -472,20 +469,20 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
           ) : (
             <>
               <div className="flex flex-col pl-3.5 min-w-0 pr-2">
-                <span className={`text-[10px] font-bold uppercase tracking-wider block truncate ${isLight ? 'text-zinc-400' : 'text-stone-500'}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider block truncate ${'text-content-inverse/60'}`}>
                   {choicesSummaryText}
                 </span>
-                <div className={`text-xs font-serif font-semibold flex items-center space-x-1.5 truncate ${isLight ? 'text-white' : 'text-stone-900'}`}>
+                <div className={`text-xs font-serif font-semibold flex items-center space-x-1.5 truncate ${'text-content-inverse'}`}>
                   {selectedDate && selectedTimeSlot ? (
                     <>
                       <CalendarIcon className="w-3.5 h-3.5 text-gold-base shrink-0" />
                       <span className="truncate">{formatDateBR(selectedDate)}</span>
-                      <span className={`shrink-0 ${isLight ? 'text-zinc-500' : 'text-stone-400'}`}>•</span>
+                      <span className={`shrink-0 ${'text-content-inverse/50'}`}>•</span>
                       <Clock className="w-3.5 h-3.5 text-gold-base shrink-0" />
                       <span className="shrink-0">{selectedTimeSlot}</span>
                     </>
                   ) : (
-                    <span className={`font-medium italic ${isLight ? 'text-zinc-400' : 'text-stone-400'}`}>
+                    <span className={`font-medium italic ${'text-content-inverse/60'}`}>
                       Escolha data e hora
                     </span>
                   )}
@@ -497,9 +494,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                   type="button"
                   onClick={() => (selectedDate || selectedTimeSlot) ? setShowBackConfirm(true) : onBack()}
                   className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all active:scale-95 shrink-0 ${
-                    isLight
-                      ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-white'
-                      : 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-900'
+                    'bg-content-inverse/10 hover:bg-content-inverse/20 border-content-inverse/20 text-content-inverse'
                   }`}
                   title="Voltar"
                 >
@@ -518,7 +513,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shrink-0 ${
                     selectedDate && selectedTimeSlot
                       ? 'bg-gold-base text-surface-base active:scale-95'
-                      : isLight ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-50' : 'bg-stone-200 text-stone-400 cursor-not-allowed opacity-50'
+                      : 'bg-content-inverse/10 text-content-inverse/40 cursor-not-allowed opacity-50'
                   }`}
                   title="Avançar"
                 >

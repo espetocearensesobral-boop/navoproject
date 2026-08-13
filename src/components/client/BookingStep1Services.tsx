@@ -50,7 +50,6 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
   onNext
 }) => {
   const { theme } = useTheme();
-  const isLight = theme === 'light';
   const [activeCategory, setActiveCategory] = useState<string>('cat_all');
   const [isCategoryOpen, setIsCategoryOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -537,25 +536,23 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
       {selectedServices.length > 0 && (
         <div className="sticky bottom-2 z-40 px-4 my-2 flex justify-center pointer-events-none animate-fade-in">
           <div className={`pointer-events-auto w-full max-w-[440px] p-3.5 rounded-3xl border flex items-center justify-between transition-colors ${
-            isLight
-              ? 'bg-zinc-900 border-zinc-800 text-white'
-              : 'bg-white border-stone-200 text-stone-900'
+            'bg-surface-inverse border-border-strong text-content-inverse'
           }`}>
             <div className="flex flex-col pl-2">
               <div className="flex items-center space-x-1.5 mb-0.5">
                 <span className={`w-5 h-5 rounded-full flex items-center justify-center font-black text-[10px] ${
-                  isLight ? 'bg-gold-base/20 text-gold-base' : 'bg-gold-base/20 text-gold-deep'
+                  'bg-accent-solid/20 text-accent-text'
                 }`}>
                   {selectedServices.length}
                 </span>
                 <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                  isLight ? 'text-zinc-400' : 'text-stone-500'
+                  'text-content-inverse/60'
                 }`}>
                   {selectedServices.length === 1 ? 'Serviço' : 'Serviços'}
                 </span>
               </div>
               <div className={`text-xl font-mono num-tabular font-semibold leading-tight ${
-                isLight ? 'text-white' : 'text-stone-900'
+                'text-content-inverse'
               }`}>
                 R$ {totalPrice.toFixed(2)}
               </div>
@@ -570,9 +567,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                     onClearServices();
                   }}
                   className={`w-10 h-10 flex-shrink-0 rounded-full border flex items-center justify-center transition-all active:scale-95 ${
-                    isLight
-                      ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300 hover:text-red-400'
-                      : 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-700 hover:text-red-500'
+                    'bg-content-inverse/10 hover:bg-content-inverse/20 border-content-inverse/20 text-content-inverse/70 hover:text-status-error'
                   }`}
                   title="Limpar seleção"
                 >

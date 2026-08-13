@@ -39,7 +39,6 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
   onCancel
 }) => {
   const { theme } = useTheme();
-  const isLight = theme === 'light';
   const [useLoyaltyPoints, setUseLoyaltyPoints] = useState<boolean>(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [modalTab, setModalTab] = useState<'terms' | 'privacy' | null>(null);
@@ -355,13 +354,11 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
       {/* Floating Bottom Tray */}
       <div className="sticky bottom-3 left-0 right-0 px-5 z-40 flex justify-center pointer-events-none animate-fade-in my-3">
         <div className={`pointer-events-auto w-full max-w-[400px] p-3.5 rounded-3xl border flex items-center justify-between space-x-3 transition-colors ${
-          isLight
-            ? 'bg-zinc-900 border-zinc-800 text-white'
-            : 'bg-white border-stone-200 text-stone-900'
+          'bg-surface-inverse border-border-strong text-content-inverse'
         }`}>
           {showCancelConfirm ? (
             <div className="flex-1 flex flex-col items-center animate-fade-in">
-              <span className={`text-[11px] font-bold mb-2 uppercase tracking-wider ${isLight ? 'text-zinc-200' : 'text-stone-800'}`}>
+              <span className={`text-[11px] font-bold mb-2 uppercase tracking-wider ${'text-content-inverse/90'}`}>
                 Cancelar agendamento?
               </span>
               <div className="flex items-center space-x-2 w-full">
@@ -369,7 +366,7 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
                   type="button"
                   onClick={() => setShowCancelConfirm(false)}
                   className={`flex-1 py-2.5 rounded-full font-bold text-[11px] transition-all ${
-                    isLight ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300' : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                    'bg-content-inverse/10 hover:bg-content-inverse/20 text-content-inverse/80'
                   }`}
                 >
                   Não
@@ -378,7 +375,7 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
                   type="button"
                   onClick={onCancel}
                   className={`flex-1 py-2.5 rounded-full border font-bold text-[11px] transition-all active:scale-95 ${
-                    isLight ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-white' : 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-900'
+                    'bg-content-inverse/10 hover:bg-content-inverse/20 border-content-inverse/20 text-content-inverse'
                   }`}
                 >
                   Sim, cancelar
@@ -392,9 +389,7 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
                 onClick={() => setShowCancelConfirm(true)}
                 disabled={isSubmitting}
                 className={`flex-1 px-5 py-3 rounded-full border flex items-center justify-center space-x-1.5 transition-all focus:outline-none active:scale-95 ${
-                  isLight
-                    ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-white'
-                    : 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-900'
+                  'bg-content-inverse/10 hover:bg-content-inverse/20 border-content-inverse/20 text-content-inverse'
                 }`}
                 title="Cancelar"
               >

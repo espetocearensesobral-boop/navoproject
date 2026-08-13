@@ -63,7 +63,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             key={toast.id}
             className={`
               pointer-events-auto
-              bg-[#1a1a1a] border border-white/10 border-l-4 ${borderColors[toast.type]}
+              bg-surface-inverse border border-content-inverse/10 border-l-4 ${borderColors[toast.type]}
               rounded-xl shadow-2xl backdrop-blur-xl
               p-4 flex items-start gap-3
               animate-toast-in
@@ -72,14 +72,14 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           >
             <div className="shrink-0 mt-0.5">{icons[toast.type]}</div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white">{toast.title}</p>
+              <p className="text-sm font-bold text-content-inverse">{toast.title}</p>
               {toast.message && (
-                <p className="text-xs text-neutral-400 mt-1">{toast.message}</p>
+                <p className="text-xs text-content-inverse/70 mt-1">{toast.message}</p>
               )}
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="shrink-0 p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="shrink-0 p-1 rounded-lg text-content-inverse/70 hover:text-content-inverse hover:bg-content-inverse/10 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>

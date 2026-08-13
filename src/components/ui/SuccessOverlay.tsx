@@ -37,13 +37,13 @@ export const SuccessOverlay: React.FC<SuccessOverlayProps> = ({
       transition-opacity duration-300
       ${show ? 'opacity-100' : 'opacity-0'}
     `}>
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-surface-inverse/90 backdrop-blur-md" />
       
       <div className="relative flex flex-col items-center text-center max-w-sm">
         {/* Animated Check Circle */}
         <div className="animate-success-pop">
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#4ade80] to-[#22c55e] flex items-center justify-center shadow-[0_0_60px_rgba(74,222,128,0.4)]">
-            <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none">
+            <svg className="w-12 h-12 text-content-inverse" viewBox="0 0 24 24" fill="none">
               <path
                 d="M5 13l4 4L19 7"
                 stroke="currentColor"
@@ -60,11 +60,11 @@ export const SuccessOverlay: React.FC<SuccessOverlayProps> = ({
         </div>
 
         {/* Text */}
-        <h3 className="mt-6 text-2xl font-bold text-white animate-fade-in" style={{ animationDelay: '0.4s' }}>
+        <h3 className="mt-6 text-2xl font-bold text-content-inverse animate-fade-in" style={{ animationDelay: '0.4s' }}>
           {title}
         </h3>
         {subtitle && (
-          <p className="mt-2 text-sm text-white/70 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+          <p className="mt-2 text-sm text-content-inverse/70 animate-fade-in" style={{ animationDelay: '0.5s' }}>
             {subtitle}
           </p>
         )}

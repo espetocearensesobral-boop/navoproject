@@ -10,6 +10,15 @@
   --color-gold-hover: var(--color-gold-hover);
   --color-content-base: var(--color-content-base);
   --color-content-on-accent: var(--color-content-on-accent);
+  --color-accent-solid: var(--color-accent-solid);
+  --color-on-accent: var(--color-on-accent);
+  --color-accent-text: var(--color-accent-text);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-accent-strong: var(--color-accent-strong);
+  --color-surface-inverse: var(--color-surface-inverse);
+  --color-content-inverse: var(--color-content-inverse);
+  --color-border-strong: var(--color-border-strong);
+
   
   --color-border-subtle: var(--color-border-subtle);
   --color-content-muted: var(--color-content-muted);
@@ -49,6 +58,10 @@
   --color-gold-hover: #E4C372;
   --color-content-base: #F2EDE4;
   --color-content-on-accent: #12131A;
+  --color-surface-inverse: #FFFFFF;
+  --color-content-inverse: #12131A;
+  --color-border-strong: #FFFFFF;
+
   --color-content-muted: #8A8F98;
   --color-border-subtle: rgba(242, 237, 228, 0.08);
 
@@ -88,6 +101,10 @@
   --color-gold-hover: #E5CD9A;
   --color-content-base: #1A1C1E;
   --color-content-on-accent: #FFFFFF;
+  --color-surface-inverse: #12131A;
+  --color-content-inverse: #FFFFFF;
+  --color-border-strong: #12131A;
+
   --color-content-muted: #6B6E73;
   --color-border-subtle: rgba(26, 28, 30, 0.08);
 
@@ -128,41 +145,6 @@
 [data-palette="midnight"] { --color-gold-base: #3B82F6; --color-gold-deep: #1D4ED8; --color-gold-accent: #93C5FD; }
 [data-palette="lavender"] { --color-gold-base: #C084FC; --color-gold-deep: #9333EA; --color-gold-accent: #E9D5FF; }
 [data-palette="bordeaux"] { --color-gold-base: #F43F5E; --color-gold-deep: #BE123C; --color-gold-accent: #FECDD3; }
-
-/* Hover semântico por paleta */
-[data-palette="heritage"] { --color-gold-hover: #E5CD9A; }
-[data-palette="sapphire"] { --color-gold-hover: #9DBBFF; }
-[data-palette="emerald"] { --color-gold-hover: #7DDBAA; }
-[data-palette="amethyst"] { --color-gold-hover: #C4B5FD; }
-[data-palette="ruby"] { --color-gold-hover: #FF9AA0; }
-[data-palette="ocean"] { --color-gold-hover: #67DCEB; }
-[data-palette="copper"] { --color-gold-hover: #F0B184; }
-[data-palette="rose"] { --color-gold-hover: #F5A9C8; }
-[data-palette="olive"] { --color-gold-hover: #C7D2A9; }
-[data-palette="slate"] { --color-gold-hover: #C2CCD8; }
-[data-palette="amber"] { --color-gold-hover: #FCD34D; }
-[data-palette="teal"] { --color-gold-hover: #5EEAD4; }
-[data-palette="indigo"] { --color-gold-hover: #A5B4FC; }
-[data-palette="crimson"] { --color-gold-hover: #FDA4AF; }
-[data-palette="bronze"] { --color-gold-hover: #E4B28C; }
-[data-palette="violet"] { --color-gold-hover: #DDD6FE; }
-[data-palette="champagne"] { --color-gold-hover: #E8D7C3; }
-[data-palette="mint"] { --color-gold-hover: #6EE7B7; }
-[data-palette="coral"] { --color-gold-hover: #FDBA74; }
-[data-palette="titanium"] { --color-gold-hover: #CBD5E1; }
-[data-palette="cobalt"] { --color-gold-hover: #60A5FA; }
-[data-palette="jade"] { --color-gold-hover: #6EE7B7; }
-[data-palette="sand"] { --color-gold-hover: #FBBF24; }
-[data-palette="plum"] { --color-gold-hover: #D8B4FE; }
-[data-palette="electric"] { --color-gold-hover: #67E8F9; }
-[data-palette="sage"] { --color-gold-hover: #CAD2C5; }
-[data-palette="terracotta"] { --color-gold-hover: #F2CC8F; }
-[data-palette="midnight"] { --color-gold-hover: #93C5FD; }
-[data-palette="lavender"] { --color-gold-hover: #E9D5FF; }
-[data-palette="bordeaux"] { --color-gold-hover: #FECDD3; }
-
-
-
 
 
 html, body {

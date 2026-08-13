@@ -38,7 +38,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       />
 
       {/* Dialog */}
-      <div className="relative w-full max-w-md bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl animate-success-pop overflow-hidden">
+      <div className="relative w-full max-w-md bg-surface-inverse border border-content-inverse/10 rounded-2xl shadow-2xl animate-success-pop overflow-hidden">
         {/* Header */}
         <div className="p-6 pb-4 flex items-start justify-between">
           <div className="flex items-start gap-4">
@@ -46,19 +46,19 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               w-12 h-12 rounded-xl flex items-center justify-center shrink-0
               ${variant === 'danger' 
                 ? 'bg-red-500/10 text-red-400 border border-red-500/20' 
-                : 'bg-[#d4a853]/10 text-[#d4a853] border border-[#d4a853]/20'}
+                : 'bg-accent-solid/10 text-accent-solid border border-accent-solid/20'}
             `}>
               {icon || <AlertTriangle className="w-6 h-6" />}
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">{title}</h3>
-              <p className="text-sm text-neutral-400 mt-1 leading-relaxed">{description}</p>
+              <h3 className="text-lg font-bold text-content-inverse">{title}</h3>
+              <p className="text-sm text-content-inverse/60 mt-1 leading-relaxed">{description}</p>
             </div>
           </div>
           {!isLoading && (
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="p-1.5 rounded-lg text-content-inverse/60 hover:text-content-inverse hover:bg-content-inverse/10 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
