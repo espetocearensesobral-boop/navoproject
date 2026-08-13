@@ -424,15 +424,15 @@ export const ServicesManagement: React.FC = () => {
           ))}
         </div>
 
-        {/* Compact Services List Feed */}
+        {/* Mobile Services List */}
         <div className="space-y-2">
           {loading ? (
-            <div className="p-8 text-center bg-surface-card rounded-2xl border border-border-subtle text-content-muted text-xs">
+            <div className="p-8 text-center bg-surface-card rounded-2xl border border-border-subtle text-sm text-content-muted">
               <Scissors className="w-5 h-5 text-gold-hover animate-spin mx-auto mb-2" />
-              <span>Carregando serviços...</span>
+              Carregando serviços...
             </div>
           ) : filteredServices.length === 0 ? (
-            <div className="p-8 text-center bg-surface-card rounded-2xl border border-border-subtle text-content-muted text-xs">
+            <div className="p-8 text-center bg-surface-card rounded-2xl border border-border-subtle text-sm text-content-muted">
               Nenhum serviço encontrado.
             </div>
           ) : (
@@ -441,74 +441,62 @@ export const ServicesManagement: React.FC = () => {
               const servicePhotos = Array.isArray(service.gallery_urls) && service.gallery_urls.length > 0
                 ? service.gallery_urls
                 : service.image_url ? [service.image_url] : [];
+              const isExpanded = expandedServiceId === service.id;
 
               return (
-                <div
-                  key={service.id}
-                  className="bg-surface-card p-3 rounded-2xl border border-border-subtle flex items-center justify-between gap-3"
-                >
-                  {/* Photo & Main Info */}
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div
-                      className="relative w-12 h-12 rounded-xl bg-surface-base border border-border-subtle overflow-hidden shrink-0"
-                    >
-                      {service.image_url || servicePhotos[0] ? (
-                        <img
-                          src={service.image_url || servicePhotos[0]}
-                          alt={service.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gold-hover">
-                          <Scissors className="w-5 h-5" />
-                        </div>
-                      )}
+                <article key={service.id} className={`overflow-hidden rounded-2xl border bg-surface-card transition-colors ${isExpanded ? 'border-gold-base/50' : 'border-border-subtle'}`}>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                    aria-expanded={isExpanded}
+                    className="w-full min-h-[78px] p-3 text-left flex items-center gap-3 hover:bg-surface-base/40"
+                  >
+                    <div className="relative w-12 h-12 rounded-xl bg-surface-base border border-border-subtle overflow-hidden shrink-0 flex items-center justify-center">
+                      {service.image_url || servicePhotos[0] ? <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" /> : <Scissors className="w-5 h-5 text-gold-hover" />}
+                      {servicePhotos.length > 0 && <span className="absolute -bottom-0.5 -right-0.5 px-1 py-0.5 rounded-md bg-surface-base/90 text-content-base text-[9px] font-bold border border-gold-base/40">{servicePhotos.length}</span>}
                     </div>
-
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-bold text-content-base text-xs truncate">{service.title}</span>
-                        {service.is_combo && (
-                          <span className="text-[8px] bg-status-success/20 text-status-success font-black px-1.5 py-0.5 rounded-xl uppercase">Combo</span>
-                        )}
-                        {service.popular && (
-                          <span className="text-[8px] bg-gold-base/20 text-gold-hover font-black px-1.5 py-0.5 rounded-xl uppercase">Destaque</span>
-                        )}
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="text-[10px] text-gold-base font-bold uppercase truncate">{categoryName}</span>
+                        {service.is_combo && <span className="shrink-0 text-[9px] bg-status-success/15 text-status-success font-bold px-1.5 py-0.5 rounded-md">Combo</span>}
+                        {service.popular && <span className="shrink-0 text-[9px] bg-gold-base/15 text-gold-hover font-bold px-1.5 py-0.5 rounded-md">Destaque</span>}
                       </div>
-                      <div className="flex items-center gap-2 text-[10px] text-content-muted mt-0.5">
-                        <span className="text-content-base font-bold">R$ {service.price.toFixed(2)}</span>
-                        <span>•</span>
-                        <span>{service.duration_minutes} min</span>
-                        <span>•</span>
-                        <span className="truncate">{categoryName}</span>
+                      <h3 className="mt-0.5 font-bold text-content-base text-sm truncate">{service.title}</h3>
+                      <p className="text-xs text-content-muted truncate">{service.description || 'Sem descrição cadastrada'}</p>
+                    </div>
+                    <div className="text-right shrink-0 min-w-[62px]">
+                      <p className="text-xs font-bold text-gold-base">R$ {service.price.toFixed(2)}</p>
+                      <p className="text-[10px] text-content-muted">{service.duration_minutes} min</p>
+                    </div>
+                    {isExpanded ? <ChevronUp className="w-5 h-5 text-gold-base shrink-0" /> : <ChevronDown className="w-5 h-5 text-content-muted shrink-0" />}
+                  </button>
+
+                  {isExpanded && (
+                    <div className="border-t border-border-subtle bg-surface-base/35 p-3 space-y-3">
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Categoria</p><p className="font-semibold text-content-base">{categoryName}</p></div>
+                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Duração</p><p className="font-semibold text-content-base">{service.duration_minutes} min</p></div>
+                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Preço original</p><p className="font-semibold text-content-base">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Galeria</p><p className="font-semibold text-content-base">{servicePhotos.length} foto(s)</p></div>
+                      </div>
+                      {service.description && <p className="text-sm text-content-muted leading-relaxed">{service.description}</p>}
+                      <div className="flex flex-wrap gap-2">
+                        <button type="button" onClick={() => handleToggleCombo(service)} className={`min-h-10 px-3 rounded-xl border text-sm font-semibold ${service.is_combo ? 'border-status-success/30 text-status-success' : 'border-border-subtle text-content-muted'}`}>{service.is_combo ? '🔥 Combo ativo' : '+ Combo VIP'}</button>
+                        <button type="button" onClick={() => handleTogglePopular(service)} className={`min-h-10 px-3 rounded-xl border text-sm font-semibold ${service.popular ? 'border-gold-base/40 text-gold-base' : 'border-border-subtle text-content-muted'}`}>{service.popular ? '⭐ Destaque ativo' : '+ Destaque'}</button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button type="button" onClick={() => handleDuplicate(service)} className="min-h-10 px-3 rounded-xl border border-border-subtle text-content-muted text-sm font-semibold flex items-center gap-1.5"><Copy className="w-4 h-4" /> Duplicar</button>
+                        <button type="button" onClick={() => handleOpenEdit(service)} className="min-h-10 px-3 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center gap-1.5"><Edit2 className="w-4 h-4" /> Editar</button>
+                        <button type="button" onClick={() => handleDelete(service.id)} className="min-h-10 px-3 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center gap-1.5"><Trash2 className="w-4 h-4" /> Excluir</button>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Quick Action Buttons */}
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={() => handleOpenEdit(service)}
-                      className="p-2 rounded-xl bg-surface-card text-gold-hover hover:bg-surface-card border border-border-subtle"
-                      title="Editar"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(service.id)}
-                      className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
-                      title="Excluir"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
+                  )}
+                </article>
               );
             })
           )}
-        </div>
+                </div>
       </div>
-
       {/* ========================================================= */}
       {/* DESKTOP SERVICES VIEW (FULL RICH MANAGEMENT) - hidden md:block */}
       {/* ========================================================= */}
