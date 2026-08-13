@@ -130,7 +130,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
             newBusySlots = Array.isArray(resData.busySlots) ? resData.busySlots : [];
             const serverAvailableSlots = Array.isArray(resData.availableSlots) ? resData.availableSlots : [];
             const serverApprovalSlots = Array.isArray(resData.requiresApprovalSlots) ? resData.requiresApprovalSlots : [];
-            const statusReason = Array.isArray(resData.slots)
+            const statusReason = serverAvailableSlots.length === 0 && serverApprovalSlots.length === 0 && Array.isArray(resData.slots)
               ? resData.slots.find((slot: any) => ['PROFESSIONAL_UNAVAILABLE', 'SHOP_CLOSED'].includes(slot?.statusCode))?.reason
               : null;
             if (isMounted) {
