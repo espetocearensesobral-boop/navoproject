@@ -55,6 +55,8 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   const [cancelError, setCancelError] = useState<string | null>(null);
 
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const rescheduleModalRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (showRescheduleModal) { setTimeout(() => rescheduleModalRef.current?.focus(), 50); } else if (isOpen) { setTimeout(() => modalRef.current?.focus(), 50); } }, [showRescheduleModal, isOpen]);
   const modalRef = useRef<HTMLDivElement>(null);
   useEffect(() => { if (isOpen) modalRef.current?.focus(); }, [isOpen]);
   const [cancelReason, setCancelReason] = useState('Compromisso inesperado');
@@ -308,7 +310,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   // WhatsApp Message Link Generator
   const getWhatsAppUrl = () => {
     const text = encodeURIComponent(
-      `💈 *NAVO PREMIUM*\n\nOlá! Gostaria de falar sobre o meu agendamento:\n\n📋 *Voucher:* #${currentApt.id.replace('apt_', '').substring(0, 8)}\n📅 *Data:* ${currentApt.date}\n⏰ *Horário:* ${currentApt.time_slot}\n✂️ *Barbeiro:* ${currentApt.professional_name}`
+      `💈 *NAVO PREMIUM*\n\nOlá! Gostaria de falar sobre o meu agendamento:\n\n📋 *Voucher:* #${currentApt.booking_code || currentApt.id.replace('apt_', '').substring(0, 8)}\n📅 *Data:* ${currentApt.date}\n⏰ *Horário:* ${currentApt.time_slot}\n✂️ *Barbeiro:* ${currentApt.professional_name}`
     );
     return `https://api.whatsapp.com/send?phone=5588998340085&text=${text}`;
   };
@@ -416,7 +418,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   return (
     <>
       {/* Main Voucher/Receipt Modal */}
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-surface-inverse/70 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
+      <div role="dialog" aria-modal="true" aria-labelledby="receipt-title" tabIndex={-1} className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-surface-inverse/70 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto outline-none" onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}>
         <div className="w-full max-w-[380px] my-auto flex flex-col items-center animate-in zoom-in-95 duration-200">
           
           {/* VOUCHER TICKET CARD */}
@@ -478,7 +480,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                   {shopProfile.name || 'NAVO PREMIUM'}
                 </h1>
                 <div className="text-[10px] text-content-muted tracking-[0.08em] font-mono uppercase">
-                  VOUCHER #{currentApt.id.replace('apt_', '').substring(0, 8).toUpperCase()}
+                  VOUCHER #{currentApt.booking_code || currentApt.id.replace('apt_', '').substring(0, 8).toUpperCase()}
                 </div>
               </div>
 
@@ -756,7 +758,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
       {/* Reschedule Modal */}
       {showRescheduleModal && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-md animate-in fade-in duration-200">
+        <div role="dialog" aria-modal="true" aria-labelledby="reschedule-title" tabIndex={-1} className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-surface-inverse/80 backdrop-blur-sm animate-in fade-in duration-200 outline-none" onKeyDown={(e) => { if (e.key === "Escape") setShowRescheduleModal(false); }} ref={rescheduleModalRef}>
           <div className="w-full sm:w-[380px] bg-surface-card rounded-2xl border border-border-subtle shadow-2xl p-5 space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-serif text-content-base font-semibold">Reagendar</h3>

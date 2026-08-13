@@ -80,21 +80,16 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
             <span className="text-2xl font-black text-content-base tracking-widest font-mono select-all">
               {bookingCode}
             </span>
-            <button
-              type="button"
-              onClick={handleCopyVoucher}
-              className="p-2 rounded-xl bg-gold-base/20 hover:bg-gold-base/30 text-gold-base active:scale-95 transition-all flex items-center gap-1 text-xs font-bold"
-              title="Copiar Código"
-            >
+            <span className="sr-only"> </span><button type="button" onClick={handleCopyVoucher} aria-label={copied ? "Código copiado" : "Copiar código"} className="p-2 rounded-xl bg-gold-base/20 hover:bg-gold-base/30 text-gold-base active:scale-95 transition-all flex items-center gap-1 text-xs font-bold" title="Copiar Código">
               {copied ? (
                 <>
                   <Check className="w-4 h-4 text-status-success" />
-                  <span className="text-status-success text-[10px]">Copiado</span>
+                  <span className="text-status-success text-[10px]" aria-hidden="true">Copiado</span>
                 </>
               ) : (
                 <>
                   <Copy className="w-4 h-4" />
-                  <span className="text-[10px]">Copiar</span>
+                  <span className="text-[10px]" aria-hidden="true">Copiar</span>
                 </>
               )}
             </button>
