@@ -88,6 +88,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
   const [dbServices, setDbServices] = useState<any[]>([]);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -272,6 +273,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       date: 'Há 3 semanas',
       text: 'Experiência 5 estrelas do começo ao fim! Agendei pelo site em segundos com confirmação instantânea no WhatsApp, fui atendido no horário e o resultado do visual superou todas as expectativas.',
       avatar: 'https://images.unsplash.com/photo-1600486913747-55e5470d6f40?auto=format&fit=crop&q=80&w=150'
+    },
+    {
+      name: 'Marcos P.',
+      service: 'Corte Social',
+      rating: 5,
+      date: 'Há 1 mês',
+      text: 'Excelente profissionalismo. A atenção aos detalhes é fantástica, o ambiente é muito agradável e o sistema de agendamento online é super prático.',
+      avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=150'
+    },
+    {
+      name: 'Thiago B.',
+      service: 'Barba Terapia',
+      rating: 5,
+      date: 'Há 2 meses',
+      text: 'A melhor barba que já fiz. Produtos de primeira linha e um cuidado especial. Sem contar a cerveja gelada de cortesia. Voltarei sempre!',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150'
     }
   ];
 
@@ -670,65 +687,94 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto"
         >
-          <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
-            <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
-              DEPOIMENTOS
-            </span>
-            <h2 className="font-serif text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
-              Quem já passou por aqui
-            </h2>
+          <div className="shrink-0 mb-[clamp(1rem,2.5vh,2rem)] flex flex-col gap-[clamp(1.5rem,3vh,2rem)]">
+            <div className="text-left">
+              <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
+                DEPOIMENTOS
+              </span>
+              <h2 className="font-serif text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
+                Quem usa, vira fã
+                <br className="hidden md:block" /> (e sobe de nível)
+              </h2>
+            </div>
+            
+            {/* The Green/Gold Pill Banner matching visual */}
+            <div className="w-full flex justify-center">
+              <div className="bg-emerald-500 text-white rounded-[1.25rem] flex items-center py-2.5 px-6 shadow-sm w-fit shrink-0 divide-x divide-white/30">
+                 <div className="flex flex-col items-center pr-5">
+                   <span className="text-xl md:text-2xl font-black leading-none tracking-tight">4.9/5</span>
+                   <span className="text-[0.65rem] font-bold uppercase tracking-wide mt-0.5">NPS DE SATISFAÇÃO</span>
+                 </div>
+                 <div className="flex flex-col items-center pl-5">
+                   <span className="text-xl md:text-2xl font-black leading-none tracking-tight">+1.2k</span>
+                   <span className="text-[0.65rem] font-bold uppercase tracking-wide mt-0.5">AVALIAÇÕES</span>
+                 </div>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[clamp(0.5rem,1.5vh,1.25rem)] flex-1 min-h-0 justify-center items-stretch my-auto py-[clamp(0.25rem,1vh,0.75rem)] w-full">
-            {testimonials.slice(0, 3).map((item, idx) => (
-              <motion.div 
-                key={idx}
-                whileHover={reducedMotion ? {} : { y: -3, scale: 1.01 }}
-                transition={{ duration: 0.2 }}
-                className="w-full bg-neutral-50/80 border border-neutral-200/90 rounded-[clamp(0.875rem,1.8vh,1.25rem)] p-[clamp(0.85rem,2vh,1.35rem)] flex flex-col justify-between gap-3 shadow-2xs hover:border-gold-base/60 hover:shadow-md transition-all h-full min-h-0"
-              >
-                <div className="flex flex-col gap-2.5">
-                  {/* Top Header: Avatar, Name, Rating & Date */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-3">
-                      <img 
-                        src={item.avatar} 
-                        alt={item.name}
-                        className="w-[clamp(2.25rem,4.5vh,3rem)] h-[clamp(2.25rem,4.5vh,3rem)] rounded-full object-cover shrink-0 border-2 border-gold-base/40"
-                      />
-                      <div>
-                        <h4 className="text-[clamp(0.85rem,1.6vh,1.05rem)] font-extrabold text-neutral-900 leading-tight">
-                          {item.name}
-                        </h4>
-                        <div className="flex text-amber-400 gap-0.5 mt-1">
-                          {[...Array(item.rating)].map((_, i) => (
-                            <Star key={i} className="w-[clamp(0.7rem,1.2vh,0.85rem)] h-[clamp(0.7rem,1.2vh,0.85rem)] fill-current" />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <span className="text-[clamp(0.6rem,1.1vh,0.75rem)] font-medium text-neutral-400 shrink-0">
-                      {item.date}
-                    </span>
+          <div className="flex-1 min-h-0 flex flex-col justify-center items-center w-full py-[clamp(0.25rem,1vh,0.75rem)]">
+            <div className="relative w-full max-w-sm md:max-w-2xl lg:max-w-3xl">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={testimonialIndex}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full bg-white border border-neutral-100 rounded-[1.5rem] p-[clamp(1.5rem,3vh,2rem)] shadow-lg shadow-neutral-200/50 flex flex-col gap-4 md:gap-6"
+                >
+                  <div className="flex text-amber-400 gap-1">
+                    {[...Array(testimonials[testimonialIndex].rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 md:w-6 md:h-6 fill-current" />
+                    ))}
                   </div>
-
-                  {/* Service Badge */}
-                  {item.service && (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-base/12 border border-gold-base/25 w-fit">
-                      <Scissors className="w-3 h-3 text-gold-base" />
-                      <span className="text-[clamp(0.625rem,1.15vh,0.725rem)] font-bold text-gold-deep">
-                        {item.service}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Testimonial Quote Text */}
-                  <p className="text-[clamp(0.75rem,1.35vh,0.925rem)] text-neutral-700 leading-relaxed font-normal italic mt-1">
-                    "{item.text}"
+                  <p className="text-[clamp(0.9rem,1.6vh,1.125rem)] text-neutral-700 leading-relaxed font-medium md:min-h-[80px]">
+                    "{testimonials[testimonialIndex].text}"
                   </p>
-                </div>
-              </motion.div>
-            ))}
+                  
+                  <div className="flex items-center gap-3 md:gap-4 mt-2">
+                    <img 
+                      src={testimonials[testimonialIndex].avatar} 
+                      alt={testimonials[testimonialIndex].name}
+                      className="w-12 h-12 md:w-14 md:h-14 rounded-2xl object-cover shrink-0 border border-neutral-100 shadow-sm"
+                    />
+                    <div className="flex flex-col">
+                      <span className="font-bold text-neutral-900 text-sm md:text-base">{testimonials[testimonialIndex].name}</span>
+                      <span className="text-xs md:text-sm text-neutral-500 font-medium">{testimonials[testimonialIndex].service}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            
+            {/* Carousel Controls */}
+            <div className="flex items-center justify-center gap-4 mt-6 md:mt-8">
+              <button 
+                onClick={() => setTestimonialIndex(prev => prev === 0 ? testimonials.length - 1 : prev - 1)}
+                className="p-1.5 text-neutral-800 hover:text-black transition-colors"
+                aria-label="Anterior"
+              >
+                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+              <div className="flex items-center gap-2">
+                {testimonials.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setTestimonialIndex(idx)}
+                    className={`transition-all duration-300 rounded-full ${idx === testimonialIndex ? 'w-6 h-2 md:w-8 bg-neutral-900' : 'w-2 h-2 bg-neutral-300 hover:bg-neutral-400'}`}
+                    aria-label={`Ir para depoimento ${idx + 1}`}
+                  />
+                ))}
+              </div>
+              <button 
+                onClick={() => setTestimonialIndex(prev => (prev + 1) % testimonials.length)}
+                className="p-1.5 text-neutral-800 hover:text-black transition-colors"
+                aria-label="Próximo"
+              >
+                <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+            </div>
           </div>
 
           <div className="flex justify-center pt-2 shrink-0">

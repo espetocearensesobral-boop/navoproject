@@ -106,14 +106,14 @@ appointmentsRouter.post("/lookup/verify", sensitiveOpsLimiter, async (req: any, 
     const token = jwt.sign(
       { role: 'guest_auth', phone: inputPhone, appointmentId: matchedApt.id, id: `guest_${Date.now()}` },
       JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '30m' } // Reduzido de 1h para 30m
     );
 
     res.cookie('guest_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 3600 * 1000 // 1 hour
+      maxAge: 30 * 60 * 1000 // 30 minutos (em milissegundos)
     });
 
     return res.json({ success: true, message: 'Validado com sucesso.' });
@@ -124,8 +124,13 @@ appointmentsRouter.post("/lookup/verify", sensitiveOpsLimiter, async (req: any, 
 
 // POST /api/appointments/lookup/logout — Revoga a sessão de visitante
 appointmentsRouter.post("/lookup/logout", (req: any, res) => {
-  res.clearCookie('guest_token');
-  res.json({ success: true });
+  res.clearCookie('guest_token', {
+    path: '/',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  });
+  return res.status(200).json({ success: true });
 });
 
 // GET /api/appointments/lookup/step2 — Valida código e retorna detalhes do agendamento

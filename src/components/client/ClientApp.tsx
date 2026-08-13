@@ -143,6 +143,68 @@ export const ClientApp: React.FC = () => {
   const [userCreatedAppointments, setUserCreatedAppointments] = useState<Appointment[]>([]);
   const [isConfirmingBooking, setIsConfirmingBooking] = useState(false);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // Se é um convidado com um agendamento recente, limpa a sessão
+      if (isGuest && createdBookingCode) {
+        // Usa sendBeacon para garantir que a requisição seja enviada antes de fechar
+        navigator.sendBeacon(
+          '/api/appointments/lookup/logout',
+          new Blob([JSON.stringify({})], { type: 'application/json' })
+        );
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isGuest, createdBookingCode]);
+
+  useEffect(() => {
+    let inactivityTimer: NodeJS.Timeout;
+
+    const resetInactivityTimer = () => {
+      clearTimeout(inactivityTimer);
+      
+      // Se é um convidado, limpa a sessão após 5 minutos de inatividade
+      if (isGuest) {
+        inactivityTimer = setTimeout(async () => {
+          try {
+            await fetch('/api/appointments/lookup/logout', {
+              method: 'POST',
+              credentials: 'include'
+            });
+            console.log('Sessão de convidado limpa por inatividade');
+            
+            // Opcional: mostrar notificação
+            if (createdBookingCode) {
+              alert('Sua sessão foi encerrada por inatividade. Seus dados estão seguros.');
+            }
+          } catch (error) {
+            console.error('Erro ao limpar sessão por inatividade:', error);
+          }
+        }, 5 * 60 * 1000); // 5 minutos
+      }
+    };
+
+    // Detecta atividade do usuário
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      window.addEventListener(event, resetInactivityTimer, { passive: true });
+    });
+
+    resetInactivityTimer();
+
+    return () => {
+      clearTimeout(inactivityTimer);
+      events.forEach(event => {
+        window.removeEventListener(event, resetInactivityTimer);
+      });
+    };
+  }, [isGuest, createdBookingCode]);
+
   const handleToggleService = (service: ServiceItem) => {
     hapticLight();
     setSelectedServices(prev => {
@@ -267,9 +329,23 @@ export const ClientApp: React.FC = () => {
     }
   );
 
-  const handleTabChange = (tabId: 'home' | 'booking' | 'appointments' | 'more') => {
+  const handleTabChange = async (tabId: 'home' | 'booking' | 'appointments' | 'more' | 'subscriptions' | 'loyalty' | string) => {
     hapticLight();
     
+    // Se o usuário está saindo da aba de agendamento e é um convidado
+    if (activeTab === 'booking' && tabId !== 'booking' && isGuest) {
+      try {
+        // Limpa o cookie de convidado
+        await fetch('/api/appointments/lookup/logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        console.log('Sessão de convidado limpa ao mudar de aba');
+      } catch (error) {
+        console.error('Erro ao limpar sessão:', error);
+      }
+    }
+
     // Proteção: se está no meio do booking e vai sair
     if (activeTab === 'booking' && bookingStep >= 1 && bookingStep <= 4 && tabId !== 'booking') {
       if (selectedServices.length > 0 || selectedBarber || selectedDate) {
