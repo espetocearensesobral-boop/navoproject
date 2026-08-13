@@ -35,7 +35,7 @@ interface AdminTabsProps {
 
 export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, className = '' }) => {
   return (
-    <div className={`flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1 ${className}`}>
+    <div className={`flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 ${className}`}>
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeId === tab.id;
@@ -46,7 +46,7 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, 
             onClick={() => !tab.disabled && onChange(tab.id)}
             disabled={tab.disabled}
             aria-disabled={tab.disabled || undefined}
-            className={`shrink-0 h-9 px-3.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-95 ${
+            className={`shrink-0 min-h-11 px-4 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors active:scale-95 ${
               tab.disabled
                 ? 'bg-surface-base/60 text-content-muted/50 border border-border-subtle/60 cursor-not-allowed'
                 : isActive
@@ -58,7 +58,7 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, 
             <span className="whitespace-nowrap">{tab.label}</span>
             {typeof tab.count === 'number' && (
               <span
-                className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-extrabold shrink-0 ${
+                className={`min-w-6 h-6 px-1 rounded-full text-xs flex items-center justify-center font-extrabold shrink-0 ${
                   isActive ? 'bg-surface-base/25 text-surface-base' : 'bg-gold-base/10 text-gold-base'
                 }`}
               >

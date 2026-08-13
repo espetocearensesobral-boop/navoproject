@@ -551,7 +551,7 @@ export const ScheduleGrid: React.FC = () => {
       {/* Modal: Bloquear Horário */}
       {isBlockModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface-card border border-red-500/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
+          <div className="admin-modal bg-surface-card border border-red-500/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
             <div className="p-4 bg-surface-card border-b border-border-subtle flex justify-between items-center">
               <h2 className="text-sm font-serif text-content-base font-semibold flex items-center space-x-2">
                 <Lock className="w-4 h-4 text-red-400" />
@@ -635,7 +635,7 @@ export const ScheduleGrid: React.FC = () => {
       {/* Modal: Encaixe Manual Presencial */}
       {isManualBookingOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface-card border border-gold-base/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
+          <div className="admin-modal bg-surface-card border border-gold-base/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
             <div className="p-4 bg-surface-card border-b border-border-subtle flex justify-between items-center">
               <h2 className="text-sm font-serif text-content-base font-semibold flex items-center space-x-2">
                 <Scissors className="w-4 h-4 text-gold-base" />

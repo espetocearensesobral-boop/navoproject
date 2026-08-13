@@ -437,3 +437,96 @@ button, a, input, select, textarea {
 .animate-success-pop {
   animation: success-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* Admin density and mobile readability guardrails. Keep these scoped so the
+   public booking funnel keeps its own rhythm and typography. */
+.admin-shell {
+  --admin-content-gap: 1.25rem;
+  --admin-control-height: 2.75rem;
+}
+
+.admin-shell main,
+.admin-shell main * {
+  min-width: 0;
+}
+
+.admin-shell main {
+  overscroll-behavior-x: none;
+}
+
+.admin-shell button,
+.admin-shell a,
+.admin-shell input,
+.admin-shell select,
+.admin-shell textarea {
+  font-size: 0.875rem;
+}
+
+.admin-shell input,
+.admin-shell select,
+.admin-shell textarea {
+  min-height: var(--admin-control-height);
+}
+
+.admin-shell img,
+.admin-shell svg {
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  .admin-shell .text-\[9px\],
+  .admin-shell .text-\[10px\],
+  .admin-shell .text-\[11px\] {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .admin-shell .text-xs {
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+  }
+
+  .admin-shell .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .admin-shell table {
+    font-size: 0.8125rem;
+  }
+}
+
+.admin-modal {
+  max-height: min(90dvh, 820px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.admin-modal form {
+  min-width: 0;
+}
+
+.admin-modal button,
+.admin-modal input,
+.admin-modal select,
+.admin-modal textarea {
+  min-height: 2.75rem;
+}
+
+.admin-modal input,
+.admin-modal select,
+.admin-modal textarea {
+  font-size: 0.875rem;
+}
+
+.admin-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-table-wrap table {
+  min-width: 42rem;
+}
