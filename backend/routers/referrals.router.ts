@@ -26,8 +26,8 @@ referralsRouter.post('/apply-code', requireAuth, async (req: any, res: any) => {
   try {
     if (!db) return res.status(503).json({ error: 'Database unavailable' });
     
-    const { referralCode } = req.body;
-    if (!referralCode) return res.status(400).json({ error: 'Código de indicação é obrigatório' });
+    const referralCode = typeof req.body?.referralCode === 'string' ? req.body.referralCode.trim().toUpperCase() : '';
+    if (!referralCode || referralCode.length > 80) return res.status(400).json({ error: 'Código de indicação é obrigatório' });
     
     // Check if code exists and is not the user's own code
     const referrer = await db.query.profiles.findFirst({ where: eq(schema.profiles.referralCode, referralCode) });
@@ -38,15 +38,15 @@ referralsRouter.post('/apply-code', requireAuth, async (req: any, res: any) => {
     const existingRef = await db.query.referrals.findFirst({ where: eq(schema.referrals.referredId, req.user.id) });
     if (existingRef) return res.status(400).json({ error: 'Você já utilizou um código de indicação' });
     
-    await db.insert(schema.referrals).values({
+    const [created] = await db.insert(schema.referrals).values({
       id: `ref_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
       referrerId: referrer.id,
       referredId: req.user.id,
       status: 'pending',
       pointsAwarded: 0,
       createdAt: new Date(),
-    });
-    
+    }).onConflictDoNothing().returning();
+    if (!created) return res.status(409).json({ error: 'Você já utilizou um código de indicação.' });
     res.json({ success: true, message: 'Código aplicado com sucesso!' });
   } catch (e) {
     res.status(500).json({ error: 'Internal server error' });

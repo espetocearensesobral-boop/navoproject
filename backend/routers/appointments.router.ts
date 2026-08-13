@@ -8,6 +8,7 @@ import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin, optionalAuth, authLimiter, sensitiveOpsLimiter, apiLimiter, setAuthCookie } from '../middleware/index.js';
 import { handleError, userErrors, sanitizePhone, matchPhoneNumbers, generateBookingCode, bookingSchema } from '../utils/index.js';
 import { timeToMinutes, minutesToTime, getDayOfWeekKey, getTodayStringBRT, getCurrentTimeBRT } from '../utils/datetime.js';
+import { dateSchema, timeSchema } from '../utils/validation.js';
 import { JWT_SECRET } from '../config/env.js';
 import { checkSlotAvailability } from '../services/availability.service.js';
 import { invalidateAvailabilityCache } from './availability.router.js';
@@ -308,13 +309,23 @@ appointmentsRouter.patch("/lookup/cancel", sensitiveOpsLimiter, optionalAuth, as
       return res.status(400).json({ error: 'Este agendamento já foi cancelado.' });
     }
 
-    await db.update(schema.appointments)
-      .set({ status: 'cancelled', updatedAt: new Date() })
-      .where(eq(schema.appointments.id, appointment.id));
-
-    await db.update(schema.waitingQueue)
-      .set({ status: 'abandoned', updatedAt: new Date() })
-      .where(eq(schema.waitingQueue.appointmentId, appointment.id));
+    if (typeof db.transaction === 'function') {
+      await db.transaction(async (tx: any) => {
+        await tx.update(schema.appointments)
+          .set({ status: 'cancelled', updatedAt: new Date() })
+          .where(eq(schema.appointments.id, appointment.id));
+        await tx.update(schema.waitingQueue)
+          .set({ status: 'abandoned', updatedAt: new Date() })
+          .where(eq(schema.waitingQueue.appointmentId, appointment.id));
+      });
+    } else {
+      await db.update(schema.appointments)
+        .set({ status: 'cancelled', updatedAt: new Date() })
+        .where(eq(schema.appointments.id, appointment.id));
+      await db.update(schema.waitingQueue)
+        .set({ status: 'abandoned', updatedAt: new Date() })
+        .where(eq(schema.waitingQueue.appointmentId, appointment.id));
+    }
 
     const msg = `❌ *NAVO BARBER & CLUB*\n\n` +
       `Olá, *${appointment.clientName}*!\n\n` +
@@ -571,7 +582,7 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
     const isPendingApproval = checkRes.requiresApproval || data.status === 'pending_approval';
 
     const newApt = {
-      id: data.id || `apt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      id: `apt_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`,
       clientId,
       clientName,
       clientPhone,
@@ -579,37 +590,40 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
       professionalName: resolvedProfessionalName,
       date,
       timeSlot,
-      status: isPendingApproval ? 'pending_approval' : (data.status || 'confirmed'),
+      status: isPendingApproval ? 'pending_approval' : (isAdmin && data.status ? data.status : 'confirmed'),
       totalDurationMinutes: calculatedDuration > 0 ? calculatedDuration : Number(data.totalDurationMinutes || data.total_duration_minutes || 30),
       originalAmount: originalAmount.toString(),
       discountAmount: discountAmount.toString(),
       finalAmount: finalAmount.toString(),
       paymentMethod: data.paymentMethod || data.payment_method || 'PIX',
-      bookingCode: data.bookingCode || generateBookingCode(),
+      bookingCode: generateBookingCode(),
       services: data.services || [],
-      createdAt: data.createdAt || new Date().toISOString()
+      createdAt: new Date().toISOString()
     };
 
     // 2. Atomic Save (Transaction)
     if (isDbConnected && db && typeof db.transaction === 'function') {
       try {
         await db.transaction(async (tx: any) => {
+          const lockKey = `${resolvedProfessionalId}:${date}`;
+          await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
+          const lockedCheck = await checkSlotAvailability({
+            dateStr: date,
+            startMins: reqStart,
+            reqDuration: calculatedDuration,
+            profId: resolvedProfessionalId,
+            todayBRT,
+            currTimeBRT,
+          });
+          if (!lockedCheck.available) throw new Error('BOOKING_CONFLICT');
+
           // A. Ensure professional exists in DB before referencing in appointments
           if (resolvedProfessionalId && resolvedProfessionalId !== 'prof_any') {
             const profCheck = await tx.query.professionals.findFirst({
               where: eq(schema.professionals.id, resolvedProfessionalId)
             });
-            if (!profCheck) {
-              await tx.insert(schema.professionals).values({
-                id: resolvedProfessionalId,
-                name: resolvedProfessionalName || 'Profissional',
-                roleTitle: 'Master Barber',
-                rating: '5.00',
-                reviewsCount: 0,
-                commissionRate: '0.40',
-                isActive: true,
-                workingHours: {}
-              }).onConflictDoNothing();
+            if (!profCheck || !profCheck.isActive) {
+              throw new Error('PROFESSIONAL_NOT_FOUND');
             }
           }
 
@@ -637,14 +651,7 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
             ...newApt,
             createdAt: newApt.createdAt ? new Date(newApt.createdAt) : new Date()
           };
-          const { createdAt, id: _idKey, ...updateFields } = dbApt;
-          await tx.insert(schema.appointments).values(dbApt).onConflictDoUpdate({
-            target: schema.appointments.id,
-            set: {
-              ...updateFields,
-              updatedAt: new Date()
-            }
-          });
+          await tx.insert(schema.appointments).values(dbApt);
 
           // Auto-feed waiting queue if appointment is for today
           // (usa getTodayStringBRT — não new Date().toISOString(), que retorna a data em UTC
@@ -660,16 +667,20 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
               appointmentId: newApt.id,
               clientId: newApt.clientId,
               clientName: newApt.clientName,
+              clientPhone: newApt.clientPhone,
               professionalId: newApt.professionalId,
+              professionalName: newApt.professionalName,
               serviceTitle,
+              servicePrice: newApt.finalAmount,
+              scheduledTime: newApt.timeSlot,
+              arrivedAt: null,
+              notes: null,
               status: newApt.status === 'in_service' ? 'in_chair' : 'waiting',
               joinedAt: new Date(),
-              estimatedWaitMinutes: 15
+              estimatedWaitMinutes: 15,
+              updatedAt: new Date()
             };
-            await tx.insert(schema.waitingQueue).values(queueItem).onConflictDoUpdate({
-              target: schema.waitingQueue.id,
-              set: queueItem
-            });
+            await tx.insert(schema.waitingQueue).values(queueItem).onConflictDoNothing();
           }
         });
       } catch (err: any) {
@@ -679,61 +690,23 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
         const pgConstraint = err?.constraint || err?.cause?.constraint || '';
         const fullErr = `${errMsg} ${causeMsg} ${pgCode} ${pgConstraint}`;
 
-        if (fullErr.includes('booking_conflict_idx') || fullErr.includes('23505') || pgCode === '23505') {
-          if (fullErr.includes('booking_code')) {
-            // Se conflitou no código da reserva, tentar código alternativo
-            newApt.bookingCode = generateBookingCode() + 'X';
-            const dbApt = { ...newApt, createdAt: new Date() };
-            const { createdAt, id: _idKey, ...updateFields } = dbApt;
-            await db.insert(schema.appointments).values(dbApt).onConflictDoUpdate({
-              target: schema.appointments.id,
-              set: { ...updateFields, updatedAt: new Date() }
-            });
-          } else {
-            return res.status(409).json({ error: 'Este horário já está reservado. Por favor, escolha outro.' });
-          }
+        if (fullErr.includes('BOOKING_CONFLICT') || fullErr.includes('booking_conflict_idx') || fullErr.includes('23505') || pgCode === '23505') {
+          return res.status(409).json({ error: 'Este horário ou código já está reservado. Por favor, tente novamente.' });
         } else {
           console.error('[API] Atomic transaction failed:', err);
 
+          if (fullErr.includes('PROFESSIONAL_NOT_FOUND') || fullErr.includes('appointments_professional_id_fkey')) {
+            return res.status(400).json({ error: 'Profissional não encontrado ou inativo.' });
+          }
           if (fullErr.includes('appointments_client_id_fkey')) {
             return res.status(400).json({ error: 'Erro no perfil do cliente. Atualize a página e tente novamente.' });
-          }
-          if (fullErr.includes('appointments_professional_id_fkey')) {
-            return res.status(400).json({ error: 'Profissional não encontrado.' });
           }
 
           return res.status(400).json({ error: 'Falha ao salvar agendamento no banco de dados. Por favor, tente novamente.' });
         }
       }
     } else {
-      // Fallback to non-transactional insert
-      const dbApt = {
-        ...newApt,
-        createdAt: newApt.createdAt ? new Date(newApt.createdAt) : new Date()
-      };
-      const { createdAt, id: _idKey, ...updateFields } = dbApt;
-      try {
-        await db.insert(schema.appointments).values(dbApt).onConflictDoUpdate({
-          target: schema.appointments.id,
-          set: {
-            ...updateFields,
-            updatedAt: new Date()
-          }
-        });
-      } catch (err: any) {
-        const errMsg = err?.message || '';
-        const causeMsg = err?.cause?.message || err?.cause?.constraint_name || '';
-        const pgCode = err?.code || err?.cause?.code || '';
-        const pgConstraint = err?.constraint || err?.cause?.constraint || '';
-        const fullErr = `${errMsg} ${causeMsg} ${pgCode} ${pgConstraint}`;
-
-        if (fullErr.includes('booking_conflict_idx') || fullErr.includes('23505') || pgCode === '23505') {
-          return res.status(409).json({ error: 'Este horário já está reservado. Por favor, escolha outro.' });
-        }
-        
-        console.error("[API] Fallback insert failed:", err);
-        return res.status(400).json({ error: "Falha ao salvar agendamento no banco de dados. Por favor, tente novamente." });
-      }
+      return res.status(503).json({ error: 'O banco não oferece transação para concluir o agendamento com segurança.' });
     }
 
 
@@ -791,18 +764,24 @@ appointmentsRouter.post("/:id/review", requireAuth, async (req: any, res) => {
 
     const reviewId = 'rev_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 
-    await db.insert(schema.reviews).values({
-      id: reviewId,
-      appointmentId: id,
-      professionalId: dbApt.professionalId,
-      rating,
-      comment
+    if (typeof db.transaction !== 'function') {
+      return res.status(503).json({ error: 'O banco não oferece transação para registrar a avaliação.' });
+    }
+    await db.transaction(async (tx: any) => {
+      await tx.insert(schema.reviews).values({
+        id: reviewId,
+        appointmentId: id,
+        clientId: req.user.id,
+        professionalId: dbApt.professionalId,
+        rating,
+        comment: comment || null,
+        createdAt: new Date(),
+      });
+      await tx.update(schema.appointments).set({
+        isReviewed: true,
+        updatedAt: new Date()
+      }).where(eq(schema.appointments.id, id));
     });
-
-    await db.update(schema.appointments).set({ 
-      isReviewed: true,
-      updatedAt: new Date() 
-    }).where(eq(schema.appointments.id, id));
 
     // Optional: update professional rating logic can go here
     // for now we just return success
@@ -857,16 +836,29 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
       }
     }
 
-    await db.update(schema.appointments).set({ 
-      status: 'cancelled', 
-      cancellationReason: reason || 'Cancelado pelo cliente',
-      updatedAt: new Date() 
-    }).where(eq(schema.appointments.id, id));
-    
-    await db.update(schema.waitingQueue).set({
-      status: 'abandoned',
-      updatedAt: new Date()
-    }).where(eq(schema.waitingQueue.appointmentId, id));
+    if (typeof db.transaction === 'function') {
+      await db.transaction(async (tx: any) => {
+        await tx.update(schema.appointments).set({
+          status: 'cancelled',
+          cancellationReason: reason || 'Cancelado pelo cliente',
+          updatedAt: new Date()
+        }).where(eq(schema.appointments.id, id));
+        await tx.update(schema.waitingQueue).set({
+          status: 'abandoned',
+          updatedAt: new Date()
+        }).where(eq(schema.waitingQueue.appointmentId, id));
+      });
+    } else {
+      await db.update(schema.appointments).set({
+        status: 'cancelled',
+        cancellationReason: reason || 'Cancelado pelo cliente',
+        updatedAt: new Date()
+      }).where(eq(schema.appointments.id, id));
+      await db.update(schema.waitingQueue).set({
+        status: 'abandoned',
+        updatedAt: new Date()
+      }).where(eq(schema.waitingQueue.appointmentId, id));
+    }
     
     updatedApt = { ...dbApt, status: 'cancelled', cancellationReason: reason };
 
@@ -897,6 +889,12 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
 
     const dbApt = await db.query.appointments.findFirst({ where: eq(schema.appointments.id, id) });
     if (!dbApt) return res.status(404).json({ error: 'Agendamento não encontrado' });
+    if (!isAdmin && ['completed', 'cancelled'].includes(dbApt.status)) {
+      return res.status(400).json({ error: 'Agendamentos concluídos ou cancelados não podem ser editados.' });
+    }
+    if (!isAdmin && data.status !== undefined) {
+      return res.status(403).json({ error: 'Somente a equipe autorizada pode alterar o status do agendamento.' });
+    }
 
     if (!isAdmin) {
       let userPhone = req.user?.phone;
@@ -934,7 +932,13 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
     const newDate = data.date || dbApt.date;
     const newTimeSlot = data.timeSlot || data.time_slot || dbApt.timeSlot;
     const newProfessionalId = data.professionalId || data.professional_id || dbApt.professionalId;
-    const durationMins = Number(data.totalDurationMinutes || data.total_duration_minutes || dbApt.totalDurationMinutes || 30);
+    let durationMins = Number(data.totalDurationMinutes || data.total_duration_minutes || dbApt.totalDurationMinutes || 30);
+    if (!dateSchema.safeParse(newDate).success || !timeSchema.safeParse(newTimeSlot).success) {
+      return res.status(400).json({ error: 'Data ou horário inválidos.' });
+    }
+    if (!Number.isInteger(durationMins) || durationMins < 5 || durationMins > 480) {
+      return res.status(400).json({ error: 'Duração inválida.' });
+    }
 
     if (newDate !== dbApt.date || newTimeSlot !== dbApt.timeSlot || newProfessionalId !== dbApt.professionalId || data.services !== undefined) {
       const todayBRT = getTodayStringBRT();
@@ -1013,7 +1017,10 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
             return res.status(400).json({ error: 'Um ou mais serviços selecionados são inválidos.', invalidServiceIds: editUnmatchedIds });
           }
           updateData.originalAmount = recalcTotal.toString();
-          if (recalcDuration > 0) updateData.totalDurationMinutes = recalcDuration;
+          if (recalcDuration > 0) {
+            updateData.totalDurationMinutes = recalcDuration;
+            durationMins = recalcDuration;
+          }
 
           let rawDiscount = Number(data.discountAmount ?? data.discount_amount ?? 0);
           if (!Number.isFinite(rawDiscount) || rawDiscount < 0) rawDiscount = 0;
@@ -1033,13 +1040,49 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
         if (data.paymentMethod !== undefined) updateData.paymentMethod = data.paymentMethod;
         if (data.payment_method !== undefined) updateData.paymentMethod = data.payment_method;
 
-        await db
-          .update(schema.appointments)
-          .set(updateData)
-          .where(eq(schema.appointments.id, id));
+        if (typeof db.transaction !== 'function') {
+          return res.status(503).json({ error: 'O banco não oferece transação para atualizar o agendamento com segurança.' });
+        }
 
-        const updatedApt = await db.query.appointments.findFirst({ 
-          where: eq(schema.appointments.id, id) 
+        let updatedApt: any;
+        await db.transaction(async (tx: any) => {
+          const scheduleChanged = newDate !== dbApt.date || newTimeSlot !== dbApt.timeSlot || newProfessionalId !== dbApt.professionalId || data.services !== undefined;
+          if (scheduleChanged) {
+            const lockKey = `${newProfessionalId}:${newDate}`;
+            await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
+            const lockedCheck = await checkSlotAvailability({
+              dateStr: newDate,
+              startMins: timeToMinutes(newTimeSlot),
+              reqDuration: durationMins,
+              profId: newProfessionalId,
+              excludeAptId: id,
+              todayBRT: getTodayStringBRT(),
+              currTimeBRT: getCurrentTimeBRT(),
+            });
+            if (!lockedCheck.available) throw new Error('BOOKING_CONFLICT');
+            const prof = await tx.query.professionals.findFirst({ where: eq(schema.professionals.id, newProfessionalId) });
+            if (!prof || !prof.isActive) throw new Error('PROFESSIONAL_NOT_FOUND');
+          }
+
+          const [saved] = await tx.update(schema.appointments)
+            .set(updateData)
+            .where(eq(schema.appointments.id, id))
+            .returning();
+          if (!saved) throw new Error('APPOINTMENT_NOT_FOUND');
+          updatedApt = saved;
+
+          const queueUpdate: any = {
+            scheduledTime: saved.timeSlot,
+            professionalId: saved.professionalId,
+            professionalName: saved.professionalName,
+            servicePrice: saved.finalAmount,
+            updatedAt: new Date(),
+          };
+          if (saved.status === 'cancelled') queueUpdate.status = 'abandoned';
+          if (saved.status === 'in_service') queueUpdate.status = 'in_chair';
+          await tx.update(schema.waitingQueue)
+            .set(queueUpdate)
+            .where(eq(schema.waitingQueue.appointmentId, id));
         });
 
         if (data.status === 'completed' && dbApt.status !== 'completed') {
@@ -1060,6 +1103,13 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
         invalidateAvailabilityCache();
         return res.json(updatedApt);
       } catch (err: any) {
+        const fullErr = `${err?.message || ''} ${err?.cause?.message || ''} ${err?.code || ''}`;
+        if (fullErr.includes('BOOKING_CONFLICT') || fullErr.includes('23505')) {
+          return res.status(409).json({ error: 'Este horário conflita com outro agendamento.' });
+        }
+        if (fullErr.includes('PROFESSIONAL_NOT_FOUND')) {
+          return res.status(400).json({ error: 'Profissional não encontrado ou inativo.' });
+        }
         console.warn('[API] Could not update appointment in Postgres:', err);
         return res.status(500).json({ error: 'Falha ao atualizar agendamento no banco de dados.' });
       }

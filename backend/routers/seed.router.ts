@@ -41,7 +41,7 @@ async function seedDatabase() {
       password: defaultPasswordHash,
       role: 'professional',
       phone: '5511988888888',
-      avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=200&auto=format&fit=crop',
+      avatarUrl: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=200&auto=format&fit=crop',
     },
     {
       id: 'prof_2',
@@ -50,7 +50,7 @@ async function seedDatabase() {
       password: defaultPasswordHash,
       role: 'professional',
       phone: '5511977777777',
-      avatar: 'https://images.unsplash.com/photo-1605406575497-015ab0d21b9b?q=80&w=200&auto=format&fit=crop',
+      avatarUrl: 'https://images.unsplash.com/photo-1605406575497-015ab0d21b9b?q=80&w=200&auto=format&fit=crop',
     },
     {
       id: 'prof_3',
@@ -59,7 +59,7 @@ async function seedDatabase() {
       password: defaultPasswordHash,
       role: 'professional',
       phone: '5511966666666',
-      avatar: 'https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?q=80&w=200&auto=format&fit=crop',
+      avatarUrl: 'https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?q=80&w=200&auto=format&fit=crop',
     },
     {
       id: 'client_1',
@@ -85,47 +85,29 @@ async function seedDatabase() {
 
   const seedServices = [
     {
-      id: 'svc_1',
-      name: 'Corte Clássico',
-      description: 'Corte tradicional com tesoura ou máquina.',
-      price: '50.00',
-      duration: 30,
-      image: 'https://images.unsplash.com/photo-1593980313883-9cbacfa8bc27?q=80&w=800&auto=format&fit=crop',
-      popular: true,
+      id: 'svc_1', categorySlug: 'cortes', title: 'Corte Clássico',
+      description: 'Corte tradicional com tesoura ou máquina.', price: '50.00', durationMinutes: 30,
+      imageUrl: 'https://images.unsplash.com/photo-1593980313883-9cbacfa8bc27?q=80&w=800&auto=format&fit=crop', isPopular: true,
     },
     {
-      id: 'svc_2',
-      name: 'Barba Terapia',
-      description: 'Barba com toalha quente e massagem facial.',
-      price: '40.00',
-      duration: 30,
-      image: 'https://images.unsplash.com/photo-1534015843468-d621531c3fc8?q=80&w=800&auto=format&fit=crop',
-      popular: true,
+      id: 'svc_2', categorySlug: 'barba', title: 'Barba Terapia',
+      description: 'Barba com toalha quente e massagem facial.', price: '40.00', durationMinutes: 30,
+      imageUrl: 'https://images.unsplash.com/photo-1534015843468-d621531c3fc8?q=80&w=800&auto=format&fit=crop', isPopular: true,
     },
     {
-      id: 'svc_3',
-      name: 'Corte + Barba',
-      description: 'Pacote completo: corte clássico e barba terapia.',
-      price: '85.00',
-      duration: 60,
-      image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=800&auto=format&fit=crop',
-      popular: true,
+      id: 'svc_3', categorySlug: 'combos', title: 'Corte + Barba',
+      description: 'Pacote completo: corte clássico e barba terapia.', price: '85.00', durationMinutes: 60,
+      isCombo: true, imageUrl: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=800&auto=format&fit=crop', isPopular: true,
     },
     {
-      id: 'svc_4',
-      name: 'Platinado',
-      description: 'Descoloração global até o tom platinado (necessário avaliação).',
-      price: '150.00',
-      duration: 120,
-      image: 'https://images.unsplash.com/photo-1600948836101-f9ff5a0eb3f8?q=80&w=800&auto=format&fit=crop',
+      id: 'svc_4', categorySlug: 'tratamentos', title: 'Platinado',
+      description: 'Descoloração global até o tom platinado (necessário avaliação).', price: '150.00', durationMinutes: 120,
+      imageUrl: 'https://images.unsplash.com/photo-1600948836101-f9ff5a0eb3f8?q=80&w=800&auto=format&fit=crop',
     },
     {
-      id: 'svc_5',
-      name: 'Sobrancelha',
-      description: 'Alinhamento na navalha ou pinça.',
-      price: '15.00',
-      duration: 15,
-      image: 'https://images.unsplash.com/photo-1593980313883-9cbacfa8bc27?q=80&w=800&auto=format&fit=crop',
+      id: 'svc_5', categorySlug: 'barba', title: 'Sobrancelha',
+      description: 'Alinhamento na navalha ou pinça.', price: '15.00', durationMinutes: 15,
+      imageUrl: 'https://images.unsplash.com/photo-1593980313883-9cbacfa8bc27?q=80&w=800&auto=format&fit=crop',
     }
   ];
 
@@ -135,40 +117,20 @@ async function seedDatabase() {
 
   const seedProducts = [
     {
-      id: 'prod_1',
-      name: 'Pomada Efeito Matte (120g)',
-      description: 'Pomada modeladora com fixação forte e efeito seco natural.',
-      price: '45.90',
-      stock: 12,
-      category: 'Cabelo',
-      image: 'https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=600&auto=format&fit=crop',
+      id: 'prod_1', name: 'Pomada Efeito Matte (120g)', category: 'Cabelo', brand: 'Navo', price: '45.90', costPrice: '20.00', stockQuantity: 12, minStockAlert: 5, commissionPercentage: 0,
+      imageUrl: 'https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=600&auto=format&fit=crop',
     },
     {
-      id: 'prod_2',
-      name: 'Óleo para Barba Wood (30ml)',
-      description: 'Óleo hidratante com aroma amadeirado. Previne coceira.',
-      price: '38.50',
-      stock: 8,
-      category: 'Barba',
-      image: 'https://images.unsplash.com/photo-1626081467554-1b327b7fce2f?q=80&w=600&auto=format&fit=crop',
+      id: 'prod_2', name: 'Óleo para Barba Wood (30ml)', category: 'Barba', brand: 'Navo', price: '38.50', costPrice: '16.00', stockQuantity: 8, minStockAlert: 5, commissionPercentage: 0,
+      imageUrl: 'https://images.unsplash.com/photo-1626081467554-1b327b7fce2f?q=80&w=600&auto=format&fit=crop',
     },
     {
-      id: 'prod_3',
-      name: 'Shampoo Refrescante Ice',
-      description: 'Limpeza profunda com mentol. Controle de oleosidade.',
-      price: '32.00',
-      stock: 15,
-      category: 'Cabelo',
-      image: 'https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?q=80&w=600&auto=format&fit=crop',
+      id: 'prod_3', name: 'Shampoo Refrescante Ice', category: 'Cabelo', brand: 'Navo', price: '32.00', costPrice: '12.00', stockQuantity: 15, minStockAlert: 5, commissionPercentage: 0,
+      imageUrl: 'https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?q=80&w=600&auto=format&fit=crop',
     },
     {
-      id: 'prod_4',
-      name: 'Balm Pós-barba Suave',
-      description: 'Acalma a pele e reduz a irritação após o uso da navalha.',
-      price: '28.90',
-      stock: 5,
-      category: 'Pele',
-      image: 'https://images.unsplash.com/photo-1556228578-8d89f8eb76e1?q=80&w=600&auto=format&fit=crop',
+      id: 'prod_4', name: 'Balm Pós-barba Suave', category: 'Pele', brand: 'Navo', price: '28.90', costPrice: '10.00', stockQuantity: 5, minStockAlert: 3, commissionPercentage: 0,
+      imageUrl: 'https://images.unsplash.com/photo-1556228578-8d89f8eb76e1?q=80&w=600&auto=format&fit=crop',
     }
   ];
 
@@ -216,9 +178,7 @@ async function seedDatabase() {
   ];
   
   for (const r of seedRewards) {
-    try {
-      await db.insert(schema.rewards).values(r).onConflictDoNothing();
-    } catch(e) {}
+    await db.insert(schema.rewards).values(r).onConflictDoNothing();
   }
 
 
@@ -259,9 +219,7 @@ async function seedDatabase() {
   ];
 
   for (const tx of seedTransactions) {
-    try {
-      await db.insert(schema.cashTransactions).values(tx).onConflictDoNothing();
-    } catch(e) {}
+    await db.insert(schema.cashTransactions).values(tx).onConflictDoNothing();
   }
 
   const defaultShopSettings = {
@@ -290,9 +248,7 @@ async function seedDatabase() {
     description: 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.',
   };
 
-  try {
-    await db.insert(schema.shopSettings).values(defaultShopSettings).onConflictDoNothing();
-  } catch(e) {}
+  await db.insert(schema.shopSettings).values(defaultShopSettings).onConflictDoNothing();
 
 
   return {

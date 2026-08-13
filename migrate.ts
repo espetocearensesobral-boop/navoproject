@@ -21,6 +21,7 @@ const runMigrate = async () => {
     console.log("✅ Migrations complete!");
   } catch (err) {
     console.error("❌ Migration failed!", err);
+    process.exitCode = 1;
   } finally {
     await sql.end();
   }

@@ -4,6 +4,7 @@ import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { optionalAuth, requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
+import { reviewPayloadSchema } from '../utils/validation.js';
 
 export const reviewsRouter = express.Router();
 
@@ -48,52 +49,63 @@ reviewsRouter.get('/public', async (req: any, res: any) => {
 });
 
 // POST /api/reviews - Submit review
-reviewsRouter.post('/', optionalAuth, async (req: any, res: any) => {
+reviewsRouter.post('/', requireAuth, async (req: any, res: any) => {
   try {
     if (!db) {
       return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
     }
-    const {
-      appointmentId,
-      professionalId,
-      rating,
-      understoodRequest,
-      waitTimeAcceptable,
-      wouldRecommend,
-      comment,
-      hasPhoto,
-      photoUrl
-    } = req.body;
-
-    if (!professionalId || !rating) {
-      return res.status(400).json({ error: 'Profissional e nota são obrigatórios.' });
+    const parsed = reviewPayloadSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Dados de avaliação inválidos.', details: parsed.error.flatten() });
     }
 
-    const clientId = req.user?.id || null;
-    const reviewId = `rev_${Date.now()}`;
+    const payload = parsed.data;
+    let appointment: any = null;
+    if (payload.appointmentId) {
+      appointment = await db.query.appointments.findFirst({
+        where: eq(schema.appointments.id, payload.appointmentId),
+      });
+      if (!appointment) return res.status(404).json({ error: 'Agendamento não encontrado.' });
+      if (appointment.clientId !== req.user.id) return res.status(403).json({ error: 'A avaliação não pertence a este cliente.' });
+      if (appointment.status !== 'completed') return res.status(400).json({ error: 'Apenas agendamentos concluídos podem ser avaliados.' });
+      if (appointment.isReviewed) return res.status(409).json({ error: 'Este agendamento já foi avaliado.' });
+      if (appointment.professionalId !== payload.professionalId) return res.status(400).json({ error: 'O profissional não corresponde ao agendamento.' });
+    } else {
+      const professional = await db.query.professionals.findFirst({ where: eq(schema.professionals.id, payload.professionalId) });
+      if (!professional) return res.status(404).json({ error: 'Profissional não encontrado.' });
+    }
 
     const newReview = {
-      id: reviewId,
-      appointmentId: appointmentId || null,
-      clientId: clientId && clientId !== 'usr_guest' ? clientId : null,
-      professionalId,
-      rating: Number(rating),
-      understoodRequest: understoodRequest || null,
-      waitTimeAcceptable: waitTimeAcceptable || null,
-      wouldRecommend: wouldRecommend || null,
-      comment: comment || null,
-      hasPhoto: !!hasPhoto,
-      photoUrl: photoUrl || null,
-      createdAt: new Date()
+      id: `rev_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      appointmentId: payload.appointmentId || null,
+      clientId: req.user.id,
+      professionalId: payload.professionalId,
+      rating: payload.rating,
+      understoodRequest: payload.understoodRequest || null,
+      waitTimeAcceptable: payload.waitTimeAcceptable || null,
+      wouldRecommend: payload.wouldRecommend || null,
+      comment: payload.comment || null,
+      hasPhoto: payload.hasPhoto,
+      photoUrl: payload.photoUrl || null,
+      createdAt: new Date(),
     };
 
-    await db.insert(schema.reviews).values(newReview);
-
-    // Update appointment if appointmentId present
-    if (appointmentId) {
-      await db.update(schema.appointments)
-        .set({ isReviewed: true })
-        .where(eq(schema.appointments.id, appointmentId));
+    if (typeof db.transaction === 'function') {
+      await db.transaction(async (tx: any) => {
+        await tx.insert(schema.reviews).values(newReview);
+        if (payload.appointmentId) {
+          await tx.update(schema.appointments)
+            .set({ isReviewed: true, updatedAt: new Date() })
+            .where(eq(schema.appointments.id, payload.appointmentId));
+        }
+      });
+    } else {
+      await db.insert(schema.reviews).values(newReview);
+      if (payload.appointmentId) {
+        await db.update(schema.appointments)
+          .set({ isReviewed: true, updatedAt: new Date() })
+          .where(eq(schema.appointments.id, payload.appointmentId));
+      }
     }
 
     res.json({ success: true, message: 'Avaliação enviada com sucesso! Obrigado pelo feedback.' });

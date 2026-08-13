@@ -106,8 +106,16 @@ export const waitingQueue = pgTable('waiting_queue', {
   appointmentId: text('appointment_id').references(() => appointments.id, { onDelete: 'cascade' }),
   clientId: text('client_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   clientName: text('client_name').notNull(),
+  clientPhone: text('client_phone'),
   professionalId: text('professional_id').references(() => professionals.id, { onDelete: 'set null' }),
+  professionalName: text('professional_name'),
   serviceTitle: text('service_title').notNull(),
+  servicePrice: numeric('service_price', { precision: 10, scale: 2 }),
+  scheduledTime: text('scheduled_time'),
+  arrivedAt: text('arrived_at'),
+  notes: text('notes'),
+  startedAt: text('started_at'),
+  completedAt: text('completed_at'),
   status: text('status').notNull().default('waiting'),
   joinedAt: timestamp('joined_at').defaultNow().notNull(),
   estimatedWaitMinutes: integer('estimated_wait_minutes').notNull().default(0),
@@ -130,7 +138,11 @@ export const reviews = pgTable('reviews', {
   pointsAwarded: integer('points_awarded').default(0),
   adminResponse: text('admin_response'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => ({
+  appointmentUniqueIdx: uniqueIndex('reviews_appointment_id_unique')
+    .on(table.appointmentId)
+    .where(sql`${table.appointmentId} IS NOT NULL`),
+}));
 
 export const pointTransactions = pgTable('point_transactions', {
   id: text('id').primaryKey(),
@@ -138,8 +150,13 @@ export const pointTransactions = pgTable('point_transactions', {
   amount: integer('amount').notNull(),
   type: text('type').notNull(),
   description: text('description').notNull(),
+  sourceKey: text('source_key'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => ({
+  sourceKeyUniqueIdx: uniqueIndex('point_transactions_source_key_unique')
+    .on(table.sourceKey)
+    .where(sql`${table.sourceKey} IS NOT NULL`),
+}));
 
 export const referrals = pgTable('referrals', {
   id: text('id').primaryKey(),
@@ -148,6 +165,32 @@ export const referrals = pgTable('referrals', {
   status: text('status').notNull().default('pending'),
   pointsAwarded: integer('points_awarded').notNull().default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  referredUniqueIdx: uniqueIndex('referrals_referred_id_unique').on(table.referredId),
+}));
+
+export const loyaltyRedemptions = pgTable('loyalty_redemptions', {
+  id: text('id').primaryKey(),
+  clientId: text('client_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  rewardId: text('reward_id').notNull().references(() => rewards.id, { onDelete: 'restrict' }),
+  points: integer('points').notNull(),
+  status: text('status').notNull().default('completed'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const notificationDeliveries = pgTable('notification_deliveries', {
+  id: text('id').primaryKey(),
+  appointmentId: text('appointment_id').references(() => appointments.id, { onDelete: 'cascade' }),
+  kind: text('kind').notNull(),
+  channel: text('channel').notNull(),
+  deliveryKey: text('delivery_key').notNull().unique(),
+  sentAt: timestamp('sent_at').defaultNow().notNull(),
+});
+
+export const loyaltySettings = pgTable('loyalty_settings', {
+  id: text('id').primaryKey().default('default'),
+  config: jsonb('config').notNull().default({}),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const rewards = pgTable('rewards', {
@@ -245,6 +288,24 @@ export const waitingQueueRelations = relations(waitingQueue, ({ one }) => ({
   clientProfile: one(profiles, {
     fields: [waitingQueue.clientId],
     references: [profiles.id],
+  }),
+}));
+
+export const loyaltyRedemptionsRelations = relations(loyaltyRedemptions, ({ one }) => ({
+  client: one(profiles, {
+    fields: [loyaltyRedemptions.clientId],
+    references: [profiles.id],
+  }),
+  reward: one(rewards, {
+    fields: [loyaltyRedemptions.rewardId],
+    references: [rewards.id],
+  }),
+}));
+
+export const notificationDeliveriesRelations = relations(notificationDeliveries, ({ one }) => ({
+  appointment: one(appointments, {
+    fields: [notificationDeliveries.appointmentId],
+    references: [appointments.id],
   }),
 }));
 

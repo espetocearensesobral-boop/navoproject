@@ -167,9 +167,25 @@ profilesRouter.put("/:id", requireAuth, async (req: any, res) => {
     
     let setObj: any = { updatedAt: new Date() };
 
-    if (name !== undefined) setObj.name = name;
-    if (email !== undefined) setObj.email = email.toLowerCase().trim();
-    if (phone !== undefined) setObj.phone = sanitizePhone(phone);
+    if (name !== undefined) {
+      const normalizedName = String(name).trim();
+      if (!normalizedName || normalizedName.length > 120) return res.status(400).json({ error: 'Nome inválido.' });
+      setObj.name = normalizedName;
+    }
+    if (email !== undefined) {
+      const normalizedEmail = String(email).toLowerCase().trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) return res.status(400).json({ error: 'E-mail inválido.' });
+      const existingEmail = await db.query.profiles.findFirst({ where: eq(schema.profiles.email, normalizedEmail) });
+      if (existingEmail && existingEmail.id !== req.params.id) return res.status(409).json({ error: 'E-mail já está em uso.' });
+      setObj.email = normalizedEmail;
+    }
+    if (phone !== undefined) {
+      const normalizedPhone = sanitizePhone(phone);
+      if (normalizedPhone && normalizedPhone.length < 10) return res.status(400).json({ error: 'Telefone inválido.' });
+      const existingPhone = normalizedPhone ? await db.query.profiles.findFirst({ where: eq(schema.profiles.phone, normalizedPhone) }) : null;
+      if (existingPhone && existingPhone.id !== req.params.id) return res.status(409).json({ error: 'Telefone já está em uso.' });
+      setObj.phone = normalizedPhone;
+    }
 
     const avatar = avatar_url !== undefined ? avatar_url : avatarUrl;
     if (avatar !== undefined) {
@@ -184,6 +200,7 @@ profilesRouter.put("/:id", requireAuth, async (req: any, res) => {
     }
 
     if (password) {
+      if (String(password).length < 6 || String(password).length > 200) return res.status(400).json({ error: 'A senha deve ter entre 6 e 200 caracteres.' });
       setObj.password = await bcrypt.hash(password, 10);
     }
 
@@ -205,8 +222,25 @@ profilesRouter.delete("/:id", requireAuth, async (req: any, res) => {
       return res.status(403).json({ error: 'Acesso negado: Você só pode deletar o próprio perfil' });
     }
     
-    await db.delete(schema.profiles).where(eq(schema.profiles.id, req.params.id));
+    const linkedAppointments = await db.select({ id: schema.appointments.id })
+      .from(schema.appointments)
+      .where(eq(schema.appointments.clientId, req.params.id))
+      .limit(1);
+    if (linkedAppointments.length > 0) {
+      return res.status(409).json({ error: 'Não é possível excluir um perfil com histórico de agendamentos. Desative o acesso em vez disso.' });
+    }
+    const linkedQueue = await db.select({ id: schema.waitingQueue.id })
+      .from(schema.waitingQueue)
+      .where(eq(schema.waitingQueue.clientId, req.params.id))
+      .limit(1);
+    if (linkedQueue.length > 0) {
+      return res.status(409).json({ error: 'Não é possível excluir um perfil vinculado à fila de atendimento.' });
+    }
 
+    const deleted = await db.delete(schema.profiles)
+      .where(eq(schema.profiles.id, req.params.id))
+      .returning({ id: schema.profiles.id });
+    if (deleted.length === 0) return res.status(404).json({ error: 'Perfil não encontrado.' });
     res.json({ success: true });
   } catch (e: any) {
     return handleError(res, e, req.path);

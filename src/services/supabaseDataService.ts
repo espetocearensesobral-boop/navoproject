@@ -333,12 +333,13 @@ export async function getQueueFromSupabase(): Promise<WaitingQueueItem[]> {
 export async function addToQueueInSupabase(newItem: Partial<WaitingQueueItem>): Promise<WaitingQueueItem[]> {
   const itemToSave = {
     id: newItem.id || `q_${Date.now()}`,
+    clientId: (newItem as any).client_id || 'usr_guest',
     clientName: newItem.client_name || 'Cliente Walk-in',
     clientPhone: newItem.client_phone || '',
     serviceTitle: newItem.service_title || 'Corte & Barba',
     servicePrice: newItem.service_price?.toString() || '85',
-    professionalId: newItem.professional_id || '',
-    professionalName: newItem.professional_name || '',
+    professionalId: newItem.professional_id || null,
+    professionalName: newItem.professional_name || null,
     scheduledTime: newItem.scheduled_time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     estimatedWaitMinutes: newItem.estimated_wait_minutes || 15,
     status: newItem.status || 'waiting',
@@ -548,16 +549,24 @@ export async function addScheduleBlock(block: Omit<ScheduleBlock, 'id'>): Promis
     endTime: block.end_time,
     reason: block.reason
   };
-  await authFetch(`${API_BASE}/schedule-blocks`, {
+  const res = await authFetch(`${API_BASE}/schedule-blocks`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(newBlock)
   });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Falha ao criar bloqueio.');
+  }
   return fetchScheduleBlocks();
 }
 
 export async function deleteScheduleBlock(id: string): Promise<ScheduleBlock[]> {
-  await authFetch(`${API_BASE}/schedule-blocks/${id}`, { method: 'DELETE' });
+  const res = await authFetch(`${API_BASE}/schedule-blocks/${id}`, { method: 'DELETE' });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Falha ao remover bloqueio.');
+  }
   return fetchScheduleBlocks();
 }
 
@@ -601,7 +610,7 @@ export async function saveCashTransactionInSupabase(tx: CashTransactionItem, isU
   const method = isUpdate ? 'PUT' : 'POST';
   const url = isUpdate ? `${API_BASE}/cash-transactions/${tx.id}` : `${API_BASE}/cash-transactions`;
 
-  await authFetch(url, {
+  const res = await authFetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -617,6 +626,10 @@ export async function saveCashTransactionInSupabase(tx: CashTransactionItem, isU
       notes: tx.notes
     })
   });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Falha ao salvar lançamento financeiro.');
+  }
   return fetchCashTransactionsFromSupabase();
 }
 

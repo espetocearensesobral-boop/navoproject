@@ -3,7 +3,7 @@ import express from "express";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, or, desc, like, sql } from "drizzle-orm";
+import { eq, or, and, desc, like, sql } from "drizzle-orm";
 import postgres from "postgres";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -582,9 +582,23 @@ app.post("/api/cron/reminders", async (req: any, res: any) => {
     });
     let sentCount = 0;
     for (const apt of upcoming) {
-      if (apt.clientPhone) {
+      if (!apt.clientPhone || ['cancelled', 'no_show'].includes(apt.status)) continue;
+      const deliveryKey = `appointment-reminder:${apt.id}:${todayStr}`;
+      const [claimed] = await db.insert(schema.notificationDeliveries).values({
+        id: `nd_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        appointmentId: apt.id,
+        kind: 'appointment_reminder',
+        channel: 'whatsapp',
+        deliveryKey,
+        sentAt: new Date(),
+      }).onConflictDoNothing().returning({ id: schema.notificationDeliveries.id });
+      if (!claimed) continue;
+      try {
         await sendWhatsAppMessage(apt.clientPhone, `Lembrete Barbearia: Você possui um agendamento hoje às ${apt.timeSlot}.`);
         sentCount++;
+      } catch (sendError) {
+        await db.delete(schema.notificationDeliveries).where(eq(schema.notificationDeliveries.id, claimed.id)).catch(() => {});
+        console.error('[CRON] Falha ao enviar lembrete:', sendError);
       }
     }
     return res.json({ success: true, processed: upcoming.length, sentCount });
@@ -620,22 +634,38 @@ let loyaltyConfig = {
   birthdayBonus: 100
 };
 
-app.get("/api/loyalty/config", async (req: any, res: any) => {
-  res.json(loyaltyConfig);
+const mergeLoyaltyConfig = (base: any, incoming: any = {}) => ({
+  ...base,
+  ...incoming,
+  tierMultipliers: { ...base.tierMultipliers, ...(incoming.tierMultipliers || {}) },
+  referralPoints: { ...base.referralPoints, ...(incoming.referralPoints || {}) },
+  reviewPoints: { ...base.reviewPoints, ...(incoming.reviewPoints || {}) },
+});
+
+app.get("/api/loyalty/config", async (_req: any, res: any) => {
+  try {
+    if (isDbConnected && db) {
+      const saved = await db.query.loyaltySettings.findFirst({ where: eq(schema.loyaltySettings.id, 'default') });
+      if (saved?.config && typeof saved.config === 'object') {
+        loyaltyConfig = mergeLoyaltyConfig(loyaltyConfig, saved.config);
+      }
+    }
+    res.json(loyaltyConfig);
+  } catch (e: any) {
+    return handleError(res, e, '/api/loyalty/config');
+  }
 });
 
 app.post("/api/loyalty/config", requireAuth, requireAdmin, async (req: any, res: any) => {
   try {
-    const newCfg = req.body;
-    if (newCfg) {
-      loyaltyConfig = {
-        ...loyaltyConfig,
-        ...newCfg,
-        tierMultipliers: { ...loyaltyConfig.tierMultipliers, ...newCfg.tierMultipliers },
-        referralPoints: { ...loyaltyConfig.referralPoints, ...newCfg.referralPoints },
-        reviewPoints: { ...loyaltyConfig.reviewPoints, ...newCfg.reviewPoints }
-      };
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+      return res.status(400).json({ error: 'Configuração inválida.' });
     }
+    loyaltyConfig = mergeLoyaltyConfig(loyaltyConfig, req.body);
+    if (!isDbConnected || !db) return res.status(503).json({ error: userErrors.dbDisconnected });
+    await db.insert(schema.loyaltySettings)
+      .values({ id: 'default', config: loyaltyConfig, updatedAt: new Date() })
+      .onConflictDoUpdate({ target: schema.loyaltySettings.id, set: { config: loyaltyConfig, updatedAt: new Date() } });
     res.json({ success: true, config: loyaltyConfig, message: 'Configurações de fidelidade salvas com sucesso!' });
   } catch (e: any) {
     return handleError(res, e, req.path);
@@ -740,21 +770,64 @@ app.use('/api', (req: any, res: any) => {
 
 export default app;
 export async function processAppointmentCompletion(appointment: any) {
-  if (!appointment || !appointment.clientId || appointment.clientId === 'usr_guest') return;
+  if (!appointment?.id || !appointment.clientId || appointment.clientId === 'usr_guest') return;
   try {
-    if (isDbConnected && db) {
-      const amount = Number(appointment.finalAmount || appointment.originalAmount || 0);
-      if (amount > 0) {
-        const pointsEarned = Math.round(amount);
-        const user = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, appointment.clientId) });
-        if (user) {
-          const currentPoints = Number(user.loyaltyPoints || 0);
-          await db.update(schema.profiles)
-            .set({ loyaltyPoints: currentPoints + pointsEarned, updatedAt: new Date() })
-            .where(eq(schema.profiles.id, appointment.clientId));
+    if (!isDbConnected || !db) return;
+    const amount = Number(appointment.finalAmount || appointment.originalAmount || 0);
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    const pointsEarned = Math.round(amount);
+    const sourceKey = `appointment-completion:${appointment.id}`;
+    await db.transaction(async (tx: any) => {
+      const inserted = await tx.insert(schema.pointTransactions).values({
+        id: `pt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        clientId: appointment.clientId,
+        amount: pointsEarned,
+        type: 'appointment_completion',
+        description: `Pontos pelo atendimento ${appointment.bookingCode || appointment.id}`,
+        sourceKey,
+      }).onConflictDoNothing({ target: schema.pointTransactions.sourceKey }).returning({ id: schema.pointTransactions.id });
+      if (inserted.length === 0) return;
+      await tx.update(schema.profiles)
+        .set({ loyaltyPoints: sql`${schema.profiles.loyaltyPoints} + ${pointsEarned}`, updatedAt: new Date() })
+        .where(eq(schema.profiles.id, appointment.clientId));
+
+      const referral = await tx.query.referrals.findFirst({
+        where: and(eq(schema.referrals.referredId, appointment.clientId), eq(schema.referrals.status, 'pending')),
+      });
+      if (referral) {
+        const referrerBonus = Number(loyaltyConfig.referralPoints?.referrerBonus || 0);
+        const referredBonus = Number(loyaltyConfig.referralPoints?.referredBonus || 0);
+        await tx.update(schema.referrals)
+          .set({ status: 'completed', pointsAwarded: referrerBonus + referredBonus })
+          .where(eq(schema.referrals.id, referral.id));
+        if (referrerBonus > 0) {
+          await tx.update(schema.profiles)
+            .set({ loyaltyPoints: sql`${schema.profiles.loyaltyPoints} + ${referrerBonus}`, updatedAt: new Date() })
+            .where(eq(schema.profiles.id, referral.referrerId));
+          await tx.insert(schema.pointTransactions).values({
+            id: `pt_referrer_${referral.id}`,
+            clientId: referral.referrerId,
+            amount: referrerBonus,
+            type: 'referral_bonus',
+            description: 'Bônus por indicação concluída',
+            sourceKey: `referral:${referral.id}:referrer`,
+          }).onConflictDoNothing({ target: schema.pointTransactions.sourceKey });
+        }
+        if (referredBonus > 0) {
+          await tx.update(schema.profiles)
+            .set({ loyaltyPoints: sql`${schema.profiles.loyaltyPoints} + ${referredBonus}`, updatedAt: new Date() })
+            .where(eq(schema.profiles.id, referral.referredId));
+          await tx.insert(schema.pointTransactions).values({
+            id: `pt_referred_${referral.id}`,
+            clientId: referral.referredId,
+            amount: referredBonus,
+            type: 'referral_bonus',
+            description: 'Bônus de boas-vindas por indicação',
+            sourceKey: `referral:${referral.id}:referred`,
+          }).onConflictDoNothing({ target: schema.pointTransactions.sourceKey });
         }
       }
-    }
+    });
   } catch (e) {
     console.error('Error processing appointment completion:', e);
   }
