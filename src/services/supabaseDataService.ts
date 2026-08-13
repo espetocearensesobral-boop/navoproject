@@ -12,61 +12,6 @@ export interface ScheduleBlock {
 
 const API_BASE = '/api';
 
-const DEFAULT_SERVICES_FALLBACK: ServiceItem[] = [
-  {
-    id: 'srv_combo_1',
-    category_id: 'cat_combos',
-    title: 'Combo Executivo: Corte + Barba Imperial',
-    description: 'Corte de cabelo completo à sua escolha combinado com barboterapia toalha quente e massagem facial.',
-    price: 95,
-    duration_minutes: 50,
-    is_combo: true,
-    original_price: 110,
-    discount_percentage: 14,
-    popular: true,
-    image_url: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=80&w=400',
-    gallery_urls: ['https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=80&w=400']
-  },
-  {
-    id: 'srv_combo_2',
-    category_id: 'cat_combos',
-    title: 'Combo Barão: Corte + Barba + Sobrancelha',
-    description: 'Pacote VIP completo com lavagem especial, corte estilizado, barba completa e alinhamento de sobrancelha na navalha.',
-    price: 115,
-    duration_minutes: 60,
-    is_combo: true,
-    original_price: 135,
-    discount_percentage: 15,
-    popular: true,
-    image_url: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=400',
-    gallery_urls: ['https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=400']
-  },
-  {
-    id: 'srv_corte_1',
-    category_id: 'cat_cortes',
-    title: 'Corte Moderno / Fade / Mid Fade',
-    description: 'Degradê de precisão técnica (Low, Mid, High Fade) finalizado com pomada matte de alta fixação.',
-    price: 60,
-    duration_minutes: 35,
-    is_combo: false,
-    popular: true,
-    image_url: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=400',
-    gallery_urls: ['https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=400']
-  },
-  {
-    id: 'srv_barba_1',
-    category_id: 'cat_barba',
-    title: 'Barboterapia Imperial com Toalha Quente',
-    description: 'Ritual completo de barba com óleos essenciais, toalha quente, alinhamento na navalha e balm hidratante.',
-    price: 45,
-    duration_minutes: 30,
-    is_combo: false,
-    popular: true,
-    image_url: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&q=80&w=400',
-    gallery_urls: ['https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&q=80&w=400']
-  }
-];
-
 let servicesFetchPromise: Promise<ServiceItem[]> | null = null;
 let cachedServices: ServiceItem[] | null = null;
 let servicesCachedAt = 0;
@@ -105,12 +50,12 @@ export async function fetchServicesFromSupabase(forceRefresh = false): Promise<S
           gallery_urls: Array.isArray(s.galleryUrls) && s.galleryUrls.length > 0 ? s.galleryUrls : (s.imageUrl ? [s.imageUrl] : [])
         };
       });
-      cachedServices = mapped.length > 0 ? mapped : DEFAULT_SERVICES_FALLBACK;
+      cachedServices = mapped;
       servicesCachedAt = Date.now();
       return cachedServices;
     } catch (err) {
       console.warn('Aviso ao carregar serviços do servidor, usando fallback local:', err);
-      cachedServices = DEFAULT_SERVICES_FALLBACK;
+      cachedServices = [];
       servicesCachedAt = Date.now();
       return cachedServices;
     } finally {

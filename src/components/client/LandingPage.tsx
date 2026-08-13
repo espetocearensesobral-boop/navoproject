@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import type { ServiceItem } from '../../types';
 import { TermsAndPrivacyModal } from '../shared/TermsAndPrivacyModal';
 import { 
   ShopProfile, 
@@ -7,7 +8,7 @@ import {
   fetchShopProfile, 
   daysOfWeekMap 
 } from '../../services/shopProfileService';
-import { fetchServicesFromSupabase } from '../../services/supabaseDataService';
+import { fetchServicesFromSupabase, fetchPublicReviews } from '../../services/supabaseDataService';
 import { openWhatsAppDirect, openMapsDirect, openWazeDirect, openInstagramDirect, getShopStatusInfo } from '../../utils/externalLinks';
 import { 
   Clock, 
@@ -99,10 +100,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     };
   }, [scrollContainerRef]);
   const [activeCategory, setActiveCategory] = useState<'todos' | 'cabelo' | 'barba'>('todos');
+  const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [termsPrivacyTab, setTermsPrivacyTab] = useState<'terms' | 'privacy' | null>(null);
   const [isHoursModalOpen, setIsHoursModalOpen] = useState(false);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
-  const [dbServices, setDbServices] = useState<any[]>([]);
+  const [dbServices, setDbServices] = useState<ServiceItem[]>([]);
+  const [publicReviews, setPublicReviews] = useState<any[]>([]);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
 
@@ -121,6 +124,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     fetchServicesFromSupabase()
       .then(data => setDbServices(Array.isArray(data) ? data : []))
       .catch(() => setDbServices([]));
+    fetchPublicReviews()
+      .then(data => setPublicReviews(Array.isArray(data) ? data : []))
+      .catch(() => setPublicReviews([]));
   }, []);
 
   const toggleMenu = () => {
@@ -216,17 +222,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
   const filteredServices = servicesToDisplay.filter(s => {
     if (activeCategory === 'todos') return true;
-    const cat = (s.category || '').toLowerCase();
+    const cat = `${s.category_id || ''} ${s.title || ''} ${s.description || ''}`.toLowerCase();
     if (activeCategory === 'cabelo') return cat.includes('cabelo') || cat.includes('corte');
     if (activeCategory === 'barba') return cat.includes('barba');
     return true;
   });
 
   const differentials = [
-    { icon: User, secondaryIcon: Scissors, label: 'Barbeiros Master', desc: '10+ anos de experiência', strokeColor: 'var(--color-gold-deep)', bgColor: 'color-mix(in srgb, var(--color-gold-base) 14%, transparent)' },
-    { icon: Snowflake, label: 'Ambiente Premium', desc: 'Som e ar-condicionado', strokeColor: '#80b6c6', bgColor: '#e3f4f8' },
-    { icon: Coffee, label: 'Bebida Cortesia', desc: 'Café e cerveja artesanal', strokeColor: '#9e795a', bgColor: '#f5efe9' },
-    { icon: Clock, secondaryIcon: Check, secondaryColor: '#4ade80', label: 'Agendamento Ágil', desc: 'Confirmação por WhatsApp', strokeColor: '#c1877f', bgColor: '#faece9' }
+    { icon: Scissors, label: 'Serviços reais', desc: 'Catálogo atualizado da Navo', strokeColor: 'var(--color-gold-deep)', bgColor: 'color-mix(in srgb, var(--color-gold-base) 14%, transparent)' },
+    { icon: User, label: 'Equipe disponível', desc: 'Escolha o profissional no fluxo', strokeColor: '#80b6c6', bgColor: '#e3f4f8' },
+    { icon: CalendarCheck, label: 'Agenda em tempo real', desc: 'Horários conforme a disponibilidade', strokeColor: '#9e795a', bgColor: '#f5efe9' },
+    { icon: MessageCircle, secondaryIcon: Check, secondaryColor: '#4ade80', label: 'Confirmação clara', desc: 'Comprovante após o agendamento', strokeColor: '#c1877f', bgColor: '#faece9' }
   ];
 
   const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
@@ -263,68 +269,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedGalleryIndex, galleryFeaturedItems]);
 
-  const testimonials = [
-    {
-      name: "Rafael M.",
-      initials: "RM",
-      since: "Cliente desde 2023",
-      service: "Corte Degradê & Barba VIP",
-      rating: 5.0,
-      text: "Melhor barbearia de São Paulo sem dúvidas! O atendimento é personalizado do início ao fim, o café artesanal é excelente e o acabamento na navalha ficou impecável.",
-      gradient: "from-emerald-500 to-teal-600",
-      avatarGradient: "from-emerald-500/20 to-amber-500/20",
-      borderColor: "border-emerald-500/30",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150"
-    },
-    {
-      name: "João Lucas",
-      initials: "JL",
-      since: "Cliente desde 2022",
-      service: "Corte Social & Barba",
-      rating: 5.0,
-      text: "Ambiente incrível, música boa e profissionais que realmente entendem do ofício. Sempre saio satisfeito e já indiquei para todos os meus amigos da firma.",
-      gradient: "from-amber-500 to-orange-600",
-      avatarGradient: "from-amber-500/20 to-orange-500/20",
-      borderColor: "border-amber-500/30",
-      avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150"
-    },
-    {
-      name: "Marcos C.",
-      initials: "MC",
-      since: "Cliente desde 2024",
-      service: "Platinado & Design de Barba",
-      rating: 5.0,
-      text: "Fiz o platinado aqui e o resultado superou todas as expectativas. O cuidado com os detalhes é impressionante. Vale cada centavo investido no visual.",
-      gradient: "from-blue-500 to-indigo-600",
-      avatarGradient: "from-blue-500/20 to-indigo-500/20",
-      borderColor: "border-blue-500/30",
-      avatar: "https://images.unsplash.com/photo-1600486913747-55e5470d6f40?auto=format&fit=crop&q=80&w=150"
-    },
-    {
-      name: "André P.",
-      initials: "AP",
-      since: "Cliente desde 2021",
-      service: "Corte Clássico & Hot Towel",
-      rating: 4.9,
-      text: "Tradição e modernidade no mesmo lugar. O serviço de toalha quente no final é um diferencial que não encontro em lugar nenhum. Recomendo de olhos fechados.",
-      gradient: "from-rose-500 to-pink-600",
-      avatarGradient: "from-rose-500/20 to-pink-500/20",
-      borderColor: "border-rose-500/30",
-      avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=150"
-    },
-    {
-      name: "Tiago F.",
-      initials: "TF",
-      since: "Cliente desde 2023",
-      service: "Corte Militar & Sobrancelha",
-      rating: 5.0,
-      text: "Pontualidade e qualidade definem esse lugar. Nunca precisei esperar e o corte sempre sai exatamente como peço. O atendimento é nota 10.",
-      gradient: "from-violet-500 to-purple-600",
-      avatarGradient: "from-violet-500/20 to-purple-500/20",
-      borderColor: "border-violet-500/30",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150"
-    }
-  ];
+  useEffect(() => {
+    if (!isCatalogOpen) return;
+    const handleCatalogKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsCatalogOpen(false);
+    };
+    window.addEventListener('keydown', handleCatalogKeyDown);
+    return () => window.removeEventListener('keydown', handleCatalogKeyDown);
+  }, [isCatalogOpen]);
+
+  const activeReview = publicReviews[testimonialIndex] || null;
+  const reviewCount = publicReviews.length;
+  const averageRating = reviewCount > 0
+    ? (publicReviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviewCount).toFixed(1)
+    : null;
 
   const handleOpenGoogleMaps = () => {
     hapticLight();
@@ -593,7 +551,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <Star className="w-4 h-4 fill-current" />
             <Star className="w-4 h-4 fill-current" />
           </div>
-          <span className="text-white/90 text-sm font-medium">4.9/5 <span className="text-white/50">(500+ avaliações)</span></span>
+          <span className="text-white/90 text-sm font-medium">
+            {averageRating ? `${averageRating}/5` : 'Avaliações verificadas'}
+            {averageRating && <span className="text-white/50"> ({reviewCount})</span>}
+          </span>
         </div>
         <div className="hidden sm:block w-px h-6 bg-white/10" />
         <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
@@ -608,66 +569,80 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         <div className="max-w-5xl w-full mx-auto space-y-10">
           <div className="text-center space-y-3">
             <h2 className="font-serif text-[clamp(1.75rem,3vh,2.25rem)] font-bold text-neutral-900 tracking-tight">
-              Serviços mais agendados
+              Escolha seu ritual
             </h2>
             <p className="text-neutral-500 font-medium text-sm">
-              Escolha seu estilo e deixe o resto com nossos especialistas.
+              Corte, barba ou combo: escolha o cuidado que combina com o seu momento.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                title: 'Corte Navo Premium',
-                duration: '45 min',
-                price: 'R$ 60,00',
-                tag: 'Mais agendado',
-                image: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=600'
-              },
-              {
-                title: 'Combo Corte + Barba',
-                duration: '1h 20 min',
-                price: 'R$ 100,00',
-                tag: 'Ideal para primeira visita',
-                image: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=80&w=600'
-              },
-              {
-                title: 'Barba Clássica',
-                duration: '30 min',
-                price: 'R$ 45,00',
-                tag: 'Ritual com toalha quente',
-                image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600'
-              }
-            ].map((srv, idx) => (
-              <div key={idx} onClick={onGoToBooking} className="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-neutral-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                <div className="h-48 relative overflow-hidden bg-neutral-100">
-                  <div className="absolute top-3 left-3 z-10 bg-gold-base text-neutral-900 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                    {srv.tag}
-                  </div>
-                  <img src={srv.image} alt={srv.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                </div>
-                <div className="p-5 flex flex-col flex-1 justify-between">
-                  <div>
-                    <h3 className="font-bold text-lg text-neutral-900">{srv.title}</h3>
-                    <div className="flex items-center gap-2 mt-2 text-neutral-500 text-sm">
-                      <Clock className="w-4 h-4" />
-                      <span>{srv.duration}</span>
+          {galleryFeaturedItems.length > 0 ? (
+            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0 scrollbar-none">
+              {galleryFeaturedItems.map((item, idx) => {
+                const image = item.src || '/placeholder-service.svg';
+                const durationLabel = item.duration > 0 ? `${item.duration} min` : 'Consulte a duração';
+                const priceLabel = item.price > 0
+                  ? item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                  : 'Consulte o valor';
+                const badge = item.badge || (idx === 0 ? 'Destaque da casa' : 'Escolha Navo');
+                return (
+                  <div
+                    key={item.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedGalleryIndex(idx)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        setSelectedGalleryIndex(idx);
+                      }
+                    }}
+                    className="group cursor-pointer min-w-[84%] sm:min-w-[56%] md:min-w-0 snap-start bg-white rounded-2xl overflow-hidden border border-neutral-200 shadow-sm hover:shadow-xl hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-base transition-all duration-300 flex flex-col"
+                    aria-label={`Ver detalhes de ${item.title}`}
+                  >
+                    <div className="h-48 relative overflow-hidden bg-neutral-100">
+                      <div className="absolute top-3 left-3 z-10 bg-gold-base text-neutral-900 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        {badge}
+                      </div>
+                      <img src={optimizeImageUrl(image, 600, 80)} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    </div>
+                    <div className="p-5 flex flex-col flex-1 justify-between">
+                      <div>
+                        <h3 className="font-bold text-lg text-neutral-900 line-clamp-2">{item.title}</h3>
+                        <div className="flex items-center gap-2 mt-2 text-neutral-500 text-sm">
+                          <Clock className="w-4 h-4" />
+                          <span>{durationLabel}</span>
+                        </div>
+                      </div>
+                      <div className="mt-5 flex items-center justify-between gap-3">
+                        <span className="font-extrabold text-neutral-900">{priceLabel}</span>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            hapticMedium();
+                            onGoToBooking(item.service);
+                          }}
+                          className="bg-neutral-900 text-white text-xs font-bold px-4 py-2 rounded-xl group-hover:bg-gold-base group-hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-base transition-colors"
+                        >
+                          Agendar
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-5 flex items-center justify-between">
-                    <span className="font-extrabold text-neutral-900">{srv.price}</span>
-                    <button className="bg-neutral-900 text-white text-xs font-bold px-4 py-2 rounded-xl group-hover:bg-gold-base group-hover:text-neutral-900 transition-colors">
-                      Agendar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center text-neutral-500">
+              <p className="font-semibold">Os serviços estão sendo atualizados.</p>
+              <p className="text-sm mt-1">Consulte o catálogo completo para ver as opções disponíveis.</p>
+            </div>
+          )}
 
           <div className="flex justify-center pt-4">
-            <button onClick={onGoToBooking} className="text-neutral-900 border border-neutral-300 hover:border-neutral-900 bg-white hover:bg-neutral-50 px-6 py-3 rounded-full font-bold text-sm transition-all flex items-center gap-2 shadow-2xs cursor-pointer">
+            <button type="button" onClick={() => setIsCatalogOpen(true)} className="text-neutral-900 border border-neutral-300 hover:border-neutral-900 bg-white hover:bg-neutral-50 px-6 py-3 rounded-full font-bold text-sm transition-all flex items-center gap-2 shadow-2xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-base">
               Ver todos os serviços
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -803,7 +778,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               Experiência <span className="text-gold-base">Navo</span>
             </h2>
             <p className="text-white/60 font-medium text-sm">
-              Mais que um corte, um ritual de cuidado. Veja o que nossos clientes dizem.
+              Mais que um corte, um ritual de cuidado. Avaliações verificadas de clientes Navo.
             </p>
           </div>
 
@@ -811,8 +786,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             {/* Galeria de 3 fotos */}
             <div className="w-full md:w-1/2 flex flex-col gap-3">
                <div className="flex items-center justify-between px-1">
-                 <span className="text-white/80 font-bold text-sm uppercase tracking-wider">Cortes Reais</span>
-                 <button onClick={() => { hapticLight(); onGoToBooking(); }} className="text-gold-base hover:text-gold-deep text-xs font-bold transition-colors">Ver portfólio completo →</button>
+                 <span className="text-white/80 font-bold text-sm uppercase tracking-wider">Serviços da casa</span>
+                 <button type="button" onClick={() => { hapticLight(); setIsCatalogOpen(true); }} className="text-gold-base hover:text-gold-deep text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-base">Ver catálogo completo →</button>
                </div>
                <div className="grid grid-cols-2 gap-3 h-full min-h-[300px]">
                  {galleryFeaturedItems.slice(0, 3).map((item, idx) => (
@@ -839,27 +814,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                  </svg>
                </div>
                
-               <div className="flex items-center gap-3 mb-6">
-                 <div className="w-12 h-12 rounded-full overflow-hidden bg-gold-base flex items-center justify-center text-neutral-900 font-bold text-lg">
-                   MC
-                 </div>
-                 <div>
-                   <h4 className="font-bold text-white text-base">Marcos C.</h4>
-                   <p className="text-white/50 text-xs">Cliente desde 2024</p>
-                 </div>
-               </div>
-               
-               <p className="text-white/90 text-[clamp(1rem,2vh,1.15rem)] font-medium leading-relaxed italic mb-6">
-                 "O cuidado com os detalhes é impressionante. O ambiente é incrível, o atendimento é de primeira e o corte superou todas as expectativas. Vale cada centavo."
-               </p>
-               
-               <div className="flex items-center gap-2">
-                 <div className="bg-white/10 px-3 py-1 rounded-full text-xs text-white/80 font-medium">Platinado & Barba</div>
-                 <div className="flex items-center gap-1 text-gold-base text-sm font-bold">
-                   <Star className="w-4 h-4 fill-current" />
-                   5.0
-                 </div>
-               </div>
+               {activeReview ? (
+                <>
+                  <div className="flex items-center gap-3 mb-6">
+                    {activeReview.photoUrl ? (
+                      <img src={activeReview.photoUrl} alt="" className="w-12 h-12 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-gold-base flex items-center justify-center text-neutral-900 font-bold text-lg">
+                        {(activeReview.clientName || 'C').slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="font-bold text-white text-base">{activeReview.clientName || 'Cliente Navo'}</h4>
+                      <p className="text-white/50 text-xs">Atendimento com {activeReview.professionalName || 'nossa equipe'}</p>
+                    </div>
+                  </div>
+                  <p className="text-white/90 text-[clamp(1rem,2vh,1.15rem)] font-medium leading-relaxed italic mb-6">
+                    “{activeReview.comment || 'Experiência registrada com a equipe Navo.'}”
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-white/10 px-3 py-1 rounded-full text-xs text-white/80 font-medium">Avaliação verificada</div>
+                    <div className="flex items-center gap-1 text-gold-base text-sm font-bold">
+                      <Star className="w-4 h-4 fill-current" />
+                      {Number(activeReview.rating || 0).toFixed(1)}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white/80">
+                  <p className="font-semibold">As avaliações verificadas aparecerão aqui.</p>
+                  <p className="text-sm text-white/55 mt-2">Depois do seu atendimento, compartilhe sua experiência com a Navo.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -976,15 +962,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                     </div>
                   </a>
                   
-                  <div className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs">
-                    <Car className="w-3.5 h-3.5 shrink-0 text-gold-base" />
-                    <div>
-                      <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Estacionamento</span>
-                      <span className="text-[10.5px] font-bold text-neutral-800">
-                        Vagas gratuitas
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -1079,9 +1056,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
           {/* TRUST GUARANTEES BADGES */}
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-[clamp(1rem,2.2vh,1.5rem)] pt-[clamp(0.75rem,1.8vh,1.25rem)] border-t border-gray-800 text-[#d1d5db] text-[clamp(0.7rem,1.4vh,0.82rem)] font-semibold">
-            <span className="flex items-center gap-1.5"><span className="text-[#4ade80] font-bold">✓</span> Confirmação instantânea</span>
-            <span className="flex items-center gap-1.5"><span className="text-[#4ade80] font-bold">✓</span> Sem taxa de cancelamento</span>
-            <span className="flex items-center gap-1.5"><span className="text-[#4ade80] font-bold">✓</span> Bebida cortesia no local</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#4ade80] font-bold">✓</span> Catálogo atualizado</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#4ade80] font-bold">✓</span> Horários reais da equipe</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#4ade80] font-bold">✓</span> Confirmação via WhatsApp</span>
           </div>
         </motion.div>
 
@@ -1139,6 +1116,89 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </div>
         </footer>
       </section>
+
+      <AnimatePresence>
+        {isCatalogOpen && (
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="services-catalog-title"
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm p-4 sm:p-6 flex items-center justify-center"
+            onMouseDown={() => setIsCatalogOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 18, scale: 0.98 }}
+              onMouseDown={(event) => event.stopPropagation()}
+              className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-3xl bg-surface-card text-content-base border border-border-subtle shadow-2xl p-5 sm:p-7"
+            >
+              <div className="flex items-start justify-between gap-4 mb-6">
+                <div>
+                  <p className="text-gold-base text-xs font-bold uppercase tracking-[0.18em]">Catálogo Navo</p>
+                  <h2 id="services-catalog-title" className="font-serif text-2xl sm:text-3xl font-bold mt-1">Escolha seu ritual</h2>
+                  <p className="text-content-muted text-sm mt-2">Veja somente serviços cadastrados e escolha o que combina com o seu momento.</p>
+                </div>
+                <button type="button" onClick={() => setIsCatalogOpen(false)} aria-label="Fechar catálogo" className="w-10 h-10 rounded-full border border-border-subtle text-content-muted hover:text-content-base hover:bg-surface-base flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-base">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-6" role="tablist" aria-label="Filtrar serviços">
+                {([
+                  ['todos', 'Todos'],
+                  ['cabelo', 'Cortes'],
+                  ['barba', 'Barba']
+                ] as const).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeCategory === value}
+                    onClick={() => setActiveCategory(value)}
+                    className={`px-4 py-2 rounded-full text-sm font-bold border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-base ${activeCategory === value ? 'bg-gold-base text-surface-base border-gold-base' : 'border-border-subtle text-content-muted hover:text-content-base hover:bg-surface-base'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {filteredServices.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredServices.map((service) => {
+                    const image = service.image_url || service.gallery_urls?.[0] || '/placeholder-service.svg';
+                    const price = Number(service.price || 0);
+                    const duration = Number(service.duration_minutes || 0);
+                    return (
+                      <article key={service.id} className="rounded-2xl overflow-hidden border border-border-subtle bg-surface-base flex flex-col">
+                        <div className="h-40 relative bg-surface-card">
+                          <img src={optimizeImageUrl(image, 600, 80)} alt={service.title} className="w-full h-full object-cover" loading="lazy" />
+                          {service.popular && <span className="absolute top-3 left-3 rounded-full bg-gold-base text-surface-base px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">Mais agendado</span>}
+                        </div>
+                        <div className="p-4 flex flex-col flex-1">
+                          <h3 className="font-bold text-base leading-snug">{service.title}</h3>
+                          <p className="text-content-muted text-sm mt-2 line-clamp-3 min-h-[3.75rem]">{service.description || 'Experiência Navo com atendimento personalizado.'}</p>
+                          <div className="flex items-center justify-between gap-3 mt-4 text-sm">
+                            <span className="font-black text-gold-base">{price > 0 ? price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Consulte o valor'}</span>
+                            <span className="text-content-muted">{duration > 0 ? `${duration} min` : 'Consulte a duração'}</span>
+                          </div>
+                          <button type="button" onClick={() => { setIsCatalogOpen(false); onGoToBooking(service); }} className="mt-4 w-full rounded-xl bg-gold-base hover:bg-gold-deep text-surface-base font-bold py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-base">
+                            Agendar este serviço
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-border-subtle p-8 text-center text-content-muted">
+                  Nenhum serviço disponível nesta categoria no momento.
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <TermsAndPrivacyModal
         isOpen={!!termsPrivacyTab}
