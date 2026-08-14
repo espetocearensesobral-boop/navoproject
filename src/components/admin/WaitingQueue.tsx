@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { WaitingQueueItem, Professional, ServiceItem } from '../../types';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { ReceiptCheckoutModal } from './ReceiptCheckoutModal';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   getQueueFromSupabase,
@@ -63,6 +64,7 @@ export const WaitingQueue: React.FC = () => {
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [isSavingWalkIn, setIsSavingWalkIn] = useState(false);
   const [expandedQueueItemId, setExpandedQueueItemId] = useState<string | null>(null);
+  const [receiptCheckoutItem, setReceiptCheckoutItem] = useState<WaitingQueueItem | null>(null);
 
   // Walk-in Form state
   const [newClientName, setNewClientName] = useState('');
@@ -146,12 +148,13 @@ export const WaitingQueue: React.FC = () => {
     }
   };
 
-  const handleFinishService = async (id: string) => {
-    setActionLoadingId(id);
+  const handleFinishService = async (item: WaitingQueueItem) => {
+    setActionLoadingId(item.id);
     try {
-      const updated = await updateQueueStatusInSupabase(id, 'completed');
+      const updated = await updateQueueStatusInSupabase(item.id, 'completed');
       setQueue([...updated]);
-      showNotification('Atendimento finalizado e marcado como concluído!');
+      setReceiptCheckoutItem(item);
+      showNotification('Atendimento concluído. Escolha se deseja registrar o recebimento agora.');
     } catch (error) {
       showNotification(getActionErrorMessage(error, 'Não foi possível finalizar o atendimento.'), 'error');
     } finally {
@@ -559,7 +562,7 @@ export const WaitingQueue: React.FC = () => {
                     <button
                       type="button"
                       disabled={actionLoadingId === item.id}
-                      onClick={() => handleFinishService(item.id)}
+                      onClick={() => handleFinishService(item)}
                       className="flex-1 py-1.5 rounded-xl bg-status-success text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-95 disabled:opacity-60 disabled:cursor-wait"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
@@ -1006,6 +1009,24 @@ export const WaitingQueue: React.FC = () => {
       )}
 
       {/* MODAL: WHATSAPP ALERT */}
+      {receiptCheckoutItem && (
+        <ReceiptCheckoutModal
+          source={{
+            appointmentId: receiptCheckoutItem.appointment_id,
+            clientId: receiptCheckoutItem.client_id,
+            clientName: receiptCheckoutItem.client_name,
+            clientPhone: receiptCheckoutItem.client_phone,
+            professionalId: receiptCheckoutItem.professional_id,
+            professionalName: receiptCheckoutItem.professional_name,
+            serviceTitle: receiptCheckoutItem.service_title,
+            servicePrice: receiptCheckoutItem.service_price,
+          }}
+          onClose={() => setReceiptCheckoutItem(null)}
+          onPending={() => showNotification('Recebimento pendente criado no Financeiro.')}
+          onReceived={() => showNotification('Recebimento confirmado e lançado no extrato financeiro.')}
+        />
+      )}
+
       {isWhatsAppModalOpen && selectedQueueItemForWa && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
           <div className="bg-surface-card border border-[#25D366]/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">

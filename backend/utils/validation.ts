@@ -61,6 +61,37 @@ export const cashTransactionPayloadSchema = z.object({
   notes: z.string().trim().max(2000).nullable().optional(),
 });
 
+const receiptMoney = moneySchema.max(99999999.99);
+const receiptPercent = z.coerce.number().finite().min(0).max(100);
+const receiptPaymentMethod = z.enum(['pix', 'credit_card', 'debit_card', 'cash', 'other']);
+
+export const receiptCreatePayloadSchema = z.object({
+  id: idSchema.optional(),
+  appointmentId: idSchema.nullable().optional(),
+  clientId: idSchema.nullable().optional(),
+  clientName: z.string().trim().min(1).max(120),
+  clientPhone: z.string().trim().max(30).nullable().optional(),
+  professionalId: idSchema.nullable().optional(),
+  professionalName: z.string().trim().max(120).nullable().optional(),
+  serviceTitle: z.string().trim().min(1).max(500),
+  originalAmount: receiptMoney,
+  enteredAmount: receiptMoney,
+  observations: z.string().trim().max(2000).nullable().optional(),
+});
+
+export const receiptReceivePayloadSchema = z.object({
+  enteredAmount: receiptMoney,
+  discountPercent: receiptPercent,
+  discountAmount: receiptMoney,
+  surchargePercent: receiptPercent,
+  surchargeAmount: receiptMoney,
+  totalAmount: receiptMoney,
+  paymentMethod: receiptPaymentMethod,
+  amountReceived: receiptMoney,
+  changeAmount: receiptMoney,
+  observations: z.string().trim().max(2000).nullable().optional(),
+});
+
 export const queuePayloadSchema = z.object({
   id: idSchema.optional(),
   appointmentId: idSchema.nullable().optional(),

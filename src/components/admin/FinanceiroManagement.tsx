@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Wallet, DollarSign, CreditCard, Activity, TrendingUp } from 'lucide-react';
 import { CaixaManagement } from './CaixaManagement';
-import { PdvInteligente } from './PdvInteligente';
+import { ReceiptsManagement } from './ReceiptsManagement';
 import { FinancialStatementManagement } from './FinancialStatementManagement';
 import { FinancialHealthManagement } from './FinancialHealthManagement';
 import { AccountsPayableManagement } from './AccountsPayableManagement';
@@ -9,15 +9,15 @@ import { ReportsManagement } from './ReportsManagement';
 import { AdminTabs } from './shared/AdminTabs';
 import { AdminModuleNotice } from './shared/AdminModuleNotice';
 
-type FinanceiroSubTab = 'extrato' | 'pdv' | 'caixa' | 'pagar' | 'saude' | 'relatorios';
+type FinanceiroSubTab = 'recebimentos' | 'extrato' | 'caixa' | 'pagar' | 'saude' | 'relatorios';
 
 interface FinanceiroManagementProps {
   initialSubTab?: FinanceiroSubTab;
 }
 
 const subTabs: { id: FinanceiroSubTab; label: string; icon: React.ElementType; disabled?: boolean }[] = [
+  { id: 'recebimentos', label: 'Recebimentos', icon: Wallet },
   { id: 'extrato', label: 'Extrato real', icon: DollarSign },
-  { id: 'pdv', label: 'PDV', icon: Wallet },
   { id: 'caixa', label: 'Caixa', icon: Wallet, disabled: true },
   { id: 'pagar', label: 'A Pagar', icon: CreditCard, disabled: true },
   { id: 'saude', label: 'Saúde', icon: Activity, disabled: true },
@@ -33,13 +33,13 @@ const subTabs: { id: FinanceiroSubTab; label: string; icon: React.ElementType; d
  * item de navegação, com abas internas — nenhuma lógica dos componentes
  * originais foi alterada, apenas reorganizada.
  */
-export const FinanceiroManagement: React.FC<FinanceiroManagementProps> = ({ initialSubTab = 'extrato' }) => {
+export const FinanceiroManagement: React.FC<FinanceiroManagementProps> = ({ initialSubTab = 'recebimentos' }) => {
   const [subTab, setSubTab] = useState<FinanceiroSubTab>(initialSubTab);
 
   const renderSubContent = () => {
     switch (subTab) {
-      case 'pdv':
-        return <PdvInteligente />;
+      case 'recebimentos':
+        return <ReceiptsManagement />;
       case 'caixa':
         return <CaixaManagement />;
       case 'extrato':
@@ -61,7 +61,7 @@ export const FinanceiroManagement: React.FC<FinanceiroManagementProps> = ({ init
 
       <AdminModuleNotice
         title="Financeiro operacional enxuto"
-        description="PDV e Extrato são as áreas ativas porque já gravam e consultam lançamentos reais no banco."
+        description="Recebimentos e Extrato são as áreas ativas: a pendência nasce quando o serviço é concluído e somente pagamentos confirmados entram no livro-caixa."
         detail="Caixa de sessão, contas a pagar, saúde e relatórios avançados ficam bloqueados até existir uma modelagem persistida, evitando números demonstrativos no painel."
       />
 

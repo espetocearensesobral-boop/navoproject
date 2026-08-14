@@ -261,6 +261,7 @@ export async function getQueueFromSupabase(): Promise<WaitingQueueItem[]> {
     return data.map((q: any) => ({
       id: q.id,
       appointment_id: q.appointmentId || undefined,
+      client_id: q.clientId || undefined,
       client_name: q.clientName || 'Cliente Avulso',
       client_phone: q.clientPhone || '',
       service_title: q.serviceTitle || 'Atendimento Geral',
@@ -603,6 +604,139 @@ export async function saveCashTransactionInSupabase(tx: CashTransactionItem, isU
 export async function deleteCashTransactionInSupabase(id: string): Promise<CashTransactionItem[]> {
   await authFetch(`${API_BASE}/cash-transactions/${id}`, { method: 'DELETE' });
   return fetchCashTransactionsFromSupabase();
+}
+
+export type ReceiptStatus = 'pending' | 'received' | 'cancelled';
+export type ReceiptPaymentMethod = 'pix' | 'credit_card' | 'debit_card' | 'cash' | 'other';
+
+export interface ReceiptItem {
+  id: string;
+  appointmentId?: string | null;
+  clientId?: string | null;
+  clientName: string;
+  clientPhone?: string | null;
+  professionalId?: string | null;
+  professionalName?: string | null;
+  serviceTitle: string;
+  originalAmount: number;
+  enteredAmount: number;
+  discountPercent: number;
+  discountAmount: number;
+  surchargePercent: number;
+  surchargeAmount: number;
+  totalAmount: number;
+  paymentMethod?: ReceiptPaymentMethod | null;
+  amountReceived: number;
+  changeAmount: number;
+  observations?: string | null;
+  status: ReceiptStatus;
+  receivedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateReceiptPayload {
+  appointmentId?: string | null;
+  clientId?: string | null;
+  clientName: string;
+  clientPhone?: string | null;
+  professionalId?: string | null;
+  professionalName?: string | null;
+  serviceTitle: string;
+  originalAmount: number;
+  enteredAmount: number;
+  observations?: string | null;
+}
+
+export interface ReceiveReceiptPayload {
+  enteredAmount: number;
+  discountPercent: number;
+  discountAmount: number;
+  surchargePercent: number;
+  surchargeAmount: number;
+  totalAmount: number;
+  paymentMethod: ReceiptPaymentMethod;
+  amountReceived: number;
+  changeAmount: number;
+  observations?: string | null;
+}
+
+const mapReceiptItem = (value: any): ReceiptItem => ({
+  id: value.id,
+  appointmentId: value.appointmentId ?? value.appointment_id ?? null,
+  clientId: value.clientId ?? value.client_id ?? null,
+  clientName: value.clientName ?? value.client_name,
+  clientPhone: value.clientPhone ?? value.client_phone ?? null,
+  professionalId: value.professionalId ?? value.professional_id ?? null,
+  professionalName: value.professionalName ?? value.professional_name ?? null,
+  serviceTitle: value.serviceTitle ?? value.service_title,
+  originalAmount: Number(value.originalAmount ?? value.original_amount ?? 0),
+  enteredAmount: Number(value.enteredAmount ?? value.entered_amount ?? 0),
+  discountPercent: Number(value.discountPercent ?? value.discount_percent ?? 0),
+  discountAmount: Number(value.discountAmount ?? value.discount_amount ?? 0),
+  surchargePercent: Number(value.surchargePercent ?? value.surcharge_percent ?? 0),
+  surchargeAmount: Number(value.surchargeAmount ?? value.surcharge_amount ?? 0),
+  totalAmount: Number(value.totalAmount ?? value.total_amount ?? 0),
+  paymentMethod: value.paymentMethod ?? value.payment_method ?? null,
+  amountReceived: Number(value.amountReceived ?? value.amount_received ?? 0),
+  changeAmount: Number(value.changeAmount ?? value.change_amount ?? 0),
+  observations: value.observations ?? null,
+  status: value.status,
+  receivedAt: value.receivedAt ?? value.received_at ?? null,
+  createdAt: value.createdAt ?? value.created_at,
+  updatedAt: value.updatedAt ?? value.updated_at,
+});
+
+export async function fetchReceiptsFromSupabase(options?: { strict?: boolean }): Promise<ReceiptItem[]> {
+  try {
+    const res = await authFetch(`${API_BASE}/receipts`);
+    if (!res.ok) {
+      const error = new Error(`Falha ao carregar recebimentos (${res.status}).`);
+      if (options?.strict) throw error;
+      return [];
+    }
+    const data = await res.json();
+    return Array.isArray(data) ? data.map(mapReceiptItem) : [];
+  } catch (error) {
+    console.error('Erro ao buscar recebimentos:', error);
+    if (options?.strict) throw error;
+    return [];
+  }
+}
+
+export async function createReceiptInSupabase(payload: CreateReceiptPayload): Promise<ReceiptItem> {
+  const res = await authFetch(`${API_BASE}/receipts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Não foi possível criar o recebimento pendente.');
+  }
+  return mapReceiptItem(await res.json());
+}
+
+export async function receiveReceiptInSupabase(id: string, payload: ReceiveReceiptPayload): Promise<ReceiptItem> {
+  const res = await authFetch(`${API_BASE}/receipts/${id}/receive`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Não foi possível confirmar o recebimento.');
+  }
+  return mapReceiptItem(await res.json());
+}
+
+export async function cancelReceiptInSupabase(id: string): Promise<ReceiptItem> {
+  const res = await authFetch(`${API_BASE}/receipts/${id}/cancel`, { method: 'PATCH' });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Não foi possível cancelar o recebimento.');
+  }
+  return mapReceiptItem(await res.json());
 }
 
 // =====================================

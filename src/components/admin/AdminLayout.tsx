@@ -263,7 +263,7 @@ export const AdminLayout: React.FC = () => {
       id: 'financeiro' as AdminTab, 
       label: 'Financeiro', 
       icon: Wallet,
-      description: 'PDV, extrato real e controles financeiros',
+      description: 'Recebimentos, extrato real e controles financeiros',
       section: 'financeiro' as AdminSection,
     },
     { 
@@ -277,7 +277,7 @@ export const AdminLayout: React.FC = () => {
       id: 'produtos' as AdminTab,
       label: 'Produtos & Estoque',
       icon: Package,
-      description: 'Catálogo do PDV e alertas',
+      description: 'Catálogo de produtos e alertas de estoque',
       section: 'cadastros' as AdminSection,
     },
     { 

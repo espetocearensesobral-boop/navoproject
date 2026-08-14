@@ -256,7 +256,7 @@ export const ProductsManagement: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="w-full sm:max-w-lg max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-2xl border border-border-subtle bg-surface-card p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <div><h2 className="text-base font-bold text-content-base">{editingProduct ? 'Editar produto' : 'Novo produto'}</h2><p className="text-[11px] text-content-muted">Dados persistidos no catálogo do PDV.</p></div>
+              <div><h2 className="text-base font-bold text-content-base">{editingProduct ? 'Editar produto' : 'Novo produto'}</h2><p className="text-[11px] text-content-muted">Dados persistidos no catálogo de produtos e estoque.</p></div>
               <button type="button" onClick={() => { setEditingProduct(null); setIsModalOpen(false); }} className="h-9 w-9 rounded-xl text-content-muted flex items-center justify-center" aria-label="Fechar formulário"><X className="w-5 h-5" /></button>
             </div>
             <form onKeyDown={handleEnterAsTab} onSubmit={handleSave} className="space-y-3">

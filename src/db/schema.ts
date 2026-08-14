@@ -228,6 +228,51 @@ export const cashTransactions = pgTable('cash_transactions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+export const receipts = pgTable('receipts', {
+  id: text('id').primaryKey(),
+  appointmentId: text('appointment_id').references(() => appointments.id, { onDelete: 'set null' }),
+  clientId: text('client_id').references(() => profiles.id, { onDelete: 'set null' }),
+  clientName: text('client_name').notNull(),
+  clientPhone: text('client_phone'),
+  professionalId: text('professional_id').references(() => professionals.id, { onDelete: 'set null' }),
+  professionalName: text('professional_name'),
+  serviceTitle: text('service_title').notNull(),
+  originalAmount: numeric('original_amount', { precision: 10, scale: 2 }).notNull(),
+  enteredAmount: numeric('entered_amount', { precision: 10, scale: 2 }).notNull(),
+  discountPercent: numeric('discount_percent', { precision: 5, scale: 2 }).notNull().default('0.00'),
+  discountAmount: numeric('discount_amount', { precision: 10, scale: 2 }).notNull().default('0.00'),
+  surchargePercent: numeric('surcharge_percent', { precision: 5, scale: 2 }).notNull().default('0.00'),
+  surchargeAmount: numeric('surcharge_amount', { precision: 10, scale: 2 }).notNull().default('0.00'),
+  totalAmount: numeric('total_amount', { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: text('payment_method'),
+  amountReceived: numeric('amount_received', { precision: 10, scale: 2 }).notNull().default('0.00'),
+  changeAmount: numeric('change_amount', { precision: 10, scale: 2 }).notNull().default('0.00'),
+  observations: text('observations'),
+  status: text('status').notNull().default('pending'),
+  receivedAt: timestamp('received_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  appointmentUniqueIdx: uniqueIndex('receipts_appointment_id_unique')
+    .on(table.appointmentId)
+    .where(sql`${table.appointmentId} IS NOT NULL`),
+}));
+
+export const receiptsRelations = relations(receipts, ({ one }) => ({
+  appointment: one(appointments, {
+    fields: [receipts.appointmentId],
+    references: [appointments.id],
+  }),
+  client: one(profiles, {
+    fields: [receipts.clientId],
+    references: [profiles.id],
+  }),
+  professional: one(professionals, {
+    fields: [receipts.professionalId],
+    references: [professionals.id],
+  }),
+}));
+
 // Relationships
 export const scheduleBlocksRelations = relations(scheduleBlocks, ({ one }) => ({
   professional: one(professionals, {
