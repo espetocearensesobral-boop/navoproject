@@ -118,7 +118,7 @@ const getInitialCollapsedSections = (activeTab: AdminTab): Record<AdminSection, 
 
 export const AdminLayout: React.FC = () => {
   const { theme, setTheme } = useTheme();
-  const { isSupported: notificationsSupported, permission: notificationPermission, isEnabled: notificationsEnabled, requestPermission, sendTestNotification } = useAdminOperationNotifications();
+  const { isSupported: notificationsSupported, permission: notificationPermission, isEnabled: notificationsEnabled, requestPermission, sendTestNotification, backgroundPushEnabled } = useAdminOperationNotifications();
   const [activeTab, setActiveTab] = useState<AdminTab>(() => getStoredAdminTab());
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -149,11 +149,13 @@ export const AdminLayout: React.FC = () => {
   const notificationsActive = notificationsSupported && notificationPermission === 'granted' && notificationsEnabled;
   const notificationControlLabel = !notificationsSupported
     ? 'Notificações indisponíveis neste navegador'
-    : notificationsActive
-      ? 'Enviar alerta de teste'
-      : notificationPermission === 'denied'
-        ? 'Notificações bloqueadas no navegador'
-        : 'Ativar alertas operacionais';
+    : notificationPermission === 'denied'
+      ? 'Notificações bloqueadas no navegador'
+      : backgroundPushEnabled
+        ? 'Testar alertas em segundo plano'
+        : notificationsActive
+          ? 'Testar alertas enquanto o Admin estiver aberto'
+          : 'Ativar alertas operacionais';
 
   const scrollSidebarNavigationToItem = (tab: AdminTab, mobile = false) => {
     window.requestAnimationFrame(() => {
@@ -641,7 +643,7 @@ export const AdminLayout: React.FC = () => {
                 className={`w-full h-11 flex items-center justify-center gap-2 px-3 rounded-xl border font-semibold text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${notificationsActive ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-border-subtle bg-surface-base text-content-base hover:border-gold-base/40'}`}
               >
                 {notificationsActive ? <BellRing className="w-4 h-4 shrink-0" /> : <Bell className="w-4 h-4 shrink-0" />}
-                <span className="truncate">{notificationsActive ? 'Testar alertas operacionais' : 'Ativar alertas operacionais'}</span>
+                <span className="truncate">{backgroundPushEnabled ? 'Testar alertas em segundo plano' : notificationsActive ? 'Testar alertas operacionais' : 'Ativar alertas operacionais'}</span>
               </button>
               <button
                 onClick={handleLogout}

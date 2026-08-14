@@ -6,6 +6,7 @@ import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
 import { queuePayloadSchema } from '../utils/validation.js';
+import { sendAdminPush } from '../services/admin-push.service.js';
 
 export const queueRouter = express.Router();
 
@@ -29,6 +30,12 @@ queueRouter.post('/', requireAuth, requireAdmin, async (req: any, res) => {
       .onConflictDoNothing()
       .returning();
     if (!created) return res.status(409).json({ error: 'Já existe um item com este identificador.' });
+    sendAdminPush({
+      title: 'Novo cliente na fila',
+      body: `${created.clientName} · ${created.serviceTitle} · ${created.professionalName || 'Profissional a definir'}.`,
+      tag: `queue:${created.id}:new`,
+      url: '/admin',
+    }).catch(() => {});
     res.status(201).json(created);
   } catch (e: any) {
     return handleError(res, e, req.path);
@@ -101,6 +108,24 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
       updatedQueue = savedQueue;
     }
 
+    if (nextStatus && currentQueueItem.status !== nextStatus) {
+      const statusCopy: Record<string, { title: string; body: string }> = {
+        waiting: { title: 'Cliente na recepção', body: 'Um cliente está aguardando atendimento.' },
+        in_chair: { title: 'Cliente chamado para cadeira', body: 'Um atendimento entrou em andamento.' },
+        completed: { title: 'Atendimento concluído', body: 'Um corte foi finalizado na operação.' },
+        cancelled: { title: 'Operação cancelada', body: 'Um cliente foi cancelado na Fila de Espera.' },
+        abandoned: { title: 'Cliente removido da fila', body: 'Um cliente saiu temporariamente da recepção.' },
+      };
+      const copy = statusCopy[nextStatus];
+      if (copy) {
+        sendAdminPush({
+          title: copy.title,
+          body: `${updatedQueue.clientName} · ${updatedQueue.serviceTitle} · ${copy.body}`,
+          tag: `queue:${updatedQueue.appointmentId || updatedQueue.id}:${nextStatus}`,
+          url: '/admin',
+        }).catch(() => {});
+      }
+    }
     res.json(updatedQueue);
   } catch (e: any) {
     if (e?.message === 'APPOINTMENT_NOT_FOUND') {

@@ -7,6 +7,7 @@ import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
 import { receiptCreatePayloadSchema, receiptReceivePayloadSchema } from '../utils/validation.js';
 import { getTodayStringBRT } from '../utils/datetime.js';
+import { sendAdminPush } from '../services/admin-push.service.js';
 
 export const receiptsRouter = express.Router();
 
@@ -78,6 +79,12 @@ receiptsRouter.post('/', requireAuth, requireAdmin, async (req: any, res) => {
       updatedAt: new Date(),
     }).returning();
 
+    sendAdminPush({
+      title: 'Recebimento pendente',
+      body: `${created.clientName} · ${created.serviceTitle} · registre o pagamento no Financeiro.`,
+      tag: `receipt:${created.id}:pending`,
+      url: '/admin',
+    }).catch(() => {});
     return res.status(201).json(created);
   } catch (error: any) {
     // Corrida entre duas finalizações do mesmo atendimento: devolve a pendência existente.
@@ -173,6 +180,12 @@ receiptsRouter.post('/:id/receive', requireAuth, requireAdmin, async (req, res) 
       return received;
     });
 
+    sendAdminPush({
+      title: 'Recebimento confirmado',
+      body: `${result.clientName} · ${result.serviceTitle} · R$ ${Number(result.totalAmount || 0).toFixed(2).replace('.', ',')} lançado no Extrato.`,
+      tag: `receipt:${result.id}:received`,
+      url: '/admin',
+    }).catch(() => {});
     return res.json(result);
   } catch (error: any) {
     return handleError(res, error, req.path);
@@ -189,6 +202,12 @@ receiptsRouter.patch('/:id/cancel', requireAuth, requireAdmin, async (req, res) 
       .set({ status: 'cancelled', updatedAt: new Date() })
       .where(eq(schema.receipts.id, current.id))
       .returning();
+    sendAdminPush({
+      title: 'Recebimento cancelado',
+      body: `${cancelled.clientName} · ${cancelled.serviceTitle} · a pendência foi cancelada.`,
+      tag: `receipt:${cancelled.id}:cancelled`,
+      url: '/admin',
+    }).catch(() => {});
     return res.json(cancelled);
   } catch (error: any) {
     return handleError(res, error, req.path);

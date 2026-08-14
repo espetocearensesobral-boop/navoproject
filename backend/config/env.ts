@@ -9,3 +9,8 @@ if (!process.env.JWT_SECRET) {
 }
 
 export const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
+
+// Web Push: a chave privada permanece exclusivamente no backend/Vercel.
+export const WEB_PUSH_VAPID_PUBLIC_KEY = process.env.WEB_PUSH_VAPID_PUBLIC_KEY || '';
+export const WEB_PUSH_VAPID_PRIVATE_KEY = process.env.WEB_PUSH_VAPID_PRIVATE_KEY || '';
+export const WEB_PUSH_VAPID_SUBJECT = process.env.WEB_PUSH_VAPID_SUBJECT || 'mailto:admin@navoproject.com';

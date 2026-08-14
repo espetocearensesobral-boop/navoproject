@@ -702,6 +702,50 @@ export async function fetchOperationalReportFromSupabase(period: OperationalRepo
   }
 }
 
+export interface AdminPushConfig {
+  enabled: boolean;
+  publicKey: string | null;
+}
+
+export async function fetchAdminPushConfig(options?: { strict?: boolean }): Promise<AdminPushConfig> {
+  try {
+    const res = await authFetch(`${API_BASE}/admin-push/config`);
+    if (!res.ok) throw new Error(`Falha ao carregar configuração de push (${res.status}).`);
+    return await res.json() as AdminPushConfig;
+  } catch (error) {
+    if (options?.strict) throw error;
+    return { enabled: false, publicKey: null };
+  }
+}
+
+export async function saveAdminPushSubscription(subscription: PushSubscriptionJSON): Promise<void> {
+  const res = await authFetch(`${API_BASE}/admin-push/subscriptions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subscription }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Não foi possível registrar este dispositivo para push.');
+  }
+}
+
+export async function removeAdminPushSubscription(endpoint: string): Promise<void> {
+  const res = await authFetch(`${API_BASE}/admin-push/subscriptions`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ endpoint }),
+  });
+  if (!res.ok) throw new Error('Não foi possível desativar os alertas push deste dispositivo.');
+}
+
+export async function sendAdminPushTest(): Promise<{ sent: number }> {
+  const res = await authFetch(`${API_BASE}/admin-push/test`, { method: 'POST' });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Não foi possível enviar o teste de push.');
+  return data as { sent: number };
+}
+
 export type ReceiptStatus = 'pending' | 'received' | 'cancelled';
 export type ReceiptPaymentMethod = 'pix' | 'credit_card' | 'debit_card' | 'cash' | 'other';
 

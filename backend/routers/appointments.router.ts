@@ -17,6 +17,7 @@ import { invalidateAvailabilityCache } from './availability.router.js';
 
 import { processAppointmentCompletion, notifyClientByEmail } from '../index.js';
 import { sendWhatsAppMessage } from '../whatsapp.js';
+import { sendAdminPush } from '../services/admin-push.service.js';
 
 export const appointmentsRouter = express.Router();
 
@@ -730,6 +731,18 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
     }
 
     invalidateAvailabilityCache();
+    const appointmentPush = newApt.status === 'cancelled'
+      ? {
+          title: 'Agendamento cancelado',
+          body: `${newApt.clientName || 'Cliente'} · ${newApt.date} às ${newApt.timeSlot} · o compromisso foi cancelado.`,
+          tag: `appointment:${newApt.id}:cancelled`,
+        }
+      : {
+          title: 'Novo agendamento',
+          body: `${newApt.clientName || 'Cliente'} · ${newApt.date} às ${newApt.timeSlot} · ${newApt.professionalName || 'Profissional a definir'}.`,
+          tag: `appointment:${newApt.id}:new`,
+        };
+    sendAdminPush({ ...appointmentPush, url: '/admin' }).catch(() => {});
     res.json(newApt);
   } catch (e: any) {
     console.error('Error in POST /api/appointments:', e);
@@ -1111,6 +1124,33 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
         }
 
         invalidateAvailabilityCache();
+        if (dbApt.status !== updatedApt.status) {
+          const statusPush = updatedApt.status === 'cancelled'
+            ? {
+                title: 'Agendamento cancelado',
+                body: `${updatedApt.clientName || 'Cliente'} · o compromisso foi cancelado na Agenda.`,
+                tag: `appointment:${updatedApt.id}:cancelled`,
+              }
+            : updatedApt.status === 'completed'
+              ? {
+                  title: 'Atendimento concluído',
+                  body: `${updatedApt.clientName || 'Cliente'} · o atendimento foi finalizado.`,
+                  tag: `appointment:${updatedApt.id}:completed`,
+                }
+              : {
+                  title: 'Status da Agenda atualizado',
+                  body: `${updatedApt.clientName || 'Cliente'} · o agendamento passou para ${updatedApt.status}.`,
+                  tag: `appointment:${updatedApt.id}:${updatedApt.status}`,
+                };
+          sendAdminPush({ ...statusPush, url: '/admin' }).catch(() => {});
+        } else if (data.date || data.timeSlot || data.time_slot) {
+          sendAdminPush({
+            title: 'Agendamento reagendado',
+            body: `${updatedApt.clientName || 'Cliente'} · novo horário ${updatedApt.date} às ${updatedApt.timeSlot}.`,
+            tag: `appointment:${updatedApt.id}:rescheduled:${updatedApt.date}:${updatedApt.timeSlot}`,
+            url: '/admin',
+          }).catch(() => {});
+        }
         return res.json(updatedApt);
       } catch (err: any) {
         const fullErr = `${err?.message || ''} ${err?.cause?.message || ''} ${err?.code || ''}`;

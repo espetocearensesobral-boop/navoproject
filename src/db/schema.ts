@@ -187,6 +187,19 @@ export const notificationDeliveries = pgTable('notification_deliveries', {
   sentAt: timestamp('sent_at').defaultNow().notNull(),
 });
 
+export const adminPushSubscriptions = pgTable('admin_push_subscriptions', {
+  id: text('id').primaryKey(),
+  adminId: text('admin_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  endpoint: text('endpoint').notNull().unique(),
+  p256dh: text('p256dh').notNull(),
+  auth: text('auth').notNull(),
+  userAgent: text('user_agent'),
+  enabled: boolean('enabled').notNull().default(true),
+  lastSeenAt: timestamp('last_seen_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const loyaltySettings = pgTable('loyalty_settings', {
   id: text('id').primaryKey().default('default'),
   config: jsonb('config').notNull().default({}),
@@ -282,6 +295,7 @@ export const scheduleBlocksRelations = relations(scheduleBlocks, ({ one }) => ({
 }));
 export const profilesRelations = relations(profiles, ({ many }) => ({
   appointments: many(appointments),
+  adminPushSubscriptions: many(adminPushSubscriptions),
 }));
 
 export const professionalsRelations = relations(professionals, ({ many, one }) => ({
@@ -351,6 +365,12 @@ export const notificationDeliveriesRelations = relations(notificationDeliveries,
   appointment: one(appointments, {
     fields: [notificationDeliveries.appointmentId],
     references: [appointments.id],
+  }),
+}));
+export const adminPushSubscriptionsRelations = relations(adminPushSubscriptions, ({ one }) => ({
+  admin: one(profiles, {
+    fields: [adminPushSubscriptions.adminId],
+    references: [profiles.id],
   }),
 }));
 

@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Appointment, WaitingQueueItem } from '../types';
 import {
+  fetchAdminPushConfig,
   fetchAppointmentsFromSupabase,
   fetchReceiptsFromSupabase,
   getQueueFromSupabase,
+  saveAdminPushSubscription,
+  sendAdminPushTest,
   type ReceiptItem,
 } from '../services/supabaseDataService';
 
@@ -29,6 +32,7 @@ export type AdminNotificationState = {
   isEnabled: boolean;
   requestPermission: () => Promise<NotificationPermission | 'unsupported'>;
   sendTestNotification: () => Promise<boolean>;
+  backgroundPushEnabled: boolean;
 };
 
 const appointmentStatusCopy: Partial<Record<Appointment['status'], Pick<OperationNotification, 'title' | 'body'>>> = {
@@ -60,6 +64,13 @@ const getAppointmentOperationKey = (appointmentId: string, status: string) => `a
 const getQueueOperationKey = (item: WaitingQueueItem, status: string) => `appointment:${item.appointment_id || item.id}:${status}`;
 const getReceiptOperationKey = (receipt: ReceiptItem, status: string) => `receipt:${receipt.id}:${status}`;
 
+const base64ToUint8Array = (value: string) => {
+  const padding = '='.repeat((4 - (value.length % 4)) % 4);
+  const base64 = (value + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map((character) => character.charCodeAt(0)));
+};
+
 export function useAdminOperationNotifications(): AdminNotificationState {
   const isSupported = typeof window !== 'undefined' && 'Notification' in window;
   const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>(() => isSupported ? Notification.permission : 'unsupported');
@@ -67,6 +78,7 @@ export function useAdminOperationNotifications(): AdminNotificationState {
     if (typeof window === 'undefined') return false;
     return window.localStorage.getItem(PREFERENCE_KEY) === 'true';
   });
+  const [backgroundPushEnabled, setBackgroundPushEnabled] = useState(false);
   const snapshotRef = useRef<Snapshot | null>(null);
   const sentTagsRef = useRef<Map<string, number>>(new Map());
   const isPollingRef = useRef(false);
@@ -101,6 +113,30 @@ export function useAdminOperationNotifications(): AdminNotificationState {
       return true;
     } catch (error) {
       console.warn('[Admin Notifications] Falha ao exibir alerta:', error);
+      return false;
+    }
+  }, [isSupported]);
+
+  const registerBackgroundPush = useCallback(async () => {
+    if (!isSupported || Notification.permission !== 'granted' || !('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+
+    try {
+      const config = await fetchAdminPushConfig();
+      if (!config.enabled || !config.publicKey) return false;
+      const registration = await navigator.serviceWorker.ready;
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: base64ToUint8Array(config.publicKey),
+        });
+      }
+      await saveAdminPushSubscription(subscription.toJSON());
+      setBackgroundPushEnabled(true);
+      return true;
+    } catch (error) {
+      setBackgroundPushEnabled(false);
+      console.warn('[Admin Notifications] Push em segundo plano indisponível:', error);
       return false;
     }
   }, [isSupported]);
@@ -221,14 +257,34 @@ export function useAdminOperationNotifications(): AdminNotificationState {
     setIsEnabled(enabled);
     window.localStorage.setItem(PREFERENCE_KEY, String(enabled));
     snapshotRef.current = null;
+    if (enabled) await registerBackgroundPush();
     return nextPermission;
   }, [isSupported]);
 
-  const sendTestNotification = useCallback(async () => showNotification({
-    title: 'Alertas operacionais ativados',
-    body: 'Você receberá avisos sobre Agenda, Fila e recebimentos pendentes enquanto o Admin estiver aberto.',
-    tag: 'admin-notifications:test',
-  }), [showNotification]);
+  useEffect(() => {
+    if (isEnabled && permission === 'granted') void registerBackgroundPush();
+  }, [isEnabled, permission, registerBackgroundPush]);
 
-  return { isSupported, permission, isEnabled, requestPermission, sendTestNotification };
+  const sendTestNotification = useCallback(async () => {
+    let sentInBackground = false;
+    if (backgroundPushEnabled) {
+      try {
+        const result = await sendAdminPushTest();
+        sentInBackground = result.sent > 0;
+      } catch (error) {
+        console.warn('[Admin Notifications] Falha no teste de push em segundo plano:', error);
+      }
+    }
+
+    if (!sentInBackground) {
+      await showNotification({
+        title: 'Alertas operacionais ativados',
+        body: 'Você receberá avisos sobre Agenda, Fila e recebimentos pendentes enquanto o Admin estiver aberto.',
+        tag: 'admin-notifications:test',
+      });
+    }
+    return true;
+  }, [backgroundPushEnabled, showNotification]);
+
+  return { isSupported, permission, isEnabled, requestPermission, sendTestNotification, backgroundPushEnabled };
 }
