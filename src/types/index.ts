@@ -119,6 +119,7 @@ export interface LoyaltyReward {
 
 export interface WaitingQueueItem {
   id: string;
+  appointment_id?: string;
   client_name: string;
   client_phone?: string;
   service_title: string;

@@ -357,7 +357,8 @@ export const ScheduleGrid: React.FC = () => {
                 a => a.professional_id === barber.id &&
                      a.date === selectedDate &&
                      a.time_slot === slot &&
-                     a.status !== 'cancelled'
+                     a.status !== 'cancelled' &&
+                     a.status !== 'completed'
               );
               const block = blocks.find(
                 b => b.professional_id === barber.id && isBlockCoveringSlot(b, slot)

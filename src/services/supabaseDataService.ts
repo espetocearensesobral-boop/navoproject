@@ -259,6 +259,7 @@ export async function getQueueFromSupabase(): Promise<WaitingQueueItem[]> {
     }
     return data.map((q: any) => ({
       id: q.id,
+      appointment_id: q.appointmentId || undefined,
       client_name: q.clientName || 'Cliente Avulso',
       client_phone: q.clientPhone || '',
       service_title: q.serviceTitle || 'Atendimento Geral',

@@ -1,7 +1,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
-import { db } from '../index.js';
+import { db, processAppointmentCompletion } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
@@ -39,13 +39,66 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
   try {
     const parsed = queuePayloadSchema.omit({ id: true }).partial().safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Dados da fila inválidos.', details: parsed.error.flatten() });
-    const [updated] = await db.update(schema.waitingQueue)
-      .set({ ...parsed.data, updatedAt: new Date() })
-      .where(eq(schema.waitingQueue.id, req.params.id))
-      .returning();
-    if (!updated) return res.status(404).json({ error: 'Item da fila não encontrado.' });
-    res.json(updated);
+
+    const currentQueueItem = await db.query.waitingQueue.findFirst({
+      where: eq(schema.waitingQueue.id, req.params.id),
+    });
+    if (!currentQueueItem) return res.status(404).json({ error: 'Item da fila não encontrado.' });
+
+    const nextStatus = parsed.data.status;
+    const appointmentStatus = nextStatus === 'completed'
+      ? 'completed'
+      : nextStatus === 'in_chair'
+      ? 'in_service'
+      : nextStatus === 'waiting'
+      ? 'in_queue'
+      : undefined;
+
+    const queueUpdate = { ...parsed.data, updatedAt: new Date() };
+    let updatedQueue: any;
+    let updatedAppointment: any = null;
+
+    if (currentQueueItem.appointmentId && appointmentStatus) {
+      if (typeof db.transaction !== 'function') {
+        return res.status(503).json({ error: 'O banco não oferece transação para sincronizar Fila e Agenda.' });
+      }
+
+      await db.transaction(async (tx: any) => {
+        const [savedAppointment] = await tx.update(schema.appointments)
+          .set({ status: appointmentStatus, updatedAt: new Date() })
+          .where(eq(schema.appointments.id, currentQueueItem.appointmentId))
+          .returning();
+        if (!savedAppointment) throw new Error('APPOINTMENT_NOT_FOUND');
+        updatedAppointment = savedAppointment;
+
+        const [savedQueue] = await tx.update(schema.waitingQueue)
+          .set(queueUpdate)
+          .where(eq(schema.waitingQueue.id, req.params.id))
+          .returning();
+        if (!savedQueue) throw new Error('QUEUE_ITEM_NOT_FOUND');
+        updatedQueue = savedQueue;
+      });
+
+      if (appointmentStatus === 'completed') {
+        await processAppointmentCompletion(updatedAppointment);
+      }
+    } else {
+      const [savedQueue] = await db.update(schema.waitingQueue)
+        .set(queueUpdate)
+        .where(eq(schema.waitingQueue.id, req.params.id))
+        .returning();
+      if (!savedQueue) return res.status(404).json({ error: 'Item da fila não encontrado.' });
+      updatedQueue = savedQueue;
+    }
+
+    res.json(updatedQueue);
   } catch (e: any) {
+    if (e?.message === 'APPOINTMENT_NOT_FOUND') {
+      return res.status(409).json({ error: 'O agendamento associado não foi encontrado para sincronização.' });
+    }
+    if (e?.message === 'QUEUE_ITEM_NOT_FOUND') {
+      return res.status(404).json({ error: 'Item da fila não encontrado.' });
+    }
     return handleError(res, e, req.path);
   }
 });
