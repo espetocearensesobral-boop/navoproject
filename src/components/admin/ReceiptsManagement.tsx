@@ -43,16 +43,19 @@ export const ReceiptsManagement: React.FC = () => {
   const [filter, setFilter] = useState<ReceiptFilter>('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptItem | null>(null);
   const [checkoutReceipt, setCheckoutReceipt] = useState<ReceiptItem | null>(null);
 
   const loadReceipts = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       setReceipts(await fetchReceiptsFromSupabase({ strict: true }));
     } catch (error) {
       console.error('Não foi possível carregar recebimentos:', error);
       setReceipts([]);
+      setError(error instanceof Error ? error.message : 'Não foi possível carregar os recebimentos.');
     } finally {
       setLoading(false);
     }
@@ -105,6 +108,8 @@ export const ReceiptsManagement: React.FC = () => {
         ]}
         action={{ label: 'Atualizar', onClick: loadReceipts, icon: RefreshCw, disabled: loading }}
       />
+
+      {error && <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">{error}</div>}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <SummaryCard label="Pendentes" value={String(summary.pending.length)} detail={money(summary.pendingAmount)} icon={Clock3} tone="warning" />

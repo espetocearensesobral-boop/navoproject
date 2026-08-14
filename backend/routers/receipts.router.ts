@@ -6,6 +6,7 @@ import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
 import { receiptCreatePayloadSchema, receiptReceivePayloadSchema } from '../utils/validation.js';
+import { getTodayStringBRT } from '../utils/datetime.js';
 
 export const receiptsRouter = express.Router();
 
@@ -18,12 +19,6 @@ const PAYMENT_METHOD_LABEL: Record<string, string> = {
 };
 
 const asMoney = (value: unknown) => Number(Number(value || 0).toFixed(2));
-const getTodayBrt = () => new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'America/Fortaleza',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-}).format(new Date());
 
 receiptsRouter.get('/', requireAuth, requireAdmin, async (_req, res) => {
   try {
@@ -159,7 +154,7 @@ receiptsRouter.post('/:id/receive', requireAuth, requireAdmin, async (req, res) 
         amount: String(expectedTotal),
         category: 'Recebimento de serviço',
         paymentMethod: PAYMENT_METHOD_LABEL[payment.paymentMethod] || payment.paymentMethod,
-        date: getTodayBrt(),
+        date: getTodayStringBRT(),
         status: 'completed',
         professionalName: current.professionalName || null,
         notes: JSON.stringify({
