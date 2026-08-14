@@ -205,13 +205,14 @@ export async function createAppointmentInSupabase(
 
 export async function cancelAppointmentInSupabase(
   appointmentId: string,
-  fullApt?: Appointment
+  fullApt?: Appointment,
+  reason = 'Cancelado pelo cliente'
 ): Promise<{ success: boolean; appointment?: Appointment; error?: string }> {
   try {
     const res = await authFetch(`${API_BASE}/appointments/${appointmentId}/cancel`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fullApt || {})
+      body: JSON.stringify({ ...(fullApt || {}), reason })
     });
     
     if (!res.ok) {
