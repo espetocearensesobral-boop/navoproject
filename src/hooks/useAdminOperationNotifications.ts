@@ -40,7 +40,7 @@ export type AdminNotificationState = {
   notificationsBusy: boolean;
 };
 
-const appointmentStatusCopy: Partial<Record<Appointment['status'], Pick<OperationNotification, 'title' | 'body'>>> = {
+const appointmentStatusCopy: Record<string, Pick<OperationNotification, 'title' | 'body'>> = {
   confirmed: { title: 'Agendamento confirmado', body: 'Um agendamento foi confirmado na Agenda.' },
   cancelled: { title: 'Agendamento cancelado', body: 'Um compromisso foi cancelado e saiu da operação.' },
   completed: { title: 'Atendimento concluído', body: 'Um atendimento foi finalizado.' },
@@ -64,6 +64,8 @@ const getServiceTitle = (appointment: Appointment) => {
   const firstService = Array.isArray(appointment.services) ? appointment.services[0] : null;
   return firstService?.title || 'Serviço agendado';
 };
+
+const normalizeAppointmentStatus = (status: unknown) => status === 'canceled' ? 'cancelled' : String(status || '');
 
 const getAppointmentOperationKey = (appointmentId: string, status: string) => `appointment:${appointmentId}:${status}`;
 const getQueueOperationKey = (item: WaitingQueueItem, status: string) => `appointment:${item.appointment_id || item.id}:${status}`;
@@ -195,6 +197,7 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
 
       for (const appointment of appointments) {
         const previous = previousSnapshot.appointments.get(appointment.id);
+        const currentStatus = normalizeAppointmentStatus(appointment.status);
         if (!previous) {
           await showNotification({
             title: 'Novo agendamento',
@@ -203,14 +206,28 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
           });
           continue;
         }
-        if (previous.status !== appointment.status) {
-          const copy = appointmentStatusCopy[appointment.status];
+        const previousStatus = normalizeAppointmentStatus(previous.status);
+        if (previousStatus !== currentStatus) {
+          const copy = appointmentStatusCopy[currentStatus];
           if (copy) await showNotification({
             title: copy.title,
             body: `${appointment.client_name} · ${getServiceTitle(appointment)} · ${copy.body}`,
-            tag: getAppointmentOperationKey(appointment.id, appointment.status),
+            tag: getAppointmentOperationKey(appointment.id, currentStatus),
           });
         }
+      }
+
+      // Algumas integrações retornam a Agenda sem o registro cancelado. Nesse
+      // caso a mudança não aparece no loop acima; o desaparecimento de um
+      // agendamento previamente conhecido deve ser tratado como cancelamento.
+      for (const [appointmentId, previous] of previousSnapshot.appointments.entries()) {
+        if (nextSnapshot.appointments.has(appointmentId) || normalizeAppointmentStatus(previous.status) === 'cancelled') continue;
+        const copy = appointmentStatusCopy.cancelled;
+        await showNotification({
+          title: copy.title,
+          body: `${previous.client_name} · ${getServiceTitle(previous)} · ${copy.body}`,
+          tag: getAppointmentOperationKey(appointmentId, 'cancelled'),
+        });
       }
 
       for (const item of queue) {
