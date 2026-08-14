@@ -573,7 +573,8 @@ export const ScheduleGrid: React.FC = () => {
                           a => a.professional_id === barber.id &&
                                a.date === selectedDate &&
                                a.time_slot === slot &&
-                               a.status !== 'cancelled'
+                               a.status !== 'cancelled' &&
+                               a.status !== 'completed'
                         );
                         const operationalState = apt ? getAppointmentOperationalState(apt) : null;
                         const professionalAccent = selectedBarberId === 'all' && !operationalState?.isLate
