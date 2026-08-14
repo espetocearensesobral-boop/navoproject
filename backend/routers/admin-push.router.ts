@@ -12,6 +12,26 @@ adminPushRouter.get('/config', requireAuth, requireAdmin, (_req, res) => {
   return res.json({ enabled: isAdminPushConfigured(), publicKey: getAdminPushPublicKey() });
 });
 
+adminPushRouter.get('/subscriptions/status', requireAuth, requireAdmin, async (req: any, res) => {
+  try {
+    const endpoint = typeof req.query?.endpoint === 'string' ? req.query.endpoint.trim() : '';
+    const conditions = endpoint
+      ? and(eq(schema.adminPushSubscriptions.adminId, req.user.id), eq(schema.adminPushSubscriptions.endpoint, endpoint))
+      : eq(schema.adminPushSubscriptions.adminId, req.user.id);
+    const [subscription] = await db.select({
+      endpoint: schema.adminPushSubscriptions.endpoint,
+      enabled: schema.adminPushSubscriptions.enabled,
+    }).from(schema.adminPushSubscriptions).where(conditions).limit(1);
+
+    return res.json({
+      active: Boolean(subscription?.enabled),
+      endpoint: subscription?.endpoint || endpoint || null,
+    });
+  } catch (error: any) {
+    return handleError(res, error, req.path);
+  }
+});
+
 adminPushRouter.post('/subscriptions', requireAuth, requireAdmin, async (req: any, res) => {
   try {
     const subscription = req.body?.subscription || req.body;

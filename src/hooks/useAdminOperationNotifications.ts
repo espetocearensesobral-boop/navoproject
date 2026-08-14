@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Appointment, WaitingQueueItem } from '../types';
 import {
   fetchAdminPushConfig,
+  fetchAdminPushSubscriptionStatus,
   fetchAppointmentsFromSupabase,
   fetchReceiptsFromSupabase,
   getQueueFromSupabase,
+  removeAdminPushSubscription,
   saveAdminPushSubscription,
   sendAdminPushTest,
   type ReceiptItem,
@@ -31,8 +33,10 @@ export type AdminNotificationState = {
   permission: NotificationPermission | 'unsupported';
   isEnabled: boolean;
   requestPermission: () => Promise<NotificationPermission | 'unsupported'>;
+  toggleNotifications: () => Promise<boolean>;
   sendTestNotification: () => Promise<boolean>;
   backgroundPushEnabled: boolean;
+  notificationsBusy: boolean;
 };
 
 const appointmentStatusCopy: Partial<Record<Appointment['status'], Pick<OperationNotification, 'title' | 'body'>>> = {
@@ -79,6 +83,7 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
     return window.localStorage.getItem(PREFERENCE_KEY) === 'true';
   });
   const [backgroundPushEnabled, setBackgroundPushEnabled] = useState(false);
+  const [notificationsBusy, setNotificationsBusy] = useState(false);
   const snapshotRef = useRef<Snapshot | null>(null);
   const sentTagsRef = useRef<Map<string, number>>(new Map());
   const isPollingRef = useRef(false);
@@ -118,23 +123,40 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
     }
   }, [isSupported]);
 
-  const registerBackgroundPush = useCallback(async () => {
+  const registerBackgroundPush = useCallback(async (activate = false) => {
     if (!isAuthorized || !isSupported || Notification.permission !== 'granted' || !('serviceWorker' in navigator) || !('PushManager' in window)) return false;
     if (registeringPushRef.current) return false;
     registeringPushRef.current = true;
 
     try {
-      const config = await fetchAdminPushConfig();
+      const config = await fetchAdminPushConfig({ strict: true });
       if (!config.enabled || !config.publicKey) return false;
       const registration = await navigator.serviceWorker.ready;
-      let subscription = await registration.pushManager.getSubscription();
+      const subscription = await registration.pushManager.getSubscription();
+
       if (!subscription) {
-        subscription = await registration.pushManager.subscribe({
+        if (!activate) {
+          setBackgroundPushEnabled(false);
+          return false;
+        }
+        const newSubscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: base64ToUint8Array(config.publicKey),
         });
+        await saveAdminPushSubscription(newSubscription.toJSON());
+        setBackgroundPushEnabled(true);
+        return true;
       }
-      await saveAdminPushSubscription(subscription.toJSON());
+
+      const status = await fetchAdminPushSubscriptionStatus(subscription.endpoint);
+      if (!status.active && !activate) {
+        setBackgroundPushEnabled(false);
+        return false;
+      }
+
+      if (activate) {
+        await saveAdminPushSubscription(subscription.toJSON());
+      }
       setBackgroundPushEnabled(true);
       return true;
     } catch (error) {
@@ -256,15 +278,52 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
     const nextPermission = Notification.permission === 'granted'
       ? 'granted'
       : await Notification.requestPermission();
-
     setPermission(nextPermission);
-    const enabled = nextPermission === 'granted';
-    setIsEnabled(enabled);
-    window.localStorage.setItem(PREFERENCE_KEY, String(enabled));
-    snapshotRef.current = null;
-    if (enabled) await registerBackgroundPush();
     return nextPermission;
-  }, [isSupported, registerBackgroundPush]);
+  }, [isSupported]);
+
+  const toggleNotifications = useCallback(async () => {
+    if (!isAuthorized || !isSupported || notificationsBusy) return backgroundPushEnabled;
+    setNotificationsBusy(true);
+
+    try {
+      if (backgroundPushEnabled) {
+        const registration = 'serviceWorker' in navigator ? await navigator.serviceWorker.ready : null;
+        const subscription = registration?.pushManager ? await registration.pushManager.getSubscription() : null;
+        if (subscription?.endpoint) {
+          await removeAdminPushSubscription(subscription.endpoint);
+          await subscription.unsubscribe();
+        }
+        setBackgroundPushEnabled(false);
+        setIsEnabled(false);
+        snapshotRef.current = null;
+        window.localStorage.setItem(PREFERENCE_KEY, 'false');
+        return false;
+      }
+
+      const nextPermission = await requestPermission();
+      if (nextPermission !== 'granted') {
+        setBackgroundPushEnabled(false);
+        setIsEnabled(false);
+        window.localStorage.setItem(PREFERENCE_KEY, 'false');
+        return false;
+      }
+
+      const activated = await registerBackgroundPush(true);
+      setIsEnabled(activated);
+      window.localStorage.setItem(PREFERENCE_KEY, String(activated));
+      snapshotRef.current = null;
+      return activated;
+    } catch (error) {
+      setBackgroundPushEnabled(false);
+      setIsEnabled(false);
+      window.localStorage.setItem(PREFERENCE_KEY, 'false');
+      console.warn('[Admin Notifications] Falha ao alternar alertas:', error);
+      return false;
+    } finally {
+      setNotificationsBusy(false);
+    }
+  }, [backgroundPushEnabled, isAuthorized, isSupported, notificationsBusy, registerBackgroundPush, removeAdminPushSubscription, requestPermission]);
 
   useEffect(() => {
     if (!isAuthorized || !isEnabled || permission !== 'granted') {
@@ -276,7 +335,7 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
       void registerBackgroundPush();
     };
 
-    synchronizePushSubscription();
+    void registerBackgroundPush(false);
     window.addEventListener('focus', synchronizePushSubscription);
     window.addEventListener('pageshow', synchronizePushSubscription);
     document.addEventListener('visibilitychange', synchronizePushSubscription);
@@ -309,5 +368,5 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
     return true;
   }, [backgroundPushEnabled, showNotification]);
 
-  return { isSupported, permission, isEnabled, requestPermission, sendTestNotification, backgroundPushEnabled };
+  return { isSupported, permission, isEnabled, requestPermission, toggleNotifications, sendTestNotification, backgroundPushEnabled, notificationsBusy };
 }

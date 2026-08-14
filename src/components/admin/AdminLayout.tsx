@@ -119,7 +119,7 @@ const getInitialCollapsedSections = (activeTab: AdminTab): Record<AdminSection, 
 export const AdminLayout: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const { isSupported: notificationsSupported, permission: notificationPermission, isEnabled: notificationsEnabled, requestPermission, sendTestNotification, backgroundPushEnabled } = useAdminOperationNotifications(isAuthorized);
+  const { isSupported: notificationsSupported, permission: notificationPermission, toggleNotifications, backgroundPushEnabled, notificationsBusy } = useAdminOperationNotifications(isAuthorized);
   const [activeTab, setActiveTab] = useState<AdminTab>(() => getStoredAdminTab());
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
@@ -139,22 +139,19 @@ export const AdminLayout: React.FC = () => {
   const mainRef = useRef<HTMLElement>(null);
 
   const handleNotificationsAction = async () => {
-    if (!notificationsSupported) return;
-    const permission = notificationPermission === 'granted' && notificationsEnabled
-      ? 'granted'
-      : await requestPermission();
-    if (permission === 'granted') await sendTestNotification();
+    if (!notificationsSupported || notificationsBusy) return;
+    await toggleNotifications();
   };
 
-  const notificationsActive = notificationsSupported && notificationPermission === 'granted' && notificationsEnabled;
+  const notificationsActive = notificationsSupported && notificationPermission === 'granted' && backgroundPushEnabled;
   const notificationControlLabel = !notificationsSupported
     ? 'Notificações indisponíveis neste navegador'
     : notificationPermission === 'denied'
       ? 'Notificações bloqueadas no navegador'
-      : backgroundPushEnabled
-        ? 'Testar alertas em segundo plano'
+      : notificationsBusy
+        ? 'Sincronizando estado das notificações'
         : notificationsActive
-          ? 'Testar alertas enquanto o Admin estiver aberto'
+          ? 'Desativar alertas operacionais'
           : 'Ativar alertas operacionais';
 
   const scrollSidebarNavigationToItem = (tab: AdminTab, mobile = false) => {
@@ -513,7 +510,7 @@ export const AdminLayout: React.FC = () => {
             <button
               type="button"
               onClick={handleNotificationsAction}
-              disabled={!notificationsSupported || notificationPermission === 'denied'}
+              disabled={!notificationsSupported || notificationPermission === 'denied' || notificationsBusy}
               className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${notificationsActive ? 'bg-status-success/10 text-status-success hover:bg-status-success/20' : 'text-content-muted hover:bg-surface-base hover:text-gold-base'}`}
               title={notificationControlLabel}
               aria-label={notificationControlLabel}
@@ -555,7 +552,7 @@ export const AdminLayout: React.FC = () => {
           <button
             type="button"
             onClick={handleNotificationsAction}
-            disabled={!notificationsSupported || notificationPermission === 'denied'}
+            disabled={!notificationsSupported || notificationPermission === 'denied' || notificationsBusy}
             className={`w-10 h-10 flex items-center justify-center rounded-full border transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${notificationsActive ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-border-subtle bg-surface-card text-content-muted active:text-gold-base'}`}
             title={notificationControlLabel}
             aria-label={notificationControlLabel}
@@ -639,11 +636,11 @@ export const AdminLayout: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNotificationsAction}
-                disabled={!notificationsSupported || notificationPermission === 'denied'}
+                disabled={!notificationsSupported || notificationPermission === 'denied' || notificationsBusy}
                 className={`w-full h-11 flex items-center justify-center gap-2 px-3 rounded-xl border font-semibold text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${notificationsActive ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-border-subtle bg-surface-base text-content-base hover:border-gold-base/40'}`}
               >
                 {notificationsActive ? <BellRing className="w-4 h-4 shrink-0" /> : <Bell className="w-4 h-4 shrink-0" />}
-                <span className="truncate">{backgroundPushEnabled ? 'Testar alertas em segundo plano' : notificationsActive ? 'Testar alertas operacionais' : 'Ativar alertas operacionais'}</span>
+                <span className="truncate">{notificationsBusy ? 'Sincronizando notificações…' : notificationsActive ? 'Desativar alertas operacionais' : 'Ativar alertas operacionais'}</span>
               </button>
               <button
                 onClick={handleLogout}

@@ -706,6 +706,11 @@ export interface AdminPushConfig {
   publicKey: string | null;
 }
 
+export interface AdminPushSubscriptionStatus {
+  active: boolean;
+  endpoint: string | null;
+}
+
 export async function fetchAdminPushConfig(options?: { strict?: boolean }): Promise<AdminPushConfig> {
   try {
     const res = await authFetch(`${API_BASE}/admin-push/config`);
@@ -715,6 +720,14 @@ export async function fetchAdminPushConfig(options?: { strict?: boolean }): Prom
     if (options?.strict) throw error;
     return { enabled: false, publicKey: null };
   }
+}
+
+export async function fetchAdminPushSubscriptionStatus(endpoint?: string): Promise<AdminPushSubscriptionStatus> {
+  const query = endpoint ? `?endpoint=${encodeURIComponent(endpoint)}` : '';
+  const res = await authFetch(`${API_BASE}/admin-push/subscriptions/status${query}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Não foi possível consultar o estado das notificações.');
+  return data as AdminPushSubscriptionStatus;
 }
 
 export async function saveAdminPushSubscription(subscription: PushSubscriptionJSON): Promise<void> {
