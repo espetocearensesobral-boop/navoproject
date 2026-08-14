@@ -277,7 +277,7 @@ export const AdminLayout: React.FC = () => {
   const bottomBarItems = [
     { id: 'dashboard' as AdminTab, label: 'Dashboard', icon: TrendingUp },
     { id: 'agenda' as AdminTab, label: 'Agenda', icon: Calendar },
-    { id: 'clientes' as AdminTab, label: 'Clientes', icon: UserCheck },
+    { id: 'queue' as AdminTab, label: 'Fila', icon: Clock },
   ];
 
   const renderSidebarNavigation = (mobile = false) => (

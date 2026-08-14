@@ -52,6 +52,8 @@ export const WaitingQueue: React.FC = () => {
 
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isServicePickerOpen, setIsServicePickerOpen] = useState(false);
+  const clientNameInputRef = React.useRef<HTMLInputElement>(null);
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [selectedQueueItemForWa, setSelectedQueueItemForWa] = useState<WaitingQueueItem | null>(null);
   const [customWaMessage, setCustomWaMessage] = useState('');
@@ -81,6 +83,12 @@ export const WaitingQueue: React.FC = () => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!isAddModalOpen) return;
+    const frame = window.requestAnimationFrame(() => clientNameInputRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [isAddModalOpen]);
 
   const loadData = async () => {
     setLoading(true);
@@ -248,6 +256,13 @@ export const WaitingQueue: React.FC = () => {
     showNotification('Ordem da fila de espera atualizada!');
   };
 
+  const handleSelectWalkInService = (service: ServiceItem) => {
+    setNewServiceTitle(service.title);
+    setNewServicePrice(service.price);
+    setIsServicePickerOpen(false);
+    window.requestAnimationFrame(() => document.getElementById('walk-in-professional')?.focus());
+  };
+
   const handleAddWalkInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newClientName.trim()) {
@@ -348,21 +363,17 @@ export const WaitingQueue: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={Users}
-        title="Fila de Espera Digital"
-        stats={[
-          { label: 'ao vivo', value: '', tone: 'gold' },
-          { label: 'whatsapp ativo', value: '', tone: 'success' },
-        ]}
-        action={{ label: 'Adicionar Encaixe (Walk-In)', onClick: () => setIsAddModalOpen(true), icon: Plus }}
+        title="Fila de Espera"
+        action={{ label: 'Adicionar Encaixe', onClick: () => { setIsServicePickerOpen(false); setIsAddModalOpen(true); }, icon: Plus }}
       />
 
       {/* Ação (mobile) */}
       <button
-        onClick={() => setIsAddModalOpen(true)}
-        className="md:hidden w-full bg-gold-base text-surface-base px-3.5 py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+        onClick={() => { setIsServicePickerOpen(false); setIsAddModalOpen(true); }}
+        className="md:hidden w-full min-h-11 bg-gold-base text-surface-base px-4 py-2.5 rounded-xl text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 shrink-0"
       >
         <Plus className="w-4 h-4" />
-        <span>Adicionar Encaixe (Walk-In)</span>
+        <span>Novo encaixe</span>
       </button>
 
       {/* TOAST MESSAGE */}
@@ -373,65 +384,104 @@ export const WaitingQueue: React.FC = () => {
         </div>
       )}
 
-      {/* FILTER & TABS BAR */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
-        <div className="relative flex-1">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
+      {/* BUSCA, FILTROS E ABAS */}
+      <div className="space-y-3">
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar cliente, serviço ou barbeiro..."
-            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+            className="w-full min-h-11 bg-surface-card border border-border-subtle rounded-xl pl-10 pr-3.5 py-2 text-sm text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base"
           />
         </div>
 
-        <div className="flex items-center gap-2 justify-between sm:justify-end">
-          {/* BARBER FILTER SELECT */}
-          <div className="flex items-center gap-1.5 bg-surface-card px-2.5 py-1 rounded-xl border border-border-subtle shrink-0">
-            <Filter className="w-3 h-3 text-gold-hover" />
+        {/* Mobile: filtros soltos e deslizáveis, no padrão de Serviços */}
+        <div className="md:hidden space-y-2">
+          <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar -mx-1 px-1">
+            <button
+              type="button"
+              onClick={() => setSelectedBarberFilter('all')}
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+                selectedBarberFilter === 'all'
+                  ? 'bg-gold-base text-surface-base border-gold-base'
+                  : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
+              }`}
+            >
+              Todos os barbeiros
+            </button>
+            {professionals.map((professional) => (
+              <button
+                key={professional.id}
+                type="button"
+                onClick={() => setSelectedBarberFilter(professional.id)}
+                className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+                  selectedBarberFilter === professional.id
+                    ? 'bg-gold-base text-surface-base border-gold-base'
+                    : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
+                }`}
+              >
+                {professional.name}
+              </button>
+            ))}
+          </div>
+
+          <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar -mx-1 px-1">
+            {([
+              ['kanban', 'Painel'],
+              ['history', 'Histórico'],
+              ['abandoned', 'Removidos'],
+            ] as const).map(([tab, label]) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`shrink-0 min-h-10 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all border ${
+                  activeTab === tab
+                    ? 'bg-surface-base text-gold-base border-gold-base/50 shadow-sm'
+                    : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop: controles lineares, com as abas sem contadores */}
+        <div className="hidden md:flex items-center justify-between gap-3 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
+          <label className="flex items-center gap-2 shrink-0 px-2.5 py-1.5 rounded-lg bg-surface-base border border-border-subtle">
+            <Filter className="w-3.5 h-3.5 text-gold-hover" />
             <select
               value={selectedBarberFilter}
               onChange={(e) => setSelectedBarberFilter(e.target.value)}
-              className="bg-transparent text-[11px] text-content-base font-semibold outline-none cursor-pointer"
+              className="bg-transparent text-xs text-content-base font-semibold outline-none cursor-pointer"
+              aria-label="Filtrar por barbeiro"
             >
-              <option value="all" className="bg-surface-card text-content-base">
-                Todos Barbeiros
-              </option>
-              {professionals.map((p) => (
-                <option key={p.id} value={p.id} className="bg-surface-card text-content-base">
-                  {p.name}
-                </option>
-              ))}
+              <option value="all">Todos os barbeiros</option>
+              {professionals.map((professional) => <option key={professional.id} value={professional.id}>{professional.name}</option>)}
             </select>
-          </div>
-
-          {/* TAB SWITCHER */}
-          <div className="flex items-center bg-surface-card p-0.5 rounded-xl border border-border-subtle shrink-0">
-            <button
-              onClick={() => setActiveTab('kanban')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors ${
-                activeTab === 'kanban' ? 'bg-gold-base text-surface-base' : 'text-content-muted hover:text-content-base'
-              }`}
-            >
-              Painel
-            </button>
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors ${
-                activeTab === 'history' ? 'bg-gold-base text-surface-base' : 'text-content-muted hover:text-content-base'
-              }`}
-            >
-              Histórico ({historyList.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('abandoned')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors ${
-                activeTab === 'abandoned' ? 'bg-gold-base text-surface-base' : 'text-content-muted hover:text-content-base'
-              }`}
-            >
-              Removidos ({abandonedList.length})
-            </button>
+          </label>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {([
+              ['kanban', 'Painel'],
+              ['history', 'Histórico'],
+              ['abandoned', 'Removidos'],
+            ] as const).map(([tab, label]) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`min-h-9 px-3 rounded-lg text-xs font-bold transition-colors border ${
+                  activeTab === tab
+                    ? 'bg-gold-base text-surface-base border-gold-base'
+                    : 'bg-surface-base text-content-muted border-border-subtle hover:text-content-base'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -448,9 +498,7 @@ export const WaitingQueue: React.FC = () => {
                   Em atendimento
                 </span>
               </div>
-              <span className="text-[10px] bg-status-success/15 text-status-success px-2.5 py-1 rounded-full font-black border border-status-success/30 whitespace-nowrap">
-                {inChairList.length} AO VIVO
-              </span>
+
             </div>
             <p className="text-[11px] text-content-muted -mt-1">Ações em curso: finalize somente após concluir o serviço.</p>
 
@@ -803,40 +851,46 @@ export const WaitingQueue: React.FC = () => {
 
       {/* MODAL: ADD WALK-IN */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/30 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
-            <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
-                  <Plus className="w-4 h-4" />
+        <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
+          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/30 rounded-2xl w-full max-w-xl max-h-[90dvh] overflow-hidden shadow-2xl flex flex-col animate-fade-in">
+            <div className="p-5 sm:p-6 bg-surface-base border-b border-border-subtle flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-hover flex items-center justify-center">
+                  <Plus className="w-5 h-5" />
                 </div>
-                <h2 className="text-xs font-bold text-content-base">Adicionar Encaixe (Walk-In)</h2>
+                <div>
+                  <h2 className="text-base font-bold text-content-base">Novo encaixe</h2>
+                  <p className="text-xs text-content-muted mt-0.5">Adicione um cliente à recepção em poucos passos.</p>
+                </div>
               </div>
               <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="w-7 h-7 rounded-lg bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center"
+                type="button"
+                onClick={() => { setIsServicePickerOpen(false); setIsAddModalOpen(false); }}
+                className="w-10 h-10 rounded-xl bg-surface-card border border-border-subtle text-content-muted hover:text-content-base flex items-center justify-center"
+                aria-label="Fechar modal"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onKeyDown={handleEnterAsTab} onSubmit={handleAddWalkInSubmit} className="p-4 space-y-3 text-xs">
+            <form onKeyDown={handleEnterAsTab} onSubmit={handleAddWalkInSubmit} className="p-5 sm:p-6 space-y-4 text-sm overflow-y-auto">
               <div>
-                <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
-                  Nome do Cliente *
+                <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">
+                  Nome do cliente *
                 </label>
                 <input
+                  ref={clientNameInputRef}
                   type="text"
                   value={newClientName}
                   onChange={(e) => setNewClientName(e.target.value)}
                   placeholder="Ex: Gabriel Santos"
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                  className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base"
                   required
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
+                <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">
                   Telefone / WhatsApp
                 </label>
                 <input
@@ -844,38 +898,30 @@ export const WaitingQueue: React.FC = () => {
                   value={newClientPhone}
                   onChange={(e) => setNewClientPhone(e.target.value)}
                   placeholder="(11) 99887-1122"
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                  className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
-                    Serviço
-                  </label>
-                  <select
-                    value={newServiceTitle}
-                    onChange={(e) => {
-                      const title = e.target.value;
-                      setNewServiceTitle(title);
-                      const found = services.find((s) => s.title === title);
-                      if (found) setNewServicePrice(found.price);
-                    }}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base cursor-pointer"
+                  <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">Serviço *</label>
+                  <button
+                    type="button"
+                    data-enter-action="true"
+                    onClick={() => setIsServicePickerOpen(true)}
+                    className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3 text-left hover:border-gold-base/60 focus:outline-none focus:border-gold-base"
+                    aria-haspopup="dialog"
+                    aria-expanded={isServicePickerOpen}
                   >
-                    {services.map((svc) => (
-                      <option key={svc.id} value={svc.title} className="bg-surface-card">
-                        {svc.title} (R$ {svc.price})
-                      </option>
-                    ))}
-                  </select>
+                    <span className={`text-sm font-semibold truncate ${newServiceTitle ? 'text-content-base' : 'text-content-muted'}`}>{newServiceTitle || 'Selecionar serviço'}</span>
+                    <span className="text-sm font-black finance-positive shrink-0">R$ {newServicePrice.toFixed(2)}</span>
+                  </button>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
-                    Barbeiro
-                  </label>
+                  <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">Barbeiro *</label>
                   <select
+                    id="walk-in-professional"
                     value={newProfessionalId}
                     onChange={(e) => {
                       const id = e.target.value;
@@ -883,47 +929,78 @@ export const WaitingQueue: React.FC = () => {
                       const found = professionals.find((p) => p.id === id);
                       if (found) setNewProfessionalName(found.name);
                     }}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base cursor-pointer"
+                    className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base cursor-pointer"
                   >
-                    {professionals.map((p) => (
-                      <option key={p.id} value={p.id} className="bg-surface-card">
-                        {p.name}
-                      </option>
-                    ))}
+                    {professionals.map((p) => <option key={p.id} value={p.id} className="bg-surface-card">{p.name}</option>)}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
-                  Observações
-                </label>
+                <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">Observações</label>
                 <input
                   type="text"
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
                   placeholder="Ex: Aceitou aguardar 15 min"
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                  className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border-subtle">
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-border-subtle">
                 <button
                   type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-3 py-1.5 rounded-xl bg-surface-card text-content-muted hover:text-content-base font-bold"
+                  onClick={() => { setIsServicePickerOpen(false); setIsAddModalOpen(false); }}
+                  className="min-h-11 px-4 rounded-xl bg-surface-base border border-border-subtle text-content-muted hover:text-content-base font-bold text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingWalkIn}
-                  className="px-4 py-1.5 rounded-xl bg-gold-base text-surface-base font-black shadow disabled:opacity-60 disabled:cursor-wait"
+                  className="min-h-11 px-5 rounded-xl bg-gold-base text-surface-base font-black text-sm shadow disabled:opacity-60 disabled:cursor-wait"
                 >
-                  {isSavingWalkIn ? 'Inserindo…' : 'Inserir na Fila'}
+                  {isSavingWalkIn ? 'Inserindo…' : 'Inserir na fila'}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: SERVICE PICKER */}
+      {isAddModalOpen && isServicePickerOpen && (
+        <div className="fixed inset-0 z-[60] bg-surface-base/85 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-6">
+          <div role="dialog" aria-modal="true" aria-label="Selecionar serviço" className="w-full max-w-2xl max-h-[82dvh] overflow-hidden rounded-t-2xl sm:rounded-2xl bg-surface-card border border-gold-base/30 shadow-2xl animate-fade-in flex flex-col">
+            <div className="p-5 border-b border-border-subtle flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-bold text-content-base">Selecionar serviço</h3>
+                <p className="text-xs text-content-muted mt-0.5">Escolha o serviço para este encaixe.</p>
+              </div>
+              <button type="button" onClick={() => setIsServicePickerOpen(false)} className="w-10 h-10 rounded-xl bg-surface-base border border-border-subtle text-content-muted hover:text-content-base flex items-center justify-center" aria-label="Fechar seleção de serviços"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="p-4 sm:p-5 overflow-y-auto">
+              {services.length === 0 ? (
+                <p className="py-10 text-center text-sm text-content-muted">Nenhum serviço disponível no catálogo.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {services.map((service) => {
+                    const isSelected = service.title === newServiceTitle;
+                    return (
+                      <button
+                        key={service.id}
+                        type="button"
+                        onClick={() => handleSelectWalkInService(service)}
+                        className={`min-h-16 p-3.5 rounded-xl border text-left flex items-center justify-between gap-3 transition-colors ${isSelected ? 'bg-gold-base/10 border-gold-base text-content-base' : 'bg-surface-base border-border-subtle text-content-base hover:border-gold-base/50'}`}
+                      >
+                        <span className="text-sm font-bold leading-snug">{service.title}</span>
+                        <span className="text-sm font-black finance-positive shrink-0">R$ {service.price.toFixed(2)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
