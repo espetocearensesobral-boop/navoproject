@@ -346,7 +346,6 @@ export async function deleteQueueItemInSupabase(id: string): Promise<WaitingQueu
 }
 
 export function subscribeToAppointmentsRealtime(onUpdate: (appointments: Appointment[]) => void) { return () => {}; }
-export async function seedSupabaseDatabase(): Promise<{ success: boolean; message: string }> { return { success: true, message: 'Seeded in server' }; }
 
 export async function fetchProductsFromSupabase(options?: { strict?: boolean }): Promise<ProductItem[]> {
   try {

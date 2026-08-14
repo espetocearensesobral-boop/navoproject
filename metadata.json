@@ -1,6 +1,0 @@
-{
-  "name": "Navo - Barbearia Inteligente",
-  "description": "Plataforma de gestão inteligente para barbearias: agendamentos, equipe, clientes, comissões e métricas financeiras.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

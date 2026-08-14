@@ -1,39 +1,46 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Navo Project
 
-# BarberX App
+Aplicação web da **Navo Premium — Heritage Barber & Club**, com fluxo público de agendamento e painel administrativo para operação da barbearia.
 
-This contains the BarberX application.
+## Stack
 
-## Run Locally
+O projeto utiliza React 19, Vite 6, TypeScript, Express, Drizzle ORM e PostgreSQL/Supabase. A interface é publicada na Vercel; as APIs ficam sob `/api` e usam o banco configurado em `DATABASE_URL`.
 
-**Prerequisites:**  Node.js (v18+)
+## Execução local
 
-1. Install dependencies:
-   `npm install`
-2. Configure `.env.example` / `.env` with the following variables:
-   ```env
-   # API Keys & Secrets
-   GEMINI_API_KEY=your_gemini_api_key
-   JWT_SECRET=your_jwt_secret
-   ENCRYPTION_KEY=your_encryption_key
-   CRON_SECRET=your_cron_secret
+Instale Node.js 20 ou superior e as dependências com o gerenciador definido pelo projeto:
 
-   # Database (PostgreSQL)
-   DATABASE_URL=postgres://user:pass@host:5432/db
-   ```
-3. Run the app:
-   `npm run dev`
+```bash
+pnpm install
+pnpm dev
+```
 
-## Deploying
+Para gerar uma versão de produção local:
 
-Se você for fazer o deploy na Vercel ou outro ambiente Serverless, lembre-se:
-- **Banco de Dados:** Configurar o `DATABASE_URL` conectando a um banco Postgres de verdade (Supabase, Neon, Cloud SQL, etc).
-- **WhatsApp:** A integração do WhatsApp incluída neste repositório suporta disparo de mensagens configurado com os serviços de gateway e fallback seguro.
-- **Pagamentos:** Os botões de pagamento e PIX registram o método escolhido de forma persistente.
+```bash
+pnpm build
+pnpm start
+```
 
-## Database Migrations
-O sistema utiliza Drizzle ORM com migrações automáticas e seed inicial no boot do servidor. Para rodar as migrações manualmente:
-`npx tsx migrate.ts`
+O arquivo `.env.example` lista as variáveis necessárias. Nunca versionar `.env`, credenciais SMTP, chaves JWT, chaves VAPID ou credenciais do banco.
 
+## Banco de dados
+
+As alterações estruturais são versionadas em `drizzle/` e aplicadas pelo comando:
+
+```bash
+pnpm db:migrate
+```
+
+O arquivo [`sql/reset_operacoes.sql`](sql/reset_operacoes.sql) é um procedimento **manual e destrutivo**, fora do fluxo de migrações. Ele limpa registros operacionais sem remover paletas, configurações da unidade, configurações de e-mail, catálogo, profissionais, recompensas ou contas de acesso. Revise o arquivo e faça um backup antes de executá-lo no Supabase.
+
+## Verificações
+
+Antes de publicar alterações, execute:
+
+```bash
+pnpm lint
+pnpm build:vercel
+```
+
+O build da Vercel usa `npm run build:vercel`, conforme `vercel.json`. O `package-lock.json` é mantido para garantir compatibilidade com o ambiente de instalação da Vercel; o `pnpm-lock.yaml` permanece como lockfile de desenvolvimento.

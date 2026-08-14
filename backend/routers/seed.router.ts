@@ -1,8 +1,7 @@
 import express from 'express';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { db } from '../index.js';
-import { getTodayStringBRT, handleError } from '../utils/index.js';
-import { JWT_SECRET } from '../config/env.js';
+import { handleError } from '../utils/index.js';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import * as schema from '../../src/db/schema.js';
@@ -23,8 +22,6 @@ async function seedDatabase() {
   }
   const defaultPasswordHash = await bcrypt.hash(seedClientPassword, 10);
   const adminPasswordHash = await bcrypt.hash(seedAdminPassword, 10);
-  const todayStr = getTodayStringBRT();
-
   const seedProfiles = [
     {
       id: 'admin_1',
@@ -181,46 +178,8 @@ async function seedDatabase() {
     await db.insert(schema.rewards).values(r).onConflictDoNothing();
   }
 
-
-  const seedTransactions = [
-    {
-      id: 'tx_1',
-      type: 'income',
-      description: 'Corte + Barba',
-      amount: '85.00',
-      category: 'Serviço',
-      paymentMethod: 'Pix',
-      date: todayStr,
-      status: 'completed',
-      professionalName: 'Carlos Silva',
-    },
-    {
-      id: 'tx_2',
-      type: 'income',
-      description: 'Venda: Pomada Matte',
-      amount: '45.90',
-      category: 'Produto',
-      paymentMethod: 'Crédito',
-      date: todayStr,
-      status: 'completed',
-      professionalName: 'Recepção',
-    },
-    {
-      id: 'tx_3',
-      type: 'expense',
-      description: 'Compra Insumos (Lâminas)',
-      amount: '120.00',
-      category: 'Suprimentos',
-      paymentMethod: 'Débito',
-      date: todayStr,
-      status: 'completed',
-      notes: 'Nota fiscal anexada'
-    }
-  ];
-
-  for (const tx of seedTransactions) {
-    await db.insert(schema.cashTransactions).values(tx).onConflictDoNothing();
-  }
+  // O seed não cria lançamentos financeiros. Receitas só podem nascer da
+  // confirmação do checkout e despesas devem ser registradas pelo Admin.
 
   const defaultShopSettings = {
     id: 'default',
@@ -256,7 +215,6 @@ async function seedDatabase() {
     services: seedServices.length,
     products: seedProducts.length,
     rewards: seedRewards.length,
-    transactions: seedTransactions.length,
   };
 }
 
