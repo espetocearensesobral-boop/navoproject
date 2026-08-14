@@ -427,7 +427,7 @@ export const ScheduleGrid: React.FC = () => {
                                 <span className="font-extrabold finance-positive text-base shrink-0">R$ {apt.final_amount ? Number(apt.final_amount).toFixed(2) : '60.00'}</span>
                               </div>
                               <div className="flex justify-between items-start gap-3 text-sm text-content-muted">
-                                <span className="min-w-0 leading-relaxed">{(apt.services && apt.services[0]?.title) || 'Atendimento'} • <strong className="text-gold-base">{barber.name}</strong></span>
+                                <span className="min-w-0 leading-relaxed">{(apt.services && apt.services[0]?.title) || 'Atendimento'}</span>
                                 <div className="flex flex-col items-end gap-1 shrink-0">
                                   {operationalState.remainingMinutes > 0 && (
                                     <span className="inline-flex items-center gap-1 text-[9px] font-bold text-status-info bg-status-info/10 border border-status-info/20 px-2 py-0.5 rounded-full whitespace-nowrap">
@@ -447,6 +447,10 @@ export const ScheduleGrid: React.FC = () => {
                                     {isPending ? 'Requer Aprovação' : getAppointmentStatusLabel(apt.status)}
                                   </span>
                                 </div>
+                              </div>
+                              <div className="mt-2 pt-2 border-t border-border-subtle/70 flex items-center justify-between gap-2 text-[10px]">
+                                <span className="font-bold uppercase tracking-wide text-content-muted">Barbeiro</span>
+                                <span className="font-bold text-gold-base truncate">{barber.name}</span>
                               </div>
 
                               {isPending && (
