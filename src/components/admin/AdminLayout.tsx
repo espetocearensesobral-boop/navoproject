@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { usePullToRefresh } from '../../hooks/usePullToRefresh';
 import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
 import { NavoHomeView } from './NavoHomeView';
+import { OperationalReportsManagement } from './OperationalReportsManagement';
 import { ScheduleGrid } from './ScheduleGrid';
 import { FinanceiroManagement } from './FinanceiroManagement';
 import { AuditLogsManagement } from './AuditLogsManagement';
@@ -48,6 +49,7 @@ import {
 
 export type AdminTab = 
   | 'dashboard' 
+  | 'relatorios'
   | 'agenda' 
   | 'financeiro'
   | 'audit'
@@ -66,7 +68,7 @@ export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionam
 
 const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
 const ADMIN_TAB_VALUES: AdminTab[] = [
-  'dashboard', 'agenda', 'financeiro', 'audit', 'whatsapp', 'qrcode', 'queue',
+  'dashboard', 'relatorios', 'agenda', 'financeiro', 'audit', 'whatsapp', 'qrcode', 'queue',
   'rewards', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings'
 ];
 
@@ -84,6 +86,7 @@ const getStoredAdminTab = (): AdminTab => {
 
 const ADMIN_TAB_SECTIONS: Partial<Record<AdminTab, AdminSection>> = {
   dashboard: 'operacao',
+  relatorios: 'operacao',
   agenda: 'operacao',
   queue: 'operacao',
   financeiro: 'financeiro',
@@ -246,7 +249,14 @@ export const AdminLayout: React.FC = () => {
       section: 'operacao' as AdminSection,
     },
     { 
-      id: 'agenda' as AdminTab, 
+      id: 'relatorios' as AdminTab,
+      label: 'Relatórios',
+      icon: FileText,
+      description: 'Visão geral da operação',
+      section: 'operacao' as AdminSection,
+    },
+    {
+      id: 'agenda' as AdminTab,
       label: 'Agenda', 
       icon: Calendar,
       description: 'Gerenciar horários',
@@ -403,6 +413,8 @@ export const AdminLayout: React.FC = () => {
     switch (activeTab) {
       case 'dashboard':
         return <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />;
+      case 'relatorios':
+        return <OperationalReportsManagement />;
       case 'financeiro':
         return <FinanceiroManagement />;
       case 'audit':

@@ -650,6 +650,58 @@ export async function fetchFinancialReportFromSupabase(period: FinancialPeriod, 
   }
 }
 
+export type OperationalReportPeriod = 'today' | 'week' | 'month' | 'quarter';
+
+export interface OperationalReportData {
+  period: { id: OperationalReportPeriod; from: string; to: string; label: string; days: number };
+  summary: {
+    appointments: number;
+    activeAppointments: number;
+    completedAppointments: number;
+    cancelledAppointments: number;
+    noShowAppointments: number;
+    completionRate: number;
+    cancellationRate: number;
+    todayAppointments: number;
+    todayActiveAppointments: number;
+    currentQueue: number;
+    currentWaiting: number;
+    currentInChair: number;
+    pendingReceipts: number;
+    pendingAmount: number;
+    serviceRevenue: number;
+    otherIncome: number;
+    totalIncome: number;
+    totalExpenses: number;
+    netResult: number;
+    averageTicket: number;
+  };
+  peakHour: { hour: string; label: string; count: number } | null;
+  topHours: { hour: string; label: string; count: number }[];
+  topServices: { serviceTitle: string; count: number; completedCount: number; revenue: number }[];
+  topProfessionals: { professionalName: string; appointments: number; completed: number; revenue: number }[];
+  weeklyMovement: { weekday: number; label: string; appointments: number; completed: number; revenue: number }[];
+  dailyMovement: { date: string; label: string; appointments: number; completed: number; cancelled: number; revenue: number }[];
+  queueSummary: { status: string; count: number }[];
+  upcomingAppointments: { id: string; clientName: string; professionalName: string; serviceTitle: string; timeSlot: string; status: string; finalAmount: number }[];
+}
+
+export async function fetchOperationalReportFromSupabase(period: OperationalReportPeriod, options?: { strict?: boolean }): Promise<OperationalReportData | null> {
+  try {
+    const res = await authFetch(`${API_BASE}/operational-reports?period=${period}`);
+    if (!res.ok) {
+      const error = new Error(`Falha ao carregar dashboard operacional (${res.status}).`);
+      if (options?.strict) throw error;
+      return null;
+    }
+    return await res.json() as OperationalReportData;
+  } catch (error) {
+    console.error('Erro ao buscar dashboard operacional:', error);
+    if (options?.strict) throw error;
+    return null;
+  }
+}
+
 export type ReceiptStatus = 'pending' | 'received' | 'cancelled';
 export type ReceiptPaymentMethod = 'pix' | 'credit_card' | 'debit_card' | 'cash' | 'other';
 
