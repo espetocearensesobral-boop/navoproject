@@ -539,9 +539,9 @@ export interface CashTransactionItem {
   description: string;
   amount: number;
   category: string;
-  paymentMethod: 'pix' | 'credit_card' | 'debit_card' | 'cash';
+  paymentMethod: 'pix' | 'credit_card' | 'debit_card' | 'cash' | 'other' | string;
   date: string;
-  status: 'completed' | 'pending';
+  status: 'completed' | 'pending' | 'cancelled';
   professionalName?: string;
   notes?: string;
 }
@@ -561,9 +561,9 @@ export async function fetchCashTransactionsFromSupabase(options?: { strict?: boo
       description: t.description,
       amount: Number(t.amount),
       category: t.category,
-      paymentMethod: t.paymentMethod || t.payment_method,
+      paymentMethod: t.paymentMethod || t.payment_method || 'other',
       date: t.date,
-      status: t.status,
+      status: t.status || 'completed',
       professionalName: t.professionalName || t.professional_name,
       notes: t.notes
     })) : [];
@@ -604,6 +604,50 @@ export async function saveCashTransactionInSupabase(tx: CashTransactionItem, isU
 export async function deleteCashTransactionInSupabase(id: string): Promise<CashTransactionItem[]> {
   await authFetch(`${API_BASE}/cash-transactions/${id}`, { method: 'DELETE' });
   return fetchCashTransactionsFromSupabase();
+}
+
+export type FinancialPeriod = 'today' | 'week' | 'month' | 'quarter' | 'year';
+
+export interface FinancialReportData {
+  period: { id: FinancialPeriod; from: string; to: string; label: string };
+  summary: {
+    totalIncome: number;
+    totalExpenses: number;
+    netResult: number;
+    serviceRevenue: number;
+    otherIncome: number;
+    ticketAverage: number;
+    receivedCount: number;
+    pendingCount: number;
+    pendingAmount: number;
+    expenseCount: number;
+    incomeCount: number;
+    clientCount: number;
+    returningClientCount: number;
+    retentionRate: number;
+  };
+  services: { serviceTitle: string; count: number; revenue: number; averageTicket: number }[];
+  clients: { clientName: string; clientPhone: string | null; visits: number; totalSpent: number; lastReceivedAt: string | null }[];
+  professionals: { professionalName: string; servicesCount: number; revenue: number; commissionRate: number; commissionAmount: number }[];
+  paymentMethods: { method: string; total: number; count: number }[];
+  expenseCategories: { category: string; total: number; count: number }[];
+  dailyCashFlow: { date: string; income: number; expense: number; net: number }[];
+}
+
+export async function fetchFinancialReportFromSupabase(period: FinancialPeriod, options?: { strict?: boolean }): Promise<FinancialReportData | null> {
+  try {
+    const res = await authFetch(`${API_BASE}/financial-reports?period=${period}`);
+    if (!res.ok) {
+      const error = new Error(`Falha ao carregar relatório financeiro (${res.status}).`);
+      if (options?.strict) throw error;
+      return null;
+    }
+    return await res.json() as FinancialReportData;
+  } catch (error) {
+    console.error('Erro ao buscar relatório financeiro:', error);
+    if (options?.strict) throw error;
+    return null;
+  }
 }
 
 export type ReceiptStatus = 'pending' | 'received' | 'cancelled';

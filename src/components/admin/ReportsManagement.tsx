@@ -1,439 +1,185 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  fetchAppointmentsFromSupabase, 
-  fetchServicesFromSupabase, 
-  fetchProfessionalsFromSupabase 
-} from '../../services/supabaseDataService';
-import { Appointment, ServiceItem, Professional } from '../../types';
-import { 
-  BarChart3, 
-  Scissors, 
-  Users, 
-  UserCheck, 
-  TrendingUp, 
-  Calendar, 
-  Download, 
-  Printer, 
-  Sparkles, 
-  PieChart, 
-  DollarSign, 
-  Filter, 
-  Award, 
-  Clock, 
-  ArrowUpRight, 
+import React, { useEffect, useMemo, useState } from 'react';
+import {
   ArrowDownRight,
-  AlertCircle
+  ArrowUpRight,
+  BarChart3,
+  CalendarRange,
+  CreditCard,
+  Download,
+  Loader2,
+  PieChart,
+  RefreshCw,
+  Scissors,
+  TrendingDown,
+  TrendingUp,
+  UserRound,
+  Users,
+  WalletCards,
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
+import {
+  fetchFinancialReportFromSupabase,
+  type FinancialPeriod,
+  type FinancialReportData,
+} from '../../services/supabaseDataService';
+
+const money = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+
+const periodOptions: { id: FinancialPeriod; label: string }[] = [
+  { id: 'today', label: 'Hoje' },
+  { id: 'week', label: '7 dias' },
+  { id: 'month', label: 'Mês' },
+  { id: 'quarter', label: '90 dias' },
+  { id: 'year', label: 'Ano' },
+];
+
+const paymentLabel: Record<string, string> = {
+  pix: 'PIX',
+  credit_card: 'Crédito',
+  debit_card: 'Débito',
+  cash: 'Dinheiro',
+  other: 'Outro',
+};
+
+type ReportTab = 'visao' | 'receitas' | 'despesas' | 'operacao';
 
 export const ReportsManagement: React.FC = () => {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [services, setServices] = useState<ServiceItem[]>([]);
-  const [professionals, setProfessionals] = useState<Professional[]>([]);
+  const [period, setPeriod] = useState<FinancialPeriod>('month');
+  const [tab, setTab] = useState<ReportTab>('visao');
+  const [report, setReport] = useState<FinancialReportData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Active Sub-tab & Period Filter
-  const [activeReportTab, setActiveReportTab] = useState<'services' | 'clients' | 'professionals'>('services');
-  const [periodFilter, setPeriodFilter] = useState<'today' | 'week' | 'month' | 'quarter' | 'year'>('month');
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadReport = async (selectedPeriod = period) => {
     setLoading(true);
+    setError(null);
     try {
-      const [apts, svcs, profs] = await Promise.all([
-        fetchAppointmentsFromSupabase().catch(() => []),
-        fetchServicesFromSupabase().catch(() => []),
-        fetchProfessionalsFromSupabase().catch(() => [])
-      ]);
-      setAppointments(apts);
-      setServices(svcs);
-      setProfessionals(profs);
-    } catch (e) {
-      console.error('Erro ao carregar dados dos relatórios:', e);
+      const data = await fetchFinancialReportFromSupabase(selectedPeriod, { strict: true });
+      setReport(data);
+    } catch (requestError) {
+      setReport(null);
+      setError(requestError instanceof Error ? requestError.message : 'Não foi possível carregar os relatórios financeiros.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter appointments by selected period
-  const getFilteredAppointments = () => {
-    const now = new Date();
-    return appointments.filter(apt => {
-      if (apt.status === 'cancelled') return false;
-      const aptDate = new Date(apt.date || Date.now());
-      
-      if (periodFilter === 'today') {
-        return aptDate.toDateString() === now.toDateString();
-      }
-      if (periodFilter === 'week') {
-        const oneWeekAgo = new Date(now.getTime() - 7 * 86400000);
-        return aptDate >= oneWeekAgo;
-      }
-      if (periodFilter === 'month') {
-        return aptDate.getMonth() === now.getMonth() && aptDate.getFullYear() === now.getFullYear();
-      }
-      if (periodFilter === 'quarter') {
-        const threeMonthsAgo = new Date(now.getTime() - 90 * 86400000);
-        return aptDate >= threeMonthsAgo;
-      }
-      return true; // year / all
-    });
+  useEffect(() => {
+    loadReport(period);
+  }, [period]);
+
+  useEffect(() => {
+    const refresh = () => loadReport(period);
+    window.addEventListener('adminRefresh', refresh);
+    return () => window.removeEventListener('adminRefresh', refresh);
+  }, [period]);
+
+  const maxDaily = useMemo(() => Math.max(1, ...(report?.dailyCashFlow.map((item) => Math.max(item.income, item.expense)) || [1])), [report]);
+
+  const exportCsv = () => {
+    if (!report) return;
+    const rows = [
+      ['Relatório financeiro', report.period.label],
+      ['Período', `${report.period.from} até ${report.period.to}`],
+      [],
+      ['Resumo', 'Valor'],
+      ['Entradas confirmadas', report.summary.totalIncome.toFixed(2)],
+      ['Saídas confirmadas', report.summary.totalExpenses.toFixed(2)],
+      ['Resultado líquido', report.summary.netResult.toFixed(2)],
+      ['Recebimentos pendentes', report.summary.pendingAmount.toFixed(2)],
+      [],
+      ['Serviço', 'Execuções', 'Receita'],
+      ...report.services.map((item) => [item.serviceTitle, String(item.count), item.revenue.toFixed(2)]),
+      [],
+      ['Categoria de saída', 'Lançamentos', 'Total'],
+      ...report.expenseCategories.map((item) => [item.category, String(item.count), item.total.toFixed(2)]),
+    ].map((row) => row.map((value) => `"${String(value ?? '').replaceAll('"', '""')}"`).join(',')).join('\n');
+    const blob = new Blob([rows], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `relatorio_financeiro_${report.period.from}_${report.period.to}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
-  const activeAppointments = getFilteredAppointments();
-
-  // --- REPORT 1: SERVICES ANALYSIS ---
-  const getServiceStats = () => {
-    const map: Record<string, { title: string; count: number; totalRevenue: number }> = {};
-
-    activeAppointments.forEach(apt => {
-      const title = apt.services?.[0]?.title || 'Serviço Padrão';
-      const rev = apt.final_amount || apt.original_amount || 60;
-
-      if (!map[title]) {
-        map[title] = { title, count: 0, totalRevenue: 0 };
-      }
-      map[title].count += 1;
-      map[title].totalRevenue += rev;
-    });
-
-    return Object.values(map).sort((a, b) => b.totalRevenue - a.totalRevenue);
-  };
-
-  // --- REPORT 2: CLIENTS ANALYSIS ---
-  const getClientStats = () => {
-    const map: Record<string, { name: string; phone?: string; visits: number; totalSpent: number; lastVisit: string }> = {};
-
-    activeAppointments.forEach(apt => {
-      const key = apt.client_phone || apt.client_name;
-      const rev = apt.final_amount || apt.original_amount || 60;
-      const d = apt.date || new Date().toISOString().split('T')[0];
-
-      if (!map[key]) {
-        map[key] = { name: apt.client_name, phone: apt.client_phone, visits: 0, totalSpent: 0, lastVisit: d };
-      }
-      map[key].visits += 1;
-      map[key].totalSpent += rev;
-      if (d > map[key].lastVisit) {
-        map[key].lastVisit = d;
-      }
-    });
-
-    const clientList = Object.values(map).sort((a, b) => b.totalSpent - a.totalSpent);
-    const totalClientsCount = clientList.length;
-    const returningClients = clientList.filter(c => c.visits > 1).length;
-    const retentionRate = totalClientsCount > 0 ? ((returningClients / totalClientsCount) * 100).toFixed(1) : '0';
-
-    return { clientList, totalClientsCount, returningClients, retentionRate };
-  };
-
-  // --- REPORT 3: PROFESSIONALS ANALYSIS ---
-  const getProfessionalStats = () => {
-    const map: Record<string, { name: string; servicesCount: number; totalGross: number; commissionRate: number; totalCommission: number; rating: number }> = {};
-
-    // Initialize map from registered professionals
-    professionals.forEach(p => {
-      map[p.name] = {
-        name: p.name,
-        servicesCount: 0,
-        totalGross: 0,
-        commissionRate: p.commission_rate || 50,
-        totalCommission: 0,
-        rating: p.rating || 5.0
-      };
-    });
-
-    activeAppointments.forEach(apt => {
-      const name = apt.professional_name || 'Geral';
-      const rev = apt.final_amount || apt.original_amount || 60;
-
-      if (!map[name]) {
-        map[name] = {
-          name,
-          servicesCount: 0,
-          totalGross: 0,
-          commissionRate: 50,
-          totalCommission: 0,
-          rating: 4.9
-        };
-      }
-      map[name].servicesCount += 1;
-      map[name].totalGross += rev;
-      map[name].totalCommission += (rev * (map[name].commissionRate / 100));
-    });
-
-    return Object.values(map).sort((a, b) => b.totalGross - a.totalGross);
-  };
-
-  const serviceStats = getServiceStats();
-  const { clientList, totalClientsCount, returningClients, retentionRate } = getClientStats();
-  const professionalStats = getProfessionalStats();
-
-  const totalPeriodRevenue = activeAppointments.reduce((acc, a) => acc + (a.final_amount || a.original_amount || 60), 0);
-  const totalPeriodServices = activeAppointments.length;
-  const avgTicket = totalPeriodServices > 0 ? (totalPeriodRevenue / totalPeriodServices) : 0;
+  const summary = report?.summary;
 
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
-      {/* Header (desktop) */}
       <AdminPageHeader
         icon={BarChart3}
-        title="Relatórios & Desempenho"
-      >
-        <div className="flex items-center gap-1 bg-surface-base p-1 rounded-xl border border-border-subtle shrink-0">
-          {[
-            { id: 'today', label: 'Hoje' },
-            { id: 'week', label: 'Semana' },
-            { id: 'month', label: 'Mês' },
-            { id: 'quarter', label: '90 Dias' },
-            { id: 'year', label: 'Ano' }
-          ].map(p => (
-            <button
-              key={p.id}
-              onClick={() => setPeriodFilter(p.id as any)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                periodFilter === p.id
-                  ? 'bg-gold-base text-surface-base shadow-xs'
-                  : 'text-content-muted hover:text-content-base'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-      </AdminPageHeader>
-
-      {/* Ações (mobile) */}
-      <div className="md:hidden w-full flex items-center gap-1 bg-surface-base p-1 rounded-xl border border-border-subtle overflow-x-auto no-scrollbar">
-        {[
-          { id: 'today', label: 'Hoje' },
-          { id: 'week', label: 'Semana' },
-          { id: 'month', label: 'Mês' },
-          { id: 'quarter', label: '90 Dias' },
-          { id: 'year', label: 'Ano' }
-        ].map(p => (
-          <button
-            key={p.id}
-            onClick={() => setPeriodFilter(p.id as any)}
-            className={`px-3 py-2 rounded-lg text-xs font-bold transition-all shrink-0 whitespace-nowrap ${
-              periodFilter === p.id
-                ? 'bg-gold-base text-surface-base shadow-xs'
-                : 'text-content-muted hover:text-content-base'
-            }`}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Overview Metrics Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Faturamento</span>
-            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0">
-              <DollarSign className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalPeriodRevenue.toFixed(2)}</p>
-          <p className="text-[9px] text-status-success mt-1 font-medium truncate">{totalPeriodServices} atendimentos</p>
-        </div>
-
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Ticket Médio</span>
-            <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle flex items-center justify-center shrink-0">
-              <Award className="w-3.5 h-3.5 text-gold-base" />
-            </div>
-          </div>
-          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {avgTicket.toFixed(2)}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Por cliente atendido</p>
-        </div>
-
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Retenção</span>
-            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
-              <UserCheck className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-black text-status-success tabular-nums">{retentionRate}%</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{returningClients} de {totalClientsCount} clientes</p>
-        </div>
-      </div>
-
-      {/* Report Type Selector Tabs */}
-      <AdminTabs
-        tabs={[
-          { id: 'services', label: 'Relatório por Serviço', icon: Scissors },
-          { id: 'clients', label: 'Relatório por Cliente', icon: UserCheck },
-          { id: 'professionals', label: 'Relatório por Profissional', icon: Users },
-        ]}
-        activeId={activeReportTab}
-        onChange={(id) => setActiveReportTab(id as typeof activeReportTab)}
+        title="Relatórios financeiros"
+        stats={report ? [
+          { label: report.period.label.toLowerCase(), value: `${report.summary.incomeCount} entradas`, tone: 'neutral' },
+          { label: 'pendente', value: money(report.summary.pendingAmount), tone: report.summary.pendingAmount > 0 ? 'warning' : 'muted' },
+        ] : undefined}
+        action={{ label: 'Exportar CSV', onClick: exportCsv, icon: Download, disabled: !report || loading }}
       />
 
-      {/* SECTION 1: SERVICES REPORT */}
-      {activeReportTab === 'services' && (
-        <div className="space-y-4">
-          <div className="bg-surface-card border border-border-subtle rounded-2xl p-5 shadow-xs">
-            <h3 className="text-sm font-bold text-content-base mb-3 flex items-center gap-2">
-              <Scissors className="w-4 h-4 text-gold-base" />
-              <span>Ranking de Serviços Mais Rentáveis</span>
-            </h3>
-
-            {serviceStats.length === 0 ? (
-              <p className="text-xs text-content-muted py-4 text-center">
-                Sem registros de atendimento no período selecionado.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {serviceStats.map((item, idx) => {
-                  const sharePct = totalPeriodRevenue > 0 ? ((item.totalRevenue / totalPeriodRevenue) * 100).toFixed(1) : '0';
-                  return (
-                    <div key={idx} className="bg-surface-base p-3.5 rounded-xl border border-border-subtle space-y-2">
-                      <div className="flex justify-between items-center text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-gold-base/15 text-gold-base text-[10px] font-bold flex items-center justify-center">
-                            #{idx + 1}
-                          </span>
-                          <span className="font-bold text-content-base">{item.title}</span>
-                          <span className="text-[10px] text-content-muted font-bold bg-surface-card px-2 py-0.5 rounded-xl border border-border-subtle">
-                            {item.count} execuções
-                          </span>
-                        </div>
-                        <span className="font-bold finance-positive tabular-nums">
-                          R$ {item.totalRevenue.toFixed(2)} ({sharePct}%)
-                        </span>
-                      </div>
-
-                      {/* Progress Bar */}
-                      <div className="w-full h-1.5 bg-surface-card rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gold-base rounded-full transition-all duration-500"
-                          style={{ width: `${Math.min(100, Number(sharePct))}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="admin-category-scroll flex gap-2 overflow-x-auto no-scrollbar pb-1" data-gesture-scroll="horizontal">
+          {periodOptions.map((option) => <button key={option.id} type="button" onClick={() => setPeriod(option.id)} className={`shrink-0 h-10 px-4 rounded-full text-sm font-bold transition-colors ${period === option.id ? 'bg-gold-base text-surface-base' : 'bg-surface-card border border-border-subtle text-content-muted hover:text-content-base'}`}>{option.label}</button>)}
         </div>
-      )}
+        <button type="button" onClick={() => loadReport()} className="h-10 px-4 rounded-xl border border-border-subtle bg-surface-card text-sm font-bold text-content-muted hover:text-content-base flex items-center justify-center gap-2"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />Atualizar</button>
+      </div>
 
-      {/* SECTION 2: CLIENTS REPORT */}
-      {activeReportTab === 'clients' && (
-        <div className="space-y-4">
-          <div className="bg-surface-card border border-border-subtle rounded-2xl p-5 shadow-xs">
-            <h3 className="text-sm font-bold text-content-base mb-3 flex items-center gap-2">
-              <UserCheck className="w-4 h-4 text-gold-base" />
-              <span>Maiores Clientes em Faturamento (LTV)</span>
-            </h3>
+      {error && <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">{error}</div>}
 
-            {clientList.length === 0 ? (
-              <p className="text-xs text-content-muted py-4 text-center">
-                Nenhum histórico de cliente para o período selecionado.
-              </p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs min-w-[600px]">
-                  <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
-                    <tr className="whitespace-nowrap">
-                      <th className="p-3">Posição</th>
-                      <th className="p-3">Cliente</th>
-                      <th className="p-3 text-center">Visitas</th>
-                      <th className="p-3">Última Visita</th>
-                      <th className="p-3 text-right">Total Investido</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border-subtle/60 text-content-base">
-                    {clientList.slice(0, 15).map((c, i) => (
-                      <tr key={i} className="hover:bg-surface-base/50 transition-colors">
-                        <td className="p-3 font-bold text-gold-base">#{i + 1}</td>
-                        <td className="p-3 font-semibold">
-                          {c.name}
-                          {c.phone && <span className="text-[10px] text-content-muted block font-mono">{c.phone}</span>}
-                        </td>
-                        <td className="p-3 text-center font-bold">{c.visits}x</td>
-                        <td className="p-3 text-content-muted">{new Date(c.lastVisit).toLocaleDateString('pt-BR')}</td>
-                        <td className="p-3 text-right font-bold finance-positive tabular-nums">
-                          R$ {c.totalSpent.toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+      {loading && !report ? <div className="bg-surface-card border border-border-subtle rounded-xl p-12 text-center text-content-muted"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Carregando os dados persistidos…</div> : report && summary && <>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <MetricCard label="Entradas" value={money(summary.totalIncome)} detail={`${summary.incomeCount} lançamento${summary.incomeCount === 1 ? '' : 's'} confirmado${summary.incomeCount === 1 ? '' : 's'}`} icon={ArrowUpRight} tone="positive" />
+          <MetricCard label="Saídas" value={money(summary.totalExpenses)} detail={`${summary.expenseCount} despesa${summary.expenseCount === 1 ? '' : 's'} registrada${summary.expenseCount === 1 ? '' : 's'}`} icon={ArrowDownRight} tone="negative" />
+          <MetricCard label="Resultado líquido" value={money(summary.netResult)} detail="Entradas menos saídas" icon={summary.netResult >= 0 ? TrendingUp : TrendingDown} tone={summary.netResult >= 0 ? 'positive' : 'negative'} />
+          <MetricCard label="A receber" value={money(summary.pendingAmount)} detail={`${summary.pendingCount} recebimento${summary.pendingCount === 1 ? '' : 's'} pendente${summary.pendingCount === 1 ? '' : 's'}`} icon={WalletCards} tone={summary.pendingAmount > 0 ? 'warning' : 'neutral'} />
         </div>
-      )}
 
-      {/* SECTION 3: PROFESSIONALS REPORT */}
-      {activeReportTab === 'professionals' && (
-        <div className="space-y-4">
-          <div className="bg-surface-card border border-border-subtle rounded-2xl p-5 shadow-xs">
-            <h3 className="text-sm font-bold text-content-base mb-3 flex items-center gap-2">
-              <Award className="w-4 h-4 text-gold-base" />
-              <span>Desempenho & Comissões dos Barbeiros</span>
-            </h3>
+        <AdminTabs
+          tabs={[
+            { id: 'visao', label: 'Visão geral', icon: PieChart },
+            { id: 'receitas', label: 'Receitas', icon: ArrowUpRight },
+            { id: 'despesas', label: 'Despesas', icon: ArrowDownRight },
+            { id: 'operacao', label: 'Clientes & equipe', icon: Users },
+          ]}
+          activeId={tab}
+          onChange={(id) => setTab(id as ReportTab)}
+        />
 
-            {professionalStats.length === 0 ? (
-              <p className="text-xs text-content-muted py-4 text-center">
-                Nenhum barbeiro cadastrado ou sem atendimentos no período.
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {professionalStats.map((prof, i) => (
-                  <div key={i} className="bg-surface-base border border-border-subtle rounded-xl p-4 space-y-3">
-                    <div className="flex items-center justify-between border-b border-border-subtle/60 pb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center">
-                          {prof.name.substring(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-xs text-content-base">{prof.name}</h4>
-                          <span className="text-[10px] text-content-muted font-semibold">
-                            Comissão: {prof.commissionRate}%
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-bold text-gold-base bg-gold-base/10 px-2 py-0.5 rounded-xl">
-                        ★ {prof.rating.toFixed(1)}
-                      </span>
-                    </div>
+        {tab === 'visao' && <div className="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-4">
+          <section className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5"><div className="flex items-start justify-between gap-3"><div><h2 className="text-base font-serif font-bold text-content-base">Fluxo do período</h2><p className="mt-1 text-sm text-content-muted">Entradas e saídas registradas no livro-caixa por dia.</p></div><CalendarRange className="w-5 h-5 text-gold-base shrink-0" /></div>{report.dailyCashFlow.length === 0 ? <EmptyState text="Não há lançamentos confirmados neste período." /> : <div className="mt-6 h-52 flex items-end gap-2 sm:gap-3">{report.dailyCashFlow.map((day) => <div key={day.date} className="flex-1 min-w-0 h-full flex flex-col justify-end items-center gap-1.5 group"><div className="w-full flex justify-center items-end gap-1 h-[calc(100%-1.75rem)]"><span title={`Entradas: ${money(day.income)}`} className="w-[42%] max-w-5 bg-status-success/75 rounded-t-md transition-all" style={{ height: `${Math.max(day.income ? 5 : 0, (day.income / maxDaily) * 100)}%` }} /><span title={`Saídas: ${money(day.expense)}`} className="w-[42%] max-w-5 bg-status-error/70 rounded-t-md transition-all" style={{ height: `${Math.max(day.expense ? 5 : 0, (day.expense / maxDaily) * 100)}%` }} /></div><span className="text-[10px] font-mono text-content-muted whitespace-nowrap">{day.date.slice(8, 10)}/{day.date.slice(5, 7)}</span></div>)}</div>}<div className="mt-4 flex flex-wrap gap-4 text-xs text-content-muted"><span className="flex items-center gap-1.5"><i className="w-2.5 h-2.5 rounded-sm bg-status-success/75" />Entradas</span><span className="flex items-center gap-1.5"><i className="w-2.5 h-2.5 rounded-sm bg-status-error/70" />Saídas</span></div></section>
+          <section className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5"><h2 className="text-base font-serif font-bold text-content-base">Composição das entradas</h2><p className="mt-1 text-sm text-content-muted">Apenas valores recebidos e confirmados.</p><div className="mt-5 space-y-3"><InfoRow label="Serviços recebidos" value={money(summary.serviceRevenue)} tone="positive" /><InfoRow label="Outras entradas" value={money(summary.otherIncome)} tone="positive" /><InfoRow label="Ticket médio real" value={money(summary.ticketAverage)} tone="positive" /><div className="pt-3 mt-3 border-t border-border-subtle"><InfoRow label="Recebimentos concluídos" value={`${summary.receivedCount}`} /></div></div></section>
+        </div>}
 
-                    <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                      <div className="bg-surface-card p-2 rounded-lg border border-border-subtle/60">
-                        <span className="text-[9px] text-content-muted uppercase font-bold block">Atendimentos</span>
-                        <span className="font-bold text-content-base mt-0.5 block">{prof.servicesCount}</span>
-                      </div>
-                      <div className="bg-surface-card p-2 rounded-lg border border-border-subtle/60">
-                        <span className="text-[9px] text-content-muted uppercase font-bold block">Gerado Bruto</span>
-                        <span className="font-bold finance-positive mt-0.5 block tabular-nums">
-                          R$ {prof.totalGross.toFixed(0)}
-                        </span>
-                      </div>
-                      <div className="bg-surface-card p-2 rounded-lg border border-border-subtle/60">
-                        <span className="text-[9px] text-content-muted uppercase font-bold block">Comissão R$</span>
-                        <span className="font-bold finance-negative mt-0.5 block tabular-nums">
-                          R$ {prof.totalCommission.toFixed(0)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+        {tab === 'receitas' && <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <section className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5"><SectionTitle icon={Scissors} title="Serviços recebidos" description="Ranking baseado exclusivamente em pagamentos confirmados." />{report.services.length === 0 ? <EmptyState text="Nenhum recebimento de serviço confirmado no período." /> : <div className="mt-4 space-y-3">{report.services.map((service, index) => <RankRow key={service.serviceTitle} position={index + 1} title={service.serviceTitle} subtitle={`${service.count} atendimento${service.count === 1 ? '' : 's'} · ticket ${money(service.averageTicket)}`} value={money(service.revenue)} percentage={summary.serviceRevenue ? (service.revenue / summary.serviceRevenue) * 100 : 0} />)}</div>}</section>
+          <section className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5"><SectionTitle icon={CreditCard} title="Formas de pagamento" description="Distribuição dos recebimentos confirmados." />{report.paymentMethods.length === 0 ? <EmptyState text="Nenhuma forma de pagamento registrada no período." /> : <div className="mt-4 space-y-3">{report.paymentMethods.map((method) => <RankRow key={method.method} position={null} title={paymentLabel[method.method] || method.method} subtitle={`${method.count} pagamento${method.count === 1 ? '' : 's'}`} value={money(method.total)} percentage={summary.serviceRevenue ? (method.total / summary.serviceRevenue) * 100 : 0} />)}</div>}</section>
+        </div>}
+
+        {tab === 'despesas' && <div className="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-4">
+          <section className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5"><SectionTitle icon={ArrowDownRight} title="Saídas por categoria" description="Todas as despesas vêm de lançamentos persistidos no Extrato real." />{report.expenseCategories.length === 0 ? <EmptyState text="Nenhuma saída registrada no período." /> : <div className="mt-4 space-y-3">{report.expenseCategories.map((expense, index) => <RankRow key={expense.category} position={index + 1} title={expense.category} subtitle={`${expense.count} lançamento${expense.count === 1 ? '' : 's'}`} value={`- ${money(expense.total)}`} valueTone="negative" percentage={summary.totalExpenses ? (expense.total / summary.totalExpenses) * 100 : 0} />)}</div>}</section>
+          <section className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5"><h2 className="text-base font-serif font-bold text-content-base">Leitura do resultado</h2><p className="mt-1 text-sm text-content-muted">Resumo calculado no período selecionado.</p><div className="mt-5 p-4 rounded-xl bg-surface-base border border-border-subtle"><p className="text-xs font-bold uppercase tracking-wider text-content-muted">Margem após saídas</p><p className={`mt-2 text-2xl font-mono font-bold ${summary.netResult >= 0 ? 'finance-positive' : 'finance-negative'}`}>{money(summary.netResult)}</p><p className="mt-2 text-sm text-content-muted">Entradas confirmadas de {money(summary.totalIncome)} menos despesas de {money(summary.totalExpenses)}.</p></div><div className="mt-4 text-sm text-content-muted leading-relaxed">As saídas são incluídas no momento em que são salvas na aba <strong className="text-content-base">Saídas</strong>; para corrigir um lançamento, edite-o ou remova-o nessa mesma aba, e o Extrato e os Relatórios serão atualizados.</div></section>
+        </div>}
+
+        {tab === 'operacao' && <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <section className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5"><SectionTitle icon={UserRound} title="Clientes por valor recebido" description={`${summary.returningClientCount} cliente${summary.returningClientCount === 1 ? '' : 's'} recorrente${summary.returningClientCount === 1 ? '' : 's'} de ${summary.clientCount} no período · retenção de ${summary.retentionRate.toFixed(1)}%.`} />{report.clients.length === 0 ? <EmptyState text="Nenhum cliente com recebimento confirmado no período." /> : <div className="mt-4 space-y-2">{report.clients.slice(0, 12).map((client, index) => <div key={`${client.clientName}-${index}`} className="p-3 rounded-xl bg-surface-base border border-border-subtle flex items-center gap-3"><span className="w-8 h-8 rounded-lg bg-gold-base/10 text-gold-base font-bold text-xs shrink-0 flex items-center justify-center">#{index + 1}</span><div className="min-w-0 flex-1"><p className="text-sm font-bold text-content-base truncate">{client.clientName}</p><p className="mt-0.5 text-xs text-content-muted">{client.visits} visita{client.visits === 1 ? '' : 's'} recebida{client.visits === 1 ? '' : 's'}{client.clientPhone ? ` · ${client.clientPhone}` : ''}</p></div><p className="text-sm font-mono font-bold finance-positive shrink-0">{money(client.totalSpent)}</p></div>)}</div>}</section>
+          <section className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-5"><SectionTitle icon={Users} title="Profissionais por receita" description="Produção e comissão estimada a partir dos serviços efetivamente recebidos." />{report.professionals.length === 0 ? <EmptyState text="Nenhum recebimento associado a profissional no período." /> : <div className="mt-4 space-y-3">{report.professionals.map((professional, index) => <div key={professional.professionalName} className="p-3.5 rounded-xl bg-surface-base border border-border-subtle"><div className="flex items-center justify-between gap-3"><div className="min-w-0"><p className="text-sm font-bold text-content-base truncate">{professional.professionalName}</p><p className="mt-0.5 text-xs text-content-muted">{professional.servicesCount} serviço{professional.servicesCount === 1 ? '' : 's'} · comissão {professional.commissionRate.toFixed(1)}%</p></div><p className="text-sm font-mono font-bold finance-positive shrink-0">{money(professional.revenue)}</p></div><div className="mt-3 pt-3 border-t border-border-subtle flex justify-between text-xs"><span className="text-content-muted">Comissão estimada</span><strong className="finance-negative">{money(professional.commissionAmount)}</strong></div></div>)}</div>}</section>
+        </div>}
+      </>}
     </div>
   );
 };
+
+const MetricCard: React.FC<{ label: string; value: string; detail: string; icon: React.ElementType; tone: 'positive' | 'negative' | 'warning' | 'neutral' }> = ({ label, value, detail, icon: Icon, tone }) => {
+  const toneClass = tone === 'positive' ? 'text-status-success bg-status-success/10' : tone === 'negative' ? 'text-status-error bg-status-error/10' : tone === 'warning' ? 'text-amber-500 bg-amber-500/10' : 'text-gold-base bg-gold-base/10';
+  const valueClass = tone === 'positive' ? 'finance-positive' : tone === 'negative' ? 'finance-negative' : 'text-content-base';
+  return <div className="min-w-0 p-3.5 sm:p-4 bg-surface-card border border-border-subtle rounded-xl"><div className="flex items-start justify-between gap-2"><p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-content-muted truncate">{label}</p><span className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${toneClass}`}><Icon className="w-4 h-4" /></span></div><p className={`mt-3 text-lg sm:text-xl font-mono font-bold truncate ${valueClass}`}>{value}</p><p className="mt-1 text-xs text-content-muted truncate">{detail}</p></div>;
+};
+
+const SectionTitle: React.FC<{ icon: React.ElementType; title: string; description: string }> = ({ icon: Icon, title, description }) => <div><h2 className="text-base font-serif font-bold text-content-base flex items-center gap-2"><Icon className="w-4 h-4 text-gold-base" />{title}</h2><p className="mt-1 text-sm text-content-muted">{description}</p></div>;
+
+const EmptyState: React.FC<{ text: string }> = ({ text }) => <p className="py-12 text-center text-sm text-content-muted">{text}</p>;
+
+const InfoRow: React.FC<{ label: string; value: string; tone?: 'positive' | 'negative' }> = ({ label, value, tone }) => <div className="flex items-center justify-between gap-3 text-sm"><span className="text-content-muted">{label}</span><strong className={tone === 'positive' ? 'finance-positive' : tone === 'negative' ? 'finance-negative' : 'text-content-base'}>{value}</strong></div>;
+
+const RankRow: React.FC<{ position: number | null; title: string; subtitle: string; value: string; percentage: number; valueTone?: 'negative' }> = ({ position, title, subtitle, value, percentage, valueTone }) => <div className="p-3 rounded-xl bg-surface-base border border-border-subtle"><div className="flex items-start gap-2"><>{position !== null && <span className="w-6 h-6 rounded-full bg-gold-base/10 text-gold-base text-[10px] font-bold shrink-0 flex items-center justify-center">#{position}</span>}</><div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-sm font-bold text-content-base truncate">{title}</p><p className="mt-0.5 text-xs text-content-muted truncate">{subtitle}</p></div><strong className={`text-sm font-mono shrink-0 ${valueTone === 'negative' ? 'finance-negative' : 'finance-positive'}`}>{value}</strong></div><div className="mt-3 h-1.5 rounded-full bg-surface-card overflow-hidden"><span className={`block h-full rounded-full ${valueTone === 'negative' ? 'bg-status-error' : 'bg-gold-base'}`} style={{ width: `${Math.min(100, Math.max(0, percentage))}%` }} /></div></div></div></div>;

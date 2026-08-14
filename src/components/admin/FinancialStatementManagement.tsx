@@ -70,23 +70,38 @@ export const FinancialStatementManagement: React.FC = () => {
   };
 
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'completed' | 'pending'>('all');
+  const [periodFilter, setPeriodFilter] = useState<'today' | 'week' | 'month' | 'all'>('month');
   const [search, setSearch] = useState('');
 
-  const visibleTransactions = transactions.filter(t => t.status !== 'cancelled');
-  const totalIncomes = visibleTransactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
-  const totalExpenses = visibleTransactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+  const today = getTodayStringBRT();
+  const getPeriodStart = () => {
+    if (periodFilter === 'all') return '';
+    if (periodFilter === 'today') return today;
+    const date = new Date(`${today}T12:00:00`);
+    if (periodFilter === 'week') date.setDate(date.getDate() - 6);
+    if (periodFilter === 'month') date.setDate(1);
+    return date.toISOString().slice(0, 10);
+  };
+  const periodStart = getPeriodStart();
+  const visibleTransactions = transactions.filter((transaction) => transaction.status !== 'cancelled' && (!periodStart || transaction.date >= periodStart));
+  const settledTransactions = visibleTransactions.filter((transaction) => transaction.status === 'completed');
+  const pendingTransactions = visibleTransactions.filter((transaction) => transaction.status === 'pending');
+  const totalIncomes = settledTransactions.filter((transaction) => transaction.type === 'income').reduce((total, transaction) => total + transaction.amount, 0);
+  const totalExpenses = settledTransactions.filter((transaction) => transaction.type === 'expense').reduce((total, transaction) => total + transaction.amount, 0);
   const netBalance = totalIncomes - totalExpenses;
 
-  const filtered = visibleTransactions.filter(t => {
-    const matchesType = filterType === 'all' || t.type === filterType;
-    const matchesSearch = t.description.toLowerCase().includes(search.toLowerCase()) ||
-                          t.category.toLowerCase().includes(search.toLowerCase());
-    return matchesType && matchesSearch;
+  const filtered = visibleTransactions.filter((transaction) => {
+    const matchesType = filterType === 'all' || transaction.type === filterType;
+    const matchesStatus = filterStatus === 'all' || transaction.status === filterStatus;
+    const term = search.toLowerCase();
+    const matchesSearch = transaction.description.toLowerCase().includes(term) || transaction.category.toLowerCase().includes(term) || transaction.paymentMethod.toLowerCase().includes(term);
+    return matchesType && matchesStatus && matchesSearch;
   });
 
   const handleExportCsv = () => {
-    const csv = 'Data,Tipo,Categoria,Descrição,Valor,Forma Pagamento\n' +
-      filtered.map(t => `"${formatTransactionDate(t.date)}","${t.type}","${t.category}","${t.description}",${t.amount},"${t.paymentMethod}"`).join('\n');
+    const csv = 'Data,Status,Tipo,Categoria,Descrição,Valor,Forma Pagamento\n' +
+      filtered.map(t => `"${formatTransactionDate(t.date)}","${t.status || 'completed'}","${t.type}","${t.category}","${t.description}",${t.amount},"${t.paymentMethod}"`).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -122,7 +137,7 @@ export const FinancialStatementManagement: React.FC = () => {
       )}
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-status-success mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider truncate">Entradas</span>
@@ -145,7 +160,7 @@ export const FinancialStatementManagement: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Saídas persistidas</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-gold-base mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider truncate">Resultado</span>
             <div className="w-6 h-6 rounded-lg bg-gold-base/10 flex items-center justify-center shrink-0">
@@ -155,39 +170,53 @@ export const FinancialStatementManagement: React.FC = () => {
           <p className={`text-lg font-black tabular-nums truncate ${netBalance >= 0 ? 'finance-positive' : 'finance-negative'}`}>
              R$ {netBalance.toFixed(2)}
           </p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Saldo do extrato</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Saldo confirmado</p>
+        </div>
+
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-amber-500 mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Pendentes</span>
+            <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+              <Clock className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-lg font-black text-content-base tabular-nums truncate">{pendingTransactions.length}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Fora do resultado</p>
         </div>
       </div>
 
-      {/* Search & Filter */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 text-content-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Buscar lançamentos no extrato..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-10 pr-4 py-2.5 text-xs text-content-base focus:outline-none focus:ring-1 focus:ring-gold-base/50"
-          />
+      {/* Busca e filtros do mesmo livro-caixa consultado pelos Relatórios */}
+      <div className="space-y-2.5">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-content-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Buscar lançamentos no extrato..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-surface-card border border-border-subtle rounded-xl pl-10 pr-4 py-2.5 text-xs text-content-base focus:outline-none focus:ring-1 focus:ring-gold-base/50"
+            />
+          </div>
+          <div data-gesture-scroll="horizontal" className="admin-category-scroll flex bg-surface-card p-1 rounded-xl border border-border-subtle shrink-0 overflow-x-auto no-scrollbar">
+            {[
+              { id: 'today', label: 'Hoje' },
+              { id: 'week', label: '7 dias' },
+              { id: 'month', label: 'Mês' },
+              { id: 'all', label: 'Tudo' }
+            ].map((item) => <button key={item.id} onClick={() => setPeriodFilter(item.id as typeof periodFilter)} className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${periodFilter === item.id ? 'bg-gold-base text-surface-base shadow-xs' : 'text-content-muted'}`}>{item.label}</button>)}
+          </div>
         </div>
-
-        <div className="flex bg-surface-card p-1 rounded-xl border border-border-subtle shrink-0">
+        <div data-gesture-scroll="horizontal" className="admin-category-scroll flex gap-2 overflow-x-auto no-scrollbar pb-1">
           {[
             { id: 'all', label: 'Todos' },
             { id: 'income', label: 'Entradas' },
             { id: 'expense', label: 'Saídas' }
-          ].map(f => (
-            <button
-              key={f.id}
-              onClick={() => setFilterType(f.id as any)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                filterType === f.id ? 'bg-gold-base text-surface-base shadow-xs' : 'text-content-muted'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+          ].map((item) => <button key={item.id} onClick={() => setFilterType(item.id as typeof filterType)} className={`shrink-0 h-9 px-3.5 rounded-full border text-xs font-bold transition-colors ${filterType === item.id ? 'bg-gold-base border-gold-base text-surface-base' : 'bg-surface-card border-border-subtle text-content-muted'}`}>{item.label}</button>)}
+          {[
+            { id: 'completed', label: 'Confirmados' },
+            { id: 'pending', label: 'Pendentes' }
+          ].map((item) => <button key={item.id} onClick={() => setFilterStatus(filterStatus === item.id ? 'all' : item.id as typeof filterStatus)} className={`shrink-0 h-9 px-3.5 rounded-full border text-xs font-bold transition-colors ${filterStatus === item.id ? 'bg-amber-500 border-amber-500 text-white' : 'bg-surface-card border-border-subtle text-content-muted'}`}>{item.label}</button>)}
         </div>
       </div>
 
@@ -198,6 +227,7 @@ export const FinancialStatementManagement: React.FC = () => {
             <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
               <tr className="whitespace-nowrap">
                 <th className="p-3">Data / Hora</th>
+                <th className="p-3">Status</th>
                 <th className="p-3">Tipo</th>
                 <th className="p-3">Categoria</th>
                 <th className="p-3 min-w-[200px]">Descrição</th>
@@ -210,6 +240,9 @@ export const FinancialStatementManagement: React.FC = () => {
                 <tr key={t.id} className="hover:bg-surface-base/50 transition-colors">
                   <td className="p-3 font-mono text-[11px] text-content-muted whitespace-nowrap">
                     {formatTransactionDate(t.date)}
+                  </td>
+                  <td className="p-3 whitespace-nowrap">
+                    <span className={`font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase ${t.status === 'pending' ? 'bg-amber-500/15 text-amber-500' : 'bg-status-success/15 text-status-success'}`}>{t.status === 'pending' ? 'Pendente' : 'Confirmado'}</span>
                   </td>
                   <td className="p-3 whitespace-nowrap">
                     {t.type === 'income' ? (

@@ -1,37 +1,31 @@
 import React, { useState } from 'react';
-import { Wallet, DollarSign, CreditCard, Activity, TrendingUp } from 'lucide-react';
-import { CaixaManagement } from './CaixaManagement';
+import { Wallet, DollarSign, ArrowDownRight, TrendingUp } from 'lucide-react';
 import { ReceiptsManagement } from './ReceiptsManagement';
 import { FinancialStatementManagement } from './FinancialStatementManagement';
-import { FinancialHealthManagement } from './FinancialHealthManagement';
-import { AccountsPayableManagement } from './AccountsPayableManagement';
+import { ExpensesManagement } from './ExpensesManagement';
 import { ReportsManagement } from './ReportsManagement';
 import { AdminTabs } from './shared/AdminTabs';
 import { AdminModuleNotice } from './shared/AdminModuleNotice';
 
-type FinanceiroSubTab = 'recebimentos' | 'extrato' | 'caixa' | 'pagar' | 'saude' | 'relatorios';
+type FinanceiroSubTab = 'recebimentos' | 'extrato' | 'saidas' | 'relatorios';
 
 interface FinanceiroManagementProps {
   initialSubTab?: FinanceiroSubTab;
 }
 
-const subTabs: { id: FinanceiroSubTab; label: string; icon: React.ElementType; disabled?: boolean }[] = [
+const subTabs: { id: FinanceiroSubTab; label: string; icon: React.ElementType }[] = [
   { id: 'recebimentos', label: 'Recebimentos', icon: Wallet },
   { id: 'extrato', label: 'Extrato real', icon: DollarSign },
-  { id: 'caixa', label: 'Caixa', icon: Wallet, disabled: true },
-  { id: 'pagar', label: 'A Pagar', icon: CreditCard, disabled: true },
-  { id: 'saude', label: 'Saúde', icon: Activity, disabled: true },
-  { id: 'relatorios', label: 'Relatórios', icon: TrendingUp, disabled: true },
+  { id: 'saidas', label: 'Saídas', icon: ArrowDownRight },
+  { id: 'relatorios', label: 'Relatórios', icon: TrendingUp },
 ];
 
 /**
  * Módulo Financeiro unificado.
  *
- * Antes, Caixa / Extrato / Contas a Pagar / Saúde Financeira / Relatórios eram
- * 5 itens separados no menu principal. Isso fragmentava um único assunto
- * ("meu dinheiro") em 5 lugares diferentes. Aqui eles vivem sob um único
- * item de navegação, com abas internas — nenhuma lógica dos componentes
- * originais foi alterada, apenas reorganizada.
+ * A operação financeira permanece em uma única área. Recebimentos e saídas
+ * usam o mesmo livro-caixa persistido do Extrato; Relatórios apenas consolidam
+ * esses registros reais, sem indicadores demonstrativos ou dados locais.
  */
 export const FinanceiroManagement: React.FC<FinanceiroManagementProps> = ({ initialSubTab = 'recebimentos' }) => {
   const [subTab, setSubTab] = useState<FinanceiroSubTab>(initialSubTab);
@@ -40,14 +34,10 @@ export const FinanceiroManagement: React.FC<FinanceiroManagementProps> = ({ init
     switch (subTab) {
       case 'recebimentos':
         return <ReceiptsManagement />;
-      case 'caixa':
-        return <CaixaManagement />;
       case 'extrato':
         return <FinancialStatementManagement />;
-      case 'pagar':
-        return <AccountsPayableManagement />;
-      case 'saude':
-        return <FinancialHealthManagement />;
+      case 'saidas':
+        return <ExpensesManagement />;
       case 'relatorios':
         return <ReportsManagement />;
       default:
@@ -60,9 +50,9 @@ export const FinanceiroManagement: React.FC<FinanceiroManagementProps> = ({ init
       <AdminTabs tabs={subTabs} activeId={subTab} onChange={(id) => setSubTab(id as FinanceiroSubTab)} />
 
       <AdminModuleNotice
-        title="Financeiro operacional enxuto"
-        description="Recebimentos e Extrato são as áreas ativas: a pendência nasce quando o serviço é concluído e somente pagamentos confirmados entram no livro-caixa."
-        detail="Caixa de sessão, contas a pagar, saúde e relatórios avançados ficam bloqueados até existir uma modelagem persistida, evitando números demonstrativos no painel."
+        title="Financeiro integrado ao banco"
+        description="Recebimentos confirmados e saídas registradas alimentam o mesmo Extrato real."
+        detail="Os Relatórios consolidam exclusivamente lançamentos persistidos, sem sessões locais, valores demonstrativos ou indicadores desconectados do livro-caixa."
       />
 
       <div className="animate-fade-in min-w-0">

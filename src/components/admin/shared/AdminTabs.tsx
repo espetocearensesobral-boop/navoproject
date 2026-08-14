@@ -10,7 +10,7 @@ import { LucideIcon } from 'lucide-react';
  * mesma string de className duplicada em cada `<button>`. Isso fazia o app
  * parecer inconsistente ao navegar entre módulos e multiplicava o trabalho
  * de manutenção. Agora existe um único componente: qualquer tela com abas
- * (Financeiro, Contas a Pagar, Comandas, Assinaturas, Relatórios, Perfil da
+ * (Financeiro, Comandas, Assinaturas, Relatórios, Perfil da
  * Barbearia, Configurações, etc.) usa <AdminTabs /> e herda o mesmo visual,
  * o mesmo comportamento de rolagem horizontal no mobile e o mesmo contrato
  * de props.
