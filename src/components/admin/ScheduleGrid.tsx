@@ -304,7 +304,7 @@ export const ScheduleGrid: React.FC = () => {
         </div>
 
         {/* Compact Timeline Feed */}
-        <div className="bg-surface-card rounded-2xl border border-border-subtle p-3 space-y-2">
+        <div className="space-y-3">
           {timeSlots.map(slot => {
             // Find appointments or blocks in this time slot for active barbers
             const slotAppointments = activeBarbers.map(barber => {
@@ -321,35 +321,36 @@ export const ScheduleGrid: React.FC = () => {
             }).filter(item => item.apt || item.block);
 
             return (
-              <div key={slot} className="border-b border-border-subtle/60 pb-2 last:border-0 last:pb-0">
-                <div className="flex items-start gap-2.5">
+              <div key={slot} className="flex items-stretch gap-3">
+                <div className="w-16 shrink-0 pt-3 text-right">
                   {/* Time Badge */}
-                  <div className="text-[11px] font-mono num-tabular text-content-base font-semibold bg-surface-base px-2 py-1 rounded-lg border border-border-subtle shrink-0 mt-0.5">
-                    {slot}
-                  </div>
+                  <span className="text-sm font-mono num-tabular font-bold text-content-muted">{slot}</span>
+                </div>
 
-                  {/* Slot Items Container */}
-                  <div className="flex-1 space-y-1.5 min-w-0">
+                {/* Slot Items Container */}
+                <div className="flex-1 space-y-2 min-w-0 pb-1">
                     {slotAppointments.length === 0 ? (
                       <div 
                         onClick={() => {
                           setManualBookingForm(prev => ({ ...prev, time_slot: slot }));
                           setIsManualBookingOpen(true);
                         }}
-                        className="py-1 px-2.5 rounded-xl bg-surface-base/50 border border-dashed border-border-subtle hover:border-border-subtle flex items-center justify-between text-[11px] text-content-muted cursor-pointer group"
+                        className="min-h-[72px] px-4 rounded-2xl bg-surface-card border-2 border-dashed border-border-subtle hover:border-gold-base/50 flex items-center justify-between text-base font-semibold text-content-muted cursor-pointer group transition-colors"
                       >
                         <span>Livre</span>
-                        <Plus className="w-3 h-3 text-content-muted group-hover:text-gold-hover" />
+                        <span className="w-10 h-10 rounded-full bg-surface-base text-content-muted group-hover:text-gold-base flex items-center justify-center transition-colors">
+                          <Plus className="w-5 h-5" />
+                        </span>
                       </div>
                     ) : (
                       slotAppointments.map(({ barber, apt, block }) => {
                         if (apt) {
                           const isPending = apt.status === 'pending_approval';
                           return (
-                            <div key={apt.id} className={`p-2.5 rounded-xl transition-all ${
+                            <div key={apt.id} className={`p-4 rounded-2xl border shadow-sm transition-all ${
                               isPending
                                 ? 'bg-amber-500/10 border-2 border-amber-500/50 text-amber-200 shadow-sm'
-                                : 'bg-surface-base border-l-2 border-l-[#FFFFFF] border border-border-subtle'
+                                : 'bg-surface-card border-border-subtle'
                             }`}>
                               {isPending && (
                                 <div className="flex items-center justify-between text-[10px] font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-xl border border-amber-500/30">
@@ -360,12 +361,12 @@ export const ScheduleGrid: React.FC = () => {
                                   <span className="text-[9px] bg-amber-400 text-black px-1.5 rounded-xl font-extrabold">Aprovação Pendente</span>
                                 </div>
                               )}
-                              <div className="flex justify-between items-center text-xs mb-1">
+                              <div className="flex justify-between items-center text-base mb-2 gap-3">
                                 <span className="font-bold text-content-base truncate">{apt.client_name || (apt as any).clientName}</span>
-                                <span className="font-bold text-gold-hover text-[11px] shrink-0">R$ {apt.final_amount ? Number(apt.final_amount).toFixed(2) : '60.00'}</span>
+                                <span className="font-extrabold text-status-success text-base shrink-0">R$ {apt.final_amount ? Number(apt.final_amount).toFixed(2) : '60.00'}</span>
                               </div>
-                              <div className="flex justify-between items-center text-[10px] text-content-muted">
-                                <span className="truncate">{(apt.services && apt.services[0]?.title) || 'Atendimento'} • <strong className="text-gold-base">{barber.name}</strong></span>
+                              <div className="flex justify-between items-start gap-3 text-sm text-content-muted">
+                                <span className="min-w-0 leading-relaxed">{(apt.services && apt.services[0]?.title) || 'Atendimento'} • <strong className="text-gold-base">{barber.name}</strong></span>
                                 <span className={`px-2 py-0.5 rounded-full font-semibold text-[9px] shrink-0 ${
                                   isPending
                                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
@@ -395,10 +396,10 @@ export const ScheduleGrid: React.FC = () => {
 
                         if (block) {
                           return (
-                            <div key={block.id} className="p-2 rounded-xl bg-red-950/20 border border-red-500/20 flex items-center justify-between text-xs text-red-300">
+                            <div key={block.id} className="min-h-[72px] p-4 rounded-2xl bg-red-500/10 border border-red-500/25 flex items-center justify-between text-sm text-red-300 shadow-sm">
                               <div className="flex items-center gap-1.5 truncate">
                                 <Lock className="w-3 h-3 text-red-400 shrink-0" />
-                                <span className="text-[10px] font-semibold truncate">{barber.name}: {block.reason}</span>
+                                <span className="font-semibold truncate">{barber.name}: {block.reason}</span>
                               </div>
                               <button
                                 onClick={() => handleUnblock(block.id)}
@@ -413,7 +414,6 @@ export const ScheduleGrid: React.FC = () => {
                         return null;
                       })
                     )}
-                  </div>
                 </div>
               </div>
             );

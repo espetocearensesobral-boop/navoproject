@@ -345,7 +345,7 @@ export const AdminLayout: React.FC = () => {
             </button>
             <button 
               onClick={handleLogout}
-              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-base text-content-muted hover:text-status-error active:bg-surface-elevated transition-colors shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800 transition-colors shrink-0"
               title="Sair"
               aria-label="Sair"
             >
@@ -366,13 +366,23 @@ export const AdminLayout: React.FC = () => {
           </h1>
         </div>
 
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="w-9 h-9 flex items-center justify-center rounded-xl border border-border-subtle text-content-muted active:text-gold-base active:bg-surface-base"
-          aria-label="Abrir Menu de Navegação"
-        >
-          <Menu className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-gold-base active:scale-95 transition-transform"
+            title={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
+            aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
+          >
+            {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          </button>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-content-muted active:text-gold-base active:scale-95 transition-transform"
+            aria-label="Abrir Menu de Navegação"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* Mobile Bottom Navigation Bar */}
@@ -473,18 +483,10 @@ export const AdminLayout: React.FC = () => {
             </nav>
             
             {/* Mobile Footer */}
-            <div className="p-4 border-t border-border-subtle shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom))] flex items-center gap-3">
+            <div className="p-4 border-t border-border-subtle shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom))]">
               <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="w-11 h-11 flex items-center justify-center rounded-xl bg-surface-base text-content-muted hover:text-gold-base border border-border-subtle font-semibold text-xs active:scale-95 transition-colors shrink-0"
-                title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
-                aria-label="Alternar tema"
-              >
-                {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-content-muted" />}
-              </button>
-              <button 
                 onClick={handleLogout}
-                className="flex-1 h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-surface-base text-content-muted hover:text-status-error border border-border-subtle font-semibold text-xs active:scale-95 transition-colors min-w-0"
+                className="w-full h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800 font-semibold text-xs transition-colors min-w-0"
               >
                 <LogOut className="w-4 h-4 shrink-0" />
                 <span className="truncate">Sair do sistema</span>
