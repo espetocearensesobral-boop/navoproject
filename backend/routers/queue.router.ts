@@ -107,18 +107,27 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
     if (e?.message === 'QUEUE_ITEM_NOT_FOUND') {
       return res.status(404).json({ error: 'Item da fila não encontrado.' });
     }
-    const pgCode = e?.code || e?.cause?.code;
+    const rootDbError = e?.cause?.cause || e?.cause || e;
+    const pgCode = e?.code || e?.cause?.code || e?.cause?.cause?.code;
+    const pgConstraint = rootDbError?.constraint || rootDbError?.constraint_name || null;
     const diagnosticStage = e?.completionStage || 'before_transaction';
+    const diagnosticDetails = {
+      code: pgCode || null,
+      constraint: pgConstraint,
+      errorType: rootDbError?.name || e?.name || null
+    };
     if (pgCode === '23514') {
       return res.status(409).json({
         error: 'O banco rejeitou o status do atendimento. Aplique a migração de integridade mais recente e tente novamente.',
-        diagnosticCode: `QUEUE_${String(diagnosticStage).toUpperCase()}`
+        diagnosticCode: `QUEUE_${String(diagnosticStage).toUpperCase()}`,
+        diagnosticDetails
       });
     }
     console.error('[API] Queue completion failed:', { stage: diagnosticStage, code: pgCode || 'unknown', error: e });
     return res.status(500).json({
       error: 'Não foi possível concluir a solicitação. Tente novamente mais tarde.',
-      diagnosticCode: `QUEUE_${String(diagnosticStage).toUpperCase()}`
+      diagnosticCode: `QUEUE_${String(diagnosticStage).toUpperCase()}`,
+      diagnosticDetails
     });
   }
 });
