@@ -841,7 +841,7 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
           updatedAt: new Date()
         }).where(eq(schema.appointments.id, id));
         await tx.update(schema.waitingQueue).set({
-          status: 'abandoned',
+          status: 'cancelled',
           updatedAt: new Date()
         }).where(eq(schema.waitingQueue.appointmentId, id));
       });
@@ -852,7 +852,7 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
         updatedAt: new Date()
       }).where(eq(schema.appointments.id, id));
       await db.update(schema.waitingQueue).set({
-        status: 'abandoned',
+        status: 'cancelled',
         updatedAt: new Date()
       }).where(eq(schema.waitingQueue.appointmentId, id));
     }

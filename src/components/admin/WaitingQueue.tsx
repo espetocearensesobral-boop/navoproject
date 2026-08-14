@@ -319,6 +319,8 @@ export const WaitingQueue: React.FC = () => {
   const inChairList = filteredQueue.filter((q) => q.status === 'in_chair');
   const waitingList = filteredQueue.filter((q) => q.status === 'waiting');
   const completedList = filteredQueue.filter((q) => q.status === 'completed');
+  const cancelledList = filteredQueue.filter((q) => q.status === 'cancelled');
+  const historyList = [...completedList, ...cancelledList];
   const abandonedList = filteredQueue.filter((q) => q.status === 'abandoned');
 
   return (
@@ -400,7 +402,7 @@ export const WaitingQueue: React.FC = () => {
                 activeTab === 'history' ? 'bg-gold-base text-surface-base' : 'text-content-muted hover:text-content-base'
               }`}
             >
-              Histórico ({completedList.length})
+              Histórico ({historyList.length})
             </button>
             <button
               onClick={() => setActiveTab('abandoned')}
@@ -665,12 +667,12 @@ export const WaitingQueue: React.FC = () => {
         <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden p-3 space-y-3">
           <h2 className="text-xs font-bold text-content-base flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4 text-status-success" />
-            <span>Atendimentos Concluídos Hoje ({completedList.length})</span>
+            <span>Histórico operacional ({historyList.length})</span>
           </h2>
 
-          {completedList.length === 0 ? (
+          {historyList.length === 0 ? (
             <div className="py-8 text-center text-xs text-content-muted">
-              Nenhum atendimento finalizado ainda hoje.
+              Nenhum atendimento finalizado ou cancelado ainda hoje.
             </div>
           ) : (
             <div className="overflow-x-auto custom-scrollbar">
@@ -680,24 +682,29 @@ export const WaitingQueue: React.FC = () => {
                     <th className="p-3 font-bold uppercase text-[10px]">Cliente</th>
                     <th className="p-3 font-bold uppercase text-[10px]">Serviço</th>
                     <th className="p-3 font-bold uppercase text-[10px]">Barbeiro</th>
-                    <th className="p-3 font-bold uppercase text-[10px]">Término</th>
+                    <th className="p-3 font-bold uppercase text-[10px]">Encerramento</th>
                     <th className="p-3 font-bold uppercase text-[10px] text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-subtle">
-                  {completedList.map((item) => (
-                    <tr key={item.id} className="hover:bg-surface-card transition-colors">
-                      <td className="p-3 font-bold text-content-base">{item.client_name}</td>
-                      <td className="p-3 text-gold-hover">{item.service_title}</td>
-                      <td className="p-3 text-content-base">{item.professional_name}</td>
-                      <td className="p-3 text-status-success font-bold">{item.completed_at || 'Concluído'}</td>
-                      <td className="p-3 text-right">
-                        <span className="px-2 py-0.5 rounded-xl bg-status-success/15 text-status-success text-[10px] font-bold">
-                          ✓ Concluído
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {historyList.map((item) => {
+                    const isCancelled = item.status === 'cancelled';
+                    return (
+                      <tr key={item.id} className="hover:bg-surface-card transition-colors">
+                        <td className="p-3 font-bold text-content-base">{item.client_name}</td>
+                        <td className="p-3 text-gold-hover">{item.service_title}</td>
+                        <td className="p-3 text-content-base">{item.professional_name}</td>
+                        <td className={`p-3 font-bold ${isCancelled ? 'text-status-error' : 'text-status-success'}`}>
+                          {isCancelled ? 'Cancelado' : item.completed_at || 'Concluído'}
+                        </td>
+                        <td className="p-3 text-right">
+                          <span className={`px-2 py-0.5 rounded-xl text-[10px] font-bold ${isCancelled ? 'bg-status-error/15 text-status-error' : 'bg-status-success/15 text-status-success'}`}>
+                            {isCancelled ? '× Cancelado' : '✓ Concluído'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

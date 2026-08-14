@@ -128,7 +128,7 @@ export interface WaitingQueueItem {
   professional_name: string;
   scheduled_time: string;
   estimated_wait_minutes: number;
-  status: 'waiting' | 'in_chair' | 'completed';
+  status: 'waiting' | 'in_chair' | 'completed' | 'abandoned' | 'cancelled';
   arrived_at: string;
   notes?: string;
   started_at?: string;
