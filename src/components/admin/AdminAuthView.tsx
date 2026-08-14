@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { authFetch, setStoredToken } from '../../lib/api';
-import { 
-  ShieldCheck, 
-  Lock, 
-  User, 
-  Eye, 
-  EyeOff, 
-  ArrowLeft, 
-  Scissors, 
-  CheckCircle2, 
-  AlertCircle
+import {
+  ShieldCheck,
+  Lock,
+  User,
+  Eye,
+  EyeOff,
+  Scissors,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 
 interface AdminAuthViewProps {
@@ -22,30 +21,27 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [shopLogo, setShopLogo] = useState<string | null>(null);
-  const [shopName, setShopName] = useState<string>('Management System');
+  const [shopName, setShopName] = useState<string>('Navo Premium');
 
-  // Form State
   const [loginData, setLoginData] = useState({
     loginId: '',
-    password: ''
+    password: '',
   });
 
   useEffect(() => {
     authFetch('/api/shop-profile')
-      .then(res => res.json())
-      .then(data => {
-        if (data.logoUrl) {
-          setShopLogo(data.logoUrl);
-        }
-        if (data.name) {
-          setShopName(data.name);
-        }
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.logoUrl) setShopLogo(data.logoUrl);
+        if (data.name) setShopName(data.name);
       })
-      .catch(console.error);
+      .catch(() => {
+        // O fallback visual permanece disponível quando o perfil ainda não foi configurado.
+      });
   }, []);
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLoginSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
 
@@ -61,133 +57,124 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
     setIsLoading(true);
 
     try {
-      const res = await authFetch('/api/auth/admin/login', {
+      const response = await authFetch('/api/auth/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           loginId: loginData.loginId.trim(),
-          password: loginData.password
-        })
+          password: loginData.password,
+        }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
+      const data = await response.json();
+      if (!response.ok) {
         throw new Error(data.error || 'Credenciais de administrador inválidas.');
       }
 
-      if (data.token) {
-        setStoredToken(data.token);
-      }
-
-      setSuccessMsg('Acesso autorizado! Carregando painel...');
-      setTimeout(() => {
-        onLoginSuccess(data);
-      }, 400);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Erro ao realizar login administrativo.');
+      if (data.token) setStoredToken(data.token);
+      setSuccessMsg('Acesso autorizado. Carregando painel...');
+      window.setTimeout(() => onLoginSuccess(data), 400);
+    } catch (error: any) {
+      setErrorMsg(error.message || 'Erro ao realizar login administrativo.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#0a0b0e] text-stone-100 flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden font-sans box-border">
-      {/* Background Image with Dark Overlay */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none"
+    <div className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-surface-base px-4 py-8 text-content-base sm:px-6">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-cover bg-center opacity-[0.12] mix-blend-luminosity"
         style={{
-          backgroundImage: `linear-gradient(180deg, rgba(10,11,14,0.85) 0%, rgba(10,11,14,0.95) 50%, #06070a 100%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1200&q=80')`
+          backgroundImage: "url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1200&q=80')",
         }}
       />
+      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-gold-base/10 via-surface-base/80 to-surface-base" />
+      <div aria-hidden="true" className="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-gold-base/10 blur-3xl" />
+      <div aria-hidden="true" className="absolute -bottom-40 -left-32 h-96 w-96 rounded-full bg-gold-base/10 blur-3xl" />
 
-      {/* Main Card */}
-      <main className="w-full max-w-md my-auto py-6 z-10">
-        <div className="bg-[#12131A]/90 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
-          
-          {/* Logo & Portal Header */}
-          <div className="flex flex-col items-center text-center mb-6">
-            <div className="relative p-[3px] rounded-full bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 shadow-xl mb-4">
-              <div className="p-[2.5px] bg-[#12131A] rounded-full">
-                <div className="w-20 h-20 rounded-full overflow-hidden bg-neutral-900 flex items-center justify-center relative shadow-inner">
+      <main className="relative z-10 my-auto w-full max-w-md">
+        <div className="rounded-3xl border border-border-subtle bg-surface-base/90 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+          <div className="mb-7 flex flex-col items-center text-center">
+            <div className="mb-5 rounded-full bg-gold-base p-1 shadow-xl shadow-gold-base/20">
+              <div className="rounded-full bg-surface-base p-1">
+                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-surface-card sm:h-24 sm:w-24">
                   {shopLogo ? (
-                    <img src={shopLogo} alt={shopName} className="w-full h-full object-cover rounded-full" />
+                    <img src={shopLogo} alt={shopName} className="h-full w-full rounded-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gold-base">
-                      <Scissors className="w-8 h-8" />
-                    </div>
+                    <Scissors className="h-9 w-9 text-gold-base" />
                   )}
                 </div>
               </div>
             </div>
-            
-            <h1 className="text-xl font-serif font-extrabold text-stone-100 tracking-tight flex items-center gap-2">
+
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.24em] text-gold-base">Área restrita</p>
+            <h1 className="text-2xl font-extrabold tracking-tight text-content-base sm:text-3xl">
               Painel <span className="text-gold-base">Administrativo</span>
             </h1>
-            <p className="text-xs text-stone-400 mt-1">
-              {shopName} • Gestão e Controle
+            <p className="mt-2 text-sm leading-relaxed text-content-muted">
+              {shopName} <span className="mx-1 text-border-strong">•</span> Gestão e controle da operação
             </p>
           </div>
 
-          {/* Alert Messages */}
           {errorMsg && (
-            <div className="mb-5 p-3 rounded-xl bg-status-error/10 border border-status-error/20 text-status-error text-xs font-medium flex items-start gap-2.5 animate-fadeIn">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div role="alert" className="mb-5 flex items-start gap-3 rounded-2xl border border-status-error/20 bg-status-error/10 p-4 text-sm font-medium text-status-error">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="mb-5 p-3 rounded-xl bg-status-success/10 border border-status-success/20 text-status-success text-xs font-medium flex items-start gap-2.5 animate-fadeIn">
-              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+            <div role="status" className="mb-5 flex items-start gap-3 rounded-2xl border border-status-success/20 bg-status-success/10 p-4 text-sm font-medium text-status-success">
+              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
               <span>{successMsg}</span>
             </div>
           )}
 
-          {/* LOGIN FORM */}
-          <form onSubmit={handleLoginSubmit} className="space-y-4">
+          <form onSubmit={handleLoginSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold text-stone-100 mb-1.5">
-                E-mail ou Telefone
+              <label htmlFor="admin-login-id" className="mb-2 block text-sm font-bold text-content-base">
+                E-mail ou telefone
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
-                  <User className="w-4 h-4" />
-                </div>
+                <User className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-content-muted" />
                 <input
+                  id="admin-login-id"
                   type="text"
                   required
+                  autoComplete="username"
                   placeholder="admin@exemplo.com ou telefone"
                   value={loginData.loginId}
-                  onChange={(e) => setLoginData({ ...loginData, loginId: e.target.value })}
-                  className="w-full pl-10 pr-3.5 py-2.5 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all shadow-inner"
+                  onChange={(event) => setLoginData({ ...loginData, loginId: event.target.value })}
+                  className="min-h-12 w-full rounded-2xl border border-border-subtle bg-surface-card pl-12 pr-4 text-base text-content-base placeholder:text-content-muted focus:border-gold-base focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-stone-100 mb-1.5">
+              <label htmlFor="admin-password" className="mb-2 block text-sm font-bold text-content-base">
                 Senha
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
-                  <Lock className="w-4 h-4" />
-                </div>
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-content-muted" />
                 <input
+                  id="admin-password"
                   type={showPassword ? 'text' : 'password'}
                   required
-                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  placeholder="Digite sua senha"
                   value={loginData.password}
-                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  className="w-full pl-10 pr-10 py-2.5 bg-stone-900/80 border border-white/10 rounded-xl text-stone-100 text-xs placeholder:text-stone-500 focus:outline-none focus:border-gold-base focus:ring-1 focus:ring-gold-base/50 transition-all shadow-inner"
+                  onChange={(event) => setLoginData({ ...loginData, password: event.target.value })}
+                  className="min-h-12 w-full rounded-2xl border border-border-subtle bg-surface-card pl-12 pr-12 text-base text-content-base placeholder:text-content-muted focus:border-gold-base focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-500 hover:text-stone-300"
-                  tabIndex={-1}
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl text-content-muted hover:bg-surface-base hover:text-content-base"
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
@@ -195,30 +182,29 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-gold-base hover:brightness-110 text-stone-950 font-extrabold text-xs shadow-lg shadow-gold-base/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gold-base px-4 text-sm font-extrabold text-surface-base shadow-lg shadow-gold-base/20 transition-all hover:brightness-110 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50"
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-stone-950/30 border-t-stone-950 rounded-full animate-spin" />
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-surface-base/30 border-t-surface-base" />
                   <span>Entrando...</span>
                 </>
               ) : (
                 <>
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Acessar Painel Admin</span>
+                  <ShieldCheck className="h-5 w-5" />
+                  <span>Acessar painel</span>
                 </>
               )}
             </button>
           </form>
         </div>
-      </main>
 
-      {/* Footer info */}
-      <footer className="w-full max-w-md text-center py-2 z-10">
-        <p className="text-[11px] text-stone-500 font-medium">
-          {shopName} &copy; {new Date().getFullYear()} • Todos os direitos reservados.
+        <p className="mt-5 text-center text-xs font-medium text-content-muted">
+          {shopName} &copy; {new Date().getFullYear()} <span className="mx-1 text-border-strong">•</span> Acesso seguro para a equipe
         </p>
-      </footer>
+      </main>
     </div>
   );
 };
+
+export default AdminAuthView;

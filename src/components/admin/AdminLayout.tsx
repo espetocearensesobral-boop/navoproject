@@ -272,16 +272,16 @@ export const AdminLayout: React.FC = () => {
   return (
     <div className="admin-shell h-[100dvh] bg-surface-base flex text-content-base font-sans antialiased overflow-hidden">
       {/* Desktop Sidebar (Fixed layout for screens >= 1024px) */}
-      <aside className="hidden lg:flex lg:w-72 lg:flex-col shrink-0 lg:bg-[#12131A] lg:border-r lg:border-white/10 lg:fixed lg:inset-y-0 text-stone-200 z-30">
+      <aside className="hidden lg:flex lg:w-72 lg:flex-col shrink-0 lg:bg-surface-card lg:border-l lg:border-border-subtle lg:fixed lg:inset-y-0 lg:right-0 text-content-base z-30">
         {/* Logo Header (Fixed 56px height) */}
-        <div className="flex items-center h-16 px-5 border-b border-white/10 relative overflow-hidden shrink-0 bg-[#12131A]">
+        <div className="flex items-center h-16 px-5 border-b border-border-subtle relative overflow-hidden shrink-0 bg-surface-card">
           <div className="absolute top-0 left-0 right-0 h-0.5 barber-pole-line" />
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 bg-gold-base text-stone-950 rounded-xl flex items-center justify-center shadow-sm shrink-0 font-bold">
+            <div className="w-8 h-8 bg-gold-base text-content-on-accent rounded-xl flex items-center justify-center shadow-sm shrink-0 font-bold">
               <Scissors className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-sm font-serif font-bold text-stone-100 tracking-tight truncate">Navo Premium</h1>
+              <h1 className="text-sm font-serif font-bold text-content-base tracking-tight truncate">Navo Premium</h1>
               <p className="text-[9px] text-gold-base font-bold uppercase tracking-widest truncate">Heritage Barber & Club</p>
             </div>
           </div>
@@ -295,7 +295,7 @@ export const AdminLayout: React.FC = () => {
 
             return (
               <div key={section} className="space-y-2">
-                <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-stone-300/90">
+                <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-content-muted">
                   {sectionLabels[section]}
                 </p>
                 {itemsInSection.map((item) => {
@@ -309,10 +309,10 @@ export const AdminLayout: React.FC = () => {
                       className={`w-full min-h-11 px-3.5 rounded-lg text-sm font-semibold flex items-center gap-3 transition-colors group min-w-0 ${
                         isActive
                           ? 'bg-gold-base/20 text-gold-base shadow-sm'
-                          : 'text-stone-300 hover:text-white hover:bg-stone-800/70'
+                          : 'text-content-muted hover:text-content-base hover:bg-surface-base'
                       }`}
                     >
-                      <Icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-gold-base' : 'text-stone-300 group-hover:text-white'}`} />
+                      <Icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted group-hover:text-content-base'}`} />
                       <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
                       {isActive && (
                         <ChevronRight className="w-3.5 h-3.5 text-gold-base shrink-0" />
@@ -326,26 +326,26 @@ export const AdminLayout: React.FC = () => {
         </nav>
 
         {/* User Profile Footer */}
-        <div className="p-4 border-t border-white/10 shrink-0 bg-[#12131A]">
-          <div className="flex items-center gap-3 px-3 h-14 rounded-lg bg-stone-900/90 border border-white/10">
-            <div className="w-7 h-7 rounded-xl bg-gold-base flex items-center justify-center text-stone-950 font-bold text-xs uppercase shrink-0">
+        <div className="p-4 border-t border-border-subtle shrink-0 bg-surface-card">
+          <div className="flex items-center gap-3 px-3 h-14 rounded-lg bg-surface-base border border-border-subtle">
+            <div className="w-7 h-7 rounded-xl bg-gold-base flex items-center justify-center text-content-on-accent font-bold text-xs uppercase shrink-0">
               {adminName.substring(0, 2)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-stone-100 truncate">{adminName}</p>
-              <p className="text-[9px] font-bold text-stone-400 uppercase tracking-wider">Admin</p>
+              <p className="text-xs font-bold text-content-base truncate">{adminName}</p>
+              <p className="text-[9px] font-bold text-content-muted uppercase tracking-wider">Admin</p>
             </div>
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-800 text-stone-400 hover:text-gold-base active:bg-stone-800 transition-colors shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-base text-content-muted hover:text-gold-base active:bg-surface-elevated transition-colors shrink-0"
               title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
               aria-label="Alternar tema"
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-stone-300" />}
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-content-muted" />}
             </button>
             <button 
               onClick={handleLogout}
-              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-800 text-stone-400 hover:text-red-400 active:bg-stone-800 transition-colors shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-base text-content-muted hover:text-status-error active:bg-surface-elevated transition-colors shrink-0"
               title="Sair"
               aria-label="Sair"
             >
@@ -410,24 +410,24 @@ export const AdminLayout: React.FC = () => {
 
       {/* Mobile Drawer (Side sheet) */}
       {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
+        <div className="lg:hidden fixed inset-0 z-50 flex justify-end">
           <div 
             className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={() => setSidebarOpen(false)}
           />
           
-          <aside className="relative w-[min(320px,88vw)] bg-[#12131A] text-stone-200 flex flex-col animate-slide-in shadow-2xl border-r border-white/10 h-[100dvh]">
+          <aside className="relative w-[min(320px,88vw)] bg-surface-card text-content-base flex flex-col animate-slide-in-right shadow-2xl border-l border-border-subtle h-[100dvh]">
             {/* Header */}
-            <div className="flex items-center justify-between h-16 px-5 border-b border-white/10 shrink-0">
+            <div className="flex items-center justify-between h-16 px-5 border-b border-border-subtle shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 bg-gold-base text-stone-950 rounded-xl flex items-center justify-center shrink-0 font-bold">
+                <div className="w-7 h-7 bg-gold-base text-content-on-accent rounded-xl flex items-center justify-center shrink-0 font-bold">
                   <Scissors className="w-3.5 h-3.5" />
                 </div>
-                <h1 className="text-sm font-serif font-bold text-stone-100 truncate">Navo Premium</h1>
+                <h1 className="text-sm font-serif font-bold text-content-base truncate">Navo Premium</h1>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl text-stone-400 hover:text-stone-100 active:bg-stone-800"
+                className="w-10 h-10 flex items-center justify-center rounded-xl text-content-muted hover:text-content-base active:bg-surface-base"
                 aria-label="Fechar menu"
               >
                 <X className="w-5 h-5" />
@@ -442,7 +442,7 @@ export const AdminLayout: React.FC = () => {
 
                 return (
                   <div key={section} className="space-y-2">
-                    <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-stone-300/90">
+                    <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-content-muted">
                       {sectionLabels[section]}
                     </p>
                     {itemsInSection.map((item) => {
@@ -459,10 +459,10 @@ export const AdminLayout: React.FC = () => {
                             className={`w-full min-h-12 px-3.5 rounded-lg text-sm font-semibold flex items-center gap-3 transition-colors ${
                             isActive
                               ? 'bg-gold-base/20 text-gold-base shadow-sm'
-                              : 'text-stone-300 hover:text-white hover:bg-stone-800/70'
+                              : 'text-content-muted hover:text-content-base hover:bg-surface-base'
                           }`}
                         >
-                          <Icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-gold-base' : 'text-stone-300'}`} />
+                          <Icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted'}`} />
                           <span className="truncate flex-1 text-left min-w-0">{item.label}</span>
                         </button>
                       );
@@ -473,18 +473,18 @@ export const AdminLayout: React.FC = () => {
             </nav>
             
             {/* Mobile Footer */}
-            <div className="p-4 border-t border-white/10 shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom))] flex items-center gap-3">
+            <div className="p-4 border-t border-border-subtle shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom))] flex items-center gap-3">
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="w-11 h-11 flex items-center justify-center rounded-xl bg-stone-900/90 text-stone-300 hover:text-gold-base border border-white/10 font-semibold text-xs active:scale-95 transition-colors shrink-0"
+                className="w-11 h-11 flex items-center justify-center rounded-xl bg-surface-base text-content-muted hover:text-gold-base border border-border-subtle font-semibold text-xs active:scale-95 transition-colors shrink-0"
                 title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
                 aria-label="Alternar tema"
               >
-                {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-stone-300" />}
+                {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-content-muted" />}
               </button>
               <button 
                 onClick={handleLogout}
-                className="flex-1 h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-stone-900/90 text-stone-300 hover:text-red-400 border border-white/10 font-semibold text-xs active:scale-95 transition-colors min-w-0"
+                className="flex-1 h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-surface-base text-content-muted hover:text-status-error border border-border-subtle font-semibold text-xs active:scale-95 transition-colors min-w-0"
               >
                 <LogOut className="w-4 h-4 shrink-0" />
                 <span className="truncate">Sair do sistema</span>
@@ -495,7 +495,7 @@ export const AdminLayout: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main ref={mainRef} className="flex-1 lg:ml-72 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
+      <main ref={mainRef} className="flex-1 lg:mr-72 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
         <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
         <div className="max-w-[1440px] mx-auto px-4 sm:px-7 lg:px-10 py-6 lg:pt-9 lg:pb-14 pb-36 w-full min-w-0">
           {/* Tab Content */}
