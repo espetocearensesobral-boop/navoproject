@@ -301,7 +301,7 @@ export const AdminLayout: React.FC = () => {
   return (
     <div className="admin-shell h-[100dvh] bg-surface-base flex text-content-base font-sans antialiased overflow-hidden">
       {/* Desktop Sidebar (Fixed layout for screens >= 1024px) */}
-      <aside className="hidden lg:flex lg:w-72 lg:flex-col shrink-0 lg:bg-surface-card lg:border-l lg:border-border-subtle lg:fixed lg:inset-y-0 lg:right-0 text-content-base z-30">
+      <aside className="hidden lg:flex lg:w-72 lg:flex-col shrink-0 lg:bg-surface-card lg:border-r lg:border-border-subtle lg:fixed lg:inset-y-0 lg:left-0 text-content-base z-30">
         {/* Logo Header (Fixed 56px height) */}
         <div className="flex items-center h-16 px-5 border-b border-border-subtle relative overflow-hidden shrink-0 bg-surface-card">
           <div className="absolute top-0 left-0 right-0 h-0.5 barber-pole-line" />
@@ -449,13 +449,13 @@ export const AdminLayout: React.FC = () => {
 
       {/* Mobile Drawer (Side sheet) */}
       {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex justify-end">
+        <div className="lg:hidden fixed inset-0 z-50 flex justify-start">
           <div 
             className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={() => setSidebarOpen(false)}
           />
           
-          <aside className="relative w-[min(320px,88vw)] bg-surface-card text-content-base flex flex-col animate-slide-in-right shadow-2xl border-l border-border-subtle h-[100dvh]">
+          <aside className="relative w-[min(320px,88vw)] bg-surface-card text-content-base flex flex-col animate-slide-in shadow-2xl border-r border-border-subtle h-[100dvh]">
             {/* Header */}
             <div className="flex items-center justify-between h-16 px-5 border-b border-border-subtle shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
@@ -526,7 +526,7 @@ export const AdminLayout: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main ref={mainRef} className="flex-1 lg:mr-72 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
+      <main ref={mainRef} className="flex-1 lg:ml-72 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
         <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
         <div className="max-w-[1440px] mx-auto px-4 sm:px-7 lg:px-10 py-6 lg:pt-9 lg:pb-14 pb-36 w-full min-w-0">
           {/* Tab Content */}
