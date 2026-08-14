@@ -83,9 +83,7 @@ export const AdminNotificationCenter: React.FC<AdminNotificationCenterProps> = (
     : placement === 'topbar'
       ? 'w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-content-muted active:text-gold-base active:scale-95 transition-transform'
       : 'w-8 h-8 flex items-center justify-center rounded-xl text-content-muted hover:bg-surface-base hover:text-gold-base active:bg-surface-elevated transition-colors shrink-0';
-  const activeTriggerClass = notificationsActive
-    ? 'bg-status-success border-status-success text-content-on-accent hover:bg-status-success'
-    : '';
+  const activeTriggerClass = notificationsActive ? 'text-status-success' : '';
 
   return (
     <div className={`relative ${placement === 'drawer' ? 'w-full' : ''}`}>
@@ -165,15 +163,15 @@ export const AdminNotificationCenter: React.FC<AdminNotificationCenterProps> = (
             </div>
 
             <footer className="p-4 border-t border-border-subtle bg-surface-base/60">
-              <button type="button" onClick={() => void onToggleNotifications()} disabled={isBlocked || notificationsBusy} className={`w-full min-h-10 rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-left border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${notificationsActive ? 'border-status-success bg-status-success text-content-on-accent' : 'border-border-subtle bg-surface-card hover:border-gold-base/40'}`}>
+              <button type="button" onClick={() => void onToggleNotifications()} disabled={isBlocked || notificationsBusy} className={`w-full min-h-10 rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-left border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${notificationsActive ? 'border-status-success/40 bg-surface-card' : 'border-border-subtle bg-surface-card hover:border-gold-base/40'}`}>
                 <span className="flex items-center gap-2 min-w-0">
-                  {notificationsActive ? <BellRing className="w-4 h-4 text-content-on-accent shrink-0" /> : <Bell className="w-4 h-4 text-content-muted shrink-0" />}
+                  {notificationsActive ? <BellRing className="w-4 h-4 text-status-success shrink-0" /> : <Bell className="w-4 h-4 text-content-muted shrink-0" />}
                   <span className="min-w-0">
-                    <span className="block text-xs font-black">{notificationsActive ? 'Push ativo' : 'Push inativo'}</span>
-                    <span className={`block mt-0.5 text-[10px] truncate ${notificationsActive ? 'text-content-on-accent/80' : 'text-content-muted'}`}>{pushLabel}</span>
+                    <span className={`block text-xs font-black ${notificationsActive ? 'text-status-success' : 'text-content-base'}`}>{notificationsActive ? 'Push ativo' : 'Push inativo'}</span>
+                    <span className={`block mt-0.5 text-[10px] truncate ${notificationsActive ? 'text-status-success/80' : 'text-content-muted'}`}>{pushLabel}</span>
                   </span>
                 </span>
-                <span className={`text-[10px] font-black whitespace-nowrap ${notificationsActive ? 'text-content-on-accent' : 'text-gold-base'}`}>{notificationsActive ? 'Desativar' : 'Ativar'}</span>
+                <span className={`text-[10px] font-black whitespace-nowrap ${notificationsActive ? 'text-status-success' : 'text-gold-base'}`}>{notificationsActive ? 'Desativar' : 'Ativar'}</span>
               </button>
             </footer>
           </section>
