@@ -100,10 +100,11 @@
   --color-surface-base: #F5F5F2;
   --color-surface-card: #FFFFFF;
   --color-surface-elevated: #FDFCFA;
-  --color-gold-base: #C8A96A;
-  --color-gold-deep: #8F7138;
-  --color-gold-accent: #E5CD9A;
-  --color-gold-hover: #E5CD9A;
+  /* Heritage palette stays identical to dark mode; surfaces change, identity does not. */
+  --color-gold-base: #D4AF5A;
+  --color-gold-deep: #A88234;
+  --color-gold-accent: #C8A24B;
+  --color-gold-hover: #D4AF5A;
   --color-content-base: #1A1C1E;
   --color-content-on-accent: #FFFFFF;
   --color-accent-solid: var(--color-gold-base);
@@ -157,18 +158,20 @@
 [data-palette="bordeaux"] { --color-gold-base: #F43F5E; --color-gold-deep: #BE123C; --color-gold-accent: #FECDD3; }
 
 /* Semantic contrast guardrails: palette accents must adapt to the active theme. */
-[data-theme="dark"] {
+[data-theme="dark"],
+[data-theme="light"] {
+  /* Palette identity remains the same; only readable foreground tokens adapt. */
   --color-content-on-accent: #0A0A0A;
+  --color-gold-hover: var(--color-gold-base);
+  --color-accent-strong: var(--color-gold-base);
+}
+
+[data-theme="dark"] {
   --color-accent-text: var(--color-gold-accent);
-  --color-gold-hover: var(--color-gold-accent);
-  --color-accent-strong: var(--color-gold-accent);
 }
 
 [data-theme="light"] {
-  --color-content-on-accent: #0A0A0A;
   --color-accent-text: var(--color-gold-deep);
-  --color-gold-hover: var(--color-gold-deep);
-  --color-accent-strong: var(--color-gold-deep);
 }
 
 /* White foreground is reserved for the few darker accents where it passes contrast. */
