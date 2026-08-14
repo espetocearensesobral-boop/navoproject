@@ -410,7 +410,7 @@ export const WaitingQueue: React.FC = () => {
                       <p className="text-[11px] text-gold-hover font-semibold">{item.service_title}</p>
                     </div>
                     {item.service_price && (
-                      <span className="text-xs font-black text-status-success">
+                      <span className="text-xs font-black finance-positive">
                         R$ {item.service_price.toFixed(2)}
                       </span>
                     )}

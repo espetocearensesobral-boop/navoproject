@@ -290,7 +290,7 @@ export const CaixaManagement: React.FC = () => {
                   <User className="w-3.5 h-3.5 text-gold-base" />
                 </div>
               </div>
-              <p className="text-lg font-black text-content-base tabular-nums truncate">R$ {currentSession.initialBalance.toFixed(2)}</p>
+              <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {currentSession.initialBalance.toFixed(2)}</p>
               <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{currentSession.operatorName}</p>
             </div>
 
@@ -301,7 +301,7 @@ export const CaixaManagement: React.FC = () => {
                   <DollarSign className="w-3.5 h-3.5" />
                 </div>
               </div>
-              <p className="text-lg font-black text-status-success tabular-nums truncate">+ R$ {currentSession.cashInSales.toFixed(2)}</p>
+              <p className="text-lg font-black finance-positive tabular-nums truncate">+ R$ {currentSession.cashInSales.toFixed(2)}</p>
               <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Espécie na gaveta</p>
             </div>
 
@@ -312,7 +312,7 @@ export const CaixaManagement: React.FC = () => {
                   <ArrowUpRight className="w-3.5 h-3.5" />
                 </div>
               </div>
-              <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {(currentSession.supplies - currentSession.withdrawals).toFixed(2)}</p>
+              <p className={`text-lg font-black tabular-nums truncate ${currentSession.supplies - currentSession.withdrawals >= 0 ? 'finance-positive' : 'finance-negative'}`}>R$ {(currentSession.supplies - currentSession.withdrawals).toFixed(2)}</p>
               <p className="text-[9px] text-content-muted mt-1 font-medium truncate">+{currentSession.supplies.toFixed(0)} / -{currentSession.withdrawals.toFixed(0)}</p>
             </div>
 
@@ -323,7 +323,7 @@ export const CaixaManagement: React.FC = () => {
                   <Wallet className="w-3.5 h-3.5" />
                 </div>
               </div>
-              <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {currentSession.expectedCash.toFixed(2)}</p>
+              <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {currentSession.expectedCash.toFixed(2)}</p>
               <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Conferência no fechamento</p>
             </div>
           </div>
@@ -336,15 +336,15 @@ export const CaixaManagement: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div className="bg-surface-base p-3 rounded-xl border border-border-subtle flex justify-between items-center">
                 <span className="text-content-muted font-bold">PIX Digital:</span>
-                <span className="font-bold text-content-base tabular-nums">R$ {currentSession.pixSales.toFixed(2)}</span>
+                <span className="font-bold finance-positive tabular-nums">R$ {currentSession.pixSales.toFixed(2)}</span>
               </div>
               <div className="bg-surface-base p-3 rounded-xl border border-border-subtle flex justify-between items-center">
                 <span className="text-content-muted font-bold">Cartões (Crédito/Débito):</span>
-                <span className="font-bold text-content-base tabular-nums">R$ {currentSession.cardSales.toFixed(2)}</span>
+                <span className="font-bold finance-positive tabular-nums">R$ {currentSession.cardSales.toFixed(2)}</span>
               </div>
               <div className="bg-surface-base p-3 rounded-xl border border-border-subtle flex justify-between items-center">
                 <span className="text-content-muted font-bold">Dinheiro (Espécie):</span>
-                <span className="font-bold text-status-success tabular-nums">R$ {currentSession.cashInSales.toFixed(2)}</span>
+                <span className="font-bold finance-positive tabular-nums">R$ {currentSession.cashInSales.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -387,7 +387,7 @@ export const CaixaManagement: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <span className={`font-bold tabular-nums ${m.type === 'suprimento' ? 'text-status-success' : 'text-status-error'}`}>
+                    <span className={`font-bold tabular-nums ${m.type === 'suprimento' ? 'finance-positive' : 'finance-negative'}`}>
                       {m.type === 'suprimento' ? '+' : '-'} R$ {m.amount.toFixed(2)}
                     </span>
                   </div>
@@ -448,13 +448,13 @@ export const CaixaManagement: React.FC = () => {
                         {h.closedAt ? new Date(h.closedAt).toLocaleString('pt-BR') : '-'}
                       </td>
                       <td className="p-3 text-content-muted">{h.operatorName}</td>
-                      <td className="p-3 text-right tabular-nums">R$ {h.initialBalance.toFixed(2)}</td>
-                      <td className="p-3 text-right tabular-nums">R$ {h.expectedCash.toFixed(2)}</td>
-                      <td className="p-3 text-right tabular-nums font-bold">
+                      <td className="p-3 text-right tabular-nums finance-positive">R$ {h.initialBalance.toFixed(2)}</td>
+                      <td className="p-3 text-right tabular-nums finance-positive">R$ {h.expectedCash.toFixed(2)}</td>
+                      <td className="p-3 text-right tabular-nums font-bold finance-positive">
                         R$ {(h.declaredCash || 0).toFixed(2)}
                       </td>
                       <td className={`p-3 text-right tabular-nums font-bold ${
-                        diff === 0 ? 'text-status-success' : diff > 0 ? 'text-gold-base' : 'text-status-error'
+                        diff >= 0 ? 'finance-positive' : 'finance-negative'
                       }`}>
                         {diff === 0 ? 'Exato (R$ 0)' : `${diff > 0 ? '+' : ''} R$ ${diff.toFixed(2)}`}
                       </td>
@@ -654,7 +654,7 @@ export const CaixaManagement: React.FC = () => {
             <div className="bg-surface-base p-3 rounded-xl border border-border-subtle space-y-1 text-xs">
               <div className="flex justify-between text-content-muted">
                 <span>Dinheiro Esperado na Gaveta:</span>
-                <span className="font-bold text-gold-base tabular-nums">R$ {currentSession.expectedCash.toFixed(2)}</span>
+                <span className="font-bold finance-positive tabular-nums">R$ {currentSession.expectedCash.toFixed(2)}</span>
               </div>
             </div>
 
@@ -744,31 +744,31 @@ export const CaixaManagement: React.FC = () => {
             <div className="font-sans space-y-1.5 text-xs">
               <div className="flex justify-between text-content-muted">
                 <span>Fundo Inicial:</span>
-                <span>R$ {receiptSession.initialBalance.toFixed(2)}</span>
+                <span className="finance-positive">R$ {receiptSession.initialBalance.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-content-muted">
                 <span>Vendas em Dinheiro:</span>
-                <span>+ R$ {receiptSession.cashInSales.toFixed(2)}</span>
+                <span className="finance-positive">+ R$ {receiptSession.cashInSales.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-content-muted">
                 <span>Suprimentos:</span>
-                <span>+ R$ {receiptSession.supplies.toFixed(2)}</span>
+                <span className="finance-positive">+ R$ {receiptSession.supplies.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-content-muted">
                 <span>Sangrias:</span>
-                <span>- R$ {receiptSession.withdrawals.toFixed(2)}</span>
+                <span className="finance-negative">- R$ {receiptSession.withdrawals.toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-bold text-content-base border-t border-border-subtle/60 pt-1">
                 <span>Esperado em Gaveta:</span>
-                <span>R$ {receiptSession.expectedCash.toFixed(2)}</span>
+                <span className="finance-positive">R$ {receiptSession.expectedCash.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between font-bold text-gold-base">
+              <div className="flex justify-between font-bold finance-positive">
                 <span>Declarado Contado:</span>
-                <span>R$ {(receiptSession.declaredCash || 0).toFixed(2)}</span>
+                <span className="finance-positive">R$ {(receiptSession.declaredCash || 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-bold border-t border-border-subtle/80 pt-1">
                 <span>Divergência:</span>
-                <span className={(receiptSession.difference || 0) === 0 ? 'text-status-success' : 'text-status-error'}>
+                <span className={(receiptSession.difference || 0) >= 0 ? 'finance-positive' : 'finance-negative'}>
                   R$ {(receiptSession.difference || 0).toFixed(2)}
                 </span>
               </div>

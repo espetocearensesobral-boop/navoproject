@@ -130,7 +130,7 @@ export const FinancialStatementManagement: React.FC = () => {
               <ArrowUpRight className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-status-success tabular-nums truncate">+ R$ {totalIncomes.toFixed(2)}</p>
+          <p className="text-lg font-black finance-positive tabular-nums truncate">+ R$ {totalIncomes.toFixed(2)}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Lançamentos persistidos</p>
         </div>
 
@@ -141,7 +141,7 @@ export const FinancialStatementManagement: React.FC = () => {
               <ArrowDownRight className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-status-error tabular-nums truncate">- R$ {totalExpenses.toFixed(2)}</p>
+          <p className="text-lg font-black finance-negative tabular-nums truncate">- R$ {totalExpenses.toFixed(2)}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Saídas persistidas</p>
         </div>
 
@@ -152,7 +152,7 @@ export const FinancialStatementManagement: React.FC = () => {
               <PieChart className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className={`text-lg font-black tabular-nums truncate ${netBalance >= 0 ? 'text-gold-base' : 'text-status-error'}`}>
+          <p className={`text-lg font-black tabular-nums truncate ${netBalance >= 0 ? 'finance-positive' : 'finance-negative'}`}>
              R$ {netBalance.toFixed(2)}
           </p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Saldo do extrato</p>
@@ -234,7 +234,7 @@ export const FinancialStatementManagement: React.FC = () => {
                     {t.paymentMethod}
                   </td>
                   <td className={`p-3 text-right font-bold tabular-nums whitespace-nowrap ${
-                    t.type === 'income' ? 'text-status-success' : 'text-status-error'
+                    t.type === 'income' ? 'finance-positive' : 'finance-negative'
                   }`}>
                     {t.type === 'income' ? '+' : '-'} R$ {t.amount.toFixed(2)}
                   </td>

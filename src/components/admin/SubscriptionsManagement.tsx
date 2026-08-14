@@ -194,7 +194,7 @@ export const SubscriptionsManagement: React.FC = () => {
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {totalMRR.toFixed(2)}</p>
+          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalMRR.toFixed(2)}</p>
           <p className="text-[9px] text-status-success mt-1 font-medium truncate">Garantido todo mês</p>
         </div>
 
@@ -206,7 +206,7 @@ export const SubscriptionsManagement: React.FC = () => {
             </div>
           </div>
           <p className="text-lg font-black text-content-base tabular-nums">{totalActiveSubscribers}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Ticket: R$ {totalActiveSubscribers > 0 ? (totalMRR / totalActiveSubscribers).toFixed(0) : '0'}</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Ticket: <span className="finance-positive">R$ {totalActiveSubscribers > 0 ? (totalMRR / totalActiveSubscribers).toFixed(0) : '0'}</span></p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
@@ -294,7 +294,7 @@ export const SubscriptionsManagement: React.FC = () => {
               <div>
                 <h3 className="text-base font-bold text-content-base">{plan.name}</h3>
                 <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-gold-base tabular-nums">R$ {plan.price.toFixed(2)}</span>
+                  <span className="text-2xl font-bold finance-positive tabular-nums">R$ {plan.price.toFixed(2)}</span>
                   <span className="text-xs text-content-muted">/mês</span>
                 </div>
 
@@ -315,7 +315,7 @@ export const SubscriptionsManagement: React.FC = () => {
 
               <div className="pt-3 border-t border-border-subtle/80 flex justify-between items-center text-xs">
                 <span className="text-content-muted font-bold">Repasse ao Barbeiro:</span>
-                <span className="font-bold text-status-success tabular-nums">R$ {plan.barberPerCutFee.toFixed(2)} / corte</span>
+                <span className="font-bold finance-negative tabular-nums">R$ {plan.barberPerCutFee.toFixed(2)} / corte</span>
               </div>
             </div>
           ))}
@@ -338,11 +338,11 @@ export const SubscriptionsManagement: React.FC = () => {
               <div key={p.id} className="flex justify-between items-center bg-surface-base p-3 rounded-xl border border-border-subtle text-xs">
                 <div>
                   <span className="font-bold text-content-base block">{p.name}</span>
-                  <span className="text-[10px] text-content-muted">Mensalidade do Cliente: R$ {p.price.toFixed(2)}</span>
+                  <span className="text-[10px] text-content-muted">Mensalidade do Cliente: <span className="finance-positive">R$ {p.price.toFixed(2)}</span></span>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-content-muted uppercase font-bold block">Repasse Fixo / Corte</span>
-                  <span className="font-bold text-status-success text-sm tabular-nums">R$ {p.barberPerCutFee.toFixed(2)}</span>
+                  <span className="font-bold finance-negative text-sm tabular-nums">R$ {p.barberPerCutFee.toFixed(2)}</span>
                 </div>
               </div>
             ))}

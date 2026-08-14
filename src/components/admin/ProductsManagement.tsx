@@ -223,7 +223,7 @@ export const ProductsManagement: React.FC = () => {
                   </div>
                   <div className="hidden sm:block text-right shrink-0">
                     <p className="text-xs text-content-muted">Preço</p>
-                    <p className="text-sm font-bold text-content-base">{money(product.price)}</p>
+                    <p className="text-sm font-bold finance-positive">{money(product.price)}</p>
                   </div>
                   <div className="text-right shrink-0 min-w-[58px]">
                     <p className="text-xs text-content-muted">Estoque</p>
@@ -234,8 +234,8 @@ export const ProductsManagement: React.FC = () => {
                 {isExpanded && (
                   <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Preço de venda</p><p className="font-bold text-content-base">{money(product.price)}</p></div>
-                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Custo</p><p className="font-bold text-content-base">{money(product.cost_price)}</p></div>
+                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Preço de venda</p><p className="font-bold finance-positive">{money(product.price)}</p></div>
+                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Custo</p><p className="font-bold finance-negative">{money(product.cost_price)}</p></div>
                       <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Alerta mínimo</p><p className="font-bold text-content-base">{product.min_stock_alert} un.</p></div>
                       <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Comissão</p><p className="font-bold text-content-base">{product.commission_percentage}%</p></div>
                     </div>

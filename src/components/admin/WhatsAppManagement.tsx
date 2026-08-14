@@ -48,7 +48,7 @@ export const WhatsAppManagement: React.FC = () => {
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {balance.toFixed(2)}</p>
+          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {balance.toFixed(2)}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">~{Math.floor(balance / 0.10)} mensagens</p>
         </div>
 

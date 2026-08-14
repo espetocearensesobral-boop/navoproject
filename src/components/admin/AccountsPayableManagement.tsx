@@ -170,7 +170,7 @@ export const AccountsPayableManagement: React.FC = () => {
               <AlertCircle className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-status-error tabular-nums truncate">R$ {totalOverdue.toFixed(2)}</p>
+          <p className="text-lg font-black finance-negative tabular-nums truncate">R$ {totalOverdue.toFixed(2)}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{accounts.filter(a => a.status === 'overdue').length} conta(s)</p>
         </div>
 
@@ -181,7 +181,7 @@ export const AccountsPayableManagement: React.FC = () => {
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {totalPending.toFixed(2)}</p>
+          <p className="text-lg font-black finance-negative tabular-nums truncate">R$ {totalPending.toFixed(2)}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{accounts.filter(a => a.status === 'pending').length} a vencer</p>
         </div>
 
@@ -192,7 +192,7 @@ export const AccountsPayableManagement: React.FC = () => {
               <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-status-success tabular-nums truncate">R$ {totalPaid.toFixed(2)}</p>
+          <p className="text-lg font-black finance-negative tabular-nums truncate">R$ {totalPaid.toFixed(2)}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Liquidadas no período</p>
         </div>
       </div>
@@ -255,7 +255,7 @@ export const AccountsPayableManagement: React.FC = () => {
                       </span>
                     )}
                   </td>
-                  <td className="p-3 text-right font-bold text-content-base tabular-nums">
+                  <td className="p-3 text-right font-bold finance-negative tabular-nums">
                     R$ {a.amount.toFixed(2)}
                   </td>
                   <td className="p-3 text-center">
@@ -343,7 +343,7 @@ export const AccountsPayableManagement: React.FC = () => {
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none font-bold text-gold-base"
+                  className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs finance-negative focus:outline-none font-bold"
                 />
               </div>
 

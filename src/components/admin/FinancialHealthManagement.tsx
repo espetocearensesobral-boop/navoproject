@@ -45,7 +45,7 @@ export const FinancialHealthManagement: React.FC = () => {
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ 8.450</p>
+          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ 8.450</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Atingido dia 12</p>
         </div>
 
@@ -56,7 +56,7 @@ export const FinancialHealthManagement: React.FC = () => {
               <PieChart className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-content-base tabular-nums truncate">R$ 18.290</p>
+          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ 18.290</p>
           <p className="text-[9px] text-status-success mt-1 font-medium truncate">Reserva segura</p>
         </div>
       </div>

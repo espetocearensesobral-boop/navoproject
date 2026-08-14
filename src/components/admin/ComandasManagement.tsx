@@ -488,7 +488,7 @@ export const ComandasManagement: React.FC = () => {
                             <span className="font-bold text-gold-base">{item.quantity}x</span>
                             <span className="text-content-base truncate">{item.title}</span>
                           </div>
-                          <span className="font-bold text-content-base tabular-nums shrink-0">
+                          <span className="font-bold finance-positive tabular-nums shrink-0">
                             R$ {(item.price * item.quantity).toFixed(2)}
                           </span>
                         </div>
@@ -500,7 +500,7 @@ export const ComandasManagement: React.FC = () => {
                   <div className="border-t border-border-subtle/80 pt-3 flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-content-muted uppercase font-bold block">Total Parcial</span>
-                      <span className="text-lg font-bold text-gold-base tabular-nums">
+                      <span className="text-lg font-bold finance-positive tabular-nums">
                         R$ {cmd.subtotal.toFixed(2)}
                       </span>
                     </div>
@@ -554,7 +554,7 @@ export const ComandasManagement: React.FC = () => {
                         <td className="p-3 uppercase font-bold text-[10px] text-content-muted">
                           {cmd.paymentMethod === 'pix' ? 'PIX' : cmd.paymentMethod === 'credit_card' ? 'Cartão Crédito' : cmd.paymentMethod === 'cash' ? 'Dinheiro' : 'Débito'}
                         </td>
-                        <td className="p-3 text-right font-bold text-status-success tabular-nums">
+                        <td className="p-3 text-right font-bold finance-positive tabular-nums">
                           R$ {cmd.total.toFixed(2)}
                         </td>
                         <td className="p-3 text-center">
@@ -703,7 +703,7 @@ export const ComandasManagement: React.FC = () => {
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-bold text-gold-base tabular-nums">
+                      <span className="font-bold finance-positive tabular-nums">
                         R$ {(item.price * item.quantity).toFixed(2)}
                       </span>
                       <button
@@ -765,7 +765,7 @@ export const ComandasManagement: React.FC = () => {
             <div className="space-y-3 bg-surface-base p-3.5 rounded-xl border border-border-subtle text-xs">
               <div className="flex justify-between items-center text-content-muted">
                 <span>Subtotal dos Itens:</span>
-                <span className="font-bold text-content-base tabular-nums">R$ {closingComanda.subtotal.toFixed(2)}</span>
+                <span className="font-bold finance-positive tabular-nums">R$ {closingComanda.subtotal.toFixed(2)}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 pt-1 border-t border-border-subtle/60">
@@ -793,7 +793,7 @@ export const ComandasManagement: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center text-sm font-bold border-t border-border-subtle/80 pt-2 text-gold-base">
+              <div className="flex justify-between items-center text-sm font-bold border-t border-border-subtle/80 pt-2 finance-positive">
                 <span>Total a Pagar:</span>
                 <span className="text-base tabular-nums">
                   R$ {Math.max(0, closingComanda.subtotal - discountInput + tipInput).toFixed(2)}
@@ -894,7 +894,7 @@ export const ComandasManagement: React.FC = () => {
               {receiptModalComanda.items.map((item, i) => (
                 <div key={i} className="flex justify-between text-xs">
                   <span>{item.quantity}x {item.title}</span>
-                  <span className="font-bold tabular-nums">R$ {(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-bold finance-positive tabular-nums">R$ {(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -902,23 +902,23 @@ export const ComandasManagement: React.FC = () => {
             <div className="border-t border-border-subtle pt-3 font-sans space-y-1 text-xs">
               <div className="flex justify-between text-content-muted">
                 <span>Subtotal:</span>
-                <span>R$ {receiptModalComanda.subtotal.toFixed(2)}</span>
+                <span className="finance-positive">R$ {receiptModalComanda.subtotal.toFixed(2)}</span>
               </div>
               {receiptModalComanda.discount > 0 && (
-                <div className="flex justify-between text-status-success">
+                <div className="flex justify-between finance-negative">
                   <span>Desconto:</span>
                   <span>- R$ {receiptModalComanda.discount.toFixed(2)}</span>
                 </div>
               )}
               {receiptModalComanda.tip > 0 && (
-                <div className="flex justify-between text-gold-base">
+                <div className="flex justify-between finance-positive">
                   <span>Caixinha / Gorjeta:</span>
                   <span>+ R$ {receiptModalComanda.tip.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm font-bold text-content-base border-t border-border-subtle/80 pt-1">
                 <span>TOTAL PAGO:</span>
-                <span className="text-gold-base tabular-nums">R$ {receiptModalComanda.total.toFixed(2)}</span>
+                <span className="finance-positive tabular-nums">R$ {receiptModalComanda.total.toFixed(2)}</span>
               </div>
             </div>
 

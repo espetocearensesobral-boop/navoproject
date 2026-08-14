@@ -108,7 +108,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
               <Receipt className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-content-base tabular-nums truncate">R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{activeToday.length} cortes hoje</p>
         </div>
 
@@ -119,7 +119,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
               <CalendarCheck2 className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
           <p className="text-[9px] text-status-success mt-1 font-medium truncate">{inServiceToday} ativos agora</p>
         </div>
 
@@ -199,7 +199,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className="font-bold text-content-base num-tabular whitespace-nowrap">
+                      <span className="font-bold finance-positive num-tabular whitespace-nowrap">
                         R$ {apt.final_amount ? apt.final_amount.toFixed(2) : '0.00'}
                       </span>
                       <button
@@ -277,7 +277,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                       </td>
 
                       {/* Valor */}
-                      <td className="px-4 py-2 text-right num-tabular whitespace-nowrap font-bold text-content-base">
+                      <td className="px-4 py-2 text-right num-tabular whitespace-nowrap font-bold finance-positive">
                         R$ {apt.final_amount ? apt.final_amount.toFixed(2) : '0.00'}
                       </td>
 

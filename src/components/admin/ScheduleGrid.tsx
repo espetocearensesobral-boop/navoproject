@@ -363,7 +363,7 @@ export const ScheduleGrid: React.FC = () => {
                               )}
                               <div className="flex justify-between items-center text-base mb-2 gap-3">
                                 <span className="font-bold text-content-base truncate">{apt.client_name || (apt as any).clientName}</span>
-                                <span className="font-extrabold text-status-success text-base shrink-0">R$ {apt.final_amount ? Number(apt.final_amount).toFixed(2) : '60.00'}</span>
+                                <span className="font-extrabold finance-positive text-base shrink-0">R$ {apt.final_amount ? Number(apt.final_amount).toFixed(2) : '60.00'}</span>
                               </div>
                               <div className="flex justify-between items-start gap-3 text-sm text-content-muted">
                                 <span className="min-w-0 leading-relaxed">{(apt.services && apt.services[0]?.title) || 'Atendimento'} • <strong className="text-gold-base">{barber.name}</strong></span>
@@ -510,7 +510,7 @@ export const ScheduleGrid: React.FC = () => {
                               <div className="w-full bg-surface-base border-l-4 border-l-[#FFFFFF] p-2 rounded-r-xl space-y-0.5">
                                 <div className="flex items-center justify-between text-xs font-bold text-content-base">
                                   <span>{apt.client_name}</span>
-                                  <span className="text-[10px] text-gold-hover">R$ {apt.final_amount.toFixed(2)}</span>
+                                  <span className="text-[10px] finance-positive">R$ {apt.final_amount.toFixed(2)}</span>
                                 </div>
                                 <div className="text-[10px] text-content-muted flex items-center justify-between">
                                   <span>{apt.services[0]?.title || 'Atendimento'}</span>

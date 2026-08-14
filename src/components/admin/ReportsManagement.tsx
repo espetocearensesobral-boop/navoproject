@@ -239,7 +239,7 @@ export const ReportsManagement: React.FC = () => {
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-gold-base tabular-nums truncate">R$ {totalPeriodRevenue.toFixed(2)}</p>
+          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalPeriodRevenue.toFixed(2)}</p>
           <p className="text-[9px] text-status-success mt-1 font-medium truncate">{totalPeriodServices} atendimentos</p>
         </div>
 
@@ -250,7 +250,7 @@ export const ReportsManagement: React.FC = () => {
               <Award className="w-3.5 h-3.5 text-gold-base" />
             </div>
           </div>
-          <p className="text-lg font-black text-content-base tabular-nums truncate">R$ {avgTicket.toFixed(2)}</p>
+          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {avgTicket.toFixed(2)}</p>
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Por cliente atendido</p>
         </div>
 
@@ -306,7 +306,7 @@ export const ReportsManagement: React.FC = () => {
                             {item.count} execuções
                           </span>
                         </div>
-                        <span className="font-bold text-gold-base tabular-nums">
+                        <span className="font-bold finance-positive tabular-nums">
                           R$ {item.totalRevenue.toFixed(2)} ({sharePct}%)
                         </span>
                       </div>
@@ -362,7 +362,7 @@ export const ReportsManagement: React.FC = () => {
                         </td>
                         <td className="p-3 text-center font-bold">{c.visits}x</td>
                         <td className="p-3 text-content-muted">{new Date(c.lastVisit).toLocaleDateString('pt-BR')}</td>
-                        <td className="p-3 text-right font-bold text-gold-base tabular-nums">
+                        <td className="p-3 text-right font-bold finance-positive tabular-nums">
                           R$ {c.totalSpent.toFixed(2)}
                         </td>
                       </tr>
@@ -416,13 +416,13 @@ export const ReportsManagement: React.FC = () => {
                       </div>
                       <div className="bg-surface-card p-2 rounded-lg border border-border-subtle/60">
                         <span className="text-[9px] text-content-muted uppercase font-bold block">Gerado Bruto</span>
-                        <span className="font-bold text-content-base mt-0.5 block tabular-nums">
+                        <span className="font-bold finance-positive mt-0.5 block tabular-nums">
                           R$ {prof.totalGross.toFixed(0)}
                         </span>
                       </div>
                       <div className="bg-surface-card p-2 rounded-lg border border-border-subtle/60">
                         <span className="text-[9px] text-content-muted uppercase font-bold block">Comissão R$</span>
-                        <span className="font-bold text-status-success mt-0.5 block tabular-nums">
+                        <span className="font-bold finance-negative mt-0.5 block tabular-nums">
                           R$ {prof.totalCommission.toFixed(0)}
                         </span>
                       </div>

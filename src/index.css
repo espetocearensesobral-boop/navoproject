@@ -27,6 +27,10 @@
   --color-status-warning: var(--color-status-warning);
   --color-status-error: var(--color-status-error);
   --color-status-info: var(--color-status-info);
+  --color-finance-positive: var(--color-finance-positive);
+  --color-finance-negative: var(--color-finance-negative);
+  --color-finance-positive-soft: var(--color-finance-positive-soft);
+  --color-finance-negative-soft: var(--color-finance-negative-soft);
 
   --radius-xs: 6px;
   --radius-sm: 8px;
@@ -76,6 +80,12 @@
   --color-status-error: #EF4444;
   --color-status-info: #3B82F6;
 
+  /* Financial semantics: independent from data-palette; tuned for dark surfaces. */
+  --color-finance-positive: #34D399;
+  --color-finance-negative: #F87171;
+  --color-finance-positive-soft: color-mix(in srgb, #34D399 14%, transparent);
+  --color-finance-negative-soft: color-mix(in srgb, #F87171 14%, transparent);
+
   /* Typography */
   --font-serif: 'Fraunces', Georgia, serif;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -124,6 +134,12 @@
   --color-status-warning: #D97706;
   --color-status-error: #DC2626;
   --color-status-info: #2563EB;
+
+  /* Financial semantics: independent from data-palette; tuned for light surfaces. */
+  --color-finance-positive: #15803D;
+  --color-finance-negative: #B91C1C;
+  --color-finance-positive-soft: color-mix(in srgb, #15803D 11%, transparent);
+  --color-finance-negative-soft: color-mix(in srgb, #B91C1C 11%, transparent);
 }
 
 /* Paletas de destaque: o restante da identidade permanece vinculado ao tema claro/preto. */
@@ -156,6 +172,14 @@
 [data-palette="midnight"] { --color-gold-base: #3B82F6; --color-gold-deep: #1D4ED8; --color-gold-accent: #93C5FD; }
 [data-palette="lavender"] { --color-gold-base: #C084FC; --color-gold-deep: #9333EA; --color-gold-accent: #E9D5FF; }
 [data-palette="bordeaux"] { --color-gold-base: #F43F5E; --color-gold-deep: #BE123C; --color-gold-accent: #FECDD3; }
+
+/* Money colors are intentionally outside every palette override. */
+.finance-positive { color: var(--color-finance-positive) !important; }
+.finance-negative { color: var(--color-finance-negative) !important; }
+.finance-positive-soft { background-color: var(--color-finance-positive-soft) !important; }
+.finance-negative-soft { background-color: var(--color-finance-negative-soft) !important; }
+.finance-positive-border { border-color: color-mix(in srgb, var(--color-finance-positive) 35%, transparent) !important; }
+.finance-negative-border { border-color: color-mix(in srgb, var(--color-finance-negative) 35%, transparent) !important; }
 
 /* Semantic contrast guardrails: palette accents must adapt to the active theme. */
 [data-theme="dark"],

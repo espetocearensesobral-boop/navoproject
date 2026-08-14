@@ -18,7 +18,7 @@ export interface AdminStat {
   label: string;
   value: string | number;
   /** Cor de destaque do valor. Default = dourado. */
-  tone?: 'gold' | 'success' | 'info' | 'warning' | 'muted';
+  tone?: 'gold' | 'success' | 'info' | 'warning' | 'muted' | 'finance-positive' | 'finance-negative';
 }
 
 export interface AdminPageHeaderAction {
@@ -43,6 +43,8 @@ const TONE_CLASSES: Record<NonNullable<AdminStat['tone']>, string> = {
   info: 'text-blue-400',
   warning: 'text-amber-400',
   muted: 'text-content-muted',
+  'finance-positive': 'finance-positive',
+  'finance-negative': 'finance-negative',
 };
 
 export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({

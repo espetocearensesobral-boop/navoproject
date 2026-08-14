@@ -314,7 +314,7 @@ export const ServicesManagement: React.FC = () => {
           { label: 'serviços', value: totalServices, tone: 'gold' },
           { label: 'VIPs', value: totalCombos, tone: 'success' },
           { label: 'duração méd.', value: `${avgDuration} min`, tone: 'info' },
-          { label: 'preço méd.', value: `R$ ${avgPrice.toFixed(2)}`, tone: 'warning' },
+          { label: 'preço méd.', value: `R$ ${avgPrice.toFixed(2)}`, tone: 'finance-positive' },
         ]}
         action={{ label: 'Cadastrar Novo Serviço', onClick: handleOpenCreate, icon: Plus }}
       />
@@ -453,7 +453,7 @@ export const ServicesManagement: React.FC = () => {
                       <p className="text-xs text-content-muted truncate">{service.description || 'Sem descrição cadastrada'}</p>
                     </div>
                     <div className="text-right shrink-0 min-w-[62px]">
-                      <p className="text-xs font-bold text-gold-base">R$ {service.price.toFixed(2)}</p>
+                      <p className="text-xs font-bold finance-positive">R$ {service.price.toFixed(2)}</p>
                       <p className="text-[10px] text-content-muted">{service.duration_minutes} min</p>
                     </div>
                     {isExpanded ? <ChevronUp className="w-5 h-5 text-gold-base shrink-0" /> : <ChevronDown className="w-5 h-5 text-content-muted shrink-0" />}
@@ -464,7 +464,7 @@ export const ServicesManagement: React.FC = () => {
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Categoria</p><p className="font-semibold text-content-base">{categoryName}</p></div>
                         <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Duração</p><p className="font-semibold text-content-base">{service.duration_minutes} min</p></div>
-                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Preço original</p><p className="font-semibold text-content-base">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Preço original</p><p className="font-semibold finance-positive">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
                         <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Galeria</p><p className="font-semibold text-content-base">{servicePhotos.length} foto(s)</p></div>
                       </div>
                       {service.description && <p className="text-sm text-content-muted leading-relaxed">{service.description}</p>}
@@ -691,11 +691,11 @@ export const ServicesManagement: React.FC = () => {
                       <td className="py-3 px-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <div className="flex items-center space-x-2">
-                            <span className="font-mono num-tabular text-content-base font-semibold text-sm text-gold-base">
+                            <span className="font-mono num-tabular finance-positive font-semibold text-sm">
                               R$ {service.price.toFixed(2)}
                             </span>
                             {service.original_price && service.original_price > service.price && (
-                              <span className="text-[10px] text-content-muted line-through">
+                              <span className="text-[10px] finance-positive line-through">
                                 R$ {service.original_price.toFixed(2)}
                               </span>
                             )}
@@ -820,7 +820,7 @@ export const ServicesManagement: React.FC = () => {
                     </div>
                     <div className="text-right shrink-0 min-w-[72px]">
                       <p className="text-xs text-content-muted">Preço</p>
-                      <p className="text-sm sm:text-base font-bold text-gold-base">R$ {service.price.toFixed(2)}</p>
+                      <p className="text-sm sm:text-base font-bold finance-positive">R$ {service.price.toFixed(2)}</p>
                     </div>
                     {isExpanded ? <ChevronUp className="w-5 h-5 text-gold-base shrink-0" /> : <ChevronDown className="w-5 h-5 text-content-muted shrink-0" />}
                   </button>
@@ -830,7 +830,7 @@ export const ServicesManagement: React.FC = () => {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                         <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Categoria</p><p className="mt-1 font-semibold text-content-base">{categoryName}</p></div>
                         <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Duração</p><p className="mt-1 font-semibold text-content-base">{service.duration_minutes} minutos</p></div>
-                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Preço original</p><p className="mt-1 font-semibold text-content-base">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Preço original</p><p className="mt-1 font-semibold finance-positive">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
                         <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Desconto</p><p className="mt-1 font-semibold text-status-success">{service.discount_percentage ? `${service.discount_percentage}% OFF` : 'Sem desconto'}</p></div>
                       </div>
                       {service.description && <p className="text-sm text-content-muted leading-relaxed">{service.description}</p>}
@@ -972,7 +972,7 @@ export const ServicesManagement: React.FC = () => {
                               value={formData.duration_minutes}
                               onChange={(e) => setFormData({ ...formData, duration_minutes: Number(e.target.value) })}
                               placeholder="35"
-                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-gold-base outline-none"
+                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs finance-positive focus:border-gold-base outline-none"
                               required
                             />
                           </div>
@@ -1031,50 +1031,50 @@ export const ServicesManagement: React.FC = () => {
                     <div className="space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                          <label className="text-[11px] font-bold finance-positive block mb-1">
                             Preço de Venda (R$) *
                           </label>
                           <div className="relative">
-                            <span className="text-xs text-gold-hover font-bold absolute left-3 top-1/2 -translate-y-1/2">R$</span>
+                            <span className="text-xs finance-positive font-bold absolute left-3 top-1/2 -translate-y-1/2">R$</span>
                             <input
                               type="number"
                               step="0.01"
                               value={formData.price}
                               onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                               placeholder="60.00"
-                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold text-content-base focus:border-gold-base outline-none"
+                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold finance-positive focus:border-gold-base outline-none"
                               required
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                          <label className="text-[11px] font-bold finance-positive block mb-1">
                             Preço De / Sem Desconto (R$)
                           </label>
                           <div className="relative">
-                            <span className="text-xs text-content-muted font-bold absolute left-3 top-1/2 -translate-y-1/2">R$</span>
+                            <span className="text-xs finance-positive font-bold absolute left-3 top-1/2 -translate-y-1/2">R$</span>
                             <input
                               type="number"
                               step="0.01"
                               value={formData.original_price || ''}
                               onChange={(e) => setFormData({ ...formData, original_price: e.target.value ? Number(e.target.value) : undefined })}
                               placeholder="75.00"
-                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-gold-base outline-none"
+                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs finance-positive focus:border-gold-base outline-none"
                             />
                           </div>
                         </div>
                       </div>
 
                       {formData.original_price && formData.original_price > (formData.price || 0) && (
-                        <div className="p-3 bg-status-success/10 border border-status-success/30 rounded-xl flex items-center justify-between">
+                        <div className="p-3 finance-negative-soft finance-negative-border rounded-xl flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Flame className="w-4 h-4 text-status-success" />
-                            <span className="text-xs font-bold text-status-success">
+                            <Flame className="w-4 h-4 finance-negative" />
+                            <span className="text-xs font-bold finance-negative">
                               Desconto de R$ {(formData.original_price - (formData.price || 0)).toFixed(2)}
                             </span>
                           </div>
-                          <span className="px-2 py-0.5 rounded-xl bg-status-success text-surface-base font-black text-[10px] uppercase">
+                          <span className="px-2 py-0.5 rounded-xl finance-negative-soft finance-negative font-black text-[10px] uppercase">
                             {Math.round(((formData.original_price - (formData.price || 0)) / formData.original_price) * 100)}% OFF
                           </span>
                         </div>

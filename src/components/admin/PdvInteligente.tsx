@@ -462,7 +462,7 @@ Obrigado pela preferência!`;
         icon={Wallet}
         stats={[
           { label: 'Caixa', value: isCaixaOpen ? 'ABERTO' : 'FECHADO', tone: isCaixaOpen ? 'success' : 'warning' },
-          { label: 'Faturamento', value: `R$ ${totalRevenueToday.toFixed(2)}`, tone: 'success' },
+          { label: 'Faturamento', value: `R$ ${totalRevenueToday.toFixed(2)}`, tone: 'finance-positive' },
         ]}
         action={{
           label: 'Histórico de Hoje',
@@ -601,7 +601,7 @@ Obrigado pela preferência!`;
                     {services.filter(s => s.title.toLowerCase().includes(searchCatalog.toLowerCase())).map(s => (
                       <div key={s.id} onClick={() => handleAddServiceToCart(s)} className="p-2 border border-border-subtle rounded-lg flex items-center justify-between cursor-pointer hover:border-gold-base hover:bg-surface-card transition-colors">
                         <span className="text-xs font-bold text-content-base truncate flex-1">{s.title}</span>
-                        <span className="text-[10px] font-bold text-gold-hover font-mono bg-gold-base/10 px-1.5 py-0.5 rounded">R$ {s.price.toFixed(2)}</span>
+                        <span className="text-[10px] font-bold finance-positive font-mono finance-positive-soft px-1.5 py-0.5 rounded">R$ {s.price.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -613,7 +613,7 @@ Obrigado pela preferência!`;
                     {products.filter(p => p.name.toLowerCase().includes(searchCatalog.toLowerCase())).map(p => (
                       <div key={p.id} onClick={() => handleAddProductToCart(p)} className="p-2 border border-border-subtle rounded-lg flex items-center justify-between cursor-pointer hover:border-gold-base hover:bg-surface-card transition-colors">
                         <span className="text-xs font-bold text-content-base truncate flex-1">{p.name}</span>
-                        <span className="text-[10px] font-bold text-gold-hover font-mono bg-gold-base/10 px-1.5 py-0.5 rounded">R$ {p.price.toFixed(2)}</span>
+                        <span className="text-[10px] font-bold finance-positive font-mono finance-positive-soft px-1.5 py-0.5 rounded">R$ {p.price.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -666,7 +666,7 @@ Obrigado pela preferência!`;
                     <div key={item.id} className="p-2 bg-surface-card border border-border-subtle rounded-lg flex items-center gap-3">
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold text-content-base truncate">{item.title}</p>
-                        <p className="text-[10px] text-content-muted">R$ {item.price.toFixed(2)} un.</p>
+                        <p className="text-[10px] text-content-muted"><span className="finance-positive">R$ {item.price.toFixed(2)}</span> un.</p>
                       </div>
                       <div className="flex items-center gap-2 bg-surface-base rounded-lg border border-border-subtle p-0.5">
                         <button onClick={() => handleQuantityChange(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-content-muted hover:text-content-base rounded"><Minus className="w-3 h-3"/></button>
@@ -674,7 +674,7 @@ Obrigado pela preferência!`;
                         <button onClick={() => handleQuantityChange(item.id, 1)} className="w-6 h-6 flex items-center justify-center text-content-muted hover:text-content-base rounded"><Plus className="w-3 h-3"/></button>
                       </div>
                       <div className="text-right shrink-0 min-w-[50px]">
-                        <p className="text-xs font-bold text-content-base">R$ {(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-xs font-bold finance-positive">R$ {(item.price * item.quantity).toFixed(2)}</p>
                       </div>
                       <button onClick={() => handleRemoveItem(item.id)} className="w-6 h-6 flex items-center justify-center text-status-error/70 hover:text-status-error hover:bg-status-error/10 rounded transition-colors"><Trash2 className="w-3.5 h-3.5"/></button>
                     </div>
@@ -685,7 +685,7 @@ Obrigado pela preferência!`;
               <div className="p-4 border-t border-border-subtle bg-surface-card rounded-b-xl space-y-3">
                 <div className="flex justify-between items-center font-bold text-content-base">
                   <span className="text-xs">Subtotal:</span>
-                  <span className="text-sm font-mono text-status-success">R$ {subtotal.toFixed(2)}</span>
+                  <span className="text-sm font-mono finance-positive">R$ {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex gap-2">
                   <button 
@@ -796,7 +796,7 @@ Obrigado pela preferência!`;
                     </div>
                     <div className="flex-1">
                       <span className="text-[10px] text-content-muted block mb-1">Troco (R$)</span>
-                      <div className={`w-full bg-surface-card border rounded-lg px-3 py-2 text-sm font-mono font-bold ${changeAmount > 0 ? 'text-amber-500 border-amber-500/30' : 'text-content-muted border-border-subtle'}`}>
+                      <div className={`w-full bg-surface-card border rounded-lg px-3 py-2 text-sm font-mono font-bold ${changeAmount > 0 ? 'finance-positive finance-positive-border' : 'text-content-muted border-border-subtle'}`}>
                         {changeAmount > 0 ? changeAmount.toFixed(2) : '0.00'}
                       </div>
                     </div>
@@ -832,23 +832,23 @@ Obrigado pela preferência!`;
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-xs text-content-base">
                   <span>Subtotal ({cart.reduce((a,b)=>a+b.quantity,0)} itens)</span>
-                  <span className="font-mono">R$ {subtotal.toFixed(2)}</span>
+                  <span className="font-mono finance-positive">R$ {subtotal.toFixed(2)}</span>
                 </div>
                 {discountAmount > 0 && (
-                  <div className="flex justify-between text-xs text-status-error font-medium">
+                  <div className="flex justify-between text-xs finance-negative font-medium">
                     <span>Desconto</span>
-                    <span className="font-mono">- R$ {discountAmount.toFixed(2)}</span>
+                    <span className="font-mono finance-negative">- R$ {discountAmount.toFixed(2)}</span>
                   </div>
                 )}
                 {tipAmount > 0 && (
-                  <div className="flex justify-between text-xs text-amber-500 font-medium">
+                  <div className="flex justify-between text-xs finance-positive font-medium">
                     <span>Gorjeta / Extra</span>
-                    <span className="font-mono">+ R$ {tipAmount.toFixed(2)}</span>
+                    <span className="font-mono finance-positive">+ R$ {tipAmount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="pt-3 border-t border-dashed border-border-subtle flex justify-between items-center">
                   <span className="font-bold text-content-base">TOTAL A PAGAR</span>
-                  <span className="text-xl font-black text-status-success font-mono">
+                  <span className="text-xl font-black finance-positive font-mono">
                     R$ {finalTotal.toFixed(2)}
                   </span>
                 </div>
@@ -945,7 +945,7 @@ Obrigado pela preferência!`;
                       <p className="text-[11px] text-content-muted truncate">{sale.professionalName} • {sale.items.map(i => `${i.quantity}x ${i.title}`).join(', ')}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <span className="block font-bold text-status-success text-sm font-mono">R$ {sale.total.toFixed(2)}</span>
+                      <span className="block font-bold finance-positive text-sm font-mono">R$ {sale.total.toFixed(2)}</span>
                       <span className="text-[10px] font-bold text-content-muted uppercase">{sale.paymentMethod}</span>
                     </div>
                   </div>
@@ -955,7 +955,7 @@ Obrigado pela preferência!`;
 
             <div className="pt-3 border-t border-border-subtle flex justify-between items-center text-xs shrink-0 mt-3">
               <span className="text-content-muted font-bold">{todaysSales.length} vendas</span>
-              <span className="font-bold text-content-base">Total Faturado: <strong className="text-status-success text-sm font-mono">R$ {totalRevenueToday.toFixed(2)}</strong></span>
+              <span className="font-bold text-content-base">Total Faturado: <strong className="finance-positive text-sm font-mono">R$ {totalRevenueToday.toFixed(2)}</strong></span>
             </div>
           </div>
         </div>
