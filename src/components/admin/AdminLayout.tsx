@@ -19,6 +19,7 @@ import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { AdminAuthView } from './AdminAuthView';
 import { authFetch, setStoredToken, clearStoredToken } from '../../lib/api';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAdminOperationNotifications } from '../../hooks/useAdminOperationNotifications';
 import { 
   Calendar,
   Clock,
@@ -44,7 +45,9 @@ import {
   MessageSquare,
   QrCode,
   Sun,
-  Moon
+  Moon,
+  Bell,
+  BellRing
 } from 'lucide-react';
 
 export type AdminTab = 
@@ -115,6 +118,7 @@ const getInitialCollapsedSections = (activeTab: AdminTab): Record<AdminSection, 
 
 export const AdminLayout: React.FC = () => {
   const { theme, setTheme } = useTheme();
+  const { isSupported: notificationsSupported, permission: notificationPermission, isEnabled: notificationsEnabled, requestPermission, sendTestNotification } = useAdminOperationNotifications();
   const [activeTab, setActiveTab] = useState<AdminTab>(() => getStoredAdminTab());
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -133,6 +137,23 @@ export const AdminLayout: React.FC = () => {
   }, [activeTab]);
 
   const mainRef = useRef<HTMLElement>(null);
+
+  const handleNotificationsAction = async () => {
+    if (!notificationsSupported) return;
+    const permission = notificationPermission === 'granted' && notificationsEnabled
+      ? 'granted'
+      : await requestPermission();
+    if (permission === 'granted') await sendTestNotification();
+  };
+
+  const notificationsActive = notificationsSupported && notificationPermission === 'granted' && notificationsEnabled;
+  const notificationControlLabel = !notificationsSupported
+    ? 'Notificações indisponíveis neste navegador'
+    : notificationsActive
+      ? 'Enviar alerta de teste'
+      : notificationPermission === 'denied'
+        ? 'Notificações bloqueadas no navegador'
+        : 'Ativar alertas operacionais';
 
   const scrollSidebarNavigationToItem = (tab: AdminTab, mobile = false) => {
     window.requestAnimationFrame(() => {
@@ -487,6 +508,16 @@ export const AdminLayout: React.FC = () => {
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-content-muted" />}
             </button>
+            <button
+              type="button"
+              onClick={handleNotificationsAction}
+              disabled={!notificationsSupported || notificationPermission === 'denied'}
+              className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${notificationsActive ? 'bg-status-success/10 text-status-success hover:bg-status-success/20' : 'text-content-muted hover:bg-surface-base hover:text-gold-base'}`}
+              title={notificationControlLabel}
+              aria-label={notificationControlLabel}
+            >
+              {notificationsActive ? <BellRing className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+            </button>
             <button 
               onClick={handleLogout}
               className="w-8 h-8 flex items-center justify-center rounded-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800 transition-colors shrink-0"
@@ -518,6 +549,16 @@ export const AdminLayout: React.FC = () => {
             aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
           >
             {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          </button>
+          <button
+            type="button"
+            onClick={handleNotificationsAction}
+            disabled={!notificationsSupported || notificationPermission === 'denied'}
+            className={`w-10 h-10 flex items-center justify-center rounded-full border transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${notificationsActive ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-border-subtle bg-surface-card text-content-muted active:text-gold-base'}`}
+            title={notificationControlLabel}
+            aria-label={notificationControlLabel}
+          >
+            {notificationsActive ? <BellRing className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
           </button>
           <button
             onClick={() => setSidebarOpen(true)}
@@ -592,7 +633,16 @@ export const AdminLayout: React.FC = () => {
             {renderSidebarNavigation(true)}
             
             {/* Mobile Footer */}
-            <div className="p-4 border-t border-border-subtle shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div className="p-4 border-t border-border-subtle shrink-0 space-y-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+              <button
+                type="button"
+                onClick={handleNotificationsAction}
+                disabled={!notificationsSupported || notificationPermission === 'denied'}
+                className={`w-full h-11 flex items-center justify-center gap-2 px-3 rounded-xl border font-semibold text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${notificationsActive ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-border-subtle bg-surface-base text-content-base hover:border-gold-base/40'}`}
+              >
+                {notificationsActive ? <BellRing className="w-4 h-4 shrink-0" /> : <Bell className="w-4 h-4 shrink-0" />}
+                <span className="truncate">{notificationsActive ? 'Testar alertas operacionais' : 'Ativar alertas operacionais'}</span>
+              </button>
               <button
                 onClick={handleLogout}
                 className="w-full h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800 font-semibold text-xs transition-colors min-w-0"
