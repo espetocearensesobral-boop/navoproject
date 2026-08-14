@@ -29,7 +29,7 @@ const periodOptions: { id: OperationalReportPeriod; label: string }[] = [
   { id: 'month', label: '30 dias' },
   { id: 'quarter', label: '90 dias' },
 ];
-const statusLabels: Record<string, string> = { confirmed: 'Confirmado', completed: 'Concluído', cancelled: 'Cancelado', no_show: 'Não compareceu' };
+const statusLabels: Record<string, string> = { confirmed: 'Confirmado', in_queue: 'Na fila', in_chair: 'Na cadeira', in_service: 'Em atendimento', completed: 'Concluído', cancelled: 'Cancelado', no_show: 'Não compareceu' };
 const queueLabels: Record<string, string> = { waiting: 'Aguardando', in_chair: 'Na cadeira', completed: 'Concluídos', abandoned: 'Removidos', cancelled: 'Cancelados' };
 
 export const OperationalReportsManagement: React.FC = () => {
