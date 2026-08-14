@@ -5,6 +5,7 @@ import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
 import { getTodayStringBRT } from '../utils/datetime.js';
+import { isConfirmedCheckoutIncome, isFinancialLedgerTransaction, receiptIdFromLedgerTransaction } from '../utils/financial.js';
 
 export const operationalReportsRouter = express.Router();
 
@@ -71,14 +72,16 @@ operationalReportsRouter.get('/', requireAuth, requireAdmin, async (req, res) =>
     const todayAppointments = appointments.filter((appointment) => appointment.date === today);
     const todayActiveAppointments = todayAppointments.filter((appointment) => !['cancelled', 'completed'].includes(appointment.status));
 
-    const receivedReceipts = receipts.filter((receipt) => receipt.status === 'received');
+    const periodCashTransactions = cashTransactions.filter((transaction) => transaction.status === 'completed' && isFinancialLedgerTransaction(transaction) && inRange(transaction.date, range.from, range.to));
+    const periodIncome = periodCashTransactions.filter((transaction) => isConfirmedCheckoutIncome(transaction)).reduce((total, transaction) => total + Number(transaction.amount || 0), 0);
+    const periodExpenses = periodCashTransactions.filter((transaction) => transaction.type === 'expense').reduce((total, transaction) => total + Number(transaction.amount || 0), 0);
+    const confirmedCheckoutReceiptIds = new Set(
+      cashTransactions.filter(isConfirmedCheckoutIncome).map((transaction) => receiptIdFromLedgerTransaction(transaction.id)).filter(Boolean),
+    );
+    const receivedReceipts = receipts.filter((receipt) => receipt.status === 'received' && confirmedCheckoutReceiptIds.has(receipt.id));
     const receiptByAppointment = new Map<string, any>(receivedReceipts.filter((receipt) => receipt.appointmentId).map((receipt): [string, any] => [receipt.appointmentId as string, receipt]));
     const periodReceivedReceipts = receivedReceipts.filter((receipt) => inRange(appointmentDate(receipt.appointmentId, appointments), range.from, range.to) || inRange(toBrtDate(receipt.receivedAt), range.from, range.to));
     const periodServiceRevenue = periodReceivedReceipts.reduce((total, receipt) => total + Number(receipt.totalAmount || 0), 0);
-
-    const periodCashTransactions = cashTransactions.filter((transaction) => transaction.status === 'completed' && inRange(transaction.date, range.from, range.to));
-    const periodIncome = periodCashTransactions.filter((transaction) => transaction.type === 'income').reduce((total, transaction) => total + Number(transaction.amount || 0), 0);
-    const periodExpenses = periodCashTransactions.filter((transaction) => transaction.type === 'expense').reduce((total, transaction) => total + Number(transaction.amount || 0), 0);
 
     const serviceMap = new Map<string, ServiceAggregate>();
     const professionalMap = new Map<string, ProfessionalAggregate>();

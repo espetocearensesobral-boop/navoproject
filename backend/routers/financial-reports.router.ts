@@ -5,6 +5,7 @@ import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
 import { getTodayStringBRT } from '../utils/datetime.js';
+import { isConfirmedCheckoutIncome, isFinancialLedgerTransaction, receiptIdFromLedgerTransaction } from '../utils/financial.js';
 
 export const financialReportsRouter = express.Router();
 
@@ -72,11 +73,14 @@ financialReportsRouter.get('/', requireAuth, requireAdmin, async (req, res) => {
     ]);
 
     const activeTransactions = transactions
-      .filter((transaction) => transaction.status === 'completed' && isInRange(transaction.date, range.from, range.to))
+      .filter((transaction) => transaction.status === 'completed' && isFinancialLedgerTransaction(transaction) && isInRange(transaction.date, range.from, range.to))
       .map((transaction) => ({ ...transaction, amount: asMoney(transaction.amount) }));
 
+    const confirmedCheckoutReceiptIds = new Set(
+      transactions.filter(isConfirmedCheckoutIncome).map((transaction) => receiptIdFromLedgerTransaction(transaction.id)).filter(Boolean),
+    );
     const receivedReceipts = receipts
-      .filter((receipt) => receipt.status === 'received' && isInRange(toBrtDate(receipt.receivedAt), range.from, range.to))
+      .filter((receipt) => receipt.status === 'received' && confirmedCheckoutReceiptIds.has(receipt.id) && isInRange(toBrtDate(receipt.receivedAt), range.from, range.to))
       .map((receipt) => ({ ...receipt, totalAmount: asMoney(receipt.totalAmount) }));
 
     const pendingReceipts = receipts
