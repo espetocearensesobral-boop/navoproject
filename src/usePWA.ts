@@ -11,8 +11,6 @@ export interface PWAState {
   syncOfflineData: () => Promise<boolean>;
 }
 
-const MANIFEST_URL = '/manifest.json';
-
 export function usePWA(): PWAState {
   const deferredPromptRef = useRef<any>(null);
   const [canInstall, setCanInstall] = useState(false);
@@ -82,7 +80,8 @@ export function usePWA(): PWAState {
     const originalHref = linkEl?.href;
 
     try {
-      const res = await fetch(MANIFEST_URL);
+      const manifestUrl = linkEl?.href || '/manifest.json';
+      const res = await fetch(manifestUrl);
       const manifest = await res.json();
       const renamed = {
         ...manifest,

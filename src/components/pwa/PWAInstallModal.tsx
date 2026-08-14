@@ -18,7 +18,7 @@ interface PWAInstallModalProps {
   onShowToast?: (message: string, type?: 'success' | 'info' | 'warning') => void;
 }
 
-const DEFAULT_SHORTCUT_NAME = 'Navo Premium';
+const DEFAULT_SHORTCUT_NAME = 'Agendamentos';
 
 const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
@@ -90,9 +90,9 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
             </div>
             <div>
               <h2 className="text-base font-bold text-content-base tracking-tight leading-tight">
-                {isInstalled ? 'App já instalado' : 'Instalar aplicativo'}
+                {isInstalled ? 'Agendamentos já instalado' : 'Instalar Agendamentos'}
               </h2>
-              <p className="text-xs text-content-muted mt-0.5">Acesse com 1 toque na tela inicial.</p>
+              <p className="text-xs text-content-muted mt-0.5">Acesse seus horários com 1 toque na tela inicial.</p>
             </div>
           </div>
 

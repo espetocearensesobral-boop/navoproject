@@ -1,7 +1,8 @@
 {
-  "short_name": "Navo Premium",
-  "name": "Navo Premium - Barbearia & Club",
-  "description": "App PWA de Agendamento Online, Fila de Espera em Tempo Real e Experiência VIP na Navo Premium",
+  "id": "/",
+  "short_name": "Agendamentos",
+  "name": "Navo Agendamentos",
+  "description": "App PWA de agendamentos, fila de espera em tempo real e experiência VIP da Navo Premium",
   "icons": [
     {
       "src": "pwa-192x192.svg",
@@ -32,10 +33,10 @@
       "url": "/?tab=client"
     },
     {
-      "name": "Fila ao Vivo",
-      "short_name": "Fila",
-      "description": "Ver fila de espera em tempo real",
-      "url": "/?tab=admin&sub=queue"
+      "name": "Meus Agendamentos",
+      "short_name": "Reservas",
+      "description": "Consultar seus próximos horários e reservas",
+      "url": "/?tab=client"
     }
   ]
 }

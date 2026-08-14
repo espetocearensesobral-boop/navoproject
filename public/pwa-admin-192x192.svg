@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="adminGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4D58E" />
+      <stop offset="52%" stop-color="#D2AA5C" />
+      <stop offset="100%" stop-color="#9C7430" />
+    </linearGradient>
+    <linearGradient id="adminBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1B2433" />
+      <stop offset="100%" stop-color="#0C1018" />
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="42" fill="url(#adminBg)" stroke="url(#adminGold)" stroke-width="4"/>
+  <g transform="translate(96,96)">
+    <circle r="48" fill="#151B27" stroke="url(#adminGold)" stroke-width="4"/>
+    <path d="M-23 -26h46v12h-8v31h-10v-31h-10v31h-10v-31h-8z" fill="url(#adminGold)"/>
+    <path d="M-30 31h60" stroke="url(#adminGold)" stroke-width="5" stroke-linecap="round"/>
+    <text x="0" y="12" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="30" letter-spacing="1" fill="#111722" text-anchor="middle">AD</text>
+  </g>
+</svg>

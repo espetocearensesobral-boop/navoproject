@@ -40,16 +40,44 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#0A0A0A" />
+    <link id="pwa-manifest" rel="manifest" href="/manifest.json" />
+    <meta id="pwa-theme-color" name="theme-color" content="#0A0A0A" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Navo Premium" />
-    <link rel="apple-touch-icon" href="/pwa-192x192.svg" />
-    <link rel="icon" type="image/svg+xml" href="/pwa-192x192.svg" />
+    <meta id="pwa-apple-title" name="apple-mobile-web-app-title" content="Agendamentos" />
+    <link id="pwa-apple-icon" rel="apple-touch-icon" href="/pwa-192x192.svg" />
+    <link id="pwa-favicon" rel="icon" type="image/svg+xml" href="/pwa-192x192.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   
+    <!-- PWA Context Script -->
+    <script>
+      (function() {
+        var isAdmin = window.location.pathname.indexOf('/admin') === 0;
+        var identity = isAdmin ? {
+          manifest: '/manifest-admin.json',
+          title: 'Administrativo',
+          icon: '/pwa-admin-192x192.svg',
+          themeColor: '#10131A'
+        } : {
+          manifest: '/manifest.json',
+          title: 'Agendamentos',
+          icon: '/pwa-192x192.svg',
+          themeColor: '#0A0A0A'
+        };
+        var manifest = document.getElementById('pwa-manifest');
+        var themeColor = document.getElementById('pwa-theme-color');
+        var appleTitle = document.getElementById('pwa-apple-title');
+        var appleIcon = document.getElementById('pwa-apple-icon');
+        var favicon = document.getElementById('pwa-favicon');
+        if (manifest) manifest.setAttribute('href', identity.manifest);
+        if (themeColor) themeColor.setAttribute('content', identity.themeColor);
+        if (appleTitle) appleTitle.setAttribute('content', identity.title);
+        if (appleIcon) appleIcon.setAttribute('href', identity.icon);
+        if (favicon) favicon.setAttribute('href', identity.icon);
+      })();
+    </script>
+
     <!-- Theme Script -->
     <script>
       (function() {
