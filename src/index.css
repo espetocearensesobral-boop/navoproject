@@ -94,6 +94,9 @@
   --color-admin-professional-4: #60A5FA;
   --color-admin-professional-5: #A3E635;
 
+  /* Agenda alerts: high contrast on each surface, independent from data-palette. */
+  --color-schedule-late-text: #FCD34D;
+
   /* Typography */
   --font-serif: 'Fraunces', Georgia, serif;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -156,6 +159,9 @@
   --color-admin-professional-3: #BE185D;
   --color-admin-professional-4: #1D4ED8;
   --color-admin-professional-5: #4D7C0F;
+
+  /* Dark red prevents amber-on-amber loss of contrast in the light theme. */
+  --color-schedule-late-text: #991B1B;
 }
 
 /* Paletas de destaque: o restante da identidade permanece vinculado ao tema claro/preto. */
@@ -189,7 +195,8 @@
 [data-palette="lavender"] { --color-gold-base: #C084FC; --color-gold-deep: #9333EA; --color-gold-accent: #E9D5FF; }
 [data-palette="bordeaux"] { --color-gold-base: #F43F5E; --color-gold-deep: #BE123C; --color-gold-accent: #FECDD3; }
 
-/* Money colors are intentionally outside every palette override. */
+/* Semantic admin colors intentionally remain outside every palette override. */
+.schedule-late-text { color: var(--color-schedule-late-text) !important; }
 .finance-positive { color: var(--color-finance-positive) !important; }
 .finance-negative { color: var(--color-finance-negative) !important; }
 .finance-positive-soft { background-color: var(--color-finance-positive-soft) !important; }
