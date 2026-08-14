@@ -52,6 +52,8 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
       ? 'in_service'
       : nextStatus === 'waiting'
       ? 'in_queue'
+      : nextStatus === 'abandoned'
+      ? 'confirmed'
       : undefined;
 
     const queueUpdate = { ...parsed.data, updatedAt: new Date() };
@@ -139,45 +141,19 @@ queueRouter.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
     });
     if (!currentQueueItem) return res.status(404).json({ error: 'Item da fila não encontrado.' });
 
-    if (!['waiting', 'in_queue'].includes(currentQueueItem.status)) {
-      return res.status(409).json({ error: 'Somente clientes aguardando podem ser removidos da fila.' });
-    }
-
-    const now = new Date();
-    const queueUpdate = { status: 'abandoned' as const, updatedAt: now };
-
     if (currentQueueItem.appointmentId) {
-      if (typeof db.transaction !== 'function') {
-        return res.status(503).json({ error: 'O banco não oferece transação para sincronizar a remoção da fila.' });
-      }
-
-      await db.transaction(async (tx: any) => {
-        const [updatedAppointment] = await tx.update(schema.appointments)
-          .set({ status: 'confirmed', updatedAt: now })
-          .where(eq(schema.appointments.id, currentQueueItem.appointmentId))
-          .returning({ id: schema.appointments.id });
-        if (!updatedAppointment) throw new Error('APPOINTMENT_NOT_FOUND');
-
-        const [updatedQueue] = await tx.update(schema.waitingQueue)
-          .set(queueUpdate)
-          .where(eq(schema.waitingQueue.id, req.params.id))
-          .returning({ id: schema.waitingQueue.id });
-        if (!updatedQueue) throw new Error('QUEUE_ITEM_NOT_FOUND');
-      });
-    } else {
-      await db.update(schema.waitingQueue)
-        .set(queueUpdate)
-        .where(eq(schema.waitingQueue.id, req.params.id));
+      return res.status(409).json({ error: 'Agendamentos vinculados não podem ser excluídos. Use retornar ou cancelar atendimento.' });
+    }
+    if (currentQueueItem.status !== 'abandoned') {
+      return res.status(409).json({ error: 'Somente registros avulsos removidos podem ser excluídos.' });
     }
 
-    res.json({ success: true, status: 'abandoned', appointmentStatus: currentQueueItem.appointmentId ? 'confirmed' : null });
+    const deleted = await db.delete(schema.waitingQueue)
+      .where(eq(schema.waitingQueue.id, req.params.id))
+      .returning({ id: schema.waitingQueue.id });
+    if (deleted.length === 0) return res.status(404).json({ error: 'Item da fila não encontrado.' });
+    res.json({ success: true });
   } catch (e: any) {
-    if (e?.message === 'APPOINTMENT_NOT_FOUND') {
-      return res.status(409).json({ error: 'O agendamento associado não foi encontrado para sincronização.' });
-    }
-    if (e?.message === 'QUEUE_ITEM_NOT_FOUND') {
-      return res.status(404).json({ error: 'Item da fila não encontrado.' });
-    }
     return handleError(res, e, req.path);
   }
 });

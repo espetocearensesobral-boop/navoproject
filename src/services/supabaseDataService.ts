@@ -310,7 +310,7 @@ export async function addToQueueInSupabase(newItem: Partial<WaitingQueueItem>): 
   return getQueueFromSupabase();
 }
 
-export async function updateQueueStatusInSupabase(id: string, status: 'waiting' | 'in_chair' | 'completed'): Promise<WaitingQueueItem[]> {
+export async function updateQueueStatusInSupabase(id: string, status: 'waiting' | 'in_chair' | 'completed' | 'abandoned'): Promise<WaitingQueueItem[]> {
   const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const res = await authFetch(`${API_BASE}/queue/${id}`, {
@@ -331,10 +331,14 @@ export async function updateQueueStatusInSupabase(id: string, status: 'waiting' 
 }
 
 export async function removeFromQueueInSupabase(id: string): Promise<WaitingQueueItem[]> {
+  return updateQueueStatusInSupabase(id, 'abandoned');
+}
+
+export async function deleteQueueItemInSupabase(id: string): Promise<WaitingQueueItem[]> {
   const res = await authFetch(`${API_BASE}/queue/${id}`, { method: 'DELETE' });
   if (!res.ok) {
     const errorBody = await res.json().catch(() => null);
-    throw new Error(errorBody?.error || 'Falha ao remover item da fila no Supabase');
+    throw new Error(errorBody?.error || 'Falha ao excluir registro da fila no Supabase');
   }
 
   return getQueueFromSupabase();

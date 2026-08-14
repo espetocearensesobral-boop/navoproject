@@ -7,6 +7,7 @@ import {
   updateQueueStatusInSupabase,
   addToQueueInSupabase,
   removeFromQueueInSupabase,
+  deleteQueueItemInSupabase,
   cancelAppointmentInSupabase,
   fetchProfessionalsFromSupabase,
   fetchServicesFromSupabase,
@@ -186,6 +187,25 @@ export const WaitingQueue: React.FC = () => {
       showNotification(`${name} retornou para a fila da recepção.`);
     } catch (error) {
       showNotification(getActionErrorMessage(error, 'Não foi possível retornar o cliente à fila.'), 'error');
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleDeleteAbandonedWalkIn = async (item: WaitingQueueItem) => {
+    if (item.appointment_id) {
+      showNotification('Agendamentos vinculados não podem ser excluídos.', 'error');
+      return;
+    }
+    if (!window.confirm(`Excluir definitivamente o registro avulso de ${item.client_name}? Esta ação não pode ser desfeita.`)) return;
+
+    setActionLoadingId(item.id);
+    try {
+      const updated = await deleteQueueItemInSupabase(item.id);
+      setQueue([...updated]);
+      showNotification('Registro avulso excluído definitivamente.');
+    } catch (error) {
+      showNotification(getActionErrorMessage(error, 'Não foi possível excluir o registro.'), 'error');
     } finally {
       setActionLoadingId(null);
     }
@@ -752,7 +772,7 @@ export const WaitingQueue: React.FC = () => {
                       <RotateCcw className="w-3.5 h-3.5" />
                       Retornar à fila
                     </button>
-                    {item.appointment_id && (
+                    {item.appointment_id ? (
                       <button
                         type="button"
                         disabled={actionLoadingId === item.id}
@@ -761,6 +781,16 @@ export const WaitingQueue: React.FC = () => {
                       >
                         <X className="w-3.5 h-3.5" />
                         Cancelar atendimento
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={actionLoadingId === item.id}
+                        onClick={() => handleDeleteAbandonedWalkIn(item)}
+                        className="px-3 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-[11px] flex items-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Excluir registro
                       </button>
                     )}
                   </div>
