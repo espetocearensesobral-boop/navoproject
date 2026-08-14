@@ -28,6 +28,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  ChevronDown,
   TrendingUp,
   LogOut,
   Receipt,
@@ -88,6 +89,13 @@ export const AdminLayout: React.FC = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [adminName, setAdminName] = useState('Admin');
+  const [collapsedSections, setCollapsedSections] = useState<Record<AdminSection, boolean>>({
+    operacao: false,
+    financeiro: false,
+    cadastros: false,
+    relacionamento: true,
+    sistema: true,
+  });
 
   React.useEffect(() => {
     try {
@@ -248,6 +256,63 @@ export const AdminLayout: React.FC = () => {
     { id: 'clientes' as AdminTab, label: 'Clientes', icon: UserCheck },
   ];
 
+  React.useEffect(() => {
+    const activeItem = navItems.find((item) => item.id === activeTab);
+    if (!activeItem || !collapsedSections[activeItem.section]) return;
+    setCollapsedSections((current) => ({ ...current, [activeItem.section]: false }));
+  }, [activeTab, collapsedSections]);
+
+  const renderSidebarNavigation = (mobile = false) => (
+    <nav className={mobile ? 'flex-1 px-4 py-6 space-y-4 overflow-y-auto custom-scrollbar' : 'flex-1 px-3 py-6 space-y-4 overflow-y-auto no-scrollbar'}>
+      {sectionOrder.map((section) => {
+        const itemsInSection = navItems.filter((item) => item.section === section);
+        if (itemsInSection.length === 0) return null;
+        const isCollapsed = collapsedSections[section];
+
+        return (
+          <div key={section} className="space-y-1.5">
+            <button
+              type="button"
+              onClick={() => setCollapsedSections((current) => ({ ...current, [section]: !current[section] }))}
+              aria-expanded={!isCollapsed}
+              className="admin-sidebar-section-toggle w-full min-h-9 px-3 flex items-center justify-between gap-2 rounded-lg text-left transition-colors hover:bg-surface-base"
+            >
+              <span className="admin-sidebar-section-label text-[11px] font-bold uppercase tracking-[0.16em] truncate">
+                {sectionLabels[section]}
+              </span>
+              <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} />
+            </button>
+
+            {!isCollapsed && (
+              <div className="space-y-1">
+                {itemsInSection.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        if (mobile) setSidebarOpen(false);
+                      }}
+                      className={`admin-sidebar-item w-full min-h-11 px-3.5 rounded-lg text-sm font-semibold flex items-center gap-3 transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active shadow-sm' : ''}`}
+                    >
+                      <Icon className="w-[18px] h-[18px] shrink-0" />
+                      <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
+                      {isActive && <ChevronRight className="admin-sidebar-item-chevron w-3.5 h-3.5 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </nav>
+  );
+
   const handleLogout = async () => {
     try {
       await authFetch('/api/auth/logout', { method: 'POST' });
@@ -317,42 +382,7 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-6 overflow-y-auto no-scrollbar">
-          {sectionOrder.map((section) => {
-            const itemsInSection = navItems.filter((item) => item.section === section);
-            if (itemsInSection.length === 0) return null;
-
-            return (
-              <div key={section} className="space-y-2">
-                <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-content-muted">
-                  {sectionLabels[section]}
-                </p>
-                {itemsInSection.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setActiveTab(item.id)}
-                      className={`w-full min-h-11 px-3.5 rounded-lg text-sm font-semibold flex items-center gap-3 transition-colors group min-w-0 ${
-                        isActive
-                          ? 'bg-gold-base/20 text-gold-base shadow-sm'
-                          : 'text-content-muted hover:text-content-base hover:bg-surface-base'
-                      }`}
-                    >
-                      <Icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted group-hover:text-content-base'}`} />
-                      <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
-                      {isActive && (
-                        <ChevronRight className="w-3.5 h-3.5 text-gold-base shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </nav>
+        {renderSidebarNavigation()}
 
         {/* User Profile Footer */}
         <div className="p-4 border-t border-border-subtle shrink-0 bg-surface-card">
@@ -474,42 +504,7 @@ export const AdminLayout: React.FC = () => {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto custom-scrollbar">
-              {sectionOrder.map((section) => {
-                const itemsInSection = navItems.filter((item) => item.section === section);
-                if (itemsInSection.length === 0) return null;
-
-                return (
-                  <div key={section} className="space-y-2">
-                    <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-content-muted">
-                      {sectionLabels[section]}
-                    </p>
-                    {itemsInSection.map((item) => {
-                      const Icon = item.icon;
-                      const isActive = activeTab === item.id;
-
-                      return (
-                        <button
-                          key={item.id}
-                          onClick={() => {
-                            setActiveTab(item.id);
-                            setSidebarOpen(false);
-                          }}
-                            className={`w-full min-h-12 px-3.5 rounded-lg text-sm font-semibold flex items-center gap-3 transition-colors ${
-                            isActive
-                              ? 'bg-gold-base/20 text-gold-base shadow-sm'
-                              : 'text-content-muted hover:text-content-base hover:bg-surface-base'
-                          }`}
-                        >
-                          <Icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted'}`} />
-                          <span className="truncate flex-1 text-left min-w-0">{item.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </nav>
+            {renderSidebarNavigation(true)}
             
             {/* Mobile Footer */}
             <div className="p-4 border-t border-border-subtle shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom))]">

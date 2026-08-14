@@ -643,6 +643,53 @@ button, a, input, select, textarea {
   border-radius: 18px !important;
 }
 
+/* Admin sidebar navigation: neutral labels, palette-driven active state, and contrast guardrails. */
+.admin-shell .admin-sidebar-section-toggle {
+  color: var(--color-content-muted) !important;
+}
+
+.admin-shell .admin-sidebar-section-toggle:hover {
+  color: var(--color-content-base) !important;
+  background: var(--color-surface-base) !important;
+}
+
+.admin-shell .admin-sidebar-section-label {
+  color: #262626 !important;
+}
+
+[data-theme="dark"] .admin-shell .admin-sidebar-section-label {
+  color: #E5E7EB !important;
+}
+
+.admin-shell .admin-sidebar-item {
+  color: #171717 !important;
+  background: transparent !important;
+}
+
+[data-theme="dark"] .admin-shell .admin-sidebar-item {
+  color: #F3F4F6 !important;
+}
+
+.admin-shell .admin-sidebar-item:hover {
+  color: #000000 !important;
+  background: var(--color-surface-base) !important;
+}
+
+[data-theme="dark"] .admin-shell .admin-sidebar-item:hover {
+  color: #FFFFFF !important;
+}
+
+.admin-shell .admin-sidebar-item-active {
+  color: var(--color-accent-text) !important;
+  background: color-mix(in srgb, var(--color-gold-base) 18%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--color-gold-base), 0 1px 2px color-mix(in srgb, var(--color-gold-base) 12%, transparent) !important;
+}
+
+.admin-shell .admin-sidebar-item-active svg,
+.admin-shell .admin-sidebar-item-active .admin-sidebar-item-chevron {
+  color: var(--color-accent-text) !important;
+}
+
 /* Compact admin action controls: circular on mobile, labeled on sm+ screens. */
 .admin-shell .admin-action-icon {
   width: 2.75rem;
