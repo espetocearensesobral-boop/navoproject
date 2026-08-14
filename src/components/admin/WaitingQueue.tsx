@@ -53,7 +53,10 @@ export const WaitingQueue: React.FC = () => {
   const [selectedQueueItemForWa, setSelectedQueueItemForWa] = useState<WaitingQueueItem | null>(null);
   const [customWaMessage, setCustomWaMessage] = useState('');
   const [lastNotification, setLastNotification] = useState<string | null>(null);
+  const [notificationType, setNotificationType] = useState<'success' | 'error'>('success');
   const [copiedNotice, setCopiedNotice] = useState(false);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [isSavingWalkIn, setIsSavingWalkIn] = useState(false);
 
   // Walk-in Form state
   const [newClientName, setNewClientName] = useState('');
@@ -77,57 +80,98 @@ export const WaitingQueue: React.FC = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [qData, profs, svcs] = await Promise.all([
-      getQueueFromSupabase(),
-      fetchProfessionalsFromSupabase(),
-      fetchServicesFromSupabase()
-    ]);
+    try {
+      const [qData, profs, svcs] = await Promise.all([
+        getQueueFromSupabase(),
+        fetchProfessionalsFromSupabase(),
+        fetchServicesFromSupabase()
+      ]);
 
-    setQueue(qData);
-    setProfessionals(profs.filter((p) => p.id !== 'prof_any'));
-    setServices(svcs);
+      setQueue(qData);
+      setProfessionals(profs.filter((p) => p.id !== 'prof_any'));
+      setServices(svcs);
 
-    if (profs.length > 0) {
-      setNewProfessionalId(profs[0].id);
-      setNewProfessionalName(profs[0].name);
+      if (profs.length > 0) {
+        setNewProfessionalId(profs[0].id);
+        setNewProfessionalName(profs[0].name);
+      }
+      if (svcs.length > 0) {
+        setNewServiceTitle(svcs[0].title);
+        setNewServicePrice(svcs[0].price);
+      }
+    } catch (error) {
+      setQueue([]);
+      showNotification(getActionErrorMessage(error, 'Não foi possível carregar a fila de espera.'), 'error');
+    } finally {
+      setLoading(false);
     }
-    if (svcs.length > 0) {
-      setNewServiceTitle(svcs[0].title);
-      setNewServicePrice(svcs[0].price);
-    }
-
-    setLoading(false);
   };
 
   const loadQueueOnly = async () => {
-    const qData = await getQueueFromSupabase();
-    setQueue(qData);
+    try {
+      const qData = await getQueueFromSupabase();
+      setQueue(qData);
+    } catch (error) {
+      showNotification(getActionErrorMessage(error, 'Não foi possível atualizar a fila.'), 'error');
+    }
   };
 
   // Actions
+  const getActionErrorMessage = (error: unknown, fallback: string) => {
+    return error instanceof Error && error.message ? error.message : fallback;
+  };
+
   const handleAdvanceToChair = async (id: string) => {
-    const updated = await updateQueueStatusInSupabase(id, 'in_chair');
-    setQueue([...updated]);
-    showNotification('Cliente chamado para a cadeira!');
+    setActionLoadingId(id);
+    try {
+      const updated = await updateQueueStatusInSupabase(id, 'in_chair');
+      setQueue([...updated]);
+      showNotification('Cliente chamado para a cadeira!');
+    } catch (error) {
+      showNotification(getActionErrorMessage(error, 'Não foi possível chamar o cliente para a cadeira.'), 'error');
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
   const handleFinishService = async (id: string) => {
-    const updated = await updateQueueStatusInSupabase(id, 'completed');
-    setQueue([...updated]);
-    showNotification('Atendimento finalizado e marcado como concluído!');
+    setActionLoadingId(id);
+    try {
+      const updated = await updateQueueStatusInSupabase(id, 'completed');
+      setQueue([...updated]);
+      showNotification('Atendimento finalizado e marcado como concluído!');
+    } catch (error) {
+      showNotification(getActionErrorMessage(error, 'Não foi possível finalizar o atendimento.'), 'error');
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
   const handleRevertToWaiting = async (id: string) => {
-    const updated = await updateQueueStatusInSupabase(id, 'waiting');
-    setQueue([...updated]);
-    showNotification('Cliente retornado para a fila da recepção.');
+    setActionLoadingId(id);
+    try {
+      const updated = await updateQueueStatusInSupabase(id, 'waiting');
+      setQueue([...updated]);
+      showNotification('Cliente retornado para a fila da recepção.');
+    } catch (error) {
+      showNotification(getActionErrorMessage(error, 'Não foi possível retornar o cliente à recepção.'), 'error');
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
   const handleRemoveFromQueue = async (id: string, name: string) => {
-    if (window.confirm(`Deseja remover ${name} da fila de espera?`)) {
+    if (!window.confirm(`Deseja remover ${name} da fila de espera?`)) return;
+
+    setActionLoadingId(id);
+    try {
       const updated = await removeFromQueueInSupabase(id);
       setQueue([...updated]);
       showNotification('Cliente removido da fila.');
+    } catch (error) {
+      showNotification(getActionErrorMessage(error, 'Não foi possível remover o cliente da fila.'), 'error');
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -168,13 +212,20 @@ export const WaitingQueue: React.FC = () => {
       notes: newNotes
     };
 
-    const updated = await addToQueueInSupabase(newItem);
-    setQueue([...updated]);
-    setIsAddModalOpen(false);
-    setNewClientName('');
-    setNewClientPhone('');
-    setNewNotes('');
-    showNotification(`${newClientName} adicionado à recepção!`);
+    setIsSavingWalkIn(true);
+    try {
+      const updated = await addToQueueInSupabase(newItem);
+      setQueue([...updated]);
+      setIsAddModalOpen(false);
+      setNewClientName('');
+      setNewClientPhone('');
+      setNewNotes('');
+      showNotification(`${newClientName} adicionado à recepção!`);
+    } catch (error) {
+      showNotification(getActionErrorMessage(error, 'Não foi possível adicionar o cliente à fila.'), 'error');
+    } finally {
+      setIsSavingWalkIn(false);
+    }
   };
 
   // WhatsApp Alert Modal Trigger
@@ -207,8 +258,9 @@ export const WaitingQueue: React.FC = () => {
     setTimeout(() => setCopiedNotice(false), 2000);
   };
 
-  const showNotification = (msg: string) => {
-    setLastNotification(msg);
+  const showNotification = (msg: string, type: 'success' | 'error' = 'success') => {
+    setNotificationType(type);
+    setLastNotification(`${type === 'error' ? 'Erro: ' : ''}${msg}`);
     setTimeout(() => setLastNotification(null), 3500);
   };
 
@@ -261,8 +313,8 @@ export const WaitingQueue: React.FC = () => {
 
       {/* TOAST MESSAGE */}
       {lastNotification && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className={`${notificationType === 'error' ? 'bg-status-error/10 border-status-error/30 text-status-error' : 'bg-status-success/10 border-status-success/30 text-status-success'} p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in`}>
+          {notificationType === 'error' ? <X className="w-4 h-4 shrink-0" /> : <CheckCircle2 className="w-4 h-4 shrink-0" />}
           <span>{lastNotification}</span>
         </div>
       )}
@@ -434,18 +486,22 @@ export const WaitingQueue: React.FC = () => {
 
                   <div className="flex items-center gap-2 pt-1">
                     <button
+                      type="button"
+                      disabled={actionLoadingId === item.id}
                       onClick={() => handleRevertToWaiting(item.id)}
-                      className="p-1.5 rounded-lg bg-surface-card text-content-muted hover:text-content-base border border-border-subtle"
+                      className="p-1.5 rounded-lg bg-surface-card text-content-muted hover:text-content-base border border-border-subtle disabled:opacity-50 disabled:cursor-wait"
                       title="Retornar para Recepção"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                     </button>
                     <button
+                      type="button"
+                      disabled={actionLoadingId === item.id}
                       onClick={() => handleFinishService(item.id)}
-                      className="flex-1 py-1.5 rounded-xl bg-status-success text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-95"
+                      className="flex-1 py-1.5 rounded-xl bg-status-success text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-95 disabled:opacity-60 disabled:cursor-wait"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Finalizar Corte</span>
+                      <span>{actionLoadingId === item.id ? 'Processando…' : 'Finalizar Corte'}</span>
                     </button>
                   </div>
                 </div>
@@ -544,22 +600,28 @@ export const WaitingQueue: React.FC = () => {
 
                       <div className="flex items-center gap-1">
                         <button
+                          type="button"
+                          disabled={actionLoadingId === item.id}
                           onClick={() => handleOpenWhatsAppModal(item)}
-                          className="p-1.5 rounded-lg bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border border-[#25D366]/30"
+                          className="p-1.5 rounded-lg bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border border-[#25D366]/30 disabled:opacity-50"
                           title="Avisar WhatsApp"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />
                         </button>
                         <button
+                          type="button"
+                          disabled={actionLoadingId === item.id}
                           onClick={() => handleAdvanceToChair(item.id)}
-                          className="px-2.5 py-1.5 rounded-lg bg-gold-base text-surface-base font-extrabold text-xs flex items-center gap-1 hover:bg-gold-base/80 active:scale-95"
+                          className="px-2.5 py-1.5 rounded-lg bg-gold-base text-surface-base font-extrabold text-xs flex items-center gap-1 hover:bg-gold-base/80 active:scale-95 disabled:opacity-60 disabled:cursor-wait"
                         >
                           <Play className="w-3 h-3 fill-surface-base" />
-                          <span>Chamar Cadeira</span>
+                          <span>{actionLoadingId === item.id ? 'Chamando…' : 'Chamar Cadeira'}</span>
                         </button>
                         <button
+                          type="button"
+                          disabled={actionLoadingId === item.id}
                           onClick={() => handleRemoveFromQueue(item.id, item.client_name)}
-                          className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                          className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-wait"
                           title="Remover da fila"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -733,9 +795,10 @@ export const WaitingQueue: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-xl bg-gold-base text-surface-base font-black shadow"
+                  disabled={isSavingWalkIn}
+                  className="px-4 py-1.5 rounded-xl bg-gold-base text-surface-base font-black shadow disabled:opacity-60 disabled:cursor-wait"
                 >
-                  Inserir na Fila
+                  {isSavingWalkIn ? 'Inserindo…' : 'Inserir na Fila'}
                 </button>
               </div>
             </form>

@@ -37,7 +37,7 @@ queueRouter.post('/', requireAuth, requireAdmin, async (req: any, res) => {
 
 queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
   try {
-    const parsed = queuePayloadSchema.omit({ id: true }).safeParse(req.body);
+    const parsed = queuePayloadSchema.omit({ id: true }).partial().safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Dados da fila inválidos.', details: parsed.error.flatten() });
     const [updated] = await db.update(schema.waitingQueue)
       .set({ ...parsed.data, updatedAt: new Date() })

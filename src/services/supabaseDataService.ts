@@ -321,7 +321,8 @@ export async function updateQueueStatusInSupabase(id: string, status: 'waiting' 
     })
   });
   if (!res.ok) {
-    throw new Error('Falha ao atualizar status da fila no Supabase');
+    const errorBody = await res.json().catch(() => null);
+    throw new Error(errorBody?.error || 'Falha ao atualizar status da fila no Supabase');
   }
 
   return getQueueFromSupabase();
@@ -330,7 +331,8 @@ export async function updateQueueStatusInSupabase(id: string, status: 'waiting' 
 export async function removeFromQueueInSupabase(id: string): Promise<WaitingQueueItem[]> {
   const res = await authFetch(`${API_BASE}/queue/${id}`, { method: 'DELETE' });
   if (!res.ok) {
-    throw new Error('Falha ao remover item da fila no Supabase');
+    const errorBody = await res.json().catch(() => null);
+    throw new Error(errorBody?.error || 'Falha ao remover item da fila no Supabase');
   }
 
   return getQueueFromSupabase();
