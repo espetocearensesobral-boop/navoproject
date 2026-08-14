@@ -335,6 +335,12 @@ appointmentsRouter.patch("/lookup/cancel", sensitiveOpsLimiter, optionalAuth, as
     
     sendWhatsAppMessage(appointment.clientPhone || inputPhone, msg).catch(() => {});
     notifyClientByEmail(appointment.clientId, appointment, 'cancel');
+    sendAdminPush({
+      title: 'Agendamento cancelado',
+      body: `${appointment.clientName || 'Cliente'} · ${appointment.date} às ${appointment.timeSlot} · O agendamento foi cancelado.`,
+      tag: `appointment:${appointment.id}:cancelled`,
+      url: '/admin',
+    }).catch((error) => console.warn('[Admin Push] Falha ao notificar cancelamento:', error));
 
     return res.json({ 
       success: true, 
@@ -882,6 +888,13 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
 
       sendWhatsAppMessage(phone, msg).catch(() => {});
       notifyClientByEmail(updatedApt.clientId, updatedApt, 'cancel');
+      const serviceTitle = Array.isArray(updatedApt.services) ? updatedApt.services[0]?.title || 'Serviço agendado' : 'Serviço agendado';
+      sendAdminPush({
+        title: 'Agendamento cancelado',
+        body: `${updatedApt.clientName || 'Cliente'} · ${serviceTitle} · ${updatedApt.date} às ${updatedApt.timeSlot} · O agendamento foi cancelado.`,
+        tag: `appointment:${updatedApt.id}:cancelled`,
+        url: '/admin',
+      }).catch((error) => console.warn('[Admin Push] Falha ao notificar cancelamento:', error));
     }
 
     res.json({ success: true, updated: updatedApt });
