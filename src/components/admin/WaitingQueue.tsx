@@ -33,7 +33,9 @@ import {
   Check,
   Zap,
   MessageCircle,
-  Users
+  Users,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 export const WaitingQueue: React.FC = () => {
@@ -57,6 +59,7 @@ export const WaitingQueue: React.FC = () => {
   const [copiedNotice, setCopiedNotice] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [isSavingWalkIn, setIsSavingWalkIn] = useState(false);
+  const [expandedQueueItemId, setExpandedQueueItemId] = useState<string | null>(null);
 
   // Walk-in Form state
   const [newClientName, setNewClientName] = useState('');
@@ -544,92 +547,125 @@ export const WaitingQueue: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-2">
-                {waitingList.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="bg-surface-base/45 p-3 sm:p-3.5 rounded-xl border border-border-subtle hover:border-gold-base/35 hover:bg-surface-base transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col items-center shrink-0">
-                        <div className="w-7 h-7 rounded-lg bg-gold-base text-surface-base font-black text-xs flex items-center justify-center">
-                          #{index + 1}
+                {waitingList.map((item, index) => {
+                  const isExpanded = expandedQueueItemId === item.id;
+
+                  return (
+                    <article
+                      key={item.id}
+                      className={`overflow-hidden rounded-xl border transition-colors ${isExpanded ? 'border-gold-base/45 bg-surface-base' : 'border-border-subtle bg-surface-base/45 hover:border-gold-base/35'}`}
+                    >
+                      <div className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-7 h-7 rounded-lg bg-gold-base text-surface-base font-black text-xs flex items-center justify-center shrink-0">
+                            #{index + 1}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <h4 className="font-bold text-content-base text-xs truncate">{item.client_name}</h4>
+                              {item.notes && (
+                                <span className="shrink-0 px-1.5 py-0.5 bg-gold-base/10 text-gold-hover text-[9px] font-bold rounded-xl border border-gold-base/20">
+                                  Encaixe
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-gold-hover font-semibold truncate">{item.service_title}</p>
+                            <p className="text-[10px] text-content-muted truncate">
+                              {item.professional_name || 'Profissional a definir'} · {item.scheduled_time || 'Agora'}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-0.5 mt-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+
+                        <div className="flex items-center justify-between sm:justify-end gap-2 sm:shrink-0">
                           <button
-                            disabled={index === 0}
-                            onClick={() => handleMoveQueueItem(index, 'up')}
-                            className="text-content-muted hover:text-gold-hover disabled:opacity-20"
+                            type="button"
+                            disabled={actionLoadingId === item.id}
+                            onClick={() => handleAdvanceToChair(item.id)}
+                            className="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-gold-base text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 hover:bg-gold-base/80 active:scale-95 disabled:opacity-60 disabled:cursor-wait"
                           >
-                            <ArrowUp className="w-3 h-3" />
+                            <Play className="w-3 h-3 fill-surface-base" />
+                            <span>{actionLoadingId === item.id ? 'Chamando…' : 'Chamar Cadeira'}</span>
                           </button>
                           <button
-                            disabled={index === waitingList.length - 1}
-                            onClick={() => handleMoveQueueItem(index, 'down')}
-                            className="text-content-muted hover:text-gold-hover disabled:opacity-20"
+                            type="button"
+                            onClick={() => setExpandedQueueItemId(isExpanded ? null : item.id)}
+                            aria-expanded={isExpanded}
+                            aria-label={isExpanded ? `Recolher ${item.client_name}` : `Expandir ${item.client_name}`}
+                            className="w-9 h-9 rounded-lg border border-border-subtle bg-surface-card text-content-muted hover:text-gold-hover hover:border-gold-base/35 flex items-center justify-center shrink-0 transition-colors"
                           >
-                            <ArrowDown className="w-3 h-3" />
+                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           </button>
                         </div>
                       </div>
 
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="font-bold text-content-base text-xs truncate">{item.client_name}</h4>
-                          {item.notes && (
-                            <span className="px-1.5 py-0.5 bg-gold-base/10 text-gold-hover text-[9px] font-bold rounded-xl border border-gold-base/20">
-                              Encaixe
-                            </span>
-                          )}
+                      {isExpanded && (
+                        <div className="border-t border-border-subtle bg-surface-card/60 p-3 sm:p-3.5 space-y-3">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px]">
+                            <div className="rounded-lg bg-surface-base p-2.5">
+                              <span className="block text-content-muted uppercase font-bold tracking-wide">Tempo estimado</span>
+                              <strong className="block mt-0.5 text-gold-hover text-xs">~{index * 15 + 5} min</strong>
+                            </div>
+                            <div className="rounded-lg bg-surface-base p-2.5">
+                              <span className="block text-content-muted uppercase font-bold tracking-wide">Barbeiro</span>
+                              <strong className="block mt-0.5 text-content-base text-xs truncate">{item.professional_name || 'A definir'}</strong>
+                            </div>
+                            <div className="rounded-lg bg-surface-base p-2.5 col-span-2 sm:col-span-1">
+                              <span className="block text-content-muted uppercase font-bold tracking-wide">Horário</span>
+                              <strong className="block mt-0.5 text-content-base text-xs">{item.scheduled_time || 'Agora'}</strong>
+                            </div>
+                          </div>
+                          {item.notes && <p className="text-[11px] text-content-muted border-t border-border-subtle pt-2"><span className="text-gold-hover font-semibold">Observação:</span> {item.notes}</p>}
+                          <div className="flex items-center justify-between gap-2 pt-1 border-t border-border-subtle">
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => handleMoveQueueItem(index, 'up')}
+                                className="w-9 h-9 rounded-lg border border-border-subtle bg-surface-base text-content-muted hover:text-gold-hover disabled:opacity-25"
+                                title="Subir na fila"
+                                aria-label="Subir na fila"
+                              >
+                                <ArrowUp className="w-3.5 h-3.5 mx-auto" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === waitingList.length - 1}
+                                onClick={() => handleMoveQueueItem(index, 'down')}
+                                className="w-9 h-9 rounded-lg border border-border-subtle bg-surface-base text-content-muted hover:text-gold-hover disabled:opacity-25"
+                                title="Descer na fila"
+                                aria-label="Descer na fila"
+                              >
+                                <ArrowDown className="w-3.5 h-3.5 mx-auto" />
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                disabled={actionLoadingId === item.id}
+                                onClick={() => handleOpenWhatsAppModal(item)}
+                                className="w-9 h-9 rounded-lg bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border border-[#25D366]/30 disabled:opacity-50"
+                                title="Avisar WhatsApp"
+                                aria-label="Avisar WhatsApp"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5 mx-auto" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={actionLoadingId === item.id}
+                                onClick={() => handleRemoveFromQueue(item.id, item.client_name)}
+                                className="w-9 h-9 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-wait"
+                                title="Remover da fila"
+                                aria-label="Remover da fila"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 mx-auto" />
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-[10px] text-gold-hover font-semibold">{item.service_title}</p>
-                        <p className="text-[10px] text-content-muted">
-                          Barbeiro: <strong className="text-content-base">{item.professional_name}</strong> • Horário: <strong className="text-content-base">{item.scheduled_time}</strong>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-border-subtle w-full sm:w-auto">
-                      <div className="text-left sm:text-right">
-                        <span className="text-[9px] text-content-muted font-bold block uppercase">
-                          Tempo Est.
-                        </span>
-                        <span className="text-xs font-bold text-gold-hover">
-                          ~{index * 15 + 5} min
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-[2.25rem_minmax(0,1fr)_2.25rem] sm:flex items-center gap-1.5 w-full sm:w-auto">
-                        <button
-                          type="button"
-                          disabled={actionLoadingId === item.id}
-                          onClick={() => handleOpenWhatsAppModal(item)}
-                          className="p-1.5 rounded-lg bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border border-[#25D366]/30 disabled:opacity-50"
-                          title="Avisar WhatsApp"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          disabled={actionLoadingId === item.id}
-                          onClick={() => handleAdvanceToChair(item.id)}
-                          className="w-full sm:w-auto px-3 py-2 rounded-lg bg-gold-base text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 hover:bg-gold-base/80 active:scale-95 disabled:opacity-60 disabled:cursor-wait"
-                        >
-                          <Play className="w-3 h-3 fill-surface-base" />
-                          <span>{actionLoadingId === item.id ? 'Chamando…' : 'Chamar Cadeira'}</span>
-                        </button>
-                        <button
-                          type="button"
-                          disabled={actionLoadingId === item.id}
-                          onClick={() => handleRemoveFromQueue(item.id, item.client_name)}
-                          className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-wait"
-                          title="Remover da fila"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                      )}
+                    </article>
+                  );
+                })}
               </div>
             )}
           </section>
