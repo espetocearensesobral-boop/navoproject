@@ -28,7 +28,6 @@ import {
   X,
   RotateCcw,
   History,
-  TrendingUp,
   Copy,
   Check,
   Zap,
@@ -286,12 +285,6 @@ export const WaitingQueue: React.FC = () => {
   const waitingList = filteredQueue.filter((q) => q.status === 'waiting');
   const completedList = filteredQueue.filter((q) => q.status === 'completed');
 
-  // Stats
-  const inChairCount = queue.filter((q) => q.status === 'in_chair').length;
-  const waitingCount = queue.filter((q) => q.status === 'waiting').length;
-  const completedCount = queue.filter((q) => q.status === 'completed').length;
-  const estimatedAvgWait = waitingCount * 15;
-
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
       {/* Header (desktop) */}
@@ -321,53 +314,6 @@ export const WaitingQueue: React.FC = () => {
           <span>{lastNotification}</span>
         </div>
       )}
-
-      {/* COMPACT KPI METRICS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Cadeiras Ocupadas</span>
-            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center">
-              <Scissors className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-black text-status-success">{inChairCount}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Atendimentos em andamento</p>
-        </div>
-
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Na Recepção</span>
-            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
-              <Clock className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-mono num-tabular text-content-base font-semibold">{waitingCount}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Aguardando atendimento</p>
-        </div>
-
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Espera Estimada</span>
-            <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
-              <TrendingUp className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-mono num-tabular text-content-base font-semibold">~{estimatedAvgWait} min</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Tempo estimado de fila</p>
-        </div>
-
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Atendidos Hoje</span>
-            <div className="w-6 h-6 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-            </div>
-          </div>
-          <p className="text-lg font-black text-purple-400">{completedCount}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Cortes concluídos</p>
-        </div>
-      </div>
 
       {/* FILTER & TABS BAR */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
