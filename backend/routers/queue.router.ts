@@ -57,27 +57,35 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
     const queueUpdate = { ...parsed.data, updatedAt: new Date() };
     let updatedQueue: any;
     let updatedAppointment: any = null;
+    let completionStage = 'before_transaction';
 
     if (currentQueueItem.appointmentId && appointmentStatus) {
       if (typeof db.transaction !== 'function') {
         return res.status(503).json({ error: 'O banco não oferece transação para sincronizar Fila e Agenda.' });
       }
 
-      await db.transaction(async (tx: any) => {
-        const [savedAppointment] = await tx.update(schema.appointments)
+      try {
+        completionStage = 'appointment_update';
+        await db.transaction(async (tx: any) => {
+          const [savedAppointment] = await tx.update(schema.appointments)
           .set({ status: appointmentStatus, updatedAt: new Date() })
           .where(eq(schema.appointments.id, currentQueueItem.appointmentId))
           .returning();
         if (!savedAppointment) throw new Error('APPOINTMENT_NOT_FOUND');
         updatedAppointment = savedAppointment;
 
+        completionStage = 'queue_update';
         const [savedQueue] = await tx.update(schema.waitingQueue)
           .set(queueUpdate)
           .where(eq(schema.waitingQueue.id, req.params.id))
           .returning();
         if (!savedQueue) throw new Error('QUEUE_ITEM_NOT_FOUND');
         updatedQueue = savedQueue;
-      });
+        });
+      } catch (error: any) {
+        error.completionStage = completionStage;
+        throw error;
+      }
 
       if (appointmentStatus === 'completed') {
         await processAppointmentCompletion(updatedAppointment);
@@ -100,12 +108,18 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
       return res.status(404).json({ error: 'Item da fila não encontrado.' });
     }
     const pgCode = e?.code || e?.cause?.code;
+    const diagnosticStage = e?.completionStage || 'before_transaction';
     if (pgCode === '23514') {
       return res.status(409).json({
-        error: 'O banco rejeitou o status do atendimento. Aplique a migração de integridade mais recente e tente novamente.'
+        error: 'O banco rejeitou o status do atendimento. Aplique a migração de integridade mais recente e tente novamente.',
+        diagnosticCode: `QUEUE_${String(diagnosticStage).toUpperCase()}`
       });
     }
-    return handleError(res, e, req.path);
+    console.error('[API] Queue completion failed:', { stage: diagnosticStage, code: pgCode || 'unknown', error: e });
+    return res.status(500).json({
+      error: 'Não foi possível concluir a solicitação. Tente novamente mais tarde.',
+      diagnosticCode: `QUEUE_${String(diagnosticStage).toUpperCase()}`
+    });
   }
 });
 
