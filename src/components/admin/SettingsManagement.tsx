@@ -15,27 +15,12 @@ interface SettingsManagementProps {
 
 export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialTab = 'email' }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
-  const [isSaving, setIsSaving] = useState(false);
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialTab) {
       setActiveTab(initialTab);
     }
   }, [initialTab]);
-
-  const showToast = (msg: string) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3500);
-  };
-
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-      showToast('Configurações salvas com sucesso!');
-    }, 600);
-  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -54,32 +39,7 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300 min-w-0">
-      {/* Header (desktop) */}
-      <AdminPageHeader
-        icon={Settings}
-        title="Configurações do Sistema"
-        stats={[{ label: 'Geral', value: '', tone: 'gold' }]}
-        action={{ label: isSaving ? 'Salvando...' : 'Salvar Alterações', onClick: handleSave, icon: Save }}
-      />
-
-      {/* Ação (mobile) */}
-      <button
-        onClick={handleSave}
-        disabled={isSaving}
-        className="md:hidden w-full h-10 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 shrink-0"
-        aria-label="Salvar Alterações"
-      >
-        <Save className="w-4 h-4" />
-        <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
-      </button>
-
-      {/* TOAST MESSAGE */}
-      {toastMsg && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span className="truncate">{toastMsg}</span>
-        </div>
-      )}
+      <AdminPageHeader icon={Settings} title="Configurações do Sistema" />
 
       {/* TAB BAR */}
       <AdminTabs
@@ -322,15 +282,32 @@ const EmailSettingsTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Action Zone: Save */}
-      <div className="pt-4 border-t border-border-subtle flex justify-end">
+      {/* Ações finais da configuração de e-mail. */}
+      <div className="pt-5 mt-2 border-t border-border-subtle flex flex-col sm:flex-row sm:justify-end gap-2">
         <button
+          type="button"
+          onClick={() => {
+            fetchEmailSettings()
+              .then((data) => {
+                setSettings(data);
+                setSmtpPasswordInput('');
+                setStatusMsg({ type: 'success', text: 'Alterações descartadas.' });
+              })
+              .catch((e) => setStatusMsg({ type: 'error', text: e.message || 'Não foi possível restaurar as configurações salvas.' }));
+          }}
+          disabled={isSaving}
+          className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl border border-border-subtle bg-surface-card text-content-muted hover:text-content-base hover:bg-surface-base text-xs font-bold transition-colors disabled:opacity-50"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
           onClick={handleSave}
           disabled={isSaving}
           className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
         >
           <Save className="w-4 h-4" />
-          <span>{isSaving ? 'Salvando...' : 'Salvar Configurações de E-mail'}</span>
+          <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
         </button>
       </div>
 

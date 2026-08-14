@@ -38,6 +38,7 @@ import { timeToMinutes } from '../../utils/dateUtils';
 
 export const BarbershopProfileManagement: React.FC = () => {
   const [profile, setProfile] = useState<ShopProfile>(defaultShopProfile);
+  const [savedProfile, setSavedProfile] = useState<ShopProfile>(defaultShopProfile);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -51,6 +52,7 @@ export const BarbershopProfileManagement: React.FC = () => {
     setLoading(true);
     const data = await fetchShopProfile(true);
     setProfile(data);
+    setSavedProfile(data);
     setLoading(false);
   };
 
@@ -97,12 +99,22 @@ export const BarbershopProfileManagement: React.FC = () => {
     try {
       const updated = await saveShopProfile(profile);
       setProfile(updated);
+      setSavedProfile(updated);
       showToast('Perfil e horários da barbearia atualizados com sucesso!');
     } catch (err: any) {
       showToast(err?.message || 'Erro ao salvar perfil da barbearia.');
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleCancel = () => {
+    setProfile({
+      ...savedProfile,
+      operatingDays: [...savedProfile.operatingDays],
+      operatingSchedule: { ...savedProfile.operatingSchedule },
+    });
+    showToast('Alterações descartadas.');
   };
 
   const updateScheduleDay = (dayKey: keyof ShopProfile['operatingSchedule'], field: 'active' | 'open' | 'close', value: any) => {
@@ -139,27 +151,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
   return (
     <div className="space-y-5 animate-fade-in pb-12">
-      {/* HEADER (desktop) */}
-      <AdminPageHeader
-        icon={Store}
-        title="Perfil & Unidade"
-        action={{
-          label: isSaving ? 'Salvando...' : 'Salvar Alterações',
-          onClick: handleSave,
-          icon: Save,
-          disabled: isSaving,
-        }}
-      />
-
-      {/* Ação (mobile) */}
-      <button
-        onClick={handleSave}
-        disabled={isSaving}
-        className="md:hidden h-10 px-5 bg-gold-base hover:bg-gold-hover text-surface-base rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95 disabled:opacity-50 w-full"
-      >
-        <Save className="w-4 h-4" />
-        <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
-      </button>
+      <AdminPageHeader icon={Store} title="Perfil & Unidade" />
 
       {/* TOAST MESSAGE */}
       {toastMsg && (
@@ -650,15 +642,24 @@ export const BarbershopProfileManagement: React.FC = () => {
         <AppearanceTabContent />
       )}
 
-      {/* FOOTER SAVE ACTION */}
-      <div className="pt-4 border-t border-border-subtle flex justify-end">
+      {/* Ações finais: um único ponto de persistência para todas as abas do perfil. */}
+      <div className="pt-5 mt-2 border-t border-border-subtle flex flex-col sm:flex-row sm:justify-end gap-2">
         <button
+          type="button"
+          onClick={handleCancel}
+          disabled={isSaving}
+          className="h-11 px-6 rounded-xl border border-border-subtle bg-surface-card text-content-muted hover:text-content-base hover:bg-surface-base text-xs font-bold transition-colors disabled:opacity-50 w-full sm:w-auto"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
           onClick={handleSave}
           disabled={isSaving}
           className="h-11 px-6 bg-gold-base hover:bg-gold-hover text-surface-base rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 w-full sm:w-auto"
         >
           <Save className="w-4 h-4" />
-          <span>{isSaving ? 'Salvando...' : 'Salvar Perfil da Barbearia'}</span>
+          <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
         </button>
       </div>
     </div>

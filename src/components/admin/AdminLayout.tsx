@@ -130,6 +130,46 @@ export const AdminLayout: React.FC = () => {
   }, [activeTab]);
 
   const mainRef = useRef<HTMLElement>(null);
+
+  const scrollSidebarNavigationToItem = (tab: AdminTab, mobile = false) => {
+    window.requestAnimationFrame(() => {
+      const navigation = document.querySelector<HTMLElement>(
+        mobile ? '[data-admin-sidebar-navigation="mobile"]' : '[data-admin-sidebar-navigation="desktop"]'
+      );
+      const target = navigation?.querySelector<HTMLElement>(`[data-admin-sidebar-item="${tab}"]`);
+      if (!navigation || !target) return;
+
+      const navigationRect = navigation.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const targetTop = navigation.scrollTop + (targetRect.top - navigationRect.top) - ((navigation.clientHeight - targetRect.height) / 2);
+
+      navigation.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: 'smooth',
+      });
+    });
+  };
+
+  const handleSidebarTabChange = (tab: AdminTab, mobile = false) => {
+    const section = ADMIN_TAB_SECTIONS[tab];
+    if (section) {
+      setCollapsedSections((current) => (
+        current[section] ? { ...current, [section]: false } : current
+      ));
+    }
+
+    setActiveTab(tab);
+
+    if (mobile) {
+      setSidebarOpen(false);
+      return;
+    }
+
+    // Mantém a categoria clicada no centro da área rolável da sidebar, sem
+    // criar um segundo estado visual de seleção ou mover a página principal.
+    scrollSidebarNavigationToItem(tab);
+  };
+
   const { pullDistance, isRefreshing, handlers: pullToRefreshHandlers } = usePullToRefresh(
     mainRef,
     {
@@ -295,7 +335,10 @@ export const AdminLayout: React.FC = () => {
   ];
 
   const renderSidebarNavigation = (mobile = false) => (
-    <nav className={mobile ? 'flex-1 px-4 py-6 space-y-4 overflow-y-auto custom-scrollbar' : 'flex-1 px-3 py-6 space-y-4 overflow-y-auto no-scrollbar'}>
+    <nav
+      data-admin-sidebar-navigation={mobile ? 'mobile' : 'desktop'}
+      className={mobile ? 'flex-1 px-4 py-6 space-y-4 overflow-y-auto custom-scrollbar' : 'flex-1 px-3 py-6 space-y-4 overflow-y-auto no-scrollbar'}
+    >
       {sectionOrder.map((section) => {
         const itemsInSection = navItems.filter((item) => item.section === section);
         if (itemsInSection.length === 0) return null;
@@ -325,10 +368,8 @@ export const AdminLayout: React.FC = () => {
                     <button
                       key={item.id}
                       type="button"
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        if (mobile) setSidebarOpen(false);
-                      }}
+                      onClick={() => handleSidebarTabChange(item.id, mobile)}
+                      data-admin-sidebar-item={item.id}
                       className={`admin-sidebar-item w-full min-h-11 px-3.5 rounded-lg text-sm font-semibold flex items-center gap-3 transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active shadow-sm' : ''}`}
                     >
                       <Icon className="w-[18px] h-[18px] shrink-0" />
