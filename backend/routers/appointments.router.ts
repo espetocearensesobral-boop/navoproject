@@ -1120,6 +1120,11 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
         if (fullErr.includes('PROFESSIONAL_NOT_FOUND')) {
           return res.status(400).json({ error: 'Profissional não encontrado ou inativo.' });
         }
+        if (fullErr.includes('23514')) {
+          return res.status(409).json({
+            error: 'O banco rejeitou o status do atendimento. Aplique a migração de integridade mais recente e tente novamente.'
+          });
+        }
         console.warn('[API] Could not update appointment in Postgres:', err);
         return res.status(500).json({ error: 'Falha ao atualizar agendamento no banco de dados.' });
       }

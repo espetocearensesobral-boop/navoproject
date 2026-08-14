@@ -99,6 +99,12 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
     if (e?.message === 'QUEUE_ITEM_NOT_FOUND') {
       return res.status(404).json({ error: 'Item da fila não encontrado.' });
     }
+    const pgCode = e?.code || e?.cause?.code;
+    if (pgCode === '23514') {
+      return res.status(409).json({
+        error: 'O banco rejeitou o status do atendimento. Aplique a migração de integridade mais recente e tente novamente.'
+      });
+    }
     return handleError(res, e, req.path);
   }
 });
