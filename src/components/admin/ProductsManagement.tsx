@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, ChevronDown, ChevronUp, Edit3, Package, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronUp, Edit3, Package, Plus, Search, Trash2, X } from 'lucide-react';
 import { ProductItem } from '../../types';
 import {
   deleteProductInSupabase,
@@ -31,6 +31,7 @@ export const ProductsManagement: React.FC = () => {
   const [toast, setToast] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [onlyLowStock, setOnlyLowStock] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,7 +68,8 @@ export const ProductsManagement: React.FC = () => {
     const query = search.trim().toLowerCase();
     const matchesQuery = !query || [product.name, product.brand, product.category].some((value) => value.toLowerCase().includes(query));
     const matchesStock = !onlyLowStock || product.stock_quantity <= product.min_stock_alert;
-    return matchesQuery && matchesStock;
+    const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
+    return matchesQuery && matchesStock && matchesCategory;
   });
 
   const showToast = (message: string) => {
@@ -165,16 +167,29 @@ export const ProductsManagement: React.FC = () => {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-2">
+      {/* MOBILE SEARCH + FILTERS */}
+      <div className="md:hidden space-y-2">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar produto, marca ou categoria" className="w-full h-10 rounded-xl border border-border-subtle bg-surface-card pl-9 pr-3 text-sm text-content-base outline-none focus:border-gold-base" />
+        </div>
+        <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          <button type="button" onClick={() => { setCategoryFilter('all'); setOnlyLowStock(false); }} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === 'all' && !onlyLowStock ? 'bg-gold-base text-surface-base' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Todos ({products.length})</button>
+          {categories.map((category) => (
+            <button key={category} type="button" onClick={() => { setCategoryFilter(category); setOnlyLowStock(false); }} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === category && !onlyLowStock ? 'bg-gold-base text-surface-base' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>{category}</button>
+          ))}
+          <button type="button" onClick={() => setOnlyLowStock((value) => !value)} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors ${onlyLowStock ? 'bg-amber-500 text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}><AlertTriangle className="w-3.5 h-3.5" /> Estoque baixo ({lowStockCount})</button>
+        </div>
+      </div>
+
+      {/* DESKTOP SEARCH + FILTERS; atualização ocorre pelo pull-to-refresh global */}
+      <div className="hidden md:flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
           <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar produto, marca ou categoria" className="w-full h-10 rounded-xl border border-border-subtle bg-surface-card pl-9 pr-3 text-xs text-content-base outline-none focus:border-gold-base" />
         </div>
         <button type="button" onClick={() => setOnlyLowStock((value) => !value)} className={`h-10 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 ${onlyLowStock ? 'border-amber-400/50 bg-amber-500/15 text-amber-300' : 'border-border-subtle bg-surface-card text-content-muted'}`}>
           <AlertTriangle className="w-3.5 h-3.5" /> Estoque baixo ({lowStockCount})
-        </button>
-        <button type="button" onClick={loadProducts} className="h-10 w-10 rounded-xl border border-border-subtle bg-surface-card text-content-muted flex items-center justify-center" aria-label="Atualizar estoque">
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
