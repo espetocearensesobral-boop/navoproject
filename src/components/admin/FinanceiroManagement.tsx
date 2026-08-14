@@ -5,7 +5,6 @@ import { FinancialStatementManagement } from './FinancialStatementManagement';
 import { ExpensesManagement } from './ExpensesManagement';
 import { ReportsManagement } from './ReportsManagement';
 import { AdminTabs } from './shared/AdminTabs';
-import { AdminModuleNotice } from './shared/AdminModuleNotice';
 
 type FinanceiroSubTab = 'recebimentos' | 'extrato' | 'saidas' | 'relatorios';
 
@@ -49,11 +48,6 @@ export const FinanceiroManagement: React.FC<FinanceiroManagementProps> = ({ init
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
       <AdminTabs tabs={subTabs} activeId={subTab} onChange={(id) => setSubTab(id as FinanceiroSubTab)} />
 
-      <AdminModuleNotice
-        title="Financeiro integrado ao banco"
-        description="Recebimentos confirmados e saídas registradas alimentam o mesmo Extrato real."
-        detail="Os Relatórios consolidam exclusivamente lançamentos persistidos, sem sessões locais, valores demonstrativos ou indicadores desconectados do livro-caixa."
-      />
 
       <div className="animate-fade-in min-w-0">
         {renderSubContent()}
