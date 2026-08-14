@@ -18,9 +18,19 @@ import {
   fetchShopProfile, 
   generateTimeSlotsFromProfile 
 } from '../../services/shopProfileService';
-import { Calendar, Clock, Plus, Lock, Unlock, UserCheck, ShieldAlert, CheckCircle2, X, Save, RefreshCw, Scissors } from 'lucide-react';
-import { getTodayStringBRT, timeToMinutes } from '../../utils/dateUtils';
+import { Calendar, Clock, Plus, Lock, Unlock, UserCheck, ShieldAlert, CheckCircle2, X, Save, RefreshCw, Scissors, AlertTriangle, Timer } from 'lucide-react';
+import { getTodayStringBRT, getCurrentTimeBRT, timeToMinutes } from '../../utils/dateUtils';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+
+const PROFESSIONAL_ACCENT_COUNT = 6;
+
+const getProfessionalAccent = (professionalId: string) => {
+  let hash = 0;
+  for (let index = 0; index < professionalId.length; index += 1) {
+    hash = (hash * 31 + professionalId.charCodeAt(index)) | 0;
+  }
+  return `var(--color-admin-professional-${Math.abs(hash) % PROFESSIONAL_ACCENT_COUNT})`;
+};
 
 export const ScheduleGrid: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>(() => getTodayStringBRT());
@@ -31,6 +41,14 @@ export const ScheduleGrid: React.FC = () => {
   const [blocks, setBlocks] = useState<ScheduleBlock[]>([]);
   const [loading, setLoading] = useState(true);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+  const [currentBrtMinutes, setCurrentBrtMinutes] = useState(() => getCurrentTimeBRT().totalMinutes);
+
+  useEffect(() => {
+    const refreshCurrentTime = () => setCurrentBrtMinutes(getCurrentTimeBRT().totalMinutes);
+    refreshCurrentTime();
+    const intervalId = window.setInterval(refreshCurrentTime, 30_000);
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     fetchShopProfile().then(p => {
@@ -223,6 +241,33 @@ export const ScheduleGrid: React.FC = () => {
     ? barbers
     : barbers.filter(b => b.id === selectedBarberId);
 
+  const getAppointmentOperationalState = (apt: Appointment) => {
+    const isToday = selectedDate === getTodayStringBRT();
+    const status = apt.status as string;
+    const startMinutes = timeToMinutes(apt.time_slot);
+    const durationMinutes = Number(apt.total_duration_minutes || 30);
+    const isAwaitingClient = status === 'confirmed' || status === 'in_queue';
+    const isInService = status === 'in_service' || status === 'in_chair';
+    const isLate = isToday && isAwaitingClient && currentBrtMinutes >= startMinutes + 10;
+    const remainingMinutes = isToday && isInService
+      ? Math.max(0, startMinutes + durationMinutes - currentBrtMinutes)
+      : 0;
+
+    return {
+      isLate,
+      lateMinutes: isLate ? currentBrtMinutes - startMinutes : 0,
+      remainingMinutes,
+      isInService,
+    };
+  };
+
+  const getAppointmentStatusLabel = (status: string) => {
+    if (status === 'completed') return 'Concluído';
+    if (status === 'in_service' || status === 'in_chair') return 'Em atendimento';
+    if (status === 'in_queue') return 'Na fila';
+    return 'Confirmado';
+  };
+
   return (
     <div className="space-y-4">
       {/* SUCCESS NOTIFICATION */}
@@ -346,12 +391,22 @@ export const ScheduleGrid: React.FC = () => {
                       slotAppointments.map(({ barber, apt, block }) => {
                         if (apt) {
                           const isPending = apt.status === 'pending_approval';
+                          const operationalState = getAppointmentOperationalState(apt);
+                          const professionalAccent = selectedBarberId === 'all' && !operationalState.isLate && !isPending
+                            ? getProfessionalAccent(barber.id)
+                            : undefined;
                           return (
-                            <div key={apt.id} className={`p-4 rounded-2xl border shadow-sm transition-all ${
-                              isPending
-                                ? 'bg-amber-500/10 border-2 border-amber-500/50 text-amber-200 shadow-sm'
-                                : 'bg-surface-card border-border-subtle'
-                            }`}>
+                            <div
+                              key={apt.id}
+                              style={professionalAccent ? { borderLeftColor: professionalAccent } : undefined}
+                              className={`p-4 rounded-2xl border border-l-4 shadow-sm transition-all ${
+                                isPending
+                                  ? 'bg-amber-500/10 border-amber-500/50 text-amber-200 shadow-sm'
+                                  : operationalState.isLate
+                                  ? 'bg-amber-500/5 border-amber-500/60'
+                                  : 'bg-surface-card border-border-subtle'
+                              }`}
+                            >
                               {isPending && (
                                 <div className="flex items-center justify-between text-[10px] font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-xl border border-amber-500/30">
                                   <div className="flex items-center gap-1">
@@ -361,21 +416,37 @@ export const ScheduleGrid: React.FC = () => {
                                   <span className="text-[9px] bg-amber-400 text-black px-1.5 rounded-xl font-extrabold">Aprovação Pendente</span>
                                 </div>
                               )}
+                              {operationalState.isLate && (
+                                <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold text-amber-300 uppercase tracking-wide">
+                                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                  <span>Atrasado {operationalState.lateMinutes} min</span>
+                                </div>
+                              )}
                               <div className="flex justify-between items-center text-base mb-2 gap-3">
                                 <span className="font-bold text-content-base truncate">{apt.client_name || (apt as any).clientName}</span>
                                 <span className="font-extrabold finance-positive text-base shrink-0">R$ {apt.final_amount ? Number(apt.final_amount).toFixed(2) : '60.00'}</span>
                               </div>
                               <div className="flex justify-between items-start gap-3 text-sm text-content-muted">
                                 <span className="min-w-0 leading-relaxed">{(apt.services && apt.services[0]?.title) || 'Atendimento'} • <strong className="text-gold-base">{barber.name}</strong></span>
-                                <span className={`px-2 py-0.5 rounded-full font-semibold text-[9px] shrink-0 ${
-                                  isPending
-                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
-                                    : apt.status === 'completed'
-                                    ? 'bg-status-success/15 text-status-success'
-                                    : 'bg-status-success/15 text-status-success'
-                                }`}>
-                                  {isPending ? 'Requer Aprovação' : apt.status === 'completed' ? 'Concluído' : 'Confirmado'}
-                                </span>
+                                <div className="flex flex-col items-end gap-1 shrink-0">
+                                  {operationalState.remainingMinutes > 0 && (
+                                    <span className="inline-flex items-center gap-1 text-[9px] font-bold text-status-info bg-status-info/10 border border-status-info/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                      <Timer className="w-3 h-3" />
+                                      Faltam {operationalState.remainingMinutes} min
+                                    </span>
+                                  )}
+                                  <span className={`px-2 py-0.5 rounded-full font-semibold text-[9px] ${
+                                    isPending
+                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
+                                      : apt.status === 'completed'
+                                      ? 'bg-status-success/15 text-status-success'
+                                      : operationalState.isInService
+                                      ? 'bg-status-info/10 text-status-info border border-status-info/20'
+                                      : 'bg-status-success/15 text-status-success'
+                                  }`}>
+                                    {isPending ? 'Requer Aprovação' : getAppointmentStatusLabel(apt.status)}
+                                  </span>
+                                </div>
                               </div>
 
                               {isPending && (
@@ -499,6 +570,10 @@ export const ScheduleGrid: React.FC = () => {
                                a.time_slot === slot &&
                                a.status !== 'cancelled'
                         );
+                        const operationalState = apt ? getAppointmentOperationalState(apt) : null;
+                        const professionalAccent = selectedBarberId === 'all' && !operationalState?.isLate
+                          ? getProfessionalAccent(barber.id)
+                          : undefined;
 
                         const block = blocks.find(
                           b => b.professional_id === barber.id && isBlockCoveringSlot(b, slot)
@@ -507,17 +582,41 @@ export const ScheduleGrid: React.FC = () => {
                         return (
                           <div key={barber.id} className="p-2 min-h-[52px] flex items-center">
                             {apt ? (
-                              <div className="w-full bg-surface-base border-l-4 border-l-[#FFFFFF] p-2 rounded-r-xl space-y-0.5">
-                                <div className="flex items-center justify-between text-xs font-bold text-content-base">
-                                  <span>{apt.client_name}</span>
-                                  <span className="text-[10px] finance-positive">R$ {apt.final_amount.toFixed(2)}</span>
+                              <div
+                                style={professionalAccent ? { borderLeftColor: professionalAccent } : undefined}
+                                className={`w-full border border-l-4 p-2 rounded-r-xl space-y-1 ${
+                                  operationalState?.isLate
+                                    ? 'bg-amber-500/5 border-amber-500/60'
+                                    : 'bg-surface-base border-border-subtle'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between text-xs font-bold text-content-base gap-2">
+                                  <span className="truncate">{apt.client_name}</span>
+                                  <span className="text-[10px] finance-positive shrink-0">R$ {apt.final_amount.toFixed(2)}</span>
                                 </div>
-                                <div className="text-[10px] text-content-muted flex items-center justify-between">
-                                  <span>{apt.services[0]?.title || 'Atendimento'}</span>
-                                  <span className="px-1.5 py-0.5 rounded-xl bg-status-success/20 text-status-success text-[9px] font-bold">
-                                    {apt.status === 'completed' ? 'Concluído' : 'Confirmado'}
-                                  </span>
+                                <div className="text-[10px] text-content-muted flex items-center justify-between gap-2">
+                                  <span className="truncate">{apt.services[0]?.title || 'Atendimento'}</span>
+                                  <div className="flex items-center gap-1.5 shrink-0">
+                                    {operationalState?.remainingMinutes && operationalState.remainingMinutes > 0 ? (
+                                      <span className="inline-flex items-center gap-1 text-[9px] font-bold text-status-info">
+                                        <Timer className="w-3 h-3" /> {operationalState.remainingMinutes} min
+                                      </span>
+                                    ) : null}
+                                    <span className={`px-1.5 py-0.5 rounded-xl text-[9px] font-bold ${
+                                      operationalState?.isInService
+                                        ? 'bg-status-info/10 text-status-info border border-status-info/20'
+                                        : 'bg-status-success/20 text-status-success'
+                                    }`}>
+                                      {getAppointmentStatusLabel(apt.status)}
+                                    </span>
+                                  </div>
                                 </div>
+                                {operationalState?.isLate && (
+                                  <div className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-300">
+                                    <AlertTriangle className="w-3 h-3 text-amber-400" />
+                                    Atrasado {operationalState.lateMinutes} min
+                                  </div>
+                                )}
                               </div>
                             ) : block ? (
                               <div className="w-full bg-red-950/30 border border-red-500/30 p-2 rounded-xl flex items-center justify-between text-xs text-red-300">

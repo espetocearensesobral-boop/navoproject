@@ -86,6 +86,14 @@
   --color-finance-positive-soft: color-mix(in srgb, #34D399 14%, transparent);
   --color-finance-negative-soft: color-mix(in srgb, #F87171 14%, transparent);
 
+  /* Professional identifiers: fixed semantic accents, independent from data-palette. */
+  --color-admin-professional-0: #38BDF8;
+  --color-admin-professional-1: #A78BFA;
+  --color-admin-professional-2: #2DD4BF;
+  --color-admin-professional-3: #F472B6;
+  --color-admin-professional-4: #60A5FA;
+  --color-admin-professional-5: #A3E635;
+
   /* Typography */
   --font-serif: 'Fraunces', Georgia, serif;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -140,6 +148,14 @@
   --color-finance-negative: #B91C1C;
   --color-finance-positive-soft: color-mix(in srgb, #15803D 11%, transparent);
   --color-finance-negative-soft: color-mix(in srgb, #B91C1C 11%, transparent);
+
+  /* Professional identifiers: darker counterparts for light surfaces. */
+  --color-admin-professional-0: #0369A1;
+  --color-admin-professional-1: #6D28D9;
+  --color-admin-professional-2: #0F766E;
+  --color-admin-professional-3: #BE185D;
+  --color-admin-professional-4: #1D4ED8;
+  --color-admin-professional-5: #4D7C0F;
 }
 
 /* Paletas de destaque: o restante da identidade permanece vinculado ao tema claro/preto. */
