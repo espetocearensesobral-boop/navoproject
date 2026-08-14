@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Appointment, WaitingQueueItem } from '../types';
+import { appendAdminNotificationHistory } from '../utils/adminNotificationHistory';
 import {
   fetchAdminPushConfig,
   fetchAdminPushSubscriptionStatus,
@@ -96,6 +97,7 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
     const lastSent = sentTagsRef.current.get(notification.tag) || 0;
     if (now - lastSent < DEDUPE_WINDOW_MS) return false;
     sentTagsRef.current.set(notification.tag, now);
+    appendAdminNotificationHistory(notification);
 
     for (const [tag, timestamp] of sentTagsRef.current.entries()) {
       if (now - timestamp > DEDUPE_WINDOW_MS) sentTagsRef.current.delete(tag);
