@@ -294,9 +294,10 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
 
   const requestPermission = useCallback(async (): Promise<NotificationPermission | 'unsupported'> => {
     if (!isSupported) return 'unsupported';
-    const nextPermission = Notification.permission === 'granted'
-      ? 'granted'
-      : await Notification.requestPermission();
+    // O navegador só exibe o prompt quando a permissão está em `default`.
+    // Mesmo quando já está `granted`, chamamos a API novamente para que a
+    // reativação sempre respeite o estado atual definido pelo navegador.
+    const nextPermission = await Notification.requestPermission();
     setPermission(nextPermission);
     return nextPermission;
   }, [isSupported]);
