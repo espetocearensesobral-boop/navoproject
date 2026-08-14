@@ -73,7 +73,9 @@ interface LandingPageProps {
 export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments, isGuest = true, currentUser, onOpenLogin, onOpenProfile, onOpenMenu, scrollContainerRef }) => {
   const { theme, setTheme } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
+  const postHeroRef = useRef<HTMLElement>(null);
   const finalCtaRef = useRef<HTMLDivElement>(null);
+  const [hasReachedPostHero, setHasReachedPostHero] = useState(false);
   const [isFinalCtaVisible, setIsFinalCtaVisible] = useState(false);
 
   useEffect(() => {
@@ -87,6 +89,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       observer.observe(finalCtaRef.current);
     }
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const postHeroSection = postHeroRef.current;
+    if (!container || !postHeroSection) return;
+
+    const updateFloatingCtaVisibility = () => {
+      setHasReachedPostHero(container.scrollTop >= postHeroSection.offsetTop - 8);
+    };
+
+    updateFloatingCtaVisibility();
+    container.addEventListener('scroll', updateFloatingCtaVisibility, { passive: true });
+    return () => container.removeEventListener('scroll', updateFloatingCtaVisibility);
   }, []);
 
   // Expõe o container de scroll interno (a landing page rola dentro de si mesma,
@@ -343,7 +359,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   return (
     <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-auto bg-white text-neutral-900 font-sans antialiased relative selection:bg-gold-base/20 selection:text-neutral-900 no-scrollbar">
       <AnimatePresence>
-        {!isFinalCtaVisible && (
+        {hasReachedPostHero && !isFinalCtaVisible && (
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -579,7 +595,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
 
       {/* SECTION: CONFIANÇA IMEDIATA */}
-      <section className="w-full bg-neutral-900 border-b border-white/5 py-4 px-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 shrink-0">
+      <section ref={postHeroRef} className="w-full bg-neutral-900 border-b border-white/5 py-4 px-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 shrink-0">
         <div className="flex items-center gap-2">
           <div className="flex items-center text-gold-base">
             <Star className="w-4 h-4 fill-current" />
