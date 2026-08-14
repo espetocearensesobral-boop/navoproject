@@ -116,9 +116,9 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
       constraint: pgConstraint,
       errorType: rootDbError?.name || e?.name || null
     };
-    if (pgCode === '23514') {
+    if (pgCode === '23514' || pgCode === '42804') {
       return res.status(409).json({
-        error: 'O banco rejeitou o status do atendimento. Aplique a migração de integridade mais recente e tente novamente.',
+        error: 'A estrutura do status de agendamento está desatualizada. Aplique a migração 0011 e tente novamente.',
         diagnosticCode: `QUEUE_${String(diagnosticStage).toUpperCase()}`,
         diagnosticDetails
       });
