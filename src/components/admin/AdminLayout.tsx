@@ -63,13 +63,39 @@ export type AdminTab =
 
 export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionamento' | 'sistema';
 
+const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
+const ADMIN_TAB_VALUES: AdminTab[] = [
+  'dashboard', 'agenda', 'financeiro', 'audit', 'whatsapp', 'qrcode', 'queue',
+  'rewards', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings'
+];
+
+const getStoredAdminTab = (): AdminTab => {
+  if (typeof window === 'undefined') return 'dashboard';
+  try {
+    const storedTab = window.sessionStorage.getItem(ADMIN_ACTIVE_TAB_KEY);
+    return storedTab && ADMIN_TAB_VALUES.includes(storedTab as AdminTab)
+      ? storedTab as AdminTab
+      : 'dashboard';
+  } catch {
+    return 'dashboard';
+  }
+};
+
 export const AdminLayout: React.FC = () => {
   const { theme, setTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  const [activeTab, setActiveTab] = useState<AdminTab>(() => getStoredAdminTab());
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [adminName, setAdminName] = useState('Admin');
+
+  React.useEffect(() => {
+    try {
+      window.sessionStorage.setItem(ADMIN_ACTIVE_TAB_KEY, activeTab);
+    } catch {
+      // A navegação válida não deve falhar se o armazenamento estiver indisponível.
+    }
+  }, [activeTab]);
 
   const mainRef = useRef<HTMLElement>(null);
   const { pullDistance, isRefreshing, handlers: pullToRefreshHandlers } = usePullToRefresh(
@@ -227,6 +253,9 @@ export const AdminLayout: React.FC = () => {
       await authFetch('/api/auth/logout', { method: 'POST' });
     } catch (e) {}
     clearStoredToken();
+    try {
+      window.sessionStorage.removeItem(ADMIN_ACTIVE_TAB_KEY);
+    } catch {}
     setIsAuthorized(false);
   };
 
