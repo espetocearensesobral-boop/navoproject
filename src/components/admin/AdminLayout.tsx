@@ -82,6 +82,34 @@ const getStoredAdminTab = (): AdminTab => {
   }
 };
 
+const ADMIN_TAB_SECTIONS: Partial<Record<AdminTab, AdminSection>> = {
+  dashboard: 'operacao',
+  agenda: 'operacao',
+  queue: 'operacao',
+  financeiro: 'financeiro',
+  servicos: 'cadastros',
+  produtos: 'cadastros',
+  profissionais: 'cadastros',
+  clientes: 'cadastros',
+  rewards: 'relacionamento',
+  barbearia: 'sistema',
+  settings: 'sistema',
+  audit: 'sistema',
+  whatsapp: 'sistema',
+  qrcode: 'sistema',
+};
+
+const getInitialCollapsedSections = (activeTab: AdminTab): Record<AdminSection, boolean> => {
+  const activeSection = ADMIN_TAB_SECTIONS[activeTab];
+  return {
+    operacao: activeSection !== 'operacao',
+    financeiro: activeSection !== 'financeiro',
+    cadastros: activeSection !== 'cadastros',
+    relacionamento: activeSection !== 'relacionamento',
+    sistema: activeSection !== 'sistema',
+  };
+};
+
 export const AdminLayout: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<AdminTab>(() => getStoredAdminTab());
@@ -89,13 +117,9 @@ export const AdminLayout: React.FC = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [adminName, setAdminName] = useState('Admin');
-  const [collapsedSections, setCollapsedSections] = useState<Record<AdminSection, boolean>>({
-    operacao: false,
-    financeiro: false,
-    cadastros: false,
-    relacionamento: true,
-    sistema: true,
-  });
+  const [collapsedSections, setCollapsedSections] = useState<Record<AdminSection, boolean>>(() => (
+    getInitialCollapsedSections(getStoredAdminTab())
+  ));
 
   React.useEffect(() => {
     try {
@@ -255,12 +279,6 @@ export const AdminLayout: React.FC = () => {
     { id: 'agenda' as AdminTab, label: 'Agenda', icon: Calendar },
     { id: 'clientes' as AdminTab, label: 'Clientes', icon: UserCheck },
   ];
-
-  React.useEffect(() => {
-    const activeItem = navItems.find((item) => item.id === activeTab);
-    if (!activeItem || !collapsedSections[activeItem.section]) return;
-    setCollapsedSections((current) => ({ ...current, [activeItem.section]: false }));
-  }, [activeTab, collapsedSections]);
 
   const renderSidebarNavigation = (mobile = false) => (
     <nav className={mobile ? 'flex-1 px-4 py-6 space-y-4 overflow-y-auto custom-scrollbar' : 'flex-1 px-3 py-6 space-y-4 overflow-y-auto no-scrollbar'}>
