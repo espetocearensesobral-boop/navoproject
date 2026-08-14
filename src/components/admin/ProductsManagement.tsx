@@ -7,6 +7,7 @@ import {
   saveProductInSupabase,
 } from '../../services/supabaseDataService';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { handleEnterAsTab } from '../../utils/formUtils';
 
 const defaultProduct: ProductItem = {
   id: '',
@@ -258,7 +259,7 @@ export const ProductsManagement: React.FC = () => {
               <div><h2 className="text-base font-bold text-content-base">{editingProduct ? 'Editar produto' : 'Novo produto'}</h2><p className="text-[11px] text-content-muted">Dados persistidos no catálogo do PDV.</p></div>
               <button type="button" onClick={() => { setEditingProduct(null); setIsModalOpen(false); }} className="h-9 w-9 rounded-xl text-content-muted flex items-center justify-center" aria-label="Fechar formulário"><X className="w-5 h-5" /></button>
             </div>
-            <form onSubmit={handleSave} className="space-y-3">
+            <form onKeyDown={handleEnterAsTab} onSubmit={handleSave} className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label className="text-xs font-semibold text-content-muted">Nome<input required value={form.name} onChange={(event) => updateForm('name', event.target.value)} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>
                 <label className="text-xs font-semibold text-content-muted">Marca<input required value={form.brand} onChange={(event) => updateForm('brand', event.target.value)} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>

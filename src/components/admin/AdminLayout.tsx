@@ -140,6 +140,20 @@ export const AdminLayout: React.FC = () => {
     }
   );
 
+  // Padroniza o foco inicial de todos os modais do Admin sem exigir refs em cada tela.
+  React.useEffect(() => {
+    const focusFirstModalField = () => {
+      const modal = document.querySelector<HTMLElement>('.admin-shell .fixed.inset-0 form, .admin-shell .fixed.inset-0 [role="dialog"], .admin-shell .fixed.inset-0 .admin-modal');
+      if (!modal || modal.contains(document.activeElement)) return;
+      const firstField = modal.querySelector<HTMLElement>('[data-autofocus], input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), button[type="submit"]:not([disabled])');
+      firstField?.focus();
+    };
+
+    const observer = new MutationObserver(() => window.requestAnimationFrame(focusFirstModalField));
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
   // A autorização vem exclusivamente da sessão HTTP e do perfil no banco.
   React.useEffect(() => {
     setIsLoadingAuth(true);

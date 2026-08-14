@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Professional } from '../../types';
 import { fetchProfessionalsFromSupabase, saveProfessionalInSupabase, deleteProfessionalInSupabase } from '../../services/supabaseDataService';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   Users,
   Plus,
@@ -703,7 +704,7 @@ export const ProfessionalsManagement: React.FC = () => {
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSubmit} className="p-4 overflow-y-auto space-y-3 custom-scrollbar flex-1">
+            <form onKeyDown={handleEnterAsTab} onSubmit={handleSubmit} className="p-4 overflow-y-auto space-y-3 custom-scrollbar flex-1">
               {/* TAB 1: PROFILE */}
               {activeFormTab === 'profile' && (
                 <div className="space-y-3">

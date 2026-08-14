@@ -3,6 +3,7 @@ import { ServiceItem } from '../../types';
 import { fetchServicesFromSupabase, saveServiceInSupabase, deleteServiceInSupabase, deleteAllServicesInSupabase } from '../../services/supabaseDataService';
 import { DEFAULT_CATEGORIES, getCategoryName } from '../../data/categories';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   Scissors,
   Plus,
@@ -926,7 +927,7 @@ export const ServicesManagement: React.FC = () => {
               </div>
 
               {/* Form Content Area */}
-              <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between overflow-hidden">
+              <form onKeyDown={handleEnterAsTab} onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between overflow-hidden">
                 <div className="p-4 space-y-3.5 overflow-y-auto flex-1 custom-scrollbar">
                   {/* TAB 1: GENERAL INFO */}
                   {activeFormTab === 'general' && (

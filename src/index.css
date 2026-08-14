@@ -643,6 +643,74 @@ button, a, input, select, textarea {
   border-radius: 18px !important;
 }
 
+/* Shared admin modal system: larger reading surface, resilient mobile height, and visible keyboard focus. */
+.admin-shell {
+  --admin-modal-max-width: 42rem;
+  --admin-modal-gutter: 1rem;
+  --admin-modal-field-height: 2.75rem;
+  --admin-modal-text-size: 0.875rem;
+  --admin-modal-label-size: 0.75rem;
+}
+
+.admin-shell .admin-modal,
+.admin-shell .fixed.inset-0 > form[class*="max-w-"],
+.admin-shell .fixed.inset-0 > div[class*="max-w-"],
+.admin-shell .fixed.inset-0 > div > form[class*="max-w-"],
+.admin-shell .fixed.inset-0 > div > div[class*="max-w-"] {
+  max-width: min(var(--admin-modal-max-width), calc(100vw - (var(--admin-modal-gutter) * 2))) !important;
+  max-height: calc(100dvh - 2rem) !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.admin-shell .fixed.inset-0 form,
+.admin-shell .fixed.inset-0 [role="dialog"] {
+  font-size: var(--admin-modal-text-size);
+}
+
+.admin-shell .fixed.inset-0 form label,
+.admin-shell .fixed.inset-0 [role="dialog"] label {
+  font-size: var(--admin-modal-label-size);
+  line-height: 1.25;
+}
+
+.admin-shell .fixed.inset-0 form input,
+.admin-shell .fixed.inset-0 form select,
+.admin-shell .fixed.inset-0 form textarea,
+.admin-shell .fixed.inset-0 [role="dialog"] input,
+.admin-shell .fixed.inset-0 [role="dialog"] select,
+.admin-shell .fixed.inset-0 [role="dialog"] textarea {
+  min-height: var(--admin-modal-field-height);
+  font-size: var(--admin-modal-text-size);
+}
+
+.admin-shell .fixed.inset-0 form textarea,
+.admin-shell .fixed.inset-0 [role="dialog"] textarea {
+  min-height: 5rem;
+}
+
+.admin-shell .fixed.inset-0 input:focus-visible,
+.admin-shell .fixed.inset-0 select:focus-visible,
+.admin-shell .fixed.inset-0 textarea:focus-visible,
+.admin-shell .fixed.inset-0 button:focus-visible,
+.admin-shell .fixed.inset-0 [role="dialog"]:focus-visible {
+  outline: 2px solid var(--color-gold-base);
+  outline-offset: 2px;
+}
+
+@media (max-width: 639px) {
+  .admin-shell {
+    --admin-modal-gutter: 0.5rem;
+  }
+
+  .admin-shell .fixed.inset-0 > form[class*="max-w-"],
+  .admin-shell .fixed.inset-0 > div[class*="max-w-"],
+  .admin-shell .fixed.inset-0 > div > form[class*="max-w-"],
+  .admin-shell .fixed.inset-0 > div > div[class*="max-w-"] {
+    max-height: calc(100dvh - 1rem) !important;
+  }
+}
+
 /* Admin sidebar navigation: neutral labels, palette-driven active state, and contrast guardrails. */
 .admin-shell .admin-sidebar-section-toggle {
   color: var(--color-content-muted) !important;
