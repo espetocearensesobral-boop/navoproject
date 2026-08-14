@@ -71,7 +71,7 @@ const base64ToUint8Array = (value: string) => {
   return Uint8Array.from([...rawData].map((character) => character.charCodeAt(0)));
 };
 
-export function useAdminOperationNotifications(): AdminNotificationState {
+export function useAdminOperationNotifications(isAuthorized = true): AdminNotificationState {
   const isSupported = typeof window !== 'undefined' && 'Notification' in window;
   const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>(() => isSupported ? Notification.permission : 'unsupported');
   const [isEnabled, setIsEnabled] = useState(() => {
@@ -82,6 +82,7 @@ export function useAdminOperationNotifications(): AdminNotificationState {
   const snapshotRef = useRef<Snapshot | null>(null);
   const sentTagsRef = useRef<Map<string, number>>(new Map());
   const isPollingRef = useRef(false);
+  const registeringPushRef = useRef(false);
 
   const showNotification = useCallback(async (notification: OperationNotification) => {
     if (!isSupported || Notification.permission !== 'granted') return false;
@@ -118,7 +119,9 @@ export function useAdminOperationNotifications(): AdminNotificationState {
   }, [isSupported]);
 
   const registerBackgroundPush = useCallback(async () => {
-    if (!isSupported || Notification.permission !== 'granted' || !('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+    if (!isAuthorized || !isSupported || Notification.permission !== 'granted' || !('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+    if (registeringPushRef.current) return false;
+    registeringPushRef.current = true;
 
     try {
       const config = await fetchAdminPushConfig();
@@ -138,11 +141,13 @@ export function useAdminOperationNotifications(): AdminNotificationState {
       setBackgroundPushEnabled(false);
       console.warn('[Admin Notifications] Push em segundo plano indisponível:', error);
       return false;
+    } finally {
+      registeringPushRef.current = false;
     }
-  }, [isSupported]);
+  }, [isAuthorized, isSupported]);
 
   const processChanges = useCallback(async () => {
-    if (!isSupported || Notification.permission !== 'granted' || !isEnabled || isPollingRef.current) return;
+    if (!isAuthorized || !isSupported || Notification.permission !== 'granted' || !isEnabled || isPollingRef.current) return;
     isPollingRef.current = true;
 
     try {
@@ -222,10 +227,10 @@ export function useAdminOperationNotifications(): AdminNotificationState {
     } finally {
       isPollingRef.current = false;
     }
-  }, [isEnabled, isSupported, showNotification]);
+  }, [isAuthorized, isEnabled, isSupported, showNotification]);
 
   useEffect(() => {
-    if (!isSupported || permission !== 'granted' || !isEnabled) {
+    if (!isAuthorized || !isSupported || permission !== 'granted' || !isEnabled) {
       snapshotRef.current = null;
       return;
     }
@@ -244,7 +249,7 @@ export function useAdminOperationNotifications(): AdminNotificationState {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('adminRefresh', handleRefresh);
     };
-  }, [isEnabled, isSupported, permission, processChanges]);
+  }, [isAuthorized, isEnabled, isSupported, permission, processChanges]);
 
   const requestPermission = useCallback(async (): Promise<NotificationPermission | 'unsupported'> => {
     if (!isSupported) return 'unsupported';
@@ -259,11 +264,29 @@ export function useAdminOperationNotifications(): AdminNotificationState {
     snapshotRef.current = null;
     if (enabled) await registerBackgroundPush();
     return nextPermission;
-  }, [isSupported]);
+  }, [isSupported, registerBackgroundPush]);
 
   useEffect(() => {
-    if (isEnabled && permission === 'granted') void registerBackgroundPush();
-  }, [isEnabled, permission, registerBackgroundPush]);
+    if (!isAuthorized || !isEnabled || permission !== 'granted') {
+      setBackgroundPushEnabled(false);
+      return;
+    }
+
+    const synchronizePushSubscription = () => {
+      void registerBackgroundPush();
+    };
+
+    synchronizePushSubscription();
+    window.addEventListener('focus', synchronizePushSubscription);
+    window.addEventListener('pageshow', synchronizePushSubscription);
+    document.addEventListener('visibilitychange', synchronizePushSubscription);
+
+    return () => {
+      window.removeEventListener('focus', synchronizePushSubscription);
+      window.removeEventListener('pageshow', synchronizePushSubscription);
+      document.removeEventListener('visibilitychange', synchronizePushSubscription);
+    };
+  }, [isAuthorized, isEnabled, permission, registerBackgroundPush]);
 
   const sendTestNotification = useCallback(async () => {
     let sentInBackground = false;

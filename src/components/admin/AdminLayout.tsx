@@ -118,10 +118,10 @@ const getInitialCollapsedSections = (activeTab: AdminTab): Record<AdminSection, 
 
 export const AdminLayout: React.FC = () => {
   const { theme, setTheme } = useTheme();
-  const { isSupported: notificationsSupported, permission: notificationPermission, isEnabled: notificationsEnabled, requestPermission, sendTestNotification, backgroundPushEnabled } = useAdminOperationNotifications();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const { isSupported: notificationsSupported, permission: notificationPermission, isEnabled: notificationsEnabled, requestPermission, sendTestNotification, backgroundPushEnabled } = useAdminOperationNotifications(isAuthorized);
   const [activeTab, setActiveTab] = useState<AdminTab>(() => getStoredAdminTab());
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [adminName, setAdminName] = useState('Admin');
   const [collapsedSections, setCollapsedSections] = useState<Record<AdminSection, boolean>>(() => (
