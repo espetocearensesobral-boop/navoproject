@@ -491,19 +491,19 @@ export const WaitingQueue: React.FC = () => {
 
       {/* MAIN LAYOUT */}
       {activeTab === 'kanban' ? (
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(19rem,0.95fr)_minmax(0,2.05fr)] gap-4 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(19rem,0.95fr)_minmax(0,2.05fr)] gap-4 items-stretch">
           {/* PRIORIDADE OPERACIONAL: ATENDIMENTOS EM ANDAMENTO */}
-          <section className="space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-xl p-3 sm:p-4">
-            <div className="flex items-center justify-between gap-3">
+          <section className="flex min-h-0 h-[30rem] xl:h-[34rem] flex-col space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-xl p-3 sm:p-4">
+            <div className="flex items-center justify-between gap-3 shrink-0">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-status-success animate-ping" />
                 <span className="text-xs font-bold text-status-success uppercase tracking-wider">
                   Em atendimento
                 </span>
               </div>
-
+              <span className="text-[10px] bg-status-success/10 text-status-success px-2.5 py-1 rounded-full font-black border border-status-success/20 whitespace-nowrap">{inChairList.length} na cadeira</span>
             </div>
-            <p className="text-[11px] text-content-muted -mt-1">Ações em curso: finalize somente após concluir o serviço.</p>
+            <p className="text-[11px] text-content-muted -mt-1 shrink-0">Ações em curso: finalize somente após concluir o serviço.</p>
 
             {loading ? (
               <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
@@ -516,7 +516,8 @@ export const WaitingQueue: React.FC = () => {
                 <p className="text-[10px] text-content-muted">Chame o próximo cliente na recepção quando uma cadeira estiver livre.</p>
               </div>
             ) : (
-              inChairList.map((item) => (
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1 space-y-3">
+              {inChairList.map((item) => (
                 <div
                   key={item.id}
                   className="bg-surface-card p-3.5 rounded-xl border border-status-success/45 shadow-sm space-y-3 relative"
@@ -570,13 +571,14 @@ export const WaitingQueue: React.FC = () => {
                     </button>
                   </div>
                 </div>
-              ))
+              ))}
+              </div>
             )}
           </section>
 
           {/* RECEPÇÃO: FILA DE PRÓXIMAS AÇÕES */}
-          <section className="space-y-3 bg-surface-card border border-border-subtle rounded-xl p-3 sm:p-4">
-            <div className="flex items-center justify-between gap-3 pb-2 border-b border-border-subtle">
+          <section className="flex min-h-0 h-[30rem] xl:h-[34rem] flex-col space-y-3 bg-surface-card border border-border-subtle rounded-xl p-3 sm:p-4">
+            <div className="flex items-center justify-between gap-3 pb-2 border-b border-border-subtle shrink-0">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-gold-hover" />
                 <span className="text-xs font-bold text-gold-hover uppercase tracking-wider">
@@ -609,7 +611,8 @@ export const WaitingQueue: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1">
+                <div className="space-y-2">
                 {waitingList.map((item, index) => {
                   const isExpanded = expandedQueueItemId === item.id;
 
@@ -729,6 +732,7 @@ export const WaitingQueue: React.FC = () => {
                     </article>
                   );
                 })}
+                </div>
               </div>
             )}
           </section>
