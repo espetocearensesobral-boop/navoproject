@@ -190,12 +190,21 @@
   color: var(--color-content-on-accent) !important;
 }
 
-/* Accent tokens used as foreground text must use the theme-safe text variant. */
-.text-gold-base,
-.text-gold-deep,
-.text-gold-accent,
+/* Palette identity text stays fixed across themes; explicit contrast tokens remain available when needed. */
+.text-gold-base {
+  color: var(--color-gold-base) !important;
+}
+
+.text-gold-deep {
+  color: var(--color-gold-deep) !important;
+}
+
+.text-gold-accent {
+  color: var(--color-gold-accent) !important;
+}
+
 .text-gold-hover {
-  color: var(--color-accent-text) !important;
+  color: var(--color-gold-hover) !important;
 }
 
 html, body {
