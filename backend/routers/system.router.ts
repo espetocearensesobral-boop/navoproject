@@ -21,11 +21,11 @@ systemRouter.get('/diagnostics/appointments-status', requireAuth, requireAdmin, 
     }
 
     const columnRows = await db.execute(sql`
-      SELECT data_type, udt_schema, udt_name, column_default, is_nullable
+      SELECT column_name, data_type, udt_schema, udt_name, column_default, is_nullable
       FROM information_schema.columns
       WHERE table_schema = 'public'
         AND table_name = 'appointments'
-        AND column_name = 'status'
+      ORDER BY ordinal_position
     `);
 
     const constraintRows = await db.execute(sql`
@@ -36,6 +36,23 @@ systemRouter.get('/diagnostics/appointments-status', requireAuth, requireAdmin, 
       WHERE n.nspname = 'public'
         AND t.relname = 'appointments'
         AND (c.contype = 'c' OR c.contype = 'f')
+    `);
+
+    const indexRows = await db.execute(sql`
+      SELECT indexname, indexdef
+      FROM pg_indexes
+      WHERE schemaname = 'public'
+        AND tablename = 'appointments'
+    `);
+
+    const triggerRows = await db.execute(sql`
+      SELECT tgname, pg_get_triggerdef(pg_trigger.oid) AS definition
+      FROM pg_trigger
+      JOIN pg_class AS t ON t.oid = pg_trigger.tgrelid
+      JOIN pg_namespace AS n ON n.oid = t.relnamespace
+      WHERE n.nspname = 'public'
+        AND t.relname = 'appointments'
+        AND NOT pg_trigger.tgisinternal
     `);
 
     const enumRows = await db.execute(sql`
@@ -54,8 +71,10 @@ systemRouter.get('/diagnostics/appointments-status', requireAuth, requireAdmin, 
     `);
 
     return res.json({
-      column: columnRows?.[0] || null,
+      columns: columnRows || [],
       constraints: constraintRows || [],
+      indexes: indexRows || [],
+      triggers: triggerRows || [],
       enum: enumRows?.[0] || null
     });
   } catch (error: any) {
