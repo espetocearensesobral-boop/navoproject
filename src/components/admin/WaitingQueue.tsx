@@ -423,38 +423,37 @@ export const WaitingQueue: React.FC = () => {
 
       {/* MAIN LAYOUT */}
       {activeTab === 'kanban' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-          {/* COLUMN 1: IN CHAIR */}
-          <div className="space-y-2.5">
-            <div className="bg-surface-card p-2.5 rounded-xl border border-status-success/30 flex items-center justify-between">
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(19rem,0.95fr)_minmax(0,2.05fr)] gap-4 items-start">
+          {/* PRIORIDADE OPERACIONAL: ATENDIMENTOS EM ANDAMENTO */}
+          <section className="space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-xl p-3 sm:p-4">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-status-success animate-ping" />
                 <span className="text-xs font-bold text-status-success uppercase tracking-wider">
-                  Cadeiras ({inChairList.length})
+                  Em atendimento
                 </span>
               </div>
-              <span className="text-[9px] bg-status-success/15 text-status-success px-2 py-0.5 rounded-xl font-black border border-status-success/30">
-                AO VIVO
+              <span className="text-[10px] bg-status-success/15 text-status-success px-2.5 py-1 rounded-full font-black border border-status-success/30 whitespace-nowrap">
+                {inChairList.length} AO VIVO
               </span>
             </div>
+            <p className="text-[11px] text-content-muted -mt-1">Ações em curso: finalize somente após concluir o serviço.</p>
 
             {loading ? (
               <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
                 Carregando cadeiras...
               </div>
             ) : inChairList.length === 0 ? (
-              <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle border-dashed space-y-1">
-                <Scissors className="w-6 h-6 text-content-muted mx-auto" />
-                <p className="font-semibold text-content-base">Nenhuma cadeira ocupada</p>
-                <p className="text-[10px] text-content-muted">
-                  Clique em "Chamar Cadeira" na lista de recepção.
-                </p>
+              <div className="p-5 text-center text-xs text-content-muted bg-surface-card rounded-xl border border-status-success/20 border-dashed space-y-1.5">
+                <Scissors className="w-6 h-6 text-status-success/60 mx-auto" />
+                <p className="font-semibold text-content-base">Nenhum atendimento em andamento</p>
+                <p className="text-[10px] text-content-muted">Chame o próximo cliente na recepção quando uma cadeira estiver livre.</p>
               </div>
             ) : (
               inChairList.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-surface-card p-3 rounded-2xl border border-status-success/40 shadow-lg space-y-2.5 relative"
+                  className="bg-surface-card p-3.5 rounded-xl border border-status-success/45 shadow-sm space-y-3 relative"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -484,7 +483,7 @@ export const WaitingQueue: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 pt-1">
+                  <div className="flex items-center gap-2 pt-1 border-t border-border-subtle/70">
                     <button
                       type="button"
                       disabled={actionLoadingId === item.id}
@@ -507,20 +506,21 @@ export const WaitingQueue: React.FC = () => {
                 </div>
               ))
             )}
-          </div>
+          </section>
 
-          {/* COLUMN 2 & 3: WAITING QUEUE */}
-          <div className="lg:col-span-2 space-y-2.5">
-            <div className="bg-surface-card p-2.5 rounded-xl border border-border-subtle flex items-center justify-between">
+          {/* RECEPÇÃO: FILA DE PRÓXIMAS AÇÕES */}
+          <section className="space-y-3 bg-surface-card border border-border-subtle rounded-xl p-3 sm:p-4">
+            <div className="flex items-center justify-between gap-3 pb-2 border-b border-border-subtle">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-gold-hover" />
                 <span className="text-xs font-bold text-gold-hover uppercase tracking-wider">
-                  Recepção & Fila ({waitingList.length} aguardando)
+                  Recepção & fila
                 </span>
               </div>
-              <span className="text-[10px] text-content-muted font-medium">
-                Est. Fila: ~{waitingList.length * 15} min
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[10px] text-content-muted font-medium hidden sm:inline">Est. ~{waitingList.length * 15} min</span>
+                <span className="text-[10px] bg-gold-base/15 text-gold-hover px-2.5 py-1 rounded-full font-black border border-gold-base/20 whitespace-nowrap">{waitingList.length} aguardando</span>
+              </div>
             </div>
 
             {loading ? (
@@ -547,14 +547,14 @@ export const WaitingQueue: React.FC = () => {
                 {waitingList.map((item, index) => (
                   <div
                     key={item.id}
-                    className="bg-surface-card p-3 rounded-2xl border border-border-subtle hover:border-border-subtle transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 group"
+                    className="bg-surface-base/45 p-3 sm:p-3.5 rounded-xl border border-border-subtle hover:border-gold-base/35 hover:bg-surface-base transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col items-center shrink-0">
                         <div className="w-7 h-7 rounded-lg bg-gold-base text-surface-base font-black text-xs flex items-center justify-center">
                           #{index + 1}
                         </div>
-                        <div className="flex items-center gap-0.5 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-0.5 mt-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <button
                             disabled={index === 0}
                             onClick={() => handleMoveQueueItem(index, 'up')}
@@ -588,7 +588,7 @@ export const WaitingQueue: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-border-subtle">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-border-subtle w-full sm:w-auto">
                       <div className="text-left sm:text-right">
                         <span className="text-[9px] text-content-muted font-bold block uppercase">
                           Tempo Est.
@@ -598,7 +598,7 @@ export const WaitingQueue: React.FC = () => {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1">
+                      <div className="grid grid-cols-[2.25rem_minmax(0,1fr)_2.25rem] sm:flex items-center gap-1.5 w-full sm:w-auto">
                         <button
                           type="button"
                           disabled={actionLoadingId === item.id}
@@ -612,7 +612,7 @@ export const WaitingQueue: React.FC = () => {
                           type="button"
                           disabled={actionLoadingId === item.id}
                           onClick={() => handleAdvanceToChair(item.id)}
-                          className="px-2.5 py-1.5 rounded-lg bg-gold-base text-surface-base font-extrabold text-xs flex items-center gap-1 hover:bg-gold-base/80 active:scale-95 disabled:opacity-60 disabled:cursor-wait"
+                          className="w-full sm:w-auto px-3 py-2 rounded-lg bg-gold-base text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 hover:bg-gold-base/80 active:scale-95 disabled:opacity-60 disabled:cursor-wait"
                         >
                           <Play className="w-3 h-3 fill-surface-base" />
                           <span>{actionLoadingId === item.id ? 'Chamando…' : 'Chamar Cadeira'}</span>
@@ -632,7 +632,7 @@ export const WaitingQueue: React.FC = () => {
                 ))}
               </div>
             )}
-          </div>
+          </section>
         </div>
       ) : (
         /* HISTORY TAB */
