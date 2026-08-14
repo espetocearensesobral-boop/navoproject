@@ -55,6 +55,14 @@ systemRouter.get('/diagnostics/appointments-status', requireAuth, requireAdmin, 
         AND NOT pg_trigger.tgisinternal
     `);
 
+    const functionRows = await db.execute(sql`
+      SELECT p.proname, pg_get_functiondef(p.oid) AS definition
+      FROM pg_proc AS p
+      JOIN pg_namespace AS n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'public'
+        AND p.proname IN ('handle_appointment_completion', 'handle_updated_at', 'update_updated_at_column')
+    `);
+
     const enumRows = await db.execute(sql`
       SELECT ty.typname, array_agg(en.enumlabel ORDER BY en.enumsortorder) AS labels
       FROM pg_attribute AS a
@@ -75,6 +83,7 @@ systemRouter.get('/diagnostics/appointments-status', requireAuth, requireAdmin, 
       constraints: constraintRows || [],
       indexes: indexRows || [],
       triggers: triggerRows || [],
+      functions: functionRows || [],
       enum: enumRows?.[0] || null
     });
   } catch (error: any) {
