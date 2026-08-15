@@ -4,7 +4,10 @@ import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
 import { NavoHomeView } from './NavoHomeView';
 import { OperationalReportsManagement } from './OperationalReportsManagement';
 import { ScheduleGrid } from './ScheduleGrid';
-import { FinanceiroManagement } from './FinanceiroManagement';
+import { ReceiptsManagement } from './ReceiptsManagement';
+import { FinancialStatementManagement } from './FinancialStatementManagement';
+import { ExpensesManagement } from './ExpensesManagement';
+import { ReportsManagement } from './ReportsManagement';
 import { AuditLogsManagement } from './AuditLogsManagement';
 import { WhatsAppManagement } from './WhatsAppManagement';
 import { QrCodeManagement } from './QrCodeManagement';
@@ -46,6 +49,8 @@ import {
   FileText,
   Package,
   Wallet,
+  DollarSign,
+  ArrowDownRight,
   ShieldCheck,
   MessageSquare,
   QrCode,
@@ -57,7 +62,10 @@ export type AdminTab =
   | 'dashboard' 
   | 'relatorios'
   | 'agenda' 
-  | 'financeiro'
+  | 'financeiro_recebimentos'
+  | 'financeiro_extrato'
+  | 'financeiro_saidas'
+  | 'financeiro_relatorios'
   | 'audit'
   | 'whatsapp'
   | 'qrcode'
@@ -76,7 +84,7 @@ export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionam
 
 const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
 const ADMIN_TAB_VALUES: AdminTab[] = [
-  'dashboard', 'relatorios', 'agenda', 'financeiro', 'audit', 'whatsapp', 'qrcode', 'queue',
+  'dashboard', 'relatorios', 'agenda', 'financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas', 'financeiro_relatorios', 'audit', 'whatsapp', 'qrcode', 'queue',
   'rewards', 'followup', 'aniversariantes', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings'
 ];
 
@@ -84,8 +92,9 @@ const getStoredAdminTab = (): AdminTab => {
   if (typeof window === 'undefined') return 'dashboard';
   try {
     const storedTab = window.sessionStorage.getItem(ADMIN_ACTIVE_TAB_KEY);
-    return storedTab && ADMIN_TAB_VALUES.includes(storedTab as AdminTab)
-      ? storedTab as AdminTab
+    const normalizedTab = storedTab === 'financeiro' ? 'financeiro_recebimentos' : storedTab;
+    return normalizedTab && ADMIN_TAB_VALUES.includes(normalizedTab as AdminTab)
+      ? normalizedTab as AdminTab
       : 'dashboard';
   } catch {
     return 'dashboard';
@@ -97,7 +106,10 @@ const ADMIN_TAB_SECTIONS: Partial<Record<AdminTab, AdminSection>> = {
   relatorios: 'operacao',
   agenda: 'operacao',
   queue: 'operacao',
-  financeiro: 'financeiro',
+  financeiro_recebimentos: 'financeiro',
+  financeiro_extrato: 'financeiro',
+  financeiro_saidas: 'financeiro',
+  financeiro_relatorios: 'financeiro',
   servicos: 'cadastros',
   produtos: 'cadastros',
   profissionais: 'cadastros',
@@ -281,11 +293,32 @@ export const AdminLayout: React.FC = () => {
       description: 'Clientes aguardando',
       section: 'operacao' as AdminSection,
     },
-    { 
-      id: 'financeiro' as AdminTab, 
-      label: 'Financeiro', 
+    {
+      id: 'financeiro_recebimentos' as AdminTab,
+      label: 'Recebimentos',
       icon: Wallet,
-      description: 'Recebimentos, extrato real e controles financeiros',
+      description: 'Pendências e recebimentos confirmados',
+      section: 'financeiro' as AdminSection,
+    },
+    {
+      id: 'financeiro_extrato' as AdminTab,
+      label: 'Extrato real',
+      icon: DollarSign,
+      description: 'Livro-caixa persistido',
+      section: 'financeiro' as AdminSection,
+    },
+    {
+      id: 'financeiro_saidas' as AdminTab,
+      label: 'Saídas',
+      icon: ArrowDownRight,
+      description: 'Despesas e pagamentos',
+      section: 'financeiro' as AdminSection,
+    },
+    {
+      id: 'financeiro_relatorios' as AdminTab,
+      label: 'Relatórios financeiros',
+      icon: TrendingUp,
+      description: 'Consolidação financeira',
       section: 'financeiro' as AdminSection,
     },
     { 
@@ -441,8 +474,14 @@ export const AdminLayout: React.FC = () => {
         return <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />;
       case 'relatorios':
         return <OperationalReportsManagement />;
-      case 'financeiro':
-        return <FinanceiroManagement />;
+      case 'financeiro_recebimentos':
+        return <ReceiptsManagement />;
+      case 'financeiro_extrato':
+        return <FinancialStatementManagement />;
+      case 'financeiro_saidas':
+        return <ExpensesManagement />;
+      case 'financeiro_relatorios':
+        return <ReportsManagement />;
       case 'audit':
         return <SettingsManagement initialTab="audit" />;
       case 'whatsapp':
