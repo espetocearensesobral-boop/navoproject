@@ -63,7 +63,7 @@ export function createEmailModule(getDb: () => any, schema: any, eq: any) {
    * comportamento do sendWhatsAppMessage, pra nunca travar o fluxo principal
    * (ex.: criação de agendamento) por causa de um canal de notificação opcional.
    */
-  async function sendEmail(to: string, subject: string, html: string, text?: string, kind?: 'booking' | 'cancel'): Promise<boolean> {
+  async function sendEmail(to: string, subject: string, html: string, text?: string, kind?: 'booking' | 'reschedule' | 'cancel'): Promise<boolean> {
     if (!to) return false;
     try {
       const cfg = await getEmailSettings();
@@ -71,6 +71,7 @@ export function createEmailModule(getDb: () => any, schema: any, eq: any) {
         return false;
       }
       if (kind === 'booking' && cfg.notifyOnBooking === false) return false;
+      if (kind === 'reschedule' && cfg.notifyOnReschedule === false) return false;
       if (kind === 'cancel' && cfg.notifyOnCancel === false) return false;
       if (!isConfigComplete(cfg)) {
         console.warn(`[Email] Configuração SMTP incompleta. E-mail para ${to} não enviado.`);
@@ -122,7 +123,7 @@ export function createEmailModule(getDb: () => any, schema: any, eq: any) {
         return res.json({
           enabled: false, smtpHost: '', smtpPort: 587, smtpSecure: false,
           smtpUser: '', hasPassword: false, fromName: 'Navo Barber & Club',
-          fromEmail: '', replyTo: '', notifyOnBooking: true, notifyOnCancel: true,
+          fromEmail: '', replyTo: '', notificationEmail: '', notifyOnBooking: true, notifyOnReschedule: true, notifyOnCancel: true,
         });
       }
       const { smtpPassword, ...rest } = cfg;
@@ -156,11 +157,18 @@ export function createEmailModule(getDb: () => any, schema: any, eq: any) {
         fromName: (data.fromName || 'Navo Barber & Club').trim(),
         fromEmail: (data.fromEmail || '').trim(),
         replyTo: (data.replyTo || '').trim(),
+        notificationEmail: data.notificationEmail !== undefined
+          ? (data.notificationEmail || '').trim().toLowerCase()
+          : (existing?.notificationEmail || '').trim().toLowerCase(),
         notifyOnBooking: data.notifyOnBooking !== undefined ? !!data.notifyOnBooking : (existing?.notifyOnBooking ?? true),
+        notifyOnReschedule: data.notifyOnReschedule !== undefined ? !!data.notifyOnReschedule : (existing?.notifyOnReschedule ?? true),
         notifyOnCancel: data.notifyOnCancel !== undefined ? !!data.notifyOnCancel : (existing?.notifyOnCancel ?? true),
         updatedAt: new Date(),
       };
 
+      if (payload.notificationEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.notificationEmail)) {
+        return res.status(400).json({ error: 'Informe um e-mail administrativo válido ou deixe o campo em branco.' });
+      }
       if (payload.enabled && !isConfigComplete(payload)) {
         return res.status(400).json({ error: 'Preencha host, usuário, senha e e-mail de envio antes de ativar o envio de e-mails.' });
       }

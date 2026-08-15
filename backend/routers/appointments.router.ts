@@ -15,7 +15,7 @@ import { invalidateAvailabilityCache } from './availability.router.js';
 
 
 
-import { processAppointmentCompletion, notifyClientByEmail } from '../index.js';
+import { processAppointmentCompletion, notifyClientByEmail, notifyShopByEmail } from '../index.js';
 import { sendWhatsAppMessage } from '../whatsapp.js';
 import { sendAdminPush } from '../services/admin-push.service.js';
 
@@ -335,6 +335,7 @@ appointmentsRouter.patch("/lookup/cancel", sensitiveOpsLimiter, optionalAuth, as
     
     sendWhatsAppMessage(appointment.clientPhone || inputPhone, msg).catch(() => {});
     notifyClientByEmail(appointment.clientId, appointment, 'cancel');
+    notifyShopByEmail(appointment, 'cancel');
     sendAdminPush({
       title: 'Agendamento cancelado',
       body: `${appointment.clientName || 'Cliente'} · ${appointment.date} às ${appointment.timeSlot} · O agendamento foi cancelado.`,
@@ -554,6 +555,8 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
 
     let clientName = data.clientName || data.client_name || 'Cliente';
     let clientPhone = sanitizePhone(data.clientPhone || data.client_phone || '');
+    const rawClientEmail = data.clientEmail ?? data.client_email ?? '';
+    const clientEmail = typeof rawClientEmail === 'string' ? rawClientEmail.trim().toLowerCase() : '';
 
     // Ensure client profile exists
     if (isDbConnected && db) {
@@ -589,6 +592,7 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
       clientId,
       clientName,
       clientPhone,
+      clientEmail: clientEmail || null,
       professionalId: resolvedProfessionalId,
       professionalName: resolvedProfessionalName,
       date,
@@ -730,10 +734,12 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
       const msg = `❌ *NAVO BARBER & CLUB*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\nSeu agendamento para *${newApt.date}* às *${newApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
       sendWhatsAppMessage(phone, msg).catch(() => {});
       notifyClientByEmail(newApt.clientId, newApt, 'cancel');
+      notifyShopByEmail(newApt, 'cancel');
     } else {
       const msg = `💈 *NAVO BARBER & CLUB*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *confirmado* com sucesso:\n\n🔑 *Código:* ${newApt.bookingCode || newApt.id}\n📅 *Data:* ${newApt.date}\n⏰ *Horário:* ${newApt.timeSlot}\n✂️ *Barbeiro:* ${newApt.professionalName || 'Profissional Navo'}\n\n📍 *Local:* Navo Barber & Club - Rua Fortaleza, 1420 - Expectativa, Sobral - CE\n\nTe esperamos com o café pronto! ☕`;
       sendWhatsAppMessage(phone, msg).catch(() => {});
       notifyClientByEmail(newApt.clientId, newApt, 'booking');
+      notifyShopByEmail(newApt, 'booking');
     }
 
     invalidateAvailabilityCache();
@@ -888,6 +894,7 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
 
       sendWhatsAppMessage(phone, msg).catch(() => {});
       notifyClientByEmail(updatedApt.clientId, updatedApt, 'cancel');
+      notifyShopByEmail(updatedApt, 'cancel');
       const serviceTitle = Array.isArray(updatedApt.services) ? updatedApt.services[0]?.title || 'Serviço agendado' : 'Serviço agendado';
       sendAdminPush({
         title: 'Agendamento cancelado',
@@ -1008,6 +1015,13 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
         
         if (data.clientPhone !== undefined) updateData.clientPhone = sanitizePhone(data.clientPhone);
         if (data.client_phone !== undefined) updateData.clientPhone = sanitizePhone(data.client_phone);
+        if (data.clientEmail !== undefined || data.client_email !== undefined) {
+          const rawEmail = data.clientEmail ?? data.client_email ?? '';
+          if (rawEmail && (typeof rawEmail !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail.trim()))) {
+            return res.status(400).json({ error: 'Informe um e-mail válido ou deixe o campo em branco.' });
+          }
+          updateData.clientEmail = typeof rawEmail === 'string' && rawEmail.trim() ? rawEmail.trim().toLowerCase() : null;
+        }
         if (data.clientName !== undefined) updateData.clientName = data.clientName;
         if (data.client_name !== undefined) updateData.clientName = data.client_name;
         if (data.professionalId !== undefined || data.professional_id !== undefined) {
@@ -1125,7 +1139,8 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
           await processAppointmentCompletion(updatedApt);
         }
 
-        if (data.date || data.timeSlot || data.time_slot) {
+        const scheduleChanged = newDate !== dbApt.date || newTimeSlot !== dbApt.timeSlot || newProfessionalId !== dbApt.professionalId || data.services !== undefined;
+        if (scheduleChanged) {
           let phone = updatedApt.clientPhone || '5511999999999';
           if (!updatedApt.clientPhone && updatedApt.clientId) {
             const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, updatedApt.clientId) });
@@ -1134,6 +1149,8 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
           const msg = `🔄 *NAVO BARBER & CLUB*\n\nOlá, *${updatedApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *REAGENDADO* com sucesso:\n\n📅 *Nova Data:* ${updatedApt.date}\n⏰ *Novo Horário:* ${updatedApt.timeSlot}\n✂️ *Barbeiro:* ${updatedApt.professionalName || 'Profissional Navo'}\n\n📍 *Local:* Navo Barber & Club - Rua Fortaleza, 1420 - Expectativa, Sobral - CE\n\nTe esperamos com o café pronto! ☕`;
 
           sendWhatsAppMessage(phone, msg).catch(() => {});
+          notifyClientByEmail(updatedApt.clientId, updatedApt, 'reschedule', dbApt);
+          notifyShopByEmail(updatedApt, 'reschedule', dbApt);
         }
 
         invalidateAvailabilityCache();
@@ -1156,7 +1173,7 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
                   tag: `appointment:${updatedApt.id}:${updatedApt.status}`,
                 };
           sendAdminPush({ ...statusPush, url: '/admin' }).catch(() => {});
-        } else if (data.date || data.timeSlot || data.time_slot) {
+        } else if (scheduleChanged) {
           sendAdminPush({
             title: 'Agendamento reagendado',
             body: `${updatedApt.clientName || 'Cliente'} · novo horário ${updatedApt.date} às ${updatedApt.timeSlot}.`,

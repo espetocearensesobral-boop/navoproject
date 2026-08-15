@@ -130,7 +130,7 @@ const EmailSettingsTab: React.FC = () => {
       <div>
         <h2 className="text-sm font-serif font-bold text-content-base mb-0.5 truncate">Envio de E-mails (SMTP)</h2>
         <p className="text-[11px] text-content-muted mb-4">
-          Configure um servidor SMTP para enviar e-mails de confirmação e cancelamento de agendamentos aos clientes.
+          Configure um servidor SMTP para enviar avisos à barbearia e aos clientes que informarem e-mail no agendamento.
           Você pode usar um provedor gratuito, como o Gmail (com uma "Senha de app"), Brevo ou Zoho Mail.
         </p>
       </div>
@@ -260,6 +260,18 @@ const EmailSettingsTab: React.FC = () => {
           />
         </div>
 
+        <div>
+          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">E-mail padrão da barbearia</label>
+          <input
+            type="email"
+            placeholder="administrativo@suabarbearia.com"
+            value={settings.notificationEmail}
+            onChange={(e) => update('notificationEmail', e.target.value)}
+            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
+          />
+          <p className="mt-1 text-[10px] text-content-muted">Receberá avisos de novos agendamentos, reagendamentos e cancelamentos. Se ficar vazio, o sistema não envia alertas administrativos por e-mail.</p>
+        </div>
+
         <div className="pt-2 space-y-2">
           <label className="flex items-center gap-2 text-[11px] text-content-base">
             <input
@@ -269,6 +281,15 @@ const EmailSettingsTab: React.FC = () => {
               className="w-3.5 h-3.5 accent-gold-base"
             />
             Enviar e-mail ao confirmar agendamento
+          </label>
+          <label className="flex items-center gap-2 text-[11px] text-content-base">
+            <input
+              type="checkbox"
+              checked={settings.notifyOnReschedule}
+              onChange={(e) => update('notifyOnReschedule', e.target.checked)}
+              className="w-3.5 h-3.5 accent-gold-base"
+            />
+            Enviar e-mail ao reagendar agendamento
           </label>
           <label className="flex items-center gap-2 text-[11px] text-content-base">
             <input

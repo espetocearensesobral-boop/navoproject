@@ -209,13 +209,15 @@ app.use('/api/whatsapp', whatsappRouter);
 
 // --- Email Notification Service (SMTP via nodemailer) ---
 import { createEmailModule } from './email.js';
-const { router: emailRouter, sendEmail } = createEmailModule(() => db, schema, eq);
+const { router: emailRouter, sendEmail, getEmailSettings } = createEmailModule(() => db, schema, eq);
 app.use('/api/email/config', requireAuth, requireAdmin);
 app.use('/api/email/test', requireAuth, requireAdmin);
 app.use('/api/email', emailRouter);
 
 /** Busca o e-mail do cliente pelo clientId (perfil), sem derrubar o fluxo principal se falhar. */
-export async function getClientEmail(clientId: string | undefined | null): Promise<string | null> {
+export async function getClientEmail(clientId: string | undefined | null, appointmentEmail?: string | null): Promise<string | null> {
+  const explicitEmail = typeof appointmentEmail === 'string' ? appointmentEmail.trim().toLowerCase() : '';
+  if (explicitEmail) return explicitEmail;
   if (!clientId || clientId === 'usr_guest') return null;
   try {
     const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, clientId) });
@@ -255,15 +257,102 @@ export function buildBookingCancellationEmail(apt: any) {
   return { subject, html };
 }
 
-/** Busca o e-mail do cliente e dispara o envio, sem nunca lançar (mesmo padrão do sendWhatsAppMessage). */
-export async function notifyClientByEmail(clientId: string | undefined | null, apt: any, kind: 'booking' | 'cancel') {
+export function buildBookingRescheduleEmail(apt: any, previous: any = {}) {
+  const subject = `Agendamento reagendado — ${apt.date} às ${apt.timeSlot}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #1a1a1a;">
+      <h2 style="color: #b8860b;">💈 Navo Barber &amp; Club</h2>
+      <p>Olá, <strong>${apt.clientName || 'Cliente'}</strong>!</p>
+      <p>Seu agendamento foi <strong>reagendado</strong> com sucesso.</p>
+      <ul style="line-height: 1.8;">
+        <li><strong>Data e horário anteriores:</strong> ${previous.date || '—'} às ${previous.timeSlot || '—'}</li>
+        <li><strong>Nova data e horário:</strong> ${apt.date} às ${apt.timeSlot}</li>
+        <li><strong>Profissional:</strong> ${apt.professionalName || 'Profissional Navo'}</li>
+      </ul>
+      <p>Te esperamos com o café pronto! ☕</p>
+    </div>`;
+  return { subject, html };
+}
+
+function buildShopNotificationEmail(apt: any, kind: 'booking' | 'reschedule' | 'cancel', previous: any = {}) {
+  const labels = {
+    booking: 'Novo agendamento',
+    reschedule: 'Agendamento reagendado',
+    cancel: 'Agendamento cancelado',
+  };
+  const subject = `[Navo] ${labels[kind]} — ${apt.clientName || 'Cliente'}`;
+  const schedule = kind === 'reschedule'
+    ? `<li><strong>Horário anterior:</strong> ${previous.date || '—'} às ${previous.timeSlot || '—'}</li><li><strong>Novo horário:</strong> ${apt.date} às ${apt.timeSlot}</li>`
+    : `<li><strong>Data e horário:</strong> ${apt.date} às ${apt.timeSlot}</li>`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #1a1a1a;">
+      <h2 style="color: #b8860b;">💈 Navo Barber &amp; Club</h2>
+      <p>O sistema registrou <strong>${labels[kind].toLowerCase()}</strong>.</p>
+      <ul style="line-height: 1.8;">
+        <li><strong>Cliente:</strong> ${apt.clientName || 'Cliente'}</li>
+        <li><strong>Telefone:</strong> ${apt.clientPhone || '—'}</li>
+        ${schedule}
+        <li><strong>Profissional:</strong> ${apt.professionalName || 'Profissional Navo'}</li>
+        <li><strong>Serviço:</strong> ${Array.isArray(apt.services) && apt.services[0]?.title ? apt.services[0].title : 'Atendimento'}</li>
+      </ul>
+      ${kind === 'cancel' ? '<p>O horário foi liberado para a operação.</p>' : '<p>Consulte a Agenda no Admin para acompanhar o atendimento.</p>'}
+    </div>`;
+  return { subject, html };
+}
+
+async function sendAppointmentEmailOnce(to: string, subject: string, html: string, kind: 'booking' | 'reschedule' | 'cancel', appointmentId: string) {
+  const recipient = to.trim().toLowerCase();
+  if (!recipient) return false;
+  let claim: any = null;
   try {
-    const email = await getClientEmail(clientId);
+    if (db && schema.notificationDeliveries) {
+      const deliveryKey = `appointment-email:${appointmentId}:${kind}:${recipient}`;
+      [claim] = await db.insert(schema.notificationDeliveries).values({
+        id: `nd_email_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        appointmentId,
+        kind: `appointment_${kind}`,
+        channel: 'email',
+        deliveryKey,
+        sentAt: new Date(),
+      }).onConflictDoNothing().returning({ id: schema.notificationDeliveries.id });
+      if (!claim) return false;
+    }
+    const sent = await sendEmail(recipient, subject, html, undefined, kind);
+    if (!sent && claim) await db.delete(schema.notificationDeliveries).where(eq(schema.notificationDeliveries.id, claim.id)).catch(() => {});
+    return sent;
+  } catch (error) {
+    if (claim) await db.delete(schema.notificationDeliveries).where(eq(schema.notificationDeliveries.id, claim.id)).catch(() => {});
+    console.error('[Email] Falha ao registrar/enviar notificação:', error);
+    return false;
+  }
+}
+
+/** Envia ao cliente somente se houver e-mail informado no agendamento ou perfil cadastrado. */
+export async function notifyClientByEmail(clientId: string | undefined | null, apt: any, kind: 'booking' | 'reschedule' | 'cancel', previous: any = {}) {
+  try {
+    const email = await getClientEmail(clientId, apt.clientEmail || apt.client_email);
     if (!email) return;
-    const { subject, html } = kind === 'booking' ? buildBookingConfirmationEmail(apt) : buildBookingCancellationEmail(apt);
-    sendEmail(email, subject, html, undefined, kind).catch(() => {});
+    const template = kind === 'booking'
+      ? buildBookingConfirmationEmail(apt)
+      : kind === 'reschedule'
+        ? buildBookingRescheduleEmail(apt, previous)
+        : buildBookingCancellationEmail(apt);
+    await sendAppointmentEmailOnce(email, template.subject, template.html, kind, apt.id);
   } catch (e) {
     // Nunca deixa uma falha no envio de e-mail derrubar o fluxo principal.
+  }
+}
+
+/** Envia o mesmo evento ao e-mail administrativo configurado para a barbearia. */
+export async function notifyShopByEmail(apt: any, kind: 'booking' | 'reschedule' | 'cancel', previous: any = {}) {
+  try {
+    const settings = await getEmailSettings();
+    const email = settings?.notificationEmail?.trim();
+    if (!email) return;
+    const template = buildShopNotificationEmail(apt, kind, previous);
+    await sendAppointmentEmailOnce(email, template.subject, template.html, kind, apt.id);
+  } catch (e) {
+    // Canal opcional: não interrompe agendamento, reagendamento ou cancelamento.
   }
 }
 

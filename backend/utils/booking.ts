@@ -16,6 +16,8 @@ export const bookingSchema = z.object({
   client_name: z.string().trim().max(120).optional(),
   clientPhone: z.string().trim().max(30).optional(),
   client_phone: z.string().trim().max(30).optional(),
+  clientEmail: z.string().trim().email('E-mail inválido.').max(320).optional().or(z.literal('')),
+  client_email: z.string().trim().email('E-mail inválido.').max(320).optional().or(z.literal('')),
   professionalId: id.optional(),
   professional_id: id.optional(),
   professionalName: z.string().trim().max(120).optional(),

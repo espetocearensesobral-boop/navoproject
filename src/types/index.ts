@@ -68,6 +68,7 @@ export interface Appointment {
   client_id: string;
   client_name: string;
   client_phone: string;
+  client_email?: string | null;
   professional_id: string;
   professional_name: string;
   services: ServiceItem[];

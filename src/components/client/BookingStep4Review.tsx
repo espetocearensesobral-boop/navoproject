@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   FileText,
   Phone,
+  Mail,
   Loader2,
   X
 } from 'lucide-react';
@@ -25,7 +26,7 @@ interface BookingStep4ReviewProps {
   userProfile: UserProfile;
   isGuest?: boolean;
   isSubmitting?: boolean;
-  onConfirmReview: (reviewDetails: { loyaltyDiscount: number; couponDiscount: number; clientName: string; clientPhone: string }) => void;
+  onConfirmReview: (reviewDetails: { loyaltyDiscount: number; couponDiscount: number; clientName: string; clientPhone: string; clientEmail: string }) => void;
   onCancel: () => void;
 }
 
@@ -49,9 +50,11 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
     userProfile?.name && userProfile.name !== 'Visitante' ? userProfile.name : ''
   );
   const [clientPhone, setClientPhone] = useState<string>(userProfile?.phone || '');
+  const [clientEmail, setClientEmail] = useState<string>(userProfile?.email || '');
 
   const [clientNameError, setClientNameError] = useState('');
   const [clientPhoneError, setClientPhoneError] = useState('');
+  const [clientEmailError, setClientEmailError] = useState('');
   const [isEditingData, setIsEditingData] = useState<boolean>(() => !clientName || !clientPhone || isGuest);
 
   const formatPhone = (value: string) => {
@@ -100,6 +103,15 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
     }
   };
 
+  const handleEmailBlur = () => {
+    const value = clientEmail.trim();
+    if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      setClientEmailError('Digite um e-mail válido ou deixe o campo em branco');
+    } else {
+      setClientEmailError('');
+    }
+  };
+
   const subtotal = selectedServices.reduce((acc, curr) => acc + curr.price, 0);
   const loyaltyDiscount = 0.00;
   const couponDiscount = 0.00;
@@ -132,11 +144,19 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
       hasError = true;
     }
 
+    const emailValue = clientEmail.trim();
+    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      setClientEmailError('Digite um e-mail válido ou deixe o campo em branco');
+      hasError = true;
+    }
+
     if (hasError) {
       if (!clientName.trim() || clientName.trim().length < 3) {
         document.getElementById('name-input')?.focus();
-      } else {
+      } else if (phoneDigits.length < 10 || phoneDigits.length > 11) {
         document.getElementById('phone-input')?.focus();
+      } else {
+        document.getElementById('email-input')?.focus();
       }
       return;
     }
@@ -145,7 +165,8 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
       loyaltyDiscount,
       couponDiscount: 0,
       clientName: clientName.trim(),
-      clientPhone: clientPhone.trim()
+      clientPhone: clientPhone.trim(),
+      clientEmail: emailValue
     });
   };
   return (
@@ -249,6 +270,12 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
               <Phone className="w-4 h-4 text-content-muted" />
               <span>{clientPhone}</span>
             </div>
+            {clientEmail && (
+              <div className="flex items-center space-x-2 min-w-0">
+                <Mail className="w-4 h-4 text-content-muted shrink-0" />
+                <span className="truncate">{clientEmail}</span>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-2.5">
@@ -307,7 +334,7 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
                     if (e.key === 'Enter') {
                       e.preventDefault();
                       (e.target as HTMLElement).blur();
-                      document.getElementById('confirm-booking-btn')?.focus();
+                      document.getElementById('email-input')?.focus();
                     }
                   }}
                   placeholder="(11) 99999-9999"
@@ -319,6 +346,44 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
               {clientPhoneError && (
                 <span className="text-xs text-red-400 pl-1">{clientPhoneError}</span>
               )}
+            </div>
+            <div className="space-y-1">
+              <div className="relative">
+                <Mail className="w-4 h-4 text-content-muted absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  id="email-input"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  enterKeyHint="done"
+                  value={clientEmail}
+                  onChange={(e) => {
+                    setClientEmail(e.target.value);
+                    setClientEmailError('');
+                  }}
+                  onBlur={handleEmailBlur}
+                  onFocus={(e) => {
+                    setTimeout(() => {
+                      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 150);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      (e.target as HTMLElement).blur();
+                      document.getElementById('confirm-booking-btn')?.focus();
+                    }
+                  }}
+                  placeholder="seuemail@exemplo.com (opcional)"
+                  className={`w-full bg-border-subtle backdrop-blur-[10px] text-content-base text-xs sm:text-sm pl-9 pr-3 py-2.5 rounded-lg border focus:outline-none transition-colors ${
+                    clientEmailError ? 'border-red-500 focus:border-red-500' : 'border-border-subtle focus:border-gold-base'
+                  }`}
+                />
+              </div>
+              {clientEmailError && (
+                <span className="text-xs text-red-400 pl-1">{clientEmailError}</span>
+              )}
+              <p className="text-[10px] text-content-muted pl-1">Opcional. Usaremos este e-mail para enviar confirmações, reagendamentos e cancelamentos.</p>
             </div>
           </div>
         )}

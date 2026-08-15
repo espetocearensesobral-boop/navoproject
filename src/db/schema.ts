@@ -62,6 +62,7 @@ export const appointments = pgTable('appointments', {
   clientId: text('client_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   clientName: text('client_name').notNull(),
   clientPhone: text('client_phone'),
+  clientEmail: text('client_email'),
   professionalId: text('professional_id').notNull().references(() => professionals.id, { onDelete: 'restrict' }),
   professionalName: text('professional_name').notNull(),
   date: text('appointment_date').notNull(),
@@ -422,7 +423,9 @@ export const emailSettings = pgTable('email_settings', {
   fromName: text('from_name').notNull().default('Navo Barber & Club'),
   fromEmail: text('from_email').default(''),
   replyTo: text('reply_to').default(''),
+  notificationEmail: text('notification_email').default(''),
   notifyOnBooking: boolean('notify_on_booking').notNull().default(true),
+  notifyOnReschedule: boolean('notify_on_reschedule').notNull().default(true),
   notifyOnCancel: boolean('notify_on_cancel').notNull().default(false),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

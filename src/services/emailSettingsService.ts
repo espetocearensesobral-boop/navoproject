@@ -13,7 +13,9 @@ export interface EmailSettings {
   fromName: string;
   fromEmail: string;
   replyTo: string;
+  notificationEmail: string;
   notifyOnBooking: boolean;
+  notifyOnReschedule: boolean;
   notifyOnCancel: boolean;
 }
 
@@ -27,7 +29,9 @@ export const defaultEmailSettings: EmailSettings = {
   fromName: 'Navo Barber & Club',
   fromEmail: '',
   replyTo: '',
+  notificationEmail: '',
   notifyOnBooking: true,
+  notifyOnReschedule: true,
   notifyOnCancel: true,
 };
 

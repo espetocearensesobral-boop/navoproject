@@ -233,13 +233,14 @@ export const ClientApp: React.FC = () => {
     });
   };
 
-  const handleConfirmBooking = async (paymentDetails: { method: string; loyaltyDiscount: number; totalPaid: number; clientName?: string; clientPhone?: string }) => {
+  const handleConfirmBooking = async (paymentDetails: { method: string; loyaltyDiscount: number; totalPaid: number; clientName?: string; clientPhone?: string; clientEmail?: string }) => {
     hapticSuccess();
     setIsConfirmingBooking(true);
     setTotalPaid(paymentDetails.totalPaid);
 
     const clientName = paymentDetails.clientName || currentUser.name || 'Cliente';
     const clientPhone = paymentDetails.clientPhone || currentUser.phone || '';
+    const clientEmail = paymentDetails.clientEmail || (isGuest ? '' : currentUser.email || '');
     const generatedVoucher = `BRX-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
     // Create appointment object
@@ -249,6 +250,7 @@ export const ClientApp: React.FC = () => {
       client_id: currentUser.id || `guest_${Date.now()}`,
       client_name: clientName,
       client_phone: clientPhone,
+      client_email: clientEmail || null,
       professional_id: selectedBarber?.id || 'prof_1',
       professional_name: selectedBarber?.name || 'Carlos Silva',
       services: selectedServices,
@@ -670,6 +672,7 @@ export const ClientApp: React.FC = () => {
                           method: 'in_store',
                           clientName: details.clientName,
                           clientPhone: details.clientPhone,
+                          clientEmail: details.clientEmail,
                           loyaltyDiscount: details.loyaltyDiscount,
                           totalPaid: Math.max(0, selectedServices.reduce((a, b) => a + b.price, 0) - details.loyaltyDiscount - details.couponDiscount)
                         });
