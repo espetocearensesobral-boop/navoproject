@@ -106,22 +106,23 @@ reviewsRouter.post('/public', async (req: any, res: any) => {
       createdAt: new Date(),
     };
 
-    if (typeof db.transaction === 'function') {
+    if (!appointment) {
+      // Avaliações anônimas não precisam atualizar outro registro. Evitamos uma
+      // transação desnecessária no runtime serverless e persistimos somente o
+      // lançamento da avaliação.
+      await db.insert(schema.reviews).values(newReview);
+    } else if (typeof db.transaction === 'function') {
       await db.transaction(async (tx: any) => {
         await tx.insert(schema.reviews).values(newReview);
-        if (appointment) {
-          await tx.update(schema.appointments)
-            .set({ isReviewed: true, updatedAt: new Date() })
-            .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
-        }
+        await tx.update(schema.appointments)
+          .set({ isReviewed: true, updatedAt: new Date() })
+          .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
       });
     } else {
       await db.insert(schema.reviews).values(newReview);
-      if (appointment) {
-        await db.update(schema.appointments)
-          .set({ isReviewed: true, updatedAt: new Date() })
-          .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
-      }
+      await db.update(schema.appointments)
+        .set({ isReviewed: true, updatedAt: new Date() })
+        .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
     }
 
     return res.json({ success: true, message: 'Avaliação enviada com sucesso. Obrigado pelo feedback!' });
