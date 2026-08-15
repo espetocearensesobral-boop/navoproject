@@ -30,6 +30,7 @@ export const PublicReviewModal: React.FC<PublicReviewModalProps> = ({ isOpen, on
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const serviceSelectRef = useRef<HTMLSelectElement | null>(null);
+  const submitButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -131,11 +132,15 @@ export const PublicReviewModal: React.FC<PublicReviewModalProps> = ({ isOpen, on
       setStage('success');
       hapticSuccess();
     } catch (submitError: any) {
-      if (submitError?.message?.toLowerCase().includes('expirou')) {
+      const message = String(submitError?.message || '');
+      if (message.toLowerCase().includes('expirou')) {
         setSessionToken('');
         setStage('expired');
       } else {
-        setError(submitError?.message || 'Não foi possível enviar a avaliação.');
+        setError(message.includes('Não foi possível concluir')
+          ? 'Não foi possível registrar a avaliação agora. Tente enviar novamente; nenhuma identificação foi solicitada.'
+          : message || 'Não foi possível enviar a avaliação.');
+        window.setTimeout(() => submitButtonRef.current?.focus(), 0);
       }
     } finally {
       setLoading(false);
@@ -208,7 +213,7 @@ export const PublicReviewModal: React.FC<PublicReviewModalProps> = ({ isOpen, on
             <Question number="5" label="Você recomendaria a Navo?" options={['Com certeza', 'Talvez', 'Não']} value={wouldRecommend} onChange={setWouldRecommend} optionClass={optionClass} />
             <label className="block text-xs font-bold text-content-muted">Observações (opcional)<textarea value={comment} onChange={(event) => setComment(event.target.value)} maxLength={2000} placeholder="Conte algo que queira compartilhar..." className="mt-1.5 min-h-24 w-full resize-none rounded-xl border border-border-subtle bg-surface-base p-3 text-sm text-content-base outline-none focus:border-gold-base" /></label>
             {error && <ErrorMessage text={error} />}
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><button type="button" onClick={() => { setStage('selection'); setError(null); }} disabled={loading} className="h-11 rounded-xl border border-border-subtle px-4 text-sm font-bold text-content-muted">Voltar</button><button type="submit" disabled={loading || !sessionReady} className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-gold-base px-4 text-sm font-bold text-surface-base disabled:opacity-60">{loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</> : 'Enviar avaliação'}</button></div>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><button type="button" onClick={() => { setStage('selection'); setError(null); }} disabled={loading} className="h-11 rounded-xl border border-border-subtle px-4 text-sm font-bold text-content-muted">Voltar</button><button ref={submitButtonRef} type="submit" disabled={loading || !sessionReady} aria-busy={loading} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-gold-base px-4 text-sm font-bold text-surface-base shadow-sm transition-transform active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60">{loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</> : 'Enviar avaliação'}</button></div>
           </form>
         )}
       </div>

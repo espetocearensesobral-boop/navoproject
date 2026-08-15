@@ -33,6 +33,39 @@ const findPublicReviewAppointment = async (bookingCode: string, clientPhone: str
   return appointment;
 };
 
+const isReviewSchemaCompatibilityError = (error: any) => {
+  const message = String(error?.message || '').toLowerCase();
+  const missingOptionalColumn = ['service_id', 'service_title', 'service_experience']
+    .some((column) => message.includes(column));
+  return error?.code === '42703' || (missingOptionalColumn && message.includes('column'));
+};
+
+const insertAnonymousReview = async (review: any) => {
+  try {
+    await db.insert(schema.reviews).values(review);
+  } catch (error: any) {
+    if (!isReviewSchemaCompatibilityError(error)) throw error;
+
+    // Compatibilidade temporária com bancos que ainda possuem o formato legado
+    // de reviews. A avaliação continua anônima e preserva as respostas essenciais.
+    await db.insert(schema.reviews).values({
+      id: review.id,
+      appointmentId: review.appointmentId,
+      clientId: review.clientId,
+      professionalId: review.professionalId,
+      rating: review.rating,
+      understoodRequest: review.understoodRequest,
+      waitTimeAcceptable: review.waitTimeAcceptable,
+      wouldRecommend: review.wouldRecommend,
+      comment: review.comment,
+      hasPhoto: review.hasPhoto,
+      photoUrl: review.photoUrl,
+      pointsAwarded: review.pointsAwarded,
+      createdAt: review.createdAt,
+    });
+  }
+};
+
 // GET /api/reviews/public/session - Start a short-lived public survey session
 reviewsRouter.get('/public/session', (_req: any, res: any) => {
   const expiresInSeconds = 10 * 60;
@@ -111,7 +144,7 @@ reviewsRouter.post('/public', async (req: any, res: any) => {
       // Avaliações anônimas não precisam atualizar outro registro. Evitamos uma
       // transação desnecessária no runtime serverless e persistimos somente o
       // lançamento da avaliação.
-      await db.insert(schema.reviews).values(newReview);
+      await insertAnonymousReview(newReview);
     } else if (typeof db.transaction === 'function') {
       await db.transaction(async (tx: any) => {
         await tx.insert(schema.reviews).values(newReview);
