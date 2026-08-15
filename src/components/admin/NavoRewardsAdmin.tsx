@@ -12,7 +12,9 @@ import {
   manuallyAdjustPoints,
   fetchClientsFromSupabase,
   fetchLoyaltyConfig,
-  saveLoyaltyConfig
+  saveLoyaltyConfig,
+  fetchAdminLoyaltyTiers,
+  saveAdminLoyaltyTiers
 } from '../../services/supabaseDataService';
 import {
   Award,
@@ -88,6 +90,8 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
   const [voucherValidationResult, setVoucherValidationResult] = useState<string | null>(null);
 
   // CONFIGURABLE ENGINE SETTINGS STATE
+  const [tiers, setTiers] = useState<any[]>([]);
+  const [savingTiers, setSavingTiers] = useState(false);
   const [config, setConfig] = useState<any>({
     currencyPerPoint: 1.0,
     pointsValidityDays: 365,
@@ -132,11 +136,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
   const loadData = async () => {
     setLoading(true);
     try {
-      const [dashRes, rwdRes, clientList, cfgRes] = await Promise.all([
+      const [dashRes, rwdRes, clientList, cfgRes, tiersRes] = await Promise.all([
         fetchNavoRewardsAdminDashboard(),
         fetchRewardsList(),
         fetchClientsFromSupabase(),
-        fetchLoyaltyConfig().catch(() => null)
+        fetchLoyaltyConfig().catch(() => null),
+        fetchAdminLoyaltyTiers().catch(() => [])
       ]);
       setData(dashRes);
       setRewardsList(rwdRes);
@@ -148,6 +153,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
       if (cfgRes) {
         setConfig(cfgRes);
       }
+      setTiers(Array.isArray(tiersRes) ? tiersRes : []);
     } catch (e) {
       console.error('Erro ao carregar dados do Navo Rewards:', e);
     } finally {
@@ -161,6 +167,20 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
     window.addEventListener('adminRefresh', handleRefresh);
     return () => window.removeEventListener('adminRefresh', handleRefresh);
   }, []);
+
+  const handleSaveTiers = async () => {
+    setSavingTiers(true);
+    try {
+      await saveAdminLoyaltyTiers(tiers);
+      setConfigSuccessMsg('Níveis salvos com sucesso!');
+      await loadData();
+      setTimeout(() => setConfigSuccessMsg(null), 4000);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao salvar níveis.');
+    } finally {
+      setSavingTiers(false);
+    }
+  };
 
   const handleSaveConfig = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -411,7 +431,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                     </div>
                   </div>
                   <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Bronze || 0}</p>
-                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{config.tierMultipliers?.Bronze || 1.0}x mult</p>
+                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Bronze')?.multiplier || 1}x mult</p>
                 </div>
 
                 <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
@@ -422,7 +442,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                     </div>
                   </div>
                   <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Prata || 0}</p>
-                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{config.tierMultipliers?.Prata || 1.2}x mult</p>
+                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Prata')?.multiplier || 1.2}x mult</p>
                 </div>
 
                 <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
@@ -433,7 +453,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                     </div>
                   </div>
                   <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Ouro || 0}</p>
-                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{config.tierMultipliers?.Ouro || 1.5}x mult</p>
+                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Ouro')?.multiplier || 1.5}x mult</p>
                 </div>
 
                 <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
@@ -444,7 +464,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                     </div>
                   </div>
                   <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Diamante || 0}</p>
-                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{config.tierMultipliers?.Diamante || 2.0}x mult</p>
+                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Diamante')?.multiplier || 2}x mult</p>
                 </div>
               </div>
             </div>
@@ -562,83 +582,31 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               </div>
             </div>
 
-            <div className="space-y-2 pt-2">
-              <h4 className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Multiplicadores por Nível VIP</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-                <div className="p-2.5 bg-surface-base rounded-xl border border-border-subtle space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-amber-700 block truncate">Bronze</span>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="1"
-                      value={config.tierMultipliers?.Bronze || 1.0}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        tierMultipliers: { ...config.tierMultipliers, Bronze: Number(e.target.value) }
-                      })}
-                      className="w-16 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-content-base text-xs font-bold num-tabular"
-                    />
-                    <span className="text-content-muted text-[11px]">x Pts</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 bg-surface-base rounded-xl border border-border-subtle space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block truncate">Prata</span>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="1"
-                      value={config.tierMultipliers?.Prata || 1.2}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        tierMultipliers: { ...config.tierMultipliers, Prata: Number(e.target.value) }
-                      })}
-                      className="w-16 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-content-base text-xs font-bold num-tabular"
-                    />
-                    <span className="text-content-muted text-[11px]">x Pts</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 bg-surface-base rounded-xl border border-border-subtle space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Ouro</span>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="1"
-                      value={config.tierMultipliers?.Ouro || 1.5}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        tierMultipliers: { ...config.tierMultipliers, Ouro: Number(e.target.value) }
-                      })}
-                      className="w-16 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-content-base text-xs font-bold num-tabular"
-                    />
-                    <span className="text-content-muted text-[11px]">x Pts</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 bg-surface-base rounded-xl border border-border-subtle space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-cyan-400 block truncate">Diamante</span>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="1"
-                      value={config.tierMultipliers?.Diamante || 2.0}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        tierMultipliers: { ...config.tierMultipliers, Diamante: Number(e.target.value) }
-                      })}
-                      className="w-16 bg-surface-card border border-border-subtle rounded-xl p-1.5 text-content-base text-xs font-bold num-tabular"
-                    />
-                    <span className="text-content-muted text-[11px]">x Pts</span>
-                  </div>
-                </div>
-              </div>
+            <div className="pt-2 text-xs text-content-muted">
+              Os limites e multiplicadores dos níveis são mantidos na seção de níveis persistidos abaixo. As alterações passam por validação no servidor e afetam novos créditos, sem recalcular saldos históricos.
             </div>
           </form>
+
+          <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2"><Crown className="w-4 h-4 text-gold-base" /> Níveis VIP reais</h3>
+                <p className="text-[11px] text-content-muted mt-1">Defina o mínimo de pontos e o multiplicador usado no próximo checkout confirmado.</p>
+              </div>
+              <button type="button" onClick={handleSaveTiers} disabled={savingTiers || tiers.length === 0} className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs disabled:opacity-50">{savingTiers ? 'Salvando...' : 'Salvar níveis'}</button>
+            </div>
+            <div className="space-y-2">
+              {tiers.map((tier, index) => (
+                <div key={tier.id || index} className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_120px_100px_82px_auto] gap-2 items-center rounded-xl border border-border-subtle bg-surface-base p-2.5">
+                  <input value={tier.name} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, name: e.target.value } : item))} className="min-w-0 bg-surface-card border border-border-subtle rounded-lg p-2 text-xs font-bold text-content-base" aria-label={`Nome do nível ${index + 1}`} />
+                  <input type="number" min="0" step="1" value={tier.minimumPoints} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, minimumPoints: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Pontos mínimos do nível ${index + 1}`} />
+                  <input type="number" min="0.1" max="20" step="0.1" value={tier.multiplier} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, multiplier: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Multiplicador do nível ${index + 1}`} />
+                  <input type="number" min="0" step="1" value={tier.displayOrder} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, displayOrder: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Ordem do nível ${index + 1}`} />
+                  <label className="flex items-center gap-2 text-[11px] text-content-muted"><input type="checkbox" checked={Boolean(tier.isActive)} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, isActive: e.target.checked } : item))} /> Ativo</label>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Ajuste Manual */}
           <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">

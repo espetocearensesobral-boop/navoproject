@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { and, eq, desc, ilike } from 'drizzle-orm';
+import { and, eq, desc, ilike, sql } from 'drizzle-orm';
 import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { optionalAuth, requireAuth, requireAdmin } from '../middleware/index.js';
@@ -8,6 +8,7 @@ import { handleError } from '../utils/index.js';
 import { publicReviewLookupSchema, publicReviewPayloadSchema, reviewPayloadSchema } from '../utils/validation.js';
 import { matchPhoneNumbers } from '../utils/phone.js';
 import { JWT_SECRET } from '../config/env.js';
+import { expirePointsInTransaction, getLoyaltyConfig, refreshProfileTierInTransaction } from '../services/loyalty-engine.service.js';
 
 export const reviewsRouter = express.Router();
 
@@ -218,6 +219,36 @@ reviewsRouter.post('/', requireAuth, async (req: any, res: any) => {
       createdAt: new Date(),
     };
 
+    let pointsAwarded = 0;
+    const applyReviewPoints = async (tx: any) => {
+      await expirePointsInTransaction(tx, req.user.id);
+      const config = await getLoyaltyConfig(tx);
+      pointsAwarded = config.reviewPoints.baseReview
+        + (payload.hasPhoto ? config.reviewPoints.withPhotoBonus : 0)
+        + (payload.rating === 5 ? config.reviewPoints.fiveStarBonus : 0);
+      if (pointsAwarded <= 0) return;
+      const validity = config.pointsValidityDays > 0
+        ? new Date(Date.now() + config.pointsValidityDays * 86400000)
+        : null;
+      const [inserted] = await tx.insert(schema.pointTransactions).values({
+        id: `pt_review_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        clientId: req.user.id,
+        amount: pointsAwarded,
+        type: 'review_bonus',
+        sourceType: 'review',
+        sourceId: newReview.id,
+        sourceKey: `review:${newReview.id}`,
+        description: 'Bônus por avaliação enviada',
+        expiresAt: validity,
+        createdAt: new Date(),
+      }).onConflictDoNothing({ target: schema.pointTransactions.sourceKey }).returning({ id: schema.pointTransactions.id });
+      if (!inserted) pointsAwarded = 0;
+      await tx.update(schema.profiles)
+        .set({ loyaltyPoints: sql`${schema.profiles.loyaltyPoints} + ${pointsAwarded}`, updatedAt: new Date() })
+        .where(eq(schema.profiles.id, req.user.id));
+      await refreshProfileTierInTransaction(tx, req.user.id);
+    };
+
     if (typeof db.transaction === 'function') {
       await db.transaction(async (tx: any) => {
         await tx.insert(schema.reviews).values(newReview);
@@ -226,6 +257,7 @@ reviewsRouter.post('/', requireAuth, async (req: any, res: any) => {
             .set({ isReviewed: true, updatedAt: new Date() })
             .where(eq(schema.appointments.id, payload.appointmentId));
         }
+        await applyReviewPoints(tx);
       });
     } else {
       await db.insert(schema.reviews).values(newReview);
@@ -236,7 +268,7 @@ reviewsRouter.post('/', requireAuth, async (req: any, res: any) => {
       }
     }
 
-    res.json({ success: true, message: 'Avaliação enviada com sucesso! Obrigado pelo feedback.' });
+    res.json({ success: true, pointsAwarded, message: 'Avaliação enviada com sucesso! Obrigado pelo feedback.' });
   } catch (e: any) {
     return handleError(res, e, 'POST /api/reviews');
   }

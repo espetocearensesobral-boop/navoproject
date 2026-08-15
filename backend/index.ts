@@ -44,6 +44,7 @@ import {
   validateOrigin
 } from './middleware/index.js';
 import { JWT_SECRET } from './config/env.js';
+import { DEFAULT_LOYALTY_CONFIG, normalizeLoyaltyConfig } from './services/loyalty-engine.service.js';
 
 const app = express();
 // Express re-adds "X-Powered-By: Express" lazily on every res.send() unless this is
@@ -712,36 +713,25 @@ app.post("/api/cron/reminders", async (req: any, res: any) => {
 // NAVO REWARDS ENGINE & API
 // =====================================================================
 
-let loyaltyConfig = {
-  currencyPerPoint: 1.0, // R$ 1.00 = 1 ponto
-  pointsValidityDays: 365, // 0 = permanente, >0 = dias
-  tierMultipliers: {
-    Bronze: 1.0,
-    Prata: 1.2,
-    Ouro: 1.5,
-    Diamante: 2.0
-  },
-  referralPoints: {
-    referrerBonus: 100,
-    referredBonus: 50,
-    milestoneCount: 5,
-    milestoneBonus: 1000
-  },
-  reviewPoints: {
-    baseReview: 20,
-    withPhotoBonus: 30,
-    fiveStarBonus: 10
-  },
-  birthdayBonus: 100
-};
-
-const mergeLoyaltyConfig = (base: any, incoming: any = {}) => ({
-  ...base,
-  ...incoming,
-  tierMultipliers: { ...base.tierMultipliers, ...(incoming.tierMultipliers || {}) },
-  referralPoints: { ...base.referralPoints, ...(incoming.referralPoints || {}) },
-  reviewPoints: { ...base.reviewPoints, ...(incoming.reviewPoints || {}) },
-});
+let loyaltyConfig = normalizeLoyaltyConfig(DEFAULT_LOYALTY_CONFIG);
+const mergeLoyaltyConfig = (_base: any, incoming: any = {}) => normalizeLoyaltyConfig(incoming);
+const loyaltyConfigPayloadSchema = z.object({
+  currencyPerPoint: z.coerce.number().min(0.01).max(100000).optional(),
+  pointsValidityDays: z.coerce.number().int().min(0).max(3650).optional(),
+  tierMultipliers: z.record(z.string(), z.coerce.number().min(0.1).max(20)).optional(),
+  referralPoints: z.object({
+    referrerBonus: z.coerce.number().int().min(0).max(100000000).optional(),
+    referredBonus: z.coerce.number().int().min(0).max(100000000).optional(),
+    milestoneCount: z.coerce.number().int().min(1).max(100000).optional(),
+    milestoneBonus: z.coerce.number().int().min(0).max(100000000).optional(),
+  }).partial().optional(),
+  reviewPoints: z.object({
+    baseReview: z.coerce.number().int().min(0).max(100000000).optional(),
+    withPhotoBonus: z.coerce.number().int().min(0).max(100000000).optional(),
+    fiveStarBonus: z.coerce.number().int().min(0).max(100000000).optional(),
+  }).partial().optional(),
+  birthdayBonus: z.coerce.number().int().min(0).max(100000000).optional(),
+}).strict();
 
 app.get("/api/loyalty/config", async (_req: any, res: any) => {
   try {
@@ -759,10 +749,11 @@ app.get("/api/loyalty/config", async (_req: any, res: any) => {
 
 app.post("/api/loyalty/config", requireAuth, requireAdmin, async (req: any, res: any) => {
   try {
-    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
-      return res.status(400).json({ error: 'Configuração inválida.' });
+    const parsed = loyaltyConfigPayloadSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Configuração de fidelidade inválida.', details: parsed.error.flatten() });
     }
-    loyaltyConfig = mergeLoyaltyConfig(loyaltyConfig, req.body);
+    loyaltyConfig = mergeLoyaltyConfig(loyaltyConfig, parsed.data);
     if (!isDbConnected || !db) return res.status(503).json({ error: userErrors.dbDisconnected });
     await db.insert(schema.loyaltySettings)
       .values({ id: 'default', config: loyaltyConfig, updatedAt: new Date() })
@@ -980,66 +971,3 @@ app.use('/api', (req: any, res: any) => {
 });
 
 export default app;
-export async function processAppointmentCompletion(appointment: any) {
-  if (!appointment?.id || !appointment.clientId || appointment.clientId === 'usr_guest') return;
-  try {
-    if (!isDbConnected || !db) return;
-    const amount = Number(appointment.finalAmount || appointment.originalAmount || 0);
-    if (!Number.isFinite(amount) || amount <= 0) return;
-    const pointsEarned = Math.round(amount);
-    const sourceKey = `appointment-completion:${appointment.id}`;
-    await db.transaction(async (tx: any) => {
-      const inserted = await tx.insert(schema.pointTransactions).values({
-        id: `pt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-        clientId: appointment.clientId,
-        amount: pointsEarned,
-        type: 'appointment_completion',
-        description: `Pontos pelo atendimento ${appointment.bookingCode || appointment.id}`,
-        sourceKey,
-      }).onConflictDoNothing({ target: schema.pointTransactions.sourceKey }).returning({ id: schema.pointTransactions.id });
-      if (inserted.length === 0) return;
-      await tx.update(schema.profiles)
-        .set({ loyaltyPoints: sql`${schema.profiles.loyaltyPoints} + ${pointsEarned}`, updatedAt: new Date() })
-        .where(eq(schema.profiles.id, appointment.clientId));
-
-      const referral = await tx.query.referrals.findFirst({
-        where: and(eq(schema.referrals.referredId, appointment.clientId), eq(schema.referrals.status, 'pending')),
-      });
-      if (referral) {
-        const referrerBonus = Number(loyaltyConfig.referralPoints?.referrerBonus || 0);
-        const referredBonus = Number(loyaltyConfig.referralPoints?.referredBonus || 0);
-        await tx.update(schema.referrals)
-          .set({ status: 'completed', pointsAwarded: referrerBonus + referredBonus })
-          .where(eq(schema.referrals.id, referral.id));
-        if (referrerBonus > 0) {
-          await tx.update(schema.profiles)
-            .set({ loyaltyPoints: sql`${schema.profiles.loyaltyPoints} + ${referrerBonus}`, updatedAt: new Date() })
-            .where(eq(schema.profiles.id, referral.referrerId));
-          await tx.insert(schema.pointTransactions).values({
-            id: `pt_referrer_${referral.id}`,
-            clientId: referral.referrerId,
-            amount: referrerBonus,
-            type: 'referral_bonus',
-            description: 'Bônus por indicação concluída',
-            sourceKey: `referral:${referral.id}:referrer`,
-          }).onConflictDoNothing({ target: schema.pointTransactions.sourceKey });
-        }
-        if (referredBonus > 0) {
-          await tx.update(schema.profiles)
-            .set({ loyaltyPoints: sql`${schema.profiles.loyaltyPoints} + ${referredBonus}`, updatedAt: new Date() })
-            .where(eq(schema.profiles.id, referral.referredId));
-          await tx.insert(schema.pointTransactions).values({
-            id: `pt_referred_${referral.id}`,
-            clientId: referral.referredId,
-            amount: referredBonus,
-            type: 'referral_bonus',
-            description: 'Bônus de boas-vindas por indicação',
-            sourceKey: `referral:${referral.id}:referred`,
-          }).onConflictDoNothing({ target: schema.pointTransactions.sourceKey });
-        }
-      }
-    });
-  } catch (e) {
-    console.error('Error processing appointment completion:', e);
-  }
-}

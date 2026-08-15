@@ -15,7 +15,7 @@ import { invalidateAvailabilityCache } from './availability.router.js';
 
 
 
-import { processAppointmentCompletion, notifyClientByEmail, notifyShopByEmail } from '../index.js';
+import { notifyClientByEmail, notifyShopByEmail } from '../index.js';
 import { sendWhatsAppMessage } from '../whatsapp.js';
 import { sendAdminPush } from '../services/admin-push.service.js';
 import { getOperationSettings } from '../services/operation-settings.service.js';
@@ -1196,9 +1196,6 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
           }
         });
 
-        if (data.status === 'completed' && dbApt.status !== 'completed') {
-          await processAppointmentCompletion(updatedApt);
-        }
 
         const scheduleChanged = newDate !== dbApt.date || newTimeSlot !== dbApt.timeSlot || newProfessionalId !== dbApt.professionalId || data.services !== undefined;
         if (scheduleChanged) {

@@ -2,7 +2,7 @@ import express from 'express';
 import crypto from 'crypto';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { db, processAppointmentCompletion } from '../index.js';
+import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
@@ -122,7 +122,6 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
     if (nextStatus === 'in_chair' && !currentQueueItem.startedAt) queueUpdate.startedAt = timestamp.toISOString();
     if (nextStatus === 'completed' && !currentQueueItem.completedAt) queueUpdate.completedAt = timestamp.toISOString();
     let updatedQueue: any;
-    let updatedAppointment: any = null;
     let completionStage = 'before_transaction';
 
     if (currentQueueItem.appointmentId && appointmentStatus) {
@@ -138,7 +137,6 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
           .where(eq(schema.appointments.id, currentQueueItem.appointmentId))
           .returning();
         if (!savedAppointment) throw new Error('APPOINTMENT_NOT_FOUND');
-        updatedAppointment = savedAppointment;
 
         completionStage = 'queue_update';
         const [savedQueue] = await tx.update(schema.waitingQueue)
@@ -153,9 +151,6 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
         throw error;
       }
 
-      if (appointmentStatus === 'completed') {
-        await processAppointmentCompletion(updatedAppointment);
-      }
     } else {
       const [savedQueue] = await db.update(schema.waitingQueue)
         .set(queueUpdate)

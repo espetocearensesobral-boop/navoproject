@@ -927,14 +927,23 @@ export async function cancelReceiptInSupabase(id: string): Promise<ReceiptItem> 
 
 export interface LoyaltyInfo {
   loyaltyPoints: number;
-  loyaltyTier: 'Bronze' | 'Prata' | 'Ouro' | 'Diamante';
+  loyaltyTier: string;
+  tierMultiplier?: number;
+  currentTier?: { name: string; minimumPoints: number; multiplier: number; color?: string | null };
+  nextTier?: { name: string; minimumPoints: number; multiplier: number; color?: string | null } | null;
+  pointsToNextTier?: number;
+  tierProgress?: number;
+  tiers?: { id: string; name: string; minimumPoints: number; multiplier: number; displayOrder: number; color?: string | null; isActive: boolean }[];
   referralCode: string;
   birthday?: string | null;
   transactions: {
     id: string;
     amount: number;
     type: string;
+    sourceType?: string;
+    sourceId?: string | null;
     description: string;
+    expiresAt?: string | null;
     createdAt: string;
   }[];
   pendingReviews: Appointment[];
@@ -962,14 +971,7 @@ export async function fetchLoyaltyInfo(): Promise<LoyaltyInfo> {
     return await res.json();
   } catch (err) {
     console.error('Erro ao buscar fidelidade:', err);
-    return {
-      loyaltyPoints: 0,
-      loyaltyTier: 'Bronze',
-      referralCode: 'NAV-CLIENT',
-      transactions: [],
-      pendingReviews: [],
-      referralStats: { totalInvited: 0, completedCount: 0, pointsEarned: 0 }
-    };
+    throw err;
   }
 }
 
@@ -980,40 +982,7 @@ export async function fetchRewardsList(): Promise<NavoRewardItem[]> {
     return await res.json();
   } catch (err) {
     console.error('Erro ao buscar catálogo de prêmios:', err);
-    return [
-      {
-        id: 'rw_500',
-        title: 'Upgrade VIP de Experiência',
-        pointsRequired: 500,
-        rewardType: 'upgrade',
-        valueDescription: 'Corte + Barba ganham Hidratação Capilar e Toalha Quente grátis',
-        icon: 'Sparkles'
-      },
-      {
-        id: 'rw_1000',
-        title: 'Produto Premium Grátis',
-        pointsRequired: 1000,
-        rewardType: 'product',
-        valueDescription: 'Pomada Modeladora Efeito Matte Extra Forte (R$ 60,00)',
-        icon: 'Package'
-      },
-      {
-        id: 'rw_2000',
-        title: 'Corte Tradicional Grátis',
-        pointsRequired: 2000,
-        rewardType: 'free_cut',
-        valueDescription: '1 Corte de Cabelo Completo totalmente grátis (1x por mês)',
-        icon: 'Scissors'
-      },
-      {
-        id: 'rw_5000',
-        title: 'Status Cliente VIP Navo',
-        pointsRequired: 5000,
-        rewardType: 'vip_status',
-        valueDescription: 'Status permanente + Prioridade total na fila + 10% OFF em tudo',
-        icon: 'Crown'
-      }
-    ];
+    throw err;
   }
 }
 
@@ -1157,6 +1126,24 @@ export async function performInstagramCheckin() {
   return data;
 }
 
+export async function fetchAdminLoyaltyTiers() {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/tiers`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao carregar níveis de fidelidade');
+  return data;
+}
+
+export async function saveAdminLoyaltyTiers(tiers: any[]) {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/tiers`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tiers }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao salvar níveis de fidelidade');
+  return data;
+}
+
 export async function fetchNavoRewardsAdminDashboard() {
   const res = await authFetch(`${API_BASE}/loyalty/admin/dashboard`);
   if (!res.ok) throw new Error('Falha ao carregar dashboard de recompensas');
@@ -1215,7 +1202,7 @@ export async function manuallyAdjustPoints(clientId: string, points: number, des
   const res = await authFetch(`${API_BASE}/loyalty/admin/manual-points`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ clientId, points, description })
+    body: JSON.stringify({ clientId, points, reason: description })
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Falha ao ajustar pontos');

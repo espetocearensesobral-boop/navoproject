@@ -1,5 +1,6 @@
 import { pgTable, text, timestamp, boolean, integer, numeric, jsonb, uniqueIndex } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
+import { index } from 'drizzle-orm/pg-core';
 
 export const profiles = pgTable('profiles', {
   id: text('id').primaryKey(),
@@ -154,13 +155,34 @@ export const pointTransactions = pgTable('point_transactions', {
   clientId: text('client_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   amount: integer('amount').notNull(),
   type: text('type').notNull(),
+  sourceType: text('source_type').notNull().default('legacy'),
+  sourceId: text('source_id'),
   description: text('description').notNull(),
   sourceKey: text('source_key'),
+  expiresAt: timestamp('expires_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => ({
   sourceKeyUniqueIdx: uniqueIndex('point_transactions_source_key_unique')
     .on(table.sourceKey)
     .where(sql`${table.sourceKey} IS NOT NULL`),
+  clientExpiresIdx: index('point_transactions_client_expires_idx')
+    .on(table.clientId, table.expiresAt)
+    .where(sql`${table.expiresAt} IS NOT NULL`),
+  sourceIdx: index('point_transactions_source_idx').on(table.sourceType, table.sourceId),
+}));
+
+export const loyaltyTiers = pgTable('loyalty_tiers', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  minimumPoints: integer('minimum_points').notNull().default(0),
+  multiplier: numeric('multiplier', { precision: 8, scale: 2 }).notNull().default('1.00'),
+  displayOrder: integer('display_order').notNull().default(0),
+  color: text('color'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  displayOrderIdx: index('loyalty_tiers_order_idx').on(table.displayOrder, table.minimumPoints),
 }));
 
 export const referrals = pgTable('referrals', {

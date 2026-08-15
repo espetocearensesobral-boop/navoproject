@@ -8,6 +8,7 @@ import { handleError } from '../utils/index.js';
 import { receiptCreatePayloadSchema, receiptReceivePayloadSchema } from '../utils/validation.js';
 import { getTodayStringBRT } from '../utils/datetime.js';
 import { sendAdminPush } from '../services/admin-push.service.js';
+import { awardCheckoutPointsInTransaction } from '../services/loyalty-engine.service.js';
 
 export const receiptsRouter = express.Router();
 
@@ -133,6 +134,7 @@ receiptsRouter.post('/:id/receive', requireAuth, requireAdmin, async (req, res) 
     const changeAmount = payment.paymentMethod === 'cash' ? asMoney(amountReceived - expectedTotal) : 0;
     const now = new Date();
 
+    let loyaltyResult: { pointsEarned: number; tier: any; alreadyAwarded?: boolean } = { pointsEarned: 0, tier: null };
     const result = await db.transaction(async (tx: any) => {
       const [received] = await tx.update(schema.receipts)
         .set({
@@ -177,6 +179,14 @@ receiptsRouter.post('/:id/receive', requireAuth, requireAdmin, async (req, res) 
         createdAt: now,
       }).onConflictDoNothing();
 
+      loyaltyResult = await awardCheckoutPointsInTransaction(tx, {
+        clientId: current.clientId,
+        receiptId: current.id,
+        amount: expectedTotal,
+        description: `Pontos pelo checkout confirmado ${current.serviceTitle}`,
+        now,
+      });
+
       return received;
     });
 
@@ -186,7 +196,12 @@ receiptsRouter.post('/:id/receive', requireAuth, requireAdmin, async (req, res) 
       tag: `receipt:${result.id}:received`,
       url: '/admin',
     }).catch(() => {});
-    return res.json(result);
+    return res.json({
+      ...result,
+      loyaltyPointsAwarded: loyaltyResult.pointsEarned,
+      loyaltyTier: loyaltyResult.tier?.name || null,
+      loyaltyAlreadyAwarded: Boolean(loyaltyResult.alreadyAwarded),
+    });
   } catch (error: any) {
     return handleError(res, error, req.path);
   }

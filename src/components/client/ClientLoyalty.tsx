@@ -139,10 +139,10 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
   }
 
   const currentPoints = loyalty?.loyaltyPoints || 0;
-  const currentTier = loyalty?.loyaltyTier || 'Bronze';
-
-  const tierNextGoal = currentPoints < 1000 ? 1000 : currentPoints < 3000 ? 3000 : currentPoints < 6000 ? 6000 : 6000;
-  const tierProgress = Math.min(100, Math.round((currentPoints / tierNextGoal) * 100));
+  const currentTier = loyalty?.currentTier?.name || loyalty?.loyaltyTier || 'Bronze';
+  const tierMultiplier = loyalty?.tierMultiplier || loyalty?.currentTier?.multiplier || 1;
+  const tierNextGoal = loyalty?.nextTier?.minimumPoints || currentPoints;
+  const tierProgress = loyalty?.tierProgress ?? (tierNextGoal > 0 ? Math.min(100, Math.round((currentPoints / tierNextGoal) * 100)) : 100);
 
   return (
     <div className="space-y-6 pb-8 px-4 max-w-xl mx-auto">
@@ -208,7 +208,7 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
             <div className="flex items-center space-x-2 mt-0.5">
               <span className="text-2xl font-serif font-bold text-gold-base">{currentTier}</span>
               <span className="px-2.5 py-0.5 rounded-full bg-gold-base/20 text-gold-base text-[10px] font-bold border border-gold-base/40 uppercase">
-                {currentTier === 'Bronze' ? '1x Pontos' : currentTier === 'Prata' ? '1.2x Pontos' : currentTier === 'Ouro' ? '1.5x Pontos' : '2x Pontos VIP'}
+                {`${tierMultiplier}x Pontos`}{currentTier === 'Diamante' ? ' VIP' : ''}
               </span>
             </div>
           </div>
@@ -330,7 +330,7 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
             <Instagram className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-content-base">Check-in Instagram (+15 pts)</h4>
+            <h4 className="text-xs font-bold text-content-base">Check-in Instagram (+10 pts)</h4>
             <p className="text-[10px] text-content-muted">Poste um Story marcando @navobarber durante o atendimento</p>
           </div>
         </div>
@@ -415,7 +415,7 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
                 <div>
                   <span className="text-content-base font-semibold block">{tx.description}</span>
                   <span className="text-[10px] text-content-muted">
-                    {new Date(tx.createdAt).toLocaleDateString('pt-BR')} • {tx.type.toUpperCase()}
+                    {new Date(tx.createdAt).toLocaleDateString('pt-BR')} • {(tx.sourceType || tx.type).toUpperCase()}{tx.expiresAt ? ` • expira em ${new Date(tx.expiresAt).toLocaleDateString('pt-BR')}` : ''}
                   </span>
                 </div>
                 <span className={`font-bold ${tx.amount > 0 ? 'text-status-success' : 'text-status-error'}`}>
