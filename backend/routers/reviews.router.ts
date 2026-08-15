@@ -164,6 +164,12 @@ reviewsRouter.post('/public', async (req: any, res: any) => {
   } catch (e: any) {
     console.error('[API] Falha de persistência na avaliação pública:', e);
     if (req.headers['x-navo-review-debug'] === 'capture-2026') {
+      let reviewColumns: unknown = null;
+      try {
+        reviewColumns = await db.execute(sql`SELECT column_name, is_nullable, data_type FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'reviews' ORDER BY ordinal_position`);
+      } catch {
+        reviewColumns = null;
+      }
       return res.status(500).json({
         error: 'Não foi possível concluir a solicitação. Tente novamente mais tarde.',
         diagnostic: {
@@ -171,6 +177,7 @@ reviewsRouter.post('/public', async (req: any, res: any) => {
           code: e?.code || e?.cause?.code || e?.originalError?.code || null,
           message: String(e?.message || e).slice(0, 500),
           cause: String(e?.cause?.message || e?.originalError?.message || '').slice(0, 1200),
+          reviewColumns,
         },
       });
     }
