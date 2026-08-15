@@ -37,7 +37,7 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
     if (!isDbConnected || !db) {
       return res.status(503).json({ error: userErrors.dbDisconnected });
     }
-    const { name, email, phone, password, role, id, avatar_url, avatarUrl, lgpdConsent, lgpdConsentDate, ...rest } = req.body;
+    const { name, email, phone, birthday, password, role, id, avatar_url, avatarUrl, lgpdConsent, lgpdConsentDate, ...rest } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Nome é obrigatório.' });
@@ -80,6 +80,11 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
       finalEmail = emailExists ? `${cleanPhone || newId.slice(0, 8)}_${newId.slice(0, 4)}@client.barberx.app` : baseEmail;
     }
 
+    const normalizedBirthday = birthday ? String(birthday).trim() : null;
+    if (normalizedBirthday && !/^\d{4}-\d{2}-\d{2}$/.test(normalizedBirthday)) {
+      return res.status(400).json({ error: 'Data de aniversário inválida. Use o formato AAAA-MM-DD.' });
+    }
+
     // Tratamento seguro de data LGPD
     let parsedLgpdDate: Date | null = null;
     if (lgpdConsent) {
@@ -96,6 +101,7 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
       name,
       email: finalEmail,
       phone: cleanPhone || '',
+      birthday: normalizedBirthday,
       password: hashedPassword,
       role: 'client',
       avatarUrl: avatar,
@@ -163,7 +169,7 @@ profilesRouter.put("/:id", requireAuth, async (req: any, res) => {
       return res.status(403).json({ error: 'Acesso negado: Você só pode editar o próprio perfil' });
     }
     
-    const { password, role, id, avatar_url, avatarUrl, loyaltyPoints, loyalty_points, loyaltyTier, loyalty_tier, name, email, phone, ...rest } = req.body;
+    const { password, role, id, avatar_url, avatarUrl, loyaltyPoints, loyalty_points, loyaltyTier, loyalty_tier, name, email, phone, birthday, ...rest } = req.body;
     
     let setObj: any = { updatedAt: new Date() };
 
@@ -185,6 +191,11 @@ profilesRouter.put("/:id", requireAuth, async (req: any, res) => {
       const existingPhone = normalizedPhone ? await db.query.profiles.findFirst({ where: eq(schema.profiles.phone, normalizedPhone) }) : null;
       if (existingPhone && existingPhone.id !== req.params.id) return res.status(409).json({ error: 'Telefone já está em uso.' });
       setObj.phone = normalizedPhone;
+    }
+    if (birthday !== undefined) {
+      const normalizedBirthday = birthday ? String(birthday).trim() : null;
+      if (normalizedBirthday && !/^\d{4}-\d{2}-\d{2}$/.test(normalizedBirthday)) return res.status(400).json({ error: 'Data de aniversário inválida. Use o formato AAAA-MM-DD.' });
+      setObj.birthday = normalizedBirthday;
     }
 
     const avatar = avatar_url !== undefined ? avatar_url : avatarUrl;

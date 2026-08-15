@@ -15,6 +15,8 @@ import { ClientsManagement } from './ClientsManagement';
 import { WaitingQueue } from './WaitingQueue';
 import { SettingsManagement } from './SettingsManagement';
 import { NavoRewardsAdmin } from './NavoRewardsAdmin';
+import { FollowUpManagement } from './FollowUpManagement';
+import { BirthdaysManagement } from './BirthdaysManagement';
 import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { AdminAuthView } from './AdminAuthView';
 import { AdminNotificationCenter } from './AdminNotificationCenter';
@@ -36,6 +38,8 @@ import {
   LogOut,
   Receipt,
   Award,
+  History,
+  Cake,
   Store,
   MoreHorizontal,
   LayoutGrid,
@@ -59,6 +63,8 @@ export type AdminTab =
   | 'qrcode'
   | 'queue' 
   | 'rewards'
+  | 'followup'
+  | 'aniversariantes'
   | 'servicos'
   | 'produtos'
   | 'profissionais' 
@@ -71,7 +77,7 @@ export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionam
 const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
 const ADMIN_TAB_VALUES: AdminTab[] = [
   'dashboard', 'relatorios', 'agenda', 'financeiro', 'audit', 'whatsapp', 'qrcode', 'queue',
-  'rewards', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings'
+  'rewards', 'followup', 'aniversariantes', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings'
 ];
 
 const getStoredAdminTab = (): AdminTab => {
@@ -97,6 +103,8 @@ const ADMIN_TAB_SECTIONS: Partial<Record<AdminTab, AdminSection>> = {
   profissionais: 'cadastros',
   clientes: 'cadastros',
   rewards: 'relacionamento',
+  followup: 'relacionamento',
+  aniversariantes: 'relacionamento',
   barbearia: 'sistema',
   settings: 'sistema',
   audit: 'sistema',
@@ -315,6 +323,20 @@ export const AdminLayout: React.FC = () => {
       description: 'Fidelidade e indicações',
       section: 'relacionamento' as AdminSection,
     },
+    {
+      id: 'followup' as AdminTab,
+      label: 'Follow-up',
+      icon: History,
+      description: 'Clientes sem retorno',
+      section: 'relacionamento' as AdminSection,
+    },
+    {
+      id: 'aniversariantes' as AdminTab,
+      label: 'Aniversariantes',
+      icon: Cake,
+      description: 'Datas e relacionamento',
+      section: 'relacionamento' as AdminSection,
+    },
     { 
       id: 'barbearia' as AdminTab, 
       label: 'Perfil & Unidade', 
@@ -433,6 +455,10 @@ export const AdminLayout: React.FC = () => {
         return <WaitingQueue />;
       case 'rewards':
         return <NavoRewardsAdmin />;
+      case 'followup':
+        return <FollowUpManagement />;
+      case 'aniversariantes':
+        return <BirthdaysManagement />;
       case 'servicos':
         return <ServicesManagement />;
       case 'produtos':

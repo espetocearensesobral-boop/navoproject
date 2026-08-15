@@ -10,6 +10,7 @@ interface Profile {
   name: string;
   email: string;
   phone: string;
+  birthday: string | null;
   role: string;
   avatarUrl: string | null;
   loyaltyPoints: number;
@@ -32,6 +33,7 @@ export const ClientsManagement: React.FC = () => {
     name: '',
     email: '',
     phone: '',
+    birthday: '',
     password: '',
     role: 'client',
     loyaltyPoints: 0,
@@ -94,6 +96,7 @@ export const ClientsManagement: React.FC = () => {
         name: client.name,
         email: client.email,
         phone: client.phone || '',
+        birthday: client.birthday || '',
         password: '',
         role: client.role,
         loyaltyPoints: client.loyaltyPoints,
@@ -281,7 +284,7 @@ export const ClientsManagement: React.FC = () => {
                         <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/10 text-gold-hover text-[10px] font-bold">{tier}</span>
                       </div>
                       <p className="text-xs text-content-muted truncate">{client.email || 'E-mail não informado'}</p>
-                      <p className="text-[11px] text-content-muted truncate">Membro desde {client.createdAt ? new Date(client.createdAt).toLocaleDateString('pt-BR') : '—'}</p>
+                      <p className="text-[11px] text-content-muted truncate">{client.birthday ? `Aniversário em ${new Date(`${client.birthday}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}` : 'Aniversário não informado'}</p>
                     </div>
                     <div className="hidden sm:block text-right shrink-0 min-w-[78px]">
                       <p className="text-xs text-content-muted">Fidelidade</p>
@@ -297,7 +300,7 @@ export const ClientsManagement: React.FC = () => {
                   {isExpanded && (
                     <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Contato</p><p className="mt-1 text-content-base font-semibold break-words">{client.email || 'E-mail não informado'}</p><p className="text-content-muted">{client.phone || 'Telefone não informado'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Contato</p><p className="mt-1 text-content-base font-semibold break-words">{client.email || 'E-mail não informado'}</p><p className="text-content-muted">{client.phone || 'Telefone não informado'}</p><p className="text-content-muted">{client.birthday ? `Aniversário: ${new Date(`${client.birthday}T12:00:00`).toLocaleDateString('pt-BR')}` : 'Aniversário não informado'}</p></div>
                         <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Fidelidade</p><p className="mt-1 text-content-base font-semibold">{tier}</p><p className="text-gold-base font-bold">{client.loyaltyPoints || 0} pontos</p></div>
                         <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Papel e cadastro</p><p className="mt-1 text-content-base font-semibold capitalize">{client.role || 'client'}</p><p className="text-content-muted">Atualizado em {client.updatedAt ? new Date(client.updatedAt).toLocaleDateString('pt-BR') : '—'}</p></div>
                       </div>
@@ -390,6 +393,16 @@ export const ClientsManagement: React.FC = () => {
                       className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-gold-hover block mb-1">Data de aniversário <span className="text-content-muted font-normal">(opcional)</span></label>
+                  <input
+                    type="date"
+                    value={formData.birthday}
+                    onChange={e => setFormData({ ...formData, birthday: e.target.value })}
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                  />
                 </div>
 
                 <div>

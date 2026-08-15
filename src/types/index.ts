@@ -5,6 +5,7 @@ export interface UserProfile {
   name: string;
   email: string;
   phone: string;
+  birthday?: string | null;
   role: AppRole;
   avatar_url: string;
   loyalty_points: number;

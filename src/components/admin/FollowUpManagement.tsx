@@ -1,0 +1,136 @@
+import React, { useEffect, useState } from 'react';
+import { History, Mail, Phone, Search, RefreshCw, UsersRound, Clock3 } from 'lucide-react';
+import { authFetch } from '../../lib/api';
+import { AdminPageHeader } from './shared/AdminPageHeader';
+
+interface FollowUpClient {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  lastVisit: string | null;
+  daysSinceLastVisit: number | null;
+  appointmentCount: number;
+  hasEmail: boolean;
+  hasPhone: boolean;
+  loyaltyTier: string;
+}
+
+interface FollowUpResponse {
+  thresholdDays: number;
+  summary: { totalClients: number; inactiveClients: number; withEmail: number; withPhone: number };
+  clients: FollowUpClient[];
+}
+
+const formatDate = (value: string | null) => value ? new Date(`${value}T12:00:00`).toLocaleDateString('pt-BR') : 'Sem visita registrada';
+const whatsappUrl = (phone: string) => `https://wa.me/55${phone.replace(/\D/g, '')}`;
+
+export const FollowUpManagement: React.FC = () => {
+  const [thresholdDays, setThresholdDays] = useState(60);
+  const [search, setSearch] = useState('');
+  const [data, setData] = useState<FollowUpResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({ days: String(thresholdDays) });
+      if (search.trim()) params.set('search', search.trim());
+      const res = await authFetch(`/api/relationship/follow-up?${params.toString()}`);
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || 'Não foi possível carregar o Follow-up.');
+      setData(body);
+    } catch (err: any) {
+      setError(err.message || 'Não foi possível carregar o Follow-up.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, [thresholdDays]);
+
+  const summary = data?.summary || { totalClients: 0, inactiveClients: 0, withEmail: 0, withPhone: 0 };
+  const clients = data?.clients || [];
+
+  return (
+    <div className="space-y-4 animate-in fade-in duration-300 min-w-0">
+      <AdminPageHeader
+        icon={History}
+        title="Follow-up"
+        stats={[
+          { label: 'clientes ausentes', value: summary.inactiveClients, tone: 'warning' },
+          { label: 'com WhatsApp', value: summary.withPhone, tone: 'success' },
+          { label: 'com e-mail', value: summary.withEmail, tone: 'info' },
+        ]}
+        action={{ label: 'Atualizar', onClick: load }}
+      />
+
+      <div className="bg-status-warning/10 border border-status-warning/30 rounded-xl p-3 text-xs text-content-muted flex items-start gap-2">
+        <Clock3 className="w-4 h-4 text-status-warning shrink-0 mt-0.5" />
+        <p>Visão inicial para encontrar clientes sem retorno. O módulo não dispara mensagens automaticamente; use os canais de contato de cada cliente.</p>
+      </div>
+
+      <div className="bg-surface-card border border-border-subtle rounded-xl p-3 space-y-3">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && load()}
+              placeholder="Buscar cliente..."
+              className="w-full h-11 bg-surface-base border border-border-subtle rounded-xl pl-9 pr-3 text-sm text-content-base focus:outline-none focus:border-gold-base"
+            />
+          </div>
+          <button type="button" onClick={load} className="h-11 px-4 rounded-xl bg-gold-base text-surface-base text-xs font-bold flex items-center justify-center gap-2">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Atualizar
+          </button>
+        </div>
+        <div data-gesture-scroll="horizontal" className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+          {[30, 60, 90, 120].map((days) => (
+            <button key={days} type="button" onClick={() => setThresholdDays(days)} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${thresholdDays === days ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>
+              Sem retorno há {days} dias
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {error && <div className="p-3 rounded-xl bg-status-error/10 border border-status-error/30 text-status-error text-sm font-semibold">{error}</div>}
+
+      {loading ? (
+        <div className="py-16 flex justify-center"><div className="w-7 h-7 border-2 border-gold-base border-t-transparent rounded-full animate-spin" /></div>
+      ) : clients.length === 0 ? (
+        <div className="bg-surface-card border border-border-subtle rounded-2xl p-10 text-center space-y-2">
+          <UsersRound className="w-10 h-10 text-content-muted mx-auto" />
+          <h3 className="text-base font-bold text-content-base">Nenhum cliente nesta faixa</h3>
+          <p className="text-sm text-content-muted">Ajuste o período ou a busca para ampliar a lista.</p>
+        </div>
+      ) : (
+        <div className="bg-surface-card border border-border-subtle rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-border-subtle flex items-center justify-between gap-3">
+            <div><p className="text-sm font-bold text-content-base">Clientes para recuperar</p><p className="text-xs text-content-muted">Ordenados pelo maior tempo sem retorno</p></div>
+            <span className="text-xs font-bold text-status-warning">{clients.length} encontrados</span>
+          </div>
+          <div className="divide-y divide-border-subtle">
+            {clients.map((client) => (
+              <article key={client.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <div className="w-11 h-11 rounded-full bg-gold-base/10 text-gold-base flex items-center justify-center font-bold shrink-0">{client.name.charAt(0).toUpperCase()}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap"><h3 className="text-sm font-bold text-content-base truncate">{client.name}</h3><span className="px-2 py-1 rounded-md bg-surface-base border border-border-subtle text-[10px] text-content-muted">{client.loyaltyTier}</span></div>
+                  <p className="text-xs text-content-muted">Última visita: {formatDate(client.lastVisit)} · {client.appointmentCount} atendimento(s)</p>
+                </div>
+                <div className="sm:text-right shrink-0"><p className="text-[10px] uppercase tracking-wider text-content-muted">Tempo ausente</p><p className="text-sm font-black text-status-warning">{client.daysSinceLastVisit === null ? 'Sem histórico' : `${client.daysSinceLastVisit} dias`}</p></div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {client.hasPhone && <a href={whatsappUrl(client.phone)} target="_blank" rel="noreferrer" title="Abrir WhatsApp" className="w-10 h-10 rounded-xl border border-status-success/30 text-status-success flex items-center justify-center"><Phone className="w-4 h-4" /></a>}
+                  {client.hasEmail && <a href={`mailto:${client.email}`} title="Enviar e-mail" className="w-10 h-10 rounded-xl border border-gold-base/30 text-gold-base flex items-center justify-center"><Mail className="w-4 h-4" /></a>}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
