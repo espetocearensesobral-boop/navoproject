@@ -448,12 +448,12 @@ export const ServicesManagement: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="text-[10px] text-gold-base font-bold uppercase truncate">{categoryName}</span>
+                        <span className="text-[10px] text-gold-base font-bold uppercase admin-clamp-2">{categoryName}</span>
                         {service.is_combo && <span className="shrink-0 text-[9px] bg-status-success/15 text-status-success font-bold px-1.5 py-0.5 rounded-md">Combo</span>}
                         {service.popular && <span className="shrink-0 text-[9px] bg-gold-base/15 text-gold-hover font-bold px-1.5 py-0.5 rounded-md">Destaque</span>}
                       </div>
-                      <h3 className="mt-0.5 font-bold text-content-base text-sm truncate">{service.title}</h3>
-                      <p className="text-xs text-content-muted truncate">{service.description || 'Sem descrição cadastrada'}</p>
+                      <h3 className="mt-0.5 font-bold text-content-base text-sm admin-clamp-2">{service.title}</h3>
+                      <p className="text-xs text-content-muted admin-clamp-2">{service.description || 'Sem descrição cadastrada'}</p>
                     </div>
                     <div className="text-right shrink-0 min-w-[62px]">
                       <p className="text-xs font-bold finance-positive">R$ {service.price.toFixed(2)}</p>
@@ -464,7 +464,7 @@ export const ServicesManagement: React.FC = () => {
 
                   {isExpanded && (
                     <div className="border-t border-border-subtle bg-surface-base/35 p-3 space-y-3">
-                      <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Categoria</p><p className="font-semibold text-content-base">{categoryName}</p></div>
                         <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Duração</p><p className="font-semibold text-content-base">{service.duration_minutes} min</p></div>
                         <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Preço original</p><p className="font-semibold finance-positive">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
@@ -810,12 +810,12 @@ export const ServicesManagement: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/10 text-gold-base text-[10px] font-bold border border-gold-base/20 truncate max-w-[42%]">{categoryName}</span>
+                        <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/10 text-gold-base text-[10px] font-bold border border-gold-base/20 admin-clamp-2 max-w-[42%]">{categoryName}</span>
                         {service.is_combo && <span className="shrink-0 px-2 py-1 rounded-md bg-status-success/15 text-status-success text-[10px] font-bold">Combo</span>}
                         {service.popular && <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/15 text-gold-base text-[10px] font-bold">Destaque</span>}
                       </div>
-                      <h3 className="mt-1 text-sm sm:text-base font-bold text-content-base truncate">{service.title}</h3>
-                      <p className="text-xs text-content-muted truncate">{service.description || 'Sem descrição cadastrada'}</p>
+                      <h3 className="mt-1 text-sm sm:text-base font-bold text-content-base admin-clamp-2">{service.title}</h3>
+                      <p className="text-xs text-content-muted admin-clamp-2">{service.description || 'Sem descrição cadastrada'}</p>
                     </div>
                     <div className="hidden sm:block text-right shrink-0 min-w-[80px]">
                       <p className="text-xs text-content-muted">Duração</p>
@@ -1134,7 +1134,7 @@ export const ServicesManagement: React.FC = () => {
 
                         <div className="pt-1">
                           <p className="text-[9px] text-content-muted font-bold uppercase mb-1.5">Fotos Sugeridas:</p>
-                          <div className="grid grid-cols-4 gap-1.5">
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                             {BARBERSHOP_IMAGE_PRESETS.slice(0, 4).map((preset, idx) => (
                               <button
                                 key={idx}
@@ -1144,7 +1144,7 @@ export const ServicesManagement: React.FC = () => {
                               >
                                 <img src={preset.url} alt={preset.title} className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-surface-base/40 p-1 flex items-end">
-                                  <span className="text-[8px] font-bold text-content-base truncate">{preset.title}</span>
+                                  <span className="text-[8px] font-bold text-content-base admin-clamp-2">{preset.title}</span>
                                 </div>
                               </button>
                             ))}
@@ -1156,7 +1156,7 @@ export const ServicesManagement: React.FC = () => {
                       <div>
                         <p className="text-xs font-bold text-content-base mb-2">Fotos Cadastradas ({formData.gallery_urls?.length || 0}):</p>
                         {formData.gallery_urls && formData.gallery_urls.length > 0 ? (
-                          <div className="grid grid-cols-3 gap-2">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                             {formData.gallery_urls.map((imgUrl, index) => {
                               const isCover = formData.image_url === imgUrl;
                               return (

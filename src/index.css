@@ -210,6 +210,22 @@
 .finance-positive-border { border-color: color-mix(in srgb, var(--color-finance-positive) 35%, transparent) !important; }
 .finance-negative-border { border-color: color-mix(in srgb, var(--color-finance-negative) 35%, transparent) !important; }
 
+/* Admin text safety: preserve operational names without horizontal overflow. */
+.admin-safe-wrap {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-clamp-2 {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
 /* Semantic contrast guardrails: palette accents must adapt to the active theme. */
 [data-theme="dark"],
 [data-theme="light"] {

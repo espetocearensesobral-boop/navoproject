@@ -654,15 +654,15 @@ export const WaitingQueue: React.FC = () => {
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5 min-w-0">
-                              <h4 className="font-bold text-content-base text-xs truncate">{item.client_name}</h4>
+                              <h4 className="font-bold text-content-base text-xs admin-clamp-2">{item.client_name}</h4>
                               {item.notes && (
                                 <span className="shrink-0 px-1.5 py-0.5 bg-gold-base/10 text-gold-hover text-xs font-bold rounded-xl border border-gold-base/20">
                                   Encaixe
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-gold-hover font-semibold truncate">{item.service_title}</p>
-                            <p className="text-xs text-content-muted truncate">
+                            <p className="text-xs text-gold-hover font-semibold admin-clamp-2">{item.service_title}</p>
+                            <p className="text-xs text-content-muted admin-safe-wrap">
                               {item.professional_name || 'Profissional a definir'} · {item.scheduled_time || 'Agora'}
                             </p>
                           </div>
@@ -699,7 +699,7 @@ export const WaitingQueue: React.FC = () => {
                             </div>
                             <div className="rounded-lg bg-surface-base p-2.5">
                               <span className="block text-content-muted uppercase font-bold tracking-wide">Barbeiro</span>
-                              <strong className="block mt-0.5 text-content-base text-xs truncate">{item.professional_name || 'A definir'}</strong>
+                              <strong className="block mt-0.5 text-content-base text-xs admin-clamp-2">{item.professional_name || 'A definir'}</strong>
                             </div>
                             <div className="rounded-lg bg-surface-base p-2.5 col-span-2 sm:col-span-1">
                               <span className="block text-content-muted uppercase font-bold tracking-wide">Horário</span>
@@ -836,11 +836,11 @@ export const WaitingQueue: React.FC = () => {
                 <article key={item.id} className="rounded-xl border border-border-subtle bg-surface-base p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-content-base text-xs truncate">{item.client_name}</h3>
+                      <h3 className="font-bold text-content-base text-xs admin-clamp-2">{item.client_name}</h3>
                       <span className="px-1.5 py-0.5 rounded-full bg-status-warning/10 text-status-warning text-xs font-bold border border-status-warning/20">Removido</span>
                     </div>
-                    <p className="text-xs text-gold-hover font-semibold truncate">{item.service_title}</p>
-                    <p className="text-xs text-content-muted truncate">
+                    <p className="text-xs text-gold-hover font-semibold admin-clamp-2">{item.service_title}</p>
+                    <p className="text-xs text-content-muted admin-safe-wrap">
                       {item.professional_name || 'Profissional a definir'} · {item.scheduled_time || 'Horário não informado'}
                       {item.appointment_id ? ' · Agendamento preservado' : ' · Cliente avulso'}
                     </p>
@@ -948,7 +948,7 @@ export const WaitingQueue: React.FC = () => {
                     aria-haspopup="dialog"
                     aria-expanded={isServicePickerOpen}
                   >
-                    <span className={`text-sm font-semibold truncate ${newServiceTitle ? 'text-content-base' : 'text-content-muted'}`}>{newServiceTitle || 'Selecionar serviço'}</span>
+                    <span className={`text-sm font-semibold admin-clamp-2 ${newServiceTitle ? 'text-content-base' : 'text-content-muted'}`}>{newServiceTitle || 'Selecionar serviço'}</span>
                     <span className="text-sm font-black finance-positive shrink-0">R$ {newServicePrice.toFixed(2)}</span>
                   </button>
                 </div>

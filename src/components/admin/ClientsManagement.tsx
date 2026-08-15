@@ -282,11 +282,11 @@ export const ClientsManagement: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <h3 className="text-sm sm:text-base font-bold text-content-base truncate">{client.name || 'Cliente sem nome'}</h3>
+                        <h3 className="text-sm sm:text-base font-bold text-content-base admin-clamp-2">{client.name || 'Cliente sem nome'}</h3>
                         <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/10 text-gold-hover text-[10px] font-bold">{tier}</span>
                       </div>
-                      <p className="text-xs text-content-muted truncate">{client.email || 'E-mail não informado'}</p>
-                      <p className="text-[11px] text-content-muted truncate">{client.birthday ? `Aniversário em ${new Date(`${client.birthday}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}` : 'Aniversário não informado'}</p>
+                      <p className="text-xs text-content-muted admin-safe-wrap">{client.email || 'E-mail não informado'}</p>
+                      <p className="text-xs text-content-muted admin-safe-wrap">{client.birthday ? `Aniversário em ${new Date(`${client.birthday}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}` : 'Aniversário não informado'}</p>
                     </div>
                     <div className="hidden sm:block text-right shrink-0 min-w-[78px]">
                       <p className="text-xs text-content-muted">Fidelidade</p>
@@ -424,7 +424,7 @@ export const ClientsManagement: React.FC = () => {
                 <div className="p-3 bg-surface-base border border-border-subtle rounded-xl space-y-2.5">
                   <p className="text-[10px] font-bold text-gold-hover uppercase tracking-wider">Fidelidade & Permissões</p>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <AdminLabel tone="muted">Papel</AdminLabel>
                       <select

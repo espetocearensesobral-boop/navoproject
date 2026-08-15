@@ -483,12 +483,12 @@ export const ProfessionalsManagement: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <h3 className="font-bold text-content-base text-sm sm:text-base truncate">{barber.name}</h3>
+                        <h3 className="font-bold text-content-base text-sm sm:text-base admin-clamp-2">{barber.name}</h3>
                         <span className={`shrink-0 px-2 py-1 rounded-md text-[10px] font-bold ${isActive ? 'bg-status-success/15 text-status-success' : 'bg-red-500/15 text-red-300'}`}>
                           {isActive ? 'Ativo' : 'Pausado'}
                         </span>
                       </div>
-                      <p className="text-xs text-gold-hover font-semibold truncate">{barber.role}</p>
+                      <p className="text-xs text-gold-hover font-semibold admin-safe-wrap">{barber.role}</p>
                       <div className="flex items-center gap-1 text-xs text-amber-400 font-bold mt-1">
                         <Star className="w-3.5 h-3.5 fill-amber-400" />
                         <span>{(barber.rating || 5.0).toFixed(1)}</span>
@@ -520,8 +520,8 @@ export const ProfessionalsManagement: React.FC = () => {
                         </div>
                         <div className="rounded-xl bg-surface-base p-3">
                           <p className="text-[10px] text-content-muted uppercase tracking-wider">Contato</p>
-                          <p className="mt-1 text-content-base font-semibold truncate">{barber.phone || 'Não informado'}</p>
-                          <p className="text-content-muted truncate">{barber.pix_key || 'PIX não informado'}</p>
+                          <p className="mt-1 text-content-base font-semibold admin-safe-wrap">{barber.phone || 'Não informado'}</p>
+                          <p className="text-content-muted admin-safe-wrap">{barber.pix_key || 'PIX não informado'}</p>
                         </div>
                       </div>
                       {barber.bio && <p className="text-sm text-content-muted leading-relaxed">{barber.bio}</p>}
@@ -915,7 +915,7 @@ export const ProfessionalsManagement: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <AdminLabel tone="muted">Início Expediente</AdminLabel>
                       <input
