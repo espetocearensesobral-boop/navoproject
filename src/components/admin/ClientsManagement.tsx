@@ -4,6 +4,8 @@ import { authFetch } from '../../lib/api';
 import { formatPhone } from '../../utils/masks';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { Button } from '../ui/Button';
+import { AdminLabel } from '../ui/AdminLabel';
 
 interface Profile {
   id: string;
@@ -173,16 +175,16 @@ export const ClientsManagement: React.FC = () => {
 
       {/* MOBILE CTA + TOP BAR: mesmo padrão de Produtos & Estoque */}
       <div className="md:hidden space-y-2">
-        <button
+        <Button
           type="button"
           onClick={() => handleOpenModal()}
           title="Cadastrar novo cliente"
           aria-label="Cadastrar novo cliente"
-          className="w-full h-10 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
+          className="w-full h-10 shadow-md active:scale-95"
         >
           <Plus className="w-4 h-4" />
           <span>Novo Cliente</span>
-        </button>
+        </Button>
       </div>
       <div className="md:hidden flex items-center gap-2">
         <div className="relative flex-1">
@@ -360,7 +362,7 @@ export const ClientsManagement: React.FC = () => {
 
               <form id="clientForm" onSubmit={handleSave} className="space-y-3" onKeyDown={handleEnterAsTab}>
                 <div>
-                  <label className="text-[11px] font-bold text-gold-hover block mb-1">Nome Completo *</label>
+                  <AdminLabel tone="accent">Nome Completo *</AdminLabel>
                   <input
                     type="text"
                     required
@@ -373,7 +375,7 @@ export const ClientsManagement: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
-                    <label className="text-[11px] font-bold text-gold-hover block mb-1">E-mail *</label>
+                    <AdminLabel tone="accent">E-mail *</AdminLabel>
                     <input
                       type="email"
                       required
@@ -384,7 +386,7 @@ export const ClientsManagement: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-bold text-gold-hover block mb-1">Telefone</label>
+                    <AdminLabel tone="accent">Telefone</AdminLabel>
                     <input
                       type="tel"
                       value={formData.phone}
@@ -396,7 +398,7 @@ export const ClientsManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-gold-hover block mb-1">Data de aniversário <span className="text-content-muted font-normal">(opcional)</span></label>
+                  <AdminLabel tone="accent">Data de aniversário <span className="text-content-muted font-normal">(opcional)</span></AdminLabel>
                   <input
                     type="date"
                     value={formData.birthday}
@@ -406,9 +408,9 @@ export const ClientsManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                  <AdminLabel tone="accent">
                     Senha {editingClient && <span className="text-content-muted font-normal">(Deixe em branco para manter)</span>}
-                  </label>
+                  </AdminLabel>
                   <input
                     type="password"
                     required={!editingClient}
@@ -424,7 +426,7 @@ export const ClientsManagement: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[10px] font-bold text-content-muted block mb-1">Papel</label>
+                      <AdminLabel tone="muted">Papel</AdminLabel>
                       <select
                         value={formData.role}
                         onChange={e => setFormData({ ...formData, role: e.target.value })}
@@ -436,7 +438,7 @@ export const ClientsManagement: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-bold text-content-muted block mb-1">Nível Fidelidade</label>
+                      <AdminLabel tone="muted">Nível Fidelidade</AdminLabel>
                       <select
                         value={formData.loyaltyTier}
                         onChange={e => setFormData({ ...formData, loyaltyTier: e.target.value })}
@@ -451,7 +453,7 @@ export const ClientsManagement: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-content-muted block mb-1">Pontos de Fidelidade</label>
+                    <AdminLabel tone="muted">Pontos de Fidelidade</AdminLabel>
                     <input
                       type="number"
                       min="0"
@@ -466,20 +468,22 @@ export const ClientsManagement: React.FC = () => {
 
             {/* Footer */}
             <div className="p-3 bg-surface-base border-t border-border-subtle flex justify-end gap-2 shrink-0">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => setIsModalOpen(false)}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold text-content-muted hover:text-content-base bg-surface-card transition-colors"
               >
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 form="clientForm"
-                className="px-4 py-1.5 rounded-xl text-xs font-extrabold text-surface-base bg-gold-base hover:bg-gold-base/80 transition-all"
+                variant="primary"
+                size="sm"
               >
                 Salvar
-              </button>
+              </Button>
             </div>
           </div>
         </div>

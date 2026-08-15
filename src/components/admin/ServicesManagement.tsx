@@ -3,6 +3,8 @@ import { ServiceItem } from '../../types';
 import { fetchServicesFromSupabase, saveServiceInSupabase, deleteServiceInSupabase, deleteAllServicesInSupabase } from '../../services/supabaseDataService';
 import { DEFAULT_CATEGORIES, getCategoryName } from '../../data/categories';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { Button } from '../ui/Button';
+import { AdminLabel } from '../ui/AdminLabel';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   Scissors,
@@ -933,9 +935,9 @@ export const ServicesManagement: React.FC = () => {
                   {activeFormTab === 'general' && (
                     <div className="space-y-3">
                       <div>
-                        <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                        <AdminLabel tone="accent">
                           Título do Serviço *
-                        </label>
+                        </AdminLabel>
                         <input
                           type="text"
                           value={formData.title}
@@ -948,9 +950,9 @@ export const ServicesManagement: React.FC = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                          <AdminLabel tone="accent">
                             Categoria *
-                          </label>
+                          </AdminLabel>
                           <select
                             value={formData.category_id}
                             onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
@@ -963,9 +965,9 @@ export const ServicesManagement: React.FC = () => {
                         </div>
 
                         <div>
-                          <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                          <AdminLabel tone="accent">
                             Duração Estimada (Minutos) *
-                          </label>
+                          </AdminLabel>
                           <div className="relative">
                             <Clock className="w-3.5 h-3.5 text-gold-hover absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
@@ -981,9 +983,9 @@ export const ServicesManagement: React.FC = () => {
                       </div>
 
                       <div>
-                        <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                        <AdminLabel tone="accent">
                           Descrição Detalhada do Serviço
-                        </label>
+                        </AdminLabel>
                         <textarea
                           rows={2}
                           value={formData.description}
@@ -1032,9 +1034,9 @@ export const ServicesManagement: React.FC = () => {
                     <div className="space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="text-[11px] font-bold finance-positive block mb-1">
+                          <AdminLabel tone="default" className="finance-positive">
                             Preço de Venda (R$) *
-                          </label>
+                          </AdminLabel>
                           <div className="relative">
                             <span className="text-xs finance-positive font-bold absolute left-3 top-1/2 -translate-y-1/2">R$</span>
                             <input
@@ -1050,9 +1052,9 @@ export const ServicesManagement: React.FC = () => {
                         </div>
 
                         <div>
-                          <label className="text-[11px] font-bold finance-positive block mb-1">
+                          <AdminLabel tone="default" className="finance-positive">
                             Preço De / Sem Desconto (R$)
-                          </label>
+                          </AdminLabel>
                           <div className="relative">
                             <span className="text-xs finance-positive font-bold absolute left-3 top-1/2 -translate-y-1/2">R$</span>
                             <input
@@ -1097,9 +1099,9 @@ export const ServicesManagement: React.FC = () => {
                   {activeFormTab === 'gallery' && (
                     <div className="space-y-3">
                       <div>
-                        <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                        <AdminLabel tone="accent">
                           URL Foto de Capa Principal
-                        </label>
+                        </AdminLabel>
                         <input
                           type="url"
                           value={formData.image_url || ''}
@@ -1110,9 +1112,9 @@ export const ServicesManagement: React.FC = () => {
                       </div>
 
                       <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                        <label className="text-[10px] font-bold text-gold-hover uppercase tracking-wider block">
+                        <AdminLabel tone="accent" uppercase>
                           Adicionar Foto por URL
-                        </label>
+                        </AdminLabel>
                         <div className="flex gap-2">
                           <input
                             type="url"
@@ -1195,36 +1197,39 @@ export const ServicesManagement: React.FC = () => {
 
                 {/* Form Fixed Footer */}
                 <div className="p-3 bg-surface-base border-t border-border-subtle flex items-center justify-between shrink-0">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-3.5 py-2 rounded-xl bg-surface-card text-content-muted hover:text-content-base text-xs font-bold transition-colors"
                   >
                     Cancelar
-                  </button>
+                  </Button>
 
                   <div className="flex items-center gap-2">
                     {activeFormTab !== 'gallery' && (
-                      <button
+                      <Button
                         type="button"
+                        variant="secondary"
+                        size="sm"
                         onClick={() => {
                           if (activeFormTab === 'general') setActiveFormTab('pricing');
                           else if (activeFormTab === 'pricing') setActiveFormTab('gallery');
                         }}
-                        className="px-3 py-2 rounded-xl bg-surface-card text-gold-hover text-xs font-bold flex items-center gap-1 border border-border-subtle"
                       >
                         <span>Avançar</span>
                         <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
+                      </Button>
                     )}
 
-                    <button
+                    <Button
                       type="submit"
-                      className="px-4 py-2 rounded-xl bg-gold-base text-surface-base text-xs font-extrabold shadow-md flex items-center gap-1.5 active:scale-95 transition-all"
+                      variant="primary"
+                      size="sm"
                     >
                       <Save className="w-3.5 h-3.5" />
                       <span>Salvar</span>
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </form>

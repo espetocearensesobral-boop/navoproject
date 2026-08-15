@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Professional } from '../../types';
 import { fetchProfessionalsFromSupabase, saveProfessionalInSupabase, deleteProfessionalInSupabase } from '../../services/supabaseDataService';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { Button } from '../ui/Button';
+import { AdminLabel } from '../ui/AdminLabel';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   Users,
@@ -710,9 +712,9 @@ export const ProfessionalsManagement: React.FC = () => {
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
-                      <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                      <AdminLabel tone="accent">
                         Nome Completo *
-                      </label>
+                      </AdminLabel>
                       <input
                         type="text"
                         required
@@ -724,9 +726,9 @@ export const ProfessionalsManagement: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                      <AdminLabel tone="accent">
                         Apelido / Cadeira
-                      </label>
+                      </AdminLabel>
                       <input
                         type="text"
                         value={formData.nickname}
@@ -739,9 +741,9 @@ export const ProfessionalsManagement: React.FC = () => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
-                      <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                      <AdminLabel tone="accent">
                         Cargo / Título
-                      </label>
+                      </AdminLabel>
                       <input
                         type="text"
                         value={formData.role}
@@ -752,9 +754,9 @@ export const ProfessionalsManagement: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                      <AdminLabel tone="accent">
                         WhatsApp / Contato
-                      </label>
+                      </AdminLabel>
                       <input
                         type="text"
                         value={formData.phone || ''}
@@ -766,9 +768,9 @@ export const ProfessionalsManagement: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                    <AdminLabel tone="accent">
                       Biografia / Descrição
-                    </label>
+                    </AdminLabel>
                     <textarea
                       rows={2}
                       value={formData.bio || ''}
@@ -780,9 +782,9 @@ export const ProfessionalsManagement: React.FC = () => {
 
                   {/* Photo selection */}
                   <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                    <label className="text-[10px] font-bold text-gold-hover block uppercase">
+                    <AdminLabel tone="accent" uppercase>
                       Foto de Perfil
-                    </label>
+                    </AdminLabel>
 
                     <div className="flex items-center gap-2.5">
                       <img
@@ -821,9 +823,9 @@ export const ProfessionalsManagement: React.FC = () => {
               {activeFormTab === 'specialties' && (
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                    <AdminLabel tone="accent">
                       Especialidades (separadas por vírgula)
-                    </label>
+                    </AdminLabel>
                     <input
                       type="text"
                       value={specialtiesText}
@@ -859,9 +861,9 @@ export const ProfessionalsManagement: React.FC = () => {
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
-                      <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                      <AdminLabel tone="accent">
                         Taxa de Comissão (Ex: 0.45 = 45%) *
-                      </label>
+                      </AdminLabel>
                       <input
                         type="number"
                         step="0.01"
@@ -875,9 +877,9 @@ export const ProfessionalsManagement: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-gold-hover block mb-1">
+                      <AdminLabel tone="accent">
                         Chave PIX Repasse
-                      </label>
+                      </AdminLabel>
                       <input
                         type="text"
                         value={formData.pix_key || ''}
@@ -915,7 +917,7 @@ export const ProfessionalsManagement: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[10px] text-content-muted font-bold block mb-1">Início Expediente</label>
+                      <AdminLabel tone="muted">Início Expediente</AdminLabel>
                       <input
                         type="time"
                         value={formData.working_hours?.start || '08:00'}
@@ -933,7 +935,7 @@ export const ProfessionalsManagement: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[10px] text-content-muted font-bold block mb-1">Fim Expediente</label>
+                      <AdminLabel tone="muted">Fim Expediente</AdminLabel>
                       <input
                         type="time"
                         value={formData.working_hours?.end || '19:00'}
@@ -952,7 +954,7 @@ export const ProfessionalsManagement: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="text-[10px] text-content-muted font-bold block mb-1">Dias da Semana</label>
+                    <AdminLabel tone="muted">Dias da Semana</AdminLabel>
                     <div className="flex flex-wrap gap-1">
                       {Object.keys(dayLabels).map((day) => {
                         const isActive = formData.working_hours?.days.includes(day);
@@ -976,21 +978,23 @@ export const ProfessionalsManagement: React.FC = () => {
 
               {/* Modal Footer */}
               <div className="pt-3 border-t border-border-subtle flex items-center justify-between shrink-0">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-3 py-1.5 rounded-xl bg-surface-card text-content-muted hover:text-content-base text-xs font-bold"
                 >
                   Cancelar
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="submit"
-                  className="bg-gold-base text-surface-base px-4 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all"
+                  variant="primary"
+                  size="sm"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>Salvar Barbeiro</span>
-                </button>
+                </Button>
               </div>
             </form>
           </div>
