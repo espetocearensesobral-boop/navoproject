@@ -37,6 +37,13 @@ const tierPayloadSchema = z.object({
 const benefitTypes = ['discount_percent', 'discount_fixed', 'free_service', 'free_product', 'points_bonus', 'priority_queue', 'custom'] as const;
 const billingPeriods = ['none', 'monthly', 'quarterly', 'annual'] as const;
 const planStatuses = ['draft', 'active', 'archived'] as const;
+const reviewManagementStatuses = ['new', 'in_review', 'resolved', 'archived'] as const;
+const reviewPriorities = ['low', 'normal', 'high', 'urgent'] as const;
+const reviewFollowupPayloadSchema = z.object({
+  managementStatus: z.enum(reviewManagementStatuses),
+  priority: z.enum(reviewPriorities),
+  internalNotes: z.string().trim().max(2000).nullable().optional(),
+}).strict();
 
 const benefitPayloadSchema = z.object({
   id: z.string().trim().min(1).max(100).optional(),
@@ -483,6 +490,13 @@ loyaltyRouter.get('/admin/dashboard', requireAuth, requireAdmin, async (_req: an
     if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
     const rows = await db.select().from(schema.pointTransactions);
     const redemptions = await db.select().from(schema.loyaltyRedemptions).orderBy(desc(schema.loyaltyRedemptions.createdAt));
+    const followupEventRows = await db.select().from(schema.reviewFollowupEvents).orderBy(desc(schema.reviewFollowupEvents.createdAt));
+    const followupByReview = new Map<string, any[]>();
+    for (const event of followupEventRows) {
+      const events = followupByReview.get(event.reviewId) || [];
+      events.push(event);
+      followupByReview.set(event.reviewId, events);
+    }
     const reviewRows = await db
       .select({
         id: schema.reviews.id,
@@ -495,6 +509,10 @@ loyaltyRouter.get('/admin/dashboard', requireAuth, requireAdmin, async (_req: an
         serviceTitle: schema.reviews.serviceTitle,
         hasPhoto: schema.reviews.hasPhoto,
         photoUrl: schema.reviews.photoUrl,
+        managementStatus: schema.reviews.managementStatus,
+        priority: schema.reviews.priority,
+        internalNotes: schema.reviews.internalNotes,
+        handledAt: schema.reviews.handledAt,
         createdAt: schema.reviews.createdAt,
         clientName: schema.profiles.name,
         professionalName: schema.professionals.name,
@@ -519,6 +537,7 @@ loyaltyRouter.get('/admin/dashboard', requireAuth, requireAdmin, async (_req: an
       clientName: review.clientName || 'Cliente anônimo',
       professionalName: review.professionalName || 'Profissional não informado',
       isAnonymous: !review.clientName,
+      followupHistory: followupByReview.get(review.id) || [],
     }));
     const issued = rows.filter((row: any) => row.amount > 0).reduce((sum: number, row: any) => sum + Number(row.amount || 0), 0);
     const redeemed = rows.filter((row: any) => row.amount < 0).reduce((sum: number, row: any) => sum + Math.abs(Number(row.amount || 0)), 0);
@@ -550,6 +569,50 @@ loyaltyRouter.get('/admin/dashboard', requireAuth, requireAdmin, async (_req: an
     });
   } catch (e: any) {
     return handleError(res, e, 'GET /api/loyalty/admin/dashboard');
+  }
+});
+
+loyaltyRouter.put('/admin/reviews/:id/followup', requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    const reviewId = String(req.params.id || '').trim();
+    const parsed = reviewFollowupPayloadSchema.safeParse(req.body);
+    if (!reviewId || !parsed.success) return res.status(400).json({ error: 'Dados de acompanhamento inválidos.', details: parsed.success ? undefined : parsed.error.flatten() });
+    const current = await db.select().from(schema.reviews).where(eq(schema.reviews.id, reviewId)).limit(1);
+    if (!current[0]) return res.status(404).json({ error: 'Avaliação não encontrada.' });
+    const review = current[0] as any;
+    const payload = parsed.data;
+    const nextNotes = payload.internalNotes?.trim() || null;
+    const statusChanged = review.managementStatus !== payload.managementStatus;
+    const priorityChanged = review.priority !== payload.priority;
+    const notesChanged = (review.internalNotes || null) !== nextNotes;
+    if (!statusChanged && !priorityChanged && !notesChanged) return res.json({ success: true, message: 'Nenhuma alteração necessária.', review });
+    const handledAt = payload.managementStatus === 'resolved' || payload.managementStatus === 'archived' ? (review.handledAt || new Date()) : null;
+    const action = statusChanged && priorityChanged ? 'status_priority_updated' : statusChanged ? 'status_updated' : priorityChanged ? 'priority_updated' : 'note_added';
+    const eventId = `review_event_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    await db.transaction(async (tx: any) => {
+      await tx.update(schema.reviews).set({
+        managementStatus: payload.managementStatus,
+        priority: payload.priority,
+        internalNotes: nextNotes,
+        handledAt,
+      }).where(eq(schema.reviews.id, reviewId));
+      await tx.insert(schema.reviewFollowupEvents).values({
+        id: eventId,
+        reviewId,
+        adminId: req.user.id,
+        action,
+        fromStatus: review.managementStatus,
+        toStatus: payload.managementStatus,
+        fromPriority: review.priority,
+        toPriority: payload.priority,
+        note: nextNotes,
+      });
+    });
+    const updated = { ...review, ...payload, internalNotes: nextNotes, handledAt };
+    return res.json({ success: true, message: 'Acompanhamento salvo.', review: updated, eventId });
+  } catch (e: any) {
+    return handleError(res, e, 'PUT /api/loyalty/admin/reviews/:id/followup');
   }
 });
 

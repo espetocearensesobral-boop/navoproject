@@ -143,11 +143,30 @@ export const reviews = pgTable('reviews', {
   photoUrl: text('photo_url'),
   pointsAwarded: integer('points_awarded').default(0),
   adminResponse: text('admin_response'),
+  managementStatus: text('management_status').notNull().default('new'),
+  priority: text('priority').notNull().default('normal'),
+  internalNotes: text('internal_notes'),
+  handledAt: timestamp('handled_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => ({
   appointmentUniqueIdx: uniqueIndex('reviews_appointment_id_unique')
     .on(table.appointmentId)
     .where(sql`${table.appointmentId} IS NOT NULL`),
+}));
+
+export const reviewFollowupEvents = pgTable('review_followup_events', {
+  id: text('id').primaryKey(),
+  reviewId: text('review_id').notNull().references(() => reviews.id, { onDelete: 'cascade' }),
+  adminId: text('admin_id').references(() => profiles.id, { onDelete: 'set null' }),
+  action: text('action').notNull(),
+  fromStatus: text('from_status'),
+  toStatus: text('to_status'),
+  fromPriority: text('from_priority'),
+  toPriority: text('to_priority'),
+  note: text('note'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  reviewCreatedIdx: index('review_followup_events_review_created_idx').on(table.reviewId, table.createdAt),
 }));
 
 export const pointTransactions = pgTable('point_transactions', {
@@ -406,7 +425,7 @@ export const appointmentsRelations = relations(appointments, ({ one }) => ({
 }));
 
 
-export const reviewsRelations = relations(reviews, ({ one }) => ({
+export const reviewsRelations = relations(reviews, ({ one, many }) => ({
   appointment: one(appointments, {
     fields: [reviews.appointmentId],
     references: [appointments.id],
@@ -414,6 +433,18 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   professional: one(professionals, {
     fields: [reviews.professionalId],
     references: [professionals.id],
+  }),
+  followupEvents: many(reviewFollowupEvents),
+}));
+
+export const reviewFollowupEventsRelations = relations(reviewFollowupEvents, ({ one }) => ({
+  review: one(reviews, {
+    fields: [reviewFollowupEvents.reviewId],
+    references: [reviews.id],
+  }),
+  admin: one(profiles, {
+    fields: [reviewFollowupEvents.adminId],
+    references: [profiles.id],
   }),
 }));
 

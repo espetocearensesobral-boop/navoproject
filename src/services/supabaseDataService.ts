@@ -1206,6 +1206,17 @@ export async function fetchNavoRewardsAdminDashboard() {
   return await res.json();
 }
 
+export async function updateAdminReviewFollowup(reviewId: string, payload: { managementStatus: string; priority: string; internalNotes: string | null }) {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/reviews/${encodeURIComponent(reviewId)}/followup`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao salvar acompanhamento da avaliação');
+  return data;
+}
+
 export async function fetchClientsFromSupabase() {
   try {
     const res = await authFetch(`${API_BASE}/profiles`);

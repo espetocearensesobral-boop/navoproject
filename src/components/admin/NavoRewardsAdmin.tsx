@@ -23,7 +23,8 @@ import {
   archiveLoyaltyBenefit,
   createLoyaltyPlan,
   updateLoyaltyPlan,
-  archiveLoyaltyPlan
+  archiveLoyaltyPlan,
+  updateAdminReviewFollowup
 } from '../../services/supabaseDataService';
 import {
   Award,
@@ -63,6 +64,20 @@ const rewardsPageTitles: Record<NavoRewardsTab, string> = {
   rewards: 'Prêmios & Cupons de Desconto',
   referrals: 'Motor de Indicações',
   reviews: 'Avaliações & NPS',
+};
+
+const reviewStatusLabels: Record<string, string> = {
+  new: 'Nova',
+  in_review: 'Em análise',
+  resolved: 'Tratada',
+  archived: 'Arquivada',
+};
+
+const reviewPriorityLabels: Record<string, string> = {
+  low: 'Baixa',
+  normal: 'Normal',
+  high: 'Alta',
+  urgent: 'Urgente',
 };
 
 export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }) => {
@@ -152,6 +167,13 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
   );
   const [copiedEvalLink, setCopiedEvalLink] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
+
+  // REVIEW FOLLOW-UP STATE
+  const [reviewStatusFilter, setReviewStatusFilter] = useState('all');
+  const [reviewPriorityFilter, setReviewPriorityFilter] = useState('all');
+  const [selectedReview, setSelectedReview] = useState<any | null>(null);
+  const [reviewDraft, setReviewDraft] = useState({ managementStatus: 'new', priority: 'normal', internalNotes: '' });
+  const [savingReviewFollowup, setSavingReviewFollowup] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -369,6 +391,43 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
     const whatsappUrl = cleanPhone ? `https://wa.me/55${cleanPhone}?text=${encodedText}` : `https://wa.me/?text=${encodedText}`;
     window.open(whatsappUrl, '_blank');
   };
+
+  const openReviewFollowup = (review: any) => {
+    setSelectedReview(review);
+    setReviewDraft({
+      managementStatus: review.managementStatus || 'new',
+      priority: review.priority || 'normal',
+      internalNotes: review.internalNotes || '',
+    });
+  };
+
+  const handleSaveReviewFollowup = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!selectedReview) return;
+    setSavingReviewFollowup(true);
+    try {
+      const result = await updateAdminReviewFollowup(selectedReview.id, {
+        managementStatus: reviewDraft.managementStatus,
+        priority: reviewDraft.priority,
+        internalNotes: reviewDraft.internalNotes.trim() || null,
+      });
+      setData((current: any) => current ? {
+        ...current,
+        reviewsList: (current.reviewsList || []).map((review: any) => review.id === selectedReview.id ? { ...review, ...result.review } : review),
+      } : current);
+      setSelectedReview(null);
+    } catch (error: any) {
+      alert(error.message || 'Não foi possível salvar o acompanhamento.');
+    } finally {
+      setSavingReviewFollowup(false);
+    }
+  };
+
+  const reviewsList = Array.isArray(data?.reviewsList) ? data.reviewsList : [];
+  const filteredReviews = reviewsList.filter((review: any) => (
+    (reviewStatusFilter === 'all' || (review.managementStatus || 'new') === reviewStatusFilter)
+    && (reviewPriorityFilter === 'all' || (review.priority || 'normal') === reviewPriorityFilter)
+  ));
 
   if (loading) {
     return (
@@ -1198,15 +1257,37 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
           {/* Feed de Avaliações */}
           <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
-            <h4 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-gold-base" />
-              <span>Feed de Pesquisas de Pós-Atendimento</span>
-            </h4>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h4 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-gold-base" />
+                <span>Feed de Pesquisas de Pós-Atendimento</span>
+              </h4>
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                <select
+                  value={reviewStatusFilter}
+                  onChange={(event) => setReviewStatusFilter(event.target.value)}
+                  className="h-9 rounded-xl border border-border-subtle bg-surface-base px-2 text-xs font-semibold text-content-base focus:border-gold-base focus:outline-none"
+                  aria-label="Filtrar status das avaliações"
+                >
+                  <option value="all">Todos os status</option>
+                  {Object.entries(reviewStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+                <select
+                  value={reviewPriorityFilter}
+                  onChange={(event) => setReviewPriorityFilter(event.target.value)}
+                  className="h-9 rounded-xl border border-border-subtle bg-surface-base px-2 text-xs font-semibold text-content-base focus:border-gold-base focus:outline-none"
+                  aria-label="Filtrar prioridade das avaliações"
+                >
+                  <option value="all">Todas as prioridades</option>
+                  {Object.entries(reviewPriorityLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </div>
+            </div>
 
-            {data?.reviewsList && data.reviewsList.length > 0 ? (
+            {filteredReviews.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                {data.reviewsList.map((rev: any) => (
-                  <div key={rev.id} className="p-3.5 rounded-xl bg-surface-base border border-border-subtle space-y-2">
+                {filteredReviews.map((rev: any) => (
+                  <button type="button" key={rev.id} onClick={() => openReviewFollowup(rev)} className="w-full text-left p-3.5 rounded-xl bg-surface-base border border-border-subtle space-y-2 transition-colors hover:border-gold-base/60 focus:outline-none focus:ring-2 focus:ring-gold-base/40">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((s) => (
@@ -1218,6 +1299,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                       </div>
                       <span className="text-xs text-content-muted num-tabular">
                         {new Date(rev.createdAt).toLocaleDateString('pt-BR')}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${rev.managementStatus === 'resolved' ? 'bg-status-success/10 text-status-success' : rev.managementStatus === 'in_review' ? 'bg-gold-base/10 text-gold-base' : rev.managementStatus === 'archived' ? 'bg-surface-card text-content-muted' : 'bg-status-warning/10 text-status-warning'}`}>
+                        {reviewStatusLabels[rev.managementStatus || 'new'] || 'Nova'}
+                      </span>
+                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${rev.priority === 'urgent' ? 'border-status-error/40 text-status-error' : rev.priority === 'high' ? 'border-gold-base/50 text-gold-base' : 'border-border-subtle text-content-muted'}`}>
+                        Prioridade {reviewPriorityLabels[rev.priority || 'normal'] || 'Normal'}
                       </span>
                     </div>
 
@@ -1237,13 +1326,83 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                       <p>• Experiência: <span className="text-content-base font-bold">{rev.serviceExperience || 'Não informado'}</span></p>
                       <p>• Recomendaria: <span className="text-content-base font-bold">{rev.wouldRecommend || 'Não informado'}</span></p>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-content-muted py-6 text-center">Nenhuma avaliação recente registrada.</p>
+              <p className="text-xs text-content-muted py-6 text-center">Nenhuma avaliação encontrada para os filtros atuais.</p>
             )}
           </div>
+
+          {selectedReview && (
+            <div className="fixed inset-0 z-[160] flex items-center justify-center bg-surface-base/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="review-followup-title">
+              <form onSubmit={handleSaveReviewFollowup} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border-subtle bg-surface-card p-5 shadow-2xl sm:p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-wider text-gold-base">Acompanhamento interno</p>
+                    <h3 id="review-followup-title" className="mt-1 text-lg font-serif font-bold text-content-base">Avaliação de {selectedReview.clientName || 'cliente anônimo'}</h3>
+                    <p className="mt-1 text-xs text-content-muted">{selectedReview.serviceTitle || 'Serviço não informado'} · {selectedReview.professionalName || 'Profissional não informado'}</p>
+                  </div>
+                  <button type="button" onClick={() => setSelectedReview(null)} className="rounded-full px-3 py-1.5 text-xs font-bold text-content-muted hover:bg-surface-base hover:text-content-base">Fechar</button>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="rounded-xl border border-border-subtle bg-surface-base p-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wide text-content-muted">Nota</span>
+                    <span className="mt-1 block text-lg font-black text-gold-base">{selectedReview.rating}/5</span>
+                  </div>
+                  <div className="rounded-xl border border-border-subtle bg-surface-base p-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wide text-content-muted">Recomendação</span>
+                    <span className="mt-1 block text-xs font-bold text-content-base">{selectedReview.wouldRecommend || 'Não informado'}</span>
+                  </div>
+                  <div className="rounded-xl border border-border-subtle bg-surface-base p-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wide text-content-muted">Recebida em</span>
+                    <span className="mt-1 block text-xs font-bold text-content-base">{new Date(selectedReview.createdAt).toLocaleString('pt-BR')}</span>
+                  </div>
+                </div>
+
+                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label className="space-y-1.5 text-xs font-bold text-content-muted">
+                    <span>Status do acompanhamento</span>
+                    <select autoFocus value={reviewDraft.managementStatus} onChange={(event) => setReviewDraft({ ...reviewDraft, managementStatus: event.target.value })} className="w-full rounded-xl border border-border-subtle bg-surface-base p-3 text-xs font-semibold text-content-base focus:border-gold-base focus:outline-none">
+                      {Object.entries(reviewStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                    </select>
+                  </label>
+                  <label className="space-y-1.5 text-xs font-bold text-content-muted">
+                    <span>Prioridade</span>
+                    <select value={reviewDraft.priority} onChange={(event) => setReviewDraft({ ...reviewDraft, priority: event.target.value })} className="w-full rounded-xl border border-border-subtle bg-surface-base p-3 text-xs font-semibold text-content-base focus:border-gold-base focus:outline-none">
+                      {Object.entries(reviewPriorityLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                    </select>
+                  </label>
+                </div>
+
+                <label className="mt-4 block space-y-1.5 text-xs font-bold text-content-muted">
+                  <span>Observação interna</span>
+                  <textarea value={reviewDraft.internalNotes} onChange={(event) => setReviewDraft({ ...reviewDraft, internalNotes: event.target.value })} maxLength={2000} rows={4} placeholder="Registre uma ação, retorno necessário ou contexto operacional..." className="w-full resize-y rounded-xl border border-border-subtle bg-surface-base p-3 text-xs font-medium text-content-base placeholder:text-content-muted focus:border-gold-base focus:outline-none" />
+                  <span className="block text-right text-[10px] font-normal text-content-muted">{reviewDraft.internalNotes.length}/2000</span>
+                </label>
+
+                {selectedReview.followupHistory?.length > 0 && (
+                  <div className="mt-4 space-y-2 rounded-xl border border-border-subtle bg-surface-base p-3">
+                    <p className="text-xs font-bold uppercase tracking-wide text-content-muted">Histórico de acompanhamento</p>
+                    <div className="max-h-32 space-y-2 overflow-y-auto">
+                      {selectedReview.followupHistory.map((event: any) => (
+                        <div key={event.id} className="border-l-2 border-gold-base/50 pl-2 text-xs">
+                          <p className="font-semibold text-content-base">{event.toStatus ? (reviewStatusLabels[event.toStatus] || event.toStatus) : 'Atualização registrada'}{event.toPriority ? ` · ${reviewPriorityLabels[event.toPriority] || event.toPriority}` : ''}</p>
+                          <p className="text-content-muted">{new Date(event.createdAt).toLocaleString('pt-BR')}{event.note ? ` · ${event.note}` : ''}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                  <button type="button" onClick={() => setSelectedReview(null)} className="h-10 rounded-xl border border-border-subtle px-4 text-xs font-bold text-content-muted hover:bg-surface-base">Cancelar</button>
+                  <button type="submit" disabled={savingReviewFollowup} className="h-10 rounded-xl bg-gold-base px-5 text-xs font-bold text-surface-base hover:bg-gold-base/90 disabled:cursor-not-allowed disabled:opacity-60">{savingReviewFollowup ? 'Salvando...' : 'Salvar acompanhamento'}</button>
+                </div>
+              </form>
+            </div>
+          )}
 
           {/* Modal QR Code */}
           {showQrModal && (
