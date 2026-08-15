@@ -412,16 +412,16 @@ export const ScheduleGrid: React.FC = () => {
                               }`}
                             >
                               {isPending && (
-                                <div className="flex items-center justify-between text-[10px] font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-xl border border-amber-500/30">
+                                <div className="flex items-center justify-between text-xs font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-xl border border-amber-500/30">
                                   <div className="flex items-center gap-1">
                                     <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                                     <span>Fora do Expediente</span>
                                   </div>
-                                  <span className="text-[9px] bg-amber-400 text-black px-1.5 rounded-xl font-extrabold">Aprovação Pendente</span>
+                                  <span className="text-xs bg-amber-400 text-black px-1.5 rounded-xl font-extrabold">Aprovação Pendente</span>
                                 </div>
                               )}
                               {operationalState.isLate && (
-                                <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold schedule-late-text uppercase tracking-wide">
+                                <div className="mb-2 flex items-center gap-1.5 text-xs font-bold schedule-late-text uppercase tracking-wide">
                                   <AlertTriangle className="w-3.5 h-3.5 schedule-late-text shrink-0" />
                                   <span>Atrasado {operationalState.lateMinutes} min</span>
                                 </div>
@@ -434,12 +434,12 @@ export const ScheduleGrid: React.FC = () => {
                                 <span className="min-w-0 leading-relaxed">{(apt.services && apt.services[0]?.title) || 'Atendimento'}</span>
                                 <div className="flex flex-col items-end gap-1 shrink-0">
                                   {operationalState.remainingMinutes > 0 && (
-                                    <span className="inline-flex items-center gap-1 text-[9px] font-bold text-status-info bg-status-info/10 border border-status-info/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                    <span className="inline-flex items-center gap-1 text-xs font-bold text-status-info bg-status-info/10 border border-status-info/20 px-2 py-0.5 rounded-full whitespace-nowrap">
                                       <Timer className="w-3 h-3" />
                                       Faltam {operationalState.remainingMinutes} min
                                     </span>
                                   )}
-                                  <span className={`px-2 py-0.5 rounded-full font-semibold text-[9px] ${
+                                  <span className={`px-2 py-0.5 rounded-full font-semibold text-xs ${
                                     isPending
                                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
                                       : apt.status === 'completed'
@@ -452,7 +452,7 @@ export const ScheduleGrid: React.FC = () => {
                                   </span>
                                 </div>
                               </div>
-                              <div className="mt-2 pt-2 border-t border-border-subtle/70 flex items-center justify-between gap-2 text-[10px]">
+                              <div className="mt-2 pt-2 border-t border-border-subtle/70 flex items-center justify-between gap-2 text-xs">
                                 <span className="font-bold uppercase tracking-wide text-content-muted">Barbeiro</span>
                                 <span className="font-bold text-gold-base truncate">{barber.name}</span>
                               </div>
@@ -462,7 +462,7 @@ export const ScheduleGrid: React.FC = () => {
                                   <button
                                     type="button"
                                     onClick={() => handleAcceptPendingAppointment(apt.id)}
-                                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] flex items-center gap-1 shadow-sm transition-all active:scale-95"
+                                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95"
                                   >
                                     <CheckCircle2 className="w-3 h-3" />
                                     <span>ACEITAR AGENDAMENTO</span>
@@ -482,7 +482,7 @@ export const ScheduleGrid: React.FC = () => {
                               </div>
                               <button
                                 onClick={() => handleUnblock(block.id)}
-                                className="text-[9px] text-red-400 underline font-bold shrink-0 ml-1"
+                                className="text-xs text-red-400 underline font-bold shrink-0 ml-1"
                               >
                                 Desbloquear
                               </button>
@@ -601,17 +601,17 @@ export const ScheduleGrid: React.FC = () => {
                               >
                                 <div className="flex items-center justify-between text-xs font-bold text-content-base gap-2">
                                   <span className="truncate">{apt.client_name}</span>
-                                  <span className="text-[10px] finance-positive shrink-0">R$ {apt.final_amount.toFixed(2)}</span>
+                                  <span className="text-xs finance-positive shrink-0">R$ {apt.final_amount.toFixed(2)}</span>
                                 </div>
-                                <div className="text-[10px] text-content-muted flex items-center justify-between gap-2">
+                                <div className="text-xs text-content-muted flex items-center justify-between gap-2">
                                   <span className="truncate">{apt.services[0]?.title || 'Atendimento'}</span>
                                   <div className="flex items-center gap-1.5 shrink-0">
                                     {operationalState?.remainingMinutes && operationalState.remainingMinutes > 0 ? (
-                                      <span className="inline-flex items-center gap-1 text-[9px] font-bold text-status-info">
+                                      <span className="inline-flex items-center gap-1 text-xs font-bold text-status-info">
                                         <Timer className="w-3 h-3" /> {operationalState.remainingMinutes} min
                                       </span>
                                     ) : null}
-                                    <span className={`px-1.5 py-0.5 rounded-xl text-[9px] font-bold ${
+                                    <span className={`px-1.5 py-0.5 rounded-xl text-xs font-bold ${
                                       operationalState?.isInService
                                         ? 'bg-status-info/10 text-status-info border border-status-info/20'
                                         : 'bg-status-success/20 text-status-success'
@@ -621,7 +621,7 @@ export const ScheduleGrid: React.FC = () => {
                                   </div>
                                 </div>
                                 {operationalState?.isLate && (
-                                  <div className="inline-flex items-center gap-1 text-[9px] font-bold schedule-late-text">
+                                  <div className="inline-flex items-center gap-1 text-xs font-bold schedule-late-text">
                                     <AlertTriangle className="w-3 h-3 schedule-late-text" />
                                     Atrasado {operationalState.lateMinutes} min
                                   </div>
@@ -631,18 +631,18 @@ export const ScheduleGrid: React.FC = () => {
                               <div className="w-full bg-red-950/30 border border-red-500/30 p-2 rounded-xl flex items-center justify-between text-xs text-red-300">
                                 <div className="flex items-center space-x-1.5">
                                   <Lock className="w-3.5 h-3.5 text-red-400" />
-                                  <span className="font-semibold text-[11px]">{block.reason}</span>
+                                  <span className="font-semibold text-xs">{block.reason}</span>
                                 </div>
                                 <button
                                   onClick={() => handleUnblock(block.id)}
-                                  className="text-red-400 hover:text-content-base text-[10px] underline ml-2"
+                                  className="text-red-400 hover:text-content-base text-xs underline ml-2"
                                   title="Desbloquear Horário"
                                 >
                                   Desbloquear
                                 </button>
                               </div>
                             ) : (
-                              <span className="text-[10px] text-content-muted italic">Disponível</span>
+                              <span className="text-xs text-content-muted italic">Disponível</span>
                             )}
                           </div>
                         );
@@ -822,7 +822,7 @@ export const ScheduleGrid: React.FC = () => {
 
               {manualBookingForm.service_id && (() => {
                 const selectedService = services.find(service => service.id === manualBookingForm.service_id);
-                return selectedService ? <p className="text-[11px] text-content-muted">Duração real: <strong className="text-gold-base">{selectedService.duration_minutes} min</strong>. O valor será recalculado pelo servidor.</p> : null;
+                return selectedService ? <p className="text-xs text-content-muted">Duração real: <strong className="text-gold-base">{selectedService.duration_minutes} min</strong>. O valor será recalculado pelo servidor.</p> : null;
               })()}
 
               <div className="pt-3 border-t border-border-subtle flex justify-end space-x-3">

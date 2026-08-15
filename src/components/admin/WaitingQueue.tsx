@@ -527,9 +527,9 @@ export const WaitingQueue: React.FC = () => {
                   Em atendimento
                 </span>
               </div>
-              <span className="text-[10px] bg-status-success/10 text-status-success px-2.5 py-1 rounded-full font-black border border-status-success/20 whitespace-nowrap">{inChairList.length} na cadeira</span>
+              <span className="text-xs bg-status-success/10 text-status-success px-2.5 py-1 rounded-full font-black border border-status-success/20 whitespace-nowrap">{inChairList.length} na cadeira</span>
             </div>
-            <p className="text-[11px] text-content-muted -mt-1 shrink-0">Ações em curso: finalize somente após concluir o serviço.</p>
+            <p className="text-xs text-content-muted -mt-1 shrink-0">Ações em curso: finalize somente após concluir o serviço.</p>
 
             {loading ? (
               <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
@@ -539,7 +539,7 @@ export const WaitingQueue: React.FC = () => {
               <div className="p-5 text-center text-xs text-content-muted bg-surface-card rounded-xl border border-status-success/20 border-dashed space-y-1.5">
                 <Scissors className="w-6 h-6 text-status-success/60 mx-auto" />
                 <p className="font-semibold text-content-base">Nenhum atendimento em andamento</p>
-                <p className="text-[10px] text-content-muted">Chame o próximo cliente na recepção quando uma cadeira estiver livre.</p>
+                <p className="text-xs text-content-muted">Chame o próximo cliente na recepção quando uma cadeira estiver livre.</p>
               </div>
             ) : (
               <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1 space-y-3" style={{ maxHeight: `${Math.max(220, operationSettings.queueVisibleLimit * 100)}px` }}>
@@ -551,7 +551,7 @@ export const WaitingQueue: React.FC = () => {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h3 className="font-bold text-content-base text-xs">{item.client_name}</h3>
-                      <p className="text-[11px] text-gold-hover font-semibold">{item.service_title}</p>
+                      <p className="text-xs text-gold-hover font-semibold">{item.service_title}</p>
                     </div>
                     {item.service_price && (
                       <span className="text-xs font-black finance-positive">
@@ -560,7 +560,7 @@ export const WaitingQueue: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="p-2 bg-surface-card rounded-xl border border-border-subtle space-y-1 text-[10px]">
+                  <div className="p-2 bg-surface-card rounded-xl border border-border-subtle space-y-1 text-xs">
                     <div className="flex justify-between text-content-muted">
                       <span>Barbeiro:</span>
                       <strong className="text-content-base">{item.professional_name}</strong>
@@ -612,8 +612,8 @@ export const WaitingQueue: React.FC = () => {
                 </span>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[10px] text-content-muted font-medium hidden sm:inline">Est. ~{waitingList.reduce((total, item) => total + (item.estimated_wait_minutes || operationSettings.queueBaseWaitMinutes), 0)} min</span>
-                <span className="text-[10px] bg-gold-base/15 text-gold-hover px-2.5 py-1 rounded-full font-black border border-gold-base/20 whitespace-nowrap">{waitingList.length} aguardando</span>
+                <span className="text-xs text-content-muted font-medium hidden sm:inline">Est. ~{waitingList.reduce((total, item) => total + (item.estimated_wait_minutes || operationSettings.queueBaseWaitMinutes), 0)} min</span>
+                <span className="text-xs bg-gold-base/15 text-gold-hover px-2.5 py-1 rounded-full font-black border border-gold-base/20 whitespace-nowrap">{waitingList.length} aguardando</span>
               </div>
             </div>
 
@@ -625,7 +625,7 @@ export const WaitingQueue: React.FC = () => {
               <div className="p-8 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle space-y-2">
                 <UserCheck className="w-8 h-8 text-content-muted mx-auto" />
                 <p className="font-bold text-content-base">Nenhum cliente na recepção</p>
-                <p className="text-[10px] text-content-muted max-w-xs mx-auto">
+                <p className="text-xs text-content-muted max-w-xs mx-auto">
                   A recepção está limpa. Adicione um cliente avulso se houver um walk-in.
                 </p>
                     {operationSettings.allowWalkIn && <button
@@ -656,13 +656,13 @@ export const WaitingQueue: React.FC = () => {
                             <div className="flex items-center gap-1.5 min-w-0">
                               <h4 className="font-bold text-content-base text-xs truncate">{item.client_name}</h4>
                               {item.notes && (
-                                <span className="shrink-0 px-1.5 py-0.5 bg-gold-base/10 text-gold-hover text-[9px] font-bold rounded-xl border border-gold-base/20">
+                                <span className="shrink-0 px-1.5 py-0.5 bg-gold-base/10 text-gold-hover text-xs font-bold rounded-xl border border-gold-base/20">
                                   Encaixe
                                 </span>
                               )}
                             </div>
-                            <p className="text-[10px] text-gold-hover font-semibold truncate">{item.service_title}</p>
-                            <p className="text-[10px] text-content-muted truncate">
+                            <p className="text-xs text-gold-hover font-semibold truncate">{item.service_title}</p>
+                            <p className="text-xs text-content-muted truncate">
                               {item.professional_name || 'Profissional a definir'} · {item.scheduled_time || 'Agora'}
                             </p>
                           </div>
@@ -692,7 +692,7 @@ export const WaitingQueue: React.FC = () => {
 
                       {isExpanded && (
                         <div className="border-t border-border-subtle bg-surface-card/60 p-3 sm:p-3.5 space-y-3">
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px]">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
                             <div className="rounded-lg bg-surface-base p-2.5">
                               <span className="block text-content-muted uppercase font-bold tracking-wide">Tempo estimado</span>
                               <strong className="block mt-0.5 text-gold-hover text-xs">~{item.estimated_wait_minutes || (index * operationSettings.queueBaseWaitMinutes + operationSettings.queueBaseWaitMinutes)} min</strong>
@@ -706,7 +706,7 @@ export const WaitingQueue: React.FC = () => {
                               <strong className="block mt-0.5 text-content-base text-xs">{item.scheduled_time || 'Agora'}</strong>
                             </div>
                           </div>
-                          {item.notes && <p className="text-[11px] text-content-muted border-t border-border-subtle pt-2"><span className="text-gold-hover font-semibold">Observação:</span> {item.notes}</p>}
+                          {item.notes && <p className="text-xs text-content-muted border-t border-border-subtle pt-2"><span className="text-gold-hover font-semibold">Observação:</span> {item.notes}</p>}
                           <div className="flex items-center justify-between gap-2 pt-1 border-t border-border-subtle">
                             <div className="flex items-center gap-1.5">
                               <button
@@ -782,11 +782,11 @@ export const WaitingQueue: React.FC = () => {
               <table className="w-full text-left text-xs whitespace-nowrap">
                 <thead className="bg-surface-base text-content-muted border-b border-border-subtle">
                   <tr>
-                    <th className="p-3 font-bold uppercase text-[10px]">Cliente</th>
-                    <th className="p-3 font-bold uppercase text-[10px]">Serviço</th>
-                    <th className="p-3 font-bold uppercase text-[10px]">Barbeiro</th>
-                    <th className="p-3 font-bold uppercase text-[10px]">Encerramento</th>
-                    <th className="p-3 font-bold uppercase text-[10px] text-right">Status</th>
+                    <th className="p-3 font-bold uppercase text-xs">Cliente</th>
+                    <th className="p-3 font-bold uppercase text-xs">Serviço</th>
+                    <th className="p-3 font-bold uppercase text-xs">Barbeiro</th>
+                    <th className="p-3 font-bold uppercase text-xs">Encerramento</th>
+                    <th className="p-3 font-bold uppercase text-xs text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-subtle">
@@ -801,7 +801,7 @@ export const WaitingQueue: React.FC = () => {
                           {isCancelled ? 'Cancelado' : item.completed_at || 'Concluído'}
                         </td>
                         <td className="p-3 text-right">
-                          <span className={`px-2 py-0.5 rounded-xl text-[10px] font-bold ${isCancelled ? 'bg-status-error/15 text-status-error' : 'bg-status-success/15 text-status-success'}`}>
+                          <span className={`px-2 py-0.5 rounded-xl text-xs font-bold ${isCancelled ? 'bg-status-error/15 text-status-error' : 'bg-status-success/15 text-status-success'}`}>
                             {isCancelled ? '× Cancelado' : '✓ Concluído'}
                           </span>
                         </td>
@@ -822,7 +822,7 @@ export const WaitingQueue: React.FC = () => {
                 <RotateCcw className="w-4 h-4 text-gold-hover" />
                 <span>Removidos da fila ({abandonedList.length})</span>
               </h2>
-              <p className="text-[10px] text-content-muted mt-1">Agendamentos preservados podem retornar à fila ou ser cancelados.</p>
+              <p className="text-xs text-content-muted mt-1">Agendamentos preservados podem retornar à fila ou ser cancelados.</p>
             </div>
           </div>
 
@@ -837,10 +837,10 @@ export const WaitingQueue: React.FC = () => {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-content-base text-xs truncate">{item.client_name}</h3>
-                      <span className="px-1.5 py-0.5 rounded-full bg-status-warning/10 text-status-warning text-[9px] font-bold border border-status-warning/20">Removido</span>
+                      <span className="px-1.5 py-0.5 rounded-full bg-status-warning/10 text-status-warning text-xs font-bold border border-status-warning/20">Removido</span>
                     </div>
-                    <p className="text-[10px] text-gold-hover font-semibold truncate">{item.service_title}</p>
-                    <p className="text-[10px] text-content-muted truncate">
+                    <p className="text-xs text-gold-hover font-semibold truncate">{item.service_title}</p>
+                    <p className="text-xs text-content-muted truncate">
                       {item.professional_name || 'Profissional a definir'} · {item.scheduled_time || 'Horário não informado'}
                       {item.appointment_id ? ' · Agendamento preservado' : ' · Cliente avulso'}
                     </p>
@@ -850,7 +850,7 @@ export const WaitingQueue: React.FC = () => {
                       type="button"
                       disabled={actionLoadingId === item.id}
                       onClick={() => handleReturnToQueue(item.id, item.client_name)}
-                      className="px-3 py-2 rounded-lg bg-gold-base text-surface-base font-extrabold text-[11px] flex items-center gap-1.5 hover:bg-gold-base/80 disabled:opacity-60"
+                      className="px-3 py-2 rounded-lg bg-gold-base text-surface-base font-extrabold text-xs flex items-center gap-1.5 hover:bg-gold-base/80 disabled:opacity-60"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       Retornar à fila
@@ -860,7 +860,7 @@ export const WaitingQueue: React.FC = () => {
                         type="button"
                         disabled={actionLoadingId === item.id}
                         onClick={() => handleCancelQueuedAppointment(item)}
-                        className="px-3 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-[11px] flex items-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60"
+                        className="px-3 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60"
                       >
                         <X className="w-3.5 h-3.5" />
                         Cancelar atendimento
@@ -870,7 +870,7 @@ export const WaitingQueue: React.FC = () => {
                         type="button"
                         disabled={actionLoadingId === item.id}
                         onClick={() => handleDeleteAbandonedWalkIn(item)}
-                        className="px-3 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-[11px] flex items-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60"
+                        className="px-3 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         Excluir registro
@@ -1069,7 +1069,7 @@ export const WaitingQueue: React.FC = () => {
                 </div>
                 <div>
                   <h2 className="text-xs font-bold text-content-base">Aviso WhatsApp</h2>
-                  <p className="text-[10px] text-content-muted">{selectedQueueItemForWa.client_name}</p>
+                  <p className="text-xs text-content-muted">{selectedQueueItemForWa.client_name}</p>
                 </div>
               </div>
               <button
@@ -1081,7 +1081,7 @@ export const WaitingQueue: React.FC = () => {
             </div>
 
             <div className="p-4 space-y-3 text-xs">
-              <div className="p-2.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 text-[11px] text-[#25D366] flex items-center gap-2">
+              <div className="p-2.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 text-xs text-[#25D366] flex items-center gap-2">
                 <Zap className="w-4 h-4 shrink-0" />
                 <span>Integração de Notificação WhatsApp via API Web/wa.me ativa. O cliente receberá a mensagem diretamente.</span>
               </div>
