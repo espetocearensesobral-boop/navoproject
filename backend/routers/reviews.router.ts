@@ -35,9 +35,11 @@ const findPublicReviewAppointment = async (bookingCode: string, clientPhone: str
 
 const isReviewSchemaCompatibilityError = (error: any) => {
   const message = String(error?.message || '').toLowerCase();
-  const missingOptionalColumn = ['service_id', 'service_title', 'service_experience']
-    .some((column) => message.includes(column));
-  return error?.code === '42703' || (missingOptionalColumn && message.includes('column'));
+  const cause = error?.cause || error?.originalError || {};
+  const causeMessage = String(cause?.message || '').toLowerCase();
+  const missingOptionalColumn = ['service_id', 'service_title', 'service_experience', 'points_awarded', 'admin_response']
+    .some((column) => message.includes(column) || causeMessage.includes(column));
+  return [error?.code, cause?.code].includes('42703') || (missingOptionalColumn && (message.includes('column') || causeMessage.includes('column')));
 };
 
 const insertAnonymousReview = async (review: any) => {
@@ -166,8 +168,9 @@ reviewsRouter.post('/public', async (req: any, res: any) => {
         error: 'Não foi possível concluir a solicitação. Tente novamente mais tarde.',
         diagnostic: {
           name: e?.name || null,
-          code: e?.code || null,
+          code: e?.code || e?.cause?.code || e?.originalError?.code || null,
           message: String(e?.message || e).slice(0, 500),
+          cause: String(e?.cause?.message || e?.originalError?.message || '').slice(0, 1200),
         },
       });
     }
