@@ -1,6 +1,7 @@
 import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
-import { timeToMinutes, minutesToTime, getDayOfWeekKey } from '../utils/datetime.js';
+import { timeToMinutes, minutesToTime, getDayOfWeekKey, addDaysBRT } from '../utils/datetime.js';
+import { DEFAULT_OPERATION_SETTINGS, getOperationSettings } from './operation-settings.service.js';
 import { and, eq, or } from 'drizzle-orm';
 
 interface CheckSlotParams {
@@ -17,7 +18,7 @@ interface CheckSlotParams {
 }
 
 interface CheckSlotResult {
-  statusCode: 'AVAILABLE' | 'REQUIRES_APPROVAL' | 'PAST_TIME' | 'SHOP_CLOSED' | 'CONFIRMED_OCCUPIED' | 'BLOCKED' | 'PROFESSIONAL_UNAVAILABLE';
+  statusCode: 'AVAILABLE' | 'REQUIRES_APPROVAL' | 'PAST_TIME' | 'SHOP_CLOSED' | 'CONFIRMED_OCCUPIED' | 'BLOCKED' | 'PROFESSIONAL_UNAVAILABLE' | 'LEAD_TIME' | 'BOOKING_HORIZON';
   available: boolean;
   requiresApproval?: boolean;
   isOutsideHours?: boolean;
@@ -32,11 +33,19 @@ interface DaySlotContext {
   allAppointments: any[];
   allBlocks: any[];
   allProfessionals: any[];
+  operationSettings: ReturnType<typeof normalizeOperationSettingsForContext>;
 }
 
 let cachedShopSettings: { data: any; timestamp: number } | null = null;
 let cachedProfessionals: { data: any[]; timestamp: number } | null = null;
 const CACHE_TTL_MS = 20000;
+
+function normalizeOperationSettingsForContext(value: any) {
+  return {
+    ...DEFAULT_OPERATION_SETTINGS,
+    ...(value || {}),
+  };
+}
 
 type NormalizedProfessionalDay = {
   closed: boolean;
@@ -128,11 +137,12 @@ export async function fetchDaySlotContext(dateStr: string, excludeAptId?: string
     return res;
   };
 
-  const [shopSettings, rawAppointments, rawBlocks, professionalsList] = await Promise.all([
+  const [shopSettings, rawAppointments, rawBlocks, professionalsList, operationSettings] = await Promise.all([
     getShopSettings(),
     db.query.appointments.findMany({ where: eq(schema.appointments.date, dateStr) }).catch(() => []),
     db.query.scheduleBlocks.findMany({ where: eq(schema.scheduleBlocks.date, dateStr) }).catch(() => []),
-    getProfessionals()
+    getProfessionals(),
+    getOperationSettings(db).catch(() => DEFAULT_OPERATION_SETTINGS),
   ]);
 
   if (shopSettings) {
@@ -146,7 +156,13 @@ export async function fetchDaySlotContext(dateStr: string, excludeAptId?: string
     allAppointments = allAppointments.filter((apt: any) => apt.id !== excludeAptId);
   }
 
-  return { shopProf, allAppointments, allBlocks: rawBlocks, allProfessionals: professionalsList };
+  return {
+    shopProf,
+    allAppointments,
+    allBlocks: rawBlocks,
+    allProfessionals: professionalsList,
+    operationSettings: normalizeOperationSettingsForContext(operationSettings),
+  };
 }
 
 export async function checkSlotAvailability(params: CheckSlotParams): Promise<CheckSlotResult> {
@@ -156,6 +172,7 @@ export async function checkSlotAvailability(params: CheckSlotParams): Promise<Ch
   
   const ctx = preloaded || await fetchDaySlotContext(dateStr, excludeAptId);
   const { shopProf, allAppointments, allBlocks, allProfessionals } = ctx;
+  const operationSettings = normalizeOperationSettingsForContext(ctx.operationSettings);
 
   const dayKey = getDayOfWeekKey(dateStr);
   const daySchedule = shopProf.operatingSchedule?.[dayKey];
@@ -172,6 +189,18 @@ export async function checkSlotAvailability(params: CheckSlotParams): Promise<Ch
   const isPast = (dateStr < todayBRT) || (dateStr === todayBRT && startMins < currTimeBRT.totalMinutes);
   if (isPast && !allowPast) {
     return { statusCode: 'PAST_TIME', available: false, reason: 'Horário no passado' };
+  }
+
+  const maximumDate = addDaysBRT(todayBRT, operationSettings.maximumBookingHorizonDays);
+  if (dateStr > maximumDate) {
+    return { statusCode: 'BOOKING_HORIZON', available: false, reason: `Agendamentos disponíveis até ${maximumDate}` };
+  }
+
+  if (dateStr === todayBRT && !allowPast) {
+    const leadMinutes = Math.max(operationSettings.minimumBookingLeadMinutes, operationSettings.sameDayBookingCutoffMinutes);
+    if (startMins < currTimeBRT.totalMinutes + leadMinutes) {
+      return { statusCode: 'LEAD_TIME', available: false, reason: `Escolha um horário com pelo menos ${leadMinutes} minutos de antecedência` };
+    }
   }
 
   const isOutside = startMins < openMins || endMins > closeMins;
@@ -223,11 +252,14 @@ export async function checkSlotAvailability(params: CheckSlotParams): Promise<Ch
     }
 
     const profApts = allAppointments.filter((a: any) => a.professionalId === prof.id);
+    const buffer = operationSettings.bufferBetweenAppointmentsMinutes;
+    const effectiveStartMins = startMins - buffer;
+    const effectiveEndMins = endMins + buffer;
     const hasAptConflict = profApts.some((a: any) => {
-      const aStart = timeToMinutes(a.timeSlot);
+      const aStart = timeToMinutes(a.timeSlot) - buffer;
       const aDuration = Number(a.totalDurationMinutes || 30);
-      const aEnd = aStart + (Number.isFinite(aDuration) && aDuration > 0 ? aDuration : 30);
-      return Math.max(startMins, aStart) < Math.min(endMins, aEnd);
+      const aEnd = timeToMinutes(a.timeSlot) + (Number.isFinite(aDuration) && aDuration > 0 ? aDuration : 30) + buffer;
+      return Math.max(effectiveStartMins, aStart) < Math.min(effectiveEndMins, aEnd);
     });
 
     if (hasAptConflict) continue;

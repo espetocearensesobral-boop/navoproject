@@ -18,6 +18,7 @@ import {
   fetchShopProfile, 
   generateTimeSlotsFromProfile 
 } from '../../services/shopProfileService';
+import { fetchOperationSettings, defaultOperationSettings, type OperationSettings } from '../../services/operationSettingsService';
 import { Calendar, Clock, Plus, Lock, Unlock, UserCheck, ShieldAlert, CheckCircle2, X, Save, RefreshCw, Scissors, AlertTriangle, Timer } from 'lucide-react';
 import { getTodayStringBRT, getCurrentTimeBRT, timeToMinutes } from '../../utils/dateUtils';
 import { AdminPageHeader } from './shared/AdminPageHeader';
@@ -41,6 +42,7 @@ export const ScheduleGrid: React.FC = () => {
   const [blocks, setBlocks] = useState<ScheduleBlock[]>([]);
   const [loading, setLoading] = useState(true);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+  const [operationSettings, setOperationSettings] = useState<OperationSettings>(defaultOperationSettings);
   const [currentBrtMinutes, setCurrentBrtMinutes] = useState(() => getCurrentTimeBRT().totalMinutes);
 
   useEffect(() => {
@@ -54,6 +56,7 @@ export const ScheduleGrid: React.FC = () => {
     fetchShopProfile().then(p => {
       if (p) setShopProfile(p);
     });
+    fetchOperationSettings().then(setOperationSettings);
   }, []);
 
   // Modals
@@ -82,8 +85,8 @@ export const ScheduleGrid: React.FC = () => {
   });
 
   const timeSlots = useMemo(
-    () => generateTimeSlotsFromProfile(shopProfile, selectedDate),
-    [shopProfile, selectedDate]
+    () => generateTimeSlotsFromProfile(shopProfile, selectedDate, 30, operationSettings.slotIntervalMinutes),
+    [shopProfile, selectedDate, operationSettings.slotIntervalMinutes]
   );
 
   useEffect(() => {

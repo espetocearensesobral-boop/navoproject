@@ -162,8 +162,9 @@ export function isDateOpenInProfile(profile: ShopProfile, dateStr: string | Date
 
 export function generateTimeSlotsFromProfile(
   profile: ShopProfile, 
-  dateStr?: string, 
-  serviceDurationMinutes: number = 30
+  dateStr?: string,
+  serviceDurationMinutes: number = 30,
+  slotIntervalMinutes: number = 30
 ): string[] {
   let open = profile.openTime || '09:00';
   let close = profile.closeTime || '21:00';
@@ -183,8 +184,9 @@ export function generateTimeSlotsFromProfile(
   const duration = serviceDurationMinutes > 0 ? serviceDurationMinutes : 30;
 
   const candidateCutoff = allowOutsideHours ? closeMinutes + 90 : closeMinutes;
+  const safeInterval = [5, 10, 15, 20, 30, 60].includes(slotIntervalMinutes) ? slotIntervalMinutes : 30;
   const slots: string[] = [];
-  for (let m = openMinutes; m < candidateCutoff; m += 30) {
+  for (let m = openMinutes; m < candidateCutoff; m += safeInterval) {
     if (!allowOutsideHours && m + duration > closeMinutes) {
       continue;
     }

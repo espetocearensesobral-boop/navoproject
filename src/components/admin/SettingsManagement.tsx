@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Save, CheckCircle2, Settings, Mail, Send, AlertCircle, Eye, EyeOff, MessageSquare, QrCode, ShieldCheck } from 'lucide-react';
+import { Save, CheckCircle2, Settings, Mail, Send, AlertCircle, Eye, EyeOff, MessageSquare, QrCode, ShieldCheck, CalendarDays } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
 import { fetchEmailSettings, saveEmailSettings, sendTestEmail, defaultEmailSettings, type EmailSettings } from '../../services/emailSettingsService';
 import { WhatsAppManagement } from './WhatsAppManagement';
 import { QrCodeManagement } from './QrCodeManagement';
 import { AuditLogsManagement } from './AuditLogsManagement';
+import { AgendaAvailabilitySettings } from './AgendaAvailabilitySettings';
 
-export type SettingsTab = 'email' | 'whatsapp' | 'qrcode' | 'audit';
+export type SettingsTab = 'email' | 'whatsapp' | 'qrcode' | 'audit' | 'availability';
 
 interface SettingsManagementProps {
   initialTab?: SettingsTab;
@@ -32,6 +33,8 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
         return <QrCodeManagement />;
       case 'audit':
         return <AuditLogsManagement />;
+      case 'availability':
+        return <AgendaAvailabilitySettings />;
       default:
         return null;
     }
@@ -48,6 +51,7 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
           { id: 'whatsapp', label: 'Painel WhatsApp', icon: MessageSquare },
           { id: 'qrcode', label: 'QR Code & Balcão', icon: QrCode },
           { id: 'audit', label: 'Logs & Auditoria', icon: ShieldCheck },
+          { id: 'availability', label: 'Agenda e Disponibilidade', icon: CalendarDays },
         ]}
         activeId={activeTab}
         onChange={(id) => setActiveTab(id as SettingsTab)}

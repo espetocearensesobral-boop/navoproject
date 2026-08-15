@@ -12,6 +12,7 @@ import {
   generateTimeSlotsFromProfile, 
   isDateOpenInProfile 
 } from '../../services/shopProfileService';
+import { OperationSettings, defaultOperationSettings, fetchOperationSettings } from '../../services/operationSettingsService';
 import { 
   getTodayStringBRT, 
   getCurrentTimeBRT, 
@@ -61,6 +62,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [unavailabilityReason, setUnavailabilityReason] = useState<string | null>(null);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+  const [operationSettings, setOperationSettings] = useState<OperationSettings>(defaultOperationSettings);
   
   const totalDurationMinutes = useMemo(() => {
     return calculateTotalServicesDuration(selectedServices);
@@ -70,6 +72,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     fetchShopProfile().then(p => {
       if (p) setShopProfile(p);
     });
+    fetchOperationSettings().then(setOperationSettings);
   }, []);
 
   const timeSectionRef = useRef<HTMLDivElement>(null);
@@ -131,7 +134,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
             const serverAvailableSlots = Array.isArray(resData.availableSlots) ? resData.availableSlots : [];
             const serverApprovalSlots = Array.isArray(resData.requiresApprovalSlots) ? resData.requiresApprovalSlots : [];
             const statusReason = serverAvailableSlots.length === 0 && serverApprovalSlots.length === 0 && Array.isArray(resData.slots)
-              ? resData.slots.find((slot: any) => ['PROFESSIONAL_UNAVAILABLE', 'SHOP_CLOSED'].includes(slot?.statusCode))?.reason
+              ? resData.slots.find((slot: any) => ['PROFESSIONAL_UNAVAILABLE', 'SHOP_CLOSED', 'LEAD_TIME', 'BOOKING_HORIZON'].includes(slot?.statusCode))?.reason
               : null;
             if (isMounted) {
               setBusySlots(newBusySlots);
@@ -166,8 +169,8 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
 
   // Base Time Slots list dynamically generated from shopProfile and duration
   const baseSlots = useMemo(() => {
-    return generateTimeSlotsFromProfile(shopProfile, selectedDate, totalDurationMinutes);
-  }, [shopProfile, selectedDate, totalDurationMinutes]);
+    return generateTimeSlotsFromProfile(shopProfile, selectedDate, totalDurationMinutes, operationSettings.slotIntervalMinutes);
+  }, [shopProfile, selectedDate, totalDurationMinutes, operationSettings.slotIntervalMinutes]);
 
   const morningSlots = useMemo(() => {
     return baseSlots.filter((time) => timeToMinutes(time) < 720);
@@ -207,7 +210,14 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
 
+  const maximumDate = useMemo(() => addDaysBRT(todayStr, operationSettings.maximumBookingHorizonDays), [todayStr, operationSettings.maximumBookingHorizonDays]);
+  const canGoNextMonth = useMemo(() => {
+    const { year: maxYear, month: maxMonth } = getTodayYearMonthBRT(maximumDate);
+    return calendarMonth.getFullYear() < maxYear || (calendarMonth.getFullYear() === maxYear && calendarMonth.getMonth() < maxMonth);
+  }, [calendarMonth, maximumDate]);
+
   const handleNextMonth = () => {
+    if (!canGoNextMonth) return;
     setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
@@ -243,7 +253,8 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
               <button
                 type="button"
                 onClick={handleNextMonth}
-                className="p-1.5 rounded-btn bg-border-subtle hover:bg-surface-card text-content-base transition-colors"
+                disabled={!canGoNextMonth}
+                className={`p-1.5 rounded-btn bg-border-subtle hover:bg-surface-card text-content-base transition-colors ${!canGoNextMonth ? 'opacity-30 cursor-not-allowed' : ''}`}
                 title="Próximo Mês"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -274,6 +285,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
               const isoDate = `${calendarDaysGrid.year}-${monthStr}-${dayStr}`;
 
               const isPast = isoDate < todayStr;
+              const isBeyondHorizon = isoDate > maximumDate;
               const isClosed = !isDateOpenInProfile(shopProfile, isoDate);
               const isSelected = isoDate === selectedDate;
 
@@ -281,7 +293,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                 <button
                   key={isoDate}
                   type="button"
-                  disabled={isPast || isClosed}
+                  disabled={isPast || isClosed || isBeyondHorizon}
                   onClick={() => {
                     if ('vibrate' in navigator) navigator.vibrate(40);
                                         onSelectDate(isoDate);
@@ -290,11 +302,11 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                       timeSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }, 100);
                   }}
-                  title={isClosed ? 'Barbearia fechada neste dia' : undefined}
+                  title={isClosed ? 'Barbearia fechada neste dia' : isBeyondHorizon ? 'Fora do horizonte de agendamento' : undefined}
                   className={`h-9 rounded-btn text-xs font-bold transition-all flex items-center justify-center ${
                     isSelected
                       ? 'bg-gold-base text-surface-base shadow-md scale-105'
-                      : (isPast || isClosed)
+                      : (isPast || isClosed || isBeyondHorizon)
                       ? 'text-content-muted cursor-not-allowed opacity-30 line-through'
                       : 'text-content-base hover:bg-surface-card hover:text-content-base'
                   }`}

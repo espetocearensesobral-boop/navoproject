@@ -9,7 +9,6 @@ export const availabilityRouter = express.Router();
 
 // Simple in-memory cache for availability calls
 const availabilityCache = new Map<string, { data: any, expiresAt: number }>();
-const CACHE_TTL_MS = 15000; // 15 seconds
 
 export function invalidateAvailabilityCache() {
   availabilityCache.clear();
@@ -36,7 +35,8 @@ availabilityRouter.get("/next", async (req, res) => {
       const openMins = timeToMinutes(openStr);
       const closeMins = timeToMinutes(closeStr);
       
-      for (let m = openMins; m < closeMins; m += 30) {
+      const slotIntervalMinutes = daySlotContext.operationSettings?.slotIntervalMinutes || 30;
+      for (let m = openMins; m < closeMins; m += slotIntervalMinutes) {
         const slot = minutesToTime(m);
         if (dateStr === todayBRT && slot <= currTimeBRT.timeStr) continue;
         
@@ -119,7 +119,8 @@ availabilityRouter.get("/", async (req, res) => {
     const allowOutsideHours = shopProf.allowOutsideHoursApproval === true;
     const slotsCutoff = allowOutsideHours ? closeMins + 90 : closeMins;
     const daySlots: string[] = [];
-    for (let m = openMins; m < slotsCutoff; m += 30) {
+    const slotIntervalMinutes = daySlotContext.operationSettings?.slotIntervalMinutes || 30;
+    for (let m = openMins; m < slotsCutoff; m += slotIntervalMinutes) {
       daySlots.push(minutesToTime(m));
     }
 
@@ -174,7 +175,8 @@ availabilityRouter.get("/", async (req, res) => {
     };
     
     if (debug !== 'true') {
-      availabilityCache.set(cacheKey, { data: responseData, expiresAt: Date.now() + CACHE_TTL_MS });
+      const cacheTtlSeconds = daySlotContext.operationSettings?.availabilityCacheTtlSeconds || 20;
+      availabilityCache.set(cacheKey, { data: responseData, expiresAt: Date.now() + cacheTtlSeconds * 1000 });
     }
 
     return res.json(responseData);

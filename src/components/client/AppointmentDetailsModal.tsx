@@ -27,8 +27,9 @@ import { useToast } from '../ui/Toast';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { SuccessOverlay } from '../ui/SuccessOverlay';
 import { LoadingButton } from '../ui/LoadingButton';
-import { getTodayStringBRT, getCurrentTimeBRT, timeToMinutes } from '../../utils/dateUtils';
+import { getTodayStringBRT, getCurrentTimeBRT, timeToMinutes, addDaysBRT } from '../../utils/dateUtils';
 import { fetchShopProfile, isDateOpenInProfile, generateTimeSlotsFromProfile, defaultShopProfile, ShopProfile } from '../../services/shopProfileService';
+import { fetchOperationSettings, defaultOperationSettings, type OperationSettings } from '../../services/operationSettingsService';
 
 interface AppointmentDetailsModalProps {
   isOpen: boolean;
@@ -68,6 +69,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   const [busySlots, setBusySlots] = useState<string[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+  const [operationSettings, setOperationSettings] = useState<OperationSettings>(defaultOperationSettings);
 
   const { showToast } = useToast();
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
@@ -76,12 +78,14 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
   const todayStrBRT = useMemo(() => getTodayStringBRT(), []);
   const currTimeBRT = useMemo(() => getCurrentTimeBRT(), []);
+  const maximumRescheduleDate = useMemo(() => addDaysBRT(todayStrBRT, operationSettings.maximumBookingHorizonDays), [todayStrBRT, operationSettings.maximumBookingHorizonDays]);
 
   // Load shop profile
   useEffect(() => {
     fetchShopProfile().then(p => {
       if (p) setShopProfile(p);
     });
+    fetchOperationSettings().then(setOperationSettings);
   }, []);
 
   // Calculate duration of appointment services
@@ -107,8 +111,8 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   // Dynamic slots based on shop schedule & duration
   const dynamicSlots = useMemo(() => {
     if (!rescheduleDate || isClosedOnSelectedDate) return [];
-    return generateTimeSlotsFromProfile(shopProfile, rescheduleDate, durationMinutes);
-  }, [shopProfile, rescheduleDate, durationMinutes, isClosedOnSelectedDate]);
+    return generateTimeSlotsFromProfile(shopProfile, rescheduleDate, durationMinutes, operationSettings.slotIntervalMinutes);
+  }, [shopProfile, rescheduleDate, durationMinutes, isClosedOnSelectedDate, operationSettings.slotIntervalMinutes]);
 
   // Initialize reschedule state when modal opens
   useEffect(() => {
@@ -132,8 +136,12 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
         if (response.ok) {
           const busyData = await response.json();
           const bookedTimes = Array.isArray(busyData)
-            ? busyData.map((b: any) => typeof b === 'string' ? b : (b.timeSlot || b.time_slot))
-            : [];
+            ? busyData.map((b: any) => typeof b === 'string' ? b : (b.timeSlot || b.time_slot)).filter(Boolean)
+            : Array.isArray(busyData?.busySlots)
+              ? busyData.busySlots
+              : Array.isArray(busyData?.slots)
+                ? busyData.slots.filter((slot: any) => slot && !slot.available).map((slot: any) => slot.timeSlot || slot.time_slot).filter(Boolean)
+                : [];
           if (isMounted) setBusySlots(bookedTimes);
         }
       } catch (err) {
@@ -151,6 +159,11 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
     if (rescheduleDate < todayStrBRT) {
       showToast('error', 'Data inválida', 'Selecione uma data futura.');
+      return;
+    }
+
+    if (rescheduleDate > maximumRescheduleDate) {
+      showToast('error', 'Data fora do limite', `Escolha uma data até ${maximumRescheduleDate.split('-').reverse().join('/')}.`);
       return;
     }
 
@@ -776,6 +789,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                     type="date"
                     value={rescheduleDate}
                     min={todayStrBRT}
+                    max={maximumRescheduleDate}
                     onChange={(e) => {
                       setRescheduleDate(e.target.value);
                       setRescheduleTimeSlot(''); // reset time when date changes
@@ -907,7 +921,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
               <LoadingButton
                 onClick={handleConfirmReschedule}
                 isLoading={isRescheduling}
-                disabled={isRescheduling || !rescheduleDate || !rescheduleTimeSlot || isClosedOnSelectedDate || rescheduleDate < todayStrBRT}
+                disabled={isRescheduling || !rescheduleDate || !rescheduleTimeSlot || isClosedOnSelectedDate || rescheduleDate < todayStrBRT || rescheduleDate > maximumRescheduleDate}
                 className="py-3 rounded-xl bg-gold-base hover:bg-gold-hover text-surface-base font-bold transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50"
                 loadingText="Salvando..."
               >

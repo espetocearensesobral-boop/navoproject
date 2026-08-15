@@ -411,6 +411,17 @@ export const shopSettings = pgTable('shop_settings', {
 // Guardado em tabela separada (não em shop_settings) porque contém uma
 // credencial sensível (smtpPassword) e shop_settings é lido publicamente
 // pelo endpoint GET /api/shop-profile (sem auth).
+export const operationSettings = pgTable('operation_settings', {
+  id: text('id').primaryKey().default('default'),
+  slotIntervalMinutes: integer('slot_interval_minutes').notNull().default(30),
+  minimumBookingLeadMinutes: integer('minimum_booking_lead_minutes').notNull().default(0),
+  maximumBookingHorizonDays: integer('maximum_booking_horizon_days').notNull().default(90),
+  sameDayBookingCutoffMinutes: integer('same_day_booking_cutoff_minutes').notNull().default(0),
+  bufferBetweenAppointmentsMinutes: integer('buffer_between_appointments_minutes').notNull().default(0),
+  availabilityCacheTtlSeconds: integer('availability_cache_ttl_seconds').notNull().default(20),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const emailSettings = pgTable('email_settings', {
   id: text('id').primaryKey().default('default'),
   enabled: boolean('enabled').notNull().default(false),
