@@ -23,6 +23,8 @@ import {
   type ReceiptItem,
   type ReceiptPaymentMethod,
 } from '../../services/supabaseDataService';
+import { defaultPrintSettings, fetchPrintSettings } from '../../services/printSettingsService';
+import { escapePrintHtml, openPrintWindow } from '../../utils/printUtils';
 
 export interface ReceiptCheckoutSource {
   appointmentId?: string;
@@ -160,26 +162,33 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
     if (pending) setStep(1);
   };
 
-  const handlePrintReceipt = () => {
+  const handlePrintReceipt = async () => {
     if (!receipt) return;
-    const popup = window.open('', '_blank', 'width=420,height=640');
-    if (!popup) {
-      setError('O comprovante foi bloqueado pelo navegador. Permita pop-ups para este site e tente novamente.');
-      return;
+    setError(null);
+    try {
+      const settings = await fetchPrintSettings().catch(() => defaultPrintSettings);
+      const contextRows = [
+        settings.showClientData ? `<p><strong>Cliente:</strong> ${escapePrintHtml(receipt.clientName)}</p>` : '',
+        settings.showService ? `<p><strong>Serviço:</strong> ${escapePrintHtml(receipt.serviceTitle)}</p>` : '',
+        settings.showProfessional ? `<p><strong>Profissional:</strong> ${escapePrintHtml(receipt.professionalName || 'Não informado')}</p>` : '',
+        `<p><strong>Data:</strong> ${escapePrintHtml(new Date(receipt.receivedAt || Date.now()).toLocaleString('pt-BR'))}</p>`,
+      ].join('');
+      const valueRows = [
+        ['Valor original', money(receipt.originalAmount)],
+        ['Valor base', money(receipt.enteredAmount)],
+        ...(receipt.discountAmount > 0 ? [['Desconto', `- ${money(receipt.discountAmount)}`]] : []),
+        ...(receipt.surchargeAmount > 0 ? [['Acréscimo', `+ ${money(receipt.surchargeAmount)}`]] : []),
+        ['Total recebido', money(receipt.totalAmount)],
+        ...(settings.showPayment ? [['Forma de pagamento', receipt.paymentMethod ? paymentLabel[receipt.paymentMethod] : 'Não informada']] : []),
+        ...(settings.showPayment && receipt.paymentMethod === 'cash' ? [['Valor entregue', money(receipt.amountReceived)], ['Troco', money(receipt.changeAmount)]] : []),
+      ].map(([label, value]) => `<div class="print-row"><span>${escapePrintHtml(label)}</span><strong>${escapePrintHtml(value)}</strong></div>`).join('');
+      const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' : ''}<h2 class="print-center">Comprovante de recebimento</h2><hr class="print-divider">${contextRows}<hr class="print-divider">${valueRows}${settings.showObservations && receipt.observations ? `<hr class="print-divider"><p><strong>Observações:</strong> ${escapePrintHtml(receipt.observations)}</p>` : ''}`;
+      if (!openPrintWindow({ title: 'Comprovante de recebimento', settings, format: settings.receiptFormat, bodyHtml })) {
+        setError('O comprovante foi bloqueado pelo navegador. Permita pop-ups para este site e tente novamente.');
+      }
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Não foi possível preparar o comprovante para impressão.');
     }
-    popup.opener = null;
-    const rows = [
-      ['Valor original', money(receipt.originalAmount)],
-              ['Valor base', money(receipt.enteredAmount)],
-      ...(receipt.discountAmount > 0 ? [['Desconto', `- ${money(receipt.discountAmount)}`]] : []),
-      ...(receipt.surchargeAmount > 0 ? [['Acréscimo', `+ ${money(receipt.surchargeAmount)}`]] : []),
-      ['Total recebido', money(receipt.totalAmount)],
-      ['Forma de pagamento', receipt.paymentMethod ? paymentLabel[receipt.paymentMethod] : 'Não informada'],
-      ...(receipt.paymentMethod === 'cash' ? [['Valor entregue', money(receipt.amountReceived)], ['Troco', money(receipt.changeAmount)]] : []),
-    ].map(([label, value]) => `<tr><td>${label}</td><td style="text-align:right"><strong>${value}</strong></td></tr>`).join('');
-
-    popup.document.write(`<!doctype html><html lang="pt-BR"><head><title>Comprovante de recebimento</title><style>body{font:14px Arial,sans-serif;margin:28px;color:#111}h1{font-size:18px;margin:0 0 4px}p{margin:4px 0;color:#555}.line{border-top:1px dashed #888;margin:16px 0}table{width:100%;border-collapse:collapse}td{padding:6px 0;vertical-align:top}.total{font-size:17px;margin-top:10px}.footer{text-align:center;margin-top:24px;font-size:12px}</style></head><body><h1>Navo Barber & Club</h1><p>Comprovante de recebimento</p><div class="line"></div><p><strong>Cliente:</strong> ${receipt.clientName}</p><p><strong>Serviço:</strong> ${receipt.serviceTitle}</p><p><strong>Profissional:</strong> ${receipt.professionalName || 'Não informado'}</p><p><strong>Data:</strong> ${new Date(receipt.receivedAt || Date.now()).toLocaleString('pt-BR')}</p><div class="line"></div><table>${rows}</table>${receipt.observations ? `<div class="line"></div><p><strong>Observações:</strong> ${receipt.observations}</p>` : ''}<p class="footer">Obrigado pela preferência.</p><script>window.print();<\/script></body></html>`);
-    popup.document.close();
   };
 
   const handleConfirmReceipt = async () => {

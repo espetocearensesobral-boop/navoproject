@@ -15,6 +15,7 @@ import {
   UserRound,
   Users,
   WalletCards,
+  Printer,
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
@@ -24,6 +25,8 @@ import {
   type FinancialReportData,
 } from '../../services/supabaseDataService';
 import { fetchOperationSettings } from '../../services/operationSettingsService';
+import { defaultPrintSettings, fetchPrintSettings } from '../../services/printSettingsService';
+import { escapePrintHtml, openPrintWindow } from '../../utils/printUtils';
 
 const money = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
 
@@ -115,6 +118,16 @@ export const ReportsManagement: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const printReport = async () => {
+    if (!report) return;
+    const settings = await fetchPrintSettings().catch(() => defaultPrintSettings);
+    const metric = (label: string, value: string) => `<div class="print-row"><span>${escapePrintHtml(label)}</span><strong>${escapePrintHtml(value)}</strong></div>`;
+    const details = settings.reportIncludeDetails ? `<hr class="print-divider"><h2>Serviços recebidos</h2>${report.services.map((item) => metric(item.serviceTitle, `${item.count} atendimento(s) — ${money(item.revenue)}`)).join('') || '<p>Nenhum serviço recebido no período.</p>'}<h2>Saídas por categoria</h2>${report.expenseCategories.map((item) => metric(item.category, `- ${money(item.total)}`)).join('') || '<p>Nenhuma saída registrada no período.</p>'}` : '';
+    const chart = settings.reportIncludeCharts ? `<hr class="print-divider"><h2>Fluxo resumido</h2>${report.dailyCashFlow.slice(-14).map((item) => metric(item.date, `Entradas ${money(item.income)} · Saídas ${money(item.expense)}`)).join('')}` : '';
+    const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' : ''}<h2 class="print-center">Relatório financeiro</h2><p class="print-center print-muted">${escapePrintHtml(report.period.label)} — ${escapePrintHtml(report.period.from)} até ${escapePrintHtml(report.period.to)}</p><hr class="print-divider">${metric('Entradas confirmadas', money(report.summary.totalIncome))}${metric('Saídas confirmadas', money(report.summary.totalExpenses))}${metric('Resultado líquido', money(report.summary.netResult))}${metric('Recebimentos pendentes', money(report.summary.pendingAmount))}${chart}${details}`;
+    openPrintWindow({ title: 'Relatório financeiro', settings, format: settings.reportFormat, bodyHtml });
+  };
+
   const summary = report?.summary;
 
   return (
@@ -133,7 +146,7 @@ export const ReportsManagement: React.FC = () => {
         <div className="admin-category-scroll flex gap-2 overflow-x-auto no-scrollbar pb-1" data-gesture-scroll="horizontal">
           {periodOptions.map((option) => <button key={option.id} type="button" onClick={() => setPeriod(option.id)} className={`shrink-0 h-10 px-4 rounded-full text-sm font-bold transition-colors ${period === option.id ? 'bg-gold-base text-surface-base' : 'bg-surface-card border border-border-subtle text-content-muted hover:text-content-base'}`}>{option.label}</button>)}
         </div>
-        <button type="button" onClick={() => loadReport()} className="h-10 px-4 rounded-xl border border-border-subtle bg-surface-card text-sm font-bold text-content-muted hover:text-content-base flex items-center justify-center gap-2"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />Atualizar</button>
+        <div className="flex gap-2"><button type="button" onClick={printReport} disabled={!report || loading} className="h-10 px-4 rounded-xl border border-border-subtle bg-surface-card text-sm font-bold text-content-muted hover:text-content-base flex items-center justify-center gap-2 disabled:opacity-50"><Printer className="w-4 h-4" />Imprimir</button><button type="button" onClick={() => loadReport()} className="h-10 px-4 rounded-xl border border-border-subtle bg-surface-card text-sm font-bold text-content-muted hover:text-content-base flex items-center justify-center gap-2"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />Atualizar</button></div>
       </div>
 
       {error && <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">{error}</div>}

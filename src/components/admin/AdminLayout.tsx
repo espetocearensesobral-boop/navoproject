@@ -51,6 +51,7 @@ import {
   Gift,
   Wallet,
   DollarSign,
+  Printer,
   ArrowDownRight,
   ShieldCheck,
   MessageSquare,
@@ -84,14 +85,15 @@ export type AdminTab =
   | 'clientes' 
   | 'barbearia'
   | 'settings'
-  | 'settings_agenda';
+  | 'settings_agenda'
+  | 'settings_print';
 
 export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionamento' | 'sistema';
 
 const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
 const ADMIN_TAB_VALUES: AdminTab[] = [
   'dashboard', 'relatorios', 'agenda', 'financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas', 'financeiro_relatorios', 'audit', 'whatsapp', 'qrcode', 'queue',
-  'relacionamento_dashboard', 'relacionamento_loyalty', 'relacionamento_rewards', 'relacionamento_referrals', 'relacionamento_reviews', 'followup', 'aniversariantes', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings', 'settings_agenda'
+  'relacionamento_dashboard', 'relacionamento_loyalty', 'relacionamento_rewards', 'relacionamento_referrals', 'relacionamento_reviews', 'followup', 'aniversariantes', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings', 'settings_agenda', 'settings_print'
 ];
 
 const getStoredAdminTab = (): AdminTab => {
@@ -134,6 +136,7 @@ const ADMIN_TAB_SECTIONS: Partial<Record<AdminTab, AdminSection>> = {
   barbearia: 'sistema',
   settings: 'sistema',
   settings_agenda: 'sistema',
+  settings_print: 'sistema',
   audit: 'sistema',
   whatsapp: 'sistema',
   qrcode: 'sistema',
@@ -434,6 +437,13 @@ export const AdminLayout: React.FC = () => {
       description: 'Intervalos, limites e margem operacional',
       section: 'sistema' as AdminSection,
     },
+    {
+      id: 'settings_print' as AdminTab,
+      label: 'Impressões',
+      icon: Printer,
+      description: 'Comprovantes, QR Codes e relatórios',
+      section: 'sistema' as AdminSection,
+    },
   ];
 
   const sectionLabels: Record<AdminSection, string> = {
@@ -570,6 +580,8 @@ export const AdminLayout: React.FC = () => {
         return <SettingsManagement />;
       case 'settings_agenda':
         return <SettingsManagement initialTab="availability" />;
+      case 'settings_print':
+        return <SettingsManagement initialTab="print" />;
       default:
         return null;
     }

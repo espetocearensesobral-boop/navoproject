@@ -533,3 +533,27 @@ export const emailSettings = pgTable('email_settings', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const printSettings = pgTable('print_settings', {
+  id: text('id').primaryKey().default('default'),
+  receiptFormat: text('receipt_format').notNull().default('thermal'),
+  reportFormat: text('report_format').notNull().default('a4'),
+  qrFormat: text('qr_format').notNull().default('a4'),
+  thermalWidthMm: integer('thermal_width_mm').notNull().default(80),
+  a4Orientation: text('a4_orientation').notNull().default('portrait'),
+  fontSize: integer('font_size').notNull().default(11),
+  density: text('density').notNull().default('comfortable'),
+  marginMm: integer('margin_mm').notNull().default(8),
+  showLogo: boolean('show_logo').notNull().default(true),
+  showClientData: boolean('show_client_data').notNull().default(true),
+  showProfessional: boolean('show_professional').notNull().default(true),
+  showService: boolean('show_service').notNull().default(true),
+  showPayment: boolean('show_payment').notNull().default(true),
+  showObservations: boolean('show_observations').notNull().default(true),
+  showQr: boolean('show_qr').notNull().default(true),
+  showFooter: boolean('show_footer').notNull().default(true),
+  footerText: text('footer_text').notNull().default('Obrigado pela preferência.'),
+  reportIncludeCharts: boolean('report_include_charts').notNull().default(true),
+  reportIncludeDetails: boolean('report_include_details').notNull().default(true),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+

@@ -7,6 +7,8 @@ import {
   fetchProfessionalsFromSupabase 
 } from '../../services/supabaseDataService';
 import { Appointment, ServiceItem, ProductItem, Professional } from '../../types';
+import { defaultPrintSettings, fetchPrintSettings } from '../../services/printSettingsService';
+import { escapePrintHtml, openPrintWindow } from '../../utils/printUtils';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
 import { 
@@ -361,6 +363,21 @@ export const ComandasManagement: React.FC = () => {
     setClosingComanda(null);
     setReceiptModalComanda(updatedCmd);
     showToast(`Comanda ${updatedCmd.code} fechada e paga!`);
+  };
+
+  const handlePrintComanda = async () => {
+    if (!receiptModalComanda) return;
+    const settings = await fetchPrintSettings().catch(() => defaultPrintSettings);
+    const details = [
+      settings.showClientData ? `<p><strong>Cliente:</strong> ${escapePrintHtml(receiptModalComanda.clientName)}</p>` : '',
+      settings.showProfessional ? `<p><strong>Profissional:</strong> ${escapePrintHtml(receiptModalComanda.professionalName || 'Geral')}</p>` : '',
+      `<p><strong>Data:</strong> ${escapePrintHtml(new Date(receiptModalComanda.closedAt || receiptModalComanda.createdAt).toLocaleString('pt-BR'))}</p>`,
+      settings.showPayment ? `<p><strong>Pagamento:</strong> ${escapePrintHtml(receiptModalComanda.paymentMethod)}</p>` : '',
+    ].join('');
+    const items = settings.showService ? `<h2>Itens consumidos</h2>${receiptModalComanda.items.map((item) => `<div class="print-row"><span>${escapePrintHtml(`${item.quantity}x ${item.title}`)}</span><strong>${escapePrintHtml(`R$ ${(item.price * item.quantity).toFixed(2)}`)}</strong></div>`).join('')}` : '';
+    const totals = `<hr class="print-divider"><div class="print-row"><span>Subtotal</span><strong>R$ ${receiptModalComanda.subtotal.toFixed(2)}</strong></div>${receiptModalComanda.discount > 0 ? `<div class="print-row"><span>Desconto</span><strong>- R$ ${receiptModalComanda.discount.toFixed(2)}</strong></div>` : ''}${receiptModalComanda.tip > 0 ? `<div class="print-row"><span>Caixinha / Gorjeta</span><strong>+ R$ ${receiptModalComanda.tip.toFixed(2)}</strong></div>` : ''}<div class="print-row print-total"><span>Total pago</span><strong>R$ ${receiptModalComanda.total.toFixed(2)}</strong></div>`;
+    const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' : ''}<h2 class="print-center">Comprovante de atendimento</h2><p class="print-center print-muted">#${escapePrintHtml(receiptModalComanda.code)}</p><hr class="print-divider">${details}${items}${totals}`;
+    openPrintWindow({ title: 'Comprovante de atendimento', settings, format: settings.receiptFormat, bodyHtml });
   };
 
   return (
@@ -924,7 +941,7 @@ export const ComandasManagement: React.FC = () => {
 
             <div className="pt-2 flex items-center justify-center gap-2 font-sans">
               <button
-                onClick={() => { window.print(); }}
+                onClick={handlePrintComanda}
                 className="px-3 py-2 rounded-xl border border-border-subtle hover:bg-surface-base text-xs font-bold flex items-center gap-1.5"
               >
                 <Printer className="w-4 h-4" />

@@ -2,11 +2,40 @@ import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { QrCode, Printer, Copy, Check, ExternalLink, Share2, AlertCircle } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { defaultPrintSettings, fetchPrintSettings } from '../../services/printSettingsService';
 
 export const QrCodeManagement: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const bookingUrl = `${window.location.origin}/?booking=1`;
+
+  const handlePrintTotem = async () => {
+    const settings = await fetchPrintSettings().catch(() => defaultPrintSettings);
+    document.body.dataset.qrPrintFormat = settings.qrFormat;
+    document.body.dataset.qrPrintWidth = String(settings.thermalWidthMm);
+    document.body.dataset.qrPrintOrientation = settings.a4Orientation;
+    document.body.dataset.qrShowLogo = String(settings.showLogo);
+    document.body.dataset.qrShowCode = String(settings.showQr);
+    document.body.dataset.qrShowFooter = String(settings.showFooter);
+    document.body.style.setProperty('--qr-print-font-size', `${settings.fontSize}px`);
+    document.body.style.setProperty('--qr-print-margin', `${settings.marginMm}mm`);
+    document.body.style.setProperty('--qr-print-density', settings.density === 'compact' ? '4px' : settings.density === 'spacious' ? '14px' : '8px');
+    const cleanup = () => {
+      delete document.body.dataset.qrPrintFormat;
+      delete document.body.dataset.qrPrintWidth;
+      delete document.body.dataset.qrPrintOrientation;
+      delete document.body.dataset.qrShowLogo;
+      delete document.body.dataset.qrShowCode;
+      delete document.body.dataset.qrShowFooter;
+      document.body.style.removeProperty('--qr-print-font-size');
+      document.body.style.removeProperty('--qr-print-margin');
+      document.body.style.removeProperty('--qr-print-density');
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup, { once: true });
+    window.print();
+    window.setTimeout(cleanup, 5000);
+  };
 
   const handleCopy = async () => {
     setCopyError(false);
@@ -37,12 +66,12 @@ export const QrCodeManagement: React.FC = () => {
       <AdminPageHeader
         icon={QrCode}
         title="Divulgação & QR Code do Agendamento"
-        action={{ label: 'Imprimir totem', onClick: () => window.print(), icon: Printer }}
+        action={{ label: 'Imprimir totem', onClick: handlePrintTotem, icon: Printer }}
       />
 
       {/* Ação (mobile) */}
       <button
-        onClick={() => window.print()}
+        onClick={handlePrintTotem}
         className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
       >
         <Printer className="w-4 h-4" />
@@ -53,17 +82,17 @@ export const QrCodeManagement: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Printable Card Totem */}
         <div className="qr-print-sheet bg-surface-card border border-gold-base/40 rounded-2xl p-6 text-center space-y-4 shadow-md bg-gold-base/5 font-serif relative overflow-hidden">
-          <div className="space-y-1">
+          <div className="qr-print-brand space-y-1">
             <h2 className="text-2xl font-bold tracking-widest uppercase text-content-base">NAVO PREMIUM</h2>
             <p className="text-xs font-sans text-gold-base font-bold uppercase tracking-wider">Agende seu horário pelo celular</p>
           </div>
 
           {/* QR Code Container */}
-          <div className="bg-surface-base p-4 rounded-2xl border-2 border-gold-base/60 inline-block shadow-inner mx-auto">
+          <div className="qr-print-code bg-surface-base p-4 rounded-2xl border-2 border-gold-base/60 inline-block shadow-inner mx-auto">
             <QRCodeSVG value={bookingUrl} size={220} level="M" includeMargin fgColor="#111111" bgColor="#ffffff" className="mx-auto" />
           </div>
 
-          <div className="space-y-1 text-xs font-sans">
+          <div className="qr-print-footer space-y-1 text-xs font-sans">
             <p className="text-content-base font-bold">Aponte a câmera para agendar</p>
             <p className="text-content-muted text-[11px]">O QR abre diretamente a escolha do serviço.</p>
           </div>

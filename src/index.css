@@ -903,12 +903,36 @@ button, a, input, select, textarea {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
-    max-width: 90mm !important;
+    max-width: 210mm !important;
     margin: 15mm auto !important;
     border: 1px solid #111 !important;
     background: #fff !important;
     color: #111 !important;
     box-shadow: none !important;
+  }
+
+  body[data-qr-print-format="thermal"]:has(.qr-print-sheet) .qr-print-sheet {
+    max-width: 80mm !important;
+    margin: 8mm auto !important;
+  }
+
+  body:has(.qr-print-sheet) .qr-print-sheet {
+    padding: var(--qr-print-margin, 8mm) !important;
+    font-size: var(--qr-print-font-size, 11px) !important;
+  }
+
+  body[data-qr-show-logo="false"]:has(.qr-print-sheet) .qr-print-brand,
+  body[data-qr-show-footer="false"]:has(.qr-print-sheet) .qr-print-footer,
+  body[data-qr-show-code="false"]:has(.qr-print-sheet) .qr-print-code {
+    display: none !important;
+  }
+
+  body[data-qr-print-width="58"]:has(.qr-print-sheet) .qr-print-sheet {
+    max-width: 58mm !important;
+  }
+
+  body[data-qr-print-orientation="landscape"]:has(.qr-print-sheet) .qr-print-sheet {
+    max-width: 270mm !important;
   }
 
   body:has(.qr-print-sheet) .qr-print-sheet p,
