@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Moon, Sun, ShieldCheck, Mail, Phone, Award, Edit2, Camera, Save, LogOut, Download, AlertCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { X, Moon, Sun, ShieldCheck, Mail, Phone, CalendarDays, Award, Edit2, Camera, Save, LogOut, Download, AlertCircle, Loader2, AlertTriangle } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { authFetch } from '../../lib/api';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
@@ -31,6 +31,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
     name: userProfile?.name || '',
     email: userProfile?.email || '',
     phone: userProfile?.phone || '',
+    birthday: userProfile?.birthday || '',
     avatar_url: userProfile?.avatar_url || ''
   });
   
@@ -40,6 +41,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
         name: userProfile.name || '',
         email: userProfile.email || '',
         phone: userProfile.phone || '',
+        birthday: userProfile.birthday || '',
         avatar_url: userProfile.avatar_url || userProfile.avatarUrl || ''
       });
       setIsEditing(false);
@@ -70,6 +72,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
+        birthday: formData.birthday || null,
         avatar_url: formData.avatar_url,
         avatarUrl: formData.avatar_url
       };
@@ -81,6 +84,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
+            birthday: formData.birthday || null,
             avatar_url: formData.avatar_url
           })
         });
@@ -208,6 +212,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
                         name: userProfile.name || '',
                         email: userProfile.email || '',
                         phone: userProfile.phone || '',
+                        birthday: userProfile.birthday || '',
                         avatar_url: userProfile.avatar_url || ''
                       });
                       setIsEditing(true);
@@ -248,6 +253,15 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
                     <div>
                       <p className="text-[10px] text-content-muted font-bold uppercase">Telefone</p>
                       <p className="text-sm text-content-base font-medium">{userProfile.phone || 'Não informado'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3">
+                    <div className="w-8 h-8 rounded-full bg-surface-base flex items-center justify-center border border-border-subtle">
+                      <CalendarDays className="w-4 h-4 text-content-base" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-content-muted font-bold uppercase">Aniversário</p>
+                      <p className="text-sm text-content-base font-medium">{userProfile.birthday ? new Date(`${userProfile.birthday}T12:00:00`).toLocaleDateString('pt-BR') : 'Não informado'}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3 p-3">
@@ -335,6 +349,16 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
                       tabIndex={3}
                     />
                   </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">Data de aniversário</label>
+                    <input
+                      type="date"
+                      value={formData.birthday}
+                      onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
+                      className="w-full bg-surface-base/50 border border-border-subtle rounded-xl py-3 px-4 text-content-base text-sm focus:border-gold-base focus:ring-1 focus:ring-gold-base focus:outline-none transition-all"
+                      tabIndex={4}
+                    />
+                  </div>
                 </div>
                 
                 <div className="flex space-x-3 mt-6 pt-2">
@@ -347,7 +371,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
                     }}
                     disabled={isSaving}
                     className="flex-1 py-3 rounded-xl bg-surface-card text-content-base font-bold text-sm hover:bg-neutral-700 transition-colors border border-border-subtle focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
-                    tabIndex={5}
+                    tabIndex={6}
                   >
                     Cancelar
                   </button>
@@ -355,7 +379,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
                     type="submit"
                     disabled={isSaving}
                     className="flex-1 py-3 rounded-xl bg-gold-base text-surface-base font-extrabold text-sm hover:opacity-95 transition-all flex items-center justify-center space-x-2 shadow-lg shadow-[#C9A96E]/20 focus:outline-none focus:ring-2 focus:ring-gold-base disabled:opacity-50"
-                    tabIndex={4}
+                    tabIndex={5}
                   >
                     {isSaving ? (
                       <>
