@@ -10,7 +10,7 @@ import {
 type StatusMessage = { type: 'success' | 'error'; text: string } | null;
 
 const fieldClass = 'w-full bg-surface-card border border-border-subtle rounded-xl p-3 text-sm text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular';
-const labelClass = 'text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1.5';
+const labelClass = 'text-xs font-bold text-content-muted uppercase tracking-wider block mb-1.5';
 
 export const AgendaAvailabilitySettings: React.FC = () => {
   const [settings, setSettings] = useState<OperationSettings>(defaultOperationSettings);

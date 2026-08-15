@@ -184,7 +184,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
                 Nome Principal da Barbearia
               </label>
               <input
@@ -197,7 +197,7 @@ export const BarbershopProfileManagement: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
                 Nome da Unidade
               </label>
               <input
@@ -211,7 +211,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
               Slogan / Subtítulo da Barbearia
             </label>
             <input
@@ -224,7 +224,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
               Descrição / Sobre a Unidade
             </label>
             <textarea
@@ -240,10 +240,10 @@ export const BarbershopProfileManagement: React.FC = () => {
           <div className="bg-surface-base border border-border-subtle rounded-2xl p-4 sm:p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-[11px] font-bold text-content-base uppercase tracking-wider block">
+                <label className="text-xs font-bold text-content-base uppercase tracking-wider block">
                   Logomarca Oficial da Unidade
                 </label>
-                <p className="text-[10px] text-content-muted mt-0.5">
+                <p className="text-xs text-content-muted mt-0.5">
                   Exibida na Landing Page (no anel circular estilo Instagram), nos comprovantes de agendamento e no cabeçalho do app.
                 </p>
               </div>
@@ -278,7 +278,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                     <Instagram className="w-3 h-3" />
                   </div>
                 </div>
-                <span className="text-[10px] font-bold text-content-muted uppercase tracking-wider mt-2">
+                <span className="text-xs font-bold text-content-muted uppercase tracking-wider mt-2">
                   Pré-visualização
                 </span>
               </div>
@@ -313,7 +313,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+                  <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
                     Ou Cole o Link Direto da Imagem (URL HTTPS)
                   </label>
                   <input
@@ -323,7 +323,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                     placeholder="https://exemplo.com/sua-logomarca.png"
                     className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
                   />
-                  <span className="text-[10px] text-content-muted mt-1 block">
+                  <span className="text-xs text-content-muted mt-1 block">
                     Formatos suportados: PNG, JPG, WEBP ou SVG (Recomendado: Imagem quadrada com fundo escuro ou transparente).
                   </span>
                 </div>
@@ -341,7 +341,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               <Clock className="w-4 h-4 text-gold-base" />
               <h2 className="text-sm font-serif font-bold text-content-base">Horários de Funcionamento Semanal</h2>
             </div>
-            <div className="text-[11px] text-content-muted bg-surface-base px-2.5 py-1 rounded-xl border border-border-subtle">
+            <div className="text-xs text-content-muted bg-surface-base px-2.5 py-1 rounded-xl border border-border-subtle">
               Slot de atendimento: <strong className="text-gold-base font-mono">30 minutos</strong>
             </div>
           </div>
@@ -356,7 +356,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           {/* GENERAL DEFAULT OPEN & CLOSE TIMES */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-surface-base p-4 rounded-xl border border-border-subtle">
             <div>
-              <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
                 Horário Padrão de Abertura
               </label>
               <input
@@ -367,7 +367,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
                 Horário Padrão de Fechamento
               </label>
               <input
@@ -391,7 +391,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 <div className="text-xs font-bold text-content-base">
                   Permitir solicitação fora do expediente
                 </div>
-                <p className="text-[11px] text-content-muted mt-1 max-w-md">
+                <p className="text-xs text-content-muted mt-1 max-w-md">
                   Quando ativado, o cliente pode solicitar um horário cujo atendimento
                   ultrapasse o fechamento — o agendamento fica pendente de aprovação do
                   barbeiro. Quando desativado (padrão), esses horários simplesmente não
@@ -442,7 +442,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                       <div className="w-28 font-bold text-xs text-content-base">
                         {dayItem.label}
                       </div>
-                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-xl ${
+                      <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded-xl ${
                         sch.active ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30' : 'bg-red-950/60 text-red-400 border border-red-500/30'
                       }`}>
                         {sch.active ? 'Aberto' : 'Fechado'}
@@ -452,7 +452,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                     {sch.active ? (
                       <div className="flex items-center gap-2 w-full sm:w-auto">
                         <div className="flex items-center gap-1.5 flex-1 sm:flex-initial">
-                          <span className="text-[10px] text-content-muted">Abre:</span>
+                          <span className="text-xs text-content-muted">Abre:</span>
                           <input
                             type="time"
                             value={sch.open || '09:00'}
@@ -464,7 +464,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                         <span className="text-content-muted text-xs">até</span>
 
                         <div className="flex items-center gap-1.5 flex-1 sm:flex-initial">
-                          <span className="text-[10px] text-content-muted">Fecha:</span>
+                          <span className="text-xs text-content-muted">Fecha:</span>
                           <input
                             type="time"
                             value={sch.close || '20:00'}
@@ -486,13 +486,13 @@ export const BarbershopProfileManagement: React.FC = () => {
 
           {/* SAMPLE SLOTS GENERATED */}
           <div className="pt-3 border-t border-border-subtle">
-            <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
               Amostra dos Horários Gerados Automaticamente ({sampleSlots.length} horários)
             </label>
             <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-surface-base rounded-xl border border-border-subtle custom-scrollbar">
               {sampleSlots.length > 0 ? (
                 sampleSlots.map(slot => (
-                  <span key={slot} className="px-2 py-1 bg-surface-card border border-border-subtle rounded-xl text-[10px] font-mono font-bold text-gold-base">
+                  <span key={slot} className="px-2 py-1 bg-surface-card border border-border-subtle rounded-xl text-xs font-mono font-bold text-gold-base">
                     {slot}
                   </span>
                 ))
@@ -513,7 +513,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
               Endereço Completo da Barbearia
             </label>
             <input
@@ -527,7 +527,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
                 Telefone Principal / Celular
               </label>
               <input
@@ -540,7 +540,7 @@ export const BarbershopProfileManagement: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
                 WhatsApp Oficial de Atendimento
               </label>
               <input
@@ -555,7 +555,7 @@ export const BarbershopProfileManagement: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
                 Telefone Fixo da Recepção
               </label>
               <input
@@ -568,7 +568,7 @@ export const BarbershopProfileManagement: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+              <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
                 E-mail de Suporte e Atendimento
               </label>
               <input
@@ -592,7 +592,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
               Perfil no Instagram (@usuario)
             </label>
             <div className="flex min-w-0">
@@ -610,7 +610,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
               Página do Facebook (URL)
             </label>
             <input
@@ -623,7 +623,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-[11px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
               Link de Localização e Avaliações (Google Maps)
             </label>
             <input
@@ -676,7 +676,7 @@ const AppearanceTabContent: React.FC = () => {
           <Palette className="w-4 h-4 text-gold-base" />
           <h2 className="text-sm font-serif font-bold text-content-base">Paleta e Identidade Visual do Sistema</h2>
         </div>
-        <p className="text-[11px] text-content-muted max-w-xl">
+        <p className="text-xs text-content-muted max-w-xl">
           Personalize a cor de destaque da sua unidade sem alterar o contraste e legibilidade. A escolha é salva neste dispositivo e aplicada instantaneamente a todo o sistema e aplicativo dos clientes.
         </p>
       </div>
@@ -696,8 +696,8 @@ const AppearanceTabContent: React.FC = () => {
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="w-8 h-8 rounded-xl shrink-0 border border-white/10 shadow-inner" style={{ background: `linear-gradient(135deg, ${item.accentSoft}, ${item.deep})` }} />
                   <span className="min-w-0">
-                    <span className="block text-xs font-bold text-content-base truncate">{item.name}</span>
-                    <span className="block text-[10px] text-content-muted truncate">{item.description}</span>
+                    <span className="block text-xs font-bold text-content-base admin-clamp-2">{item.name}</span>
+                    <span className="block text-xs text-content-muted admin-clamp-2">{item.description}</span>
                   </span>
                 </div>
                 {selected && <span className="w-5 h-5 rounded-full flex items-center justify-center bg-gold-base text-surface-base"><Check className="w-3 h-3" /></span>}
@@ -712,7 +712,7 @@ const AppearanceTabContent: React.FC = () => {
         })}
       </div>
 
-      <div className="pt-4 border-t border-border-subtle flex items-start gap-2 text-[11px] text-content-muted">
+      <div className="pt-4 border-t border-border-subtle flex items-start gap-2 text-xs text-content-muted">
         <Palette className="w-4 h-4 text-gold-base shrink-0 mt-0.5" />
         <p>O Dourado Heritage permanece como padrão original. As demais opções alteram os elementos de realce (botões, ícones, seleções) mantendo a estrutura limpa e fluida da plataforma.</p>
       </div>

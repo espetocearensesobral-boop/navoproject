@@ -216,11 +216,11 @@ export const ProductsManagement: React.FC = () => {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-gold-base truncate">{product.category}</p>
-                      {isLowStock && <span className="shrink-0 rounded-md bg-amber-500/15 px-2 py-1 text-[10px] font-bold text-amber-300">Baixo</span>}
+                      <p className="text-xs font-bold uppercase tracking-wider text-gold-base admin-clamp-2">{product.category}</p>
+                      {isLowStock && <span className="shrink-0 rounded-md bg-amber-500/15 px-2 py-1 text-xs font-bold text-amber-300">Baixo</span>}
                     </div>
-                    <h2 className="mt-0.5 text-sm sm:text-base font-bold text-content-base truncate">{product.name}</h2>
-                    <p className="text-xs text-content-muted truncate">{product.brand}</p>
+                    <h2 className="mt-0.5 text-sm sm:text-base font-bold text-content-base admin-clamp-2">{product.name}</h2>
+                    <p className="text-xs text-content-muted admin-safe-wrap">{product.brand}</p>
                   </div>
                   <div className="hidden sm:block text-right shrink-0">
                     <p className="text-xs text-content-muted">Preço</p>
@@ -234,11 +234,11 @@ export const ProductsManagement: React.FC = () => {
                 </button>
                 {isExpanded && (
                   <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Preço de venda</p><p className="font-bold finance-positive">{money(product.price)}</p></div>
-                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Custo</p><p className="font-bold finance-negative">{money(product.cost_price)}</p></div>
-                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Alerta mínimo</p><p className="font-bold text-content-base">{product.min_stock_alert} un.</p></div>
-                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Comissão</p><p className="font-bold text-content-base">{product.commission_percentage}%</p></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-xs">
+                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Preço de venda</p><p className="font-bold finance-positive">{money(product.price)}</p></div>
+                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Custo</p><p className="font-bold finance-negative">{money(product.cost_price)}</p></div>
+                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Alerta mínimo</p><p className="font-bold text-content-base">{product.min_stock_alert} un.</p></div>
+                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Comissão</p><p className="font-bold text-content-base">{product.commission_percentage}%</p></div>
                     </div>
                     <div className="flex flex-wrap gap-2 pt-1">
                       <button type="button" onClick={() => openEdit(product)} className="min-h-10 px-4 rounded-xl border border-border-subtle text-content-muted hover:text-content-base text-sm font-semibold flex items-center justify-center gap-1.5"><Edit3 className="w-4 h-4" /> Editar</button>
@@ -256,7 +256,7 @@ export const ProductsManagement: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="w-full sm:max-w-lg max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-2xl border border-border-subtle bg-surface-card p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <div><h2 className="text-base font-bold text-content-base">{editingProduct ? 'Editar produto' : 'Novo produto'}</h2><p className="text-[11px] text-content-muted">Dados persistidos no catálogo de produtos e estoque.</p></div>
+              <div><h2 className="text-base font-bold text-content-base">{editingProduct ? 'Editar produto' : 'Novo produto'}</h2><p className="text-xs text-content-muted admin-safe-wrap">Dados persistidos no catálogo de produtos e estoque.</p></div>
               <button type="button" onClick={() => { setEditingProduct(null); setIsModalOpen(false); }} className="h-9 w-9 rounded-xl text-content-muted flex items-center justify-center" aria-label="Fechar formulário"><X className="w-5 h-5" /></button>
             </div>
             <form onKeyDown={handleEnterAsTab} onSubmit={handleSave} className="space-y-3">

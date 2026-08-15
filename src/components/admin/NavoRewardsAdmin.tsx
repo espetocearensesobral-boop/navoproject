@@ -394,49 +394,49 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
       {activeTab === 'dashboard' && <>
       {/* 2. KPIS (Sempre no topo, logo abaixo do Header) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Score NPS</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Score NPS</span>
             <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0">
               <Star className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-gold-base tabular-nums truncate">{data?.npsScore || 100} <span className="text-[10px] text-status-success">/ 100</span></p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{data?.promoters || 0} prom / {data?.detractors || 0} detr</p>
+          <p className="text-lg font-black text-gold-base tabular-nums truncate">{data?.npsScore || 100} <span className="text-xs text-status-success">/ 100</span></p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">{data?.promoters || 0} prom / {data?.detractors || 0} detr</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Pts Emitidos</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Pts Emitidos</span>
             <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle flex items-center justify-center shrink-0">
               <Sparkles className="w-3.5 h-3.5 text-gold-base" />
             </div>
           </div>
           <p className="text-lg font-black text-content-base tabular-nums truncate">+{data?.totalIssued || 0}</p>
-          <p className="text-[9px] text-status-success mt-1 font-medium truncate">Cortes e indicações</p>
+          <p className="text-xs text-status-success mt-1 font-medium truncate">Cortes e indicações</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Pts Resgatados</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Pts Resgatados</span>
             <div className="w-6 h-6 rounded-lg bg-status-error/10 text-status-error flex items-center justify-center shrink-0">
               <Gift className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black text-status-error tabular-nums truncate">-{data?.totalRedeemed || 0}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Cupons gerados</p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">Cupons gerados</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Avaliações</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Avaliações</span>
             <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle flex items-center justify-center shrink-0">
               <MessageSquare className="w-3.5 h-3.5 text-gold-base" />
             </div>
           </div>
           <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.totalReviews || 0}</p>
-          <p className="text-[9px] text-gold-base mt-1 font-medium truncate">100% NPS Ativo</p>
+          <p className="text-xs text-gold-base mt-1 font-medium truncate">100% NPS Ativo</p>
         </div>
       </div>
 
@@ -447,10 +447,10 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
             <Megaphone className="w-4 h-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-xs font-bold text-content-base block truncate">
+            <span className="text-xs font-bold text-content-base block admin-safe-wrap">
               Campanha de Re-engajamento
             </span>
-            <p className="text-[11px] text-content-muted truncate">
+            <p className="text-xs text-content-muted admin-safe-wrap">
               Creditar +100 pontos para clientes inativos para incentivar retornos.
             </p>
           </div>
@@ -504,49 +504,49 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                 <span>Distribuição por Nível VIP</span>
               </h3>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
                 <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
                   <div className="flex items-center justify-between text-amber-700 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider truncate">Bronze</span>
+                    <span className="text-xs font-bold uppercase tracking-wider truncate">Bronze</span>
                     <div className="w-6 h-6 rounded-lg bg-amber-700/10 flex items-center justify-center shrink-0">
                       <Crown className="w-3.5 h-3.5" />
                     </div>
                   </div>
                   <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Bronze || 0}</p>
-                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Bronze')?.multiplier || 1}x mult</p>
+                  <p className="text-xs text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Bronze')?.multiplier || 1}x mult</p>
                 </div>
 
                 <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
                   <div className="flex items-center justify-between text-slate-400 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider truncate">Prata</span>
+                    <span className="text-xs font-bold uppercase tracking-wider truncate">Prata</span>
                     <div className="w-6 h-6 rounded-lg bg-slate-400/10 flex items-center justify-center shrink-0">
                       <Crown className="w-3.5 h-3.5" />
                     </div>
                   </div>
                   <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Prata || 0}</p>
-                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Prata')?.multiplier || 1.2}x mult</p>
+                  <p className="text-xs text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Prata')?.multiplier || 1.2}x mult</p>
                 </div>
 
                 <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
                   <div className="flex items-center justify-between text-gold-base mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider truncate">Ouro</span>
+                    <span className="text-xs font-bold uppercase tracking-wider truncate">Ouro</span>
                     <div className="w-6 h-6 rounded-lg bg-gold-base/10 flex items-center justify-center shrink-0">
                       <Crown className="w-3.5 h-3.5" />
                     </div>
                   </div>
                   <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Ouro || 0}</p>
-                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Ouro')?.multiplier || 1.5}x mult</p>
+                  <p className="text-xs text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Ouro')?.multiplier || 1.5}x mult</p>
                 </div>
 
                 <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
                   <div className="flex items-center justify-between text-cyan-400 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider truncate">Diamante</span>
+                    <span className="text-xs font-bold uppercase tracking-wider truncate">Diamante</span>
                     <div className="w-6 h-6 rounded-lg bg-cyan-400/10 flex items-center justify-center shrink-0">
                       <Crown className="w-3.5 h-3.5" />
                     </div>
                   </div>
                   <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.tierDistribution?.Diamante || 0}</p>
-                  <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Diamante')?.multiplier || 2}x mult</p>
+                  <p className="text-xs text-content-muted mt-1 font-medium truncate">{tiers.find((tier) => tier.name === 'Diamante')?.multiplier || 2}x mult</p>
                 </div>
               </div>
             </div>
@@ -563,20 +563,20 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   {data.ambassadors.map((amb: any, idx: number) => (
                     <div key={amb.id || idx} className="pt-2 flex items-center justify-between min-w-0">
                       <div className="flex items-center space-x-2.5 min-w-0">
-                        <span className={`w-6 h-6 rounded-xl font-bold text-[10px] flex items-center justify-center shrink-0 ${
+                        <span className={`w-6 h-6 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 ${
                           idx === 0 ? 'bg-gold-base text-surface-base' : 'bg-surface-base text-content-muted border border-border-subtle'
                         }`}>
                           #{idx + 1}
                         </span>
-                        <div className="min-w-0 truncate">
-                          <span className="text-content-base font-bold block truncate">{amb.name}</span>
-                          <span className="text-[10px] text-content-muted truncate block">Nível {amb.tier} • {amb.points} pts</span>
+                        <div className="min-w-0">
+                          <span className="text-content-base font-bold block admin-clamp-2">{amb.name}</span>
+                          <span className="text-xs text-content-muted admin-safe-wrap block">Nível {amb.tier} • {amb.points} pts</span>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0">
                         <span className="text-xs font-bold text-gold-base num-tabular block">{amb.totalReferrals} amigos</span>
-                        <span className="text-[10px] text-status-success font-semibold">100% convertidos</span>
+                        <span className="text-xs text-status-success font-semibold">100% convertidos</span>
                       </div>
                     </div>
                   ))}
@@ -599,7 +599,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   <Crown className="w-4 h-4 text-gold-base" />
                   <span>Configuração de Pontos & Validade</span>
                 </h3>
-                <p className="text-[11px] text-content-muted mt-0.5">Ajuste a taxa de conversão, multiplicadores e expiração.</p>
+                <p className="text-xs text-content-muted mt-0.5">Ajuste a taxa de conversão, multiplicadores e expiração.</p>
               </div>
 
               <button
@@ -614,7 +614,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <label className="text-[10px] font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
+                <label className="text-xs font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
                   <DollarSign className="w-3.5 h-3.5" /> Razão de Conversão
                 </label>
                 <div className="flex items-center gap-2">
@@ -632,7 +632,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               </div>
 
               <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <label className="text-[10px] font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
+                <label className="text-xs font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" /> Validade (Dias)
                 </label>
                 <div className="flex items-center gap-2">
@@ -648,7 +648,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               </div>
 
               <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <label className="text-[10px] font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
+                <label className="text-xs font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
                   <Gift className="w-3.5 h-3.5" /> Bônus Aniversário
                 </label>
                 <div className="flex items-center gap-2">
@@ -673,7 +673,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2"><Crown className="w-4 h-4 text-gold-base" /> Níveis VIP reais</h3>
-                <p className="text-[11px] text-content-muted mt-1">Defina o mínimo de pontos e o multiplicador usado no próximo checkout confirmado.</p>
+                <p className="text-xs text-content-muted mt-1">Defina o mínimo de pontos e o multiplicador usado no próximo checkout confirmado.</p>
               </div>
               <div className="flex gap-2"><button type="button" onClick={() => setTiers((current) => [...current, { name: 'Novo nível', minimumPoints: 0, multiplier: 1, displayOrder: current.length, color: '#D4AF5A', isActive: true }])} className="h-9 px-3 rounded-xl border border-border-subtle text-content-base font-bold text-xs flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> Novo nível</button><button type="button" onClick={handleSaveTiers} disabled={savingTiers || tiers.length === 0} className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs disabled:opacity-50">{savingTiers ? 'Salvando...' : 'Salvar níveis'}</button></div>
             </div>
@@ -685,7 +685,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   <input type="number" min="0.1" max="20" step="0.1" value={tier.multiplier} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, multiplier: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Multiplicador do nível ${index + 1}`} />
                   <input type="number" min="0" step="1" value={tier.displayOrder} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, displayOrder: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Ordem do nível ${index + 1}`} />
                   <input type="color" value={tier.color || '#D4AF5A'} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, color: e.target.value } : item))} className="w-full h-9 bg-surface-card border border-border-subtle rounded-lg p-1" aria-label={`Cor do nível ${index + 1}`} />
-                  <label className="flex items-center gap-2 text-[11px] text-content-muted"><input type="checkbox" checked={Boolean(tier.isActive)} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, isActive: e.target.checked } : item))} /> Ativo</label>
+                  <label className="flex items-center gap-2 text-xs text-content-muted"><input type="checkbox" checked={Boolean(tier.isActive)} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, isActive: e.target.checked } : item))} /> Ativo</label>
                 </div>
               ))}
             </div>
@@ -696,7 +696,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Benefícios do Club</h3>
-                  <p className="text-[11px] text-content-muted mt-1">Crie vantagens, descontos, cortes, produtos e regras de uso.</p>
+                  <p className="text-xs text-content-muted mt-1">Crie vantagens, descontos, cortes, produtos e regras de uso.</p>
                 </div>
                 <button type="button" onClick={() => openBenefitEditor()} className="h-9 px-3 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0"><Plus className="w-3.5 h-3.5" /> Novo benefício</button>
               </div>
@@ -706,13 +706,13 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className="font-bold text-xs text-content-base">{benefit.name}</span>
-                        {!benefit.isActive && <span className="text-[9px] rounded-full px-2 py-0.5 bg-status-error/10 text-status-error font-bold">INATIVO</span>}
+                        {!benefit.isActive && <span className="text-xs rounded-full px-2 py-0.5 bg-status-error/10 text-status-error font-bold">INATIVO</span>}
                       </div>
-                      <p className="text-[10px] text-content-muted mt-1 line-clamp-2">{benefit.description}</p>
-                      <p className="text-[10px] text-gold-base mt-1 font-bold">{benefit.benefitType} {benefit.valueAmount !== null && benefit.valueAmount !== undefined ? `• R$ ${Number(benefit.valueAmount).toFixed(2).replace('.', ',')}` : ''} {benefit.tierIds?.length ? `• ${benefit.tierIds.length} nível(is)` : ''}</p>
+                      <p className="text-xs text-content-muted mt-1 line-clamp-2">{benefit.description}</p>
+                      <p className="text-xs text-gold-base mt-1 font-bold">{benefit.benefitType} {benefit.valueAmount !== null && benefit.valueAmount !== undefined ? `• R$ ${Number(benefit.valueAmount).toFixed(2).replace('.', ',')}` : ''} {benefit.tierIds?.length ? `• ${benefit.tierIds.length} nível(is)` : ''}</p>
                     </div>
                     <div className="flex gap-1 shrink-0">
-                      <button type="button" onClick={() => openBenefitEditor(benefit)} className="h-8 px-2.5 rounded-lg border border-border-subtle text-content-base text-[10px] font-bold">Editar</button>
+                      <button type="button" onClick={() => openBenefitEditor(benefit)} className="h-8 px-2.5 rounded-lg border border-border-subtle text-content-base text-xs font-bold">Editar</button>
                       {benefit.isActive && <button type="button" onClick={async () => { if (!confirm('Desativar este benefício?')) return; try { await archiveLoyaltyBenefit(benefit.id); await loadData(); } catch (err: any) { alert(err.message || 'Erro ao desativar benefício.'); } }} className="h-8 w-8 rounded-lg border border-border-subtle text-status-error flex items-center justify-center" title="Desativar benefício"><Trash2 className="w-3.5 h-3.5" /></button>}
                     </div>
                   </div>
@@ -724,7 +724,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Planos do Club</h3>
-                  <p className="text-[11px] text-content-muted mt-1">Defina nome, preço, periodicidade, bônus e benefícios. Ainda sem cobrança automática.</p>
+                  <p className="text-xs text-content-muted mt-1">Defina nome, preço, periodicidade, bônus e benefícios. Ainda sem cobrança automática.</p>
                 </div>
                 <button type="button" onClick={() => openPlanEditor()} className="h-9 px-3 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0"><Plus className="w-3.5 h-3.5" /> Novo plano</button>
               </div>
@@ -734,14 +734,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className="font-bold text-xs text-content-base">{plan.name}</span>
-                        <span className={`text-[9px] rounded-full px-2 py-0.5 font-bold ${plan.status === 'active' ? 'bg-status-success/10 text-status-success' : 'bg-surface-card text-content-muted'}`}>{plan.status.toUpperCase()}</span>
-                        {plan.isFeatured && <span className="text-[9px] rounded-full px-2 py-0.5 bg-gold-base/10 text-gold-base font-bold">DESTAQUE</span>}
+                        <span className={`text-xs rounded-full px-2 py-0.5 font-bold ${plan.status === 'active' ? 'bg-status-success/10 text-status-success' : 'bg-surface-card text-content-muted'}`}>{plan.status.toUpperCase()}</span>
+                        {plan.isFeatured && <span className="text-xs rounded-full px-2 py-0.5 bg-gold-base/10 text-gold-base font-bold">DESTAQUE</span>}
                       </div>
-                      <p className="text-[10px] text-content-muted mt-1 line-clamp-2">{plan.description}</p>
-                      <p className="text-[10px] text-gold-base mt-1 font-bold">R$ {Number(plan.price || 0).toFixed(2).replace('.', ',')} {plan.billingPeriod !== 'none' ? `• ${plan.billingPeriod}` : '• único'} {plan.pointsBonus ? `• +${plan.pointsBonus} pts` : ''}</p>
+                      <p className="text-xs text-content-muted mt-1 line-clamp-2">{plan.description}</p>
+                      <p className="text-xs text-gold-base mt-1 font-bold">R$ {Number(plan.price || 0).toFixed(2).replace('.', ',')} {plan.billingPeriod !== 'none' ? `• ${plan.billingPeriod}` : '• único'} {plan.pointsBonus ? `• +${plan.pointsBonus} pts` : ''}</p>
                     </div>
                     <div className="flex gap-1 shrink-0">
-                      <button type="button" onClick={() => openPlanEditor(plan)} className="h-8 px-2.5 rounded-lg border border-border-subtle text-content-base text-[10px] font-bold">Editar</button>
+                      <button type="button" onClick={() => openPlanEditor(plan)} className="h-8 px-2.5 rounded-lg border border-border-subtle text-content-base text-xs font-bold">Editar</button>
                       {plan.status !== 'archived' && <button type="button" onClick={async () => { if (!confirm('Arquivar este plano?')) return; try { await archiveLoyaltyPlan(plan.id); await loadData(); } catch (err: any) { alert(err.message || 'Erro ao arquivar plano.'); } }} className="h-8 w-8 rounded-lg border border-border-subtle text-status-error flex items-center justify-center" title="Arquivar plano"><Trash2 className="w-3.5 h-3.5" /></button>}
                     </div>
                   </div>
@@ -756,20 +756,20 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                 <div className="mb-4"><h3 className="text-base font-serif font-bold text-content-base">{editingBenefit ? 'Editar benefício' : 'Novo benefício'}</h3><p className="text-xs text-content-muted mt-1">O benefício é cadastrado no banco e pode ser vinculado a um ou mais níveis.</p></div>
                 <form onKeyDown={handleEnterAsTab} onSubmit={handleSaveBenefit} className="space-y-3 text-xs">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Nome</span><input autoFocus required value={benefitDraft.name} onChange={(e) => setBenefitDraft({ ...benefitDraft, name: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
-                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Tipo</span><select value={benefitDraft.benefitType} onChange={(e) => setBenefitDraft({ ...benefitDraft, benefitType: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="discount_percent">Desconto percentual</option><option value="discount_fixed">Desconto fixo</option><option value="free_service">Serviço grátis</option><option value="free_product">Produto grátis</option><option value="points_bonus">Bônus de pontos</option><option value="priority_queue">Prioridade na fila</option><option value="custom">Personalizado</option></select></label>
+                    <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Nome</span><input autoFocus required value={benefitDraft.name} onChange={(e) => setBenefitDraft({ ...benefitDraft, name: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
+                    <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Tipo</span><select value={benefitDraft.benefitType} onChange={(e) => setBenefitDraft({ ...benefitDraft, benefitType: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="discount_percent">Desconto percentual</option><option value="discount_fixed">Desconto fixo</option><option value="free_service">Serviço grátis</option><option value="free_product">Produto grátis</option><option value="points_bonus">Bônus de pontos</option><option value="priority_queue">Prioridade na fila</option><option value="custom">Personalizado</option></select></label>
                   </div>
-                  <label className="space-y-1 block"><span className="block text-[10px] font-bold text-content-muted uppercase">Descrição</span><textarea required value={benefitDraft.description} onChange={(e) => setBenefitDraft({ ...benefitDraft, description: e.target.value })} className="w-full min-h-[72px] bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
+                  <label className="space-y-1 block"><span className="block text-xs font-bold text-content-muted uppercase">Descrição</span><textarea required value={benefitDraft.description} onChange={(e) => setBenefitDraft({ ...benefitDraft, description: e.target.value })} className="w-full min-h-[72px] bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Valor numérico</span><input type="number" min="0" step="0.01" value={benefitDraft.valueAmount ?? ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, valueAmount: e.target.value === '' ? null : Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" placeholder="Ex.: 10" /></label>
-                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Texto do valor</span><input value={benefitDraft.valueText || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, valueText: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" placeholder="Ex.: 10% OFF" /></label>
-                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Validade (dias)</span><input type="number" min="1" value={benefitDraft.validityDays ?? ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, validityDays: e.target.value === '' ? null : Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" placeholder="Opcional" /></label>
+                    <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Valor numérico</span><input type="number" min="0" step="0.01" value={benefitDraft.valueAmount ?? ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, valueAmount: e.target.value === '' ? null : Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" placeholder="Ex.: 10" /></label>
+                    <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Texto do valor</span><input value={benefitDraft.valueText || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, valueText: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" placeholder="Ex.: 10% OFF" /></label>
+                    <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Validade (dias)</span><input type="number" min="1" value={benefitDraft.validityDays ?? ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, validityDays: e.target.value === '' ? null : Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" placeholder="Opcional" /></label>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Serviço relacionado</span><select value={benefitDraft.serviceId || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, serviceId: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="">Todos os serviços</option>{services.map((service) => <option key={service.id} value={service.id}>{service.title} — R$ {Number(service.price || 0).toFixed(2).replace('.', ',')}</option>)}</select></label>
-                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Produto relacionado</span><select value={benefitDraft.productId || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, productId: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="">Todos os produtos</option>{products.map((product) => <option key={product.id} value={product.id}>{product.name} — R$ {Number(product.price || 0).toFixed(2).replace('.', ',')}</option>)}</select></label>
+                    <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Serviço relacionado</span><select value={benefitDraft.serviceId || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, serviceId: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="">Todos os serviços</option>{services.map((service) => <option key={service.id} value={service.id}>{service.title} — R$ {Number(service.price || 0).toFixed(2).replace('.', ',')}</option>)}</select></label>
+                    <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Produto relacionado</span><select value={benefitDraft.productId || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, productId: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="">Todos os produtos</option>{products.map((product) => <option key={product.id} value={product.id}>{product.name} — R$ {Number(product.price || 0).toFixed(2).replace('.', ',')}</option>)}</select></label>
                   </div>
-                  <div><span className="block text-[10px] font-bold text-content-muted uppercase mb-2">Níveis elegíveis</span><div className="grid grid-cols-2 sm:grid-cols-4 gap-2">{tiers.map((tier) => <label key={tier.id} className="flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-base p-2 text-[11px] text-content-base"><input type="checkbox" disabled={!tier.id} checked={Boolean(tier.id && (benefitDraft.tierIds || []).includes(tier.id))} onChange={(e) => setBenefitDraft({ ...benefitDraft, tierIds: e.target.checked ? [...(benefitDraft.tierIds || []), tier.id] : (benefitDraft.tierIds || []).filter((id: string) => id !== tier.id) })} />{tier.name}{!tier.id && <span className="text-[9px] text-content-muted">(salve primeiro)</span>}</label>)}</div></div>
+                  <div><span className="block text-xs font-bold text-content-muted uppercase mb-2">Níveis elegíveis</span><div className="grid grid-cols-2 sm:grid-cols-4 gap-2">{tiers.map((tier) => <label key={tier.id} className="flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-base p-2 text-xs text-content-base"><input type="checkbox" disabled={!tier.id} checked={Boolean(tier.id && (benefitDraft.tierIds || []).includes(tier.id))} onChange={(e) => setBenefitDraft({ ...benefitDraft, tierIds: e.target.checked ? [...(benefitDraft.tierIds || []), tier.id] : (benefitDraft.tierIds || []).filter((id: string) => id !== tier.id) })} />{tier.name}{!tier.id && <span className="text-xs text-content-muted">(salve primeiro)</span>}</label>)}</div></div>
                   <div className="flex gap-2 pt-2"><button type="button" onClick={() => { setShowBenefitModal(false); setEditingBenefit(null); }} className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted font-bold">Cancelar</button><button type="submit" disabled={savingCatalogItem} className="flex-1 h-10 rounded-xl bg-gold-base text-surface-base font-bold disabled:opacity-50">{savingCatalogItem ? 'Salvando...' : 'Salvar benefício'}</button></div>
                 </form>
               </div>
@@ -781,11 +781,11 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-surface-card rounded-2xl border border-border-subtle p-5 sm:p-6 shadow-2xl">
                 <div className="mb-4"><h3 className="text-base font-serif font-bold text-content-base">{editingPlan ? 'Editar plano' : 'Novo plano'}</h3><p className="text-xs text-content-muted mt-1">O valor é salvo como catálogo. Nenhuma cobrança ou assinatura é criada nesta etapa.</p></div>
                 <form onKeyDown={handleEnterAsTab} onSubmit={handleSavePlan} className="space-y-3 text-xs">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3"><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Nome</span><input autoFocus required value={planDraft.name} onChange={(e) => setPlanDraft({ ...planDraft, name: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Preço (R$)</span><input type="number" min="0" step="0.01" value={planDraft.price} onChange={(e) => setPlanDraft({ ...planDraft, price: Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label></div>
-                  <label className="space-y-1 block"><span className="block text-[10px] font-bold text-content-muted uppercase">Descrição</span><textarea required value={planDraft.description} onChange={(e) => setPlanDraft({ ...planDraft, description: e.target.value })} className="w-full min-h-[72px] bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3"><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Periodicidade</span><select value={planDraft.billingPeriod} onChange={(e) => setPlanDraft({ ...planDraft, billingPeriod: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="none">Pagamento único / catálogo</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option><option value="annual">Anual</option></select></label><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Bônus de pontos</span><input type="number" min="0" value={planDraft.pointsBonus} onChange={(e) => setPlanDraft({ ...planDraft, pointsBonus: Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Status</span><select value={planDraft.status} onChange={(e) => setPlanDraft({ ...planDraft, status: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="draft">Rascunho</option><option value="active">Ativo</option><option value="archived">Arquivado</option></select></label></div>
-                  <label className="flex items-center gap-2 text-[11px] text-content-base"><input type="checkbox" checked={Boolean(planDraft.isFeatured)} onChange={(e) => setPlanDraft({ ...planDraft, isFeatured: e.target.checked })} /> Destacar este plano para o cliente</label>
-                  <div><span className="block text-[10px] font-bold text-content-muted uppercase mb-2">Benefícios incluídos</span><div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto">{benefits.filter((benefit) => benefit.isActive).map((benefit) => <label key={benefit.id} className="flex items-start gap-2 rounded-xl border border-border-subtle bg-surface-base p-2 text-[11px] text-content-base"><input type="checkbox" checked={(planDraft.benefitIds || []).includes(benefit.id)} onChange={(e) => setPlanDraft({ ...planDraft, benefitIds: e.target.checked ? [...(planDraft.benefitIds || []), benefit.id] : (planDraft.benefitIds || []).filter((id: string) => id !== benefit.id) })} /><span><strong>{benefit.name}</strong><span className="block text-content-muted mt-0.5">{benefit.description}</span></span></label>)}</div></div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3"><label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Nome</span><input autoFocus required value={planDraft.name} onChange={(e) => setPlanDraft({ ...planDraft, name: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label><label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Preço (R$)</span><input type="number" min="0" step="0.01" value={planDraft.price} onChange={(e) => setPlanDraft({ ...planDraft, price: Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label></div>
+                  <label className="space-y-1 block"><span className="block text-xs font-bold text-content-muted uppercase">Descrição</span><textarea required value={planDraft.description} onChange={(e) => setPlanDraft({ ...planDraft, description: e.target.value })} className="w-full min-h-[72px] bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3"><label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Periodicidade</span><select value={planDraft.billingPeriod} onChange={(e) => setPlanDraft({ ...planDraft, billingPeriod: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="none">Pagamento único / catálogo</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option><option value="annual">Anual</option></select></label><label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Bônus de pontos</span><input type="number" min="0" value={planDraft.pointsBonus} onChange={(e) => setPlanDraft({ ...planDraft, pointsBonus: Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label><label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Status</span><select value={planDraft.status} onChange={(e) => setPlanDraft({ ...planDraft, status: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="draft">Rascunho</option><option value="active">Ativo</option><option value="archived">Arquivado</option></select></label></div>
+                  <label className="flex items-center gap-2 text-xs text-content-base"><input type="checkbox" checked={Boolean(planDraft.isFeatured)} onChange={(e) => setPlanDraft({ ...planDraft, isFeatured: e.target.checked })} /> Destacar este plano para o cliente</label>
+                  <div><span className="block text-xs font-bold text-content-muted uppercase mb-2">Benefícios incluídos</span><div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto">{benefits.filter((benefit) => benefit.isActive).map((benefit) => <label key={benefit.id} className="flex items-start gap-2 rounded-xl border border-border-subtle bg-surface-base p-2 text-xs text-content-base"><input type="checkbox" checked={(planDraft.benefitIds || []).includes(benefit.id)} onChange={(e) => setPlanDraft({ ...planDraft, benefitIds: e.target.checked ? [...(planDraft.benefitIds || []), benefit.id] : (planDraft.benefitIds || []).filter((id: string) => id !== benefit.id) })} /><span><strong>{benefit.name}</strong><span className="block text-content-muted mt-0.5">{benefit.description}</span></span></label>)}</div></div>
                   <div className="flex gap-2 pt-2"><button type="button" onClick={() => { setShowPlanModal(false); setEditingPlan(null); }} className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted font-bold">Cancelar</button><button type="submit" disabled={savingCatalogItem} className="flex-1 h-10 rounded-xl bg-gold-base text-surface-base font-bold disabled:opacity-50">{savingCatalogItem ? 'Salvando...' : 'Salvar plano'}</button></div>
                 </form>
               </div>
@@ -801,7 +801,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
             <form onKeyDown={handleEnterAsTab} onSubmit={handleManualPointsSubmit} className="space-y-3 max-w-xl text-xs">
               <div>
-                <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Selecione o Cliente</label>
+                <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Selecione o Cliente</label>
                 <select
                   value={selectedClient}
                   onChange={(e) => setSelectedClient(e.target.value)}
@@ -818,7 +818,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Pontos (Ex: +100 ou -50)</label>
+                  <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Pontos (Ex: +100 ou -50)</label>
                   <input
                     type="number"
                     value={manualPointsAmount}
@@ -827,7 +827,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Motivo</label>
+                  <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Motivo</label>
                   <input
                     type="text"
                     placeholder="Ex: Cortesia VIP"
@@ -875,10 +875,10 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
           {/* Validador de Voucher */}
           <div className="bg-surface-card p-4 rounded-xl border border-border-subtle space-y-2.5 max-w-xl">
-            <h4 className="text-[10px] font-bold uppercase text-gold-base tracking-wider flex items-center gap-1">
+            <h4 className="text-xs font-bold uppercase text-gold-base tracking-wider flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" /> Validar Código de Voucher do Cliente
             </h4>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 placeholder="Ex: NAV-RWD-123456"
@@ -888,7 +888,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               />
               <button
                 onClick={handleValidateVoucher}
-                className="h-9 px-4 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 active:scale-95 shrink-0 whitespace-nowrap"
+                className="h-10 sm:h-9 w-full sm:w-auto px-4 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 active:scale-95 shrink-0 whitespace-nowrap"
               >
                 Validar Voucher
               </button>
@@ -908,12 +908,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                 className="bg-surface-card p-4 rounded-xl border border-border-subtle flex items-center justify-between gap-3"
               >
                 <div className="space-y-1 min-w-0 flex-1">
-                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl bg-gold-base/10 text-gold-base text-[10px] font-bold border border-gold-base/30">
+                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl bg-gold-base/10 text-gold-base text-xs font-bold border border-gold-base/30">
                     <Gift className="w-3 h-3" />
                     <span>{rw.pointsRequired} PONTOS</span>
                   </div>
-                  <h4 className="font-bold text-content-base text-xs truncate">{rw.title}</h4>
-                  <p className="text-[11px] text-content-muted truncate">{rw.valueDescription}</p>
+                  <h4 className="font-bold text-content-base text-xs admin-clamp-2">{rw.title}</h4>
+                  <p className="text-xs text-content-muted admin-clamp-2">{rw.valueDescription}</p>
                 </div>
 
                 <button
@@ -935,7 +935,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
                 <form onKeyDown={handleEnterAsTab} onSubmit={handleCreateReward} className="space-y-3 text-xs">
                   <div>
-                    <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Título</label>
+                    <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Título</label>
                     <input
                       type="text"
                       required
@@ -947,7 +947,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Pontos Necessários</label>
+                    <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Pontos Necessários</label>
                     <input
                       type="number"
                       required
@@ -959,7 +959,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Tipo da Oferta</label>
+                    <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Tipo da Oferta</label>
                     <select
                       value={newReward.rewardType}
                       onChange={(e) => setNewReward({ ...newReward, rewardType: e.target.value })}
@@ -973,7 +973,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Descrição do Benefício</label>
+                    <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Descrição do Benefício</label>
                     <textarea
                       required
                       placeholder="Ex: Válido para qualquer serviço de barba ou produto."
@@ -1015,7 +1015,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   <Users className="w-4 h-4 text-gold-base" />
                   <span>Configuração do Motor de Indicações</span>
                 </h3>
-                <p className="text-[11px] text-content-muted mt-0.5">Defina os bônus para quem indica e quem é indicado.</p>
+                <p className="text-xs text-content-muted mt-0.5">Defina os bônus para quem indica e quem é indicado.</p>
               </div>
 
               <button
@@ -1030,7 +1030,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
               <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1.5">
-                <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Bônus de Quem Indica</span>
+                <span className="text-xs font-bold uppercase text-gold-base block admin-safe-wrap">Bônus de Quem Indica</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -1046,7 +1046,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               </div>
 
               <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1.5">
-                <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Bônus do Amigo Indicado</span>
+                <span className="text-xs font-bold uppercase text-gold-base block admin-safe-wrap">Bônus do Amigo Indicado</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -1062,7 +1062,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               </div>
 
               <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1.5">
-                <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Meta Amigos (Milestone)</span>
+                <span className="text-xs font-bold uppercase text-gold-base block admin-safe-wrap">Meta Amigos (Milestone)</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -1078,7 +1078,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               </div>
 
               <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1.5">
-                <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Bônus Milestone</span>
+                <span className="text-xs font-bold uppercase text-gold-base block admin-safe-wrap">Bônus Milestone</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -1104,7 +1104,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
             <div className="space-y-3 max-w-2xl text-xs">
               <div>
-                <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Selecione o Cliente Remetente</label>
+                <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Selecione o Cliente Remetente</label>
                 <select
                   value={refClient?.id || ''}
                   onChange={(e) => {
@@ -1120,7 +1120,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Mensagem do WhatsApp</label>
+                <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Mensagem do WhatsApp</label>
                 <textarea
                   value={customRefMsg}
                   onChange={(e) => setCustomRefMsg(e.target.value)}
@@ -1129,8 +1129,8 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               </div>
 
               <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <span className="text-[10px] font-bold uppercase text-content-muted block">Link Único Gerado</span>
-                <div className="flex gap-2">
+                <span className="text-xs font-bold uppercase text-content-muted block">Link Único Gerado</span>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     readOnly
@@ -1139,14 +1139,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   />
                   <button
                     onClick={() => copyToClipboard(generatedRefUrl)}
-                    className="h-9 px-3 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center gap-1"
+                    className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center justify-center gap-1"
                   >
                     {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedLink ? 'Copiado!' : 'Copiar'}</span>
                   </button>
                   <button
                     onClick={() => shareViaWhatsapp(refClient?.phone || '', `${customRefMsg} ${generatedRefUrl}`)}
-                    className="h-9 px-3 bg-whatsapp text-whatsapp-on font-bold text-xs rounded-xl hover:opacity-90 shrink-0 flex items-center gap-1"
+                    className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-whatsapp text-whatsapp-on font-bold text-xs rounded-xl hover:opacity-90 shrink-0 flex items-center justify-center gap-1"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>WhatsApp</span>
@@ -1177,8 +1177,8 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
             </div>
 
             <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2 max-w-2xl">
-              <span className="text-[10px] font-bold uppercase text-content-muted block">Link Público da Pesquisa NPS</span>
-              <div className="flex gap-2">
+              <span className="text-xs font-bold uppercase text-content-muted block">Link Público da Pesquisa NPS</span>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   readOnly
@@ -1187,7 +1187,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                 />
                 <button
                   onClick={() => copyToClipboard(generatedEvalUrl, true)}
-                  className="h-9 px-3 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center gap-1"
+                  className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center justify-center gap-1"
                 >
                   {copiedEvalLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedEvalLink ? 'Copiado!' : 'Copiar'}</span>
@@ -1216,17 +1216,17 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                           />
                         ))}
                       </div>
-                      <span className="text-[10px] text-content-muted num-tabular">
+                      <span className="text-xs text-content-muted num-tabular">
                         {new Date(rev.createdAt).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
 
-                    {rev.serviceTitle && <p className="text-[10px] text-gold-base font-bold">{rev.serviceTitle}</p>}
+                    {rev.serviceTitle && <p className="text-xs text-gold-base font-bold">{rev.serviceTitle}</p>}
                     <p className="text-content-base font-medium italic text-xs">
                       "{rev.comment || 'Sem observações adicionais.'}"
                     </p>
 
-                    <div className="text-[10px] text-content-muted space-y-0.5 pt-2 border-t border-border-subtle">
+                    <div className="text-xs text-content-muted space-y-0.5 pt-2 border-t border-border-subtle">
                       <p>• Resultado: <span className="text-content-base font-bold">{rev.understoodRequest || 'Não informado'}</span></p>
                       <p>• Experiência: <span className="text-content-base font-bold">{rev.serviceExperience || 'Não informado'}</span></p>
                       <p>• Recomendaria: <span className="text-content-base font-bold">{rev.wouldRecommend || 'Com certeza'}</span></p>
@@ -1258,7 +1258,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   />
                 </div>
 
-                <div className="text-[10px] font-mono text-content-muted break-all">
+                <div className="text-xs font-mono text-content-muted break-all">
                   {generatedEvalUrl}
                 </div>
 
