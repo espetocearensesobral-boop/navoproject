@@ -101,7 +101,7 @@ export const OperationalReportsManagement: React.FC = () => {
       {error && <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">{error}</div>}
       {loading && !report ? <div className="bg-surface-card border border-border-subtle rounded-xl p-12 text-center text-content-muted"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Carregando os dados reais da operação…</div> : report && summary && <>
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-          <MetricCard label="Agendamentos" value={String(summary.appointments)} detail={`${summary.completedAppointments} concluídos · ${summary.cancelledAppointments} cancelados`} icon={CalendarDays} tone="neutral" />
+          <MetricCard label="Agendamentos" value={String(summary.appointments)} detail={`${summary.completedAppointments} concluídos · ${summary.cancelledAppointments} cancelados fora do volume`} icon={CalendarDays} tone="neutral" />
           <MetricCard label="Hoje" value={String(summary.todayAppointments)} detail={`${summary.todayActiveAppointments} ainda na operação`} icon={Activity} tone="positive" />
           <MetricCard label="Resultado" value={money(summary.netResult)} detail={`${money(summary.totalIncome)} entradas · ${money(summary.totalExpenses)} saídas`} icon={summary.netResult >= 0 ? ArrowUpRight : ArrowDownRight} tone={summary.netResult >= 0 ? 'positive' : 'negative'} />
           <MetricCard label="Fila agora" value={String(summary.currentQueue)} detail={`${summary.currentWaiting} aguardando · ${summary.currentInChair} na cadeira`} icon={Users} tone={summary.currentQueue > 0 ? 'warning' : 'neutral'} />

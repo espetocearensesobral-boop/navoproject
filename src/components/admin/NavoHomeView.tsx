@@ -111,7 +111,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
             </div>
           </div>
           <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{operationalReport?.summary.completedAppointments || 0} recebidos hoje</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{operationalReport?.summary.completedAppointments || 0} concluídos hoje</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
