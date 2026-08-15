@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, CalendarDays, CheckCircle2, Clock3, Database, ListOrdered, RefreshCw, Save, Timer, UserRoundCheck } from 'lucide-react';
+import { AlertCircle, BarChart3, CalendarDays, CheckCircle2, Clock3, Database, ListOrdered, RefreshCw, Save, Timer, UserRoundCheck } from 'lucide-react';
 import {
   defaultOperationSettings,
   fetchOperationSettings,
@@ -50,6 +50,10 @@ export const AgendaAvailabilitySettings: React.FC = () => {
     setStatusMsg(null);
     if (settings.maximumBookingHorizonDays < 1 || settings.maximumBookingHorizonDays > 730) {
       setStatusMsg({ type: 'error', text: 'O horizonte deve ficar entre 1 e 730 dias.' });
+      return;
+    }
+    if (!/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(settings.reportsDayStartTime)) {
+      setStatusMsg({ type: 'error', text: 'Informe um início do dia operacional válido, entre 00:00 e 23:59.' });
       return;
     }
     setIsSaving(true);
@@ -168,6 +172,47 @@ export const AgendaAvailabilitySettings: React.FC = () => {
             <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
               <span><strong className="block text-sm text-content-base">Exigir profissional no encaixe</strong><span className="block mt-0.5 text-xs text-content-muted">Impede salvar um cliente avulso sem barbeiro definido.</span></span>
               <input type="checkbox" checked={settings.requireProfessionalForWalkIn} onChange={(e) => update('requireProfessionalForWalkIn', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border-subtle">
+          <BarChart3 className="w-4 h-4 text-gold-base" />
+          <h3 className="text-sm font-bold text-content-base">Contadores e Relatórios</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>Início do dia operacional</label>
+            <input type="time" value={settings.reportsDayStartTime} onChange={(e) => update('reportsDayStartTime', e.target.value)} className={fieldClass} />
+            <p className="mt-1.5 text-xs text-content-muted">Antes deste horário, os indicadores ainda pertencem ao dia operacional anterior em BRT.</p>
+          </div>
+          <div>
+            <label className={labelClass}>Atualização dos relatórios</label>
+            <input type="number" min={15} max={300} step={15} value={settings.reportsRefreshSeconds} onChange={(e) => update('reportsRefreshSeconds', Math.max(15, Number(e.target.value) || 15))} className={fieldClass} />
+            <p className="mt-1.5 text-xs text-content-muted">Define a frequência de consulta enquanto um dashboard estiver aberto.</p>
+          </div>
+          <div>
+            <label className={labelClass}>Janela de comparação</label>
+            <select value={settings.reportsComparisonWindow} onChange={(e) => update('reportsComparisonWindow', e.target.value as OperationSettings['reportsComparisonWindow'])} className={fieldClass}>
+              <option value="previous_period">Período anterior equivalente</option>
+              <option value="none">Sem comparação</option>
+            </select>
+            <p className="mt-1.5 text-xs text-content-muted">Mostra uma referência analítica sem alterar os valores atuais.</p>
+          </div>
+          <div className="sm:col-span-2 space-y-3">
+            <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
+              <span><strong className="block text-sm text-content-base">Exibir valores pendentes</strong><span className="block mt-0.5 text-xs text-content-muted">Mostra contas a receber separadas, sem tratá-las como receita realizada.</span></span>
+              <input type="checkbox" checked={settings.reportsShowPendingValues} onChange={(e) => update('reportsShowPendingValues', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
+            </label>
+            <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
+              <span><strong className="block text-sm text-content-base">Incluir cancelados no volume</strong><span className="block mt-0.5 text-xs text-content-muted">Mantém cancelamentos visíveis nas séries, sem incluir receita ou taxa de conclusão.</span></span>
+              <input type="checkbox" checked={settings.reportsIncludeCancelled} onChange={(e) => update('reportsIncludeCancelled', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
+            </label>
+            <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
+              <span><strong className="block text-sm text-content-base">Incluir não comparecimentos</strong><span className="block mt-0.5 text-xs text-content-muted">Exibe no-show na leitura operacional, sem contar como atendimento concluído.</span></span>
+              <input type="checkbox" checked={settings.reportsIncludeNoShow} onChange={(e) => update('reportsIncludeNoShow', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
             </label>
           </div>
         </div>

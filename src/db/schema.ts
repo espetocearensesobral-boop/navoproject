@@ -425,6 +425,12 @@ export const operationSettings = pgTable('operation_settings', {
   allowWalkIn: boolean('allow_walk_in').notNull().default(true),
   requireProfessionalForWalkIn: boolean('require_professional_for_walk_in').notNull().default(false),
   queueVisibleLimit: integer('queue_visible_limit').notNull().default(5),
+  reportsDayStartTime: text('reports_day_start_time').notNull().default('00:00'),
+  reportsIncludeCancelled: boolean('reports_include_cancelled').notNull().default(false),
+  reportsIncludeNoShow: boolean('reports_include_no_show').notNull().default(false),
+  reportsComparisonWindow: text('reports_comparison_window').notNull().default('previous_period'),
+  reportsRefreshSeconds: integer('reports_refresh_seconds').notNull().default(30),
+  reportsShowPendingValues: boolean('reports_show_pending_values').notNull().default(true),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 

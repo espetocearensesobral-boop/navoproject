@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAppointmentsFromSupabase } from '../../services/supabaseDataService';
+import { fetchAppointmentsFromSupabase, fetchOperationalReportFromSupabase, type OperationalReportData } from '../../services/supabaseDataService';
+import { getTodayStringBRT } from '../../utils/dateUtils';
 import { Appointment } from '../../types';
 import { RefreshCw, ArrowRight, Clock, Receipt, Scissors, Users, CalendarCheck2 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
@@ -10,6 +11,7 @@ interface NavoHomeViewProps {
 
 export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [operationalReport, setOperationalReport] = useState<OperationalReportData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,27 +23,27 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
 
   const loadData = async () => {
     setLoading(true);
-    const data = await fetchAppointmentsFromSupabase();
+    const [data, report] = await Promise.all([
+      fetchAppointmentsFromSupabase(),
+      fetchOperationalReportFromSupabase('today'),
+    ]);
     setAppointments(data);
+    setOperationalReport(report);
     setLoading(false);
   };
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = operationalReport?.summary.operationalDay || getTodayStringBRT();
   const todayAppointments = appointments.filter(a => a.date === todayStr);
-  const activeToday = todayAppointments.filter(a => a.status !== 'cancelled');
+  const activeToday = todayAppointments.filter(a => !['cancelled', 'completed', 'no_show'].includes(a.status));
   
-  const totalRevenueToday = activeToday.reduce((sum, a) => sum + (a.final_amount || 0), 0);
-  const inServiceToday = activeToday.filter(a => a.status === 'in_service' || a.status === 'in_chair').length;
-  const pendingToday = activeToday.filter(a => a.status === 'confirmed').length;
-
-  const totalCompletedAppointments = appointments.filter(a => a.status === 'completed');
-  const ticketMedio = totalCompletedAppointments.length > 0 
-    ? totalCompletedAppointments.reduce((sum, a) => sum + (a.final_amount || 0), 0) / totalCompletedAppointments.length 
-    : (activeToday.length > 0 ? totalRevenueToday / activeToday.length : 0);
+  const totalRevenueToday = operationalReport?.summary.totalIncome || 0;
+  const inServiceToday = operationalReport?.summary.currentInChair || activeToday.filter(a => a.status === 'in_service' || a.status === 'in_chair').length;
+  const pendingToday = operationalReport?.summary.currentWaiting || activeToday.filter(a => a.status === 'confirmed').length;
+  const ticketMedio = operationalReport?.summary.averageTicket || 0;
 
   const uniqueClients = new Set(appointments.map(a => a.client_id || a.client_phone || a.client_name)).size;
 
-  const todayFormatted = new Date().toLocaleDateString('pt-BR', {
+  const todayFormatted = new Date(`${todayStr}T12:00:00`).toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -109,7 +111,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
             </div>
           </div>
           <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{activeToday.length} cortes hoje</p>
+          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{operationalReport?.summary.completedAppointments || 0} recebidos hoje</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">

@@ -1,10 +1,11 @@
 import express from 'express';
-import { desc } from 'drizzle-orm';
+import { and, desc, gte, lte } from 'drizzle-orm';
 import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
-import { getTodayStringBRT } from '../utils/datetime.js';
+import { getCurrentTimeBRT, getTodayStringBRT, timeToMinutes } from '../utils/datetime.js';
+import { getOperationSettings } from '../services/operation-settings.service.js';
 import { isConfirmedCheckoutIncome, isFinancialLedgerTransaction, receiptIdFromLedgerTransaction } from '../utils/financial.js';
 
 export const financialReportsRouter = express.Router();
@@ -40,8 +41,13 @@ const subtractDays = (value: string, days: number) => {
   return date.toISOString().slice(0, 10);
 };
 
-const getPeriodRange = (period: FinancialPeriod) => {
-  const to = getTodayStringBRT();
+const getOperationalToday = (dayStartTime: string) => {
+  const today = getTodayStringBRT();
+  return getCurrentTimeBRT().totalMinutes < timeToMinutes(dayStartTime) ? subtractDays(today, 1) : today;
+};
+
+const getPeriodRange = (period: FinancialPeriod, operationalToday: string) => {
+  const to = operationalToday;
   const [year, month] = to.split('-');
   if (period === 'today') return { from: to, to, label: 'Hoje' };
   if (period === 'week') return { from: subtractDays(to, 6), to, label: 'Últimos 7 dias' };
@@ -64,10 +70,11 @@ financialReportsRouter.get('/', requireAuth, requireAdmin, async (req, res) => {
   try {
     const rawPeriod = typeof req.query.period === 'string' ? req.query.period : 'month';
     const period: FinancialPeriod = ['today', 'week', 'month', 'quarter', 'year'].includes(rawPeriod) ? rawPeriod as FinancialPeriod : 'month';
-    const range = getPeriodRange(period);
+    const operationSettings = await getOperationSettings(db);
+    const range = getPeriodRange(period, getOperationalToday(operationSettings.reportsDayStartTime));
 
     const [transactions, receipts, professionals] = await Promise.all([
-      db.query.cashTransactions.findMany({ orderBy: [desc(schema.cashTransactions.createdAt)] }),
+      db.query.cashTransactions.findMany({ where: and(gte(schema.cashTransactions.date, range.from), lte(schema.cashTransactions.date, range.to)), orderBy: [desc(schema.cashTransactions.createdAt)] }),
       db.query.receipts.findMany({ orderBy: [desc(schema.receipts.createdAt)] }),
       db.query.professionals.findMany(),
     ]);
@@ -77,15 +84,15 @@ financialReportsRouter.get('/', requireAuth, requireAdmin, async (req, res) => {
       .map((transaction) => ({ ...transaction, amount: asMoney(transaction.amount) }));
 
     const confirmedCheckoutReceiptIds = new Set(
-      transactions.filter(isConfirmedCheckoutIncome).map((transaction) => receiptIdFromLedgerTransaction(transaction.id)).filter(Boolean),
+      transactions.filter((transaction) => transaction.status === 'completed' && isConfirmedCheckoutIncome(transaction)).map((transaction) => receiptIdFromLedgerTransaction(transaction.id)).filter(Boolean),
     );
     const receivedReceipts = receipts
       .filter((receipt) => receipt.status === 'received' && confirmedCheckoutReceiptIds.has(receipt.id) && isInRange(toBrtDate(receipt.receivedAt), range.from, range.to))
       .map((receipt) => ({ ...receipt, totalAmount: asMoney(receipt.totalAmount) }));
 
-    const pendingReceipts = receipts
+    const pendingReceipts = operationSettings.reportsShowPendingValues ? receipts
       .filter((receipt) => receipt.status === 'pending' && isInRange(toBrtDate(receipt.createdAt), range.from, range.to))
-      .map((receipt) => ({ ...receipt, totalAmount: asMoney(receipt.totalAmount) }));
+      .map((receipt) => ({ ...receipt, totalAmount: asMoney(receipt.totalAmount) })) : [];
 
     const incomeTransactions = activeTransactions.filter((transaction) => transaction.type === 'income');
     const expenseTransactions = activeTransactions.filter((transaction) => transaction.type === 'expense');

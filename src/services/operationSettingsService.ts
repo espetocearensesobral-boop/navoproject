@@ -13,6 +13,12 @@ export interface OperationSettings {
   allowWalkIn: boolean;
   requireProfessionalForWalkIn: boolean;
   queueVisibleLimit: number;
+  reportsDayStartTime: string;
+  reportsIncludeCancelled: boolean;
+  reportsIncludeNoShow: boolean;
+  reportsComparisonWindow: 'previous_period' | 'none';
+  reportsRefreshSeconds: number;
+  reportsShowPendingValues: boolean;
   updatedAt?: string | null;
 }
 
@@ -28,6 +34,12 @@ export const defaultOperationSettings: OperationSettings = {
   allowWalkIn: true,
   requireProfessionalForWalkIn: false,
   queueVisibleLimit: 5,
+  reportsDayStartTime: '00:00',
+  reportsIncludeCancelled: false,
+  reportsIncludeNoShow: false,
+  reportsComparisonWindow: 'previous_period',
+  reportsRefreshSeconds: 30,
+  reportsShowPendingValues: true,
 };
 
 const normalize = (value: any): OperationSettings => {
@@ -47,6 +59,12 @@ const normalize = (value: any): OperationSettings => {
     allowWalkIn: typeof value?.allowWalkIn === 'boolean' ? value.allowWalkIn : defaultOperationSettings.allowWalkIn,
     requireProfessionalForWalkIn: typeof value?.requireProfessionalForWalkIn === 'boolean' ? value.requireProfessionalForWalkIn : defaultOperationSettings.requireProfessionalForWalkIn,
     queueVisibleLimit: Math.max(1, Math.min(20, Number(value?.queueVisibleLimit ?? defaultOperationSettings.queueVisibleLimit))),
+    reportsDayStartTime: /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(String(value?.reportsDayStartTime || '')) ? value.reportsDayStartTime : defaultOperationSettings.reportsDayStartTime,
+    reportsIncludeCancelled: typeof value?.reportsIncludeCancelled === 'boolean' ? value.reportsIncludeCancelled : defaultOperationSettings.reportsIncludeCancelled,
+    reportsIncludeNoShow: typeof value?.reportsIncludeNoShow === 'boolean' ? value.reportsIncludeNoShow : defaultOperationSettings.reportsIncludeNoShow,
+    reportsComparisonWindow: value?.reportsComparisonWindow === 'none' ? 'none' : defaultOperationSettings.reportsComparisonWindow,
+    reportsRefreshSeconds: Math.max(15, Math.min(300, Number(value?.reportsRefreshSeconds ?? defaultOperationSettings.reportsRefreshSeconds))),
+    reportsShowPendingValues: typeof value?.reportsShowPendingValues === 'boolean' ? value.reportsShowPendingValues : defaultOperationSettings.reportsShowPendingValues,
   };
 };
 

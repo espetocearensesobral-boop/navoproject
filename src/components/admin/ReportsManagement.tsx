@@ -23,6 +23,7 @@ import {
   type FinancialPeriod,
   type FinancialReportData,
 } from '../../services/supabaseDataService';
+import { fetchOperationSettings } from '../../services/operationSettingsService';
 
 const money = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
 
@@ -50,6 +51,7 @@ export const ReportsManagement: React.FC = () => {
   const [report, setReport] = useState<FinancialReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshSeconds, setRefreshSeconds] = useState(30);
 
   const loadReport = async (selectedPeriod = period) => {
     setLoading(true);
@@ -70,10 +72,19 @@ export const ReportsManagement: React.FC = () => {
   }, [period]);
 
   useEffect(() => {
+    fetchOperationSettings().then((settings) => setRefreshSeconds(settings.reportsRefreshSeconds)).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     const refresh = () => loadReport(period);
     window.addEventListener('adminRefresh', refresh);
     return () => window.removeEventListener('adminRefresh', refresh);
   }, [period]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => loadReport(period), refreshSeconds * 1000);
+    return () => window.clearInterval(timer);
+  }, [period, refreshSeconds]);
 
   const maxDaily = useMemo(() => Math.max(1, ...(report?.dailyCashFlow.map((item) => Math.max(item.income, item.expense)) || [1])), [report]);
 

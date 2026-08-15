@@ -13,6 +13,12 @@ export interface OperationSettingsValue {
   allowWalkIn: boolean;
   requireProfessionalForWalkIn: boolean;
   queueVisibleLimit: number;
+  reportsDayStartTime: string;
+  reportsIncludeCancelled: boolean;
+  reportsIncludeNoShow: boolean;
+  reportsComparisonWindow: 'previous_period' | 'none';
+  reportsRefreshSeconds: number;
+  reportsShowPendingValues: boolean;
   updatedAt?: Date | string | null;
 }
 
@@ -28,7 +34,15 @@ export const DEFAULT_OPERATION_SETTINGS: OperationSettingsValue = {
   allowWalkIn: true,
   requireProfessionalForWalkIn: false,
   queueVisibleLimit: 5,
+  reportsDayStartTime: '00:00',
+  reportsIncludeCancelled: false,
+  reportsIncludeNoShow: false,
+  reportsComparisonWindow: 'previous_period',
+  reportsRefreshSeconds: 30,
+  reportsShowPendingValues: true,
 };
+
+const isValidTime = (value: unknown): value is string => typeof value === 'string' && /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(value);
 
 const clampInteger = (value: unknown, min: number, max: number, fallback: number) => {
   const parsed = Number(value);
@@ -54,6 +68,12 @@ export function normalizeOperationSettings(value: Partial<OperationSettingsValue
     allowWalkIn: typeof value?.allowWalkIn === 'boolean' ? value.allowWalkIn : DEFAULT_OPERATION_SETTINGS.allowWalkIn,
     requireProfessionalForWalkIn: typeof value?.requireProfessionalForWalkIn === 'boolean' ? value.requireProfessionalForWalkIn : DEFAULT_OPERATION_SETTINGS.requireProfessionalForWalkIn,
     queueVisibleLimit: clampInteger(value?.queueVisibleLimit, 1, 20, DEFAULT_OPERATION_SETTINGS.queueVisibleLimit),
+    reportsDayStartTime: isValidTime(value?.reportsDayStartTime) ? value.reportsDayStartTime : DEFAULT_OPERATION_SETTINGS.reportsDayStartTime,
+    reportsIncludeCancelled: typeof value?.reportsIncludeCancelled === 'boolean' ? value.reportsIncludeCancelled : DEFAULT_OPERATION_SETTINGS.reportsIncludeCancelled,
+    reportsIncludeNoShow: typeof value?.reportsIncludeNoShow === 'boolean' ? value.reportsIncludeNoShow : DEFAULT_OPERATION_SETTINGS.reportsIncludeNoShow,
+    reportsComparisonWindow: value?.reportsComparisonWindow === 'none' ? 'none' : DEFAULT_OPERATION_SETTINGS.reportsComparisonWindow,
+    reportsRefreshSeconds: clampInteger(value?.reportsRefreshSeconds, 15, 300, DEFAULT_OPERATION_SETTINGS.reportsRefreshSeconds),
+    reportsShowPendingValues: typeof value?.reportsShowPendingValues === 'boolean' ? value.reportsShowPendingValues : DEFAULT_OPERATION_SETTINGS.reportsShowPendingValues,
     updatedAt: value?.updatedAt || null,
   };
 }
@@ -72,6 +92,12 @@ export function mapOperationSettings(row: any): OperationSettingsValue {
     allowWalkIn: row?.allowWalkIn ?? row?.allow_walk_in,
     requireProfessionalForWalkIn: row?.requireProfessionalForWalkIn ?? row?.require_professional_for_walk_in,
     queueVisibleLimit: row?.queueVisibleLimit ?? row?.queue_visible_limit,
+    reportsDayStartTime: row?.reportsDayStartTime ?? row?.reports_day_start_time,
+    reportsIncludeCancelled: row?.reportsIncludeCancelled ?? row?.reports_include_cancelled,
+    reportsIncludeNoShow: row?.reportsIncludeNoShow ?? row?.reports_include_no_show,
+    reportsComparisonWindow: row?.reportsComparisonWindow ?? row?.reports_comparison_window,
+    reportsRefreshSeconds: row?.reportsRefreshSeconds ?? row?.reports_refresh_seconds,
+    reportsShowPendingValues: row?.reportsShowPendingValues ?? row?.reports_show_pending_values,
     updatedAt: row?.updatedAt ?? row?.updated_at,
   });
 }

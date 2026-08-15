@@ -685,6 +685,25 @@ export interface OperationalReportData {
     totalExpenses: number;
     netResult: number;
     averageTicket: number;
+    operationalDay: string;
+  };
+  comparison: {
+    from: string;
+    to: string;
+    appointments: number;
+    completedAppointments: number;
+    serviceRevenue: number;
+    totalIncome: number;
+    totalExpenses: number;
+    netResult: number;
+    averageTicket: number;
+  } | null;
+  settings: {
+    dayStartTime: string;
+    includeCancelled: boolean;
+    includeNoShow: boolean;
+    showPendingValues: boolean;
+    refreshSeconds: number;
   };
   peakHour: { hour: string; label: string; count: number } | null;
   topHours: { hour: string; label: string; count: number }[];

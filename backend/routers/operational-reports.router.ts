@@ -1,10 +1,11 @@
 import express from 'express';
-import { desc } from 'drizzle-orm';
+import { and, desc, gte, lte } from 'drizzle-orm';
 import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
-import { getTodayStringBRT } from '../utils/datetime.js';
+import { getCurrentTimeBRT, getTodayStringBRT, timeToMinutes } from '../utils/datetime.js';
+import { getOperationSettings } from '../services/operation-settings.service.js';
 import { isConfirmedCheckoutIncome, isFinancialLedgerTransaction, receiptIdFromLedgerTransaction } from '../utils/financial.js';
 
 export const operationalReportsRouter = express.Router();
@@ -29,9 +30,14 @@ const subtractDays = (value: string, days: number) => {
   return date.toISOString().slice(0, 10);
 };
 
-const getRange = (period: OperationalPeriod) => {
-  const to = getTodayStringBRT();
-  if (period === 'today') return { from: to, to, label: 'Hoje', days: 1 };
+const getOperationalToday = (dayStartTime: string) => {
+  const today = getTodayStringBRT();
+  return getCurrentTimeBRT().totalMinutes < timeToMinutes(dayStartTime) ? subtractDays(today, 1) : today;
+};
+
+const getRange = (period: OperationalPeriod, operationalToday: string) => {
+  const to = operationalToday;
+  if (period === 'today') return { from: to, to, label: 'Hoje operacional', days: 1 };
   if (period === 'week') return { from: subtractDays(to, 6), to, label: 'Últimos 7 dias', days: 7 };
   if (period === 'quarter') return { from: subtractDays(to, 89), to, label: 'Últimos 90 dias', days: 90 };
   return { from: subtractDays(to, 29), to, label: 'Últimos 30 dias', days: 30 };
@@ -54,33 +60,45 @@ operationalReportsRouter.get('/', requireAuth, requireAdmin, async (req, res) =>
   try {
     const rawPeriod = typeof req.query.period === 'string' ? req.query.period : 'week';
     const period: OperationalPeriod = ['today', 'week', 'month', 'quarter'].includes(rawPeriod) ? rawPeriod as OperationalPeriod : 'week';
-    const range = getRange(period);
-    const today = getTodayStringBRT();
+    const operationSettings = await getOperationSettings(db);
+    const today = getOperationalToday(operationSettings.reportsDayStartTime);
+    const range = getRange(period, today);
+    const previousRange = operationSettings.reportsComparisonWindow === 'previous_period'
+      ? { from: subtractDays(range.from, range.days), to: subtractDays(range.from, 1) }
+      : null;
+    const queryFrom = previousRange?.from || range.from;
 
     const [appointments, queue, receipts, cashTransactions] = await Promise.all([
-      db.query.appointments.findMany({ orderBy: [desc(schema.appointments.createdAt)] }),
+      db.query.appointments.findMany({ where: and(gte(schema.appointments.date, queryFrom), lte(schema.appointments.date, range.to)), orderBy: [desc(schema.appointments.createdAt)] }),
       db.query.waitingQueue.findMany({ orderBy: [desc(schema.waitingQueue.joinedAt)] }),
       db.query.receipts.findMany({ orderBy: [desc(schema.receipts.createdAt)] }),
-      db.query.cashTransactions.findMany({ orderBy: [desc(schema.cashTransactions.createdAt)] }),
+      db.query.cashTransactions.findMany({ where: and(gte(schema.cashTransactions.date, queryFrom), lte(schema.cashTransactions.date, range.to)), orderBy: [desc(schema.cashTransactions.createdAt)] }),
     ]);
 
     const periodAppointments = appointments.filter((appointment) => inRange(appointment.date, range.from, range.to));
-    const activeAppointments = periodAppointments.filter((appointment) => appointment.status !== 'cancelled');
-    const completedAppointments = periodAppointments.filter((appointment) => appointment.status === 'completed');
+    const countableAppointments = periodAppointments.filter((appointment) => (
+      (operationSettings.reportsIncludeCancelled || appointment.status !== 'cancelled') &&
+      (operationSettings.reportsIncludeNoShow || appointment.status !== 'no_show')
+    ));
+    const activeAppointments = countableAppointments.filter((appointment) => !['cancelled', 'no_show'].includes(appointment.status));
+    const completedAppointments = countableAppointments.filter((appointment) => appointment.status === 'completed');
     const cancelledAppointments = periodAppointments.filter((appointment) => appointment.status === 'cancelled');
     const noShowAppointments = periodAppointments.filter((appointment) => appointment.status === 'no_show');
-    const todayAppointments = appointments.filter((appointment) => appointment.date === today);
-    const todayActiveAppointments = todayAppointments.filter((appointment) => !['cancelled', 'completed'].includes(appointment.status));
+    const todayAppointments = appointments.filter((appointment) => appointment.date === today && (
+      (operationSettings.reportsIncludeCancelled || appointment.status !== 'cancelled') &&
+      (operationSettings.reportsIncludeNoShow || appointment.status !== 'no_show')
+    ));
+    const todayActiveAppointments = todayAppointments.filter((appointment) => !['cancelled', 'completed', 'no_show'].includes(appointment.status));
 
     const periodCashTransactions = cashTransactions.filter((transaction) => transaction.status === 'completed' && isFinancialLedgerTransaction(transaction) && inRange(transaction.date, range.from, range.to));
     const periodIncome = periodCashTransactions.filter((transaction) => isConfirmedCheckoutIncome(transaction)).reduce((total, transaction) => total + Number(transaction.amount || 0), 0);
     const periodExpenses = periodCashTransactions.filter((transaction) => transaction.type === 'expense').reduce((total, transaction) => total + Number(transaction.amount || 0), 0);
     const confirmedCheckoutReceiptIds = new Set(
-      cashTransactions.filter(isConfirmedCheckoutIncome).map((transaction) => receiptIdFromLedgerTransaction(transaction.id)).filter(Boolean),
+      cashTransactions.filter((transaction) => transaction.status === 'completed' && isConfirmedCheckoutIncome(transaction)).map((transaction) => receiptIdFromLedgerTransaction(transaction.id)).filter(Boolean),
     );
     const receivedReceipts = receipts.filter((receipt) => receipt.status === 'received' && confirmedCheckoutReceiptIds.has(receipt.id));
-    const receiptByAppointment = new Map<string, any>(receivedReceipts.filter((receipt) => receipt.appointmentId).map((receipt): [string, any] => [receipt.appointmentId as string, receipt]));
     const periodReceivedReceipts = receivedReceipts.filter((receipt) => inRange(appointmentDate(receipt.appointmentId, appointments), range.from, range.to) || inRange(toBrtDate(receipt.receivedAt), range.from, range.to));
+    const receiptByAppointment = new Map<string, any>(periodReceivedReceipts.filter((receipt) => receipt.appointmentId).map((receipt): [string, any] => [receipt.appointmentId as string, receipt]));
     const periodServiceRevenue = periodReceivedReceipts.reduce((total, receipt) => total + Number(receipt.totalAmount || 0), 0);
 
     const serviceMap = new Map<string, ServiceAggregate>();
@@ -95,7 +113,7 @@ operationalReportsRouter.get('/', requireAuth, requireAdmin, async (req, res) =>
     }
     for (let index = 0; index < 7; index += 1) weeklyMap.set(index, { weekday: index, label: weekdayLabels[index], appointments: 0, completed: 0, revenue: 0 });
 
-    for (const appointment of periodAppointments) {
+    for (const appointment of countableAppointments) {
       const day = dailyMap.get(appointment.date) || { date: appointment.date, label: `${appointment.date.slice(8, 10)}/${appointment.date.slice(5, 7)}`, appointments: 0, completed: 0, cancelled: 0, revenue: 0 };
       day.appointments += 1;
       if (appointment.status === 'completed') day.completed += 1;
@@ -145,7 +163,7 @@ operationalReportsRouter.get('/', requireAuth, requireAdmin, async (req, res) =>
       count: periodQueue.filter((item) => item.status === status).length,
     }));
 
-    const pendingReceipts = receipts.filter((receipt) => receipt.status === 'pending');
+    const pendingReceipts = operationSettings.reportsShowPendingValues ? receipts.filter((receipt) => receipt.status === 'pending') : [];
     const upcomingAppointments = todayActiveAppointments
       .sort((a, b) => String(a.timeSlot).localeCompare(String(b.timeSlot)))
       .slice(0, 8)
@@ -177,10 +195,35 @@ operationalReportsRouter.get('/', requireAuth, requireAdmin, async (req, res) =>
     const completionRate = activeAppointments.length > 0 ? (completedAppointments.length / activeAppointments.length) * 100 : 0;
     const cancellationRate = periodAppointments.length > 0 ? (cancelledAppointments.length / periodAppointments.length) * 100 : 0;
 
+    const comparison = previousRange ? (() => {
+      const previousAppointments = appointments.filter((appointment) => inRange(appointment.date, previousRange.from, previousRange.to));
+      const previousCountable = previousAppointments.filter((appointment) => (
+        (operationSettings.reportsIncludeCancelled || appointment.status !== 'cancelled') &&
+        (operationSettings.reportsIncludeNoShow || appointment.status !== 'no_show')
+      ));
+      const previousCompleted = previousCountable.filter((appointment) => appointment.status === 'completed').length;
+      const previousCash = cashTransactions.filter((transaction) => transaction.status === 'completed' && isFinancialLedgerTransaction(transaction) && inRange(transaction.date, previousRange.from, previousRange.to));
+      const previousIncome = previousCash.filter((transaction) => isConfirmedCheckoutIncome(transaction)).reduce((total, transaction) => total + Number(transaction.amount || 0), 0);
+      const previousExpenses = previousCash.filter((transaction) => transaction.type === 'expense').reduce((total, transaction) => total + Number(transaction.amount || 0), 0);
+      const previousReceived = receipts.filter((receipt) => receipt.status === 'received' && confirmedCheckoutReceiptIds.has(receipt.id) && inRange(toBrtDate(receipt.receivedAt), previousRange.from, previousRange.to));
+      const previousServiceRevenue = previousReceived.reduce((total, receipt) => total + Number(receipt.totalAmount || 0), 0);
+      return {
+        from: previousRange.from,
+        to: previousRange.to,
+        appointments: previousAppointments.length,
+        completedAppointments: previousCompleted,
+        serviceRevenue: asMoney(previousServiceRevenue),
+        totalIncome: asMoney(previousIncome),
+        totalExpenses: asMoney(previousExpenses),
+        netResult: asMoney(previousIncome - previousExpenses),
+        averageTicket: asMoney(previousReceived.length > 0 ? previousServiceRevenue / previousReceived.length : 0),
+      };
+    })() : null;
+
     return res.json({
       period: { id: period, ...range },
       summary: {
-        appointments: periodAppointments.length,
+        appointments: countableAppointments.length,
         activeAppointments: activeAppointments.length,
         completedAppointments: completedAppointments.length,
         cancelledAppointments: cancelledAppointments.length,
@@ -200,6 +243,15 @@ operationalReportsRouter.get('/', requireAuth, requireAdmin, async (req, res) =>
         totalExpenses: asMoney(periodExpenses),
         netResult: asMoney(periodIncome - periodExpenses),
         averageTicket: asMoney(averageTicket),
+        operationalDay: today,
+      },
+      comparison,
+      settings: {
+        dayStartTime: operationSettings.reportsDayStartTime,
+        includeCancelled: operationSettings.reportsIncludeCancelled,
+        includeNoShow: operationSettings.reportsIncludeNoShow,
+        showPendingValues: operationSettings.reportsShowPendingValues,
+        refreshSeconds: operationSettings.reportsRefreshSeconds,
       },
       peakHour,
       topHours,

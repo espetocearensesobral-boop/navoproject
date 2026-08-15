@@ -63,6 +63,12 @@ export const OperationalReportsManagement: React.FC = () => {
     return () => window.removeEventListener('adminRefresh', refresh);
   }, [period]);
 
+  useEffect(() => {
+    const refreshSeconds = report?.settings.refreshSeconds || 30;
+    const refreshTimer = window.setInterval(() => loadReport(period), refreshSeconds * 1000);
+    return () => window.clearInterval(refreshTimer);
+  }, [period, report?.settings.refreshSeconds]);
+
   const maxWeekly = useMemo(() => Math.max(1, ...(report?.weeklyMovement.map((item) => item.appointments) || [1])), [report]);
   const maxHour = useMemo(() => Math.max(1, ...(report?.topHours.map((item) => item.count) || [1])), [report]);
   const summary = report?.summary;
@@ -100,6 +106,7 @@ export const OperationalReportsManagement: React.FC = () => {
           <MetricCard label="Resultado" value={money(summary.netResult)} detail={`${money(summary.totalIncome)} entradas · ${money(summary.totalExpenses)} saídas`} icon={summary.netResult >= 0 ? ArrowUpRight : ArrowDownRight} tone={summary.netResult >= 0 ? 'positive' : 'negative'} />
           <MetricCard label="Fila agora" value={String(summary.currentQueue)} detail={`${summary.currentWaiting} aguardando · ${summary.currentInChair} na cadeira`} icon={Users} tone={summary.currentQueue > 0 ? 'warning' : 'neutral'} />
         </div>
+        {report.comparison && <ComparisonStrip report={report} />}
 
         {activeView === 'overview' && <OverviewView report={report} maxWeekly={maxWeekly} maxHour={maxHour} />}
         {activeView === 'agenda' && <AgendaView report={report} maxWeekly={maxWeekly} />}
@@ -107,6 +114,16 @@ export const OperationalReportsManagement: React.FC = () => {
       </>}
     </div>
   );
+};
+
+const ComparisonStrip: React.FC<{ report: OperationalReportData }> = ({ report }) => {
+  if (!report.comparison) return null;
+  const delta = (current: number, previous: number) => {
+    if (previous === 0) return current === 0 ? '0%' : 'novo';
+    const value = ((current - previous) / Math.abs(previous)) * 100;
+    return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+  };
+  return <section className="rounded-xl border border-border-subtle bg-surface-card px-4 py-3"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="text-xs font-bold text-content-base">Comparação com o período anterior</p><p className="mt-0.5 text-[11px] text-content-muted">{report.comparison.from.split('-').reverse().join('/')} até {report.comparison.to.split('-').reverse().join('/')}</p></div><div className="flex flex-wrap gap-2 text-xs"><span className="rounded-full bg-surface-base border border-border-subtle px-2.5 py-1 text-content-muted">Agendas {delta(report.summary.appointments, report.comparison.appointments)}</span><span className="rounded-full bg-surface-base border border-border-subtle px-2.5 py-1 finance-positive">Entradas {delta(report.summary.totalIncome, report.comparison.totalIncome)}</span><span className="rounded-full bg-surface-base border border-border-subtle px-2.5 py-1 text-content-muted">Ticket {delta(report.summary.averageTicket, report.comparison.averageTicket)}</span></div></div></section>;
 };
 
 const OverviewView: React.FC<{ report: OperationalReportData; maxWeekly: number; maxHour: number }> = ({ report, maxWeekly, maxHour }) => {
@@ -120,7 +137,7 @@ const OverviewView: React.FC<{ report: OperationalReportData; maxWeekly: number;
       <MiniMetric label="Taxa de conclusão" value={`${summary.completionRate.toFixed(1)}%`} detail={`${summary.completedAppointments} finalizados`} icon={Gauge} tone="positive" />
       <MiniMetric label="Cancelamentos" value={`${summary.cancellationRate.toFixed(1)}%`} detail={`${summary.cancelledAppointments} no período`} icon={ArrowDownRight} tone="negative" />
       <MiniMetric label="Ticket médio" value={money(summary.averageTicket)} detail="Recebimentos confirmados" icon={WalletCards} tone="positive" />
-      <MiniMetric label="A receber" value={money(summary.pendingAmount)} detail={`${summary.pendingReceipts} pendência${summary.pendingReceipts === 1 ? '' : 's'}`} icon={Clock3} tone="warning" />
+      {report.settings.showPendingValues && <MiniMetric label="A receber" value={money(summary.pendingAmount)} detail={`${summary.pendingReceipts} pendência${summary.pendingReceipts === 1 ? '' : 's'}`} icon={Clock3} tone="warning" />}
     </div>
     <div className="grid grid-cols-1 xl:grid-cols-[1fr_0.9fr] gap-4">
       <TopServices report={report} />
