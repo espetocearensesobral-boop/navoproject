@@ -60,7 +60,6 @@ const insertAnonymousReview = async (review: any) => {
       comment: review.comment,
       hasPhoto: review.hasPhoto,
       photoUrl: review.photoUrl,
-      pointsAwarded: review.pointsAwarded,
       createdAt: review.createdAt,
     });
   }
