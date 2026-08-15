@@ -111,7 +111,7 @@ export const ReceiptsManagement: React.FC = () => {
 
       {error && <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">{error}</div>}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <SummaryCard label="Pendentes" value={String(summary.pending.length)} detail={money(summary.pendingAmount)} icon={Clock3} tone="warning" />
         <SummaryCard label="Recebidos" value={String(summary.received.length)} detail="Histórico consolidado" icon={CheckCircle2} tone="success" />
         <SummaryCard label="Dinheiro pendente" value={money(summary.pending.filter((item) => item.paymentMethod === 'cash').reduce((total, item) => total + item.totalAmount, 0))} detail="A definir no recebimento" icon={Banknote} tone="neutral" />
@@ -154,9 +154,9 @@ export const ReceiptsManagement: React.FC = () => {
                   <div className="flex items-start gap-3">
                     <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${pending ? 'bg-amber-500/10 text-amber-500' : 'bg-status-success/10 text-status-success'}`}>{pending ? <Clock3 className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}</div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-sm font-bold text-content-base truncate">{item.clientName}</span><StatusBadge status={item.status} /></div>
-                      <p className="mt-1 text-sm text-content-muted truncate">{item.serviceTitle}</p>
-                      <p className="mt-1 text-xs text-content-muted truncate">{item.professionalName || 'Profissional não informado'} · {new Date(getReceiptDate(item)).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</p>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-sm font-bold text-content-base admin-clamp-2">{item.clientName}</span><StatusBadge status={item.status} /></div>
+                      <p className="mt-1 text-sm text-content-muted admin-clamp-2">{item.serviceTitle}</p>
+                      <p className="mt-1 text-xs text-content-muted admin-safe-wrap">{item.professionalName || 'Profissional não informado'} · {new Date(getReceiptDate(item)).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</p>
                     </div>
                     <div className="text-right shrink-0"><p className={`text-sm sm:text-base font-mono font-bold ${pending ? 'text-content-base' : 'finance-positive'}`}>{money(item.totalAmount)}</p><p className="mt-1 text-xs text-gold-base font-bold">Ver extrato</p></div>
                   </div>
@@ -199,13 +199,13 @@ export const ReceiptsManagement: React.FC = () => {
 
 const SummaryCard: React.FC<{ label: string; value: string; detail: string; icon: React.ElementType; tone: 'warning' | 'success' | 'neutral' }> = ({ label, value, detail, icon: Icon, tone }) => {
   const toneClass = tone === 'warning' ? 'text-amber-500 bg-amber-500/10' : tone === 'success' ? 'text-status-success bg-status-success/10' : 'text-gold-base bg-gold-base/10';
-  return <div className="min-w-0 bg-surface-card border border-border-subtle rounded-xl p-3.5 sm:p-4"><div className="flex items-start justify-between gap-2"><span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-content-muted truncate">{label}</span><span className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${toneClass}`}><Icon className="w-4 h-4" /></span></div><p className="mt-3 text-lg sm:text-xl font-mono font-bold text-content-base truncate">{value}</p><p className="mt-1 text-xs text-content-muted truncate">{detail}</p></div>;
+  return <div className="min-w-0 bg-surface-card border border-border-subtle rounded-xl p-3.5 sm:p-4"><div className="flex items-start justify-between gap-2"><span className="text-xs font-bold uppercase tracking-wider text-content-muted admin-safe-wrap">{label}</span><span className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${toneClass}`}><Icon className="w-4 h-4" /></span></div><p className="mt-3 text-lg sm:text-xl font-mono font-bold text-content-base truncate">{value}</p><p className="mt-1 text-xs text-content-muted admin-safe-wrap">{detail}</p></div>;
 };
 
 const StatusBadge: React.FC<{ status: ReceiptItem['status'] }> = ({ status }) => {
   const received = status === 'received';
   const cancelled = status === 'cancelled';
-  return <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${received ? 'bg-status-success/10 text-status-success' : cancelled ? 'bg-status-error/10 text-status-error' : 'bg-amber-500/10 text-amber-500'}`}>{received ? 'Recebido' : cancelled ? 'Cancelado' : 'Pendente'}</span>;
+  return <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${received ? 'bg-status-success/10 text-status-success' : cancelled ? 'bg-status-error/10 text-status-error' : 'bg-amber-500/10 text-amber-500'}`}>{received ? 'Recebido' : cancelled ? 'Cancelado' : 'Pendente'}</span>;
 };
 
 const ReceiptDetailsModal: React.FC<{ receipt: ReceiptItem; onClose: () => void; onRegister: () => void }> = ({ receipt, onClose, onRegister }) => {
@@ -214,9 +214,9 @@ const ReceiptDetailsModal: React.FC<{ receipt: ReceiptItem; onClose: () => void;
   return (
     <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-5" role="dialog" aria-modal="true" aria-label="Extrato do recebimento">
       <div className="admin-modal w-full max-w-xl max-h-[92dvh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-surface-card border border-border-subtle shadow-2xl">
-        <div className="sticky top-0 p-5 sm:p-6 bg-surface-card border-b border-border-subtle flex items-start justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[0.15em] text-gold-base">Extrato do recebimento</p><h2 className="mt-1 text-lg font-serif font-bold text-content-base">{receipt.clientName}</h2></div><button type="button" onClick={onClose} className="w-10 h-10 rounded-xl flex items-center justify-center text-content-muted hover:text-content-base hover:bg-surface-base"><X className="w-5 h-5" /></button></div>
+        <div className="sticky top-0 p-5 sm:p-6 bg-surface-card border-b border-border-subtle flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-gold-base">Extrato do recebimento</p><h2 className="mt-1 text-lg font-serif font-bold text-content-base admin-clamp-2">{receipt.clientName}</h2></div><button type="button" onClick={onClose} className="w-10 h-10 rounded-xl flex items-center justify-center text-content-muted hover:text-content-base hover:bg-surface-base"><X className="w-5 h-5" /></button></div>
         <div className="p-5 sm:p-6 space-y-5">
-          <div className="flex items-center justify-between gap-3"><div><p className="text-sm text-content-muted">{receipt.serviceTitle}</p><p className="mt-1 text-xs text-content-muted">{receipt.professionalName || 'Profissional não informado'}</p></div><StatusBadge status={receipt.status} /></div>
+          <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-sm text-content-muted admin-clamp-2">{receipt.serviceTitle}</p><p className="mt-1 text-xs text-content-muted admin-safe-wrap">{receipt.professionalName || 'Profissional não informado'}</p></div><StatusBadge status={receipt.status} /></div>
           <div className="p-4 rounded-xl bg-surface-base border border-border-subtle space-y-3 text-sm"><AmountRow label="Valor original" value={money(receipt.originalAmount)} /><AmountRow label="Valor revisado" value={money(receipt.enteredAmount)} />{receipt.discountAmount > 0 && <AmountRow label={`Desconto${receipt.discountPercent ? ` (${receipt.discountPercent.toFixed(2)}%)` : ''}`} value={`- ${money(receipt.discountAmount)}`} tone="negative" />}{receipt.surchargeAmount > 0 && <AmountRow label={`Acréscimo${receipt.surchargePercent ? ` (${receipt.surchargePercent.toFixed(2)}%)` : ''}`} value={`+ ${money(receipt.surchargeAmount)}`} tone="positive" />}<div className="pt-3 border-t border-border-subtle"><AmountRow label="Valor total" value={money(receipt.totalAmount)} strong tone={received ? 'positive' : undefined} /></div></div>
           {received && <div className="p-4 rounded-xl bg-status-success/5 border border-status-success/20 space-y-2 text-sm"><AmountRow label="Forma de pagamento" value={paymentLabel[receipt.paymentMethod || 'other']} /><AmountRow label="Recebido" value={money(receipt.amountReceived)} />{receipt.paymentMethod === 'cash' && <AmountRow label="Troco" value={money(receipt.changeAmount)} tone="positive" />}<AmountRow label="Confirmado em" value={receipt.receivedAt ? new Date(receipt.receivedAt).toLocaleString('pt-BR') : '—'} /></div>}
           {receipt.observations && <div className="p-4 rounded-xl bg-surface-base border border-border-subtle"><p className="text-xs font-bold uppercase tracking-wider text-content-muted">Observações</p><p className="mt-2 text-sm text-content-base whitespace-pre-wrap">{receipt.observations}</p></div>}
@@ -227,4 +227,4 @@ const ReceiptDetailsModal: React.FC<{ receipt: ReceiptItem; onClose: () => void;
   );
 };
 
-const AmountRow: React.FC<{ label: string; value: string; tone?: 'positive' | 'negative'; strong?: boolean }> = ({ label, value, tone, strong }) => <div className="flex justify-between gap-3"><span className="text-content-muted">{label}</span><strong className={`text-right ${strong ? 'text-base' : ''} ${tone === 'positive' ? 'finance-positive' : tone === 'negative' ? 'finance-negative' : 'text-content-base'}`}>{value}</strong></div>;
+const AmountRow: React.FC<{ label: string; value: string; tone?: 'positive' | 'negative'; strong?: boolean }> = ({ label, value, tone, strong }) => <div className="flex justify-between gap-3"><span className="text-content-muted admin-safe-wrap">{label}</span><strong className={`text-right ${strong ? 'text-base' : ''} ${tone === 'positive' ? 'finance-positive' : tone === 'negative' ? 'finance-negative' : 'text-content-base'}`}>{value}</strong></div>;

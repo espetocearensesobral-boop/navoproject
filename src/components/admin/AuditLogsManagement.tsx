@@ -173,7 +173,7 @@ export const AuditLogsManagement: React.FC = () => {
       <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs min-w-[840px]">
-            <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
+            <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-xs">
               <tr className="whitespace-nowrap">
                 <th className="p-3">Data / Hora</th>
                 <th className="p-3">Operador</th>
@@ -188,28 +188,28 @@ export const AuditLogsManagement: React.FC = () => {
                 const Icon = getCategoryIcon(item.category);
                 return (
                   <tr key={item.id} className="hover:bg-surface-base/50 transition-colors">
-                    <td className="p-3 whitespace-nowrap font-mono text-[11px] text-content-muted">
+                    <td className="p-3 whitespace-nowrap font-mono text-xs text-content-muted">
                       {new Date(item.timestamp).toLocaleString('pt-BR')}
                     </td>
-                    <td className="p-3 font-semibold whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
+                    <td className="p-3 font-semibold">
+                      <div className="flex items-start gap-1.5 min-w-0">
                         <User className="w-3.5 h-3.5 text-gold-base shrink-0" />
-                        <span>{item.operatorName}</span>
+                        <span className="admin-safe-wrap">{item.operatorName}</span>
                       </div>
                     </td>
                     <td className="p-3 whitespace-nowrap">
-                      <span className="bg-surface-base border border-border-subtle text-content-muted font-bold text-[10px] px-2 py-0.5 rounded-xl capitalize inline-flex items-center gap-1">
+                      <span className="bg-surface-base border border-border-subtle text-content-muted font-bold text-xs px-2 py-0.5 rounded-xl capitalize inline-flex items-center gap-1">
                         <Icon className="w-3 h-3 text-gold-base" />
                         {item.category}
                       </span>
                     </td>
-                    <td className="p-3 font-bold text-content-base whitespace-nowrap">
+                    <td className="p-3 font-bold text-content-base admin-safe-wrap">
                       {item.action}
                     </td>
-                    <td className="p-3 text-content-muted max-w-md">
+                    <td className="p-3 text-content-muted max-w-md admin-safe-wrap">
                       {item.details}
                     </td>
-                    <td className="p-3 font-mono text-[10px] text-content-muted whitespace-nowrap">
+                    <td className="p-3 font-mono text-xs text-content-muted whitespace-nowrap">
                       {item.ipAddress}
                     </td>
                   </tr>

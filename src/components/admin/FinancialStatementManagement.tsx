@@ -137,32 +137,32 @@ export const FinancialStatementManagement: React.FC = () => {
       )}
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-status-success mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Entradas</span>
+            <span className="text-xs font-bold uppercase tracking-wider admin-safe-wrap">Entradas</span>
             <div className="w-6 h-6 rounded-lg bg-status-success/10 flex items-center justify-center shrink-0">
               <ArrowUpRight className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black finance-positive tabular-nums truncate">+ R$ {totalIncomes.toFixed(2)}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Lançamentos persistidos</p>
+          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Lançamentos persistidos</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-status-error mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Saídas</span>
+            <span className="text-xs font-bold uppercase tracking-wider admin-safe-wrap">Saídas</span>
             <div className="w-6 h-6 rounded-lg bg-status-error/10 flex items-center justify-center shrink-0">
               <ArrowDownRight className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black finance-negative tabular-nums truncate">- R$ {totalExpenses.toFixed(2)}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Saídas persistidas</p>
+          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Saídas persistidas</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-gold-base mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Resultado</span>
+            <span className="text-xs font-bold uppercase tracking-wider admin-safe-wrap">Resultado</span>
             <div className="w-6 h-6 rounded-lg bg-gold-base/10 flex items-center justify-center shrink-0">
               <PieChart className="w-3.5 h-3.5" />
             </div>
@@ -170,18 +170,18 @@ export const FinancialStatementManagement: React.FC = () => {
           <p className={`text-lg font-black tabular-nums truncate ${netBalance >= 0 ? 'finance-positive' : 'finance-negative'}`}>
              R$ {netBalance.toFixed(2)}
           </p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Saldo confirmado</p>
+          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Saldo confirmado</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-amber-500 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Pendentes</span>
+            <span className="text-xs font-bold uppercase tracking-wider admin-safe-wrap">Pendentes</span>
             <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black text-content-base tabular-nums truncate">{pendingTransactions.length}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Fora do resultado</p>
+          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Fora do resultado</p>
         </div>
       </div>
 
@@ -224,7 +224,7 @@ export const FinancialStatementManagement: React.FC = () => {
       <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs min-w-[760px]">
-            <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
+            <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-xs">
               <tr className="whitespace-nowrap">
                 <th className="p-3">Data / Hora</th>
                 <th className="p-3">Status</th>
@@ -238,29 +238,29 @@ export const FinancialStatementManagement: React.FC = () => {
             <tbody className="divide-y divide-border-subtle/60 text-content-base">
               {filtered.map((t) => (
                 <tr key={t.id} className="hover:bg-surface-base/50 transition-colors">
-                  <td className="p-3 font-mono text-[11px] text-content-muted whitespace-nowrap">
+                  <td className="p-3 font-mono text-xs text-content-muted whitespace-nowrap">
                     {formatTransactionDate(t.date)}
                   </td>
                   <td className="p-3 whitespace-nowrap">
-                    <span className={`font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase ${t.status === 'pending' ? 'bg-amber-500/15 text-amber-500' : 'bg-status-success/15 text-status-success'}`}>{t.status === 'pending' ? 'Pendente' : 'Confirmado'}</span>
+                    <span className={`font-bold text-xs px-2 py-0.5 rounded-xl uppercase ${t.status === 'pending' ? 'bg-amber-500/15 text-amber-500' : 'bg-status-success/15 text-status-success'}`}>{t.status === 'pending' ? 'Pendente' : 'Confirmado'}</span>
                   </td>
                   <td className="p-3 whitespace-nowrap">
                     {t.type === 'income' ? (
-                      <span className="bg-status-success/15 text-status-success font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase inline-flex items-center gap-1">
+                      <span className="bg-status-success/15 text-status-success font-bold text-xs px-2 py-0.5 rounded-xl uppercase inline-flex items-center gap-1">
                         <ArrowUpRight className="w-3 h-3" />
                         Entrada
                       </span>
                     ) : (
-                      <span className="bg-status-error/15 text-status-error font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase inline-flex items-center gap-1">
+                      <span className="bg-status-error/15 text-status-error font-bold text-xs px-2 py-0.5 rounded-xl uppercase inline-flex items-center gap-1">
                         <ArrowDownRight className="w-3 h-3" />
                         Saída
                       </span>
                     )}
                   </td>
-                  <td className="p-3 font-semibold text-content-muted">
+                  <td className="p-3 font-semibold text-content-muted admin-safe-wrap">
                     {t.category}
                   </td>
-                  <td className="p-3 font-bold text-content-base">
+                  <td className="p-3 font-bold text-content-base admin-safe-wrap">
                     {t.description}
                   </td>
                   <td className="p-3 font-mono text-content-muted">

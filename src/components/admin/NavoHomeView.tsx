@@ -55,33 +55,33 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
       case 'in_service':
       case 'in_chair':
         return (
-          <span className="text-[10px] font-bold text-status-success bg-status-success/10 border border-status-success/30 px-2 py-0.5 rounded-xl whitespace-nowrap inline-flex items-center gap-1">
+          <span className="text-xs font-bold text-status-success bg-status-success/10 border border-status-success/30 px-2 py-0.5 rounded-xl whitespace-nowrap inline-flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
             Na Cadeira
           </span>
         );
       case 'pending_approval':
         return (
-          <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-xl whitespace-nowrap inline-flex items-center gap-1 animate-pulse">
+          <span className="text-xs font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-xl whitespace-nowrap inline-flex items-center gap-1 animate-pulse">
             ⚠️ Fora do Expediente
           </span>
         );
       case 'completed':
         return (
-          <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-xl whitespace-nowrap">
+          <span className="text-xs font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-xl whitespace-nowrap">
             Finalizado
           </span>
         );
       case 'cancelled':
         return (
-          <span className="text-[10px] font-bold text-status-error bg-status-error/10 border border-status-error/30 px-2 py-0.5 rounded-xl whitespace-nowrap">
+          <span className="text-xs font-bold text-status-error bg-status-error/10 border border-status-error/30 px-2 py-0.5 rounded-xl whitespace-nowrap">
             Cancelado
           </span>
         );
       case 'confirmed':
       default:
         return (
-          <span className="text-[10px] font-bold text-gold-base bg-gold-base/10 border border-gold-base/30 px-2 py-0.5 rounded-xl whitespace-nowrap">
+          <span className="text-xs font-bold text-gold-base bg-gold-base/10 border border-gold-base/30 px-2 py-0.5 rounded-xl whitespace-nowrap">
             Confirmado
           </span>
         );
@@ -105,35 +105,35 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-gold-base mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Faturamento</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Faturamento</span>
             <div className="w-6 h-6 rounded-lg bg-gold-base/10 flex items-center justify-center shrink-0">
               <Receipt className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{operationalReport?.summary.completedAppointments || 0} concluídos hoje</p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">{operationalReport?.summary.completedAppointments || 0} concluídos hoje</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Ticket Médio</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Ticket Médio</span>
             <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle text-gold-base flex items-center justify-center shrink-0">
               <CalendarCheck2 className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-          <p className="text-[9px] text-status-success mt-1 font-medium truncate">{inServiceToday} ativos agora</p>
+          <p className="text-xs text-status-success mt-1 font-medium truncate">{inServiceToday} ativos agora</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Clientes Cadastrados</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Clientes Cadastrados</span>
             <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle text-gold-base flex items-center justify-center shrink-0">
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black text-content-base tabular-nums truncate">{uniqueClients}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{pendingToday} aguardando</p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">{pendingToday} aguardando</p>
         </div>
       </div>
 
@@ -186,8 +186,8 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                         {apt.client_name ? apt.client_name.charAt(0).toUpperCase() : 'C'}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-content-base truncate">{apt.client_name || 'Cliente'}</div>
-                        <div className="text-[11px] text-content-muted truncate">{serviceName}</div>
+                        <div className="text-xs font-bold text-content-base admin-clamp-2">{apt.client_name || 'Cliente'}</div>
+                        <div className="text-xs text-content-muted admin-clamp-2">{serviceName}</div>
                       </div>
                     </div>
                     {getStatusBadge(apt.status)}
@@ -197,7 +197,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                     <div className="flex items-center gap-3 text-content-muted">
                       <span className="num-tabular font-bold text-content-base whitespace-nowrap">{apt.time_slot || '--:--'}</span>
                       <span>•</span>
-                      <span className="text-gold-base font-bold truncate max-w-[120px]">{apt.professional_name || 'Barbeiro'}</span>
+                      <span className="text-gold-base font-bold admin-safe-wrap max-w-[120px]">{apt.professional_name || 'Barbeiro'}</span>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -223,7 +223,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
         <div className="hidden md:block overflow-x-auto custom-scrollbar">
           <table className="w-full text-left text-xs border-collapse min-w-[600px]">
             <thead>
-              <tr className="border-b border-border-subtle bg-surface-base/50 h-9 text-[10px] font-bold uppercase tracking-wider text-content-muted">
+              <tr className="border-b border-border-subtle bg-surface-base/50 h-9 text-xs font-bold uppercase tracking-wider text-content-muted">
                 <th className="px-4 py-2 font-bold min-w-[180px]">Cliente</th>
                 <th className="px-4 py-2 font-bold min-w-[180px]">Serviço & Barbeiro</th>
                 <th className="px-4 py-2 font-bold text-right min-w-[100px]">Horário</th>
@@ -260,13 +260,13 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                           <div className="w-7 h-7 rounded-xl bg-surface-base border border-border-subtle text-gold-base font-serif font-bold text-xs flex items-center justify-center shrink-0">
                             {apt.client_name ? apt.client_name.charAt(0).toUpperCase() : 'C'}
                           </div>
-                          <span className="font-bold text-content-base truncate">{apt.client_name || 'Cliente'}</span>
+                          <span className="font-bold text-content-base admin-clamp-2">{apt.client_name || 'Cliente'}</span>
                         </div>
                       </td>
 
                       {/* Serviço & Barbeiro */}
                       <td className="px-4 py-2 min-w-0">
-                        <div className="truncate text-content-muted">
+                        <div className="admin-safe-wrap text-content-muted">
                           <span className="text-content-base font-medium">{serviceName}</span>
                           <span className="mx-1">•</span>
                           <span className="text-gold-base font-bold">{apt.professional_name || 'Barbeiro'}</span>
@@ -292,7 +292,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
                       <td className="px-4 py-2 text-right">
                         <button
                           onClick={onNavigateToAgenda}
-                          className="h-8 px-2.5 rounded-xl bg-surface-base hover:bg-surface-card text-content-muted hover:text-gold-base border border-border-subtle transition-all text-[11px] font-bold whitespace-nowrap inline-flex items-center gap-1 active:scale-95"
+                          className="h-8 px-2.5 rounded-xl bg-surface-base hover:bg-surface-card text-content-muted hover:text-gold-base border border-border-subtle transition-all text-xs font-bold whitespace-nowrap inline-flex items-center gap-1 active:scale-95"
                         >
                           <span>Ver</span>
                           <ArrowRight className="w-3 h-3" />
