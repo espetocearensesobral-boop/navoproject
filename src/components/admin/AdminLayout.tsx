@@ -319,30 +319,30 @@ export const AdminLayout: React.FC = () => {
   const navItems = [
     { 
       id: 'dashboard' as AdminTab, 
-      label: 'Dashboard', 
+      label: 'Visão Geral',
       icon: TrendingUp,
       description: 'Métricas e análises',
       section: 'operacao' as AdminSection,
     },
-    { 
-      id: 'relatorios' as AdminTab,
-      label: 'Relatórios',
-      icon: FileText,
-      description: 'Visão geral da operação',
-      section: 'operacao' as AdminSection,
-    },
     {
       id: 'agenda' as AdminTab,
-      label: 'Agenda', 
+      label: 'Agenda',
       icon: Calendar,
       description: 'Gerenciar horários',
       section: 'operacao' as AdminSection,
     },
-    { 
-      id: 'queue' as AdminTab, 
-      label: 'Fila de Espera', 
+    {
+      id: 'queue' as AdminTab,
+      label: 'Fila de Espera',
       icon: Clock,
       description: 'Clientes aguardando',
+      section: 'operacao' as AdminSection,
+    },
+    {
+      id: 'relatorios' as AdminTab,
+      label: 'Relatórios',
+      icon: FileText,
+      description: 'Visão geral da operação',
       section: 'operacao' as AdminSection,
     },
     {
@@ -373,9 +373,23 @@ export const AdminLayout: React.FC = () => {
       description: 'Consolidação financeira',
       section: 'financeiro' as AdminSection,
     },
-    { 
-      id: 'servicos' as AdminTab, 
-      label: 'Serviços', 
+    {
+      id: 'clientes' as AdminTab,
+      label: 'Clientes',
+      icon: UserCheck,
+      description: 'Base de clientes',
+      section: 'cadastros' as AdminSection,
+    },
+    {
+      id: 'profissionais' as AdminTab,
+      label: 'Profissionais',
+      icon: Users,
+      description: 'Equipe de barbeiros',
+      section: 'cadastros' as AdminSection,
+    },
+    {
+      id: 'servicos' as AdminTab,
+      label: 'Serviços',
       icon: Scissors,
       description: 'Catálogo de serviços',
       section: 'cadastros' as AdminSection,
@@ -387,23 +401,9 @@ export const AdminLayout: React.FC = () => {
       description: 'Catálogo de produtos e alertas de estoque',
       section: 'cadastros' as AdminSection,
     },
-    { 
-      id: 'profissionais' as AdminTab, 
-      label: 'Profissionais', 
-      icon: Users,
-      description: 'Equipe de barbeiros',
-      section: 'cadastros' as AdminSection,
-    },
-    { 
-      id: 'clientes' as AdminTab, 
-      label: 'Clientes', 
-      icon: UserCheck,
-      description: 'Base de clientes',
-      section: 'cadastros' as AdminSection,
-    },
     {
       id: 'relacionamento_dashboard' as AdminTab,
-      label: 'Dashboard Geral',
+      label: 'Dashboard de Relacionamento',
       icon: LayoutGrid,
       description: 'Visão geral do relacionamento',
       section: 'relacionamento' as AdminSection,
@@ -413,20 +413,6 @@ export const AdminLayout: React.FC = () => {
       label: 'Clube de Fidelidade & Níveis',
       icon: Award,
       description: 'Pontos e níveis VIP',
-      section: 'relacionamento' as AdminSection,
-    },
-    {
-      id: 'relacionamento_rewards' as AdminTab,
-      label: 'Prêmios & Cupons Desconto',
-      icon: Gift,
-      description: 'Catálogo e resgates',
-      section: 'relacionamento' as AdminSection,
-    },
-    {
-      id: 'relacionamento_referrals' as AdminTab,
-      label: 'Motor de Indicações',
-      icon: Users,
-      description: 'Embaixadores e convites',
       section: 'relacionamento' as AdminSection,
     },
     {
@@ -448,6 +434,20 @@ export const AdminLayout: React.FC = () => {
       label: 'Aniversariantes',
       icon: Cake,
       description: 'Datas e relacionamento',
+      section: 'relacionamento' as AdminSection,
+    },
+    {
+      id: 'relacionamento_referrals' as AdminTab,
+      label: 'Motor de Indicações',
+      icon: Users,
+      description: 'Embaixadores e convites',
+      section: 'relacionamento' as AdminSection,
+    },
+    {
+      id: 'relacionamento_rewards' as AdminTab,
+      label: 'Prêmios & Cupons Desconto',
+      icon: Gift,
+      description: 'Catálogo e resgates',
       section: 'relacionamento' as AdminSection,
     },
     { 
@@ -492,7 +492,7 @@ export const AdminLayout: React.FC = () => {
 
   // Quick bottom bar items matching mobile model
   const bottomBarItems = [
-    { id: 'dashboard' as AdminTab, label: 'Dashboard', icon: TrendingUp },
+    { id: 'dashboard' as AdminTab, label: 'Visão Geral', icon: TrendingUp },
     { id: 'agenda' as AdminTab, label: 'Agenda', icon: Calendar },
     { id: 'queue' as AdminTab, label: 'Espera', icon: Clock },
   ];
