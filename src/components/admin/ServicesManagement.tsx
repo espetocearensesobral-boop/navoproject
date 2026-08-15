@@ -360,7 +360,7 @@ export const ServicesManagement: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar serviço..."
-              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-2.5 py-1.5 text-xs text-content-base placeholder-[#666666] outline-none focus:border-gold-base"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-2.5 py-1.5 text-xs text-content-base placeholder:text-content-muted outline-none focus:border-gold-base"
             />
           </div>
         </div>
@@ -608,7 +608,7 @@ export const ServicesManagement: React.FC = () => {
                 <th className="py-3.5 px-4 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2A2A2A] text-xs">
+            <tbody className="divide-y divide-border-subtle text-xs">
               {loading ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-content-muted">

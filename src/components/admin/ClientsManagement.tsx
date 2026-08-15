@@ -194,7 +194,7 @@ export const ClientsManagement: React.FC = () => {
             placeholder="Buscar por nome, email ou telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-2 text-xs text-content-base placeholder-[#666666] focus:outline-none focus:border-gold-base"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-2 text-xs text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base"
           />
         </div>
 

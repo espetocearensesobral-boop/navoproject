@@ -737,7 +737,7 @@ export const WaitingQueue: React.FC = () => {
                                 type="button"
                                 disabled={actionLoadingId === item.id}
                                 onClick={() => handleOpenWhatsAppModal(item)}
-                                className="w-9 h-9 rounded-lg bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border border-[#25D366]/30 disabled:opacity-50"
+                                className="w-9 h-9 rounded-lg bg-whatsapp/10 text-whatsapp hover:bg-whatsapp/20 border border-whatsapp/30 disabled:opacity-50"
                                 title="Avisar WhatsApp"
                                 aria-label="Avisar WhatsApp"
                               >
@@ -1061,10 +1061,10 @@ export const WaitingQueue: React.FC = () => {
 
       {isWhatsAppModalOpen && selectedQueueItemForWa && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface-card border border-[#25D366]/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
+          <div className="bg-surface-card border border-whatsapp/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#25D366]/10 text-[#25D366] flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-whatsapp/10 text-whatsapp flex items-center justify-center">
                   <MessageCircle className="w-4 h-4" />
                 </div>
                 <div>
@@ -1081,7 +1081,7 @@ export const WaitingQueue: React.FC = () => {
             </div>
 
             <div className="p-4 space-y-3 text-xs">
-              <div className="p-2.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 text-xs text-[#25D366] flex items-center gap-2">
+              <div className="p-2.5 rounded-xl bg-whatsapp/10 border border-whatsapp/20 text-xs text-whatsapp flex items-center gap-2">
                 <Zap className="w-4 h-4 shrink-0" />
                 <span>Integração de Notificação WhatsApp via API Web/wa.me ativa. O cliente receberá a mensagem diretamente.</span>
               </div>
@@ -1090,7 +1090,7 @@ export const WaitingQueue: React.FC = () => {
                 rows={4}
                 value={customWaMessage}
                 onChange={(e) => setCustomWaMessage(e.target.value)}
-                className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#25D366] resize-none"
+                className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-whatsapp resize-none"
               />
 
               <div className="flex items-center justify-between pt-1">
@@ -1104,7 +1104,7 @@ export const WaitingQueue: React.FC = () => {
 
                 <button
                   onClick={handleSendWhatsAppDirect}
-                  className="px-4 py-1.5 bg-[#25D366] text-surface-base rounded-xl text-xs font-black flex items-center gap-1 shadow"
+                  className="px-4 py-1.5 bg-whatsapp text-surface-base rounded-xl text-xs font-black flex items-center gap-1 shadow"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Enviar no WhatsApp</span>

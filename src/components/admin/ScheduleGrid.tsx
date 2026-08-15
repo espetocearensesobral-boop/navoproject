@@ -549,7 +549,7 @@ export const ScheduleGrid: React.FC = () => {
                 <span>Horário</span>
               </div>
 
-              <div className="col-span-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-x divide-[#2A2A2A]">
+              <div className="col-span-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-x divide-border-subtle">
                 {activeBarbers.map(barber => (
                   <div key={barber.id} className="p-3 flex items-center justify-center space-x-2">
                     <img src={barber.photo_url} alt={barber.name} className="w-6 h-6 rounded-full object-cover border border-gold-base" />
@@ -560,7 +560,7 @@ export const ScheduleGrid: React.FC = () => {
             </div>
 
             {/* Time Slots Rows */}
-            <div className="divide-y divide-[#2A2A2A]">
+            <div className="divide-y divide-border-subtle">
               {timeSlots.map(slot => {
                 return (
                   <div key={slot} className="grid grid-cols-12 hover:bg-surface-card transition-colors">
@@ -570,7 +570,7 @@ export const ScheduleGrid: React.FC = () => {
                     </div>
 
                     {/* Barbers Cells */}
-                    <div className="col-span-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-x divide-[#2A2A2A]">
+                    <div className="col-span-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-x divide-border-subtle">
                       {activeBarbers.map(barber => {
                         const apt = appointments.find(
                           a => a.professional_id === barber.id &&

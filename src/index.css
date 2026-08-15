@@ -27,6 +27,8 @@
   --color-status-warning: var(--color-status-warning);
   --color-status-error: var(--color-status-error);
   --color-status-info: var(--color-status-info);
+  --color-whatsapp: var(--color-whatsapp);
+  --color-whatsapp-on: var(--color-whatsapp-on);
   --color-finance-positive: var(--color-finance-positive);
   --color-finance-negative: var(--color-finance-negative);
   --color-finance-positive-soft: var(--color-finance-positive-soft);
@@ -79,6 +81,8 @@
   --color-status-warning: #F59E0B;
   --color-status-error: #EF4444;
   --color-status-info: #3B82F6;
+  --color-whatsapp: #25D366;
+  --color-whatsapp-on: #062D16;
 
   /* Financial semantics: independent from data-palette; tuned for dark surfaces. */
   --color-finance-positive: #34D399;
@@ -145,6 +149,8 @@
   --color-status-warning: #D97706;
   --color-status-error: #DC2626;
   --color-status-info: #2563EB;
+  --color-whatsapp: #25D366;
+  --color-whatsapp-on: #062D16;
 
   /* Financial semantics: independent from data-palette; tuned for light surfaces. */
   --color-finance-positive: #15803D;

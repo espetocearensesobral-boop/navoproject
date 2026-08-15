@@ -675,7 +675,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                 <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2"><Crown className="w-4 h-4 text-gold-base" /> Níveis VIP reais</h3>
                 <p className="text-[11px] text-content-muted mt-1">Defina o mínimo de pontos e o multiplicador usado no próximo checkout confirmado.</p>
               </div>
-              <div className="flex gap-2"><button type="button" onClick={() => setTiers((current) => [...current, { name: 'Novo nível', minimumPoints: 0, multiplier: 1, displayOrder: current.length, color: '#C9A96E', isActive: true }])} className="h-9 px-3 rounded-xl border border-border-subtle text-content-base font-bold text-xs flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> Novo nível</button><button type="button" onClick={handleSaveTiers} disabled={savingTiers || tiers.length === 0} className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs disabled:opacity-50">{savingTiers ? 'Salvando...' : 'Salvar níveis'}</button></div>
+              <div className="flex gap-2"><button type="button" onClick={() => setTiers((current) => [...current, { name: 'Novo nível', minimumPoints: 0, multiplier: 1, displayOrder: current.length, color: '#D4AF5A', isActive: true }])} className="h-9 px-3 rounded-xl border border-border-subtle text-content-base font-bold text-xs flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> Novo nível</button><button type="button" onClick={handleSaveTiers} disabled={savingTiers || tiers.length === 0} className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs disabled:opacity-50">{savingTiers ? 'Salvando...' : 'Salvar níveis'}</button></div>
             </div>
             <div className="space-y-2">
               {tiers.map((tier, index) => (
@@ -684,7 +684,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   <input type="number" min="0" step="1" value={tier.minimumPoints} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, minimumPoints: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Pontos mínimos do nível ${index + 1}`} />
                   <input type="number" min="0.1" max="20" step="0.1" value={tier.multiplier} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, multiplier: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Multiplicador do nível ${index + 1}`} />
                   <input type="number" min="0" step="1" value={tier.displayOrder} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, displayOrder: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Ordem do nível ${index + 1}`} />
-                  <input type="color" value={tier.color || '#C9A96E'} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, color: e.target.value } : item))} className="w-full h-9 bg-surface-card border border-border-subtle rounded-lg p-1" aria-label={`Cor do nível ${index + 1}`} />
+                  <input type="color" value={tier.color || '#D4AF5A'} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, color: e.target.value } : item))} className="w-full h-9 bg-surface-card border border-border-subtle rounded-lg p-1" aria-label={`Cor do nível ${index + 1}`} />
                   <label className="flex items-center gap-2 text-[11px] text-content-muted"><input type="checkbox" checked={Boolean(tier.isActive)} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, isActive: e.target.checked } : item))} /> Ativo</label>
                 </div>
               ))}
@@ -1146,7 +1146,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   </button>
                   <button
                     onClick={() => shareViaWhatsapp(refClient?.phone || '', `${customRefMsg} ${generatedRefUrl}`)}
-                    className="h-9 px-3 bg-[#25D366] text-white font-bold text-xs rounded-xl hover:opacity-90 shrink-0 flex items-center gap-1"
+                    className="h-9 px-3 bg-whatsapp text-whatsapp-on font-bold text-xs rounded-xl hover:opacity-90 shrink-0 flex items-center gap-1"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>WhatsApp</span>
