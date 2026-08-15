@@ -1,5 +1,6 @@
 import express from 'express';
-import { and, asc, desc, eq, gte, sql } from 'drizzle-orm';
+import crypto from 'crypto';
+import { and, asc, desc, eq, gte, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
@@ -32,6 +33,39 @@ const tierPayloadSchema = z.object({
   color: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
   isActive: z.coerce.boolean().default(true),
 });
+
+const benefitTypes = ['discount_percent', 'discount_fixed', 'free_service', 'free_product', 'points_bonus', 'priority_queue', 'custom'] as const;
+const billingPeriods = ['none', 'monthly', 'quarterly', 'annual'] as const;
+const planStatuses = ['draft', 'active', 'archived'] as const;
+
+const benefitPayloadSchema = z.object({
+  id: z.string().trim().min(1).max(100).optional(),
+  name: z.string().trim().min(1).max(120),
+  description: z.string().trim().min(1).max(500),
+  benefitType: z.enum(benefitTypes),
+  valueAmount: z.number().min(0).max(100000000).nullable().optional(),
+  valueText: z.string().trim().max(240).nullable().optional(),
+  serviceId: z.string().trim().min(1).max(160).nullable().optional(),
+  productId: z.string().trim().min(1).max(160).nullable().optional(),
+  usageLimit: z.number().int().min(1).max(1000000).nullable().optional(),
+  validityDays: z.number().int().min(1).max(3650).nullable().optional(),
+  displayOrder: z.number().int().min(0).max(10000).default(0),
+  isActive: z.boolean().default(true),
+  tierIds: z.array(z.string().trim().min(1).max(100)).max(20).default([]),
+}).strict();
+
+const planPayloadSchema = z.object({
+  id: z.string().trim().min(1).max(100).optional(),
+  name: z.string().trim().min(1).max(120),
+  description: z.string().trim().min(1).max(500),
+  price: z.number().min(0).max(100000000).default(0),
+  billingPeriod: z.enum(billingPeriods).default('none'),
+  pointsBonus: z.number().int().min(0).max(100000000).default(0),
+  status: z.enum(planStatuses).default('draft'),
+  displayOrder: z.number().int().min(0).max(10000).default(0),
+  isFeatured: z.boolean().default(false),
+  benefitIds: z.array(z.string().trim().min(1).max(100)).max(100).default([]),
+}).strict();
 
 const configPayloadSchema = z.object({
   currencyPerPoint: z.coerce.number().min(0.01).max(100000).optional(),
@@ -173,6 +207,198 @@ loyaltyRouter.put('/admin/tiers', requireAuth, requireAdmin, async (req: any, re
     res.json({ success: true, tiers: await listLoyaltyTiers(db, true) });
   } catch (e: any) {
     return handleError(res, e, 'PUT /api/loyalty/admin/tiers');
+  }
+});
+
+const validateBenefitBusinessRules = (payload: any) => {
+  if (payload.serviceId && payload.productId) throw new Error('BENEFIT_MULTIPLE_TARGETS');
+  if (payload.benefitType === 'discount_percent' && (payload.valueAmount === null || payload.valueAmount === undefined || payload.valueAmount > 100)) throw new Error('BENEFIT_PERCENT_INVALID');
+  if (payload.benefitType === 'free_service' && !payload.serviceId) throw new Error('BENEFIT_SERVICE_REQUIRED');
+  if (payload.benefitType === 'free_product' && !payload.productId) throw new Error('BENEFIT_PRODUCT_REQUIRED');
+  if (payload.benefitType === 'points_bonus' && (!Number.isInteger(payload.valueAmount) || Number(payload.valueAmount) <= 0)) throw new Error('BENEFIT_POINTS_INVALID');
+};
+
+const serializeBenefit = (benefit: any, tierIds: string[] = []) => ({
+  id: benefit.id,
+  name: benefit.name,
+  description: benefit.description,
+  benefitType: benefit.benefitType,
+  valueAmount: benefit.valueAmount === null || benefit.valueAmount === undefined ? null : Number(benefit.valueAmount),
+  valueText: benefit.valueText || null,
+  serviceId: benefit.serviceId || null,
+  productId: benefit.productId || null,
+  usageLimit: benefit.usageLimit === null || benefit.usageLimit === undefined ? null : Number(benefit.usageLimit),
+  validityDays: benefit.validityDays === null || benefit.validityDays === undefined ? null : Number(benefit.validityDays),
+  displayOrder: Number(benefit.displayOrder || 0),
+  isActive: Boolean(benefit.isActive),
+  tierIds,
+});
+
+const loadLoyaltyCatalog = async (dbLike: any, includeInactive = false) => {
+  const [benefitRows, planRows, tierBenefitRows, planBenefitRows, tiers] = await Promise.all([
+    dbLike.select().from(schema.loyaltyBenefits).orderBy(asc(schema.loyaltyBenefits.displayOrder), asc(schema.loyaltyBenefits.name)),
+    dbLike.select().from(schema.loyaltyPlans).orderBy(asc(schema.loyaltyPlans.displayOrder), asc(schema.loyaltyPlans.name)),
+    dbLike.select().from(schema.loyaltyTierBenefits),
+    dbLike.select().from(schema.loyaltyPlanBenefits),
+    listLoyaltyTiers(dbLike, includeInactive),
+  ]);
+  const benefitTierMap = new Map<string, string[]>();
+  for (const link of tierBenefitRows) benefitTierMap.set(link.benefitId, [...(benefitTierMap.get(link.benefitId) || []), link.tierId]);
+  const benefits = benefitRows
+    .filter((benefit: any) => includeInactive || benefit.isActive)
+    .map((benefit: any) => serializeBenefit(benefit, benefitTierMap.get(benefit.id) || []));
+  const planBenefitMap = new Map<string, string[]>();
+  for (const link of planBenefitRows) planBenefitMap.set(link.planId, [...(planBenefitMap.get(link.planId) || []), link.benefitId]);
+  const plans = planRows
+    .filter((plan: any) => includeInactive || plan.status === 'active')
+    .map((plan: any) => ({
+      id: plan.id,
+      name: plan.name,
+      description: plan.description,
+      price: Number(plan.price || 0),
+      billingPeriod: plan.billingPeriod,
+      pointsBonus: Number(plan.pointsBonus || 0),
+      status: plan.status,
+      displayOrder: Number(plan.displayOrder || 0),
+      isFeatured: Boolean(plan.isFeatured),
+      benefitIds: planBenefitMap.get(plan.id) || [],
+    }));
+  return { tiers, benefits, plans };
+};
+
+loyaltyRouter.get('/catalog', async (_req, res) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    res.json(await loadLoyaltyCatalog(db));
+  } catch (e: any) {
+    return handleError(res, e, 'GET /api/loyalty/catalog');
+  }
+});
+
+loyaltyRouter.get('/admin/catalog', requireAuth, requireAdmin, async (_req, res) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    res.json(await loadLoyaltyCatalog(db, true));
+  } catch (e: any) {
+    return handleError(res, e, 'GET /api/loyalty/admin/catalog');
+  }
+});
+
+const validateRelatedIds = async (tx: any, ids: string[], table: any, label: string) => {
+  const uniqueIds = [...new Set(ids)];
+  if (uniqueIds.length === 0) return uniqueIds;
+  const rows = await tx.select({ id: table.id }).from(table).where(inArray(table.id, uniqueIds));
+  if (rows.length !== uniqueIds.length) throw new Error(`${label.toUpperCase()}_NOT_FOUND`);
+  return uniqueIds;
+};
+
+loyaltyRouter.post('/admin/benefits', requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    const parsed = benefitPayloadSchema.omit({ id: true }).safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: 'Dados do benefício inválidos.', details: parsed.error.flatten() });
+    const payload = parsed.data;
+    try { validateBenefitBusinessRules(payload); } catch (error: any) {
+      const messages: Record<string, string> = { BENEFIT_MULTIPLE_TARGETS: 'Vincule o benefício a um serviço ou a um produto, não aos dois.', BENEFIT_PERCENT_INVALID: 'O desconto percentual deve estar entre 0 e 100.', BENEFIT_SERVICE_REQUIRED: 'Selecione o serviço do benefício grátis.', BENEFIT_PRODUCT_REQUIRED: 'Selecione o produto do benefício grátis.', BENEFIT_POINTS_INVALID: 'O bônus de pontos deve ser um número inteiro positivo.' };
+      return res.status(400).json({ error: messages[error.message] || 'Regra de benefício inválida.' });
+    }
+    const id = `benefit_${crypto.randomUUID()}`;
+    await db.transaction(async (tx: any) => {
+      const tierIds = await validateRelatedIds(tx, payload.tierIds, schema.loyaltyTiers, 'tier');
+      await tx.insert(schema.loyaltyBenefits).values({ id, name: payload.name, description: payload.description, benefitType: payload.benefitType, valueAmount: payload.valueAmount === null || payload.valueAmount === undefined ? null : payload.valueAmount.toFixed(2), valueText: payload.valueText || null, serviceId: payload.serviceId || null, productId: payload.productId || null, usageLimit: payload.usageLimit ?? null, validityDays: payload.validityDays ?? null, displayOrder: payload.displayOrder, isActive: payload.isActive, updatedAt: new Date() });
+      if (tierIds.length) await tx.insert(schema.loyaltyTierBenefits).values(tierIds.map((tierId, index) => ({ tierId, benefitId: id, displayOrder: index })));
+    });
+    res.status(201).json({ success: true, id, message: 'Benefício criado com sucesso.' });
+  } catch (e: any) {
+    if (e?.message === 'TIER_NOT_FOUND') return res.status(400).json({ error: 'Um dos níveis selecionados não existe.' });
+    return handleError(res, e, 'POST /api/loyalty/admin/benefits');
+  }
+});
+
+loyaltyRouter.put('/admin/benefits/:id', requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    const parsed = benefitPayloadSchema.omit({ id: true }).safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: 'Dados do benefício inválidos.', details: parsed.error.flatten() });
+    const payload = parsed.data;
+    try { validateBenefitBusinessRules(payload); } catch (error: any) {
+      const messages: Record<string, string> = { BENEFIT_MULTIPLE_TARGETS: 'Vincule o benefício a um serviço ou a um produto, não aos dois.', BENEFIT_PERCENT_INVALID: 'O desconto percentual deve estar entre 0 e 100.', BENEFIT_SERVICE_REQUIRED: 'Selecione o serviço do benefício grátis.', BENEFIT_PRODUCT_REQUIRED: 'Selecione o produto do benefício grátis.', BENEFIT_POINTS_INVALID: 'O bônus de pontos deve ser um número inteiro positivo.' };
+      return res.status(400).json({ error: messages[error.message] || 'Regra de benefício inválida.' });
+    }
+    await db.transaction(async (tx: any) => {
+      const tierIds = await validateRelatedIds(tx, payload.tierIds, schema.loyaltyTiers, 'tier');
+      const updated = await tx.update(schema.loyaltyBenefits).set({ name: payload.name, description: payload.description, benefitType: payload.benefitType, valueAmount: payload.valueAmount === null || payload.valueAmount === undefined ? null : payload.valueAmount.toFixed(2), valueText: payload.valueText || null, serviceId: payload.serviceId || null, productId: payload.productId || null, usageLimit: payload.usageLimit ?? null, validityDays: payload.validityDays ?? null, displayOrder: payload.displayOrder, isActive: payload.isActive, updatedAt: new Date() }).where(eq(schema.loyaltyBenefits.id, req.params.id)).returning({ id: schema.loyaltyBenefits.id });
+      if (!updated.length) throw new Error('BENEFIT_NOT_FOUND');
+      await tx.delete(schema.loyaltyTierBenefits).where(eq(schema.loyaltyTierBenefits.benefitId, req.params.id));
+      if (tierIds.length) await tx.insert(schema.loyaltyTierBenefits).values(tierIds.map((tierId, index) => ({ tierId, benefitId: req.params.id, displayOrder: index })));
+    });
+    res.json({ success: true, message: 'Benefício atualizado com sucesso.' });
+  } catch (e: any) {
+    if (e?.message === 'TIER_NOT_FOUND') return res.status(400).json({ error: 'Um dos níveis selecionados não existe.' });
+    if (e?.message === 'BENEFIT_NOT_FOUND') return res.status(404).json({ error: 'Benefício não encontrado.' });
+    return handleError(res, e, 'PUT /api/loyalty/admin/benefits');
+  }
+});
+
+loyaltyRouter.delete('/admin/benefits/:id', requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    const [updated] = await db.update(schema.loyaltyBenefits).set({ isActive: false, updatedAt: new Date() }).where(eq(schema.loyaltyBenefits.id, req.params.id)).returning({ id: schema.loyaltyBenefits.id });
+    if (!updated) return res.status(404).json({ error: 'Benefício não encontrado.' });
+    res.json({ success: true, message: 'Benefício desativado.' });
+  } catch (e: any) {
+    return handleError(res, e, 'DELETE /api/loyalty/admin/benefits');
+  }
+});
+
+loyaltyRouter.post('/admin/plans', requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    const parsed = planPayloadSchema.omit({ id: true }).safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: 'Dados do plano inválidos.', details: parsed.error.flatten() });
+    const payload = parsed.data;
+    const id = `plan_${crypto.randomUUID()}`;
+    await db.transaction(async (tx: any) => {
+      const benefitIds = await validateRelatedIds(tx, payload.benefitIds, schema.loyaltyBenefits, 'benefit');
+      await tx.insert(schema.loyaltyPlans).values({ id, name: payload.name, description: payload.description, price: payload.price.toFixed(2), billingPeriod: payload.billingPeriod, pointsBonus: payload.pointsBonus, status: payload.status, displayOrder: payload.displayOrder, isFeatured: payload.isFeatured, updatedAt: new Date() });
+      if (benefitIds.length) await tx.insert(schema.loyaltyPlanBenefits).values(benefitIds.map((benefitId, index) => ({ planId: id, benefitId, displayOrder: index })));
+    });
+    res.status(201).json({ success: true, id, message: 'Plano criado com sucesso.' });
+  } catch (e: any) {
+    if (e?.message === 'BENEFIT_NOT_FOUND') return res.status(400).json({ error: 'Um dos benefícios selecionados não existe.' });
+    return handleError(res, e, 'POST /api/loyalty/admin/plans');
+  }
+});
+
+loyaltyRouter.put('/admin/plans/:id', requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    const parsed = planPayloadSchema.omit({ id: true }).safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: 'Dados do plano inválidos.', details: parsed.error.flatten() });
+    const payload = parsed.data;
+    await db.transaction(async (tx: any) => {
+      const benefitIds = await validateRelatedIds(tx, payload.benefitIds, schema.loyaltyBenefits, 'benefit');
+      const updated = await tx.update(schema.loyaltyPlans).set({ name: payload.name, description: payload.description, price: payload.price.toFixed(2), billingPeriod: payload.billingPeriod, pointsBonus: payload.pointsBonus, status: payload.status, displayOrder: payload.displayOrder, isFeatured: payload.isFeatured, updatedAt: new Date() }).where(eq(schema.loyaltyPlans.id, req.params.id)).returning({ id: schema.loyaltyPlans.id });
+      if (!updated.length) throw new Error('PLAN_NOT_FOUND');
+      await tx.delete(schema.loyaltyPlanBenefits).where(eq(schema.loyaltyPlanBenefits.planId, req.params.id));
+      if (benefitIds.length) await tx.insert(schema.loyaltyPlanBenefits).values(benefitIds.map((benefitId, index) => ({ planId: req.params.id, benefitId, displayOrder: index })));
+    });
+    res.json({ success: true, message: 'Plano atualizado com sucesso.' });
+  } catch (e: any) {
+    if (e?.message === 'BENEFIT_NOT_FOUND') return res.status(400).json({ error: 'Um dos benefícios selecionados não existe.' });
+    if (e?.message === 'PLAN_NOT_FOUND') return res.status(404).json({ error: 'Plano não encontrado.' });
+    return handleError(res, e, 'PUT /api/loyalty/admin/plans');
+  }
+});
+
+loyaltyRouter.delete('/admin/plans/:id', requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    const [updated] = await db.update(schema.loyaltyPlans).set({ status: 'archived', updatedAt: new Date() }).where(eq(schema.loyaltyPlans.id, req.params.id)).returning({ id: schema.loyaltyPlans.id });
+    if (!updated) return res.status(404).json({ error: 'Plano não encontrado.' });
+    res.json({ success: true, message: 'Plano arquivado.' });
+  } catch (e: any) {
+    return handleError(res, e, 'DELETE /api/loyalty/admin/plans');
   }
 });
 

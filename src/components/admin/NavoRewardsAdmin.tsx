@@ -11,10 +11,19 @@ import {
   deleteAdminReward,
   manuallyAdjustPoints,
   fetchClientsFromSupabase,
+  fetchServicesFromSupabase,
+  fetchProductsFromSupabase,
   fetchLoyaltyConfig,
   saveLoyaltyConfig,
   fetchAdminLoyaltyTiers,
-  saveAdminLoyaltyTiers
+  saveAdminLoyaltyTiers,
+  fetchAdminLoyaltyCatalog,
+  createLoyaltyBenefit,
+  updateLoyaltyBenefit,
+  archiveLoyaltyBenefit,
+  createLoyaltyPlan,
+  updateLoyaltyPlan,
+  archiveLoyaltyPlan
 } from '../../services/supabaseDataService';
 import {
   Award,
@@ -91,7 +100,18 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
   // CONFIGURABLE ENGINE SETTINGS STATE
   const [tiers, setTiers] = useState<any[]>([]);
+  const [benefits, setBenefits] = useState<any[]>([]);
+  const [plans, setPlans] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [savingTiers, setSavingTiers] = useState(false);
+  const [savingCatalogItem, setSavingCatalogItem] = useState(false);
+  const [showBenefitModal, setShowBenefitModal] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [editingBenefit, setEditingBenefit] = useState<any | null>(null);
+  const [editingPlan, setEditingPlan] = useState<any | null>(null);
+  const [benefitDraft, setBenefitDraft] = useState<any>({ name: '', description: '', benefitType: 'custom', valueAmount: null, valueText: '', serviceId: '', productId: '', usageLimit: null, validityDays: null, displayOrder: 0, isActive: true, tierIds: [] });
+  const [planDraft, setPlanDraft] = useState<any>({ name: '', description: '', price: 0, billingPeriod: 'none', pointsBonus: 0, status: 'draft', displayOrder: 0, isFeatured: false, benefitIds: [] });
   const [config, setConfig] = useState<any>({
     currencyPerPoint: 1.0,
     pointsValidityDays: 365,
@@ -136,16 +156,21 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
   const loadData = async () => {
     setLoading(true);
     try {
-      const [dashRes, rwdRes, clientList, cfgRes, tiersRes] = await Promise.all([
+      const [dashRes, rwdRes, clientList, serviceList, productList, cfgRes, tiersRes, catalogRes] = await Promise.all([
         fetchNavoRewardsAdminDashboard(),
         fetchRewardsList(),
         fetchClientsFromSupabase(),
+        fetchServicesFromSupabase().catch(() => []),
+        fetchProductsFromSupabase().catch(() => []),
         fetchLoyaltyConfig().catch(() => null),
-        fetchAdminLoyaltyTiers().catch(() => [])
+        fetchAdminLoyaltyTiers().catch(() => []),
+        fetchAdminLoyaltyCatalog().catch(() => ({ benefits: [], plans: [] }))
       ]);
       setData(dashRes);
       setRewardsList(rwdRes);
       setClients(clientList || []);
+      setServices(serviceList || []);
+      setProducts(productList || []);
       if (clientList && clientList.length > 0) {
         setRefClient(clientList[0]);
         setEvalClient(clientList[0]);
@@ -154,6 +179,8 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
         setConfig(cfgRes);
       }
       setTiers(Array.isArray(tiersRes) ? tiersRes : []);
+      setBenefits(Array.isArray(catalogRes?.benefits) ? catalogRes.benefits : []);
+      setPlans(Array.isArray(catalogRes?.plans) ? catalogRes.plans : []);
     } catch (e) {
       console.error('Erro ao carregar dados do Navo Rewards:', e);
     } finally {
@@ -180,6 +207,61 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
     } finally {
       setSavingTiers(false);
     }
+  };
+
+  const resetBenefitDraft = () => setBenefitDraft({ name: '', description: '', benefitType: 'custom', valueAmount: null, valueText: '', serviceId: '', productId: '', usageLimit: null, validityDays: null, displayOrder: 0, isActive: true, tierIds: [] });
+  const resetPlanDraft = () => setPlanDraft({ name: '', description: '', price: 0, billingPeriod: 'none', pointsBonus: 0, status: 'draft', displayOrder: 0, isFeatured: false, benefitIds: [] });
+
+  const handleSaveBenefit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingCatalogItem(true);
+    try {
+      const payload = { ...benefitDraft, valueAmount: benefitDraft.valueAmount === '' ? null : benefitDraft.valueAmount, serviceId: benefitDraft.serviceId || null, productId: benefitDraft.productId || null };
+      if (editingBenefit?.id) await updateLoyaltyBenefit(editingBenefit.id, payload);
+      else await createLoyaltyBenefit(payload);
+      setShowBenefitModal(false);
+      setEditingBenefit(null);
+      resetBenefitDraft();
+      setConfigSuccessMsg('Benefício salvo com sucesso!');
+      await loadData();
+      setTimeout(() => setConfigSuccessMsg(null), 4000);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao salvar benefício.');
+    } finally {
+      setSavingCatalogItem(false);
+    }
+  };
+
+  const handleSavePlan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingCatalogItem(true);
+    try {
+      const payload = { ...planDraft, price: Number(planDraft.price || 0), pointsBonus: Number(planDraft.pointsBonus || 0) };
+      if (editingPlan?.id) await updateLoyaltyPlan(editingPlan.id, payload);
+      else await createLoyaltyPlan(payload);
+      setShowPlanModal(false);
+      setEditingPlan(null);
+      resetPlanDraft();
+      setConfigSuccessMsg('Plano salvo com sucesso!');
+      await loadData();
+      setTimeout(() => setConfigSuccessMsg(null), 4000);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao salvar plano.');
+    } finally {
+      setSavingCatalogItem(false);
+    }
+  };
+
+  const openBenefitEditor = (benefit?: any) => {
+    setEditingBenefit(benefit || null);
+    setBenefitDraft(benefit ? { ...benefit, valueAmount: benefit.valueAmount ?? null, serviceId: benefit.serviceId || '', productId: benefit.productId || '', tierIds: benefit.tierIds || [] } : { name: '', description: '', benefitType: 'custom', valueAmount: null, valueText: '', serviceId: '', productId: '', usageLimit: null, validityDays: null, displayOrder: 0, isActive: true, tierIds: [] });
+    setShowBenefitModal(true);
+  };
+
+  const openPlanEditor = (plan?: any) => {
+    setEditingPlan(plan || null);
+    setPlanDraft(plan ? { ...plan, benefitIds: plan.benefitIds || [] } : { name: '', description: '', price: 0, billingPeriod: 'none', pointsBonus: 0, status: 'draft', displayOrder: 0, isFeatured: false, benefitIds: [] });
+    setShowPlanModal(true);
   };
 
   const handleSaveConfig = async (e?: React.FormEvent) => {
@@ -593,20 +675,122 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                 <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2"><Crown className="w-4 h-4 text-gold-base" /> Níveis VIP reais</h3>
                 <p className="text-[11px] text-content-muted mt-1">Defina o mínimo de pontos e o multiplicador usado no próximo checkout confirmado.</p>
               </div>
-              <button type="button" onClick={handleSaveTiers} disabled={savingTiers || tiers.length === 0} className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs disabled:opacity-50">{savingTiers ? 'Salvando...' : 'Salvar níveis'}</button>
+              <div className="flex gap-2"><button type="button" onClick={() => setTiers((current) => [...current, { name: 'Novo nível', minimumPoints: 0, multiplier: 1, displayOrder: current.length, color: '#C9A96E', isActive: true }])} className="h-9 px-3 rounded-xl border border-border-subtle text-content-base font-bold text-xs flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> Novo nível</button><button type="button" onClick={handleSaveTiers} disabled={savingTiers || tiers.length === 0} className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs disabled:opacity-50">{savingTiers ? 'Salvando...' : 'Salvar níveis'}</button></div>
             </div>
             <div className="space-y-2">
               {tiers.map((tier, index) => (
-                <div key={tier.id || index} className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_120px_100px_82px_auto] gap-2 items-center rounded-xl border border-border-subtle bg-surface-base p-2.5">
+                <div key={tier.id || index} className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_120px_100px_82px_70px_auto] gap-2 items-center rounded-xl border border-border-subtle bg-surface-base p-2.5">
                   <input value={tier.name} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, name: e.target.value } : item))} className="min-w-0 bg-surface-card border border-border-subtle rounded-lg p-2 text-xs font-bold text-content-base" aria-label={`Nome do nível ${index + 1}`} />
                   <input type="number" min="0" step="1" value={tier.minimumPoints} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, minimumPoints: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Pontos mínimos do nível ${index + 1}`} />
                   <input type="number" min="0.1" max="20" step="0.1" value={tier.multiplier} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, multiplier: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Multiplicador do nível ${index + 1}`} />
                   <input type="number" min="0" step="1" value={tier.displayOrder} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, displayOrder: Number(e.target.value) } : item))} className="bg-surface-card border border-border-subtle rounded-lg p-2 text-xs text-content-base num-tabular" aria-label={`Ordem do nível ${index + 1}`} />
+                  <input type="color" value={tier.color || '#C9A96E'} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, color: e.target.value } : item))} className="w-full h-9 bg-surface-card border border-border-subtle rounded-lg p-1" aria-label={`Cor do nível ${index + 1}`} />
                   <label className="flex items-center gap-2 text-[11px] text-content-muted"><input type="checkbox" checked={Boolean(tier.isActive)} onChange={(e) => setTiers((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, isActive: e.target.checked } : item))} /> Ativo</label>
                 </div>
               ))}
             </div>
           </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3 min-w-0">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Benefícios do Club</h3>
+                  <p className="text-[11px] text-content-muted mt-1">Crie vantagens, descontos, cortes, produtos e regras de uso.</p>
+                </div>
+                <button type="button" onClick={() => openBenefitEditor()} className="h-9 px-3 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0"><Plus className="w-3.5 h-3.5" /> Novo benefício</button>
+              </div>
+              <div className="space-y-2">
+                {benefits.length === 0 ? <p className="text-xs text-content-muted py-5 text-center">Nenhum benefício cadastrado.</p> : benefits.map((benefit) => (
+                  <div key={benefit.id} className="p-3 rounded-xl border border-border-subtle bg-surface-base flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-bold text-xs text-content-base">{benefit.name}</span>
+                        {!benefit.isActive && <span className="text-[9px] rounded-full px-2 py-0.5 bg-status-error/10 text-status-error font-bold">INATIVO</span>}
+                      </div>
+                      <p className="text-[10px] text-content-muted mt-1 line-clamp-2">{benefit.description}</p>
+                      <p className="text-[10px] text-gold-base mt-1 font-bold">{benefit.benefitType} {benefit.valueAmount !== null && benefit.valueAmount !== undefined ? `• R$ ${Number(benefit.valueAmount).toFixed(2).replace('.', ',')}` : ''} {benefit.tierIds?.length ? `• ${benefit.tierIds.length} nível(is)` : ''}</p>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <button type="button" onClick={() => openBenefitEditor(benefit)} className="h-8 px-2.5 rounded-lg border border-border-subtle text-content-base text-[10px] font-bold">Editar</button>
+                      {benefit.isActive && <button type="button" onClick={async () => { if (!confirm('Desativar este benefício?')) return; try { await archiveLoyaltyBenefit(benefit.id); await loadData(); } catch (err: any) { alert(err.message || 'Erro ao desativar benefício.'); } }} className="h-8 w-8 rounded-lg border border-border-subtle text-status-error flex items-center justify-center" title="Desativar benefício"><Trash2 className="w-3.5 h-3.5" /></button>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3 min-w-0">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Planos do Club</h3>
+                  <p className="text-[11px] text-content-muted mt-1">Defina nome, preço, periodicidade, bônus e benefícios. Ainda sem cobrança automática.</p>
+                </div>
+                <button type="button" onClick={() => openPlanEditor()} className="h-9 px-3 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0"><Plus className="w-3.5 h-3.5" /> Novo plano</button>
+              </div>
+              <div className="space-y-2">
+                {plans.length === 0 ? <p className="text-xs text-content-muted py-5 text-center">Nenhum plano cadastrado.</p> : plans.map((plan) => (
+                  <div key={plan.id} className="p-3 rounded-xl border border-border-subtle bg-surface-base flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-bold text-xs text-content-base">{plan.name}</span>
+                        <span className={`text-[9px] rounded-full px-2 py-0.5 font-bold ${plan.status === 'active' ? 'bg-status-success/10 text-status-success' : 'bg-surface-card text-content-muted'}`}>{plan.status.toUpperCase()}</span>
+                        {plan.isFeatured && <span className="text-[9px] rounded-full px-2 py-0.5 bg-gold-base/10 text-gold-base font-bold">DESTAQUE</span>}
+                      </div>
+                      <p className="text-[10px] text-content-muted mt-1 line-clamp-2">{plan.description}</p>
+                      <p className="text-[10px] text-gold-base mt-1 font-bold">R$ {Number(plan.price || 0).toFixed(2).replace('.', ',')} {plan.billingPeriod !== 'none' ? `• ${plan.billingPeriod}` : '• único'} {plan.pointsBonus ? `• +${plan.pointsBonus} pts` : ''}</p>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <button type="button" onClick={() => openPlanEditor(plan)} className="h-8 px-2.5 rounded-lg border border-border-subtle text-content-base text-[10px] font-bold">Editar</button>
+                      {plan.status !== 'archived' && <button type="button" onClick={async () => { if (!confirm('Arquivar este plano?')) return; try { await archiveLoyaltyPlan(plan.id); await loadData(); } catch (err: any) { alert(err.message || 'Erro ao arquivar plano.'); } }} className="h-8 w-8 rounded-lg border border-border-subtle text-status-error flex items-center justify-center" title="Arquivar plano"><Trash2 className="w-3.5 h-3.5" /></button>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {showBenefitModal && (
+            <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-md">
+              <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-surface-card rounded-2xl border border-border-subtle p-5 sm:p-6 shadow-2xl">
+                <div className="mb-4"><h3 className="text-base font-serif font-bold text-content-base">{editingBenefit ? 'Editar benefício' : 'Novo benefício'}</h3><p className="text-xs text-content-muted mt-1">O benefício é cadastrado no banco e pode ser vinculado a um ou mais níveis.</p></div>
+                <form onKeyDown={handleEnterAsTab} onSubmit={handleSaveBenefit} className="space-y-3 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Nome</span><input autoFocus required value={benefitDraft.name} onChange={(e) => setBenefitDraft({ ...benefitDraft, name: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
+                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Tipo</span><select value={benefitDraft.benefitType} onChange={(e) => setBenefitDraft({ ...benefitDraft, benefitType: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="discount_percent">Desconto percentual</option><option value="discount_fixed">Desconto fixo</option><option value="free_service">Serviço grátis</option><option value="free_product">Produto grátis</option><option value="points_bonus">Bônus de pontos</option><option value="priority_queue">Prioridade na fila</option><option value="custom">Personalizado</option></select></label>
+                  </div>
+                  <label className="space-y-1 block"><span className="block text-[10px] font-bold text-content-muted uppercase">Descrição</span><textarea required value={benefitDraft.description} onChange={(e) => setBenefitDraft({ ...benefitDraft, description: e.target.value })} className="w-full min-h-[72px] bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Valor numérico</span><input type="number" min="0" step="0.01" value={benefitDraft.valueAmount ?? ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, valueAmount: e.target.value === '' ? null : Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" placeholder="Ex.: 10" /></label>
+                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Texto do valor</span><input value={benefitDraft.valueText || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, valueText: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" placeholder="Ex.: 10% OFF" /></label>
+                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Validade (dias)</span><input type="number" min="1" value={benefitDraft.validityDays ?? ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, validityDays: e.target.value === '' ? null : Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" placeholder="Opcional" /></label>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Serviço relacionado</span><select value={benefitDraft.serviceId || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, serviceId: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="">Todos os serviços</option>{services.map((service) => <option key={service.id} value={service.id}>{service.title} — R$ {Number(service.price || 0).toFixed(2).replace('.', ',')}</option>)}</select></label>
+                    <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Produto relacionado</span><select value={benefitDraft.productId || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, productId: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="">Todos os produtos</option>{products.map((product) => <option key={product.id} value={product.id}>{product.name} — R$ {Number(product.price || 0).toFixed(2).replace('.', ',')}</option>)}</select></label>
+                  </div>
+                  <div><span className="block text-[10px] font-bold text-content-muted uppercase mb-2">Níveis elegíveis</span><div className="grid grid-cols-2 sm:grid-cols-4 gap-2">{tiers.map((tier) => <label key={tier.id} className="flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-base p-2 text-[11px] text-content-base"><input type="checkbox" disabled={!tier.id} checked={Boolean(tier.id && (benefitDraft.tierIds || []).includes(tier.id))} onChange={(e) => setBenefitDraft({ ...benefitDraft, tierIds: e.target.checked ? [...(benefitDraft.tierIds || []), tier.id] : (benefitDraft.tierIds || []).filter((id: string) => id !== tier.id) })} />{tier.name}{!tier.id && <span className="text-[9px] text-content-muted">(salve primeiro)</span>}</label>)}</div></div>
+                  <div className="flex gap-2 pt-2"><button type="button" onClick={() => { setShowBenefitModal(false); setEditingBenefit(null); }} className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted font-bold">Cancelar</button><button type="submit" disabled={savingCatalogItem} className="flex-1 h-10 rounded-xl bg-gold-base text-surface-base font-bold disabled:opacity-50">{savingCatalogItem ? 'Salvando...' : 'Salvar benefício'}</button></div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {showPlanModal && (
+            <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-md">
+              <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-surface-card rounded-2xl border border-border-subtle p-5 sm:p-6 shadow-2xl">
+                <div className="mb-4"><h3 className="text-base font-serif font-bold text-content-base">{editingPlan ? 'Editar plano' : 'Novo plano'}</h3><p className="text-xs text-content-muted mt-1">O valor é salvo como catálogo. Nenhuma cobrança ou assinatura é criada nesta etapa.</p></div>
+                <form onKeyDown={handleEnterAsTab} onSubmit={handleSavePlan} className="space-y-3 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3"><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Nome</span><input autoFocus required value={planDraft.name} onChange={(e) => setPlanDraft({ ...planDraft, name: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Preço (R$)</span><input type="number" min="0" step="0.01" value={planDraft.price} onChange={(e) => setPlanDraft({ ...planDraft, price: Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label></div>
+                  <label className="space-y-1 block"><span className="block text-[10px] font-bold text-content-muted uppercase">Descrição</span><textarea required value={planDraft.description} onChange={(e) => setPlanDraft({ ...planDraft, description: e.target.value })} className="w-full min-h-[72px] bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3"><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Periodicidade</span><select value={planDraft.billingPeriod} onChange={(e) => setPlanDraft({ ...planDraft, billingPeriod: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="none">Pagamento único / catálogo</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option><option value="annual">Anual</option></select></label><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Bônus de pontos</span><input type="number" min="0" value={planDraft.pointsBonus} onChange={(e) => setPlanDraft({ ...planDraft, pointsBonus: Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label><label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Status</span><select value={planDraft.status} onChange={(e) => setPlanDraft({ ...planDraft, status: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="draft">Rascunho</option><option value="active">Ativo</option><option value="archived">Arquivado</option></select></label></div>
+                  <label className="flex items-center gap-2 text-[11px] text-content-base"><input type="checkbox" checked={Boolean(planDraft.isFeatured)} onChange={(e) => setPlanDraft({ ...planDraft, isFeatured: e.target.checked })} /> Destacar este plano para o cliente</label>
+                  <div><span className="block text-[10px] font-bold text-content-muted uppercase mb-2">Benefícios incluídos</span><div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto">{benefits.filter((benefit) => benefit.isActive).map((benefit) => <label key={benefit.id} className="flex items-start gap-2 rounded-xl border border-border-subtle bg-surface-base p-2 text-[11px] text-content-base"><input type="checkbox" checked={(planDraft.benefitIds || []).includes(benefit.id)} onChange={(e) => setPlanDraft({ ...planDraft, benefitIds: e.target.checked ? [...(planDraft.benefitIds || []), benefit.id] : (planDraft.benefitIds || []).filter((id: string) => id !== benefit.id) })} /><span><strong>{benefit.name}</strong><span className="block text-content-muted mt-0.5">{benefit.description}</span></span></label>)}</div></div>
+                  <div className="flex gap-2 pt-2"><button type="button" onClick={() => { setShowPlanModal(false); setEditingPlan(null); }} className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted font-bold">Cancelar</button><button type="submit" disabled={savingCatalogItem} className="flex-1 h-10 rounded-xl bg-gold-base text-surface-base font-bold disabled:opacity-50">{savingCatalogItem ? 'Salvando...' : 'Salvar plano'}</button></div>
+                </form>
+              </div>
+            </div>
+          )}
 
           {/* Ajuste Manual */}
           <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">

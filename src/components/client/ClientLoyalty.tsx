@@ -3,6 +3,7 @@ import confetti from 'canvas-confetti';
 import {
   fetchLoyaltyInfo,
   fetchRewardsList,
+  fetchLoyaltyCatalog,
   redeemReward,
   performInstagramCheckin,
   LoyaltyInfo,
@@ -33,6 +34,7 @@ import {
 export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) => {
   const [loyalty, setLoyalty] = useState<LoyaltyInfo | null>(null);
   const [rewards, setRewards] = useState<NavoRewardItem[]>([]);
+  const [catalog, setCatalog] = useState<{ benefits: any[]; plans: any[] }>({ benefits: [], plans: [] });
   const [loading, setLoading] = useState(true);
   const [claimingId, setClaimingId] = useState<string | null>(null);
   const [redemptionSuccess, setRedemptionSuccess] = useState<{
@@ -48,12 +50,14 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
   const loadData = async () => {
     setLoading(true);
     try {
-      const [loyaltyData, rewardsData] = await Promise.all([
+      const [loyaltyData, rewardsData, catalogData] = await Promise.all([
         fetchLoyaltyInfo(),
-        fetchRewardsList()
+        fetchRewardsList(),
+        fetchLoyaltyCatalog()
       ]);
       setLoyalty(loyaltyData);
       setRewards(rewardsData);
+      setCatalog({ benefits: Array.isArray(catalogData?.benefits) ? catalogData.benefits : [], plans: Array.isArray(catalogData?.plans) ? catalogData.plans : [] });
     } catch (e) {
       console.error('Erro ao carregar carteira de fidelidade:', e);
     } finally {
@@ -245,6 +249,29 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
           </div>
         </div>
       </div>
+
+      {catalog.plans.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-gold-hover uppercase tracking-wider flex items-center gap-1.5"><Crown className="w-4 h-4 text-gold-base" /> Planos do Club</h3>
+          <div className="space-y-3">
+            {catalog.plans.map((plan) => {
+              const planBenefits = catalog.benefits.filter((benefit) => (plan.benefitIds || []).includes(benefit.id));
+              return <div key={plan.id} className={`bg-surface-card p-4 rounded-2xl border ${plan.isFeatured ? 'border-gold-base/60 shadow-lg' : 'border-border-subtle'} space-y-3`}>
+                <div className="flex items-start justify-between gap-3"><div><div className="flex items-center gap-2"><h4 className="text-sm font-bold text-content-base">{plan.name}</h4>{plan.isFeatured && <span className="text-[9px] rounded-full px-2 py-0.5 bg-gold-base/15 text-gold-base font-bold">DESTAQUE</span>}</div><p className="text-[11px] text-content-muted mt-1">{plan.description}</p></div><div className="text-right shrink-0"><strong className="text-lg text-gold-base">R$ {Number(plan.price || 0).toFixed(2).replace('.', ',')}</strong><span className="block text-[9px] text-content-muted uppercase">{plan.billingPeriod === 'none' ? 'valor único' : plan.billingPeriod}</span></div></div>
+                {plan.pointsBonus > 0 && <div className="text-[10px] text-status-success font-bold">+{plan.pointsBonus} pontos previstos no plano</div>}
+                {planBenefits.length > 0 && <div className="grid grid-cols-1 gap-1.5">{planBenefits.map((benefit) => <div key={benefit.id} className="flex items-start gap-2 text-[10px] text-content-muted"><Gift className="w-3.5 h-3.5 text-gold-base shrink-0" /><span><strong className="text-content-base">{benefit.name}</strong> — {benefit.description}</span></div>)}</div>}
+              </div>;
+            })}
+          </div>
+        </div>
+      )}
+
+      {catalog.benefits.length > 0 && (
+        <div className="bg-surface-card p-4 rounded-2xl border border-border-subtle space-y-3">
+          <h3 className="text-xs font-bold text-gold-hover uppercase tracking-wider flex items-center gap-1.5"><Gift className="w-4 h-4 text-gold-base" /> Benefícios disponíveis</h3>
+          <div className="space-y-2">{catalog.benefits.map((benefit) => <div key={benefit.id} className="flex items-start justify-between gap-3 p-2.5 rounded-xl bg-surface-base border border-border-subtle"><div><strong className="text-xs text-content-base">{benefit.name}</strong><p className="text-[10px] text-content-muted mt-0.5">{benefit.description}</p></div>{benefit.valueText || benefit.valueAmount !== null ? <span className="text-[10px] font-bold text-gold-base shrink-0">{benefit.valueText || `R$ ${Number(benefit.valueAmount).toFixed(2).replace('.', ',')}`}</span> : null}</div>)}</div>
+        </div>
+      )}
 
       {/* Pending Reviews Alert Callout */}
       {loyalty?.pendingReviews && loyalty.pendingReviews.length > 0 && (

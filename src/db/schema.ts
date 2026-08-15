@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, integer, numeric, jsonb, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, integer, numeric, jsonb, uniqueIndex, primaryKey } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import { index } from 'drizzle-orm/pg-core';
 
@@ -226,6 +226,61 @@ export const adminPushSubscriptions = pgTable('admin_push_subscriptions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const loyaltyBenefits = pgTable('loyalty_benefits', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  benefitType: text('benefit_type').notNull().default('custom'),
+  valueAmount: numeric('value_amount', { precision: 10, scale: 2 }),
+  valueText: text('value_text'),
+  serviceId: text('service_id').references(() => services.id, { onDelete: 'set null' }),
+  productId: text('product_id').references(() => products.id, { onDelete: 'set null' }),
+  usageLimit: integer('usage_limit'),
+  validityDays: integer('validity_days'),
+  isActive: boolean('is_active').notNull().default(true),
+  displayOrder: integer('display_order').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  activeOrderIdx: index('loyalty_benefits_active_order_idx').on(table.isActive, table.displayOrder, table.name),
+}));
+
+export const loyaltyTierBenefits = pgTable('loyalty_tier_benefits', {
+  tierId: text('tier_id').notNull().references(() => loyaltyTiers.id, { onDelete: 'cascade' }),
+  benefitId: text('benefit_id').notNull().references(() => loyaltyBenefits.id, { onDelete: 'cascade' }),
+  displayOrder: integer('display_order').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  primaryKey: primaryKey({ columns: [table.tierId, table.benefitId] }),
+  benefitIdx: index('loyalty_tier_benefits_benefit_idx').on(table.benefitId, table.displayOrder),
+}));
+
+export const loyaltyPlans = pgTable('loyalty_plans', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  description: text('description').notNull(),
+  price: numeric('price', { precision: 10, scale: 2 }).notNull().default('0'),
+  billingPeriod: text('billing_period').notNull().default('none'),
+  pointsBonus: integer('points_bonus').notNull().default(0),
+  status: text('status').notNull().default('draft'),
+  displayOrder: integer('display_order').notNull().default(0),
+  isFeatured: boolean('is_featured').notNull().default(false),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  statusOrderIdx: index('loyalty_plans_status_order_idx').on(table.status, table.displayOrder, table.name),
+}));
+
+export const loyaltyPlanBenefits = pgTable('loyalty_plan_benefits', {
+  planId: text('plan_id').notNull().references(() => loyaltyPlans.id, { onDelete: 'cascade' }),
+  benefitId: text('benefit_id').notNull().references(() => loyaltyBenefits.id, { onDelete: 'cascade' }),
+  displayOrder: integer('display_order').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  primaryKey: primaryKey({ columns: [table.planId, table.benefitId] }),
+  benefitIdx: index('loyalty_plan_benefits_benefit_idx').on(table.benefitId, table.displayOrder),
+}));
 
 export const loyaltySettings = pgTable('loyalty_settings', {
   id: text('id').primaryKey().default('default'),

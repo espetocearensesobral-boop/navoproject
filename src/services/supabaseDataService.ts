@@ -1126,6 +1126,62 @@ export async function performInstagramCheckin() {
   return data;
 }
 
+export async function fetchLoyaltyCatalog() {
+  const res = await authFetch(`${API_BASE}/loyalty/catalog`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao carregar catálogo do clube');
+  return data;
+}
+
+export async function fetchAdminLoyaltyCatalog() {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/catalog`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao carregar catálogo administrativo');
+  return data;
+}
+
+export async function createLoyaltyBenefit(payload: any) {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/benefits`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao criar benefício');
+  return data;
+}
+
+export async function updateLoyaltyBenefit(id: string, payload: any) {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/benefits/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao atualizar benefício');
+  return data;
+}
+
+export async function archiveLoyaltyBenefit(id: string) {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/benefits/${id}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao desativar benefício');
+  return data;
+}
+
+export async function createLoyaltyPlan(payload: any) {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/plans`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao criar plano');
+  return data;
+}
+
+export async function updateLoyaltyPlan(id: string, payload: any) {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/plans/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao atualizar plano');
+  return data;
+}
+
+export async function archiveLoyaltyPlan(id: string) {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/plans/${id}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao arquivar plano');
+  return data;
+}
+
 export async function fetchAdminLoyaltyTiers() {
   const res = await authFetch(`${API_BASE}/loyalty/admin/tiers`);
   const data = await res.json();
