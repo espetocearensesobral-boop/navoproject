@@ -518,8 +518,8 @@ export const WaitingQueue: React.FC = () => {
       {/* MAIN LAYOUT */}
       {activeTab === 'kanban' ? (
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(19rem,0.95fr)_minmax(0,2.05fr)] gap-4 items-stretch">
-          {/* PRIORIDADE OPERACIONAL: ATENDIMENTOS EM ANDAMENTO */}
-          <section className="flex min-h-0 h-[30rem] xl:h-[34rem] flex-col space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-xl p-3 sm:p-4">
+          {/* EM ATENDIMENTO: ações em curso */}
+          <section className="order-2 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between gap-3 shrink-0">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-status-success animate-ping" />
@@ -542,7 +542,7 @@ export const WaitingQueue: React.FC = () => {
                 <p className="text-xs text-content-muted">Chame o próximo cliente na recepção quando uma cadeira estiver livre.</p>
               </div>
             ) : (
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1 space-y-3" style={{ maxHeight: `${Math.max(220, operationSettings.queueVisibleLimit * 100)}px` }}>
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1 space-y-3" style={{ maxHeight: `${Math.max(180, operationSettings.queueVisibleLimit * 86)}px` }}>
               {inChairList.map((item) => (
                 <div
                   key={item.id}
@@ -603,7 +603,7 @@ export const WaitingQueue: React.FC = () => {
           </section>
 
           {/* RECEPÇÃO: FILA DE PRÓXIMAS AÇÕES */}
-          <section className="flex min-h-0 h-[30rem] xl:h-[34rem] flex-col space-y-3 bg-surface-card border border-border-subtle rounded-xl p-3 sm:p-4">
+          <section className="order-1 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 bg-surface-card border border-border-subtle rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between gap-3 pb-2 border-b border-border-subtle shrink-0">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-gold-hover" />
@@ -637,7 +637,7 @@ export const WaitingQueue: React.FC = () => {
                     </button>}
               </div>
             ) : (
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1" style={{ maxHeight: `${Math.max(220, operationSettings.queueVisibleLimit * 86)}px` }}>
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1" style={{ maxHeight: `${Math.max(180, operationSettings.queueVisibleLimit * 76)}px` }}>
                 <div className="space-y-2">
                 {waitingList.map((item, index) => {
                   const isExpanded = expandedQueueItemId === item.id;
