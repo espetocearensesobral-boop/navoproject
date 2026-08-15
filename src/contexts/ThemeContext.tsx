@@ -176,7 +176,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     const activeTheme = scope === 'admin' ? adminTheme : clientTheme;
     document.documentElement.setAttribute('data-theme', activeTheme);
-    document.documentElement.style.colorScheme = activeTheme;
+    document.documentElement.style.colorScheme = `only ${activeTheme}`;
 
     const colorSchemeMeta = document.getElementById('pwa-color-scheme');
     if (colorSchemeMeta) colorSchemeMeta.setAttribute('content', activeTheme);

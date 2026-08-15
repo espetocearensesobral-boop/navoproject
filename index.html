@@ -90,7 +90,7 @@
           var themeColor = document.getElementById('pwa-theme-color');
           var colorScheme = document.getElementById('pwa-color-scheme');
           document.documentElement.setAttribute('data-theme', theme);
-          document.documentElement.style.colorScheme = theme;
+          document.documentElement.style.colorScheme = 'only ' + theme;
           if (colorScheme) colorScheme.setAttribute('content', theme);
           if (themeColor) themeColor.setAttribute('content', theme === 'light' ? '#F5F5F2' : (isAdmin ? '#10131A' : '#0A0A0A'));
         } catch (e) {}
