@@ -222,7 +222,7 @@ export const ClientsManagement: React.FC = () => {
           >
             <span>{pill.label}</span>
             {pill.count !== undefined && (
-              <span className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
+              <span className={`ml-1 px-1.5 py-0.2 rounded-full text-xs ${
                 selectedTier === pill.id ? 'bg-surface-base/15 text-surface-base' : 'bg-surface-card text-content-muted'
               }`}>
                 {pill.count}
@@ -283,7 +283,7 @@ export const ClientsManagement: React.FC = () => {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
                         <h3 className="text-sm sm:text-base font-bold text-content-base admin-clamp-2">{client.name || 'Cliente sem nome'}</h3>
-                        <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/10 text-gold-hover text-[10px] font-bold">{tier}</span>
+                        <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/10 text-gold-hover text-xs font-bold">{tier}</span>
                       </div>
                       <p className="text-xs text-content-muted admin-safe-wrap">{client.email || 'E-mail não informado'}</p>
                       <p className="text-xs text-content-muted admin-safe-wrap">{client.birthday ? `Aniversário em ${new Date(`${client.birthday}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}` : 'Aniversário não informado'}</p>
@@ -302,9 +302,9 @@ export const ClientsManagement: React.FC = () => {
                   {isExpanded && (
                     <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Contato</p><p className="mt-1 text-content-base font-semibold break-words">{client.email || 'E-mail não informado'}</p><p className="text-content-muted">{client.phone || 'Telefone não informado'}</p><p className="text-content-muted">{client.birthday ? `Aniversário: ${new Date(`${client.birthday}T12:00:00`).toLocaleDateString('pt-BR')}` : 'Aniversário não informado'}</p></div>
-                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Fidelidade</p><p className="mt-1 text-content-base font-semibold">{tier}</p><p className="text-gold-base font-bold">{client.loyaltyPoints || 0} pontos</p></div>
-                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Papel e cadastro</p><p className="mt-1 text-content-base font-semibold capitalize">{client.role || 'client'}</p><p className="text-content-muted">Atualizado em {client.updatedAt ? new Date(client.updatedAt).toLocaleDateString('pt-BR') : '—'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-xs text-content-muted uppercase tracking-wider">Contato</p><p className="mt-1 text-content-base font-semibold break-words">{client.email || 'E-mail não informado'}</p><p className="text-content-muted">{client.phone || 'Telefone não informado'}</p><p className="text-content-muted">{client.birthday ? `Aniversário: ${new Date(`${client.birthday}T12:00:00`).toLocaleDateString('pt-BR')}` : 'Aniversário não informado'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-xs text-content-muted uppercase tracking-wider">Fidelidade</p><p className="mt-1 text-content-base font-semibold">{tier}</p><p className="text-gold-base font-bold">{client.loyaltyPoints || 0} pontos</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-xs text-content-muted uppercase tracking-wider">Papel e cadastro</p><p className="mt-1 text-content-base font-semibold capitalize">{client.role || 'client'}</p><p className="text-content-muted">Atualizado em {client.updatedAt ? new Date(client.updatedAt).toLocaleDateString('pt-BR') : '—'}</p></div>
                       </div>
                       <div className="admin-action-group">
                         {client.phone && <a href={`https://wa.me/55${client.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" title="Abrir WhatsApp" aria-label="Abrir WhatsApp" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-success/30 text-status-success text-sm font-semibold flex items-center justify-center gap-1.5"><Phone className="w-4 h-4" /><span className="hidden sm:inline">WhatsApp</span></a>}
@@ -340,7 +340,7 @@ export const ClientsManagement: React.FC = () => {
                   <h2 className="text-sm font-bold text-content-base truncate">
                     {editingClient ? `Editar: ${editingClient.name}` : 'Cadastrar Novo Cliente'}
                   </h2>
-                  <p className="text-[10px] text-content-muted truncate">Ajuste informações de contato e pontuação</p>
+                  <p className="text-xs text-content-muted truncate">Ajuste informações de contato e pontuação</p>
                 </div>
               </div>
               <button
@@ -422,7 +422,7 @@ export const ClientsManagement: React.FC = () => {
                 </div>
 
                 <div className="p-3 bg-surface-base border border-border-subtle rounded-xl space-y-2.5">
-                  <p className="text-[10px] font-bold text-gold-hover uppercase tracking-wider">Fidelidade & Permissões</p>
+                  <p className="text-xs font-bold text-gold-hover uppercase tracking-wider">Fidelidade & Permissões</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>

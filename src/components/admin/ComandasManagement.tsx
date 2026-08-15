@@ -470,12 +470,12 @@ export const ComandasManagement: React.FC = () => {
                         <span className="text-xs font-mono font-bold text-gold-base bg-gold-base/10 px-2 py-0.5 rounded-xl">
                           {cmd.code}
                         </span>
-                        <span className="text-[10px] text-content-muted flex items-center gap-1">
+                        <span className="text-xs text-content-muted flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {new Date(cmd.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <span className="text-[10px] bg-status-success/10 text-status-success font-bold px-2 py-0.5 rounded-xl uppercase">
+                      <span className="text-xs bg-status-success/10 text-status-success font-bold px-2 py-0.5 rounded-xl uppercase">
                         Aberta
                       </span>
                     </div>
@@ -496,7 +496,7 @@ export const ComandasManagement: React.FC = () => {
 
                     {/* Items List */}
                     <div className="bg-surface-base rounded-xl p-2.5 border border-border-subtle/80 space-y-1.5 max-h-36 overflow-y-auto custom-scrollbar">
-                      <span className="text-[10px] font-bold uppercase text-content-muted tracking-wider block mb-1">
+                      <span className="text-xs font-bold uppercase text-content-muted tracking-wider block mb-1">
                         Consumo na Comanda
                       </span>
                       {cmd.items.map((item, idx) => (
@@ -516,7 +516,7 @@ export const ComandasManagement: React.FC = () => {
                   {/* Total & Action */}
                   <div className="border-t border-border-subtle/80 pt-3 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-content-muted uppercase font-bold block">Total Parcial</span>
+                      <span className="text-xs text-content-muted uppercase font-bold block">Total Parcial</span>
                       <span className="text-lg font-bold finance-positive tabular-nums">
                         R$ {cmd.subtotal.toFixed(2)}
                       </span>
@@ -548,7 +548,7 @@ export const ComandasManagement: React.FC = () => {
             <div className="bg-surface-card border border-border-subtle rounded-xl overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs min-w-[760px]">
-                  <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
+                  <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-xs">
                     <tr className="whitespace-nowrap">
                       <th className="p-3">Código</th>
                       <th className="p-3">Cliente</th>
@@ -568,7 +568,7 @@ export const ComandasManagement: React.FC = () => {
                         <td className="p-3 text-content-muted max-w-xs truncate">
                           {cmd.items.map(i => `${i.quantity}x ${i.title}`).join(', ')}
                         </td>
-                        <td className="p-3 uppercase font-bold text-[10px] text-content-muted">
+                        <td className="p-3 uppercase font-bold text-xs text-content-muted">
                           {cmd.paymentMethod === 'pix' ? 'PIX' : cmd.paymentMethod === 'credit_card' ? 'Cartão Crédito' : cmd.paymentMethod === 'cash' ? 'Dinheiro' : 'Débito'}
                         </td>
                         <td className="p-3 text-right font-bold finance-positive tabular-nums">
@@ -708,14 +708,14 @@ export const ComandasManagement: React.FC = () => {
             {/* Current Items List */}
             {newCartItems.length > 0 && (
               <div className="pt-2 border-t border-border-subtle/80 space-y-2">
-                <span className="text-[11px] font-bold text-content-muted uppercase tracking-wider block">
+                <span className="text-xs font-bold text-content-muted uppercase tracking-wider block">
                   Itens na Comanda ({newCartItems.length})
                 </span>
                 {newCartItems.map((item, idx) => (
                   <div key={idx} className="flex items-center justify-between bg-surface-card p-2.5 rounded-xl border border-border-subtle/60 text-xs">
                     <div>
                       <span className="font-bold text-content-base">{item.quantity}x {item.title}</span>
-                      <span className="text-[10px] text-content-muted block uppercase">
+                      <span className="text-xs text-content-muted block uppercase">
                         {item.type === 'service' ? 'Serviço' : 'Produto'}
                       </span>
                     </div>
@@ -787,7 +787,7 @@ export const ComandasManagement: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-2 pt-1 border-t border-border-subtle/60">
                 <div>
-                  <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">Desconto (R$)</label>
+                  <label className="text-xs font-bold text-content-muted uppercase block mb-1">Desconto (R$)</label>
                   <input
                     type="number"
                     min="0"
@@ -798,7 +798,7 @@ export const ComandasManagement: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">Gorjeta / Caixinha (R$)</label>
+                  <label className="text-xs font-bold text-content-muted uppercase block mb-1">Gorjeta / Caixinha (R$)</label>
                   <input
                     type="number"
                     min="0"
@@ -895,8 +895,8 @@ export const ComandasManagement: React.FC = () => {
                 </div>
               ) : null}
               <h2 className="text-lg font-bold text-content-base tracking-widest uppercase">{shopProfile.name || 'NAVO PREMIUM'}</h2>
-              <p className="text-[10px] text-gold-base font-bold uppercase tracking-widest">{shopProfile.slogan || 'Heritage Barber & Club'}</p>
-              <p className="text-[10px] text-content-muted font-sans">Comprovante de Atendimento #{receiptModalComanda.code}</p>
+              <p className="text-xs text-gold-base font-bold uppercase tracking-widest">{shopProfile.slogan || 'Heritage Barber & Club'}</p>
+              <p className="text-xs text-content-muted font-sans">Comprovante de Atendimento #{receiptModalComanda.code}</p>
             </div>
 
             <div className="text-xs font-sans space-y-1.5 border-b border-border-subtle pb-3">
@@ -907,7 +907,7 @@ export const ComandasManagement: React.FC = () => {
             </div>
 
             <div className="font-sans space-y-2">
-              <span className="text-[10px] font-bold uppercase text-content-muted block">Itens Consumidos</span>
+              <span className="text-xs font-bold uppercase text-content-muted block">Itens Consumidos</span>
               {receiptModalComanda.items.map((item, i) => (
                 <div key={i} className="flex justify-between text-xs">
                   <span>{item.quantity}x {item.title}</span>

@@ -99,7 +99,7 @@ export const AdminNotificationCenter: React.FC<AdminNotificationCenterProps> = (
         <span className="relative shrink-0">
           {notificationsActive ? <BellRing className={`${placement === 'topbar' ? 'w-5 h-5' : placement === 'drawer' ? 'w-4 h-4' : 'w-4 h-4'} text-content-on-accent`} /> : <Bell className={`${placement === 'topbar' ? 'w-5 h-5' : placement === 'drawer' ? 'w-4 h-4' : 'w-4 h-4'}`} />}
           {unreadCount > 0 && (
-            <span className="absolute -right-2 -top-2 min-w-4 h-4 px-1 rounded-full bg-status-error text-white text-[9px] font-black leading-4 text-center">
+            <span className="absolute -right-2 -top-2 min-w-4 h-4 px-1 rounded-full bg-status-error text-white text-xs font-black leading-4 text-center">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
@@ -119,7 +119,7 @@ export const AdminNotificationCenter: React.FC<AdminNotificationCenterProps> = (
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h2 className="text-2xl sm:text-4xl font-black tracking-tight truncate">Notificações</h2>
-                  {unreadCount > 0 && <span className="rounded-full bg-status-error/10 text-status-error px-2.5 py-1 text-[10px] sm:text-xs font-black">{unreadCount} novas</span>}
+                  {unreadCount > 0 && <span className="rounded-full bg-status-error/10 text-status-error px-2.5 py-1 text-xs sm:text-xs font-black">{unreadCount} novas</span>}
                 </div>
                 <p className="mt-2 text-base sm:text-2xl text-content-muted">Agenda, Fila e Recebimentos</p>
               </div>
@@ -153,7 +153,7 @@ export const AdminNotificationCenter: React.FC<AdminNotificationCenterProps> = (
                     <span className="min-w-0 flex-1">
                       <span className="flex items-start justify-between gap-2">
                         <span className="text-xs font-black text-content-base">{item.title}</span>
-                        <span className="text-[10px] text-content-muted whitespace-nowrap">{formatNotificationTime(item.createdAt)}</span>
+                        <span className="text-xs text-content-muted whitespace-nowrap">{formatNotificationTime(item.createdAt)}</span>
                       </span>
                       <span className="block mt-1 text-xs leading-relaxed text-content-muted">{item.body}</span>
                     </span>

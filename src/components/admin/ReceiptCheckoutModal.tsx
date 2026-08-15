@@ -230,7 +230,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
       <div className="admin-modal w-full max-w-5xl h-[100dvh] sm:h-auto sm:max-h-[94dvh] bg-surface-card border border-border-subtle rounded-none sm:rounded-2xl shadow-2xl overflow-y-auto flex flex-col">
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 p-5 sm:p-6 bg-surface-card border-b border-border-subtle">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-base">{stepLabel}</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-gold-base">{stepLabel}</p>
             <h2 className="mt-1 text-lg sm:text-xl font-serif font-bold text-content-base">{isConfirmed ? 'Recebimento confirmado' : 'Finalizar recebimento'}</h2>
           </div>
           <button type="button" onClick={onClose} className="w-10 h-10 rounded-xl flex items-center justify-center text-content-muted hover:text-content-base hover:bg-surface-base transition-colors" aria-label="Fechar modal">
@@ -269,12 +269,12 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           <form className="p-5 sm:p-8 space-y-6" onKeyDown={handleEnterAsTab} onSubmit={(event) => { event.preventDefault(); setStep(2); }}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="p-4 rounded-xl bg-surface-base border border-border-subtle">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5"><UserRound className="w-3.5 h-3.5 text-gold-base" /> Cliente</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5"><UserRound className="w-3.5 h-3.5 text-gold-base" /> Cliente</span>
                 <p className="mt-2 text-sm font-bold text-content-base truncate">{source.clientName}</p>
                 {source.clientPhone && <p className="mt-0.5 text-xs text-content-muted">{source.clientPhone}</p>}
               </div>
               <div className="p-4 rounded-xl bg-surface-base border border-border-subtle">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5"><ReceiptText className="w-3.5 h-3.5 text-gold-base" /> Serviço concluído</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5"><ReceiptText className="w-3.5 h-3.5 text-gold-base" /> Serviço concluído</span>
                 <p className="mt-2 text-sm font-bold text-content-base truncate">{source.serviceTitle}</p>
                 <p className="mt-0.5 text-xs finance-positive font-bold">{money(originalAmount)}</p>
               </div>
@@ -293,7 +293,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
         {step === 2 && !isConfirmed && (
           <form className="p-5 sm:p-8 space-y-6" onKeyDown={handleEnterAsTab} onSubmit={(event) => { event.preventDefault(); setStep(3); }}>
             <div className="p-5 rounded-2xl bg-surface-base border border-border-subtle flex items-center justify-between gap-4">
-              <div><span className="text-[10px] font-bold uppercase tracking-wider text-content-muted">Valor do serviço</span><p className="mt-1 text-sm text-content-muted">Base usada para os ajustes do recebimento</p></div>
+              <div><span className="text-xs font-bold uppercase tracking-wider text-content-muted">Valor do serviço</span><p className="mt-1 text-sm text-content-muted">Base usada para os ajustes do recebimento</p></div>
               <span className="text-2xl font-mono font-bold finance-positive shrink-0">{money(originalAmount)}</span>
             </div>
 

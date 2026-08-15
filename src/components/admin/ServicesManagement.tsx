@@ -444,20 +444,20 @@ export const ServicesManagement: React.FC = () => {
                   >
                     <div className="relative w-12 h-12 rounded-xl bg-surface-base border border-border-subtle overflow-hidden shrink-0 flex items-center justify-center">
                       {service.image_url || servicePhotos[0] ? <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" /> : <Scissors className="w-5 h-5 text-gold-hover" />}
-                      {servicePhotos.length > 0 && <span className="absolute -bottom-0.5 -right-0.5 px-1 py-0.5 rounded-md bg-surface-base/90 text-content-base text-[9px] font-bold border border-gold-base/40">{servicePhotos.length}</span>}
+                      {servicePhotos.length > 0 && <span className="absolute -bottom-0.5 -right-0.5 px-1 py-0.5 rounded-md bg-surface-base/90 text-content-base text-xs font-bold border border-gold-base/40">{servicePhotos.length}</span>}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="text-[10px] text-gold-base font-bold uppercase admin-clamp-2">{categoryName}</span>
-                        {service.is_combo && <span className="shrink-0 text-[9px] bg-status-success/15 text-status-success font-bold px-1.5 py-0.5 rounded-md">Combo</span>}
-                        {service.popular && <span className="shrink-0 text-[9px] bg-gold-base/15 text-gold-hover font-bold px-1.5 py-0.5 rounded-md">Destaque</span>}
+                        <span className="text-xs text-gold-base font-bold uppercase admin-clamp-2">{categoryName}</span>
+                        {service.is_combo && <span className="shrink-0 text-xs bg-status-success/15 text-status-success font-bold px-1.5 py-0.5 rounded-md">Combo</span>}
+                        {service.popular && <span className="shrink-0 text-xs bg-gold-base/15 text-gold-hover font-bold px-1.5 py-0.5 rounded-md">Destaque</span>}
                       </div>
                       <h3 className="mt-0.5 font-bold text-content-base text-sm admin-clamp-2">{service.title}</h3>
                       <p className="text-xs text-content-muted admin-clamp-2">{service.description || 'Sem descrição cadastrada'}</p>
                     </div>
                     <div className="text-right shrink-0 min-w-[62px]">
                       <p className="text-xs font-bold finance-positive">R$ {service.price.toFixed(2)}</p>
-                      <p className="text-[10px] text-content-muted">{service.duration_minutes} min</p>
+                      <p className="text-xs text-content-muted">{service.duration_minutes} min</p>
                     </div>
                     {isExpanded ? <ChevronUp className="w-5 h-5 text-gold-base shrink-0" /> : <ChevronDown className="w-5 h-5 text-content-muted shrink-0" />}
                   </button>
@@ -465,10 +465,10 @@ export const ServicesManagement: React.FC = () => {
                   {isExpanded && (
                     <div className="border-t border-border-subtle bg-surface-base/35 p-3 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Categoria</p><p className="font-semibold text-content-base">{categoryName}</p></div>
-                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Duração</p><p className="font-semibold text-content-base">{service.duration_minutes} min</p></div>
-                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Preço original</p><p className="font-semibold finance-positive">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
-                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-[10px] text-content-muted">Galeria</p><p className="font-semibold text-content-base">{servicePhotos.length} foto(s)</p></div>
+                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Categoria</p><p className="font-semibold text-content-base">{categoryName}</p></div>
+                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Duração</p><p className="font-semibold text-content-base">{service.duration_minutes} min</p></div>
+                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Preço original</p><p className="font-semibold finance-positive">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Galeria</p><p className="font-semibold text-content-base">{servicePhotos.length} foto(s)</p></div>
                       </div>
                       {service.description && <p className="text-sm text-content-muted leading-relaxed">{service.description}</p>}
                       <div className="admin-action-group">
@@ -537,7 +537,7 @@ export const ServicesManagement: React.FC = () => {
           <div className="flex items-center bg-surface-card p-1 rounded-xl border border-border-subtle">
             <button
               onClick={() => setFilterType('all')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                 filterType === 'all' ? 'bg-gold-base text-surface-base shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
@@ -545,7 +545,7 @@ export const ServicesManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setFilterType('combos')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                 filterType === 'combos' ? 'bg-status-success text-surface-base shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
@@ -553,7 +553,7 @@ export const ServicesManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setFilterType('popular')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                 filterType === 'popular' ? 'bg-gold-base/30 text-gold-base shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
@@ -561,7 +561,7 @@ export const ServicesManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setFilterType('gallery')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                 filterType === 'gallery' ? 'bg-blue-500/30 text-blue-300 shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
@@ -598,7 +598,7 @@ export const ServicesManagement: React.FC = () => {
         <div className="w-full overflow-x-auto rounded-2xl border border-border-subtle bg-surface-card shadow-xl">
           <table className="w-full text-left border-collapse min-w-[950px]">
             <thead>
-              <tr className="bg-surface-card border-b border-border-subtle text-[11px] font-extrabold text-gold-base uppercase tracking-wider whitespace-nowrap">
+              <tr className="bg-surface-card border-b border-border-subtle text-xs font-extrabold text-gold-base uppercase tracking-wider whitespace-nowrap">
                 <th className="py-3.5 px-4">Foto & Galeria</th>
                 <th className="py-3.5 px-4">Serviço / Descrição</th>
                 <th className="py-3.5 px-4">Categoria</th>
@@ -655,7 +655,7 @@ export const ServicesManagement: React.FC = () => {
 
                           {/* Photos count pill */}
                           {servicePhotos.length > 0 && (
-                            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-xl bg-surface-base/90 text-content-base text-[9px] font-extrabold border border-gold-base/40 shadow-sm flex items-center gap-0.5">
+                            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-xl bg-surface-base/90 text-content-base text-xs font-extrabold border border-gold-base/40 shadow-sm flex items-center gap-0.5">
                               <ImageIcon className="w-2.5 h-2.5" />
                               <span>{servicePhotos.length}</span>
                             </span>
@@ -669,7 +669,7 @@ export const ServicesManagement: React.FC = () => {
                           <span className="font-serif text-content-base font-semibold text-sm block group-hover:text-gold-base transition-colors truncate">
                             {service.title}
                           </span>
-                          <span className="text-[11px] text-content-muted block truncate" title={service.description}>
+                          <span className="text-xs text-content-muted block truncate" title={service.description}>
                             {service.description || 'Sem descrição cadastrada'}
                           </span>
                         </div>
@@ -677,7 +677,7 @@ export const ServicesManagement: React.FC = () => {
 
                       {/* Category */}
                       <td className="py-3 px-4 whitespace-nowrap">
-                        <span className="px-2.5 py-1 rounded-lg bg-surface-card text-gold-base text-[10px] font-bold border border-border-subtle">
+                        <span className="px-2.5 py-1 rounded-lg bg-surface-card text-gold-base text-xs font-bold border border-border-subtle">
                           {categoryName}
                         </span>
                       </td>
@@ -698,13 +698,13 @@ export const ServicesManagement: React.FC = () => {
                               R$ {service.price.toFixed(2)}
                             </span>
                             {service.original_price && service.original_price > service.price && (
-                              <span className="text-[10px] finance-positive line-through">
+                              <span className="text-xs finance-positive line-through">
                                 R$ {service.original_price.toFixed(2)}
                               </span>
                             )}
                           </div>
                           {service.discount_percentage && service.discount_percentage > 0 && (
-                            <span className="text-[9px] text-status-success font-extrabold">
+                            <span className="text-xs text-status-success font-extrabold">
                               🔥 {service.discount_percentage}% OFF
                             </span>
                           )}
@@ -718,7 +718,7 @@ export const ServicesManagement: React.FC = () => {
                           <button
                             onClick={() => handleToggleCombo(service)}
                             title="Clique para alterar Combo VIP"
-                            className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all border ${
+                            className={`px-2 py-1 rounded-lg text-xs font-black uppercase transition-all border ${
                               service.is_combo
                                 ? 'bg-status-success text-surface-base border-[#00A86B] shadow-sm'
                                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
@@ -731,7 +731,7 @@ export const ServicesManagement: React.FC = () => {
                           <button
                             onClick={() => handleTogglePopular(service)}
                             title="Clique para alterar Destaque/Mais Pedido"
-                            className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase transition-all border ${
+                            className={`px-2 py-1 rounded-lg text-xs font-bold uppercase transition-all border ${
                               service.popular
                                 ? 'bg-gold-base/20 text-gold-base border-gold-base/40 shadow-sm'
                                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
@@ -806,13 +806,13 @@ export const ServicesManagement: React.FC = () => {
                       ) : (
                         <Scissors className="w-6 h-6 text-gold-base/60" />
                       )}
-                      {servicePhotos.length > 0 && <span className="absolute -bottom-0.5 -right-0.5 px-1.5 py-0.5 rounded-md bg-surface-base/90 text-content-base text-[10px] font-bold border border-gold-base/40 flex items-center gap-1"><ImageIcon className="w-3 h-3" />{servicePhotos.length}</span>}
+                      {servicePhotos.length > 0 && <span className="absolute -bottom-0.5 -right-0.5 px-1.5 py-0.5 rounded-md bg-surface-base/90 text-content-base text-xs font-bold border border-gold-base/40 flex items-center gap-1"><ImageIcon className="w-3 h-3" />{servicePhotos.length}</span>}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/10 text-gold-base text-[10px] font-bold border border-gold-base/20 admin-clamp-2 max-w-[42%]">{categoryName}</span>
-                        {service.is_combo && <span className="shrink-0 px-2 py-1 rounded-md bg-status-success/15 text-status-success text-[10px] font-bold">Combo</span>}
-                        {service.popular && <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/15 text-gold-base text-[10px] font-bold">Destaque</span>}
+                        <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/10 text-gold-base text-xs font-bold border border-gold-base/20 admin-clamp-2 max-w-[42%]">{categoryName}</span>
+                        {service.is_combo && <span className="shrink-0 px-2 py-1 rounded-md bg-status-success/15 text-status-success text-xs font-bold">Combo</span>}
+                        {service.popular && <span className="shrink-0 px-2 py-1 rounded-md bg-gold-base/15 text-gold-base text-xs font-bold">Destaque</span>}
                       </div>
                       <h3 className="mt-1 text-sm sm:text-base font-bold text-content-base admin-clamp-2">{service.title}</h3>
                       <p className="text-xs text-content-muted admin-clamp-2">{service.description || 'Sem descrição cadastrada'}</p>
@@ -831,10 +831,10 @@ export const ServicesManagement: React.FC = () => {
                   {isExpanded && (
                     <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Categoria</p><p className="mt-1 font-semibold text-content-base">{categoryName}</p></div>
-                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Duração</p><p className="mt-1 font-semibold text-content-base">{service.duration_minutes} minutos</p></div>
-                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Preço original</p><p className="mt-1 font-semibold finance-positive">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
-                        <div className="rounded-xl bg-surface-base p-3"><p className="text-[10px] text-content-muted uppercase tracking-wider">Desconto</p><p className="mt-1 font-semibold text-status-success">{service.discount_percentage ? `${service.discount_percentage}% OFF` : 'Sem desconto'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-xs text-content-muted uppercase tracking-wider">Categoria</p><p className="mt-1 font-semibold text-content-base">{categoryName}</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-xs text-content-muted uppercase tracking-wider">Duração</p><p className="mt-1 font-semibold text-content-base">{service.duration_minutes} minutos</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-xs text-content-muted uppercase tracking-wider">Preço original</p><p className="mt-1 font-semibold finance-positive">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>
+                        <div className="rounded-xl bg-surface-base p-3"><p className="text-xs text-content-muted uppercase tracking-wider">Desconto</p><p className="mt-1 font-semibold text-status-success">{service.discount_percentage ? `${service.discount_percentage}% OFF` : 'Sem desconto'}</p></div>
                       </div>
                       {service.description && <p className="text-sm text-content-muted leading-relaxed">{service.description}</p>}
                       <div className="flex flex-wrap gap-2">
@@ -869,7 +869,7 @@ export const ServicesManagement: React.FC = () => {
                   <h2 className="text-sm font-bold text-content-base truncate max-w-[220px] sm:max-w-md">
                     {editingService ? `Editar: ${editingService.title}` : 'Cadastrar Novo Serviço'}
                   </h2>
-                  <p className="text-[10px] text-content-muted hidden sm:block">
+                  <p className="text-xs text-content-muted hidden sm:block">
                     Preencha informações do serviço, precificação e galeria de fotos.
                   </p>
                 </div>
@@ -997,7 +997,7 @@ export const ServicesManagement: React.FC = () => {
 
                       {/* Destaques */}
                       <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                        <p className="text-[10px] font-bold text-gold-hover uppercase tracking-wider">Configuração de Destaque</p>
+                        <p className="text-xs font-bold text-gold-hover uppercase tracking-wider">Configuração de Destaque</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <label className="flex items-center gap-2 p-2 rounded-xl bg-surface-card border border-border-subtle cursor-pointer hover:border-status-success/40">
                             <input
@@ -1008,7 +1008,7 @@ export const ServicesManagement: React.FC = () => {
                             />
                             <div>
                               <span className="text-xs font-bold text-content-base block">🔥 Combo VIP</span>
-                              <span className="text-[9px] text-content-muted">Pacote promocional</span>
+                              <span className="text-xs text-content-muted">Pacote promocional</span>
                             </div>
                           </label>
 
@@ -1021,7 +1021,7 @@ export const ServicesManagement: React.FC = () => {
                             />
                             <div>
                               <span className="text-xs font-bold text-content-base block">⭐ Mais Pedido</span>
-                              <span className="text-[9px] text-content-muted">Selo no cardápio</span>
+                              <span className="text-xs text-content-muted">Selo no cardápio</span>
                             </div>
                           </label>
                         </div>
@@ -1077,7 +1077,7 @@ export const ServicesManagement: React.FC = () => {
                               Desconto de R$ {(formData.original_price - (formData.price || 0)).toFixed(2)}
                             </span>
                           </div>
-                          <span className="px-2 py-0.5 rounded-xl finance-negative-soft finance-negative font-black text-[10px] uppercase">
+                          <span className="px-2 py-0.5 rounded-xl finance-negative-soft finance-negative font-black text-xs uppercase">
                             {Math.round(((formData.original_price - (formData.price || 0)) / formData.original_price) * 100)}% OFF
                           </span>
                         </div>
@@ -1088,7 +1088,7 @@ export const ServicesManagement: React.FC = () => {
                           <Info className="w-3.5 h-3.5 text-gold-hover" />
                           <span>Efeito de Preço Riscado</span>
                         </p>
-                        <p className="text-[11px]">
+                        <p className="text-xs">
                           Preencher o valor original ativa o selo promocional e mostra o preço de/por no agendamento do cliente.
                         </p>
                       </div>
@@ -1133,7 +1133,7 @@ export const ServicesManagement: React.FC = () => {
                         </div>
 
                         <div className="pt-1">
-                          <p className="text-[9px] text-content-muted font-bold uppercase mb-1.5">Fotos Sugeridas:</p>
+                          <p className="text-xs text-content-muted font-bold uppercase mb-1.5">Fotos Sugeridas:</p>
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                             {BARBERSHOP_IMAGE_PRESETS.slice(0, 4).map((preset, idx) => (
                               <button
@@ -1144,7 +1144,7 @@ export const ServicesManagement: React.FC = () => {
                               >
                                 <img src={preset.url} alt={preset.title} className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-surface-base/40 p-1 flex items-end">
-                                  <span className="text-[8px] font-bold text-content-base admin-clamp-2">{preset.title}</span>
+                                  <span className="text-xs font-bold text-content-base admin-clamp-2">{preset.title}</span>
                                 </div>
                               </button>
                             ))}
@@ -1163,14 +1163,14 @@ export const ServicesManagement: React.FC = () => {
                                 <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-surface-base border border-border-subtle">
                                   <img src={imgUrl} alt="Galeria" className="w-full h-full object-cover" />
                                   {isCover && (
-                                    <span className="absolute top-1 left-1 bg-gold-base text-surface-base text-[8px] font-black px-1 rounded-xl">Capa</span>
+                                    <span className="absolute top-1 left-1 bg-gold-base text-surface-base text-xs font-black px-1 rounded-xl">Capa</span>
                                   )}
                                   <div className="absolute bottom-1 right-1 flex gap-1">
                                     {!isCover && (
                                       <button
                                         type="button"
                                         onClick={() => handleSetCoverImage(imgUrl)}
-                                        className="p-1 rounded-xl bg-surface-base/80 text-gold-hover text-[8px] font-bold"
+                                        className="p-1 rounded-xl bg-surface-base/80 text-gold-hover text-xs font-bold"
                                       >
                                         Capa
                                       </button>
@@ -1188,7 +1188,7 @@ export const ServicesManagement: React.FC = () => {
                             })}
                           </div>
                         ) : (
-                          <p className="text-[11px] text-content-muted italic">Nenhuma foto adicionada.</p>
+                          <p className="text-xs text-content-muted italic">Nenhuma foto adicionada.</p>
                         )}
                       </div>
                     </div>

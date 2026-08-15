@@ -481,7 +481,7 @@ export const AdminLayout: React.FC = () => {
               aria-expanded={!isCollapsed}
               className="admin-sidebar-section-toggle w-full min-h-9 px-3 flex items-center justify-between gap-2 rounded-lg text-left transition-colors hover:bg-surface-base"
             >
-              <span className="admin-sidebar-section-label text-[11px] font-bold uppercase tracking-[0.16em] truncate">
+              <span className="admin-sidebar-section-label text-xs font-bold uppercase tracking-[0.16em] truncate">
                 {sectionLabels[section]}
               </span>
               <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} />
@@ -602,7 +602,7 @@ export const AdminLayout: React.FC = () => {
             </div>
             <div className="min-w-0">
               <h1 className="text-sm font-serif font-bold text-content-base tracking-tight truncate">Navo Premium</h1>
-              <p className="text-[9px] text-gold-base font-bold uppercase tracking-widest truncate">Heritage Barber & Club</p>
+              <p className="text-xs text-gold-base font-bold uppercase tracking-widest truncate">Heritage Barber & Club</p>
             </div>
           </div>
         </div>
@@ -618,7 +618,7 @@ export const AdminLayout: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-content-base truncate">{adminName}</p>
-              <p className="text-[9px] font-bold text-content-muted uppercase tracking-wider">Admin</p>
+              <p className="text-xs font-bold text-content-muted uppercase tracking-wider">Admin</p>
             </div>
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

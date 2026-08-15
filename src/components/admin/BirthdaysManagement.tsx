@@ -97,11 +97,11 @@ export const BirthdaysManagement: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-[10px] uppercase tracking-wider text-content-muted">Próximos 30 dias</p><p className="text-xl font-black text-content-base mt-1">{summary.next30Days}</p></div>
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-[10px] uppercase tracking-wider text-content-muted">Sem e-mail</p><p className="text-xl font-black text-status-warning mt-1">{summary.withoutEmail}</p></div>
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-[10px] uppercase tracking-wider text-content-muted">Exibidos</p><p className="text-xl font-black text-gold-base mt-1">{summary.shown}</p></div>
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-[10px] uppercase tracking-wider text-content-muted">Base completa</p><p className="text-xl font-black text-content-base mt-1">{summary.totalWithBirthday}</p></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">Próximos 30 dias</p><p className="text-xl font-black text-content-base mt-1">{summary.next30Days}</p></div>
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">Sem e-mail</p><p className="text-xl font-black text-status-warning mt-1">{summary.withoutEmail}</p></div>
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">Exibidos</p><p className="text-xl font-black text-gold-base mt-1">{summary.shown}</p></div>
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">Base completa</p><p className="text-xl font-black text-content-base mt-1">{summary.totalWithBirthday}</p></div>
       </div>
 
       <div className="bg-surface-card border border-border-subtle rounded-xl p-4">
@@ -109,7 +109,7 @@ export const BirthdaysManagement: React.FC = () => {
         <div className="grid grid-cols-6 sm:grid-cols-12 gap-2 items-end">
           {distribution.map((item) => {
             const max = Math.max(1, ...distribution.map((month) => month.count));
-            return <div key={item.month} className="text-center space-y-1"><div className="h-16 flex items-end justify-center"><div className="w-full max-w-6 rounded-t-md bg-gold-base/70" style={{ height: `${Math.max(8, (item.count / max) * 100)}%` }} /></div><p className="text-[10px] text-content-muted">{monthLabels[item.month - 1]}</p><p className="text-[10px] font-bold text-content-base">{item.count}</p></div>;
+            return <div key={item.month} className="text-center space-y-1"><div className="h-16 flex items-end justify-center"><div className="w-full max-w-6 rounded-t-md bg-gold-base/70" style={{ height: `${Math.max(8, (item.count / max) * 100)}%` }} /></div><p className="text-xs text-content-muted">{monthLabels[item.month - 1]}</p><p className="text-xs font-bold text-content-base">{item.count}</p></div>;
           })}
         </div>
       </div>
@@ -124,8 +124,8 @@ export const BirthdaysManagement: React.FC = () => {
             {clients.map((client) => (
               <article key={client.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <div className="w-11 h-11 rounded-full bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0"><Cake className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1"><div className="flex items-center gap-2 flex-wrap"><h3 className="text-sm font-bold text-content-base truncate">{client.name}</h3><span className="px-2 py-1 rounded-md bg-surface-base border border-border-subtle text-[10px] text-content-muted">{client.loyaltyTier}</span></div><p className="text-xs text-content-muted">{formatDate(client.birthday)}{client.age !== null ? ` · ${client.age} anos` : ''} · Última visita: {client.lastVisit ? formatDate(client.lastVisit) : 'sem registro'}</p></div>
-                <div className="sm:text-right shrink-0"><p className="text-[10px] uppercase tracking-wider text-content-muted">Quando</p><p className={`text-sm font-black ${client.daysUntil <= 7 ? 'text-status-warning' : 'text-gold-base'}`}>{client.daysUntil === 0 ? 'Hoje' : `em ${client.daysUntil} dias`}</p></div>
+                <div className="min-w-0 flex-1"><div className="flex items-center gap-2 flex-wrap"><h3 className="text-sm font-bold text-content-base admin-clamp-2">{client.name}</h3><span className="px-2 py-1 rounded-md bg-surface-base border border-border-subtle text-xs text-content-muted">{client.loyaltyTier}</span></div><p className="text-xs text-content-muted">{formatDate(client.birthday)}{client.age !== null ? ` · ${client.age} anos` : ''} · Última visita: {client.lastVisit ? formatDate(client.lastVisit) : 'sem registro'}</p></div>
+                <div className="sm:text-right shrink-0"><p className="text-xs uppercase tracking-wider text-content-muted">Quando</p><p className={`text-sm font-black ${client.daysUntil <= 7 ? 'text-status-warning' : 'text-gold-base'}`}>{client.daysUntil === 0 ? 'Hoje' : `em ${client.daysUntil} dias`}</p></div>
                 <div className="flex items-center gap-2 shrink-0">{client.hasPhone && <a href={whatsappUrl(client.phone)} target="_blank" rel="noreferrer" title="Abrir WhatsApp" className="w-10 h-10 rounded-xl border border-status-success/30 text-status-success flex items-center justify-center"><Phone className="w-4 h-4" /></a>}{client.hasEmail && <a href={`mailto:${client.email}`} title="Enviar e-mail" className="w-10 h-10 rounded-xl border border-gold-base/30 text-gold-base flex items-center justify-center"><Mail className="w-4 h-4" /></a>}</div>
               </article>
             ))}

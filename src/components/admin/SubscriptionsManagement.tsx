@@ -189,35 +189,35 @@ export const SubscriptionsManagement: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">MRR</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">MRR</span>
             <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0">
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalMRR.toFixed(2)}</p>
-          <p className="text-[9px] text-status-success mt-1 font-medium truncate">Garantido todo mês</p>
+          <p className="text-xs text-status-success mt-1 font-medium truncate">Garantido todo mês</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Membros Ativos</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Membros Ativos</span>
             <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle flex items-center justify-center shrink-0">
               <Users className="w-3.5 h-3.5 text-gold-base" />
             </div>
           </div>
           <p className="text-lg font-black text-content-base tabular-nums">{totalActiveSubscribers}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Ticket: <span className="finance-positive">R$ {totalActiveSubscribers > 0 ? (totalMRR / totalActiveSubscribers).toFixed(0) : '0'}</span></p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">Ticket: <span className="finance-positive">R$ {totalActiveSubscribers > 0 ? (totalMRR / totalActiveSubscribers).toFixed(0) : '0'}</span></p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Atend. do Clube</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Atend. do Clube</span>
             <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
               <Scissors className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black text-status-success tabular-nums">{members.reduce((acc, m) => acc + m.cutsUsedThisMonth, 0)}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Repasses aos barbeiros</p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">Repasses aos barbeiros</p>
         </div>
       </div>
 
@@ -237,7 +237,7 @@ export const SubscriptionsManagement: React.FC = () => {
         <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs min-w-[680px]">
-              <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-[10px]">
+              <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-xs">
                 <tr className="whitespace-nowrap">
                   <th className="p-3">Assinante</th>
                   <th className="p-3">Plano Contratado</th>
@@ -251,11 +251,11 @@ export const SubscriptionsManagement: React.FC = () => {
                   <tr key={m.id} className="hover:bg-surface-base/50 transition-colors">
                     <td className="p-3 font-semibold">
                       {m.clientName}
-                      <span className="text-[10px] text-content-muted font-mono block">{m.clientPhone}</span>
+                      <span className="text-xs text-content-muted font-mono block">{m.clientPhone}</span>
                     </td>
                     <td className="p-3 font-bold text-gold-base">{m.planName}</td>
                     <td className="p-3">
-                      <span className="bg-status-success/15 text-status-success font-bold text-[10px] px-2 py-0.5 rounded-xl uppercase">
+                      <span className="bg-status-success/15 text-status-success font-bold text-xs px-2 py-0.5 rounded-xl uppercase">
                         {m.status === 'active' ? 'Ativo' : 'Pendente'}
                       </span>
                     </td>
@@ -286,7 +286,7 @@ export const SubscriptionsManagement: React.FC = () => {
               }`}
             >
               {plan.popular && (
-                <span className="absolute -top-3 right-4 bg-gold-base text-surface-base text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full shadow-xs">
+                <span className="absolute -top-3 right-4 bg-gold-base text-surface-base text-xs font-extrabold uppercase px-2.5 py-0.5 rounded-full shadow-xs">
                   Mais Vendido
                 </span>
               )}
@@ -299,7 +299,7 @@ export const SubscriptionsManagement: React.FC = () => {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-border-subtle/80 space-y-2 text-xs">
-                  <span className="text-[10px] font-bold uppercase text-content-muted block">Incluso no Plano:</span>
+                  <span className="text-xs font-bold uppercase text-content-muted block">Incluso no Plano:</span>
                   {plan.includedServices.map((svc, i) => (
                     <div key={i} className="flex items-center gap-2 text-content-base">
                       <CheckCircle2 className="w-3.5 h-3.5 text-gold-base shrink-0" />
@@ -338,10 +338,10 @@ export const SubscriptionsManagement: React.FC = () => {
               <div key={p.id} className="flex justify-between items-center bg-surface-base p-3 rounded-xl border border-border-subtle text-xs">
                 <div>
                   <span className="font-bold text-content-base block">{p.name}</span>
-                  <span className="text-[10px] text-content-muted">Mensalidade do Cliente: <span className="finance-positive">R$ {p.price.toFixed(2)}</span></span>
+                  <span className="text-xs text-content-muted">Mensalidade do Cliente: <span className="finance-positive">R$ {p.price.toFixed(2)}</span></span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-content-muted uppercase font-bold block">Repasse Fixo / Corte</span>
+                  <span className="text-xs text-content-muted uppercase font-bold block">Repasse Fixo / Corte</span>
                   <span className="font-bold finance-negative text-sm tabular-nums">R$ {p.barberPerCutFee.toFixed(2)}</span>
                 </div>
               </div>

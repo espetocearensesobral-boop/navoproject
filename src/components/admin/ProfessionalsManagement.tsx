@@ -299,46 +299,46 @@ export const ProfessionalsManagement: React.FC = () => {
       <div className="hidden md:grid grid-cols-2 md:grid-cols-4 gap-2.5">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Total Equipe</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Total Equipe</span>
             <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-mono num-tabular text-content-base font-semibold">{totalBarbers}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Profissionais cadastrados</p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">Profissionais cadastrados</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Ativos na Agenda</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Ativos na Agenda</span>
             <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center">
               <UserCheck className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-mono num-tabular font-bold text-status-success">{activeBarbers}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Cadeiras disponíveis</p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">Cadeiras disponíveis</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Média Avaliação</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Média Avaliação</span>
             <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
               <Star className="w-3.5 h-3.5 fill-amber-400" />
             </div>
           </div>
           <p className="text-lg font-mono num-tabular font-bold text-amber-400">{avgRating} ⭐</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Sua equipe em destaque</p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">Sua equipe em destaque</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Comissão Média</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Comissão Média</span>
             <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-mono num-tabular text-content-base font-semibold">{avgCommission}%</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Por serviço prestado</p>
+          <p className="text-xs text-content-muted mt-1 font-medium truncate">Por serviço prestado</p>
         </div>
       </div>
 
@@ -484,7 +484,7 @@ export const ProfessionalsManagement: React.FC = () => {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
                         <h3 className="font-bold text-content-base text-sm sm:text-base admin-clamp-2">{barber.name}</h3>
-                        <span className={`shrink-0 px-2 py-1 rounded-md text-[10px] font-bold ${isActive ? 'bg-status-success/15 text-status-success' : 'bg-red-500/15 text-red-300'}`}>
+                        <span className={`shrink-0 px-2 py-1 rounded-md text-xs font-bold ${isActive ? 'bg-status-success/15 text-status-success' : 'bg-red-500/15 text-red-300'}`}>
                           {isActive ? 'Ativo' : 'Pausado'}
                         </span>
                       </div>
@@ -510,16 +510,16 @@ export const ProfessionalsManagement: React.FC = () => {
                     <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                         <div className="rounded-xl bg-surface-base p-3">
-                          <p className="text-[10px] text-content-muted uppercase tracking-wider">Especialidades</p>
+                          <p className="text-xs text-content-muted uppercase tracking-wider">Especialidades</p>
                           <p className="mt-1 text-content-base font-semibold leading-relaxed">{barber.specialties?.join(', ') || 'Geral'}</p>
                         </div>
                         <div className="rounded-xl bg-surface-base p-3">
-                          <p className="text-[10px] text-content-muted uppercase tracking-wider">Horários semanais</p>
+                          <p className="text-xs text-content-muted uppercase tracking-wider">Horários semanais</p>
                           <p className="mt-1 text-content-base font-semibold">{barber.working_hours?.days?.map((day) => dayLabels[day] || day).join(', ') || 'Seg-Sáb'}</p>
                           <p className="text-content-muted">{barber.working_hours?.start || '08:00'}–{barber.working_hours?.end || '19:00'}</p>
                         </div>
                         <div className="rounded-xl bg-surface-base p-3">
-                          <p className="text-[10px] text-content-muted uppercase tracking-wider">Contato</p>
+                          <p className="text-xs text-content-muted uppercase tracking-wider">Contato</p>
                           <p className="mt-1 text-content-base font-semibold admin-safe-wrap">{barber.phone || 'Não informado'}</p>
                           <p className="text-content-muted admin-safe-wrap">{barber.pix_key || 'PIX não informado'}</p>
                         </div>
@@ -547,12 +547,12 @@ export const ProfessionalsManagement: React.FC = () => {
             <table className="w-full text-left text-xs whitespace-nowrap">
               <thead className="bg-surface-base text-content-muted border-b border-border-subtle">
                 <tr>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-[10px]">Profissional</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-[10px]">Avaliação</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-[10px]">Comissão</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-[10px]">Especialidades</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-[10px]">Turno & Dias</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-[10px] text-right">Ações</th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Profissional</th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Avaliação</th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Comissão</th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Especialidades</th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Turno & Dias</th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle">
@@ -571,7 +571,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           />
                           <div>
                             <p className="font-bold text-content-base text-xs">{barber.name}</p>
-                            <p className="text-[10px] text-gold-hover">{barber.role}</p>
+                            <p className="text-xs text-gold-hover">{barber.role}</p>
                           </div>
                         </div>
                       </td>
@@ -581,13 +581,13 @@ export const ProfessionalsManagement: React.FC = () => {
                       </td>
 
                       <td className="p-3.5">
-                        <span className="px-2 py-0.5 rounded-xl bg-surface-card border border-border-subtle text-gold-hover font-bold text-[10px]">
+                        <span className="px-2 py-0.5 rounded-xl bg-surface-card border border-border-subtle text-gold-hover font-bold text-xs">
                           {commissionPercent}%
                         </span>
                       </td>
 
                       <td className="p-3.5">
-                        <span className="text-[10px] text-content-muted">
+                        <span className="text-xs text-content-muted">
                           {barber.specialties?.slice(0, 2).join(', ') || 'Geral'}
                         </span>
                       </td>
@@ -607,7 +607,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleOpenEdit(barber)}
-                            className="px-2 py-1 bg-gold-base text-surface-base font-bold rounded-xl text-[10px]"
+                            className="px-2 py-1 bg-gold-base text-surface-base font-bold rounded-xl text-xs"
                           >
                             Editar
                           </button>
@@ -642,7 +642,7 @@ export const ProfessionalsManagement: React.FC = () => {
                   <h2 className="text-sm font-bold text-content-base truncate">
                     {editingBarber ? `Editar Barbeiro: ${editingBarber.name}` : 'Novo Barbeiro'}
                   </h2>
-                  <p className="text-[10px] text-content-muted truncate">Configuração de perfil, comissões e horários</p>
+                  <p className="text-xs text-content-muted truncate">Configuração de perfil, comissões e horários</p>
                 </div>
               </div>
               <button
@@ -836,7 +836,7 @@ export const ProfessionalsManagement: React.FC = () => {
                   </div>
 
                   <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                    <p className="text-[10px] font-bold text-gold-hover flex items-center gap-1 uppercase">
+                    <p className="text-xs font-bold text-gold-hover flex items-center gap-1 uppercase">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Especialidades populares:</span>
                     </p>
@@ -846,7 +846,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           key={tag}
                           type="button"
                           onClick={() => handleAddSpecialtyTag(tag)}
-                          className="px-2 py-1 rounded-lg bg-surface-card text-content-muted hover:text-content-base border border-border-subtle text-[10px] font-bold"
+                          className="px-2 py-1 rounded-lg bg-surface-card text-content-muted hover:text-content-base border border-border-subtle text-xs font-bold"
                         >
                           + {tag}
                         </button>
@@ -891,7 +891,7 @@ export const ProfessionalsManagement: React.FC = () => {
                   </div>
 
                   <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1 text-xs">
-                    <p className="text-[10px] text-content-muted font-bold uppercase">Simulador de Divisão</p>
+                    <p className="text-xs text-content-muted font-bold uppercase">Simulador de Divisão</p>
                     <p className="font-extrabold text-status-success">
                       Em R$ 100,00 → Barbeiro recebe R$ {((formData.commission_rate || 0.45) * 100).toFixed(2)}
                     </p>

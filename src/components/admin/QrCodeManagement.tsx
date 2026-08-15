@@ -94,7 +94,7 @@ export const QrCodeManagement: React.FC = () => {
 
           <div className="qr-print-footer space-y-1 text-xs font-sans">
             <p className="text-content-base font-bold">Aponte a câmera para agendar</p>
-            <p className="text-content-muted text-[11px]">O QR abre diretamente a escolha do serviço.</p>
+            <p className="text-content-muted text-xs">O QR abre diretamente a escolha do serviço.</p>
           </div>
         </div>
 
@@ -128,7 +128,7 @@ export const QrCodeManagement: React.FC = () => {
           </div>
 
           <div className="pt-4 border-t border-border-subtle space-y-2">
-            <span className="text-[10px] font-bold uppercase text-content-muted block">Ações Rápidas</span>
+            <span className="text-xs font-bold uppercase text-content-muted block">Ações Rápidas</span>
             <a
               href={bookingUrl}
               target="_blank"

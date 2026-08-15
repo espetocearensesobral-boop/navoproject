@@ -137,7 +137,7 @@ const EmailSettingsTab: React.FC = () => {
     <div className="space-y-6 max-w-2xl text-xs min-w-0">
       <div>
         <h2 className="text-sm font-serif font-bold text-content-base mb-0.5 truncate">Envio de E-mails (SMTP)</h2>
-        <p className="text-[11px] text-content-muted mb-4">
+        <p className="text-xs text-content-muted mb-4">
           Configure um servidor SMTP para enviar avisos à barbearia e aos clientes que informarem e-mail no agendamento.
           Você pode usar um provedor gratuito, como o Gmail (com uma "Senha de app"), Brevo ou Zoho Mail.
         </p>
@@ -153,7 +153,7 @@ const EmailSettingsTab: React.FC = () => {
       <div className="flex items-center justify-between bg-surface-base p-3.5 rounded-xl border border-border-subtle">
         <div>
           <p className="text-xs font-bold text-content-base">Ativar envio de e-mails</p>
-          <p className="text-[11px] text-content-muted">Quando desativado, nenhum e-mail é enviado, mesmo com os dados preenchidos.</p>
+          <p className="text-xs text-content-muted">Quando desativado, nenhum e-mail é enviado, mesmo com os dados preenchidos.</p>
         </div>
         <button
           type="button"
@@ -169,7 +169,7 @@ const EmailSettingsTab: React.FC = () => {
       <div className="space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-2">
-            <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">Servidor SMTP (host)</label>
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">Servidor SMTP (host)</label>
             <input
               type="text"
               placeholder="smtp.gmail.com"
@@ -179,7 +179,7 @@ const EmailSettingsTab: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">Porta</label>
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">Porta</label>
             <input
               type="number"
               placeholder="587"
@@ -190,7 +190,7 @@ const EmailSettingsTab: React.FC = () => {
           </div>
         </div>
 
-        <label className="flex items-center gap-2 text-[11px] text-content-muted">
+        <label className="flex items-center gap-2 text-xs text-content-muted">
           <input
             type="checkbox"
             checked={settings.smtpSecure}
@@ -201,7 +201,7 @@ const EmailSettingsTab: React.FC = () => {
         </label>
 
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">Usuário SMTP</label>
+          <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">Usuário SMTP</label>
           <input
             type="text"
             placeholder="seuemail@gmail.com"
@@ -212,7 +212,7 @@ const EmailSettingsTab: React.FC = () => {
         </div>
 
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+          <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">
             Senha SMTP {settings.hasPassword && !smtpPasswordInput && <span className="normal-case font-normal text-content-muted">(já salva — deixe em branco para manter)</span>}
           </label>
           <div className="relative">
@@ -236,7 +236,7 @@ const EmailSettingsTab: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">Nome do remetente</label>
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">Nome do remetente</label>
             <input
               type="text"
               placeholder="Navo Barber & Club"
@@ -246,7 +246,7 @@ const EmailSettingsTab: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">E-mail de envio</label>
+            <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">E-mail de envio</label>
             <input
               type="email"
               placeholder="contato@suabarbearia.com"
@@ -258,7 +258,7 @@ const EmailSettingsTab: React.FC = () => {
         </div>
 
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">Responder para (opcional)</label>
+          <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">Responder para (opcional)</label>
           <input
             type="email"
             placeholder="Deixe em branco para usar o e-mail de envio"
@@ -269,7 +269,7 @@ const EmailSettingsTab: React.FC = () => {
         </div>
 
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">E-mail padrão da barbearia</label>
+          <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">E-mail padrão da barbearia</label>
           <input
             type="email"
             placeholder="administrativo@suabarbearia.com"
@@ -277,11 +277,11 @@ const EmailSettingsTab: React.FC = () => {
             onChange={(e) => update('notificationEmail', e.target.value)}
             className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
           />
-          <p className="mt-1 text-[10px] text-content-muted">Receberá avisos de novos agendamentos, reagendamentos e cancelamentos. Se ficar vazio, o sistema não envia alertas administrativos por e-mail.</p>
+          <p className="mt-1 text-xs text-content-muted">Receberá avisos de novos agendamentos, reagendamentos e cancelamentos. Se ficar vazio, o sistema não envia alertas administrativos por e-mail.</p>
         </div>
 
         <div className="pt-2 space-y-2">
-          <label className="flex items-center gap-2 text-[11px] text-content-base">
+          <label className="flex items-center gap-2 text-xs text-content-base">
             <input
               type="checkbox"
               checked={settings.notifyOnBooking}
@@ -290,7 +290,7 @@ const EmailSettingsTab: React.FC = () => {
             />
             Enviar e-mail ao confirmar agendamento
           </label>
-          <label className="flex items-center gap-2 text-[11px] text-content-base">
+          <label className="flex items-center gap-2 text-xs text-content-base">
             <input
               type="checkbox"
               checked={settings.notifyOnReschedule}
@@ -299,7 +299,7 @@ const EmailSettingsTab: React.FC = () => {
             />
             Enviar e-mail ao reagendar agendamento
           </label>
-          <label className="flex items-center gap-2 text-[11px] text-content-base">
+          <label className="flex items-center gap-2 text-xs text-content-base">
             <input
               type="checkbox"
               checked={settings.notifyOnCancel}
@@ -343,7 +343,7 @@ const EmailSettingsTab: React.FC = () => {
       {/* Test send */}
       <div className="pt-4 border-t border-border-subtle space-y-2">
         <h3 className="text-xs font-bold text-content-base">Testar envio</h3>
-        <p className="text-[11px] text-content-muted">Salve os dados acima antes de testar. O teste funciona mesmo com o envio desativado.</p>
+        <p className="text-xs text-content-muted">Salve os dados acima antes de testar. O teste funciona mesmo com o envio desativado.</p>
         <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="email"
@@ -447,7 +447,7 @@ const PrintSettingsTab: React.FC = () => {
     <div className="space-y-6 max-w-4xl text-xs min-w-0">
       <div>
         <h2 className="text-sm font-serif font-bold text-content-base">Impressões</h2>
-        <p className="text-[11px] text-content-muted mt-1">Defina como comprovantes, relatórios e QR Codes devem ser preparados para impressora térmica ou folha A4. As mudanças afetam novos previews e impressões do navegador.</p>
+        <p className="text-xs text-content-muted mt-1">Defina como comprovantes, relatórios e QR Codes devem ser preparados para impressora térmica ou folha A4. As mudanças afetam novos previews e impressões do navegador.</p>
       </div>
 
       {status && <div className={`p-3 rounded-xl flex items-center gap-2 font-bold ${status.type === 'success' ? 'bg-status-success/10 border border-status-success/30 text-status-success' : 'bg-status-error/10 border border-status-error/30 text-status-error'}`}><span>{status.text}</span></div>}
@@ -457,7 +457,7 @@ const PrintSettingsTab: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {([['receiptFormat', 'Comprovantes', 'receipt'], ['reportFormat', 'Relatórios', 'report'], ['qrFormat', 'QR Code / Totem', 'qr']] as const).map(([key, label, kind]) => (
             <div key={key} className="bg-surface-base border border-border-subtle rounded-xl p-3 space-y-3">
-              <div><p className="font-bold text-content-base">{label}</p><p className="text-[10px] text-content-muted mt-0.5">Escolha o padrão mais adequado.</p></div>
+              <div><p className="font-bold text-content-base">{label}</p><p className="text-xs text-content-muted mt-0.5">Escolha o padrão mais adequado.</p></div>
               <select value={settings[key]} onChange={(e) => update(key, e.target.value as PrintFormat)} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="thermal">Impressora térmica</option><option value="a4">Folha A4</option></select>
               <button type="button" onClick={() => openPreview(kind)} className="w-full h-9 rounded-xl border border-border-subtle text-content-base font-bold flex items-center justify-center gap-2 hover:border-gold-base"><Printer className="w-3.5 h-3.5" /> Pré-visualizar</button>
             </div>
@@ -466,26 +466,26 @@ const PrintSettingsTab: React.FC = () => {
       </section>
 
       <section className="bg-surface-base border border-border-subtle rounded-xl p-4 space-y-4">
-        <div><h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Papel e legibilidade</h3><p className="text-[11px] text-content-muted mt-1">Esses valores controlam largura, orientação, margem, tamanho e espaçamento no documento gerado.</p></div>
+        <div><h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Papel e legibilidade</h3><p className="text-xs text-content-muted mt-1">Esses valores controlam largura, orientação, margem, tamanho e espaçamento no documento gerado.</p></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Largura térmica</span><select value={settings.thermalWidthMm} onChange={(e) => update('thermalWidthMm', Number(e.target.value) as 58 | 80)} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="58">58 mm</option><option value="80">80 mm</option></select></label>
-          <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Orientação A4</span><select value={settings.a4Orientation} onChange={(e) => update('a4Orientation', e.target.value as PrintSettings['a4Orientation'])} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="portrait">Retrato</option><option value="landscape">Paisagem</option></select></label>
-          <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Tamanho da fonte</span><input type="number" min="9" max="18" value={settings.fontSize} onChange={(e) => update('fontSize', Number(e.target.value))} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base num-tabular" /></label>
-          <label className="space-y-1"><span className="block text-[10px] font-bold text-content-muted uppercase">Margem (mm)</span><input type="number" min="0" max="30" value={settings.marginMm} onChange={(e) => update('marginMm', Number(e.target.value))} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base num-tabular" /></label>
+          <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Largura térmica</span><select value={settings.thermalWidthMm} onChange={(e) => update('thermalWidthMm', Number(e.target.value) as 58 | 80)} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="58">58 mm</option><option value="80">80 mm</option></select></label>
+          <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Orientação A4</span><select value={settings.a4Orientation} onChange={(e) => update('a4Orientation', e.target.value as PrintSettings['a4Orientation'])} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="portrait">Retrato</option><option value="landscape">Paisagem</option></select></label>
+          <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Tamanho da fonte</span><input type="number" min="9" max="18" value={settings.fontSize} onChange={(e) => update('fontSize', Number(e.target.value))} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base num-tabular" /></label>
+          <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Margem (mm)</span><input type="number" min="0" max="30" value={settings.marginMm} onChange={(e) => update('marginMm', Number(e.target.value))} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base num-tabular" /></label>
         </div>
-        <label className="space-y-1 block max-w-sm"><span className="block text-[10px] font-bold text-content-muted uppercase">Densidade do conteúdo</span><select value={settings.density} onChange={(e) => update('density', e.target.value as PrintSettings['density'])} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="compact">Compacta — economiza papel</option><option value="comfortable">Confortável — padrão</option><option value="spacious">Espaçosa — mais respiro</option></select></label>
+        <label className="space-y-1 block max-w-sm"><span className="block text-xs font-bold text-content-muted uppercase">Densidade do conteúdo</span><select value={settings.density} onChange={(e) => update('density', e.target.value as PrintSettings['density'])} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="compact">Compacta — economiza papel</option><option value="comfortable">Confortável — padrão</option><option value="spacious">Espaçosa — mais respiro</option></select></label>
       </section>
 
       <section className="bg-surface-base border border-border-subtle rounded-xl p-4 space-y-3">
-        <div><h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Detalhes dos comprovantes</h3><p className="text-[11px] text-content-muted mt-1">Controle o que aparece no recibo sem apagar dados do banco.</p></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{toggles.map(([key, label, description]) => <label key={String(key)} className="flex items-start gap-2 p-2.5 rounded-xl border border-border-subtle bg-surface-card"><input type="checkbox" checked={Boolean(settings[key])} onChange={(e) => update(key, e.target.checked as PrintSettings[typeof key])} className="mt-0.5 accent-gold-base" /><span><strong className="text-content-base">{label}</strong><span className="block text-[10px] text-content-muted mt-0.5">{description}</span></span></label>)}</div>
-        <label className="block space-y-1 pt-2"><span className="block text-[10px] font-bold text-content-muted uppercase">Texto do rodapé</span><input value={settings.footerText} onChange={(e) => update('footerText', e.target.value)} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
+        <div><h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Detalhes dos comprovantes</h3><p className="text-xs text-content-muted mt-1">Controle o que aparece no recibo sem apagar dados do banco.</p></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{toggles.map(([key, label, description]) => <label key={String(key)} className="flex items-start gap-2 p-2.5 rounded-xl border border-border-subtle bg-surface-card"><input type="checkbox" checked={Boolean(settings[key])} onChange={(e) => update(key, e.target.checked as PrintSettings[typeof key])} className="mt-0.5 accent-gold-base" /><span><strong className="text-content-base">{label}</strong><span className="block text-xs text-content-muted mt-0.5">{description}</span></span></label>)}</div>
+        <label className="block space-y-1 pt-2"><span className="block text-xs font-bold text-content-muted uppercase">Texto do rodapé</span><input value={settings.footerText} onChange={(e) => update('footerText', e.target.value)} className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base" /></label>
       </section>
 
       <section className="bg-surface-base border border-border-subtle rounded-xl p-4 space-y-3">
-        <div><h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Relatórios</h3><p className="text-[11px] text-content-muted mt-1">O CSV continua independente; estas opções controlam a impressão visual do relatório.</p></div>
-        <label className="flex items-start gap-2 p-2.5 rounded-xl border border-border-subtle bg-surface-card"><input type="checkbox" checked={settings.reportIncludeCharts} onChange={(e) => update('reportIncludeCharts', e.target.checked)} className="mt-0.5 accent-gold-base" /><span><strong className="text-content-base">Incluir gráficos e indicadores</strong><span className="block text-[10px] text-content-muted mt-0.5">Inclui a leitura visual do período quando houver dados.</span></span></label>
-        <label className="flex items-start gap-2 p-2.5 rounded-xl border border-border-subtle bg-surface-card"><input type="checkbox" checked={settings.reportIncludeDetails} onChange={(e) => update('reportIncludeDetails', e.target.checked)} className="mt-0.5 accent-gold-base" /><span><strong className="text-content-base">Incluir detalhes e rankings</strong><span className="block text-[10px] text-content-muted mt-0.5">Inclui serviços, formas de pagamento, despesas e clientes.</span></span></label>
+        <div><h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Relatórios</h3><p className="text-xs text-content-muted mt-1">O CSV continua independente; estas opções controlam a impressão visual do relatório.</p></div>
+        <label className="flex items-start gap-2 p-2.5 rounded-xl border border-border-subtle bg-surface-card"><input type="checkbox" checked={settings.reportIncludeCharts} onChange={(e) => update('reportIncludeCharts', e.target.checked)} className="mt-0.5 accent-gold-base" /><span><strong className="text-content-base">Incluir gráficos e indicadores</strong><span className="block text-xs text-content-muted mt-0.5">Inclui a leitura visual do período quando houver dados.</span></span></label>
+        <label className="flex items-start gap-2 p-2.5 rounded-xl border border-border-subtle bg-surface-card"><input type="checkbox" checked={settings.reportIncludeDetails} onChange={(e) => update('reportIncludeDetails', e.target.checked)} className="mt-0.5 accent-gold-base" /><span><strong className="text-content-base">Incluir detalhes e rankings</strong><span className="block text-xs text-content-muted mt-0.5">Inclui serviços, formas de pagamento, despesas e clientes.</span></span></label>
       </section>
 
       <div className="pt-4 border-t border-border-subtle flex flex-col sm:flex-row sm:justify-end gap-2"><button type="button" onClick={handleReset} disabled={saving} className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl border border-border-subtle bg-surface-card text-content-muted font-bold flex items-center justify-center gap-2"><RotateCcw className="w-4 h-4" />Cancelar</button><button type="button" onClick={handleSave} disabled={saving} className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl bg-gold-base text-surface-base font-bold flex items-center justify-center gap-2 disabled:opacity-50"><Save className="w-4 h-4" />{saving ? 'Salvando...' : 'Salvar Alterações'}</button></div>

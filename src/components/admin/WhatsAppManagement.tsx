@@ -40,38 +40,38 @@ export const WhatsAppManagement: React.FC = () => {
       </button>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Saldo</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Saldo</span>
             <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center shrink-0">
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {balance.toFixed(2)}</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">~{Math.floor(balance / 0.10)} mensagens</p>
+          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">~{Math.floor(balance / 0.10)} mensagens</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Enviadas</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Enviadas</span>
             <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
               <Send className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black text-content-base tabular-nums">412</p>
-          <p className="text-[9px] text-status-success mt-1 font-medium truncate">98.5% entregues</p>
+          <p className="text-xs text-status-success mt-1 font-medium admin-safe-wrap">98.5% entregues</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
           <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider truncate">Menos Faltas</span>
+            <span className="text-xs font-bold uppercase tracking-wider truncate">Menos Faltas</span>
             <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </div>
           <p className="text-lg font-black text-status-success tabular-nums">- 82%</p>
-          <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Lembretes automáticos</p>
+          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Lembretes automáticos</p>
         </div>
       </div>
 
@@ -84,9 +84,9 @@ export const WhatsAppManagement: React.FC = () => {
 
         <div className="space-y-3 text-xs">
           <div className="flex justify-between items-center bg-surface-base p-3.5 rounded-xl border border-border-subtle">
-            <div>
-              <span className="font-bold text-content-base block">Lembrete Pré-Agendamento (2h antes)</span>
-              <span className="text-content-muted text-[11px]">Envia mensagem com botão de confirmação ou reagendamento no WhatsApp do cliente.</span>
+            <div className="min-w-0">
+              <span className="font-bold text-content-base block admin-safe-wrap">Lembrete Pré-Agendamento (2h antes)</span>
+              <span className="text-content-muted text-xs admin-safe-wrap block">Envia mensagem com botão de confirmação ou reagendamento no WhatsApp do cliente.</span>
             </div>
             <input
               type="checkbox"
@@ -97,9 +97,9 @@ export const WhatsAppManagement: React.FC = () => {
           </div>
 
           <div className="flex justify-between items-center bg-surface-base p-3.5 rounded-xl border border-border-subtle">
-            <div>
-              <span className="font-bold text-content-base block">Mensagem de Boas-Vindas & Confirmação Instantânea</span>
-              <span className="text-content-muted text-[11px]">Dispara o comprovante e link do agendamento imediatamente após a reserva.</span>
+            <div className="min-w-0">
+              <span className="font-bold text-content-base block admin-safe-wrap">Mensagem de Boas-Vindas & Confirmação Instantânea</span>
+              <span className="text-content-muted text-xs admin-safe-wrap block">Dispara o comprovante e link do agendamento imediatamente após a reserva.</span>
             </div>
             <input
               type="checkbox"
