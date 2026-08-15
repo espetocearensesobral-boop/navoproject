@@ -1,5 +1,6 @@
 import express from 'express';
 import crypto from 'crypto';
+import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { db, processAppointmentCompletion } from '../index.js';
 import * as schema from '../../src/db/schema.js';
@@ -7,6 +8,7 @@ import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
 import { queuePayloadSchema } from '../utils/validation.js';
 import { sendAdminPush } from '../services/admin-push.service.js';
+import { getOperationSettings } from '../services/operation-settings.service.js';
 
 export const queueRouter = express.Router();
 
@@ -14,6 +16,7 @@ queueRouter.get('/', requireAuth, async (req: any, res) => {
   try {
     let dbQueue = await db.query.waitingQueue.findMany();
     if (req.user.role !== 'admin') dbQueue = dbQueue.filter((q: any) => q.clientId === req.user.id);
+    dbQueue.sort((a: any, b: any) => Number(a.queuePosition || 0) - Number(b.queuePosition || 0) || new Date(a.joinedAt || 0).getTime() - new Date(b.joinedAt || 0).getTime());
     res.json(dbQueue);
   } catch (e: any) {
     return handleError(res, e, req.path);
@@ -24,9 +27,22 @@ queueRouter.post('/', requireAuth, requireAdmin, async (req: any, res) => {
   try {
     const parsed = queuePayloadSchema.omit({ id: true }).safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Dados da fila inválidos.', details: parsed.error.flatten() });
+    const operationSettings = await getOperationSettings(db);
+    const isWalkIn = !parsed.data.appointmentId;
+    if (isWalkIn && !operationSettings.allowWalkIn) {
+      return res.status(409).json({ error: 'Encaixes para clientes avulsos estão desativados nas configurações de Operação.' });
+    }
+    if (isWalkIn && operationSettings.requireProfessionalForWalkIn && !parsed.data.professionalId) {
+      return res.status(400).json({ error: 'Selecione um profissional para adicionar um cliente avulso à fila.' });
+    }
     const id = typeof req.body?.id === 'string' && req.body.id.trim() ? req.body.id.trim() : `q_${crypto.randomUUID()}`;
+    const queuePayload = {
+      ...parsed.data,
+      estimatedWaitMinutes: req.body?.estimatedWaitMinutes === undefined ? operationSettings.queueBaseWaitMinutes : parsed.data.estimatedWaitMinutes,
+      arrivedAt: parsed.data.arrivedAt || new Date().toISOString(),
+    };
     const [created] = await db.insert(schema.waitingQueue)
-      .values({ id, joinedAt: new Date(), ...parsed.data, updatedAt: new Date() })
+      .values({ id, joinedAt: new Date(), ...queuePayload, updatedAt: new Date() })
       .onConflictDoNothing()
       .returning();
     if (!created) return res.status(409).json({ error: 'Já existe um item com este identificador.' });
@@ -42,6 +58,30 @@ queueRouter.post('/', requireAuth, requireAdmin, async (req: any, res) => {
   }
 });
 
+queueRouter.post('/reorder', requireAuth, requireAdmin, async (req: any, res) => {
+  try {
+    const parsed = z.object({ orderedIds: z.array(z.string().trim().min(1).max(160)).min(1).max(100) }).safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: 'Ordem da fila inválida.' });
+    const orderedIds = [...new Set(parsed.data.orderedIds)];
+    if (typeof db.transaction !== 'function') return res.status(503).json({ error: 'O banco não oferece transação para reordenar a fila com segurança.' });
+
+    await db.transaction(async (tx: any) => {
+      const rows = await tx.query.waitingQueue.findMany();
+      const waitingIds = new Set(rows.filter((row: any) => row.status === 'waiting').map((row: any) => row.id));
+      if (orderedIds.some((id) => !waitingIds.has(id))) throw new Error('QUEUE_ORDER_INVALID');
+      for (let index = 0; index < orderedIds.length; index += 1) {
+        await tx.update(schema.waitingQueue)
+          .set({ queuePosition: index, updatedAt: new Date() })
+          .where(eq(schema.waitingQueue.id, orderedIds[index]));
+      }
+    });
+    return res.json({ success: true });
+  } catch (error: any) {
+    if (error?.message === 'QUEUE_ORDER_INVALID') return res.status(400).json({ error: 'A ordem contém registros que não estão aguardando na fila.' });
+    return handleError(res, error, req.path);
+  }
+});
+
 queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
   try {
     const parsed = queuePayloadSchema.omit({ id: true }).partial().safeParse(req.body);
@@ -53,6 +93,17 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
     if (!currentQueueItem) return res.status(404).json({ error: 'Item da fila não encontrado.' });
 
     const nextStatus = parsed.data.status;
+    const currentStatus = currentQueueItem.status;
+    const transitionMap: Record<string, string[]> = {
+      waiting: ['waiting', 'in_chair', 'abandoned', 'cancelled'],
+      in_chair: ['in_chair', 'waiting', 'completed', 'cancelled'],
+      abandoned: ['abandoned', 'waiting', 'cancelled'],
+      completed: ['completed'],
+      cancelled: ['cancelled'],
+    };
+    if (nextStatus && !((transitionMap[currentStatus] || []).includes(nextStatus))) {
+      return res.status(409).json({ error: `Transição inválida: ${currentStatus} → ${nextStatus}.` });
+    }
     const appointmentStatus = nextStatus === 'completed'
       ? 'completed'
       : nextStatus === 'in_chair'
@@ -61,9 +112,15 @@ queueRouter.put('/:id', requireAuth, requireAdmin, async (req: any, res) => {
       ? 'in_queue'
       : nextStatus === 'abandoned'
       ? 'confirmed'
+      : nextStatus === 'cancelled'
+      ? 'cancelled'
       : undefined;
 
-    const queueUpdate = { ...parsed.data, updatedAt: new Date() };
+    const { startedAt: _startedAt, completedAt: _completedAt, ...safeParsedData } = parsed.data;
+    const timestamp = new Date();
+    const queueUpdate: any = { ...safeParsedData, updatedAt: timestamp };
+    if (nextStatus === 'in_chair' && !currentQueueItem.startedAt) queueUpdate.startedAt = timestamp.toISOString();
+    if (nextStatus === 'completed' && !currentQueueItem.completedAt) queueUpdate.completedAt = timestamp.toISOString();
     let updatedQueue: any;
     let updatedAppointment: any = null;
     let completionStage = 'before_transaction';

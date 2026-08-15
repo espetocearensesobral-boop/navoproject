@@ -8,6 +8,11 @@ export interface OperationSettings {
   sameDayBookingCutoffMinutes: number;
   bufferBetweenAppointmentsMinutes: number;
   availabilityCacheTtlSeconds: number;
+  queueRefreshSeconds: number;
+  queueBaseWaitMinutes: number;
+  allowWalkIn: boolean;
+  requireProfessionalForWalkIn: boolean;
+  queueVisibleLimit: number;
   updatedAt?: string | null;
 }
 
@@ -18,6 +23,11 @@ export const defaultOperationSettings: OperationSettings = {
   sameDayBookingCutoffMinutes: 0,
   bufferBetweenAppointmentsMinutes: 0,
   availabilityCacheTtlSeconds: 20,
+  queueRefreshSeconds: 15,
+  queueBaseWaitMinutes: 15,
+  allowWalkIn: true,
+  requireProfessionalForWalkIn: false,
+  queueVisibleLimit: 5,
 };
 
 const normalize = (value: any): OperationSettings => {
@@ -32,6 +42,11 @@ const normalize = (value: any): OperationSettings => {
     sameDayBookingCutoffMinutes: Math.max(0, Math.min(1440, Number(value?.sameDayBookingCutoffMinutes ?? defaultOperationSettings.sameDayBookingCutoffMinutes))),
     bufferBetweenAppointmentsMinutes: Math.max(0, Math.min(120, Number(value?.bufferBetweenAppointmentsMinutes ?? defaultOperationSettings.bufferBetweenAppointmentsMinutes))),
     availabilityCacheTtlSeconds: Math.max(5, Math.min(300, Number(value?.availabilityCacheTtlSeconds ?? defaultOperationSettings.availabilityCacheTtlSeconds))),
+    queueRefreshSeconds: Math.max(5, Math.min(300, Number(value?.queueRefreshSeconds ?? defaultOperationSettings.queueRefreshSeconds))),
+    queueBaseWaitMinutes: Math.max(1, Math.min(240, Number(value?.queueBaseWaitMinutes ?? defaultOperationSettings.queueBaseWaitMinutes))),
+    allowWalkIn: typeof value?.allowWalkIn === 'boolean' ? value.allowWalkIn : defaultOperationSettings.allowWalkIn,
+    requireProfessionalForWalkIn: typeof value?.requireProfessionalForWalkIn === 'boolean' ? value.requireProfessionalForWalkIn : defaultOperationSettings.requireProfessionalForWalkIn,
+    queueVisibleLimit: Math.max(1, Math.min(20, Number(value?.queueVisibleLimit ?? defaultOperationSettings.queueVisibleLimit))),
   };
 };
 

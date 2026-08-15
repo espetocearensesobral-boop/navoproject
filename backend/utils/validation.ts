@@ -106,6 +106,7 @@ export const queuePayloadSchema = z.object({
   arrivedAt: z.string().trim().max(40).nullable().optional(),
   status: z.enum(['waiting', 'in_chair', 'completed', 'abandoned', 'cancelled']).default('waiting'),
   estimatedWaitMinutes: z.coerce.number().int().min(0).max(1440).default(0),
+  queuePosition: z.coerce.number().int().min(0).max(100000).optional(),
   notes: z.string().trim().max(2000).nullable().optional(),
   startedAt: z.string().trim().max(40).nullable().optional(),
   completedAt: z.string().trim().max(40).nullable().optional(),

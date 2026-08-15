@@ -8,6 +8,11 @@ export interface OperationSettingsValue {
   sameDayBookingCutoffMinutes: number;
   bufferBetweenAppointmentsMinutes: number;
   availabilityCacheTtlSeconds: number;
+  queueRefreshSeconds: number;
+  queueBaseWaitMinutes: number;
+  allowWalkIn: boolean;
+  requireProfessionalForWalkIn: boolean;
+  queueVisibleLimit: number;
   updatedAt?: Date | string | null;
 }
 
@@ -18,6 +23,11 @@ export const DEFAULT_OPERATION_SETTINGS: OperationSettingsValue = {
   sameDayBookingCutoffMinutes: 0,
   bufferBetweenAppointmentsMinutes: 0,
   availabilityCacheTtlSeconds: 20,
+  queueRefreshSeconds: 15,
+  queueBaseWaitMinutes: 15,
+  allowWalkIn: true,
+  requireProfessionalForWalkIn: false,
+  queueVisibleLimit: 5,
 };
 
 const clampInteger = (value: unknown, min: number, max: number, fallback: number) => {
@@ -39,6 +49,11 @@ export function normalizeOperationSettings(value: Partial<OperationSettingsValue
     sameDayBookingCutoffMinutes: clampInteger(value?.sameDayBookingCutoffMinutes, 0, 1440, DEFAULT_OPERATION_SETTINGS.sameDayBookingCutoffMinutes),
     bufferBetweenAppointmentsMinutes: clampInteger(value?.bufferBetweenAppointmentsMinutes, 0, 120, DEFAULT_OPERATION_SETTINGS.bufferBetweenAppointmentsMinutes),
     availabilityCacheTtlSeconds: clampInteger(value?.availabilityCacheTtlSeconds, 5, 300, DEFAULT_OPERATION_SETTINGS.availabilityCacheTtlSeconds),
+    queueRefreshSeconds: clampInteger(value?.queueRefreshSeconds, 5, 300, DEFAULT_OPERATION_SETTINGS.queueRefreshSeconds),
+    queueBaseWaitMinutes: clampInteger(value?.queueBaseWaitMinutes, 1, 240, DEFAULT_OPERATION_SETTINGS.queueBaseWaitMinutes),
+    allowWalkIn: typeof value?.allowWalkIn === 'boolean' ? value.allowWalkIn : DEFAULT_OPERATION_SETTINGS.allowWalkIn,
+    requireProfessionalForWalkIn: typeof value?.requireProfessionalForWalkIn === 'boolean' ? value.requireProfessionalForWalkIn : DEFAULT_OPERATION_SETTINGS.requireProfessionalForWalkIn,
+    queueVisibleLimit: clampInteger(value?.queueVisibleLimit, 1, 20, DEFAULT_OPERATION_SETTINGS.queueVisibleLimit),
     updatedAt: value?.updatedAt || null,
   };
 }
@@ -52,6 +67,11 @@ export function mapOperationSettings(row: any): OperationSettingsValue {
     sameDayBookingCutoffMinutes: row?.sameDayBookingCutoffMinutes ?? row?.same_day_booking_cutoff_minutes,
     bufferBetweenAppointmentsMinutes: row?.bufferBetweenAppointmentsMinutes ?? row?.buffer_between_appointments_minutes,
     availabilityCacheTtlSeconds: row?.availabilityCacheTtlSeconds ?? row?.availability_cache_ttl_seconds,
+    queueRefreshSeconds: row?.queueRefreshSeconds ?? row?.queue_refresh_seconds,
+    queueBaseWaitMinutes: row?.queueBaseWaitMinutes ?? row?.queue_base_wait_minutes,
+    allowWalkIn: row?.allowWalkIn ?? row?.allow_walk_in,
+    requireProfessionalForWalkIn: row?.requireProfessionalForWalkIn ?? row?.require_professional_for_walk_in,
+    queueVisibleLimit: row?.queueVisibleLimit ?? row?.queue_visible_limit,
     updatedAt: row?.updatedAt ?? row?.updated_at,
   });
 }

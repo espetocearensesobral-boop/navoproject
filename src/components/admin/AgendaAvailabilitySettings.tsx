@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, CalendarDays, CheckCircle2, Clock3, Database, Save, Timer } from 'lucide-react';
+import { AlertCircle, CalendarDays, CheckCircle2, Clock3, Database, ListOrdered, RefreshCw, Save, Timer, UserRoundCheck } from 'lucide-react';
 import {
   defaultOperationSettings,
   fetchOperationSettings,
@@ -128,6 +128,47 @@ export const AgendaAvailabilitySettings: React.FC = () => {
               <input type="number" min={0} max={120} step={5} value={settings.bufferBetweenAppointmentsMinutes} onChange={(e) => update('bufferBetweenAppointmentsMinutes', Math.max(0, Number(e.target.value) || 0))} className={`${fieldClass} pl-10`} />
             </div>
             <p className="mt-1.5 text-xs text-content-muted">Reserva esta margem antes e depois de cada atendimento para organização, limpeza e preparação.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border-subtle">
+          <ListOrdered className="w-4 h-4 text-gold-base" />
+          <h3 className="text-sm font-bold text-content-base">Operação da Fila</h3>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>Atualização automática</label>
+            <div className="relative">
+              <RefreshCw className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
+              <input type="number" min={5} max={300} step={5} value={settings.queueRefreshSeconds} onChange={(e) => update('queueRefreshSeconds', Math.max(5, Number(e.target.value) || 5))} className={`${fieldClass} pl-10`} />
+            </div>
+            <p className="mt-1.5 text-xs text-content-muted">Define a frequência de atualização enquanto a tela da Fila estiver aberta.</p>
+          </div>
+
+          <div>
+            <label className={labelClass}>Tempo-base de espera</label>
+            <input type="number" min={1} max={240} step={5} value={settings.queueBaseWaitMinutes} onChange={(e) => update('queueBaseWaitMinutes', Math.max(1, Number(e.target.value) || 1))} className={fieldClass} />
+            <p className="mt-1.5 text-xs text-content-muted">Estimativa inicial usada para novos clientes que entram na recepção.</p>
+          </div>
+
+          <div>
+            <label className={labelClass}>Limite visual de registros</label>
+            <input type="number" min={1} max={20} step={1} value={settings.queueVisibleLimit} onChange={(e) => update('queueVisibleLimit', Math.max(1, Number(e.target.value) || 1))} className={fieldClass} />
+            <p className="mt-1.5 text-xs text-content-muted">Mantém a operação compacta; registros excedentes permanecem acessíveis pela rolagem.</p>
+          </div>
+
+          <div className="sm:col-span-2 space-y-3">
+            <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
+              <span className="flex items-start gap-2.5"><UserRoundCheck className="w-4 h-4 text-gold-base mt-0.5 shrink-0" /><span><strong className="block text-sm text-content-base">Permitir cliente avulso</strong><span className="block mt-0.5 text-xs text-content-muted">Habilita o botão Novo encaixe para clientes sem agendamento.</span></span></span>
+              <input type="checkbox" checked={settings.allowWalkIn} onChange={(e) => update('allowWalkIn', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
+            </label>
+            <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
+              <span><strong className="block text-sm text-content-base">Exigir profissional no encaixe</strong><span className="block mt-0.5 text-xs text-content-muted">Impede salvar um cliente avulso sem barbeiro definido.</span></span>
+              <input type="checkbox" checked={settings.requireProfessionalForWalkIn} onChange={(e) => update('requireProfessionalForWalkIn', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
+            </label>
           </div>
         </div>
       </section>

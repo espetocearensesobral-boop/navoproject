@@ -273,6 +273,7 @@ export async function getQueueFromSupabase(): Promise<WaitingQueueItem[]> {
       professional_name: q.professionalName || '',
       scheduled_time: q.scheduledTime || '',
       estimated_wait_minutes: q.estimatedWaitMinutes || 0,
+      queue_position: Number(q.queuePosition ?? q.queue_position ?? 0),
       status: q.status || 'waiting',
       arrived_at: q.arrivedAt || '',
       notes: q.notes || '',
@@ -281,7 +282,7 @@ export async function getQueueFromSupabase(): Promise<WaitingQueueItem[]> {
     }));
   } catch (err) {
     console.error('Erro ao obter fila do Supabase:', err);
-    return [];
+    throw err instanceof Error ? err : new Error('Não foi possível atualizar a fila.');
   }
 }
 
@@ -314,23 +315,30 @@ export async function addToQueueInSupabase(newItem: Partial<WaitingQueueItem>): 
   return getQueueFromSupabase();
 }
 
-export async function updateQueueStatusInSupabase(id: string, status: 'waiting' | 'in_chair' | 'completed' | 'abandoned'): Promise<WaitingQueueItem[]> {
-  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+export async function updateQueueStatusInSupabase(id: string, status: 'waiting' | 'in_chair' | 'completed' | 'abandoned' | 'cancelled'): Promise<WaitingQueueItem[]> {
   const res = await authFetch(`${API_BASE}/queue/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      status,
-      ...(status === 'in_chair' ? { startedAt: now } : {}),
-      ...(status === 'completed' ? { completedAt: now } : {})
-    })
+    body: JSON.stringify({ status })
   });
   if (!res.ok) {
     const errorBody = await res.json().catch(() => null);
     throw new Error(errorBody?.error || 'Falha ao atualizar status da fila no Supabase');
   }
 
+  return getQueueFromSupabase();
+}
+
+export async function reorderQueueInSupabase(orderedIds: string[]): Promise<WaitingQueueItem[]> {
+  const response = await authFetch(`${API_BASE}/queue/reorder`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderedIds }),
+  });
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => null);
+    throw new Error(errorBody?.error || 'Falha ao persistir a ordem da fila.');
+  }
   return getQueueFromSupabase();
 }
 

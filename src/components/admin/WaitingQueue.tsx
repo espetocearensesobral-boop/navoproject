@@ -9,11 +9,13 @@ import {
   addToQueueInSupabase,
   removeFromQueueInSupabase,
   deleteQueueItemInSupabase,
+  reorderQueueInSupabase,
   cancelAppointmentInSupabase,
   fetchProfessionalsFromSupabase,
   fetchServicesFromSupabase,
   subscribeToAppointmentsRealtime
 } from '../../services/supabaseDataService';
+import { defaultOperationSettings, fetchOperationSettings, type OperationSettings } from '../../services/operationSettingsService';
 import {
   Clock,
   UserCheck,
@@ -44,6 +46,7 @@ export const WaitingQueue: React.FC = () => {
   const [queue, setQueue] = useState<WaitingQueueItem[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [services, setServices] = useState<ServiceItem[]>([]);
+  const [operationSettings, setOperationSettings] = useState<OperationSettings>(defaultOperationSettings);
   const [loading, setLoading] = useState(true);
 
   // Filters & Tabs
@@ -87,6 +90,13 @@ export const WaitingQueue: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const refreshInterval = window.setInterval(() => {
+      loadQueueOnly();
+    }, operationSettings.queueRefreshSeconds * 1000);
+    return () => window.clearInterval(refreshInterval);
+  }, [operationSettings.queueRefreshSeconds]);
+
+  useEffect(() => {
     if (!isAddModalOpen) return;
     const frame = window.requestAnimationFrame(() => clientNameInputRef.current?.focus());
     return () => window.cancelAnimationFrame(frame);
@@ -95,14 +105,16 @@ export const WaitingQueue: React.FC = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [qData, profs, svcs] = await Promise.all([
+      const [qData, profs, svcs, settings] = await Promise.all([
         getQueueFromSupabase(),
         fetchProfessionalsFromSupabase(),
-        fetchServicesFromSupabase()
+        fetchServicesFromSupabase(),
+        fetchOperationSettings(),
       ]);
 
       setQueue(qData);
       setProfessionals(profs.filter((p) => p.id !== 'prof_any'));
+      setOperationSettings(settings);
       setServices(svcs);
 
       if (profs.length > 0) {
@@ -243,20 +255,26 @@ export const WaitingQueue: React.FC = () => {
     }
   };
 
-  const handleMoveQueueItem = (index: number, direction: 'up' | 'down') => {
-    const waitingItems = queue.filter((q) => q.status === 'waiting');
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+  const handleMoveQueueItem = async (item: WaitingQueueItem, direction: 'up' | 'down') => {
+    const waitingItems = queue
+      .filter((q) => q.status === 'waiting')
+      .sort((a, b) => (a.queue_position || 0) - (b.queue_position || 0));
+    const currentIndex = waitingItems.findIndex((queueItem) => queueItem.id === item.id);
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= waitingItems.length) return;
 
-    if (targetIndex < 0 || targetIndex >= waitingItems.length) return;
-
-    const newWaiting = [...waitingItems];
-    const temp = newWaiting[index];
-    newWaiting[index] = newWaiting[targetIndex];
-    newWaiting[targetIndex] = temp;
-
-    const nonWaiting = queue.filter((q) => q.status !== 'waiting');
-    setQueue([...nonWaiting, ...newWaiting]);
-    showNotification('Ordem da fila de espera atualizada!');
+    const reordered = [...waitingItems];
+    [reordered[currentIndex], reordered[targetIndex]] = [reordered[targetIndex], reordered[currentIndex]];
+    setActionLoadingId(item.id);
+    try {
+      const updated = await reorderQueueInSupabase(reordered.map((queueItem) => queueItem.id));
+      setQueue(updated);
+      showNotification('Ordem da fila de espera atualizada!');
+    } catch (error) {
+      showNotification(getActionErrorMessage(error, 'Não foi possível atualizar a ordem da fila.'), 'error');
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
   const handleSelectWalkInService = (service: ServiceItem) => {
@@ -268,6 +286,14 @@ export const WaitingQueue: React.FC = () => {
 
   const handleAddWalkInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!operationSettings.allowWalkIn) {
+      showNotification('Encaixes para clientes avulsos estão desativados nas configurações de Operação.', 'error');
+      return;
+    }
+    if (operationSettings.requireProfessionalForWalkIn && !newProfessionalId) {
+      showNotification('Selecione um profissional para adicionar o cliente avulso.', 'error');
+      return;
+    }
     if (!newClientName.trim()) {
       alert('Por favor, informe o nome do cliente.');
       return;
@@ -281,7 +307,7 @@ export const WaitingQueue: React.FC = () => {
       professional_id: newProfessionalId,
       professional_name: newProfessionalName,
       scheduled_time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      estimated_wait_minutes: 15,
+      estimated_wait_minutes: operationSettings.queueBaseWaitMinutes,
       status: 'waiting',
       arrived_at: 'Chegou agora',
       notes: newNotes
@@ -367,17 +393,17 @@ export const WaitingQueue: React.FC = () => {
       <AdminPageHeader
         icon={Users}
         title="Fila de Espera"
-        action={{ label: 'Adicionar Encaixe', onClick: () => { setIsServicePickerOpen(false); setIsAddModalOpen(true); }, icon: Plus }}
+        action={operationSettings.allowWalkIn ? { label: 'Adicionar Encaixe', onClick: () => { setIsServicePickerOpen(false); setIsAddModalOpen(true); }, icon: Plus } : undefined}
       />
 
       {/* Ação (mobile) */}
-      <button
+      {operationSettings.allowWalkIn && <button
         onClick={() => { setIsServicePickerOpen(false); setIsAddModalOpen(true); }}
         className="md:hidden w-full min-h-11 bg-gold-base text-surface-base px-4 py-2.5 rounded-xl text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 shrink-0"
       >
         <Plus className="w-4 h-4" />
         <span>Novo encaixe</span>
-      </button>
+      </button>}
 
       {/* TOAST MESSAGE */}
       {lastNotification && (
@@ -516,7 +542,7 @@ export const WaitingQueue: React.FC = () => {
                 <p className="text-[10px] text-content-muted">Chame o próximo cliente na recepção quando uma cadeira estiver livre.</p>
               </div>
             ) : (
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1 space-y-3">
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1 space-y-3" style={{ maxHeight: `${Math.max(220, operationSettings.queueVisibleLimit * 100)}px` }}>
               {inChairList.map((item) => (
                 <div
                   key={item.id}
@@ -586,7 +612,7 @@ export const WaitingQueue: React.FC = () => {
                 </span>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[10px] text-content-muted font-medium hidden sm:inline">Est. ~{waitingList.length * 15} min</span>
+                <span className="text-[10px] text-content-muted font-medium hidden sm:inline">Est. ~{waitingList.reduce((total, item) => total + (item.estimated_wait_minutes || operationSettings.queueBaseWaitMinutes), 0)} min</span>
                 <span className="text-[10px] bg-gold-base/15 text-gold-hover px-2.5 py-1 rounded-full font-black border border-gold-base/20 whitespace-nowrap">{waitingList.length} aguardando</span>
               </div>
             </div>
@@ -602,16 +628,16 @@ export const WaitingQueue: React.FC = () => {
                 <p className="text-[10px] text-content-muted max-w-xs mx-auto">
                   A recepção está limpa. Adicione um cliente avulso se houver um walk-in.
                 </p>
-                <button
-                  onClick={() => setIsAddModalOpen(true)}
-                  className="bg-gold-base text-surface-base px-3 py-1.5 rounded-xl text-xs font-extrabold inline-flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Adicionar Cliente</span>
-                </button>
+                    {operationSettings.allowWalkIn && <button
+                      onClick={() => setIsAddModalOpen(true)}
+                      className="bg-gold-base text-surface-base px-3 py-1.5 rounded-xl text-xs font-extrabold inline-flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Adicionar Cliente</span>
+                    </button>}
               </div>
             ) : (
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1">
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1" style={{ maxHeight: `${Math.max(220, operationSettings.queueVisibleLimit * 86)}px` }}>
                 <div className="space-y-2">
                 {waitingList.map((item, index) => {
                   const isExpanded = expandedQueueItemId === item.id;
@@ -669,7 +695,7 @@ export const WaitingQueue: React.FC = () => {
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px]">
                             <div className="rounded-lg bg-surface-base p-2.5">
                               <span className="block text-content-muted uppercase font-bold tracking-wide">Tempo estimado</span>
-                              <strong className="block mt-0.5 text-gold-hover text-xs">~{index * 15 + 5} min</strong>
+                              <strong className="block mt-0.5 text-gold-hover text-xs">~{item.estimated_wait_minutes || (index * operationSettings.queueBaseWaitMinutes + operationSettings.queueBaseWaitMinutes)} min</strong>
                             </div>
                             <div className="rounded-lg bg-surface-base p-2.5">
                               <span className="block text-content-muted uppercase font-bold tracking-wide">Barbeiro</span>
@@ -686,8 +712,9 @@ export const WaitingQueue: React.FC = () => {
                               <button
                                 type="button"
                                 disabled={index === 0}
-                                onClick={() => handleMoveQueueItem(index, 'up')}
+                                onClick={() => handleMoveQueueItem(item, 'up')}
                                 className="w-9 h-9 rounded-lg border border-border-subtle bg-surface-base text-content-muted hover:text-gold-hover disabled:opacity-25"
+                                aria-busy={actionLoadingId === item.id}
                                 title="Subir na fila"
                                 aria-label="Subir na fila"
                               >
@@ -696,8 +723,9 @@ export const WaitingQueue: React.FC = () => {
                               <button
                                 type="button"
                                 disabled={index === waitingList.length - 1}
-                                onClick={() => handleMoveQueueItem(index, 'down')}
+                                onClick={() => handleMoveQueueItem(item, 'down')}
                                 className="w-9 h-9 rounded-lg border border-border-subtle bg-surface-base text-content-muted hover:text-gold-hover disabled:opacity-25"
+                                aria-busy={actionLoadingId === item.id}
                                 title="Descer na fila"
                                 aria-label="Descer na fila"
                               >

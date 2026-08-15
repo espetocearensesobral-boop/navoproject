@@ -18,6 +18,7 @@ import { invalidateAvailabilityCache } from './availability.router.js';
 import { processAppointmentCompletion, notifyClientByEmail, notifyShopByEmail } from '../index.js';
 import { sendWhatsAppMessage } from '../whatsapp.js';
 import { sendAdminPush } from '../services/admin-push.service.js';
+import { getOperationSettings } from '../services/operation-settings.service.js';
 
 export const appointmentsRouter = express.Router();
 
@@ -665,6 +666,7 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
           // (usa getTodayStringBRT — não new Date().toISOString(), que retorna a data em UTC
           // e diverge do dia real em BRT entre 21h e 23h59, horário de Brasília)
           const todayStr = getTodayStringBRT();
+          const operationSettings = await getOperationSettings(tx);
           if (newApt.date === todayStr && newApt.status !== 'cancelled') {
             const serviceTitle = Array.isArray(newApt.services) && newApt.services.length > 0
               ? (typeof newApt.services[0] === 'string' ? newApt.services[0] : (newApt.services[0].title || 'Atendimento BarberX'))
@@ -685,7 +687,7 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
               notes: null,
               status: newApt.status === 'in_service' ? 'in_chair' : 'waiting',
               joinedAt: new Date(),
-              estimatedWaitMinutes: 15,
+              estimatedWaitMinutes: operationSettings.queueBaseWaitMinutes,
               updatedAt: new Date()
             };
             await tx.insert(schema.waitingQueue).values(queueItem).onConflictDoNothing();
@@ -1121,18 +1123,77 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
           if (!saved) throw new Error('APPOINTMENT_NOT_FOUND');
           updatedApt = saved;
 
-          const queueUpdate: any = {
-            scheduledTime: saved.timeSlot,
-            professionalId: saved.professionalId,
-            professionalName: saved.professionalName,
-            servicePrice: saved.finalAmount,
-            updatedAt: new Date(),
-          };
-          if (saved.status === 'cancelled') queueUpdate.status = 'abandoned';
-          if (saved.status === 'in_service') queueUpdate.status = 'in_chair';
-          await tx.update(schema.waitingQueue)
-            .set(queueUpdate)
-            .where(eq(schema.waitingQueue.appointmentId, id));
+          const todayStr = getTodayStringBRT();
+          const linkedQueue = await tx.query.waitingQueue.findFirst({
+            where: eq(schema.waitingQueue.appointmentId, id),
+          });
+          const isOperationalToday = saved.date === todayStr && !['cancelled', 'completed', 'no_show'].includes(saved.status);
+          const serviceTitle = Array.isArray(saved.services) && saved.services.length > 0
+            ? (typeof saved.services[0] === 'string' ? saved.services[0] : (saved.services[0].title || 'Atendimento Navo'))
+            : 'Atendimento Navo';
+          const queueStatus = saved.status === 'in_service'
+            ? 'in_chair'
+            : saved.status === 'cancelled'
+              ? 'cancelled'
+              : saved.status === 'completed'
+                ? 'completed'
+                : 'waiting';
+
+          if (isOperationalToday) {
+            const operationSettings = await getOperationSettings(tx);
+            const queueUpdate: any = {
+              clientId: saved.clientId,
+              clientName: saved.clientName,
+              clientPhone: saved.clientPhone,
+              professionalId: saved.professionalId,
+              professionalName: saved.professionalName,
+              serviceTitle,
+              servicePrice: saved.finalAmount,
+              scheduledTime: saved.timeSlot,
+              status: queueStatus,
+              estimatedWaitMinutes: linkedQueue?.estimatedWaitMinutes || operationSettings.queueBaseWaitMinutes,
+              updatedAt: new Date(),
+            };
+            if (queueStatus === 'in_chair' && !linkedQueue?.startedAt) queueUpdate.startedAt = new Date().toISOString();
+            if (queueStatus === 'completed') queueUpdate.completedAt = linkedQueue?.completedAt || new Date().toISOString();
+
+            if (linkedQueue) {
+              await tx.update(schema.waitingQueue)
+                .set(queueUpdate)
+                .where(eq(schema.waitingQueue.id, linkedQueue.id));
+            } else {
+              await tx.insert(schema.waitingQueue).values({
+                id: `q_${saved.id}`,
+                appointmentId: saved.id,
+                clientId: saved.clientId,
+                clientName: saved.clientName,
+                clientPhone: saved.clientPhone,
+                professionalId: saved.professionalId,
+                professionalName: saved.professionalName,
+                serviceTitle,
+                servicePrice: saved.finalAmount,
+                scheduledTime: saved.timeSlot,
+                arrivedAt: null,
+                notes: null,
+                status: queueStatus,
+                joinedAt: new Date(),
+                estimatedWaitMinutes: operationSettings.queueBaseWaitMinutes,
+                updatedAt: new Date(),
+              }).onConflictDoNothing();
+            }
+          } else if (linkedQueue) {
+            if (saved.status === 'cancelled') {
+              await tx.update(schema.waitingQueue)
+                .set({ status: 'cancelled', updatedAt: new Date() })
+                .where(eq(schema.waitingQueue.id, linkedQueue.id));
+            } else if (saved.status === 'completed') {
+              await tx.update(schema.waitingQueue)
+                .set({ status: 'completed', completedAt: linkedQueue.completedAt || new Date().toISOString(), updatedAt: new Date() })
+                .where(eq(schema.waitingQueue.id, linkedQueue.id));
+            } else {
+              await tx.delete(schema.waitingQueue).where(eq(schema.waitingQueue.id, linkedQueue.id));
+            }
+          }
         });
 
         if (data.status === 'completed' && dbApt.status !== 'completed') {

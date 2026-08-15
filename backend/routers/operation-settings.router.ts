@@ -21,6 +21,11 @@ const operationSettingsSchema = z.object({
   sameDayBookingCutoffMinutes: z.number().int().min(0).max(1440),
   bufferBetweenAppointmentsMinutes: z.number().int().min(0).max(120),
   availabilityCacheTtlSeconds: z.number().int().min(5).max(300),
+  queueRefreshSeconds: z.number().int().min(5).max(300),
+  queueBaseWaitMinutes: z.number().int().min(1).max(240),
+  allowWalkIn: z.boolean(),
+  requireProfessionalForWalkIn: z.boolean(),
+  queueVisibleLimit: z.number().int().min(1).max(20),
 });
 
 operationSettingsRouter.get('/', async (_req, res) => {

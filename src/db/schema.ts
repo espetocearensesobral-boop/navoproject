@@ -120,6 +120,7 @@ export const waitingQueue = pgTable('waiting_queue', {
   status: text('status').notNull().default('waiting'),
   joinedAt: timestamp('joined_at').defaultNow().notNull(),
   estimatedWaitMinutes: integer('estimated_wait_minutes').notNull().default(0),
+  queuePosition: integer('queue_position').notNull().default(0),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
@@ -419,6 +420,11 @@ export const operationSettings = pgTable('operation_settings', {
   sameDayBookingCutoffMinutes: integer('same_day_booking_cutoff_minutes').notNull().default(0),
   bufferBetweenAppointmentsMinutes: integer('buffer_between_appointments_minutes').notNull().default(0),
   availabilityCacheTtlSeconds: integer('availability_cache_ttl_seconds').notNull().default(20),
+  queueRefreshSeconds: integer('queue_refresh_seconds').notNull().default(15),
+  queueBaseWaitMinutes: integer('queue_base_wait_minutes').notNull().default(15),
+  allowWalkIn: boolean('allow_walk_in').notNull().default(true),
+  requireProfessionalForWalkIn: boolean('require_professional_for_walk_in').notNull().default(false),
+  queueVisibleLimit: integer('queue_visible_limit').notNull().default(5),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
