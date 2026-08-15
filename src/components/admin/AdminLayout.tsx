@@ -48,6 +48,7 @@ import {
   LayoutGrid,
   FileText,
   Package,
+  Gift,
   Wallet,
   DollarSign,
   ArrowDownRight,
@@ -70,7 +71,11 @@ export type AdminTab =
   | 'whatsapp'
   | 'qrcode'
   | 'queue' 
-  | 'rewards'
+  | 'relacionamento_dashboard'
+  | 'relacionamento_loyalty'
+  | 'relacionamento_rewards'
+  | 'relacionamento_referrals'
+  | 'relacionamento_reviews'
   | 'followup'
   | 'aniversariantes'
   | 'servicos'
@@ -85,14 +90,18 @@ export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionam
 const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
 const ADMIN_TAB_VALUES: AdminTab[] = [
   'dashboard', 'relatorios', 'agenda', 'financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas', 'financeiro_relatorios', 'audit', 'whatsapp', 'qrcode', 'queue',
-  'rewards', 'followup', 'aniversariantes', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings'
+  'relacionamento_dashboard', 'relacionamento_loyalty', 'relacionamento_rewards', 'relacionamento_referrals', 'relacionamento_reviews', 'followup', 'aniversariantes', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings'
 ];
 
 const getStoredAdminTab = (): AdminTab => {
   if (typeof window === 'undefined') return 'dashboard';
   try {
     const storedTab = window.sessionStorage.getItem(ADMIN_ACTIVE_TAB_KEY);
-    const normalizedTab = storedTab === 'financeiro' ? 'financeiro_recebimentos' : storedTab;
+    const normalizedTab = storedTab === 'financeiro'
+      ? 'financeiro_recebimentos'
+      : storedTab === 'rewards'
+        ? 'relacionamento_dashboard'
+        : storedTab;
     return normalizedTab && ADMIN_TAB_VALUES.includes(normalizedTab as AdminTab)
       ? normalizedTab as AdminTab
       : 'dashboard';
@@ -114,7 +123,11 @@ const ADMIN_TAB_SECTIONS: Partial<Record<AdminTab, AdminSection>> = {
   produtos: 'cadastros',
   profissionais: 'cadastros',
   clientes: 'cadastros',
-  rewards: 'relacionamento',
+  relacionamento_dashboard: 'relacionamento',
+  relacionamento_loyalty: 'relacionamento',
+  relacionamento_rewards: 'relacionamento',
+  relacionamento_referrals: 'relacionamento',
+  relacionamento_reviews: 'relacionamento',
   followup: 'relacionamento',
   aniversariantes: 'relacionamento',
   barbearia: 'sistema',
@@ -349,11 +362,39 @@ export const AdminLayout: React.FC = () => {
       description: 'Base de clientes',
       section: 'cadastros' as AdminSection,
     },
-    { 
-      id: 'rewards' as AdminTab, 
-      label: 'Rewards & NPS', 
+    {
+      id: 'relacionamento_dashboard' as AdminTab,
+      label: 'Dashboard Geral',
+      icon: LayoutGrid,
+      description: 'Visão geral do relacionamento',
+      section: 'relacionamento' as AdminSection,
+    },
+    {
+      id: 'relacionamento_loyalty' as AdminTab,
+      label: 'Clube de Fidelidade & Níveis',
       icon: Award,
-      description: 'Fidelidade e indicações',
+      description: 'Pontos e níveis VIP',
+      section: 'relacionamento' as AdminSection,
+    },
+    {
+      id: 'relacionamento_rewards' as AdminTab,
+      label: 'Prêmios & Cupons Desconto',
+      icon: Gift,
+      description: 'Catálogo e resgates',
+      section: 'relacionamento' as AdminSection,
+    },
+    {
+      id: 'relacionamento_referrals' as AdminTab,
+      label: 'Motor de Indicações',
+      icon: Users,
+      description: 'Embaixadores e convites',
+      section: 'relacionamento' as AdminSection,
+    },
+    {
+      id: 'relacionamento_reviews' as AdminTab,
+      label: 'Avaliações & NPS',
+      icon: MessageSquare,
+      description: 'Experiência e satisfação',
       section: 'relacionamento' as AdminSection,
     },
     {
@@ -492,8 +533,16 @@ export const AdminLayout: React.FC = () => {
         return <ScheduleGrid />;
       case 'queue':
         return <WaitingQueue />;
-      case 'rewards':
-        return <NavoRewardsAdmin />;
+      case 'relacionamento_dashboard':
+        return <NavoRewardsAdmin initialTab="dashboard" />;
+      case 'relacionamento_loyalty':
+        return <NavoRewardsAdmin initialTab="loyalty" />;
+      case 'relacionamento_rewards':
+        return <NavoRewardsAdmin initialTab="rewards" />;
+      case 'relacionamento_referrals':
+        return <NavoRewardsAdmin initialTab="referrals" />;
+      case 'relacionamento_reviews':
+        return <NavoRewardsAdmin initialTab="reviews" />;
       case 'followup':
         return <FollowUpManagement />;
       case 'aniversariantes':

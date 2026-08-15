@@ -41,9 +41,25 @@ import {
 
 type NavoRewardsTab = 'dashboard' | 'loyalty' | 'rewards' | 'referrals' | 'reviews';
 
-export const NavoRewardsAdmin: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<NavoRewardsTab>('dashboard');
+interface NavoRewardsAdminProps {
+  initialTab?: NavoRewardsTab;
+}
+
+const rewardsPageTitles: Record<NavoRewardsTab, string> = {
+  dashboard: 'Dashboard Geral',
+  loyalty: 'Clube de Fidelidade & Níveis',
+  rewards: 'Prêmios & Cupons de Desconto',
+  referrals: 'Motor de Indicações',
+  reviews: 'Avaliações & NPS',
+};
+
+export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }) => {
+  const [activeTab, setActiveTab] = useState<NavoRewardsTab>(initialTab || 'dashboard');
   const [data, setData] = useState<any | null>(null);
+
+  useEffect(() => {
+    if (initialTab) setActiveTab(initialTab);
+  }, [initialTab]);
   const [loading, setLoading] = useState(true);
   const [campaignLoading, setCampaignLoading] = useState(false);
   const [campaignMsg, setCampaignMsg] = useState<string | null>(null);
@@ -265,7 +281,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={Award}
-        title="Navo Rewards & NPS"
+        title={rewardsPageTitles[activeTab]}
         stats={[{ label: 'score NPS', value: data?.npsScore || 100, tone: 'gold' }]}
         action={{ label: 'Atualizar', onClick: loadData, icon: RefreshCw, disabled: loading }}
       />
@@ -273,6 +289,7 @@ export const NavoRewardsAdmin: React.FC = () => {
       {/* Ação (mobile) */}
       
 
+      {activeTab === 'dashboard' && <>
       {/* 2. KPIS (Sempre no topo, logo abaixo do Header) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
@@ -351,6 +368,7 @@ export const NavoRewardsAdmin: React.FC = () => {
           {campaignMsg}
         </div>
       )}
+      </>}
 
       {configSuccessMsg && (
         <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-xl animate-fade-in">
@@ -358,8 +376,8 @@ export const NavoRewardsAdmin: React.FC = () => {
         </div>
       )}
 
-      {/* 4. TABS SECUNDÁRIAS */}
-      <AdminTabs
+      {/* 4. TABS SECUNDÁRIAS — mantidas apenas para compatibilidade quando o componente é usado sem rota própria. */}
+      {!initialTab && <AdminTabs
         tabs={[
           { id: 'dashboard', label: 'Dashboard Geral', icon: TrendingUp },
           { id: 'loyalty', label: 'Clube de Fidelidade & Níveis', icon: Crown },
@@ -369,9 +387,9 @@ export const NavoRewardsAdmin: React.FC = () => {
         ]}
         activeId={activeTab}
         onChange={(id) => setActiveTab(id as NavoRewardsTab)}
-      />
+      />}
 
-      {/* 5. CONTEÚDO DA TAB */}
+      {/* 5. CONTEÚDO DA INTERFACE */}
       {/* TAB 1: DASHBOARD GERAL */}
       {activeTab === 'dashboard' && (
         <div className="space-y-4 min-w-0">
