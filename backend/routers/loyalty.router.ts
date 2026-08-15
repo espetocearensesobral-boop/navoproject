@@ -483,6 +483,43 @@ loyaltyRouter.get('/admin/dashboard', requireAuth, requireAdmin, async (_req: an
     if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
     const rows = await db.select().from(schema.pointTransactions);
     const redemptions = await db.select().from(schema.loyaltyRedemptions).orderBy(desc(schema.loyaltyRedemptions.createdAt));
+    const reviewRows = await db
+      .select({
+        id: schema.reviews.id,
+        rating: schema.reviews.rating,
+        understoodRequest: schema.reviews.understoodRequest,
+        waitTimeAcceptable: schema.reviews.waitTimeAcceptable,
+        serviceExperience: schema.reviews.serviceExperience,
+        wouldRecommend: schema.reviews.wouldRecommend,
+        comment: schema.reviews.comment,
+        serviceTitle: schema.reviews.serviceTitle,
+        hasPhoto: schema.reviews.hasPhoto,
+        photoUrl: schema.reviews.photoUrl,
+        createdAt: schema.reviews.createdAt,
+        clientName: schema.profiles.name,
+        professionalName: schema.professionals.name,
+      })
+      .from(schema.reviews)
+      .leftJoin(schema.profiles, eq(schema.reviews.clientId, schema.profiles.id))
+      .leftJoin(schema.professionals, eq(schema.reviews.professionalId, schema.professionals.id))
+      .orderBy(desc(schema.reviews.createdAt))
+      .limit(100);
+    const npsValues = reviewRows
+      .map((review: any) => review.wouldRecommend === 'Com certeza' ? 100 : review.wouldRecommend === 'Talvez' ? 50 : review.wouldRecommend === 'Não' ? 0 : null)
+      .filter((value): value is number => value !== null);
+    const promoters = npsValues.filter((value) => value === 100).length;
+    const detractors = npsValues.filter((value) => value === 0).length;
+    const passives = npsValues.filter((value) => value === 50).length;
+    const npsScore = npsValues.length > 0 ? Math.round(((promoters - detractors) / npsValues.length) * 100) : 0;
+    const averageRating = reviewRows.length > 0
+      ? Number((reviewRows.reduce((sum: number, review: any) => sum + Number(review.rating || 0), 0) / reviewRows.length).toFixed(1))
+      : 0;
+    const reviewsList = reviewRows.map((review: any) => ({
+      ...review,
+      clientName: review.clientName || 'Cliente anônimo',
+      professionalName: review.professionalName || 'Profissional não informado',
+      isAnonymous: !review.clientName,
+    }));
     const issued = rows.filter((row: any) => row.amount > 0).reduce((sum: number, row: any) => sum + Number(row.amount || 0), 0);
     const redeemed = rows.filter((row: any) => row.amount < 0).reduce((sum: number, row: any) => sum + Math.abs(Number(row.amount || 0)), 0);
     const profiles = await db.select().from(schema.profiles).where(eq(schema.profiles.role, 'client'));
@@ -503,6 +540,13 @@ loyaltyRouter.get('/admin/dashboard', requireAuth, requireAdmin, async (_req: an
       totalRedeemed: redeemed,
       tierDistribution,
       topClients,
+      reviewsList,
+      totalReviews: reviewRows.length,
+      npsScore,
+      promoters,
+      detractors,
+      passives,
+      averageRating,
     });
   } catch (e: any) {
     return handleError(res, e, 'GET /api/loyalty/admin/dashboard');

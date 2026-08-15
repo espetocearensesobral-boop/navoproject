@@ -385,7 +385,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
       <AdminPageHeader
         icon={Award}
         title={rewardsPageTitles[activeTab]}
-        stats={[{ label: 'score NPS', value: data?.npsScore || 100, tone: 'gold' }]}
+        stats={[{ label: 'score NPS', value: data?.npsScore ?? 0, tone: 'gold' }]}
         action={{ label: 'Atualizar', onClick: loadData, icon: RefreshCw, disabled: loading }}
       />
 
@@ -402,7 +402,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               <Star className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-black text-gold-base tabular-nums truncate">{data?.npsScore || 100} <span className="text-xs text-status-success">/ 100</span></p>
+          <p className="text-lg font-black text-gold-base tabular-nums truncate">{data?.npsScore ?? 0} <span className="text-xs text-status-success">/ 100</span></p>
           <p className="text-xs text-content-muted mt-1 font-medium truncate">{data?.promoters || 0} prom / {data?.detractors || 0} detr</p>
         </div>
 
@@ -436,7 +436,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
             </div>
           </div>
           <p className="text-lg font-black text-content-base tabular-nums truncate">{data?.totalReviews || 0}</p>
-          <p className="text-xs text-gold-base mt-1 font-medium truncate">100% NPS Ativo</p>
+          <p className="text-xs text-gold-base mt-1 font-medium truncate">Média {data?.averageRating ?? 0}/5 · {data?.promoters ?? 0} prom.</p>
         </div>
       </div>
 
@@ -1221,15 +1221,21 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                       </span>
                     </div>
 
-                    {rev.serviceTitle && <p className="text-xs text-gold-base font-bold">{rev.serviceTitle}</p>}
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                      <span className="font-bold text-content-base">{rev.clientName || 'Cliente anônimo'}</span>
+                      {rev.isAnonymous && <span className="rounded-full border border-border-subtle px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-content-muted">Anônimo</span>}
+                    </div>
+                    {rev.serviceTitle && <p className="line-clamp-2 text-xs font-bold text-gold-base">{rev.serviceTitle}</p>}
+                    <p className="text-xs text-content-muted">Profissional: <span className="font-semibold text-content-base">{rev.professionalName || 'Não informado'}</span></p>
                     <p className="text-content-base font-medium italic text-xs">
                       "{rev.comment || 'Sem observações adicionais.'}"
                     </p>
 
                     <div className="text-xs text-content-muted space-y-0.5 pt-2 border-t border-border-subtle">
                       <p>• Resultado: <span className="text-content-base font-bold">{rev.understoodRequest || 'Não informado'}</span></p>
+                      <p>• Espera: <span className="text-content-base font-bold">{rev.waitTimeAcceptable || 'Não informado'}</span></p>
                       <p>• Experiência: <span className="text-content-base font-bold">{rev.serviceExperience || 'Não informado'}</span></p>
-                      <p>• Recomendaria: <span className="text-content-base font-bold">{rev.wouldRecommend || 'Com certeza'}</span></p>
+                      <p>• Recomendaria: <span className="text-content-base font-bold">{rev.wouldRecommend || 'Não informado'}</span></p>
                     </div>
                   </div>
                 ))}
