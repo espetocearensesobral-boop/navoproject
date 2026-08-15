@@ -1,4 +1,5 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import { and, eq, desc, ilike } from 'drizzle-orm';
 import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
@@ -6,6 +7,7 @@ import { optionalAuth, requireAuth, requireAdmin } from '../middleware/index.js'
 import { handleError } from '../utils/index.js';
 import { publicReviewLookupSchema, publicReviewPayloadSchema, reviewPayloadSchema } from '../utils/validation.js';
 import { matchPhoneNumbers } from '../utils/phone.js';
+import { JWT_SECRET } from '../config/env.js';
 
 export const reviewsRouter = express.Router();
 
@@ -30,6 +32,17 @@ const findPublicReviewAppointment = async (bookingCode: string, clientPhone: str
   return appointment;
 };
 
+// GET /api/reviews/public/session - Start a short-lived public survey session
+reviewsRouter.get('/public/session', (_req: any, res: any) => {
+  const expiresInSeconds = 10 * 60;
+  const token = jwt.sign(
+    { kind: 'public_review', nonce: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}` },
+    JWT_SECRET,
+    { expiresIn: expiresInSeconds },
+  );
+  return res.json({ token, expiresAt: Date.now() + expiresInSeconds * 1000 });
+});
+
 // POST /api/reviews/public/lookup - Validate a completed appointment for the public survey
 reviewsRouter.post('/public/lookup', async (req: any, res: any) => {
   try {
@@ -52,6 +65,13 @@ reviewsRouter.post('/public', async (req: any, res: any) => {
     if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
     const parsed = publicReviewPayloadSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Dados de avaliação inválidos.', details: parsed.error.flatten() });
+
+    try {
+      const session = jwt.verify(parsed.data.sessionToken, JWT_SECRET) as any;
+      if (session?.kind !== 'public_review') throw new Error('invalid_review_session');
+    } catch {
+      return res.status(410).json({ error: 'Esta avaliação expirou. Reinicie pelo mesmo link para começar novamente.' });
+    }
 
     const service = await db.query.services.findFirst({ where: eq(schema.services.id, parsed.data.serviceId) });
     if (!service) return res.status(404).json({ error: 'Serviço não encontrado ou indisponível.' });

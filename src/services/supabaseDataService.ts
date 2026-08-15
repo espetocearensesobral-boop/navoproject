@@ -1072,7 +1072,20 @@ export async function lookupPublicReviewAccess(bookingCode: string, clientPhone:
   return data as PublicReviewAccess;
 }
 
+export interface PublicReviewSession {
+  token: string;
+  expiresAt: number;
+}
+
+export async function startPublicReviewSession(): Promise<PublicReviewSession> {
+  const res = await fetch(`${API_BASE}/reviews/public/session`, { credentials: 'include' });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.token || !data.expiresAt) throw new Error(data.error || 'Não foi possível iniciar a avaliação.');
+  return data as PublicReviewSession;
+}
+
 export async function submitPublicReview(reviewData: {
+  sessionToken: string;
   serviceId: string;
   serviceTitle: string;
   professionalId: string;

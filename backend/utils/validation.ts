@@ -165,6 +165,7 @@ export const publicReviewLookupSchema = z.object({
 });
 
 export const publicReviewPayloadSchema = z.object({
+  sessionToken: z.string().trim().min(20).max(2000),
   serviceId: idSchema,
   serviceTitle: z.string().trim().min(1).max(160),
   professionalId: idSchema,
