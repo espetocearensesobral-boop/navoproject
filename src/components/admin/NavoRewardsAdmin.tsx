@@ -1069,12 +1069,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                       </span>
                     </div>
 
+                    {rev.serviceTitle && <p className="text-[10px] text-gold-base font-bold">{rev.serviceTitle}</p>}
                     <p className="text-content-base font-medium italic text-xs">
-                      "{rev.comment || 'Corte e atendimento perfeitos!'}"
+                      "{rev.comment || 'Sem observações adicionais.'}"
                     </p>
 
                     <div className="text-[10px] text-content-muted space-y-0.5 pt-2 border-t border-border-subtle">
-                      <p>• Atendimento: <span className="text-content-base font-bold">{rev.understoodRequest || 'Sim'}</span></p>
+                      <p>• Resultado: <span className="text-content-base font-bold">{rev.understoodRequest || 'Não informado'}</span></p>
+                      <p>• Experiência: <span className="text-content-base font-bold">{rev.serviceExperience || 'Não informado'}</span></p>
                       <p>• Recomendaria: <span className="text-content-base font-bold">{rev.wouldRecommend || 'Com certeza'}</span></p>
                     </div>
                   </div>

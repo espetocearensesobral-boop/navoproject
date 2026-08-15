@@ -1034,6 +1034,7 @@ export async function submitPostServiceReview(reviewData: {
   rating: number;
   understoodRequest?: string;
   waitTimeAcceptable?: string;
+  serviceExperience?: string;
   wouldRecommend?: string;
   comment?: string;
   hasPhoto?: boolean;
@@ -1072,13 +1073,17 @@ export async function lookupPublicReviewAccess(bookingCode: string, clientPhone:
 }
 
 export async function submitPublicReview(reviewData: {
-  bookingCode: string;
-  clientPhone: string;
+  serviceId: string;
+  serviceTitle: string;
+  professionalId: string;
   rating: number;
-  understoodRequest?: string;
-  waitTimeAcceptable?: string;
-  wouldRecommend?: string;
+  understoodRequest: string;
+  waitTimeAcceptable: string;
+  serviceExperience: string;
+  wouldRecommend: string;
   comment?: string;
+  bookingCode?: string;
+  clientPhone?: string;
 }) {
   const res = await fetch(`${API_BASE}/reviews/public`, {
     method: 'POST',

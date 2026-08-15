@@ -152,6 +152,7 @@ export const reviewPayloadSchema = z.object({
   rating: z.coerce.number().int().min(1).max(5),
   understoodRequest: z.string().trim().max(30).nullable().optional(),
   waitTimeAcceptable: z.string().trim().max(30).nullable().optional(),
+  serviceExperience: z.string().trim().max(30).nullable().optional(),
   wouldRecommend: z.string().trim().max(30).nullable().optional(),
   comment: z.string().trim().max(2000).nullable().optional(),
   hasPhoto: z.coerce.boolean().optional().default(false),
@@ -164,13 +165,20 @@ export const publicReviewLookupSchema = z.object({
 });
 
 export const publicReviewPayloadSchema = z.object({
-  bookingCode: z.string().trim().min(4).max(80),
-  clientPhone: z.string().trim().min(8).max(30),
+  serviceId: idSchema,
+  serviceTitle: z.string().trim().min(1).max(160),
+  professionalId: idSchema,
+  bookingCode: z.string().trim().min(4).max(80).optional(),
+  clientPhone: z.string().trim().min(8).max(30).optional(),
   rating: z.coerce.number().int().min(1).max(5),
-  understoodRequest: z.string().trim().max(30).nullable().optional(),
-  waitTimeAcceptable: z.string().trim().max(30).nullable().optional(),
-  wouldRecommend: z.string().trim().max(30).nullable().optional(),
+  understoodRequest: z.string().trim().max(30),
+  waitTimeAcceptable: z.string().trim().max(30),
+  serviceExperience: z.string().trim().max(30),
+  wouldRecommend: z.string().trim().max(30),
   comment: z.string().trim().max(2000).nullable().optional(),
+}).refine((data) => Boolean(data.bookingCode) === Boolean(data.clientPhone), {
+  message: 'Código e telefone devem ser enviados juntos.',
+  path: ['bookingCode'],
 });
 
 export { dateSchema, timeSchema, idSchema, moneySchema };

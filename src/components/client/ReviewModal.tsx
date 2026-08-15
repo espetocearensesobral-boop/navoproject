@@ -16,6 +16,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, appoi
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [understoodRequest, setUnderstoodRequest] = useState<string>('Sim, perfeitamente');
   const [waitTimeAcceptable, setWaitTimeAcceptable] = useState<string>('Sim');
+  const [serviceExperience, setServiceExperience] = useState<string>('Excelente');
   const [wouldRecommend, setWouldRecommend] = useState<string>('Com certeza');
   const [comment, setComment] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
@@ -29,6 +30,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, appoi
     if (!isOpen) {
       setRating(5);
       setComment('');
+      setServiceExperience('Excelente');
       setPhotoUrl('');
       setHasPhoto(false);
       setError(null);
@@ -51,6 +53,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, appoi
         rating,
         understoodRequest,
         waitTimeAcceptable,
+        serviceExperience,
         wouldRecommend,
         comment,
         hasPhoto,
@@ -132,7 +135,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, appoi
               {/* Specific Questions */}
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="font-bold text-content-base block mb-1.5">1. O barbeiro entendeu o que você queria?</label>
+                  <label className="font-bold text-content-base block mb-1.5">2. O resultado ficou como você esperava?</label>
                   <div className="grid grid-cols-3 gap-2">
                     {['Sim, perfeitamente', 'Quase', 'Não'].map((opt) => (
                       <button
@@ -152,7 +155,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, appoi
                 </div>
 
                 <div>
-                  <label className="font-bold text-content-base block mb-1.5">2. O tempo de espera foi aceitável?</label>
+                  <label className="font-bold text-content-base block mb-1.5">3. O tempo de espera foi aceitável?</label>
                   <div className="grid grid-cols-3 gap-2">
                     {['Sim', 'Um pouco', 'Não'].map((opt) => (
                       <button
@@ -172,7 +175,27 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, appoi
                 </div>
 
                 <div>
-                  <label className="font-bold text-content-base block mb-1.5">3. Você indicaria a Navo para um amigo?</label>
+                  <label className="font-bold text-content-base block mb-1.5">4. Como você avalia o atendimento?</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {['Excelente', 'Muito bom', 'Bom', 'Pode melhorar'].map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setServiceExperience(opt)}
+                        className={`p-2 rounded-xl text-center font-medium border transition-all ${
+                          serviceExperience === opt
+                            ? 'bg-gold-base text-surface-base border-gold-base font-bold'
+                            : 'bg-surface-base text-content-muted border-border-subtle hover:text-content-base'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-bold text-content-base block mb-1.5">5. Você indicaria a Navo para um amigo?</label>
                   <div className="grid grid-cols-3 gap-2">
                     {['Com certeza', 'Talvez', 'Não'].map((opt) => (
                       <button

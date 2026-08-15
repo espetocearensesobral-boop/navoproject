@@ -46,26 +46,39 @@ reviewsRouter.post('/public/lookup', async (req: any, res: any) => {
   }
 });
 
-// POST /api/reviews/public - Submit a survey after validating the booking code and phone again
+// POST /api/reviews/public - Submit a quick anonymous survey
 reviewsRouter.post('/public', async (req: any, res: any) => {
   try {
     if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
     const parsed = publicReviewPayloadSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Dados de avaliação inválidos.', details: parsed.error.flatten() });
-    const appointment = await findPublicReviewAppointment(parsed.data.bookingCode, parsed.data.clientPhone);
-    if (!appointment) return res.status(404).json({ error: 'Não encontramos um atendimento para esses dados.' });
-    if (appointment.status !== 'completed') return res.status(400).json({ error: 'A avaliação fica disponível após a conclusão do atendimento.' });
-    if (appointment.isReviewed) return res.status(409).json({ error: 'Este atendimento já recebeu uma avaliação.' });
+
+    const service = await db.query.services.findFirst({ where: eq(schema.services.id, parsed.data.serviceId) });
+    if (!service) return res.status(404).json({ error: 'Serviço não encontrado ou indisponível.' });
+    const professional = await db.query.professionals.findFirst({ where: and(eq(schema.professionals.id, parsed.data.professionalId), eq(schema.professionals.isActive, true)) });
+    if (!professional) return res.status(404).json({ error: 'Profissional não encontrado ou indisponível.' });
+
+    let appointment: any = null;
+    if (parsed.data.bookingCode && parsed.data.clientPhone) {
+      appointment = await findPublicReviewAppointment(parsed.data.bookingCode, parsed.data.clientPhone);
+      if (!appointment) return res.status(404).json({ error: 'Não encontramos um atendimento para esses dados.' });
+      if (appointment.status !== 'completed') return res.status(400).json({ error: 'A avaliação fica disponível após a conclusão do atendimento.' });
+      if (appointment.isReviewed) return res.status(409).json({ error: 'Este atendimento já recebeu uma avaliação.' });
+      if (appointment.professionalId !== professional.id) return res.status(400).json({ error: 'O profissional não corresponde ao atendimento informado.' });
+    }
 
     const newReview = {
       id: `rev_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      appointmentId: appointment.id,
-      clientId: appointment.clientId || null,
-      professionalId: appointment.professionalId,
+      appointmentId: appointment?.id || null,
+      clientId: appointment?.clientId || null,
+      serviceId: service.id,
+      serviceTitle: service.title,
+      professionalId: professional.id,
       rating: parsed.data.rating,
-      understoodRequest: parsed.data.understoodRequest || null,
-      waitTimeAcceptable: parsed.data.waitTimeAcceptable || null,
-      wouldRecommend: parsed.data.wouldRecommend || null,
+      understoodRequest: parsed.data.understoodRequest,
+      waitTimeAcceptable: parsed.data.waitTimeAcceptable,
+      serviceExperience: parsed.data.serviceExperience,
+      wouldRecommend: parsed.data.wouldRecommend,
       comment: parsed.data.comment || null,
       hasPhoto: false,
       photoUrl: null,
@@ -76,15 +89,19 @@ reviewsRouter.post('/public', async (req: any, res: any) => {
     if (typeof db.transaction === 'function') {
       await db.transaction(async (tx: any) => {
         await tx.insert(schema.reviews).values(newReview);
-        await tx.update(schema.appointments)
-          .set({ isReviewed: true, updatedAt: new Date() })
-          .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
+        if (appointment) {
+          await tx.update(schema.appointments)
+            .set({ isReviewed: true, updatedAt: new Date() })
+            .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
+        }
       });
     } else {
       await db.insert(schema.reviews).values(newReview);
-      await db.update(schema.appointments)
-        .set({ isReviewed: true, updatedAt: new Date() })
-        .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
+      if (appointment) {
+        await db.update(schema.appointments)
+          .set({ isReviewed: true, updatedAt: new Date() })
+          .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
+      }
     }
 
     return res.json({ success: true, message: 'Avaliação enviada com sucesso. Obrigado pelo feedback!' });
@@ -104,6 +121,8 @@ reviewsRouter.get('/public', async (req: any, res: any) => {
         id: schema.reviews.id,
         rating: schema.reviews.rating,
         comment: schema.reviews.comment,
+        serviceTitle: schema.reviews.serviceTitle,
+        serviceExperience: schema.reviews.serviceExperience,
         hasPhoto: schema.reviews.hasPhoto,
         photoUrl: schema.reviews.photoUrl,
         createdAt: schema.reviews.createdAt,
@@ -120,6 +139,8 @@ reviewsRouter.get('/public', async (req: any, res: any) => {
       id: r.id,
       rating: r.rating,
       comment: r.comment || '',
+      serviceTitle: r.serviceTitle || '',
+      serviceExperience: r.serviceExperience || '',
       clientName: r.clientName ? r.clientName.split(' ')[0] : 'Cliente',
       professionalName: r.professionalName || 'Barbeiro',
       hasPhoto: !!r.hasPhoto,
@@ -168,6 +189,7 @@ reviewsRouter.post('/', requireAuth, async (req: any, res: any) => {
       rating: payload.rating,
       understoodRequest: payload.understoodRequest || null,
       waitTimeAcceptable: payload.waitTimeAcceptable || null,
+      serviceExperience: payload.serviceExperience || null,
       wouldRecommend: payload.wouldRecommend || null,
       comment: payload.comment || null,
       hasPhoto: payload.hasPhoto,
