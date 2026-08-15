@@ -176,6 +176,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     const activeTheme = scope === 'admin' ? adminTheme : clientTheme;
     document.documentElement.setAttribute('data-theme', activeTheme);
+    document.documentElement.style.colorScheme = activeTheme;
+
+    const colorSchemeMeta = document.getElementById('pwa-color-scheme');
+    if (colorSchemeMeta) colorSchemeMeta.setAttribute('content', activeTheme);
+    const themeColorMeta = document.getElementById('pwa-theme-color');
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute('content', activeTheme === 'light' ? '#F5F5F2' : scope === 'admin' ? '#10131A' : '#0A0A0A');
+    }
 
     if (palette && palette !== 'heritage') {
       document.documentElement.setAttribute('data-palette', palette);
