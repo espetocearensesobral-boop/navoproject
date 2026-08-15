@@ -195,12 +195,46 @@ export const AdminLayout: React.FC = () => {
     });
   };
 
+  const scrollSidebarNavigationToSection = (section: AdminSection, mobile = false) => {
+    window.requestAnimationFrame(() => {
+      const navigation = document.querySelector<HTMLElement>(
+        mobile ? '[data-admin-sidebar-navigation="mobile"]' : '[data-admin-sidebar-navigation="desktop"]'
+      );
+      const target = navigation?.querySelector<HTMLElement>(`[data-admin-sidebar-section="${section}"]`);
+      if (!navigation || !target) return;
+
+      target.focus({ preventScroll: true });
+      const navigationRect = navigation.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const targetTop = navigation.scrollTop + (targetRect.top - navigationRect.top) - ((navigation.clientHeight - targetRect.height) / 2);
+      navigation.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    });
+  };
+
+  const handleSidebarSectionToggle = (section: AdminSection, mobile = false) => {
+    setCollapsedSections((current) => {
+      const shouldCollapse = !current[section];
+      return {
+        operacao: section === 'operacao' ? shouldCollapse : true,
+        financeiro: section === 'financeiro' ? shouldCollapse : true,
+        cadastros: section === 'cadastros' ? shouldCollapse : true,
+        relacionamento: section === 'relacionamento' ? shouldCollapse : true,
+        sistema: section === 'sistema' ? shouldCollapse : true,
+      };
+    });
+    scrollSidebarNavigationToSection(section, mobile);
+  };
+
   const handleSidebarTabChange = (tab: AdminTab, mobile = false) => {
     const section = ADMIN_TAB_SECTIONS[tab];
     if (section) {
-      setCollapsedSections((current) => (
-        current[section] ? { ...current, [section]: false } : current
-      ));
+      setCollapsedSections(() => ({
+        operacao: section !== 'operacao',
+        financeiro: section !== 'financeiro',
+        cadastros: section !== 'cadastros',
+        relacionamento: section !== 'relacionamento',
+        sistema: section !== 'sistema',
+      }));
     }
 
     setActiveTab(tab);
@@ -477,7 +511,8 @@ export const AdminLayout: React.FC = () => {
           <div key={section} className="space-y-1.5">
             <button
               type="button"
-              onClick={() => setCollapsedSections((current) => ({ ...current, [section]: !current[section] }))}
+              data-admin-sidebar-section={section}
+              onClick={() => handleSidebarSectionToggle(section, mobile)}
               aria-expanded={!isCollapsed}
               className="admin-sidebar-section-toggle w-full min-h-9 px-3 flex items-center justify-between gap-2 rounded-lg text-left transition-colors hover:bg-surface-base"
             >
