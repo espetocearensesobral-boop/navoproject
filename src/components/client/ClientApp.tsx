@@ -13,6 +13,7 @@ import { BookingStep3DateTime } from './BookingStep3DateTime';
 import { BookingStep4Review } from "./BookingStep4Review";
 import { BookingStep5Confirmation } from "./BookingStep5Confirmation";
 import { LandingPage } from './LandingPage';
+import { PublicReviewModal } from './PublicReviewModal';
 import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
 import { usePullToRefresh } from '../../hooks/usePullToRefresh';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -41,6 +42,7 @@ export const ClientApp: React.FC = () => {
   const [loginModalView, setLoginModalView] = useState<'login' | 'register'>('login');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
+  const [isPublicReviewOpen, setIsPublicReviewOpen] = useState(false);
   const [pendingTabChange, setPendingTabChange] = useState<string | null>(null);
   const [showGuestSignupPrompt, setShowGuestSignupPrompt] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -72,6 +74,13 @@ export const ClientApp: React.FC = () => {
     // Check URL for referral code ?ref=NAV-XXX
     const params = new URLSearchParams(window.location.search);
     const refCode = params.get('ref');
+    if (params.get('review') === 'true') {
+      setIsPublicReviewOpen(true);
+    }
+    if (params.get('booking') === '1') {
+      setActiveTab('booking');
+      setBookingStep(1);
+    }
     if (refCode) {
       showToast(`Código de indicação ${refCode.toUpperCase()} ativado! Cadastre-se para ganhar 50 pontos bônus.`, 'info');
     }
@@ -841,6 +850,11 @@ export const ClientApp: React.FC = () => {
         onShowToast={showToast}
       />
       </Suspense>
+
+      <PublicReviewModal
+        isOpen={isPublicReviewOpen}
+        onClose={() => setIsPublicReviewOpen(false)}
+      />
     </div>
   );
 };

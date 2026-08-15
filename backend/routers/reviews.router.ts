@@ -1,12 +1,97 @@
 import express from 'express';
-import { eq, desc } from 'drizzle-orm';
+import { and, eq, desc, ilike } from 'drizzle-orm';
 import { db } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { optionalAuth, requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
-import { reviewPayloadSchema } from '../utils/validation.js';
+import { publicReviewLookupSchema, publicReviewPayloadSchema, reviewPayloadSchema } from '../utils/validation.js';
+import { matchPhoneNumbers } from '../utils/phone.js';
 
 export const reviewsRouter = express.Router();
+
+const publicReviewDetails = (appointment: any) => ({
+  appointmentId: appointment.id,
+  clientName: appointment.clientName || 'Cliente',
+  professionalId: appointment.professionalId,
+  professionalName: appointment.professionalName || 'Profissional Navo',
+  serviceTitle: Array.isArray(appointment.services) && appointment.services.length > 0
+    ? (typeof appointment.services[0] === 'string' ? appointment.services[0] : appointment.services[0]?.title || 'Atendimento')
+    : 'Atendimento de Barbearia',
+  date: appointment.date,
+  timeSlot: appointment.timeSlot,
+});
+
+const findPublicReviewAppointment = async (bookingCode: string, clientPhone: string) => {
+  const normalizedCode = bookingCode.trim().toUpperCase();
+  const appointment = await db.query.appointments.findFirst({
+    where: ilike(schema.appointments.bookingCode, normalizedCode),
+  });
+  if (!appointment || !appointment.clientPhone || !matchPhoneNumbers(appointment.clientPhone, clientPhone)) return null;
+  return appointment;
+};
+
+// POST /api/reviews/public/lookup - Validate a completed appointment for the public survey
+reviewsRouter.post('/public/lookup', async (req: any, res: any) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    const parsed = publicReviewLookupSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: 'Informe o código do agendamento e o telefone.' });
+    const appointment = await findPublicReviewAppointment(parsed.data.bookingCode, parsed.data.clientPhone);
+    if (!appointment) return res.status(404).json({ error: 'Não encontramos um atendimento para esses dados.' });
+    if (appointment.status !== 'completed') return res.status(400).json({ error: 'A avaliação fica disponível após a conclusão do atendimento.' });
+    if (appointment.isReviewed) return res.status(409).json({ error: 'Este atendimento já recebeu uma avaliação.' });
+    return res.json(publicReviewDetails(appointment));
+  } catch (e: any) {
+    return handleError(res, e, 'POST /api/reviews/public/lookup');
+  }
+});
+
+// POST /api/reviews/public - Submit a survey after validating the booking code and phone again
+reviewsRouter.post('/public', async (req: any, res: any) => {
+  try {
+    if (!db) return res.status(503).json({ error: 'Banco de dados indisponível no momento.' });
+    const parsed = publicReviewPayloadSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: 'Dados de avaliação inválidos.', details: parsed.error.flatten() });
+    const appointment = await findPublicReviewAppointment(parsed.data.bookingCode, parsed.data.clientPhone);
+    if (!appointment) return res.status(404).json({ error: 'Não encontramos um atendimento para esses dados.' });
+    if (appointment.status !== 'completed') return res.status(400).json({ error: 'A avaliação fica disponível após a conclusão do atendimento.' });
+    if (appointment.isReviewed) return res.status(409).json({ error: 'Este atendimento já recebeu uma avaliação.' });
+
+    const newReview = {
+      id: `rev_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      appointmentId: appointment.id,
+      clientId: appointment.clientId || null,
+      professionalId: appointment.professionalId,
+      rating: parsed.data.rating,
+      understoodRequest: parsed.data.understoodRequest || null,
+      waitTimeAcceptable: parsed.data.waitTimeAcceptable || null,
+      wouldRecommend: parsed.data.wouldRecommend || null,
+      comment: parsed.data.comment || null,
+      hasPhoto: false,
+      photoUrl: null,
+      pointsAwarded: 0,
+      createdAt: new Date(),
+    };
+
+    if (typeof db.transaction === 'function') {
+      await db.transaction(async (tx: any) => {
+        await tx.insert(schema.reviews).values(newReview);
+        await tx.update(schema.appointments)
+          .set({ isReviewed: true, updatedAt: new Date() })
+          .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
+      });
+    } else {
+      await db.insert(schema.reviews).values(newReview);
+      await db.update(schema.appointments)
+        .set({ isReviewed: true, updatedAt: new Date() })
+        .where(and(eq(schema.appointments.id, appointment.id), eq(schema.appointments.isReviewed, false)));
+    }
+
+    return res.json({ success: true, message: 'Avaliação enviada com sucesso. Obrigado pelo feedback!' });
+  } catch (e: any) {
+    return handleError(res, e, 'POST /api/reviews/public');
+  }
+});
 
 // GET /api/reviews/public - Public reviews list
 reviewsRouter.get('/public', async (req: any, res: any) => {

@@ -1,20 +1,35 @@
 import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { QrCode, Download, Printer, Copy, Check, ExternalLink, Smartphone, Share2, Sparkles } from 'lucide-react';
+import { QrCode, Printer, Copy, Check, ExternalLink, Share2, AlertCircle } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 
 export const QrCodeManagement: React.FC = () => {
   const [copied, setCopied] = useState(false);
-  const bookingUrl = window.location.origin;
+  const [copyError, setCopyError] = useState(false);
+  const bookingUrl = `${window.location.origin}/?booking=1`;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(bookingUrl);
+  const handleCopy = async () => {
+    setCopyError(false);
+    try {
+      await navigator.clipboard.writeText(bookingUrl);
+    } catch {
+      const helper = document.createElement('textarea');
+      helper.value = bookingUrl;
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.focus();
+      helper.select();
+      const copiedWithFallback = document.execCommand('copy');
+      helper.remove();
+      if (!copiedWithFallback) {
+        setCopyError(true);
+        return;
+      }
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  // Generate Google Chart API QR Code image URL for clean rendering
-  
 
   return (
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
@@ -22,7 +37,7 @@ export const QrCodeManagement: React.FC = () => {
       <AdminPageHeader
         icon={QrCode}
         title="Divulgação & QR Code do Agendamento"
-        action={{ label: 'Imprimir', onClick: () => window.print(), icon: Printer }}
+        action={{ label: 'Imprimir totem', onClick: () => window.print(), icon: Printer }}
       />
 
       {/* Ação (mobile) */}
@@ -37,7 +52,7 @@ export const QrCodeManagement: React.FC = () => {
       {/* Main Container */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Printable Card Totem */}
-        <div className="bg-surface-card border border-gold-base/40 rounded-2xl p-6 text-center space-y-4 shadow-md bg-gold-base/5 font-serif relative overflow-hidden">
+        <div className="qr-print-sheet bg-surface-card border border-gold-base/40 rounded-2xl p-6 text-center space-y-4 shadow-md bg-gold-base/5 font-serif relative overflow-hidden">
           <div className="space-y-1">
             <h2 className="text-2xl font-bold tracking-widest uppercase text-content-base">NAVO PREMIUM</h2>
             <p className="text-xs font-sans text-gold-base font-bold uppercase tracking-wider">Agende seu horário pelo celular</p>
@@ -45,17 +60,17 @@ export const QrCodeManagement: React.FC = () => {
 
           {/* QR Code Container */}
           <div className="bg-surface-base p-4 rounded-2xl border-2 border-gold-base/60 inline-block shadow-inner mx-auto">
-            <QRCodeSVG value={bookingUrl} size={192} fgColor="#d4af37" bgColor="#141414" className="mx-auto" />
+            <QRCodeSVG value={bookingUrl} size={220} level="M" includeMargin fgColor="#111111" bgColor="#ffffff" className="mx-auto" />
           </div>
 
           <div className="space-y-1 text-xs font-sans">
-            <p className="text-content-base font-bold">Aponta a câmera do seu celular para agendar</p>
-            <p className="text-content-muted text-[11px]">Rápido, sem filas e 24h por dia disponível.</p>
+            <p className="text-content-base font-bold">Aponte a câmera para agendar</p>
+            <p className="text-content-muted text-[11px]">O QR abre diretamente a escolha do serviço.</p>
           </div>
         </div>
 
         {/* Link & Digital Sharing Options */}
-        <div className="bg-surface-card border border-border-subtle rounded-2xl p-6 space-y-5 shadow-xs flex flex-col justify-between">
+        <div className="qr-print-exclude bg-surface-card border border-border-subtle rounded-2xl p-6 space-y-5 shadow-xs flex flex-col justify-between">
           <div className="space-y-3">
             <h3 className="text-sm font-bold text-content-base flex items-center gap-2">
               <Share2 className="w-4 h-4 text-gold-base" />
@@ -80,6 +95,7 @@ export const QrCodeManagement: React.FC = () => {
                 <span>{copied ? 'Copiado!' : 'Copiar'}</span>
               </button>
             </div>
+            {copyError && <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-status-error"><AlertCircle className="h-3.5 w-3.5" /> Não foi possível copiar automaticamente. Selecione o link e copie manualmente.</p>}
           </div>
 
           <div className="pt-4 border-t border-border-subtle space-y-2">

@@ -883,3 +883,36 @@ button, a, input, select, textarea {
 .animate-slide-in-right {
   animation: slide-in-right 0.3s ease-out;
 }
+
+/* QR Code & Balcão: impressão dedicada do totem, sem dados do painel. */
+@media print {
+  body:has(.qr-print-sheet) * {
+    visibility: hidden !important;
+  }
+
+  body:has(.qr-print-sheet) .qr-print-sheet,
+  body:has(.qr-print-sheet) .qr-print-sheet * {
+    visibility: visible !important;
+  }
+
+  body:has(.qr-print-sheet) .qr-print-exclude {
+    display: none !important;
+  }
+
+  body:has(.qr-print-sheet) .qr-print-sheet {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 90mm !important;
+    margin: 15mm auto !important;
+    border: 1px solid #111 !important;
+    background: #fff !important;
+    color: #111 !important;
+    box-shadow: none !important;
+  }
+
+  body:has(.qr-print-sheet) .qr-print-sheet p,
+  body:has(.qr-print-sheet) .qr-print-sheet h2 {
+    color: #111 !important;
+  }
+}

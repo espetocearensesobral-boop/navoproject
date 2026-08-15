@@ -1049,6 +1049,48 @@ export async function submitPostServiceReview(reviewData: {
   return data;
 }
 
+export interface PublicReviewAccess {
+  appointmentId: string;
+  clientName: string;
+  professionalId: string;
+  professionalName: string;
+  serviceTitle: string;
+  date: string;
+  timeSlot: string;
+}
+
+export async function lookupPublicReviewAccess(bookingCode: string, clientPhone: string): Promise<PublicReviewAccess> {
+  const res = await fetch(`${API_BASE}/reviews/public/lookup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ bookingCode, clientPhone }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Não foi possível localizar o atendimento.');
+  return data as PublicReviewAccess;
+}
+
+export async function submitPublicReview(reviewData: {
+  bookingCode: string;
+  clientPhone: string;
+  rating: number;
+  understoodRequest?: string;
+  waitTimeAcceptable?: string;
+  wouldRecommend?: string;
+  comment?: string;
+}) {
+  const res = await fetch(`${API_BASE}/reviews/public`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(reviewData),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Falha ao enviar avaliação.');
+  return data;
+}
+
 export async function fetchPublicReviews() {
   try {
     const res = await authFetch(`${API_BASE}/reviews/public`);

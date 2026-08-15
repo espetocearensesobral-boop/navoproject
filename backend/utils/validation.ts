@@ -158,4 +158,19 @@ export const reviewPayloadSchema = z.object({
   photoUrl: z.string().url().max(2000).nullable().optional(),
 });
 
+export const publicReviewLookupSchema = z.object({
+  bookingCode: z.string().trim().min(4).max(80),
+  clientPhone: z.string().trim().min(8).max(30),
+});
+
+export const publicReviewPayloadSchema = z.object({
+  bookingCode: z.string().trim().min(4).max(80),
+  clientPhone: z.string().trim().min(8).max(30),
+  rating: z.coerce.number().int().min(1).max(5),
+  understoodRequest: z.string().trim().max(30).nullable().optional(),
+  waitTimeAcceptable: z.string().trim().max(30).nullable().optional(),
+  wouldRecommend: z.string().trim().max(30).nullable().optional(),
+  comment: z.string().trim().max(2000).nullable().optional(),
+});
+
 export { dateSchema, timeSchema, idSchema, moneySchema };

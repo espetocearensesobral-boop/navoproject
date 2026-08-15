@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
 import { handleEnterAsTab } from '../../utils/formUtils';
@@ -1091,10 +1092,15 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                 <h3 className="text-sm font-serif font-bold text-content-base">QR Code para Mesas & Espelhos</h3>
 
                 <div className="p-3 bg-white rounded-xl border border-border-subtle inline-block mx-auto">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(generatedEvalUrl)}`}
-                    alt="QR Code de Avaliação Navo"
-                    className="w-40 h-40 mx-auto"
+                  <QRCodeSVG
+                    value={generatedEvalUrl}
+                    size={200}
+                    level="M"
+                    includeMargin
+                    fgColor="#111111"
+                    bgColor="#ffffff"
+                    aria-label="QR Code de Avaliação Navo"
+                    className="mx-auto"
                   />
                 </div>
 
