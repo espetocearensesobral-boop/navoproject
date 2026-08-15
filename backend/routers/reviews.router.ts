@@ -68,7 +68,7 @@ const insertAnonymousReview = async (review: any) => {
 
 // GET /api/reviews/public/session - Start a short-lived public survey session
 reviewsRouter.get('/public/session', (_req: any, res: any) => {
-  const expiresInSeconds = 10 * 60;
+  const expiresInSeconds = 5 * 60;
   const token = jwt.sign(
     { kind: 'public_review', nonce: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}` },
     JWT_SECRET,
