@@ -514,16 +514,16 @@ export const AdminLayout: React.FC = () => {
               data-admin-sidebar-section={section}
               onClick={() => handleSidebarSectionToggle(section, mobile)}
               aria-expanded={!isCollapsed}
-              className="admin-sidebar-section-toggle w-full min-h-9 px-3 flex items-center justify-between gap-2 rounded-lg text-left transition-colors hover:bg-surface-base"
+              className="admin-sidebar-section-toggle w-full min-h-10 px-3.5 flex items-center justify-between gap-2 rounded-xl text-left transition-colors hover:bg-surface-base"
             >
-              <span className="admin-sidebar-section-label text-xs font-bold uppercase tracking-[0.16em] truncate">
+              <span className="admin-sidebar-section-label text-xs font-black uppercase tracking-[0.18em] truncate">
                 {sectionLabels[section]}
               </span>
               <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} />
             </button>
 
             {!isCollapsed && (
-              <div className="space-y-1">
+              <div className="admin-sidebar-items space-y-1 pl-2 ml-1 border-l border-border-subtle/70">
                 {itemsInSection.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
@@ -534,7 +534,7 @@ export const AdminLayout: React.FC = () => {
                       type="button"
                       onClick={() => handleSidebarTabChange(item.id, mobile)}
                       data-admin-sidebar-item={item.id}
-                      className={`admin-sidebar-item w-full min-h-11 px-3.5 rounded-lg text-sm font-semibold flex items-center gap-3 transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active shadow-sm' : ''}`}
+                      className={`admin-sidebar-item w-full min-h-11 px-3.5 rounded-lg text-sm font-medium flex items-center gap-3 transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active shadow-sm' : ''}`}
                     >
                       <Icon className="w-[18px] h-[18px] shrink-0" />
                       <span className="flex-1 text-left truncate min-w-0">{item.label}</span>

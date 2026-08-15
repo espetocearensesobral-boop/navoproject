@@ -733,41 +733,56 @@ button, a, input, select, textarea {
   }
 }
 
-/* Admin sidebar navigation: neutral labels, palette-driven active state, and contrast guardrails. */
+/* Admin sidebar hierarchy: structural category headers, subdued options, and palette-driven active state. */
 .admin-shell .admin-sidebar-section-toggle {
   color: var(--color-content-muted) !important;
+  background: transparent !important;
+  border-left: 2px solid transparent;
 }
 
-.admin-shell .admin-sidebar-section-toggle:hover {
+.admin-shell .admin-sidebar-section-toggle[aria-expanded="true"] {
+  color: var(--color-gold-base) !important;
+  background: color-mix(in srgb, var(--color-gold-base) 7%, transparent) !important;
+  border-left-color: var(--color-gold-base);
+}
+
+.admin-shell .admin-sidebar-section-toggle:hover,
+.admin-shell .admin-sidebar-section-toggle:focus-visible {
+  color: var(--color-gold-base) !important;
+  background: color-mix(in srgb, var(--color-gold-base) 10%, transparent) !important;
+}
+
+.admin-shell .admin-sidebar-section-label {
+  color: inherit !important;
+  letter-spacing: 0.18em;
+}
+
+.admin-shell .admin-sidebar-items {
+  border-left-color: color-mix(in srgb, var(--color-content-muted) 28%, transparent) !important;
+}
+
+.admin-shell .admin-sidebar-item {
+  color: var(--color-content-muted) !important;
+  background: transparent !important;
+}
+
+.admin-shell .admin-sidebar-item svg {
+  color: var(--color-content-muted) !important;
+  opacity: 0.82;
+}
+
+.admin-shell .admin-sidebar-item:hover,
+.admin-shell .admin-sidebar-item:focus-visible {
   color: var(--color-content-base) !important;
   background: var(--color-surface-base) !important;
 }
 
-.admin-shell .admin-sidebar-section-label {
-  color: #262626 !important;
+.admin-shell .admin-sidebar-item:hover svg,
+.admin-shell .admin-sidebar-item:focus-visible svg {
+  color: var(--color-gold-base) !important;
+  opacity: 1;
 }
 
-[data-theme="dark"] .admin-shell .admin-sidebar-section-label {
-  color: #E5E7EB !important;
-}
-
-.admin-shell .admin-sidebar-item {
-  color: #171717 !important;
-  background: transparent !important;
-}
-
-[data-theme="dark"] .admin-shell .admin-sidebar-item {
-  color: #F3F4F6 !important;
-}
-
-.admin-shell .admin-sidebar-item:hover {
-  color: #000000 !important;
-  background: var(--color-surface-base) !important;
-}
-
-[data-theme="dark"] .admin-shell .admin-sidebar-item:hover {
-  color: #FFFFFF !important;
-}
 
 .admin-shell .admin-sidebar-item-active {
   color: var(--color-accent-text) !important;
