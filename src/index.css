@@ -2804,3 +2804,81 @@ button, a, input, select, textarea {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
+
+
+/* Receipt checkout desktop stability: fixed dialog frame, flexible inner scroller. */
+.receipt-v2-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  padding: 16px !important;
+}
+
+.receipt-v2-dialog {
+  width: min(520px, calc(100vw - 32px)) !important;
+  height: min(760px, calc(100dvh - 32px)) !important;
+  max-width: 520px !important;
+  max-height: calc(100dvh - 32px) !important;
+  min-height: 0 !important;
+}
+
+.receipt-v2-scroll {
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+@media (max-width: 639px) {
+  .receipt-v2-overlay {
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+
+  .receipt-v2-dialog {
+    width: 100% !important;
+    height: min(100dvh, 844px) !important;
+    max-width: none !important;
+    max-height: 100dvh !important;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .receipt-v2-scroll {
+    max-height: none !important;
+  }
+}
+
+
+/* Keep checkout actions reachable while the internal content scrolls. */
+.receipt-v2-scroll .receipt-v2-actions,
+.receipt-v2-scroll .receipt-v2-decision-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 12px 0 0;
+  margin-bottom: 0;
+  background: var(--color-surface-card);
+}
+
+.receipt-v2-scroll .receipt-v2-actions::before,
+.receipt-v2-scroll .receipt-v2-decision-actions::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--color-border-subtle);
+  content: '';
+}
+
+
+/* One scroll container only: content must not create a nested vertical scroller. */
+.receipt-v2-content {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
