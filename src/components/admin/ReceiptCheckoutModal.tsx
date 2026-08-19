@@ -6,7 +6,9 @@ import {
   CheckCircle2,
   ClipboardCheck,
   CreditCard,
+  ChevronDown,
   FileText,
+  Info,
   Loader2,
   Percent,
   Printer,
@@ -227,6 +229,12 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
 
   const stepLabel = step === 'decision' ? 'Recebimento' : `Recebimento · Etapa ${step} de 3`;
   const isConfirmed = receipt?.status === 'received';
+  const adjustmentSummary = calculation.discountAmount > 0 || calculation.surchargeAmount > 0
+    ? [
+        calculation.discountAmount > 0 ? `− ${money(calculation.discountAmount)}` : '',
+        calculation.surchargeAmount > 0 ? `+ ${money(calculation.surchargeAmount)}` : '',
+      ].filter(Boolean).join(' · ')
+    : 'Sem ajustes';
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-5" role="dialog" aria-modal="true" aria-labelledby="receipt-dialog-title">
@@ -272,61 +280,47 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
         )}
 
         {step === 1 && !isConfirmed && (
-          <form className="p-4 sm:p-6 space-y-5" onKeyDown={handleEnterAsTab} onSubmit={(event) => { event.preventDefault(); setStep(2); }}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-4 rounded-xl bg-surface-base border border-border-subtle">
-                <span className="text-xs font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5"><UserRound className="w-3.5 h-3.5 text-gold-base" /> Cliente</span>
-                <p className="mt-2 text-sm font-bold text-content-base truncate">{source.clientName}</p>
-                {source.clientPhone && <p className="mt-0.5 text-xs text-content-muted">{source.clientPhone}</p>}
-              </div>
-              <div className="p-4 rounded-xl bg-surface-base border border-border-subtle">
-                <span className="text-xs font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5"><ReceiptText className="w-3.5 h-3.5 text-gold-base" /> Serviço</span>
-                <p className="mt-2 text-sm font-bold text-content-base truncate">{source.serviceTitle}</p>
-                <p className="mt-0.5 text-xs finance-positive font-bold">{money(originalAmount)}</p>
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-bold text-content-base block mb-2">Observações</label>
-              <textarea value={observations} onChange={(event) => setObservations(event.target.value)} rows={4} placeholder="Ex.: pagar no próximo atendimento" className="w-full rounded-xl bg-surface-base border border-border-subtle px-3 py-3 text-sm text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base resize-none" />
-            </div>
-            <div className="pt-4 border-t border-border-subtle flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
-              <button type="button" onClick={onClose} className="h-11 px-5 rounded-xl text-sm font-bold text-content-muted hover:text-content-base">Fechar</button>
-              <button type="submit" className="h-11 px-5 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-2"><span>Revisar valores</span><ArrowRight className="w-4 h-4" /></button>
+          <form className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5 space-y-4" onKeyDown={handleEnterAsTab} onSubmit={(event) => { event.preventDefault(); setStep(2); }}>
+            <CheckoutHero label="Valor do serviço" value={money(originalAmount)} meta={source.clientPhone ? `${source.clientName} · ${source.clientPhone}` : source.clientName} />
+            <ServiceSummary title={source.serviceTitle} value={money(originalAmount)} />
+            <label className="block">
+              <span className="receipt-field-label">Observações</span>
+              <input value={observations} onChange={(event) => setObservations(event.target.value)} placeholder="Ex.: pagar no próximo atendimento" className="receipt-minimal-input" />
+            </label>
+            <InlineNotice>Ao confirmar, o recebimento será marcado como recebido e entrará no extrato financeiro. Esta ação não poderá ser repetida.</InlineNotice>
+            <div className="sticky bottom-0 z-10 -mx-4 sm:-mx-5 px-4 sm:px-5 pt-3 pb-1 border-t border-border-subtle bg-surface-card flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
+              <button type="button" onClick={onClose} className="h-10 px-4 rounded-xl text-sm font-bold text-content-muted hover:text-content-base">Fechar</button>
+              <button type="submit" className="h-10 px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-2"><span>Revisar valores</span><ArrowRight className="w-4 h-4" /></button>
             </div>
           </form>
         )}
 
         {step === 2 && !isConfirmed && (
           <form className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5 space-y-4" onKeyDown={handleEnterAsTab} onSubmit={(event) => { event.preventDefault(); setStep(3); }}>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="min-w-0 rounded-xl bg-surface-base border border-border-subtle p-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-content-muted">Valor base</span>
-                <p className="mt-0.5 text-[11px] text-content-muted truncate">Preço do serviço</p>
-                <strong className="mt-2 block truncate text-lg font-mono finance-positive">{money(originalAmount)}</strong>
-              </div>
-              <div className="min-w-0 rounded-xl border border-gold-base/30 bg-gold-base/10 p-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-content-muted">Total</span>
-                <p className="mt-0.5 text-[11px] text-content-muted truncate">Após ajustes</p>
-                <strong className="mt-2 block truncate text-lg font-mono finance-positive">{money(calculation.total)}</strong>
-              </div>
-            </div>
+            <CheckoutHero label="Valor do serviço" value={money(originalAmount)} meta={source.clientName} />
 
-            <div>
-              <div className="flex items-center justify-between gap-3 mb-2"><h3 className="text-sm font-bold text-content-base">Ajustes</h3><span className="text-[11px] text-content-muted">Opcional</span></div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <AdjustmentControl label="Desconto" mode={discountMode} value={discountValue} onModeChange={setDiscountMode} onValueChange={setDiscountValue} calculated={calculation.discountAmount} tone="negative" />
-                <AdjustmentControl label="Acréscimo" mode={surchargeMode} value={surchargeValue} onModeChange={setSurchargeMode} onValueChange={setSurchargeValue} calculated={calculation.surchargeAmount} tone="positive" />
+            <details open className="receipt-accordion">
+              <summary className="receipt-accordion-summary">
+                <span>Ajustes do valor</span>
+                <span className="receipt-accordion-status"><span>{adjustmentSummary}</span><ChevronDown className="w-4 h-4" aria-hidden="true" /></span>
+              </summary>
+              <div className="receipt-accordion-body">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <AdjustmentControl label="Desconto" mode={discountMode} value={discountValue} onModeChange={setDiscountMode} onValueChange={setDiscountValue} calculated={calculation.discountAmount} tone="negative" />
+                  <AdjustmentControl label="Acréscimo" mode={surchargeMode} value={surchargeValue} onModeChange={setSurchargeMode} onValueChange={setSurchargeValue} calculated={calculation.surchargeAmount} tone="positive" />
+                </div>
               </div>
+            </details>
 
-            </div>
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-status-success/20 bg-status-success/5 px-3.5 py-3"><span className="text-sm font-bold text-content-base">Valor total</span><strong className="text-xl font-mono finance-positive">{money(calculation.total)}</strong></div>
 
             <div className="rounded-xl border border-border-subtle bg-surface-base p-3 space-y-2.5">
               <div className="flex items-center justify-between gap-3"><p className="text-sm font-bold text-content-base">Pagamento</p><span className="text-[11px] text-content-muted">Escolha uma opção</span></div>
-              <div role="radiogroup" aria-label="Forma de pagamento" className="grid grid-cols-2 lg:grid-cols-5 gap-2">
+              <div role="radiogroup" aria-label="Forma de pagamento" className="receipt-payment-scroll">
                 {paymentOptions.map((option) => {
                   const Icon = option.icon;
                   const selected = paymentMethod === option.id;
-                  return <button key={option.id} type="button" role="radio" aria-checked={selected} onClick={() => setPaymentMethod(option.id)} className={`min-h-12 rounded-lg border px-2 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors active:scale-[0.98] ${selected ? 'border-gold-base bg-gold-base/10 text-gold-hover' : 'border-border-subtle bg-surface-card text-content-muted hover:text-content-base'}`}><Icon className="w-4 h-4 shrink-0" aria-hidden="true" /><span className="truncate">{option.label}</span></button>;
+                  return <button key={option.id} type="button" role="radio" aria-checked={selected} onClick={() => setPaymentMethod(option.id)} className={`receipt-payment-chip min-h-10 rounded-full border px-3 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors active:scale-[0.98] ${selected ? 'border-gold-base bg-gold-base/10 text-gold-hover' : 'border-border-subtle bg-surface-card text-content-muted hover:text-content-base'}`}><Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" /><span className="truncate">{option.label}</span></button>;
                 })}
               </div>
             </div>
@@ -341,6 +335,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
             )}
 
+            <InlineNotice>Ao confirmar, o recebimento entra no Extrato Financeiro e não poderá ser confirmado novamente.</InlineNotice>
+
             <div className="sticky bottom-0 z-10 -mx-4 sm:-mx-5 px-4 sm:px-5 pt-3 pb-1 border-t border-border-subtle bg-surface-card flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
               <button type="button" onClick={() => setStep(1)} className="h-10 px-4 rounded-xl text-sm font-bold text-content-muted hover:text-content-base flex items-center justify-center gap-2"><ArrowLeft className="w-4 h-4" />Voltar</button>
               <button type="submit" className="h-10 px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-2">Revisar pagamento<ArrowRight className="w-4 h-4" /></button>
@@ -349,31 +345,79 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
         )}
 
         {step === 3 && !isConfirmed && (
-          <div className="p-5 sm:p-6 space-y-5">
-            <div className="p-4 rounded-xl bg-surface-base border border-border-subtle space-y-3">
-              <div className="flex items-center justify-between gap-3"><span className="text-sm font-bold text-content-base">{source.clientName}</span><span className="text-sm font-bold finance-positive">{money(calculation.total)}</span></div>
-              <p className="text-sm text-content-muted">{source.serviceTitle} · {paymentLabel[paymentMethod]}</p>
-              <div className="pt-3 border-t border-border-subtle grid grid-cols-2 gap-y-2 text-xs"><span className="text-content-muted">Valor base</span><strong className="text-right text-content-base">{money(calculation.entered)}</strong>{calculation.discountAmount > 0 && <><span className="text-content-muted">Desconto</span><strong className="text-right finance-negative">- {money(calculation.discountAmount)}</strong></>}{calculation.surchargeAmount > 0 && <><span className="text-content-muted">Acréscimo</span><strong className="text-right finance-positive">+ {money(calculation.surchargeAmount)}</strong></>}{paymentMethod === 'cash' && <><span className="text-content-muted">Troco</span><strong className="text-right finance-positive">{money(calculation.change)}</strong></>}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+            <CheckoutHero label="Valor a receber" value={money(calculation.total)} meta={`${source.clientName} · ${paymentLabel[paymentMethod]}`} />
+            <div className="rounded-xl bg-surface-base border border-border-subtle p-3.5 text-sm">
+              <ReviewRow label="Cliente" value={source.clientName} />
+              <ReviewRow label="Serviço" value={source.serviceTitle} />
+              <ReviewRow label="Forma de pagamento" value={paymentLabel[paymentMethod]} />
+              <ReviewRow label="Valor base" value={money(calculation.entered)} />
+              {calculation.discountAmount > 0 && <ReviewRow label="Desconto" value={`− ${money(calculation.discountAmount)}`} tone="negative" />}
+              {calculation.surchargeAmount > 0 && <ReviewRow label="Acréscimo" value={`+ ${money(calculation.surchargeAmount)}`} tone="positive" />}
+              {paymentMethod === 'cash' && <ReviewRow label="Troco" value={money(calculation.change)} tone="positive" />}
+              <div className="mt-2 border-t-2 border-border-subtle pt-2"><ReviewRow label="Valor total" value={money(calculation.total)} tone="positive" strong /></div>
             </div>
-            <p className="text-sm text-content-muted">Ao confirmar, o recebimento será marcado como recebido e entrará no extrato financeiro. Esta ação não poderá ser repetida para este atendimento.</p>
-            <div className="pt-4 border-t border-border-subtle flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
-              <button type="button" onClick={() => setStep(2)} disabled={isConfirming} className="h-11 px-5 rounded-xl text-sm font-bold text-content-muted hover:text-content-base">Voltar</button>
-              <button type="button" onClick={handleConfirmReceipt} disabled={isConfirming} className="h-11 px-5 rounded-xl bg-status-success text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50">{isConfirming ? <Loader2 className="w-4 h-4 animate-spin" /> : <ClipboardCheck className="w-4 h-4" />}{isConfirming ? 'Confirmando…' : 'Confirmar pagamento'}</button>
+            <InlineNotice>Ao confirmar, o recebimento será marcado como recebido e entrará no extrato financeiro. Esta ação não poderá ser repetida para este atendimento.</InlineNotice>
+            <div className="sticky bottom-0 z-10 -mx-4 sm:-mx-5 px-4 sm:px-5 pt-3 pb-1 border-t border-border-subtle bg-surface-card flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
+              <button type="button" onClick={() => setStep(2)} disabled={isConfirming} className="h-10 px-4 rounded-xl text-sm font-bold text-content-muted hover:text-content-base">Voltar</button>
+              <button type="button" onClick={handleConfirmReceipt} disabled={isConfirming} className="h-10 px-4 rounded-xl bg-status-success text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50">{isConfirming ? <Loader2 className="w-4 h-4 animate-spin" /> : <ClipboardCheck className="w-4 h-4" />}{isConfirming ? 'Confirmando…' : 'Confirmar pagamento'}</button>
             </div>
           </div>
         )}
 
         {isConfirmed && receipt && (
-          <div className="min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4">
-            <div className="text-center py-3"><span className="mx-auto w-14 h-14 rounded-full bg-status-success/15 text-status-success flex items-center justify-center"><CheckCircle2 className="w-7 h-7" /></span><h3 className="mt-3 text-lg font-bold text-content-base">Recebimento fechado</h3><p className="mt-1 text-sm text-content-muted">{money(receipt.totalAmount)} registrado em {paymentLabel[receipt.paymentMethod || 'other']}.</p></div>
-            <div className="p-5 rounded-2xl bg-surface-base border border-border-subtle text-sm space-y-3"><div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><FileText className="w-4 h-4 text-gold-base" /><span className="font-bold text-content-base">Comprovante</span></div><strong className="text-content-muted font-mono text-xs">{receipt.id.slice(-8).toUpperCase()}</strong></div><div className="pt-3 border-t border-border-subtle grid grid-cols-1 sm:grid-cols-2 gap-2"><div><span className="text-xs text-content-muted">Cliente</span><p className="font-bold text-content-base">{receipt.clientName}</p></div><div><span className="text-xs text-content-muted">Serviço</span><p className="font-bold text-content-base">{receipt.serviceTitle}</p></div><div><span className="text-xs text-content-muted">Profissional</span><p className="font-bold text-content-base">{receipt.professionalName || 'Não informado'}</p></div><div><span className="text-xs text-content-muted">Pagamento</span><p className="font-bold text-content-base">{paymentLabel[receipt.paymentMethod || 'other']}</p></div><div><span className="text-xs text-content-muted">Total recebido</span><p className="font-mono font-bold finance-positive">{money(receipt.totalAmount)}</p></div><div><span className="text-xs text-content-muted">Confirmado em</span><p className="font-bold text-content-base">{new Date(receipt.receivedAt || Date.now()).toLocaleString('pt-BR')}</p></div></div>{receipt.observations && <div className="pt-3 border-t border-border-subtle"><span className="text-xs text-content-muted">Observações</span><p className="mt-1 text-content-base">{receipt.observations}</p></div>}</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2"><button type="button" onClick={handlePrintReceipt} className="h-11 rounded-xl border border-border-subtle bg-surface-base text-content-base text-sm font-bold flex items-center justify-center gap-2"><Printer className="w-4 h-4" />Imprimir</button><button type="button" onClick={onClose} className="h-11 rounded-xl bg-gold-base text-surface-base text-sm font-bold">Fechar</button></div>
+          <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+            <div className="flex items-center justify-center gap-2 py-1 text-status-success"><CheckCircle2 className="h-5 w-5" aria-hidden="true" /><span className="text-sm font-bold">Recebimento confirmado</span></div>
+            <CheckoutHero label="Valor recebido" value={money(receipt.totalAmount)} meta={`${receipt.clientName} · ${paymentLabel[receipt.paymentMethod || 'other']}`} />
+            <div className="rounded-xl bg-surface-base border border-border-subtle p-3.5 text-sm">
+              <div className="mb-1 flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2"><FileText className="h-4 w-4 shrink-0 text-gold-base" aria-hidden="true" /><span className="font-bold text-content-base">Comprovante</span></div><strong className="shrink-0 text-xs font-mono text-content-muted">{receipt.id.slice(-8).toUpperCase()}</strong></div>
+              <ReviewRow label="Cliente" value={receipt.clientName} />
+              <ReviewRow label="Serviço" value={receipt.serviceTitle} />
+              <ReviewRow label="Profissional" value={receipt.professionalName || 'Não informado'} />
+              <ReviewRow label="Pagamento" value={paymentLabel[receipt.paymentMethod || 'other']} />
+              <ReviewRow label="Total recebido" value={money(receipt.totalAmount)} tone="positive" strong />
+              <ReviewRow label="Confirmado em" value={new Date(receipt.receivedAt || Date.now()).toLocaleString('pt-BR')} />
+              {receipt.observations && <div className="mt-2 border-t border-border-subtle pt-2"><span className="text-xs text-content-muted">Observações</span><p className="mt-1 whitespace-pre-wrap text-sm text-content-base admin-safe-wrap">{receipt.observations}</p></div>}
+            </div>
+            <div className="sticky bottom-0 z-10 -mx-4 sm:-mx-5 px-4 sm:px-5 pt-3 pb-1 border-t border-border-subtle bg-surface-card grid grid-cols-1 sm:grid-cols-2 gap-2"><button type="button" onClick={handlePrintReceipt} className="h-10 rounded-xl border border-border-subtle bg-surface-base text-content-base text-sm font-bold flex items-center justify-center gap-2"><Printer className="w-4 h-4" />Imprimir</button><button type="button" onClick={onClose} className="h-10 rounded-xl bg-gold-base text-surface-base text-sm font-bold">Fechar</button></div>
           </div>
         )}
       </div>
     </div>
   );
 };
+
+const ReviewRow: React.FC<{ label: string; value: string; tone?: 'positive' | 'negative'; strong?: boolean }> = ({ label, value, tone, strong }) => (
+  <div className="flex items-center justify-between gap-3 border-b border-border-subtle/70 py-2 last:border-b-0">
+    <span className={`min-w-0 admin-safe-wrap ${strong ? 'font-bold text-content-base' : 'text-content-muted'}`}>{label}</span>
+    <strong className={`shrink-0 text-right ${strong ? 'text-base' : 'text-sm'} ${tone === 'positive' ? 'finance-positive' : tone === 'negative' ? 'finance-negative' : 'text-content-base'}`}>{value}</strong>
+  </div>
+);
+
+const CheckoutHero: React.FC<{ label: string; value: string; meta: string }> = ({ label, value, meta }) => (
+  <div className="receipt-hero">
+    <span className="receipt-hero-label">{label}</span>
+    <strong className="receipt-hero-value">{value}</strong>
+    <span className="receipt-hero-meta">{meta}</span>
+  </div>
+);
+
+const ServiceSummary: React.FC<{ title: string; value: string }> = ({ title, value }) => (
+  <div className="receipt-service-row">
+    <span className="receipt-service-icon"><ReceiptText className="w-4 h-4" aria-hidden="true" /></span>
+    <div className="min-w-0 flex-1">
+      <p className="truncate text-sm font-bold text-content-base">{title}</p>
+      <p className="mt-0.5 text-xs text-content-muted">Serviço · <span className="finance-positive font-bold">{value}</span></p>
+    </div>
+  </div>
+);
+
+const InlineNotice: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="receipt-inline-notice" role="note">
+    <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-status-warning" aria-hidden="true" />
+    <span>{children}</span>
+  </div>
+);
 
 const CheckoutProgress: React.FC<{ step: CheckoutStep }> = ({ step }) => {
   if (typeof step !== 'number') return null;

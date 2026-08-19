@@ -1081,6 +1081,194 @@ button, a, input, select, textarea {
   }
 }
 
+.receipt-hero {
+  text-align: center;
+  padding: 0.35rem 0 0.15rem;
+}
+
+.receipt-hero-label,
+.receipt-field-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--color-content-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.receipt-hero-value {
+  color: var(--color-content-base);
+  font-size: clamp(2.25rem, 7vw, 3rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.receipt-hero-meta {
+  display: inline-flex;
+  max-width: 100%;
+  margin-top: 0.55rem;
+  padding: 0.28rem 0.7rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 999px;
+  color: var(--color-content-muted);
+  font-size: 0.72rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.receipt-service-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--admin-control-radius, 0.5rem);
+  background: var(--color-surface-base);
+}
+
+.receipt-service-icon {
+  display: flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--admin-control-radius, 0.5rem);
+  background: color-mix(in srgb, var(--color-gold-base) 10%, transparent);
+  color: var(--color-gold-base);
+}
+
+.receipt-minimal-input {
+  width: 100%;
+  height: 2.65rem;
+  border: 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-content-base);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 150ms var(--admin-ease-out, ease-out);
+}
+
+.receipt-minimal-input:focus {
+  border-bottom-color: var(--color-gold-base);
+}
+
+.receipt-minimal-input::placeholder {
+  color: var(--color-content-muted);
+}
+
+.receipt-inline-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-status-warning) 20%, transparent);
+  border-radius: var(--admin-control-radius, 0.5rem);
+  background: color-mix(in srgb, var(--color-status-warning) 7%, transparent);
+  color: var(--color-content-muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.receipt-accordion {
+  margin: 0;
+}
+
+.receipt-accordion-summary {
+  display: flex;
+  min-height: 2.45rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  color: var(--color-content-base);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 700;
+  list-style: none;
+  user-select: none;
+}
+
+.receipt-accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.receipt-accordion-status {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-content-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.receipt-accordion-status > span {
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.receipt-accordion-summary svg {
+  flex: 0 0 auto;
+  transition: transform 150ms var(--admin-ease-out, ease-out);
+}
+
+.receipt-accordion[open] .receipt-accordion-summary svg {
+  transform: rotate(180deg);
+}
+
+.receipt-accordion-body {
+  padding: 0.7rem 0 0.1rem;
+}
+
+.receipt-payment-scroll {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+  scrollbar-width: none;
+}
+
+.receipt-payment-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.receipt-payment-chip {
+  flex: 0 0 auto;
+  min-width: 5.5rem;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .receipt-payment-scroll {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .receipt-payment-chip {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .receipt-hero-value {
+    font-size: 2.35rem;
+  }
+
+  .receipt-accordion-status > span {
+    max-width: 7rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
