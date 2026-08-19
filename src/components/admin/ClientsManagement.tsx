@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Users, Search, Edit2, Trash2, Plus, Star, Award, ShieldCheck, Mail, Phone, Calendar, AlertCircle, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, Users, Search, Edit2, Trash2, Plus, Star, Award, ShieldCheck, Mail, Phone, Calendar, AlertCircle, AlertTriangle, X } from 'lucide-react';
 import { authFetch } from '../../lib/api';
 import { z } from 'zod';
 import { formatPhone } from '../../utils/masks';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import { useDialogFocus } from '../../hooks/useDialogFocus';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { AdminListSkeleton } from './shared/AdminSkeleton';
 import { AdminEmptyState } from './shared/AdminEmptyState';
 import { useToast } from '../ui/Toast';
@@ -49,6 +50,8 @@ export const ClientsManagement: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<ClientFieldErrors>({});
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   useDialogFocus(isModalOpen, dialogRef);
 
@@ -195,15 +198,27 @@ export const ClientsManagement: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Tem certeza que deseja excluir este cliente?')) return;
+  const handleDelete = (id: string) => {
+    if (isDeleting) return;
+    setDeleteTargetId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTargetId || isDeleting) return;
+    setIsDeleting(true);
     try {
-      const res = await authFetch(`/api/profiles/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Erro ao excluir');
+      const res = await authFetch(`/api/profiles/${deleteTargetId}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => null);
+        throw new Error(errorBody?.error || 'Não foi possível excluir o cliente.');
+      }
       showToast('success', 'Cliente excluído', 'A lista de clientes foi atualizada.');
-      loadClients(debouncedSearch);
+      await loadClients(debouncedSearch);
     } catch (error: any) {
-      console.warn(error);
+      showToast('error', 'Erro ao excluir', error?.message || 'Não foi possível excluir o cliente.');
+    } finally {
+      setIsDeleting(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -314,13 +329,13 @@ export const ClientsManagement: React.FC = () => {
           )}
           {/* RESPONSIVE CLIENT LIST */}
           <div className="space-y-2">
-            {filteredClients.map((client) => {
+            {filteredClients.map((client, index) => {
               const isExpanded = expandedClientId === client.id;
               const tier = client.loyaltyTier || 'Bronze';
               const isAdmin = (client.role || '').toLowerCase() === 'admin';
 
               return (
-                <article key={client.id} className={`overflow-hidden rounded-2xl border bg-surface-card transition-colors ${isExpanded ? 'border-gold-base/50' : 'border-border-subtle'}`}>
+                <article key={client.id} style={{ animationDelay: `${Math.min(index, 6) * 24}ms` }} className={`admin-list-item-enter overflow-hidden rounded-2xl border bg-surface-card transition-colors ${isExpanded ? 'border-gold-base/50' : 'border-border-subtle'}`}>
                   <button
                     type="button"
                     onClick={() => setExpandedClientId(isExpanded ? null : client.id)}
@@ -359,7 +374,10 @@ export const ClientsManagement: React.FC = () => {
                       <div className="admin-action-group">
                         {client.phone && <a href={`https://wa.me/55${client.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" title="Abrir WhatsApp" aria-label="Abrir WhatsApp" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-success/30 text-status-success text-sm font-semibold flex items-center justify-center gap-1.5"><Phone className="w-4 h-4" /><span className="hidden sm:inline">WhatsApp</span></a>}
                         <button type="button" onClick={() => handleOpenModal(client)} title="Editar cliente" aria-label="Editar cliente" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
-                        <button type="button" onClick={() => handleDelete(client.id)} title="Excluir cliente" aria-label="Excluir cliente" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5"><Trash2 className="w-4 h-4" /><span className="hidden sm:inline">Excluir</span></button>
+                        <button type="button" onClick={() => handleDelete(client.id)} disabled={isDeleting} title="Excluir cliente" aria-label="Excluir cliente" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5 hover:bg-status-error/10 disabled:cursor-not-allowed disabled:opacity-50 transition-colors">
+                          {isDeleting && deleteTargetId === client.id ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-status-error/30 border-t-status-error" aria-hidden="true" /> : <Trash2 className="w-4 h-4" />}
+                          <span className="hidden sm:inline">{isDeleting && deleteTargetId === client.id ? 'Excluindo…' : 'Excluir'}</span>
+                        </button>
                         {isAdmin && <span title="Administrador" aria-label="Administrador" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-purple-500/15 text-purple-300 text-sm font-semibold flex items-center justify-center gap-1.5"><ShieldCheck className="w-4 h-4" /><span className="hidden sm:inline">Administrador</span></span>}
                       </div>
                     </div>
@@ -553,6 +571,19 @@ export const ClientsManagement: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={Boolean(deleteTargetId)}
+        onClose={() => !isDeleting && setDeleteTargetId(null)}
+        onConfirm={confirmDelete}
+        title="Excluir cliente?"
+        description="Esta ação não pode ser desfeita. O histórico de fidelidade e os vínculos do cliente serão removidos."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={isDeleting}
+        icon={<AlertTriangle className="h-6 w-6" aria-hidden="true" />}
+      />
     </div>
   );
 };
