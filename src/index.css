@@ -733,34 +733,7 @@ button, a, input, select, textarea {
   }
 }
 
-/* Admin sidebar hierarchy: structural category headers, subdued options, and palette-driven active state. */
-.admin-shell .admin-sidebar-section-toggle {
-  color: var(--color-content-muted) !important;
-  background: transparent !important;
-  border-left: 2px solid transparent;
-}
-
-.admin-shell .admin-sidebar-section-toggle[aria-expanded="true"] {
-  color: var(--color-gold-base) !important;
-  background: color-mix(in srgb, var(--color-gold-base) 7%, transparent) !important;
-  border-left-color: var(--color-gold-base);
-}
-
-.admin-shell .admin-sidebar-section-toggle:hover,
-.admin-shell .admin-sidebar-section-toggle:focus-visible {
-  color: var(--color-gold-base) !important;
-  background: color-mix(in srgb, var(--color-gold-base) 10%, transparent) !important;
-}
-
-.admin-shell .admin-sidebar-section-label {
-  color: inherit !important;
-  letter-spacing: 0.18em;
-}
-
-.admin-shell .admin-sidebar-items {
-  border-left-color: color-mix(in srgb, var(--color-content-muted) 28%, transparent) !important;
-}
-
+/* Admin sidebar: a single flat navigation list with one active state. */
 .admin-shell .admin-sidebar-item {
   color: var(--color-content-muted) !important;
   background: transparent !important;
@@ -1041,18 +1014,6 @@ button, a, input, select, textarea {
 .admin-shell :is(button, a, input, select, textarea):focus-visible {
   outline: 2px solid color-mix(in srgb, var(--color-gold-base) 76%, white 10%);
   outline-offset: 2px;
-}
-
-.admin-shell .admin-sidebar-section-toggle[aria-expanded="true"] {
-  color: var(--color-content-muted) !important;
-  background: transparent !important;
-  border-left-color: transparent !important;
-}
-
-.admin-shell .admin-sidebar-section-toggle:hover,
-.admin-shell .admin-sidebar-section-toggle:focus-visible {
-  color: var(--color-content-base) !important;
-  background: var(--admin-muted-surface) !important;
 }
 
 .admin-shell .admin-sidebar-item-active {

@@ -55,7 +55,6 @@ export type AdminTab =
   | 'relacionamento'
   | 'sistema';
 
-export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionamento' | 'sistema';
 
 const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
 const ADMIN_TAB_VALUES: AdminTab[] = [
@@ -98,30 +97,6 @@ const getStoredAdminTab = (): AdminTab => {
   }
 };
 
-const ADMIN_TAB_SECTIONS: Partial<Record<AdminTab, AdminSection>> = {
-  dashboard: 'operacao',
-  agenda: 'operacao',
-  queue: 'operacao',
-  relatorios: 'operacao',
-  financeiro_recebimentos: 'financeiro',
-  financeiro_extrato: 'financeiro',
-  financeiro_saidas: 'financeiro',
-  clientes: 'cadastros',
-  catalogo: 'cadastros',
-  relacionamento: 'relacionamento',
-  sistema: 'sistema',
-};
-
-const getInitialCollapsedSections = (activeTab: AdminTab): Record<AdminSection, boolean> => {
-  const activeSection = ADMIN_TAB_SECTIONS[activeTab];
-  return {
-    operacao: activeSection !== 'operacao',
-    financeiro: activeSection !== 'financeiro',
-    cadastros: activeSection !== 'cadastros',
-    relacionamento: activeSection !== 'relacionamento',
-    sistema: activeSection !== 'sistema',
-  };
-};
 
 export const AdminLayout: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -131,9 +106,6 @@ export const AdminLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [adminName, setAdminName] = useState('Admin');
-  const [collapsedSections, setCollapsedSections] = useState<Record<AdminSection, boolean>>(() => (
-    getInitialCollapsedSections(getStoredAdminTab())
-  ));
 
   React.useEffect(() => {
     try {
@@ -167,57 +139,13 @@ export const AdminLayout: React.FC = () => {
     });
   };
 
-  const scrollSidebarNavigationToSection = (section: AdminSection, mobile = false) => {
-    window.requestAnimationFrame(() => {
-      const navigation = document.querySelector<HTMLElement>(
-        mobile ? '[data-admin-sidebar-navigation="mobile"]' : '[data-admin-sidebar-navigation="desktop"]'
-      );
-      const target = navigation?.querySelector<HTMLElement>(`[data-admin-sidebar-section="${section}"]`);
-      if (!navigation || !target) return;
-
-      target.focus({ preventScroll: true });
-      const navigationRect = navigation.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-      const targetTop = navigation.scrollTop + (targetRect.top - navigationRect.top) - ((navigation.clientHeight - targetRect.height) / 2);
-      navigation.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-    });
-  };
-
-  const handleSidebarSectionToggle = (section: AdminSection, mobile = false) => {
-    setCollapsedSections((current) => {
-      const shouldCollapse = !current[section];
-      return {
-        operacao: section === 'operacao' ? shouldCollapse : true,
-        financeiro: section === 'financeiro' ? shouldCollapse : true,
-        cadastros: section === 'cadastros' ? shouldCollapse : true,
-        relacionamento: section === 'relacionamento' ? shouldCollapse : true,
-        sistema: section === 'sistema' ? shouldCollapse : true,
-      };
-    });
-    scrollSidebarNavigationToSection(section, mobile);
-  };
 
   const handleSidebarTabChange = (tab: AdminTab, mobile = false) => {
-    const section = ADMIN_TAB_SECTIONS[tab];
-    if (section) {
-      setCollapsedSections(() => ({
-        operacao: section !== 'operacao',
-        financeiro: section !== 'financeiro',
-        cadastros: section !== 'cadastros',
-        relacionamento: section !== 'relacionamento',
-        sistema: section !== 'sistema',
-      }));
-    }
-
     setActiveTab(tab);
-
     if (mobile) {
       setSidebarOpen(false);
       return;
     }
-
-    // Mantém a categoria clicada no centro da área rolável da sidebar, sem
-    // criar um segundo estado visual de seleção ou mover a página principal.
     scrollSidebarNavigationToItem(tab);
   };
 
@@ -291,89 +219,69 @@ export const AdminLayout: React.FC = () => {
       label: 'Hoje',
       icon: TrendingUp,
       description: 'Resumo e alertas do dia',
-      section: 'operacao' as AdminSection,
     },
     {
       id: 'agenda' as AdminTab,
       label: 'Agenda',
       icon: Calendar,
       description: 'Horários, encaixes e bloqueios',
-      section: 'operacao' as AdminSection,
     },
     {
       id: 'queue' as AdminTab,
       label: 'Fila',
       icon: Clock,
       description: 'Atendimentos em andamento',
-      section: 'operacao' as AdminSection,
     },
     {
       id: 'relatorios' as AdminTab,
       label: 'Relatórios',
       icon: FileText,
       description: 'Operação e financeiro',
-      section: 'operacao' as AdminSection,
     },
     {
       id: 'financeiro_recebimentos' as AdminTab,
       label: 'Recebimentos',
       icon: Wallet,
       description: 'Pendências e recebimentos confirmados',
-      section: 'financeiro' as AdminSection,
     },
     {
       id: 'financeiro_extrato' as AdminTab,
       label: 'Extrato',
       icon: DollarSign,
       description: 'Livro-caixa persistido',
-      section: 'financeiro' as AdminSection,
     },
     {
       id: 'financeiro_saidas' as AdminTab,
       label: 'Saídas',
       icon: ArrowDownRight,
       description: 'Despesas e pagamentos',
-      section: 'financeiro' as AdminSection,
     },
     {
       id: 'clientes' as AdminTab,
       label: 'Clientes',
       icon: UserCheck,
       description: 'Base de clientes',
-      section: 'cadastros' as AdminSection,
     },
     {
       id: 'catalogo' as AdminTab,
       label: 'Catálogo',
       icon: Package,
       description: 'Serviços, equipe e estoque',
-      section: 'cadastros' as AdminSection,
     },
     {
       id: 'relacionamento' as AdminTab,
       label: 'Relacionamento',
       icon: Award,
       description: 'Fidelidade, avaliações e retorno',
-      section: 'relacionamento' as AdminSection,
     },
     {
       id: 'sistema' as AdminTab,
       label: 'Sistema',
       icon: Settings,
       description: 'Unidade, integrações e segurança',
-      section: 'sistema' as AdminSection,
     },
   ];
 
-  const sectionLabels: Record<AdminSection, string> = {
-    operacao: 'Operação do Dia',
-    financeiro: 'Financeiro',
-    cadastros: 'Cadastros',
-    relacionamento: 'Relacionamento',
-    sistema: 'Sistema',
-  };
-
-  const sectionOrder: AdminSection[] = ['operacao', 'financeiro', 'cadastros', 'relacionamento', 'sistema'];
 
   // Quick bottom bar items matching mobile model
   const bottomBarItems = [
@@ -385,53 +293,28 @@ export const AdminLayout: React.FC = () => {
   const renderSidebarNavigation = (mobile = false) => (
     <nav
       data-admin-sidebar-navigation={mobile ? 'mobile' : 'desktop'}
-      className={mobile ? 'flex-1 px-3 py-4 space-y-3 overflow-y-auto custom-scrollbar' : 'flex-1 px-2 py-4 space-y-3 overflow-y-auto no-scrollbar'}
+      className={mobile ? 'flex-1 px-3 py-4 overflow-y-auto custom-scrollbar' : 'flex-1 px-2 py-4 overflow-y-auto no-scrollbar'}
     >
-      {sectionOrder.map((section) => {
-        const itemsInSection = navItems.filter((item) => item.section === section);
-        if (itemsInSection.length === 0) return null;
-        const isCollapsed = collapsedSections[section];
-
-        return (
-          <div key={section} className="space-y-1">
+      <div className="admin-sidebar-items space-y-0.5">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
             <button
+              key={item.id}
               type="button"
-              data-admin-sidebar-section={section}
-              onClick={() => handleSidebarSectionToggle(section, mobile)}
-              aria-expanded={!isCollapsed}
-              className={`admin-sidebar-section-toggle w-full ${mobile ? 'min-h-10 px-2.5 rounded-lg' : 'min-h-8 px-2 rounded-md'} flex items-center justify-between gap-2 text-left transition-colors hover:bg-surface-base`}
+              onClick={() => handleSidebarTabChange(item.id, mobile)}
+              data-admin-sidebar-item={item.id}
+              title={item.description}
+              className={`admin-sidebar-item w-full ${mobile ? 'min-h-11 px-3 rounded-lg text-sm gap-3' : 'min-h-9 px-2 rounded-md text-xs gap-2'} font-medium flex items-center transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active' : ''}`}
             >
-              <span className="admin-sidebar-section-label text-[10px] font-bold uppercase tracking-[0.14em] truncate">
-                {sectionLabels[section]}
-              </span>
-              <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} />
+              <Icon className={`${mobile ? 'w-[18px] h-[18px]' : 'w-4 h-4'} shrink-0`} />
+              <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
+              {isActive && <ChevronRight className="admin-sidebar-item-chevron w-3 h-3 shrink-0" />}
             </button>
-
-            {!isCollapsed && (
-              <div className="admin-sidebar-items space-y-0.5 pl-1 ml-1 border-l border-border-subtle/70">
-                {itemsInSection.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleSidebarTabChange(item.id, mobile)}
-                      data-admin-sidebar-item={item.id}
-                      className={`admin-sidebar-item w-full ${mobile ? 'min-h-11 px-3 rounded-lg text-sm gap-3' : 'min-h-9 px-2 rounded-md text-xs gap-2'} font-medium flex items-center transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active' : ''}`}
-                    >
-                      <Icon className={`${mobile ? 'w-[18px] h-[18px]' : 'w-4 h-4'} shrink-0`} />
-                      <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
-                      {isActive && <ChevronRight className="admin-sidebar-item-chevron w-3 h-3 shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </nav>
   );
 
