@@ -291,7 +291,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           {step === 2 && !isConfirmed && (
             <form className="receipt-v2-content" onKeyDown={handleEnterAsTab} onSubmit={(event) => { event.preventDefault(); setStep(3); }}>
               <CheckoutHero label="Valor do serviço" value={money(originalAmount)} meta={source.clientName} />
-              <details open className="receipt-v2-accordion">
+              <details className="receipt-v2-accordion">
                 <summary className="receipt-v2-accordion-summary">
                   <span>Ajustes do valor</span>
                   <span className="receipt-v2-summary-right"><span>{adjustmentSummary}</span><ChevronDown aria-hidden="true" /></span>

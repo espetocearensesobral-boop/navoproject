@@ -2744,3 +2744,46 @@ button, a, input, select, textarea {
     font-size: 13px;
   }
 }
+
+
+/* Receipt checkout final geometry fixes. */
+.receipt-v2-dialog {
+  width: min(100%, 520px);
+  min-width: 0;
+  max-width: 520px;
+  overflow-x: hidden;
+}
+
+.receipt-v2-scroll,
+.receipt-v2-content {
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.receipt-v2-scroll {
+  max-height: calc(90dvh - 118px);
+}
+
+.receipt-v2-actions,
+.receipt-v2-decision-actions {
+  min-width: 0;
+}
+
+@media (max-width: 639px) {
+  .receipt-v2-dialog {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - 8px);
+  }
+
+  .receipt-v2-scroll {
+    max-height: calc(100dvh - 118px);
+    flex: 0 1 auto;
+  }
+}
+
+@media (max-width: 380px) {
+  .receipt-v2-scroll {
+    max-height: calc(100dvh - 108px);
+  }
+}
