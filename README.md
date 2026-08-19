@@ -2,7 +2,7 @@
 
 Aplicação web da **Navo Premium — Heritage Barber & Club**, com fluxo público de agendamento e painel administrativo para operação da barbearia.
 
-**Versão atual:** `0.1.0`
+**Versão atual:** `0.3.0`
 
 ## Stack
 

@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.3.0] — 2026-08-19
+
+### Evolução premium do painel administrativo
+
+- Empty states reutilizáveis para Clientes, Serviços, Fila e atendimentos do dashboard, com ações contextuais e diferenciação entre lista vazia, filtro sem resultado e erro de carregamento.
+- Toast global aprimorado para mobile, com safe area, semântica de status/erro e fechamento acessível.
+- Validação Zod por campo no cadastro e edição de clientes, com feedback visual e atributos ARIA.
+- Formulários de Clientes e Recebimentos refinados como drawers mobile, com foco controlado, alça visual e melhor ergonomia em telas estreitas.
+
+### Operações e segurança
+
+- Exclusão de clientes migrada de `window.confirm()` para `ConfirmDialog` acessível.
+- Estado de exclusão com spinner, bloqueio contra cliques duplicados e feedback global de sucesso ou erro.
+- Regras de backend e vínculos existentes preservados durante a exclusão.
+
+### Busca e qualidade de interação
+
+- Busca de Clientes com debounce e parâmetro server-side opcional por nome, e-mail ou telefone.
+- Consultas administrativas com limite de 100 resultados quando há busca ativa.
+- Cards da lista de Clientes com entrada suave, atraso escalonado limitado e respeito a `prefers-reduced-motion`.
+- Versão do pacote, lockfile e documentação pública sincronizados em `0.3.0`.
+
 ## [0.2.0] — 2026-08-19
 
 ### Experiência mobile do painel administrativo
