@@ -385,7 +385,7 @@ export const AdminLayout: React.FC = () => {
   const renderSidebarNavigation = (mobile = false) => (
     <nav
       data-admin-sidebar-navigation={mobile ? 'mobile' : 'desktop'}
-      className={mobile ? 'flex-1 px-4 py-6 space-y-4 overflow-y-auto custom-scrollbar' : 'flex-1 px-3 py-6 space-y-4 overflow-y-auto no-scrollbar'}
+      className={mobile ? 'flex-1 px-3 py-4 space-y-3 overflow-y-auto custom-scrollbar' : 'flex-1 px-2 py-4 space-y-3 overflow-y-auto no-scrollbar'}
     >
       {sectionOrder.map((section) => {
         const itemsInSection = navItems.filter((item) => item.section === section);
@@ -393,22 +393,22 @@ export const AdminLayout: React.FC = () => {
         const isCollapsed = collapsedSections[section];
 
         return (
-          <div key={section} className="space-y-1.5">
+          <div key={section} className="space-y-1">
             <button
               type="button"
               data-admin-sidebar-section={section}
               onClick={() => handleSidebarSectionToggle(section, mobile)}
               aria-expanded={!isCollapsed}
-              className="admin-sidebar-section-toggle w-full min-h-10 px-3.5 flex items-center justify-between gap-2 rounded-xl text-left transition-colors hover:bg-surface-base"
+              className={`admin-sidebar-section-toggle w-full ${mobile ? 'min-h-10 px-2.5 rounded-lg' : 'min-h-8 px-2 rounded-md'} flex items-center justify-between gap-2 text-left transition-colors hover:bg-surface-base`}
             >
-              <span className="admin-sidebar-section-label text-xs font-black uppercase tracking-[0.18em] truncate">
+              <span className="admin-sidebar-section-label text-[10px] font-bold uppercase tracking-[0.14em] truncate">
                 {sectionLabels[section]}
               </span>
-              <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} />
             </button>
 
             {!isCollapsed && (
-              <div className="admin-sidebar-items space-y-1 pl-2 ml-1 border-l border-border-subtle/70">
+              <div className="admin-sidebar-items space-y-0.5 pl-1 ml-1 border-l border-border-subtle/70">
                 {itemsInSection.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
@@ -419,11 +419,11 @@ export const AdminLayout: React.FC = () => {
                       type="button"
                       onClick={() => handleSidebarTabChange(item.id, mobile)}
                       data-admin-sidebar-item={item.id}
-                      className={`admin-sidebar-item w-full min-h-11 px-3.5 rounded-lg text-sm font-medium flex items-center gap-3 transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active shadow-sm' : ''}`}
+                      className={`admin-sidebar-item w-full ${mobile ? 'min-h-11 px-3 rounded-lg text-sm gap-3' : 'min-h-9 px-2 rounded-md text-xs gap-2'} font-medium flex items-center transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active' : ''}`}
                     >
-                      <Icon className="w-[18px] h-[18px] shrink-0" />
+                      <Icon className={`${mobile ? 'w-[18px] h-[18px]' : 'w-4 h-4'} shrink-0`} />
                       <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
-                      {isActive && <ChevronRight className="admin-sidebar-item-chevron w-3.5 h-3.5 shrink-0" />}
+                      {isActive && <ChevronRight className="admin-sidebar-item-chevron w-3 h-3 shrink-0" />}
                     </button>
                   );
                 })}
@@ -481,17 +481,14 @@ export const AdminLayout: React.FC = () => {
   return (
     <div className="admin-shell h-[100dvh] bg-surface-base flex text-content-base font-sans antialiased overflow-hidden">
       {/* Desktop Sidebar (Fixed layout for screens >= 1024px) */}
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col shrink-0 lg:bg-surface-card lg:border-r lg:border-border-subtle lg:fixed lg:inset-y-0 lg:left-0 text-content-base z-30">
+      <aside className="hidden lg:flex lg:w-56 lg:flex-col shrink-0 lg:bg-surface-card lg:border-r lg:border-border-subtle lg:fixed lg:inset-y-0 lg:left-0 text-content-base z-30">
         {/* Logo Header (Fixed 56px height) */}
-        <div className="flex items-center h-14 px-4 border-b border-border-subtle shrink-0 bg-surface-card">
+        <div className="flex items-center h-12 px-3 border-b border-border-subtle shrink-0 bg-surface-card">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 bg-gold-base text-content-on-accent rounded-lg flex items-center justify-center shrink-0 font-bold">
-              <Scissors className="w-4 h-4" />
+            <div className="w-6 h-6 bg-gold-base text-content-on-accent rounded-md flex items-center justify-center shrink-0 font-bold">
+              <Scissors className="w-3.5 h-3.5" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-sm font-serif font-bold text-content-base tracking-tight truncate">Navo Premium</h1>
-              <p className="text-xs text-gold-base font-bold uppercase tracking-widest truncate">Heritage Barber & Club</p>
-            </div>
+            <h1 className="text-xs font-semibold text-content-base tracking-tight truncate">Navo Premium</h1>
           </div>
         </div>
 
@@ -499,14 +496,14 @@ export const AdminLayout: React.FC = () => {
         {renderSidebarNavigation()}
 
         {/* User Profile Footer */}
-        <div className="p-3 border-t border-border-subtle shrink-0 bg-surface-card">
-          <div className="flex items-center gap-3 px-2.5 h-12 rounded-lg bg-surface-base border border-border-subtle">
-            <div className="w-7 h-7 rounded-xl bg-gold-base flex items-center justify-center text-content-on-accent font-bold text-xs uppercase shrink-0">
+        <div className="p-2 border-t border-border-subtle shrink-0 bg-surface-card">
+          <div className="flex items-center gap-2 px-2 h-10 rounded-md bg-surface-base border border-border-subtle">
+            <div className="w-6 h-6 rounded-md bg-gold-base flex items-center justify-center text-content-on-accent font-bold text-[10px] uppercase shrink-0">
               {adminName.substring(0, 2)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-content-base truncate">{adminName}</p>
-              <p className="text-xs font-bold text-content-muted uppercase tracking-wider">Admin</p>
+              <p className="text-[11px] font-semibold text-content-base truncate">{adminName}</p>
+              <p className="text-[9px] font-medium text-content-muted uppercase tracking-wider">Admin</p>
             </div>
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -536,9 +533,9 @@ export const AdminLayout: React.FC = () => {
       </aside>
 
       {/* Mobile Topbar */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-surface-card border-b border-border-subtle z-40 px-4 flex items-center justify-between">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-surface-card border-b border-border-subtle z-40 px-3 flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0 px-2">
-          <div className="w-8 h-8 bg-gold-base text-surface-base rounded-xl flex items-center justify-center shadow-sm shrink-0">
+          <div className="w-7 h-7 bg-gold-base text-surface-base rounded-md flex items-center justify-center shrink-0">
             <Scissors className="w-4 h-4" />
           </div>
           <h1 className="text-sm font-serif font-bold text-content-base truncate">
@@ -565,22 +562,22 @@ export const AdminLayout: React.FC = () => {
       </header>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 min-h-[68px] bg-surface-card border-t border-border-subtle z-40 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 min-h-[60px] bg-surface-card border-t border-border-subtle z-40 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
         {bottomBarItems.map(item => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`flex-1 min-h-14 flex flex-col items-center justify-center gap-1 rounded-lg transition-all active:scale-95 ${
+              onClick={() => handleSidebarTabChange(item.id, true)}
+              className={`flex-1 min-h-12 flex flex-col items-center justify-center gap-0.5 rounded-md transition-all active:scale-95 ${
                 isActive 
                   ? 'text-gold-base font-bold bg-gold-base/10' 
                   : 'text-content-muted hover:text-content-base'
               }`}
             >
               <Icon className="w-5 h-5 shrink-0" />
-              <span className="text-xs font-semibold tracking-tight truncate max-w-[76px]">{item.label}</span>
+              <span className="text-[11px] font-semibold tracking-tight truncate max-w-[76px]">{item.label}</span>
             </button>
           );
         })}
@@ -588,12 +585,12 @@ export const AdminLayout: React.FC = () => {
         {/* 4th Item: Menu / Mais */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className={`flex-1 h-12 flex flex-col items-center justify-center gap-0.5 rounded-xl transition-all active:scale-95 ${
+          className={`flex-1 h-12 flex flex-col items-center justify-center gap-0.5 rounded-md transition-all active:scale-95 ${
             isMoreActive ? 'text-gold-base font-bold' : 'text-content-muted hover:text-content-base'
           }`}
         >
           <MoreHorizontal className="w-5 h-5 shrink-0" />
-          <span className="text-xs font-semibold tracking-tight truncate max-w-[76px]">Mais</span>
+          <span className="text-[11px] font-semibold tracking-tight truncate max-w-[76px]">Mais</span>
         </button>
       </nav>
 
@@ -605,11 +602,11 @@ export const AdminLayout: React.FC = () => {
             onClick={() => setSidebarOpen(false)}
           />
           
-          <aside ref={sidebarRef} tabIndex={-1} className="relative w-[min(320px,88vw)] bg-surface-card text-content-base flex flex-col animate-slide-in border-r border-border-subtle h-[100dvh] outline-none">
+          <aside ref={sidebarRef} tabIndex={-1} className="relative w-[min(280px,84vw)] bg-surface-card text-content-base flex flex-col animate-slide-in border-r border-border-subtle h-[100dvh] outline-none">
             {/* Header */}
-            <div className="flex items-center justify-between h-16 px-5 border-b border-border-subtle shrink-0">
+            <div className="flex items-center justify-between h-14 px-4 border-b border-border-subtle shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 bg-gold-base text-content-on-accent rounded-xl flex items-center justify-center shrink-0 font-bold">
+                <div className="w-6 h-6 bg-gold-base text-content-on-accent rounded-md flex items-center justify-center shrink-0 font-bold">
                   <Scissors className="w-3.5 h-3.5" />
                 </div>
                 <h1 className="text-sm font-serif font-bold text-content-base truncate">Navo Premium</h1>
@@ -627,7 +624,7 @@ export const AdminLayout: React.FC = () => {
             {renderSidebarNavigation(true)}
             
             {/* Mobile Footer */}
-            <div className="p-4 border-t border-border-subtle shrink-0 space-y-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div className="p-3 border-t border-border-subtle shrink-0 space-y-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
               <AdminNotificationCenter
                 notificationsSupported={notificationsSupported}
                 notificationPermission={notificationPermission}
@@ -649,9 +646,9 @@ export const AdminLayout: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main ref={mainRef} className="flex-1 lg:ml-64 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
+      <main ref={mainRef} className="flex-1 lg:ml-56 pt-14 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
         <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-7 lg:px-10 py-6 lg:pt-9 lg:pb-14 pb-36 w-full min-w-0">
+        <div className="max-w-[1320px] mx-auto px-3 sm:px-5 lg:px-6 py-5 lg:pt-6 lg:pb-10 pb-24 w-full min-w-0">
           {/* Tab Content */}
           <div className="w-full min-w-0">
             {renderContent()}

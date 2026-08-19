@@ -113,38 +113,38 @@ export const AdminNotificationCenter: React.FC<AdminNotificationCenterProps> = (
           <section
             role="dialog"
             aria-label="Central de notificações"
-            className={`z-[60] flex flex-col overflow-hidden rounded-[2rem] sm:rounded-[2.75rem] border border-border-subtle bg-surface-card text-content-base shadow-2xl ${placement === 'drawer' ? 'fixed left-4 right-4 bottom-24 max-h-[min(78vh,48rem)]' : 'fixed left-1/2 top-1/2 w-[min(54rem,calc(100vw-2rem))] max-h-[min(86vh,52rem)] -translate-x-1/2 -translate-y-1/2'}`}
+            className={`z-[60] flex flex-col overflow-hidden rounded-lg border border-border-subtle bg-surface-card text-content-base ${placement === 'drawer' ? 'fixed left-3 right-3 bottom-20 max-h-[min(78vh,40rem)]' : 'fixed left-1/2 top-1/2 w-[min(42rem,calc(100vw-2rem))] max-h-[min(86vh,42rem)] -translate-x-1/2 -translate-y-1/2'}`}
           >
-            <header className="flex items-start justify-between gap-5 p-6 sm:p-10 border-b border-border-subtle">
+            <header className="flex items-start justify-between gap-3 p-4 border-b border-border-subtle">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-2xl sm:text-4xl font-black tracking-tight truncate">Notificações</h2>
-                  {unreadCount > 0 && <span className="rounded-full bg-status-error/10 text-status-error px-2.5 py-1 text-xs sm:text-xs font-black">{unreadCount} novas</span>}
+                  <h2 className="text-base font-semibold tracking-tight truncate">Notificações</h2>
+                  {unreadCount > 0 && <span className="rounded-full bg-status-error/10 text-status-error px-2 py-0.5 text-[10px] font-bold">{unreadCount} novas</span>}
                 </div>
-                <p className="mt-2 text-base sm:text-2xl text-content-muted">Agenda, Fila e Recebimentos</p>
+                <p className="mt-1 text-xs text-content-muted">Agenda, fila e recebimentos</p>
               </div>
-              <button type="button" onClick={() => setOpen(false)} className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl text-content-muted hover:bg-surface-base hover:text-content-base flex items-center justify-center shrink-0" aria-label="Fechar notificações">
-                <X className="w-7 h-7 sm:w-9 sm:h-9" />
+              <button type="button" onClick={() => setOpen(false)} className="w-8 h-8 rounded-md text-content-muted hover:bg-surface-base hover:text-content-base flex items-center justify-center shrink-0" aria-label="Fechar notificações">
+                <X className="w-4 h-4" />
               </button>
             </header>
 
-            <div className="flex items-center gap-6 px-6 sm:px-10 py-5 sm:py-6 border-b border-border-subtle bg-surface-base/30">
-              <button type="button" onClick={markAllAsRead} disabled={unreadCount === 0} className="inline-flex items-center gap-2 rounded-xl px-0 py-2 text-sm sm:text-lg font-bold text-content-muted hover:text-content-base disabled:opacity-40 disabled:cursor-not-allowed">
-                <CheckCheck className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="flex items-center gap-4 px-4 py-3 border-b border-border-subtle bg-surface-base/30">
+              <button type="button" onClick={markAllAsRead} disabled={unreadCount === 0} className="inline-flex items-center gap-1.5 rounded-md px-0 py-1 text-xs font-semibold text-content-muted hover:text-content-base disabled:opacity-40 disabled:cursor-not-allowed">
+                <CheckCheck className="w-4 h-4" />
                 Marcar lidas
               </button>
-              <button type="button" onClick={clearHistory} disabled={history.length === 0} className="inline-flex items-center gap-2 rounded-xl px-0 py-2 text-sm sm:text-lg font-bold text-status-error hover:text-status-error/80 disabled:opacity-40 disabled:cursor-not-allowed">
-                <Trash2 className="w-5 h-5 sm:w-6 sm:h-6" />
+              <button type="button" onClick={clearHistory} disabled={history.length === 0} className="inline-flex items-center gap-1.5 rounded-md px-0 py-1 text-xs font-semibold text-status-error hover:text-status-error/80 disabled:opacity-40 disabled:cursor-not-allowed">
+                <Trash2 className="w-4 h-4" />
                 Limpar
               </button>
             </div>
 
             <div className="flex-1 min-h-0 max-h-[min(42vh,22rem)] overflow-y-auto overscroll-contain">
               {history.length === 0 ? (
-                <div className="px-5 py-16 sm:py-24 text-center">
-                  <Bell className="w-14 h-14 sm:w-20 sm:h-20 mx-auto text-content-muted/40" />
-                  <p className="mt-8 text-xl sm:text-2xl font-black text-content-base">Nenhuma notificação registrada</p>
-                  <p className="mt-3 text-base sm:text-xl text-content-muted">Novos eventos operacionais aparecerão aqui.</p>
+                <div className="px-4 py-12 text-center">
+                  <Bell className="w-8 h-8 mx-auto text-content-muted/40" />
+                  <p className="mt-4 text-sm font-semibold text-content-base">Nenhuma notificação registrada</p>
+                  <p className="mt-1 text-xs text-content-muted">Novos eventos operacionais aparecerão aqui.</p>
                 </div>
               ) : history.map((item) => (
                 <button key={item.id} type="button" onClick={() => markAsRead(item.id)} className={`w-full text-left px-4 py-3 border-b border-border-subtle last:border-b-0 hover:bg-surface-base transition-colors ${item.read ? '' : 'bg-gold-base/5'}`}>
@@ -162,18 +162,18 @@ export const AdminNotificationCenter: React.FC<AdminNotificationCenterProps> = (
               ))}
             </div>
 
-            <footer className="p-5 sm:p-8 border-t border-border-subtle bg-surface-base/30">
-              <button type="button" onClick={() => void onToggleNotifications()} disabled={isBlocked || notificationsBusy} className={`w-full min-h-[76px] rounded-[1.5rem] px-5 py-4 flex items-center justify-between gap-4 text-left border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${notificationsActive ? 'border-status-success/40 bg-surface-card' : 'border-border-subtle bg-surface-card hover:border-gold-base/40'}`}>
-                <span className="flex items-center gap-4 min-w-0">
-                  <span className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-surface-base flex items-center justify-center shrink-0">
-                    {notificationsActive ? <BellRing className="w-6 h-6 sm:w-7 sm:h-7 text-status-success" /> : <Bell className="w-6 h-6 sm:w-7 sm:h-7 text-content-muted" />}
+            <footer className="p-3 border-t border-border-subtle bg-surface-base/30">
+              <button type="button" onClick={() => void onToggleNotifications()} disabled={isBlocked || notificationsBusy} className={`w-full min-h-12 rounded-md px-3 py-2 flex items-center justify-between gap-4 text-left border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${notificationsActive ? 'border-status-success/40 bg-surface-card' : 'border-border-subtle bg-surface-card hover:border-gold-base/40'}`}>
+                <span className="flex items-center gap-2.5 min-w-0">
+                  <span className="w-8 h-8 rounded-md bg-surface-base flex items-center justify-center shrink-0">
+                    {notificationsActive ? <BellRing className="w-4 h-4 text-status-success" /> : <Bell className="w-4 h-4 text-content-muted" />}
                   </span>
                   <span className="min-w-0">
-                    <span className={`block text-base sm:text-xl font-black ${notificationsActive ? 'text-status-success' : 'text-content-base'}`}>{notificationsActive ? 'Push ativo' : 'Push inativo'}</span>
-                    <span className={`block mt-1 text-sm sm:text-lg truncate ${notificationsActive ? 'text-status-success/80' : 'text-content-muted'}`}>{pushLabel}</span>
+                    <span className={`block text-xs font-bold ${notificationsActive ? 'text-status-success' : 'text-content-base'}`}>{notificationsActive ? 'Push ativo' : 'Push inativo'}</span>
+                    <span className={`block mt-0.5 text-[11px] truncate ${notificationsActive ? 'text-status-success/80' : 'text-content-muted'}`}>{pushLabel}</span>
                   </span>
                 </span>
-                <span className={`text-sm sm:text-lg font-black whitespace-nowrap ${notificationsActive ? 'text-status-success' : 'text-gold-base'}`}>{notificationsActive ? 'Desativar' : 'Ativar'}</span>
+                <span className={`text-xs font-bold whitespace-nowrap ${notificationsActive ? 'text-status-success' : 'text-gold-base'}`}>{notificationsActive ? 'Desativar' : 'Ativar'}</span>
               </button>
             </footer>
           </section>
