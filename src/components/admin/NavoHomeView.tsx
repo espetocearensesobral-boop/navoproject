@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { fetchAppointmentsFromSupabase, fetchOperationalReportFromSupabase, type OperationalReportData } from '../../services/supabaseDataService';
 import { getTodayStringBRT } from '../../utils/dateUtils';
 import { Appointment } from '../../types';
-import { RefreshCw, ArrowRight, Clock, Receipt, Scissors, Users, CalendarCheck2 } from 'lucide-react';
+import { Receipt, Scissors, Users, CalendarCheck2 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminAppointmentFeed } from './shared/AdminAppointmentFeed';
 
 interface NavoHomeViewProps {
   onNavigateToAgenda: () => void;
@@ -56,14 +57,14 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
       case 'in_chair':
         return (
           <span className="text-xs font-bold text-status-success bg-status-success/10 border border-status-success/30 px-2 py-0.5 rounded-xl whitespace-nowrap inline-flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-status-success" />
             Na Cadeira
           </span>
         );
       case 'pending_approval':
         return (
-          <span className="text-xs font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-xl whitespace-nowrap inline-flex items-center gap-1 animate-pulse">
-            ⚠️ Fora do Expediente
+          <span className="text-xs font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-xl whitespace-nowrap inline-flex items-center gap-1">
+            Fora do expediente
           </span>
         );
       case 'completed':
@@ -158,153 +159,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
           </button>
         </div>
 
-        {/* MOBILE CARD LIST (< md) / DESKTOP TABLE (>= md) */}
-        {/* Mobile View */}
-        <div className="block md:hidden divide-y divide-border-subtle">
-          {todayAppointments.length === 0 ? (
-            <div className="py-10 px-4 text-center text-content-muted">
-              <Clock className="w-6 h-6 text-content-muted mx-auto mb-2 opacity-50" />
-              <p className="text-xs font-medium">Nenhum agendamento hoje.</p>
-              <button
-                onClick={onNavigateToAgenda}
-                className="mt-2 text-xs font-bold text-gold-base active:underline"
-              >
-                Abrir agenda completa
-              </button>
-            </div>
-          ) : (
-            todayAppointments.map(apt => {
-              const serviceName = Array.isArray(apt.services) && apt.services.length > 0
-                ? (typeof apt.services[0] === 'string' ? apt.services[0] : apt.services[0].title)
-                : 'Atendimento de Barbearia';
-
-              return (
-                <div key={apt.id} className="p-3.5 space-y-2.5 active:bg-surface-base/50 transition-colors">
-                  <div className="flex items-start justify-between gap-2 min-w-0">
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <div className="w-8 h-8 rounded-xl bg-surface-base border border-border-subtle text-gold-base font-serif font-bold text-xs flex items-center justify-center shrink-0">
-                        {apt.client_name ? apt.client_name.charAt(0).toUpperCase() : 'C'}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-content-base admin-clamp-2">{apt.client_name || 'Cliente'}</div>
-                        <div className="text-xs text-content-muted admin-clamp-2">{serviceName}</div>
-                      </div>
-                    </div>
-                    {getStatusBadge(apt.status)}
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs pt-1 border-t border-border-subtle/50">
-                    <div className="flex items-center gap-3 text-content-muted">
-                      <span className="num-tabular font-bold text-content-base whitespace-nowrap">{apt.time_slot || '--:--'}</span>
-                      <span>•</span>
-                      <span className="text-gold-base font-bold admin-safe-wrap max-w-[120px]">{apt.professional_name || 'Barbeiro'}</span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold finance-positive num-tabular whitespace-nowrap">
-                        R$ {apt.final_amount ? apt.final_amount.toFixed(2) : '0.00'}
-                      </span>
-                      <button
-                        onClick={onNavigateToAgenda}
-                        className="h-8 w-8 flex items-center justify-center rounded-xl bg-surface-base text-content-muted active:text-gold-base border border-border-subtle shrink-0"
-                        aria-label="Ver agendamento"
-                      >
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        {/* Desktop View Table (>= md) */}
-        <div className="hidden md:block overflow-x-auto custom-scrollbar">
-          <table className="w-full text-left text-xs border-collapse min-w-[600px]">
-            <thead>
-              <tr className="border-b border-border-subtle bg-surface-base/50 h-9 text-xs font-bold uppercase tracking-wider text-content-muted">
-                <th className="px-4 py-2 font-bold min-w-[180px]">Cliente</th>
-                <th className="px-4 py-2 font-bold min-w-[180px]">Serviço & Barbeiro</th>
-                <th className="px-4 py-2 font-bold text-right min-w-[100px]">Horário</th>
-                <th className="px-4 py-2 font-bold text-right min-w-[110px]">Valor</th>
-                <th className="px-4 py-2 font-bold text-center min-w-[120px]">Status</th>
-                <th className="px-4 py-2 font-bold text-right min-w-[80px]">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-subtle">
-              {todayAppointments.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-content-muted">
-                    <Clock className="w-6 h-6 text-content-muted mx-auto mb-2 opacity-50" />
-                    <p className="text-xs font-medium">Nenhum agendamento registrado para hoje.</p>
-                    <button
-                      onClick={onNavigateToAgenda}
-                      className="mt-2 text-xs font-bold text-gold-base hover:underline"
-                    >
-                      Abrir agenda para agendar cliente
-                    </button>
-                  </td>
-                </tr>
-              ) : (
-                todayAppointments.map(apt => {
-                  const serviceName = Array.isArray(apt.services) && apt.services.length > 0
-                    ? (typeof apt.services[0] === 'string' ? apt.services[0] : apt.services[0].title)
-                    : 'Atendimento de Barbearia';
-
-                  return (
-                    <tr key={apt.id} className="h-12 hover:bg-surface-base/40 transition-colors">
-                      {/* Cliente */}
-                      <td className="px-4 py-2 min-w-0">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-7 h-7 rounded-xl bg-surface-base border border-border-subtle text-gold-base font-serif font-bold text-xs flex items-center justify-center shrink-0">
-                            {apt.client_name ? apt.client_name.charAt(0).toUpperCase() : 'C'}
-                          </div>
-                          <span className="font-bold text-content-base admin-clamp-2">{apt.client_name || 'Cliente'}</span>
-                        </div>
-                      </td>
-
-                      {/* Serviço & Barbeiro */}
-                      <td className="px-4 py-2 min-w-0">
-                        <div className="admin-safe-wrap text-content-muted">
-                          <span className="text-content-base font-medium">{serviceName}</span>
-                          <span className="mx-1">•</span>
-                          <span className="text-gold-base font-bold">{apt.professional_name || 'Barbeiro'}</span>
-                        </div>
-                      </td>
-
-                      {/* Horário */}
-                      <td className="px-4 py-2 text-right num-tabular whitespace-nowrap font-bold text-content-base">
-                        {apt.time_slot || '--:--'}
-                      </td>
-
-                      {/* Valor */}
-                      <td className="px-4 py-2 text-right num-tabular whitespace-nowrap font-bold finance-positive">
-                        R$ {apt.final_amount ? apt.final_amount.toFixed(2) : '0.00'}
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-4 py-2 text-center">
-                        {getStatusBadge(apt.status)}
-                      </td>
-
-                      {/* Action Zone: End of Table Row */}
-                      <td className="px-4 py-2 text-right">
-                        <button
-                          onClick={onNavigateToAgenda}
-                          className="h-8 px-2.5 rounded-xl bg-surface-base hover:bg-surface-card text-content-muted hover:text-gold-base border border-border-subtle transition-all text-xs font-bold whitespace-nowrap inline-flex items-center gap-1 active:scale-95"
-                        >
-                          <span>Ver</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+        <AdminAppointmentFeed appointments={todayAppointments} onNavigateToAgenda={onNavigateToAgenda} loading={loading} />
       </div>
     </div>
   );

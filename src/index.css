@@ -989,3 +989,24 @@ button, a, input, select, textarea {
     scroll-behavior: auto !important;
   }
 }
+
+
+/* Admin: densidade e sobriedade visual. Feedback funcional, como loaders, permanece ativo. */
+.admin-shell .animate-fade-in,
+.admin-shell .animate-in,
+.admin-shell .animate-pulse,
+.admin-shell .animate-ping,
+.admin-shell .animate-slide-in,
+.admin-shell .animate-slide-in-right {
+  animation: none !important;
+}
+
+.admin-shell [class*="shadow-"]:not(.admin-preserve-depth) {
+  box-shadow: none !important;
+}
+
+.admin-shell .backdrop-blur-sm,
+.admin-shell .backdrop-blur-md,
+.admin-shell .backdrop-blur-lg {
+  backdrop-filter: none !important;
+}

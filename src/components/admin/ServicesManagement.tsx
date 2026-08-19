@@ -386,7 +386,7 @@ export const ServicesManagement: React.FC = () => {
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
-            🔥 Combos VIP
+            Combos VIP
           </button>
 
           <button
@@ -397,7 +397,7 @@ export const ServicesManagement: React.FC = () => {
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
-            ⭐ Destaques
+            Destaques
           </button>
 
           {DEFAULT_CATEGORIES.map((cat) => (
@@ -705,7 +705,7 @@ export const ServicesManagement: React.FC = () => {
                           </div>
                           {service.discount_percentage && service.discount_percentage > 0 && (
                             <span className="text-xs text-status-success font-extrabold">
-                              🔥 {service.discount_percentage}% OFF
+                              {service.discount_percentage}% OFF
                             </span>
                           )}
                         </div>
@@ -724,7 +724,7 @@ export const ServicesManagement: React.FC = () => {
                                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
                             }`}
                           >
-                            {service.is_combo ? '🔥 Combo VIP' : '+ Combo'}
+                            {service.is_combo ? 'Combo VIP' : '+ Combo'}
                           </button>
 
                           {/* Toggle Popular */}
@@ -737,7 +737,7 @@ export const ServicesManagement: React.FC = () => {
                                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
                             }`}
                           >
-                            {service.popular ? '⭐ Destaque' : '+ Destaque'}
+                            {service.popular ? 'Destaque' : '+ Destaque'}
                           </button>
                         </div>
                       </td>
@@ -838,8 +838,8 @@ export const ServicesManagement: React.FC = () => {
                       </div>
                       {service.description && <p className="text-sm text-content-muted leading-relaxed">{service.description}</p>}
                       <div className="flex flex-wrap gap-2">
-                        <button type="button" onClick={() => handleToggleCombo(service)} className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.is_combo ? 'border-status-success/30 text-status-success' : 'border-border-subtle text-content-muted'}`}>{service.is_combo ? '🔥 Combo VIP ativo' : '+ Ativar Combo VIP'}</button>
-                        <button type="button" onClick={() => handleTogglePopular(service)} className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.popular ? 'border-gold-base/40 text-gold-base' : 'border-border-subtle text-content-muted'}`}>{service.popular ? '⭐ Destaque ativo' : '+ Marcar destaque'}</button>
+                        <button type="button" onClick={() => handleToggleCombo(service)} className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.is_combo ? 'border-status-success/30 text-status-success' : 'border-border-subtle text-content-muted'}`}>{service.is_combo ? 'Combo VIP ativo' : '+ Ativar Combo VIP'}</button>
+                        <button type="button" onClick={() => handleTogglePopular(service)} className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.popular ? 'border-gold-base/40 text-gold-base' : 'border-border-subtle text-content-muted'}`}>{service.popular ? 'Destaque ativo' : '+ Marcar destaque'}</button>
                       </div>
                       <div className="flex flex-wrap gap-2 pt-1">
                         <button type="button" onClick={() => handleOpenEdit(service)} className="min-h-10 px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center gap-1.5"><Edit2 className="w-4 h-4" /> Editar</button>
@@ -1007,7 +1007,7 @@ export const ServicesManagement: React.FC = () => {
                               className="w-3.5 h-3.5 accent-[#4CAF50]"
                             />
                             <div>
-                              <span className="text-xs font-bold text-content-base block">🔥 Combo VIP</span>
+                              <span className="text-xs font-bold text-content-base block">Combo VIP</span>
                               <span className="text-xs text-content-muted">Pacote promocional</span>
                             </div>
                           </label>
@@ -1020,7 +1020,7 @@ export const ServicesManagement: React.FC = () => {
                               className="w-3.5 h-3.5 accent-gold-base"
                             />
                             <div>
-                              <span className="text-xs font-bold text-content-base block">⭐ Mais Pedido</span>
+                              <span className="text-xs font-bold text-content-base block">Mais pedido</span>
                               <span className="text-xs text-content-muted">Selo no cardápio</span>
                             </div>
                           </label>

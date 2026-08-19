@@ -334,7 +334,7 @@ export const ScheduleGrid: React.FC = () => {
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
-            💈 Todos
+              Todos
           </button>
           {barbers.map(b => (
             <button
@@ -441,7 +441,7 @@ export const ScheduleGrid: React.FC = () => {
                                   )}
                                   <span className={`px-2 py-0.5 rounded-full font-semibold text-xs ${
                                     isPending
-                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
+                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                                       : apt.status === 'completed'
                                       ? 'bg-status-success/15 text-status-success'
                                       : operationalState.isInService
@@ -523,7 +523,7 @@ export const ScheduleGrid: React.FC = () => {
               onChange={(e) => setSelectedBarberId(e.target.value)}
               className="bg-surface-base border border-border-subtle text-xs text-content-base rounded-xl px-3 py-2 outline-none focus:border-gold-base"
             >
-              <option value="all">💈 Todos os Barbeiros</option>
+              <option value="all">Todos os barbeiros</option>
               {barbers.map(b => (
                 <option key={b.id} value={b.id}>{b.name}</option>
               ))}

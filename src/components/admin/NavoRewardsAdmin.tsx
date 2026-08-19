@@ -365,7 +365,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
     if (voucherCodeInput.toUpperCase().startsWith('NAV-RWD-')) {
       setVoucherValidationResult(`✅ VOUCHER VÁLIDO: Código ${voucherCodeInput.toUpperCase()} confirmado! Pode conceder o prêmio ao cliente.`);
     } else {
-      setVoucherValidationResult(`⚠️ VOUCHER INVÁLIDO ou CÓDIGO INCORRETO. Verifique com o cliente.`);
+      setVoucherValidationResult(`Voucher inválido ou código incorreto. Verifique com o cliente.`);
     }
   };
 

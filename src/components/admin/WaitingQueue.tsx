@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { WaitingQueueItem, Professional, ServiceItem } from '../../types';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminTabs } from './shared/AdminTabs';
 import { ReceiptCheckoutModal } from './ReceiptCheckoutModal';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import {
@@ -426,91 +427,28 @@ export const WaitingQueue: React.FC = () => {
           />
         </div>
 
-        {/* Mobile: filtros soltos e deslizáveis, no padrão de Serviços */}
-        <div className="md:hidden space-y-2">
-          <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar -mx-1 px-1">
-            <button
-              type="button"
-              onClick={() => setSelectedBarberFilter('all')}
-              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
-                selectedBarberFilter === 'all'
-                  ? 'bg-gold-base text-surface-base border-gold-base'
-                  : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
-              }`}
-            >
-              Todos os barbeiros
-            </button>
-            {professionals.map((professional) => (
-              <button
-                key={professional.id}
-                type="button"
-                onClick={() => setSelectedBarberFilter(professional.id)}
-                className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
-                  selectedBarberFilter === professional.id
-                    ? 'bg-gold-base text-surface-base border-gold-base'
-                    : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
-                }`}
-              >
-                {professional.name}
-              </button>
-            ))}
-          </div>
-
-          <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar -mx-1 px-1">
-            {([
-              ['kanban', 'Painel'],
-              ['history', 'Histórico'],
-              ['abandoned', 'Removidos'],
-            ] as const).map(([tab, label]) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`shrink-0 min-h-10 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all border ${
-                  activeTab === tab
-                    ? 'bg-surface-base text-gold-base border-gold-base/50 shadow-sm'
-                    : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Desktop: controles lineares, com as abas sem contadores */}
-        <div className="hidden md:flex items-center justify-between gap-3 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
-          <label className="flex items-center gap-2 shrink-0 px-2.5 py-1.5 rounded-lg bg-surface-base border border-border-subtle">
-            <Filter className="w-3.5 h-3.5 text-gold-hover" />
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-2.5 space-y-2">
+          <AdminTabs
+            tabs={[
+              { id: 'kanban', label: 'Painel' },
+              { id: 'history', label: 'Histórico' },
+              { id: 'abandoned', label: 'Removidos' },
+            ]}
+            activeId={activeTab}
+            onChange={(id) => setActiveTab(id as 'kanban' | 'history' | 'abandoned')}
+            className="pb-0"
+          />
+          <div className="flex items-center gap-2 min-w-0">
+            <Filter className="w-3.5 h-3.5 text-content-muted shrink-0" aria-hidden="true" />
             <select
               value={selectedBarberFilter}
               onChange={(e) => setSelectedBarberFilter(e.target.value)}
-              className="bg-transparent text-xs text-content-base font-semibold outline-none cursor-pointer"
+              className="min-h-10 flex-1 min-w-0 bg-surface-base border border-border-subtle rounded-lg px-3 text-xs text-content-base font-semibold outline-none cursor-pointer"
               aria-label="Filtrar por barbeiro"
             >
               <option value="all">Todos os barbeiros</option>
               {professionals.map((professional) => <option key={professional.id} value={professional.id}>{professional.name}</option>)}
             </select>
-          </label>
-          <div className="flex items-center gap-1.5 shrink-0">
-            {([
-              ['kanban', 'Painel'],
-              ['history', 'Histórico'],
-              ['abandoned', 'Removidos'],
-            ] as const).map(([tab, label]) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`min-h-9 px-3 rounded-lg text-xs font-bold transition-colors border ${
-                  activeTab === tab
-                    ? 'bg-gold-base text-surface-base border-gold-base'
-                    : 'bg-surface-base text-content-muted border-border-subtle hover:text-content-base'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
           </div>
         </div>
       </div>
@@ -522,7 +460,7 @@ export const WaitingQueue: React.FC = () => {
           <section className="order-2 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between gap-3 shrink-0">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-status-success animate-ping" />
+                <div className="w-2 h-2 rounded-full bg-status-success" />
                 <span className="text-xs font-bold text-status-success uppercase tracking-wider">
                   Em atendimento
                 </span>

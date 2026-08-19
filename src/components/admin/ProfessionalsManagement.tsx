@@ -326,7 +326,7 @@ export const ProfessionalsManagement: React.FC = () => {
               <Star className="w-3.5 h-3.5 fill-amber-400" />
             </div>
           </div>
-          <p className="text-lg font-mono num-tabular font-bold text-amber-400">{avgRating} ⭐</p>
+          <p className="text-lg font-mono num-tabular font-bold text-amber-400">{avgRating} / 5</p>
           <p className="text-xs text-content-muted mt-1 font-medium truncate">Sua equipe em destaque</p>
         </div>
 
@@ -577,7 +577,7 @@ export const ProfessionalsManagement: React.FC = () => {
                       </td>
 
                       <td className="p-3.5 text-amber-400 font-bold">
-                        ⭐ {(barber.rating || 5.0).toFixed(1)}
+                        {(barber.rating || 5.0).toFixed(1)} / 5
                       </td>
 
                       <td className="p-3.5">

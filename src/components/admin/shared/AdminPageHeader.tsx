@@ -9,8 +9,8 @@ import { LucideIcon, Plus } from 'lucide-react';
  *   aparece na topbar fixa do AdminLayout, então repetir o título aqui
  *   só ocupa espaço. Cada tela mantém sua própria barra de ação mobile
  *   (busca + botão) que já é compacta.
- * - No desktop (md+): 1 card, 1 linha, ícone + título + estatísticas
- *   curtas (StatPill) à esquerda, botão dourado à direita.
+ * - No desktop (md+): 1 barra discreta, 1 linha, ícone + título + estatísticas
+ *   curtas à esquerda, botão primário à direita.
  */
 
 export interface AdminStat {
@@ -57,13 +57,13 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
   const ActionIcon = action?.icon ?? Plus;
 
   return (
-    <div className="hidden md:flex items-center justify-between gap-5 bg-surface-card px-5 py-5 rounded-2xl border border-border-subtle overflow-hidden">
+    <div className="hidden md:flex min-h-12 items-center justify-between gap-4 border-b border-border-subtle pb-3 overflow-hidden">
       <div className="flex items-center gap-2.5 min-w-0 flex-1">
-        <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-base flex items-center justify-center border border-gold-base/20 shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-surface-card text-gold-base flex items-center justify-center border border-border-subtle shrink-0">
           <Icon className="w-5 h-5" />
         </div>
 
-        <h1 className="text-lg font-semibold text-content-base tracking-tight truncate min-w-0 shrink">
+          <h1 className="text-base font-semibold text-content-base tracking-tight truncate min-w-0 shrink">
           {title}
         </h1>
 
@@ -90,7 +90,7 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
           <button
             onClick={action.onClick}
             disabled={action.disabled}
-              className="min-h-11 px-5 py-2.5 rounded-xl bg-gold-base text-surface-base font-bold text-sm flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap shrink-0"
+              className="min-h-10 px-4 py-2 rounded-lg bg-gold-base text-surface-base font-bold text-xs flex items-center gap-2 hover:bg-gold-hover active:scale-95 transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap shrink-0"
           >
             <ActionIcon className="w-4 h-4 stroke-[3] shrink-0" />
             <span className="whitespace-nowrap">{action.label}</span>

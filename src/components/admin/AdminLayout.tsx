@@ -2,109 +2,94 @@ import React, { useState, useRef } from 'react';
 import { usePullToRefresh } from '../../hooks/usePullToRefresh';
 import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
 import { NavoHomeView } from './NavoHomeView';
-import { OperationalReportsManagement } from './OperationalReportsManagement';
 import { ScheduleGrid } from './ScheduleGrid';
 import { ReceiptsManagement } from './ReceiptsManagement';
 import { FinancialStatementManagement } from './FinancialStatementManagement';
 import { ExpensesManagement } from './ExpensesManagement';
-import { ReportsManagement } from './ReportsManagement';
-import { AuditLogsManagement } from './AuditLogsManagement';
-import { WhatsAppManagement } from './WhatsAppManagement';
-import { QrCodeManagement } from './QrCodeManagement';
-import { ServicesManagement } from './ServicesManagement';
-import { ProductsManagement } from './ProductsManagement';
-import { ProfessionalsManagement } from './ProfessionalsManagement';
 import { ClientsManagement } from './ClientsManagement';
 import { WaitingQueue } from './WaitingQueue';
-import { SettingsManagement } from './SettingsManagement';
-import { NavoRewardsAdmin } from './NavoRewardsAdmin';
-import { FollowUpManagement } from './FollowUpManagement';
-import { BirthdaysManagement } from './BirthdaysManagement';
-import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { AdminAuthView } from './AdminAuthView';
+import { CatalogWorkspace } from './CatalogWorkspace';
+import { ReportsWorkspace } from './ReportsWorkspace';
+import { RelationshipWorkspace } from './RelationshipWorkspace';
+import { SystemWorkspace } from './SystemWorkspace';
 import { AdminNotificationCenter } from './AdminNotificationCenter';
 import { authFetch } from '../../lib/api';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAdminOperationNotifications } from '../../hooks/useAdminOperationNotifications';
-import { 
+import { useDialogFocus } from '../../hooks/useDialogFocus';
+import {
   Calendar,
   Clock,
-  Scissors,
-  Users,
   UserCheck,
-  Settings,
   Menu,
   X,
   ChevronRight,
   ChevronDown,
   TrendingUp,
   LogOut,
-  Receipt,
-  Award,
-  History,
-  Cake,
-  Store,
-  MoreHorizontal,
-  LayoutGrid,
-  FileText,
-  Package,
-  Gift,
   Wallet,
   DollarSign,
-  Printer,
   ArrowDownRight,
-  ShieldCheck,
-  MessageSquare,
-  QrCode,
+  FileText,
+  Package,
+  Award,
+  Scissors,
+  MoreHorizontal,
+  Store,
+  Settings,
   Sun,
   Moon,
 } from 'lucide-react';
 
-export type AdminTab = 
-  | 'dashboard' 
+export type AdminTab =
+  | 'dashboard'
+  | 'agenda'
+  | 'queue'
   | 'relatorios'
-  | 'agenda' 
   | 'financeiro_recebimentos'
   | 'financeiro_extrato'
   | 'financeiro_saidas'
-  | 'financeiro_relatorios'
-  | 'audit'
-  | 'whatsapp'
-  | 'qrcode'
-  | 'queue' 
-  | 'relacionamento_dashboard'
-  | 'relacionamento_loyalty'
-  | 'relacionamento_rewards'
-  | 'relacionamento_referrals'
-  | 'relacionamento_reviews'
-  | 'followup'
-  | 'aniversariantes'
-  | 'servicos'
-  | 'produtos'
-  | 'profissionais' 
-  | 'clientes' 
-  | 'barbearia'
-  | 'settings'
-  | 'settings_agenda'
-  | 'settings_print';
+  | 'clientes'
+  | 'catalogo'
+  | 'relacionamento'
+  | 'sistema';
 
 export type AdminSection = 'operacao' | 'financeiro' | 'cadastros' | 'relacionamento' | 'sistema';
 
 const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
 const ADMIN_TAB_VALUES: AdminTab[] = [
-  'dashboard', 'relatorios', 'agenda', 'financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas', 'financeiro_relatorios', 'audit', 'whatsapp', 'qrcode', 'queue',
-  'relacionamento_dashboard', 'relacionamento_loyalty', 'relacionamento_rewards', 'relacionamento_referrals', 'relacionamento_reviews', 'followup', 'aniversariantes', 'servicos', 'produtos', 'profissionais', 'clientes', 'barbearia', 'settings', 'settings_agenda', 'settings_print'
+  'dashboard', 'agenda', 'queue', 'relatorios', 'financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas',
+  'clientes', 'catalogo', 'relacionamento', 'sistema'
 ];
 
 const getStoredAdminTab = (): AdminTab => {
   if (typeof window === 'undefined') return 'dashboard';
   try {
     const storedTab = window.sessionStorage.getItem(ADMIN_ACTIVE_TAB_KEY);
-    const normalizedTab = storedTab === 'financeiro'
-      ? 'financeiro_recebimentos'
-      : storedTab === 'rewards'
-        ? 'relacionamento_dashboard'
-        : storedTab;
+    const legacyTabMap: Record<string, AdminTab> = {
+      financeiro: 'financeiro_recebimentos',
+      financeiro_relatorios: 'relatorios',
+      rewards: 'relacionamento',
+      servicos: 'catalogo',
+      profissionais: 'catalogo',
+      produtos: 'catalogo',
+      relacionamento_dashboard: 'relacionamento',
+      relacionamento_loyalty: 'relacionamento',
+      relacionamento_rewards: 'relacionamento',
+      relacionamento_referrals: 'relacionamento',
+      relacionamento_reviews: 'relacionamento',
+      followup: 'relacionamento',
+      aniversariantes: 'relacionamento',
+      barbearia: 'sistema',
+      settings: 'sistema',
+      settings_agenda: 'sistema',
+      settings_print: 'sistema',
+      audit: 'sistema',
+      whatsapp: 'sistema',
+      qrcode: 'sistema',
+    };
+    const normalizedTab = (storedTab && legacyTabMap[storedTab]) || storedTab;
     return normalizedTab && ADMIN_TAB_VALUES.includes(normalizedTab as AdminTab)
       ? normalizedTab as AdminTab
       : 'dashboard';
@@ -115,31 +100,16 @@ const getStoredAdminTab = (): AdminTab => {
 
 const ADMIN_TAB_SECTIONS: Partial<Record<AdminTab, AdminSection>> = {
   dashboard: 'operacao',
-  relatorios: 'operacao',
   agenda: 'operacao',
   queue: 'operacao',
+  relatorios: 'operacao',
   financeiro_recebimentos: 'financeiro',
   financeiro_extrato: 'financeiro',
   financeiro_saidas: 'financeiro',
-  financeiro_relatorios: 'financeiro',
-  servicos: 'cadastros',
-  produtos: 'cadastros',
-  profissionais: 'cadastros',
   clientes: 'cadastros',
-  relacionamento_dashboard: 'relacionamento',
-  relacionamento_loyalty: 'relacionamento',
-  relacionamento_rewards: 'relacionamento',
-  relacionamento_referrals: 'relacionamento',
-  relacionamento_reviews: 'relacionamento',
-  followup: 'relacionamento',
-  aniversariantes: 'relacionamento',
-  barbearia: 'sistema',
-  settings: 'sistema',
-  settings_agenda: 'sistema',
-  settings_print: 'sistema',
-  audit: 'sistema',
-  whatsapp: 'sistema',
-  qrcode: 'sistema',
+  catalogo: 'cadastros',
+  relacionamento: 'relacionamento',
+  sistema: 'sistema',
 };
 
 const getInitialCollapsedSections = (activeTab: AdminTab): Record<AdminSection, boolean> => {
@@ -174,6 +144,8 @@ export const AdminLayout: React.FC = () => {
   }, [activeTab]);
 
   const mainRef = useRef<HTMLElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+  useDialogFocus(sidebarOpen, sidebarRef);
   const notificationsActive = notificationsSupported && notificationPermission === 'granted' && backgroundPushEnabled;
 
   const scrollSidebarNavigationToItem = (tab: AdminTab, mobile = false) => {
@@ -314,32 +286,32 @@ export const AdminLayout: React.FC = () => {
   }
 
   const navItems = [
-    { 
-      id: 'dashboard' as AdminTab, 
-      label: 'Visão Geral',
+    {
+      id: 'dashboard' as AdminTab,
+      label: 'Hoje',
       icon: TrendingUp,
-      description: 'Métricas e análises',
+      description: 'Resumo e alertas do dia',
       section: 'operacao' as AdminSection,
     },
     {
       id: 'agenda' as AdminTab,
       label: 'Agenda',
       icon: Calendar,
-      description: 'Gerenciar horários',
+      description: 'Horários, encaixes e bloqueios',
       section: 'operacao' as AdminSection,
     },
     {
       id: 'queue' as AdminTab,
-      label: 'Fila de Espera',
+      label: 'Fila',
       icon: Clock,
-      description: 'Clientes aguardando',
+      description: 'Atendimentos em andamento',
       section: 'operacao' as AdminSection,
     },
     {
       id: 'relatorios' as AdminTab,
       label: 'Relatórios',
       icon: FileText,
-      description: 'Visão geral da operação',
+      description: 'Operação e financeiro',
       section: 'operacao' as AdminSection,
     },
     {
@@ -351,7 +323,7 @@ export const AdminLayout: React.FC = () => {
     },
     {
       id: 'financeiro_extrato' as AdminTab,
-      label: 'Extrato real',
+      label: 'Extrato',
       icon: DollarSign,
       description: 'Livro-caixa persistido',
       section: 'financeiro' as AdminSection,
@@ -364,13 +336,6 @@ export const AdminLayout: React.FC = () => {
       section: 'financeiro' as AdminSection,
     },
     {
-      id: 'financeiro_relatorios' as AdminTab,
-      label: 'Relatórios financeiros',
-      icon: TrendingUp,
-      description: 'Consolidação financeira',
-      section: 'financeiro' as AdminSection,
-    },
-    {
       id: 'clientes' as AdminTab,
       label: 'Clientes',
       icon: UserCheck,
@@ -378,101 +343,24 @@ export const AdminLayout: React.FC = () => {
       section: 'cadastros' as AdminSection,
     },
     {
-      id: 'profissionais' as AdminTab,
-      label: 'Profissionais',
-      icon: Users,
-      description: 'Equipe de barbeiros',
-      section: 'cadastros' as AdminSection,
-    },
-    {
-      id: 'servicos' as AdminTab,
-      label: 'Serviços',
-      icon: Scissors,
-      description: 'Catálogo de serviços',
-      section: 'cadastros' as AdminSection,
-    },
-    {
-      id: 'produtos' as AdminTab,
-      label: 'Produtos & Estoque',
+      id: 'catalogo' as AdminTab,
+      label: 'Catálogo',
       icon: Package,
-      description: 'Catálogo de produtos e alertas de estoque',
+      description: 'Serviços, equipe e estoque',
       section: 'cadastros' as AdminSection,
     },
     {
-      id: 'relacionamento_dashboard' as AdminTab,
-      label: 'Dashboard de Relacionamento',
-      icon: LayoutGrid,
-      description: 'Visão geral do relacionamento',
-      section: 'relacionamento' as AdminSection,
-    },
-    {
-      id: 'relacionamento_loyalty' as AdminTab,
-      label: 'Clube de Fidelidade & Níveis',
+      id: 'relacionamento' as AdminTab,
+      label: 'Relacionamento',
       icon: Award,
-      description: 'Pontos e níveis VIP',
+      description: 'Fidelidade, avaliações e retorno',
       section: 'relacionamento' as AdminSection,
     },
     {
-      id: 'relacionamento_reviews' as AdminTab,
-      label: 'Avaliações & NPS',
-      icon: MessageSquare,
-      description: 'Experiência e satisfação',
-      section: 'relacionamento' as AdminSection,
-    },
-    {
-      id: 'followup' as AdminTab,
-      label: 'Follow-up',
-      icon: History,
-      description: 'Clientes sem retorno',
-      section: 'relacionamento' as AdminSection,
-    },
-    {
-      id: 'aniversariantes' as AdminTab,
-      label: 'Aniversariantes',
-      icon: Cake,
-      description: 'Datas e relacionamento',
-      section: 'relacionamento' as AdminSection,
-    },
-    {
-      id: 'relacionamento_referrals' as AdminTab,
-      label: 'Motor de Indicações',
-      icon: Users,
-      description: 'Embaixadores e convites',
-      section: 'relacionamento' as AdminSection,
-    },
-    {
-      id: 'relacionamento_rewards' as AdminTab,
-      label: 'Prêmios & Cupons Desconto',
-      icon: Gift,
-      description: 'Catálogo e resgates',
-      section: 'relacionamento' as AdminSection,
-    },
-    { 
-      id: 'barbearia' as AdminTab, 
-      label: 'Perfil & Unidade', 
-      icon: Store,
-      description: 'Endereço, horários e dados',
-      section: 'sistema' as AdminSection,
-    },
-    { 
-      id: 'settings' as AdminTab, 
-      label: 'Configurações', 
+      id: 'sistema' as AdminTab,
+      label: 'Sistema',
       icon: Settings,
-      description: 'Preferências do sistema',
-      section: 'sistema' as AdminSection,
-    },
-    {
-      id: 'settings_agenda' as AdminTab,
-      label: 'Agenda e Disponibilidade',
-      icon: Clock,
-      description: 'Intervalos, limites e margem operacional',
-      section: 'sistema' as AdminSection,
-    },
-    {
-      id: 'settings_print' as AdminTab,
-      label: 'Impressões',
-      icon: Printer,
-      description: 'Comprovantes, QR Codes e relatórios',
+      description: 'Unidade, integrações e segurança',
       section: 'sistema' as AdminSection,
     },
   ];
@@ -489,7 +377,7 @@ export const AdminLayout: React.FC = () => {
 
   // Quick bottom bar items matching mobile model
   const bottomBarItems = [
-    { id: 'dashboard' as AdminTab, label: 'Visão Geral', icon: TrendingUp },
+    { id: 'dashboard' as AdminTab, label: 'Hoje', icon: TrendingUp },
     { id: 'agenda' as AdminTab, label: 'Agenda', icon: Calendar },
     { id: 'queue' as AdminTab, label: 'Espera', icon: Clock },
   ];
@@ -563,56 +451,26 @@ export const AdminLayout: React.FC = () => {
     switch (activeTab) {
       case 'dashboard':
         return <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />;
+      case 'agenda':
+        return <ScheduleGrid />;
+      case 'queue':
+        return <WaitingQueue />;
       case 'relatorios':
-        return <OperationalReportsManagement />;
+        return <ReportsWorkspace />;
       case 'financeiro_recebimentos':
         return <ReceiptsManagement />;
       case 'financeiro_extrato':
         return <FinancialStatementManagement />;
       case 'financeiro_saidas':
         return <ExpensesManagement />;
-      case 'financeiro_relatorios':
-        return <ReportsManagement />;
-      case 'audit':
-        return <SettingsManagement initialTab="audit" />;
-      case 'whatsapp':
-        return <SettingsManagement initialTab="whatsapp" />;
-      case 'qrcode':
-        return <SettingsManagement initialTab="qrcode" />;
-      case 'agenda':
-        return <ScheduleGrid />;
-      case 'queue':
-        return <WaitingQueue />;
-      case 'relacionamento_dashboard':
-        return <NavoRewardsAdmin initialTab="dashboard" />;
-      case 'relacionamento_loyalty':
-        return <NavoRewardsAdmin initialTab="loyalty" />;
-      case 'relacionamento_rewards':
-        return <NavoRewardsAdmin initialTab="rewards" />;
-      case 'relacionamento_referrals':
-        return <NavoRewardsAdmin initialTab="referrals" />;
-      case 'relacionamento_reviews':
-        return <NavoRewardsAdmin initialTab="reviews" />;
-      case 'followup':
-        return <FollowUpManagement />;
-      case 'aniversariantes':
-        return <BirthdaysManagement />;
-      case 'servicos':
-        return <ServicesManagement />;
-      case 'produtos':
-        return <ProductsManagement />;
-      case 'profissionais':
-        return <ProfessionalsManagement />;
       case 'clientes':
         return <ClientsManagement />;
-      case 'barbearia':
-        return <BarbershopProfileManagement />;
-      case 'settings':
-        return <SettingsManagement />;
-      case 'settings_agenda':
-        return <SettingsManagement initialTab="availability" />;
-      case 'settings_print':
-        return <SettingsManagement initialTab="print" />;
+      case 'catalogo':
+        return <CatalogWorkspace />;
+      case 'relacionamento':
+        return <RelationshipWorkspace />;
+      case 'sistema':
+        return <SystemWorkspace />;
       default:
         return null;
     }
@@ -623,12 +481,11 @@ export const AdminLayout: React.FC = () => {
   return (
     <div className="admin-shell h-[100dvh] bg-surface-base flex text-content-base font-sans antialiased overflow-hidden">
       {/* Desktop Sidebar (Fixed layout for screens >= 1024px) */}
-      <aside className="hidden lg:flex lg:w-72 lg:flex-col shrink-0 lg:bg-surface-card lg:border-r lg:border-border-subtle lg:fixed lg:inset-y-0 lg:left-0 text-content-base z-30">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col shrink-0 lg:bg-surface-card lg:border-r lg:border-border-subtle lg:fixed lg:inset-y-0 lg:left-0 text-content-base z-30">
         {/* Logo Header (Fixed 56px height) */}
-        <div className="flex items-center h-16 px-5 border-b border-border-subtle relative overflow-hidden shrink-0 bg-surface-card">
-          <div className="absolute top-0 left-0 right-0 h-0.5 barber-pole-line" />
+        <div className="flex items-center h-14 px-4 border-b border-border-subtle shrink-0 bg-surface-card">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 bg-gold-base text-content-on-accent rounded-xl flex items-center justify-center shadow-sm shrink-0 font-bold">
+            <div className="w-8 h-8 bg-gold-base text-content-on-accent rounded-lg flex items-center justify-center shrink-0 font-bold">
               <Scissors className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -642,8 +499,8 @@ export const AdminLayout: React.FC = () => {
         {renderSidebarNavigation()}
 
         {/* User Profile Footer */}
-        <div className="p-4 border-t border-border-subtle shrink-0 bg-surface-card">
-          <div className="flex items-center gap-3 px-3 h-14 rounded-lg bg-surface-base border border-border-subtle">
+        <div className="p-3 border-t border-border-subtle shrink-0 bg-surface-card">
+          <div className="flex items-center gap-3 px-2.5 h-12 rounded-lg bg-surface-base border border-border-subtle">
             <div className="w-7 h-7 rounded-xl bg-gold-base flex items-center justify-center text-content-on-accent font-bold text-xs uppercase shrink-0">
               {adminName.substring(0, 2)}
             </div>
@@ -690,14 +547,6 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-gold-base active:scale-95 transition-transform"
-            title={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
-            aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
-          >
-            {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-          </button>
           <AdminNotificationCenter
             notificationsSupported={notificationsSupported}
             notificationPermission={notificationPermission}
@@ -716,7 +565,7 @@ export const AdminLayout: React.FC = () => {
       </header>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 min-h-[72px] bg-surface-card/95 backdrop-blur-md border-t border-border-subtle z-40 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 min-h-[68px] bg-surface-card border-t border-border-subtle z-40 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
         {bottomBarItems.map(item => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -756,7 +605,7 @@ export const AdminLayout: React.FC = () => {
             onClick={() => setSidebarOpen(false)}
           />
           
-          <aside className="relative w-[min(320px,88vw)] bg-surface-card text-content-base flex flex-col animate-slide-in shadow-2xl border-r border-border-subtle h-[100dvh]">
+          <aside ref={sidebarRef} tabIndex={-1} className="relative w-[min(320px,88vw)] bg-surface-card text-content-base flex flex-col animate-slide-in border-r border-border-subtle h-[100dvh] outline-none">
             {/* Header */}
             <div className="flex items-center justify-between h-16 px-5 border-b border-border-subtle shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
@@ -800,11 +649,11 @@ export const AdminLayout: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <main ref={mainRef} className="flex-1 lg:ml-72 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
+      <main ref={mainRef} className="flex-1 lg:ml-64 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
         <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
         <div className="max-w-[1440px] mx-auto px-4 sm:px-7 lg:px-10 py-6 lg:pt-9 lg:pb-14 pb-36 w-full min-w-0">
           {/* Tab Content */}
-          <div className="animate-fade-in w-full min-w-0">
+          <div className="w-full min-w-0">
             {renderContent()}
           </div>
         </div>

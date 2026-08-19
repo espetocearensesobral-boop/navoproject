@@ -13,9 +13,10 @@ export type SettingsTab = 'email' | 'whatsapp' | 'qrcode' | 'audit' | 'availabil
 
 interface SettingsManagementProps {
   initialTab?: SettingsTab;
+  hideTabs?: boolean;
 }
 
-export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialTab = 'email' }) => {
+export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialTab = 'email', hideTabs = false }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
     <div className="space-y-4 animate-in fade-in duration-300 min-w-0">
       <AdminPageHeader icon={Settings} title="Configurações do Sistema" />
 
+      {!hideTabs && <>
       {/* TAB BAR */}
       <AdminTabs
         tabs={[
@@ -60,6 +62,7 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
         activeId={activeTab}
         onChange={(id) => setActiveTab(id as SettingsTab)}
       />
+      </>}
 
       {/* MAIN CONTENT AREA */}
       <div className="bg-surface-card border border-border-subtle rounded-xl p-4 sm:p-6 min-w-0">

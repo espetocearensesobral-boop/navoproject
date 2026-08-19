@@ -46,11 +46,11 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, 
             onClick={() => !tab.disabled && onChange(tab.id)}
             disabled={tab.disabled}
             aria-disabled={tab.disabled || undefined}
-            className={`shrink-0 min-h-11 px-4 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors active:scale-95 ${
+            className={`shrink-0 min-h-11 px-4 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors active:scale-[0.98] ${
               tab.disabled
                 ? 'bg-surface-base/60 text-content-muted/50 border border-border-subtle/60 cursor-not-allowed'
                 : isActive
-                  ? 'bg-gold-base text-surface-base shadow-sm'
+                  ? 'bg-gold-base text-surface-base'
                   : 'bg-surface-card text-content-muted border border-border-subtle hover:text-content-base'
             }`}
           >
