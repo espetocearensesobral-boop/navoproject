@@ -2787,3 +2787,20 @@ button, a, input, select, textarea {
     max-height: calc(100dvh - 108px);
   }
 }
+
+
+/* Lock background scrolling while Receipt Checkout v2 is open. */
+.receipt-v2-overlay {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.receipt-v2-dialog {
+  overscroll-behavior: contain;
+}
+
+.receipt-v2-scroll {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
