@@ -312,25 +312,25 @@ export const ServicesManagement: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={Scissors}
-        title="Cardápio de Serviços"
+        title="Serviços"
         stats={[
           { label: 'serviços', value: totalServices, tone: 'gold' },
           { label: 'VIPs', value: totalCombos, tone: 'success' },
           { label: 'duração méd.', value: `${avgDuration} min`, tone: 'info' },
           { label: 'preço méd.', value: `R$ ${avgPrice.toFixed(2)}`, tone: 'finance-positive' },
         ]}
-        action={{ label: 'Cadastrar Novo Serviço', onClick: handleOpenCreate, icon: Plus }}
+        action={{ label: 'Novo serviço', onClick: handleOpenCreate, icon: Plus }}
       />
 
       {/* Ação mobile: mesmo padrão de Produtos & Estoque */}
       <button
         onClick={handleOpenCreate}
-        title="Cadastrar novo serviço"
-        aria-label="Cadastrar novo serviço"
+        title="Novo serviço"
+        aria-label="Novo serviço"
         className="md:hidden w-full h-10 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
       >
         <Plus className="w-4 h-4" />
-        <span>Cadastrar Novo Serviço</span>
+        <span>Novo serviço</span>
       </button>
 
       {/* Success Notification Banner */}
@@ -526,7 +526,7 @@ export const ServicesManagement: React.FC = () => {
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="bg-surface-card border border-border-subtle text-xs text-content-base rounded-xl px-3 py-2 outline-none focus:border-gold-base"
             >
-              <option value="all">Todas as Categorias</option>
+              <option value="all">Todas</option>
               {DEFAULT_CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
@@ -867,7 +867,7 @@ export const ServicesManagement: React.FC = () => {
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-content-base truncate max-w-[220px] sm:max-w-md">
-                    {editingService ? `Editar: ${editingService.title}` : 'Cadastrar Novo Serviço'}
+                    {editingService ? `Editar: ${editingService.title}` : 'Novo serviço'}
                   </h2>
                   <p className="text-xs text-content-muted hidden sm:block">
                     Preencha informações do serviço, precificação e galeria de fotos.

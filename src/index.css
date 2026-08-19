@@ -223,7 +223,60 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+/* Editorial hierarchy: titles stay balanced, supporting copy stays readable,
+   and action labels never force a card wider than the viewport. */
+.admin-copy-title {
+  min-width: 0;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.admin-copy-description {
+  min-width: 0;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.admin-copy-label {
+  min-width: 0;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.admin-button-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+  .admin-shell h1,
+  .admin-shell h2,
+  .admin-shell h3 {
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
+
+  .admin-shell .admin-copy-description {
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  .admin-shell .admin-copy-label {
+    font-size: 0.6875rem;
+    line-height: 1.2;
+  }
+
+  .admin-shell button {
+    min-width: 0;
+  }
 }
 
 /* Semantic contrast guardrails: palette accents must adapt to the active theme. */

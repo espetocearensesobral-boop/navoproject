@@ -63,7 +63,7 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
           <Icon className="w-4 h-4" />
         </div>
 
-        <h1 className="text-sm font-semibold text-content-base tracking-tight truncate min-w-0 shrink">
+        <h1 className="admin-copy-title text-sm font-semibold text-content-base tracking-tight truncate min-w-0 shrink">
           {title}
         </h1>
 
@@ -72,7 +72,7 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
             {stats.map((stat, idx) => (
               <React.Fragment key={stat.label}>
                 {idx > 0 && <span className="text-border-subtle">·</span>}
-                <span>
+                <span className="admin-copy-label">
                   <span className={`font-semibold ${TONE_CLASSES[stat.tone ?? 'gold']}`}>
                     {stat.value}
                   </span>{' '}
@@ -90,10 +90,10 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
           <button
             onClick={action.onClick}
             disabled={action.disabled}
-              className="min-h-9 px-3 py-1.5 rounded-md bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 hover:bg-gold-hover active:scale-95 transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap shrink-0"
+            className="min-h-9 min-w-0 px-3 py-1.5 rounded-md bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 hover:bg-gold-hover active:scale-95 transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap shrink-0"
           >
             <ActionIcon className="w-4 h-4 stroke-[3] shrink-0" />
-            <span className="whitespace-nowrap">{action.label}</span>
+            <span className="admin-button-label">{action.label}</span>
           </button>
         )}
       </div>

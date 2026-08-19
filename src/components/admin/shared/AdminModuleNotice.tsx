@@ -15,13 +15,13 @@ export const AdminModuleNotice: React.FC<AdminModuleNoticeProps> = ({ title, des
       </div>
       <div className="min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <h2 className="text-sm font-bold text-content-base">{title}</h2>
+          <h2 className="admin-copy-title text-sm font-bold text-content-base">{title}</h2>
           <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-amber-300">
             <Database className="w-3 h-3" /> Em configuração
           </span>
         </div>
-        <p className="mt-1 text-xs leading-relaxed text-content-muted">{description}</p>
-        {detail && <p className="mt-2 text-xs leading-relaxed text-amber-200/80">{detail}</p>}
+        <p className="admin-copy-description mt-1 text-xs leading-relaxed text-content-muted">{description}</p>
+        {detail && <p className="admin-copy-description mt-2 text-xs leading-relaxed text-amber-200/80">{detail}</p>}
       </div>
     </div>
   </div>

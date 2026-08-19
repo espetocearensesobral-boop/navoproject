@@ -171,9 +171,9 @@ export const SubscriptionsManagement: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={Award}
-        title="Clube de Assinaturas Recorrentes"
+        title="Assinaturas"
         stats={[{ label: 'assinantes', value: totalActiveSubscribers, tone: 'gold' }]}
-        action={{ label: 'Criar Novo Plano', onClick: () => setIsPlanModalOpen(true), icon: Plus }}
+        action={{ label: 'Novo plano', onClick: () => setIsPlanModalOpen(true), icon: Plus }}
       />
 
       {/* Ação (mobile) */}
@@ -182,7 +182,7 @@ export const SubscriptionsManagement: React.FC = () => {
         className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
       >
         <Plus className="w-4 h-4 stroke-[2.5]" />
-        <span>Criar Novo Plano</span>
+        <span>Novo plano</span>
       </button>
 
       {/* MRR Metrics */}
@@ -224,9 +224,9 @@ export const SubscriptionsManagement: React.FC = () => {
       {/* Tabs */}
       <AdminTabs
         tabs={[
-          { id: 'members', label: 'Assinantes Ativos', icon: UserCheck },
-          { id: 'plans', label: 'Planos Configurados', icon: Award },
-          { id: 'commissions', label: 'Regras de Comissões de Clube', icon: DollarSign },
+          { id: 'members', label: 'Ativos', icon: UserCheck },
+          { id: 'plans', label: 'Planos', icon: Award },
+          { id: 'commissions', label: 'Comissões', icon: DollarSign },
         ]}
         activeId={activeTab}
         onChange={(id) => setActiveTab(id as typeof activeTab)}
@@ -327,10 +327,10 @@ export const SubscriptionsManagement: React.FC = () => {
         <div className="bg-surface-card border border-border-subtle rounded-2xl p-5 space-y-3 shadow-xs">
           <h3 className="text-sm font-bold text-content-base flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-gold-base" />
-            <span>Regras de Repasse de Comissão para Membros do Clube</span>
+            <span>Regras de comissão</span>
           </h3>
           <p className="text-xs text-content-muted leading-relaxed">
-            Como atendimentos de assinantes não geram cobrança individual na comanda, o barbeiro recebe um repasse fixo estipulado por corte realizado para cada assinante.
+            Assinantes não geram cobrança individual. O barbeiro recebe um valor fixo por corte.
           </p>
 
           <div className="space-y-2 pt-2">
@@ -338,10 +338,10 @@ export const SubscriptionsManagement: React.FC = () => {
               <div key={p.id} className="flex justify-between items-center bg-surface-base p-3 rounded-xl border border-border-subtle text-xs">
                 <div>
                   <span className="font-bold text-content-base block">{p.name}</span>
-                  <span className="text-xs text-content-muted">Mensalidade do Cliente: <span className="finance-positive">R$ {p.price.toFixed(2)}</span></span>
+                  <span className="text-xs text-content-muted">Mensalidade: <span className="finance-positive">R$ {p.price.toFixed(2)}</span></span>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-content-muted uppercase font-bold block">Repasse Fixo / Corte</span>
+                  <span className="text-xs text-content-muted uppercase font-bold block">Repasse por corte</span>
                   <span className="font-bold finance-negative text-sm tabular-nums">R$ {p.barberPerCutFee.toFixed(2)}</span>
                 </div>
               </div>
@@ -367,8 +367,8 @@ export const SubscriptionsManagement: React.FC = () => {
                 <Award className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-content-base">Cadastrar Novo Plano</h3>
-                <p className="text-xs text-content-muted">Configure nome, valor mensal e regras de comissão.</p>
+                <h3 className="text-base font-bold text-content-base">Novo plano</h3>
+                <p className="text-xs text-content-muted">Nome, mensalidade e comissão.</p>
               </div>
             </div>
 
@@ -413,7 +413,7 @@ export const SubscriptionsManagement: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-content-muted uppercase block mb-1">Serviços Inclusos (separados por vírgula)</label>
+              <label className="text-xs font-bold text-content-muted uppercase block mb-1">Serviços inclusos</label>
               <input
                 type="text"
                 value={newPlanServices}

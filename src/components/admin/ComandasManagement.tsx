@@ -393,11 +393,11 @@ export const ComandasManagement: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={Receipt}
-        title="Comandas & Atendimentos"
+        title="Comandas"
         stats={[
           { label: 'abertas', value: openComandas.length, tone: 'success' },
         ]}
-        action={{ label: 'Nova Comanda', onClick: () => setActiveTab('new') }}
+        action={{ label: 'Nova comanda', onClick: () => setActiveTab('new') }}
       />
 
       {/* Ação (mobile) */}
@@ -406,15 +406,15 @@ export const ComandasManagement: React.FC = () => {
         className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 shrink-0"
       >
         <Plus className="w-4 h-4 stroke-[2.5]" />
-        <span>Abrir Nova Comanda</span>
+        <span>Nova comanda</span>
       </button>
 
       {/* Navigation Tabs */}
       <AdminTabs
         tabs={[
-          { id: 'open', label: 'Comandas Abertas', count: comandas.filter(c => c.status === 'open').length },
-          { id: 'closed', label: 'Comandas Fechadas', count: comandas.filter(c => c.status === 'closed').length },
-          { id: 'new', label: 'Nova Comanda', icon: Plus },
+          { id: 'open', label: 'Abertas', count: comandas.filter(c => c.status === 'open').length },
+          { id: 'closed', label: 'Fechadas', count: comandas.filter(c => c.status === 'closed').length },
+          { id: 'new', label: 'Nova', icon: Plus },
         ]}
         activeId={activeTab}
         onChange={(id) => setActiveTab(id as typeof activeTab)}
@@ -426,7 +426,7 @@ export const ComandasManagement: React.FC = () => {
           <Search className="w-4 h-4 text-content-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar comanda por número, nome do cliente ou telefone..."
+            placeholder="Número, cliente ou telefone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-surface-card border border-border-subtle rounded-xl pl-10 pr-4 py-2.5 text-xs text-content-base focus:outline-none focus:ring-1 focus:ring-gold-base/50 placeholder:text-content-muted/60"
@@ -442,16 +442,16 @@ export const ComandasManagement: React.FC = () => {
               <div className="w-12 h-12 rounded-full bg-surface-base border border-border-subtle text-content-muted flex items-center justify-center mx-auto">
                 <Receipt className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-content-base">Nenhuma comanda aberta no momento</h3>
+              <h3 className="text-sm font-bold text-content-base">Nenhuma comanda aberta</h3>
               <p className="text-xs text-content-muted max-w-sm mx-auto">
-                Todas as comandas estão pagas e encerradas. Abra uma nova comanda para registrar atendimento ou consumo de produtos.
+                Sem comandas abertas. Crie uma para registrar atendimento ou consumo.
               </p>
               <button
                 onClick={() => setActiveTab('new')}
                 className="bg-gold-base text-surface-base px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-2 hover:bg-gold-hover transition-all"
               >
                 <Plus className="w-4 h-4" />
-                <span>Abrir Comanda Agora</span>
+                <span>Abrir comanda</span>
               </button>
             </div>
           ) : (
@@ -599,10 +599,10 @@ export const ComandasManagement: React.FC = () => {
           <div className="border-b border-border-subtle pb-3">
             <h2 className="text-base font-bold text-content-base flex items-center gap-2">
               <Plus className="w-5 h-5 text-gold-base" />
-              <span>Abertura de Nova Comanda</span>
+              <span>Nova comanda</span>
             </h2>
             <p className="text-xs text-content-muted mt-0.5">
-              Identifique o cliente, escolha o barbeiro e adicione os serviços e produtos consumidos.
+              Cliente, barbeiro, serviços e produtos.
             </p>
           </div>
 
@@ -646,7 +646,7 @@ export const ComandasManagement: React.FC = () => {
               onChange={(e) => setNewBarberId(e.target.value)}
               className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:ring-1 focus:ring-gold-base"
             >
-              <option value="">Selecione o Barbeiro (Opcional)</option>
+              <option value="">Barbeiro (opcional)</option>
               {professionals.map((p) => (
                 <option key={p.id} value={p.id}>{p.name} ({p.role})</option>
               ))}
@@ -667,7 +667,7 @@ export const ComandasManagement: React.FC = () => {
                   onChange={(e) => setSelectedServiceId(e.target.value)}
                   className="w-full bg-surface-card border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none"
                 >
-                  <option value="">+ Selecionar Serviço do Catálogo</option>
+                  <option value="">+ Serviço</option>
                   {services.map((s) => (
                     <option key={s.id} value={s.id}>{s.title} — R$ {s.price.toFixed(2)}</option>
                   ))}
@@ -690,7 +690,7 @@ export const ComandasManagement: React.FC = () => {
                   onChange={(e) => setSelectedProductId(e.target.value)}
                   className="w-full bg-surface-card border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none"
                 >
-                  <option value="">+ Selecionar Produto (Bebida, Pomada, etc)</option>
+                  <option value="">+ Produto</option>
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>{p.name} — R$ {p.price.toFixed(2)} (Estoque: {p.stock_quantity})</option>
                   ))}
@@ -751,7 +751,7 @@ export const ComandasManagement: React.FC = () => {
               type="submit"
               className="bg-gold-base hover:bg-gold-hover text-surface-base px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95"
             >
-              Confirmar & Abrir Comanda
+              Abrir comanda
             </button>
           </div>
         </form>
@@ -773,7 +773,7 @@ export const ComandasManagement: React.FC = () => {
                 <Receipt className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-content-base">Fechamento de Conta</h3>
+                <h3 className="text-base font-bold text-content-base">Fechar conta</h3>
                 <p className="text-xs text-content-muted font-mono">{closingComanda.code} • {closingComanda.clientName}</p>
               </div>
             </div>
@@ -865,7 +865,7 @@ export const ComandasManagement: React.FC = () => {
                 className="bg-gold-base hover:bg-gold-hover text-surface-base px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95 flex items-center gap-1.5"
               >
                 <Check className="w-4 h-4 stroke-[3]" />
-                <span>Confirmar Pagamento</span>
+                <span>Confirmar</span>
               </button>
             </div>
           </div>

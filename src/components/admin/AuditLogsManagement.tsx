@@ -128,7 +128,7 @@ export const AuditLogsManagement: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={ShieldCheck}
-        title="Logs de Atividades & Auditoria"
+        title="Auditoria"
         stats={[{ label: 'registros', value: logs.length }]}
         action={{ label: 'Exportar', onClick: handleExportLogs, icon: Download }}
       />
@@ -139,7 +139,7 @@ export const AuditLogsManagement: React.FC = () => {
         className="md:hidden w-full bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
       >
         <Download className="w-4 h-4 text-gold-base" />
-        <span>Exportar Logs</span>
+        <span>Exportar logs</span>
       </button>
 
       {/* Filters */}
@@ -148,7 +148,7 @@ export const AuditLogsManagement: React.FC = () => {
           <Search className="w-4 h-4 text-content-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar por operador, ação ou detalhes do evento..."
+            placeholder="Operador, ação ou detalhe..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-surface-card border border-border-subtle rounded-xl pl-10 pr-4 py-2.5 text-xs text-content-base focus:outline-none focus:ring-1 focus:ring-gold-base/50"
@@ -160,7 +160,7 @@ export const AuditLogsManagement: React.FC = () => {
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="bg-surface-card border border-border-subtle rounded-xl px-3 py-2.5 text-xs text-content-base focus:outline-none shrink-0"
         >
-          <option value="all">Todas as Categorias</option>
+          <option value="all">Todas</option>
           <option value="comandas">Comandas</option>
           <option value="caixa">Caixa</option>
           <option value="agendamentos">Agendamentos</option>
@@ -178,7 +178,7 @@ export const AuditLogsManagement: React.FC = () => {
                 <th className="p-3">Data / Hora</th>
                 <th className="p-3">Operador</th>
                 <th className="p-3">Categoria</th>
-                <th className="p-3">Ação Realizada</th>
+                <th className="p-3">Ação</th>
                 <th className="p-3 min-w-[220px]">Detalhes</th>
                 <th className="p-3">IP Origem</th>
               </tr>

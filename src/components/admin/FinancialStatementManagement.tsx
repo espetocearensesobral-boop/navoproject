@@ -116,7 +116,7 @@ export const FinancialStatementManagement: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={DollarSign}
-        title="Extrato Financeiro & Balancete"
+        title="Extrato financeiro"
         action={{ label: 'Baixar CSV', onClick: handleExportCsv, icon: Download }}
       />
 
@@ -126,7 +126,7 @@ export const FinancialStatementManagement: React.FC = () => {
         className="md:hidden w-full bg-surface-base border border-border-subtle hover:border-gold-base/50 text-content-base px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
       >
         <Download className="w-4 h-4 text-gold-base" />
-        <span>Baixar Extrato CSV</span>
+        <span>Baixar CSV</span>
       </button>
 
       {loading && <AdminSkeleton className="h-11 rounded-xl" label="Carregando lançamentos" />}
@@ -147,7 +147,7 @@ export const FinancialStatementManagement: React.FC = () => {
             </div>
           </div>
           <p className="text-lg font-black finance-positive tabular-nums truncate">+ R$ {totalIncomes.toFixed(2)}</p>
-          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Lançamentos persistidos</p>
+          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Lançamentos confirmados</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
@@ -158,7 +158,7 @@ export const FinancialStatementManagement: React.FC = () => {
             </div>
           </div>
           <p className="text-lg font-black finance-negative tabular-nums truncate">- R$ {totalExpenses.toFixed(2)}</p>
-          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Saídas persistidas</p>
+          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Saídas confirmadas</p>
         </div>
 
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
@@ -182,7 +182,7 @@ export const FinancialStatementManagement: React.FC = () => {
             </div>
           </div>
           <p className="text-lg font-black text-content-base tabular-nums truncate">{pendingTransactions.length}</p>
-          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Fora do resultado</p>
+          <p className="text-xs text-content-muted mt-1 font-medium admin-safe-wrap">Não entram no resultado</p>
         </div>
       </div>
 
@@ -193,7 +193,7 @@ export const FinancialStatementManagement: React.FC = () => {
             <Search className="w-4 h-4 text-content-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Buscar lançamentos no extrato..."
+              placeholder="Buscar lançamentos..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-surface-card border border-border-subtle rounded-xl pl-10 pr-4 py-2.5 text-xs text-content-base focus:outline-none focus:ring-1 focus:ring-gold-base/50"

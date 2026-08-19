@@ -60,16 +60,16 @@ export const FollowUpManagement: React.FC = () => {
         icon={History}
         title="Follow-up"
         stats={[
-          { label: 'clientes ausentes', value: summary.inactiveClients, tone: 'warning' },
-          { label: 'com WhatsApp', value: summary.withPhone, tone: 'success' },
-          { label: 'com e-mail', value: summary.withEmail, tone: 'info' },
+          { label: 'ausentes', value: summary.inactiveClients, tone: 'warning' },
+          { label: 'WhatsApp', value: summary.withPhone, tone: 'success' },
+          { label: 'e-mail', value: summary.withEmail, tone: 'info' },
         ]}
         action={{ label: 'Atualizar', onClick: load }}
       />
 
       <div className="bg-status-warning/10 border border-status-warning/30 rounded-xl p-3 text-xs text-content-muted flex items-start gap-2">
         <Clock3 className="w-4 h-4 text-status-warning shrink-0 mt-0.5" />
-        <p>Visão inicial para encontrar clientes sem retorno. O módulo não dispara mensagens automaticamente; use os canais de contato de cada cliente.</p>
+        <p>Clientes sem retorno. O módulo não envia mensagens; use os canais do cliente.</p>
       </div>
 
       <div className="bg-surface-card border border-border-subtle rounded-xl p-3 space-y-3">
@@ -91,7 +91,7 @@ export const FollowUpManagement: React.FC = () => {
         <div data-gesture-scroll="horizontal" className="flex gap-2 overflow-x-auto no-scrollbar py-1">
           {[30, 60, 90, 120].map((days) => (
             <button key={days} type="button" onClick={() => setThresholdDays(days)} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${thresholdDays === days ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>
-              Sem retorno há {days} dias
+              {days} dias sem retorno
             </button>
           ))}
         </div>
@@ -105,12 +105,12 @@ export const FollowUpManagement: React.FC = () => {
         <div className="bg-surface-card border border-border-subtle rounded-2xl p-10 text-center space-y-2">
           <UsersRound className="w-10 h-10 text-content-muted mx-auto" />
           <h3 className="text-base font-bold text-content-base">Nenhum cliente nesta faixa</h3>
-          <p className="text-sm text-content-muted">Ajuste o período ou a busca para ampliar a lista.</p>
+          <p className="text-sm text-content-muted">Ajuste o período ou a busca.</p>
         </div>
       ) : (
         <div className="bg-surface-card border border-border-subtle rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-border-subtle flex items-center justify-between gap-3">
-            <div><p className="text-sm font-bold text-content-base">Clientes para recuperar</p><p className="text-xs text-content-muted">Ordenados pelo maior tempo sem retorno</p></div>
+            <div><p className="text-sm font-bold text-content-base">Clientes a recuperar</p><p className="text-xs text-content-muted">Maior tempo sem retorno</p></div>
             <span className="text-xs font-bold text-status-warning">{clients.length} encontrados</span>
           </div>
           <div className="divide-y divide-border-subtle">
@@ -119,9 +119,9 @@ export const FollowUpManagement: React.FC = () => {
                 <div className="w-11 h-11 rounded-full bg-gold-base/10 text-gold-base flex items-center justify-center font-bold shrink-0">{client.name.charAt(0).toUpperCase()}</div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap"><h3 className="text-sm font-bold text-content-base truncate">{client.name}</h3><span className="px-2 py-1 rounded-md bg-surface-base border border-border-subtle text-xs text-content-muted">{client.loyaltyTier}</span></div>
-                  <p className="text-xs text-content-muted">Última visita: {formatDate(client.lastVisit)} · {client.appointmentCount} atendimento(s)</p>
+                  <p className="text-xs text-content-muted">Última visita: {formatDate(client.lastVisit)} · {client.appointmentCount} atend.</p>
                 </div>
-                <div className="sm:text-right shrink-0"><p className="text-xs uppercase tracking-wider text-content-muted">Tempo ausente</p><p className="text-sm font-black text-status-warning">{client.daysSinceLastVisit === null ? 'Sem histórico' : `${client.daysSinceLastVisit} dias`}</p></div>
+                <div className="sm:text-right shrink-0"><p className="text-xs uppercase tracking-wider text-content-muted">Ausente há</p><p className="text-sm font-black text-status-warning">{client.daysSinceLastVisit === null ? 'Sem histórico' : `${client.daysSinceLastVisit} dias`}</p></div>
                 <div className="flex items-center gap-2 shrink-0">
                   {client.hasPhone && <a href={whatsappUrl(client.phone)} target="_blank" rel="noreferrer" title="Abrir WhatsApp" className="w-10 h-10 rounded-xl border border-status-success/30 text-status-success flex items-center justify-center"><Phone className="w-4 h-4" /></a>}
                   {client.hasEmail && <a href={`mailto:${client.email}`} title="Enviar e-mail" className="w-10 h-10 rounded-xl border border-gold-base/30 text-gold-base flex items-center justify-center"><Mail className="w-4 h-4" /></a>}

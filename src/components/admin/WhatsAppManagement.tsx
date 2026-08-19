@@ -25,9 +25,9 @@ export const WhatsAppManagement: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={MessageSquare}
-        title="Painel WhatsApp & Notificações"
+        title="WhatsApp"
         stats={isConnected ? [{ label: 'conectado', value: '', tone: 'success' }] : [{ label: 'desconectado', value: '', tone: 'error' }]}
-        action={{ label: 'Recarregar (+ R$ 50)', onClick: () => setBalance(prev => prev + 50), icon: CreditCard }}
+        action={{ label: 'Recarregar saldo', onClick: () => setBalance(prev => prev + 50), icon: CreditCard }}
       />
 
       {/* Ação (mobile) */}
@@ -36,7 +36,7 @@ export const WhatsAppManagement: React.FC = () => {
         className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
       >
         <CreditCard className="w-4 h-4" />
-        <span>Recarregar (+ R$ 50)</span>
+        <span>Recarregar saldo</span>
       </button>
 
       {/* Metrics Cards */}
@@ -79,14 +79,14 @@ export const WhatsAppManagement: React.FC = () => {
       <div className="bg-surface-card border border-border-subtle rounded-2xl p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-bold text-content-base flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-gold-base" />
-          <span>Regras de Notificações Automáticas</span>
+          <span>Notificações automáticas</span>
         </h3>
 
         <div className="space-y-3 text-xs">
           <div className="flex justify-between items-center bg-surface-base p-3.5 rounded-xl border border-border-subtle">
             <div className="min-w-0">
-              <span className="font-bold text-content-base block admin-safe-wrap">Lembrete Pré-Agendamento (2h antes)</span>
-              <span className="text-content-muted text-xs admin-safe-wrap block">Envia mensagem com botão de confirmação ou reagendamento no WhatsApp do cliente.</span>
+              <span className="font-bold text-content-base block admin-safe-wrap">Lembrete pré-agendamento · 2h</span>
+              <span className="text-content-muted text-xs admin-safe-wrap block">Confirmação ou reagendamento pelo WhatsApp.</span>
             </div>
             <input
               type="checkbox"
@@ -98,8 +98,8 @@ export const WhatsAppManagement: React.FC = () => {
 
           <div className="flex justify-between items-center bg-surface-base p-3.5 rounded-xl border border-border-subtle">
             <div className="min-w-0">
-              <span className="font-bold text-content-base block admin-safe-wrap">Mensagem de Boas-Vindas & Confirmação Instantânea</span>
-              <span className="text-content-muted text-xs admin-safe-wrap block">Dispara o comprovante e link do agendamento imediatamente após a reserva.</span>
+              <span className="font-bold text-content-base block admin-safe-wrap">Boas-vindas e confirmação</span>
+              <span className="text-content-muted text-xs admin-safe-wrap block">Envia comprovante e link após a reserva.</span>
             </div>
             <input
               type="checkbox"

@@ -46,7 +46,9 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, 
             onClick={() => !tab.disabled && onChange(tab.id)}
             disabled={tab.disabled}
             aria-disabled={tab.disabled || undefined}
-            className={`shrink-0 min-h-10 sm:min-h-9 px-3 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-[0.98] ${
+            aria-current={isActive ? 'page' : undefined}
+            title={tab.label}
+            className={`shrink-0 min-h-10 sm:min-h-9 min-w-0 px-3 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-[0.98] ${
               tab.disabled
                 ? 'bg-surface-base/60 text-content-muted/50 border border-border-subtle/60 cursor-not-allowed'
                 : isActive
@@ -55,7 +57,7 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, 
             }`}
           >
             {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
-            <span className="whitespace-nowrap">{tab.label}</span>
+            <span className="admin-button-label">{tab.label}</span>
             {typeof tab.count === 'number' && (
               <span
                 className={`min-w-5 h-5 px-1 rounded-full text-[10px] flex items-center justify-center font-extrabold shrink-0 ${

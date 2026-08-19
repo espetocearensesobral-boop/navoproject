@@ -91,7 +91,7 @@ export const BarbershopProfileManagement: React.FC = () => {
       }
     }
     if (invalidDayLabels.length > 0) {
-      showToast(`Horário de abertura deve ser antes do fechamento em: ${invalidDayLabels.join(', ')}.`);
+      showToast(`A abertura deve ser antes do fechamento: ${invalidDayLabels.join(', ')}.`);
       return;
     }
 
@@ -100,9 +100,9 @@ export const BarbershopProfileManagement: React.FC = () => {
       const updated = await saveShopProfile(profile);
       setProfile(updated);
       setSavedProfile(updated);
-      showToast('Perfil e horários da barbearia atualizados com sucesso!');
+      showToast('Perfil e horários atualizados.');
     } catch (err: any) {
-      showToast(err?.message || 'Erro ao salvar perfil da barbearia.');
+      showToast(err?.message || 'Erro ao salvar o perfil.');
     } finally {
       setIsSaving(false);
     }
@@ -164,11 +164,11 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* NAVIGATION TABS */}
       <AdminTabs
         tabs={[
-          { id: 'info', label: 'Identidade e Dados', icon: Store },
-          { id: 'hours', label: 'Horários de Funcionamento', icon: Clock },
-          { id: 'contacts', label: 'Canais de Contato', icon: Phone },
-          { id: 'links', label: 'Links & Redes', icon: LinkIcon },
-          { id: 'appearance', label: 'Aparência e Paleta', icon: Palette },
+          { id: 'info', label: 'Identidade', icon: Store },
+          { id: 'hours', label: 'Horários', icon: Clock },
+          { id: 'contacts', label: 'Contatos', icon: Phone },
+          { id: 'links', label: 'Links', icon: LinkIcon },
+          { id: 'appearance', label: 'Aparência', icon: Palette },
         ]}
         activeId={activeTab}
         onChange={(id) => setActiveTab(id as typeof activeTab)}
@@ -339,7 +339,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-gold-base" />
-              <h2 className="text-sm font-serif font-bold text-content-base">Horários de Funcionamento Semanal</h2>
+              <h2 className="text-sm font-serif font-bold text-content-base">Horários Semanal</h2>
             </div>
             <div className="text-xs text-content-muted bg-surface-base px-2.5 py-1 rounded-xl border border-border-subtle">
               Slot de atendimento: <strong className="text-gold-base font-mono">30 minutos</strong>
@@ -509,7 +509,7 @@ export const BarbershopProfileManagement: React.FC = () => {
         <form className="bg-surface-card border border-border-subtle p-5 rounded-lg space-y-5" onKeyDown={handleEnterAsTab} onSubmit={e => e.preventDefault()}>
           <div className="flex items-center gap-2 pb-3 border-b border-border-subtle">
             <Phone className="w-4 h-4 text-gold-base" />
-            <h2 className="text-sm font-serif font-bold text-content-base">Canais de Contato & Endereço</h2>
+            <h2 className="text-sm font-serif font-bold text-content-base">Contatos & Endereço</h2>
           </div>
 
           <div>

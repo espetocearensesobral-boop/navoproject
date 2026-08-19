@@ -129,7 +129,7 @@ export const WaitingQueue: React.FC = () => {
       }
     } catch (error) {
       setQueue([]);
-      showNotification(getActionErrorMessage(error, 'Não foi possível carregar a fila de espera.'), 'error');
+      showNotification(getActionErrorMessage(error, 'Não foi possível carregar a fila.'), 'error');
     } finally {
       setLoading(false);
     }
@@ -156,7 +156,7 @@ export const WaitingQueue: React.FC = () => {
       setQueue([...updated]);
       showNotification('Cliente chamado para a cadeira!');
     } catch (error) {
-      showNotification(getActionErrorMessage(error, 'Não foi possível chamar o cliente para a cadeira.'), 'error');
+      showNotification(getActionErrorMessage(error, 'Não foi possível chamar o cliente.'), 'error');
     } finally {
       setActionLoadingId(null);
     }
@@ -170,7 +170,7 @@ export const WaitingQueue: React.FC = () => {
       setReceiptCheckoutItem(item);
       showNotification('Atendimento concluído. Escolha se deseja registrar o recebimento agora.');
     } catch (error) {
-      showNotification(getActionErrorMessage(error, 'Não foi possível finalizar o atendimento.'), 'error');
+      showNotification(getActionErrorMessage(error, 'Não foi possível finalizar.'), 'error');
     } finally {
       setActionLoadingId(null);
     }
@@ -183,7 +183,7 @@ export const WaitingQueue: React.FC = () => {
       setQueue([...updated]);
       showNotification('Cliente retornado para a fila da recepção.');
     } catch (error) {
-      showNotification(getActionErrorMessage(error, 'Não foi possível retornar o cliente à recepção.'), 'error');
+      showNotification(getActionErrorMessage(error, 'Não foi possível retornar à recepção.'), 'error');
     } finally {
       setActionLoadingId(null);
     }
@@ -198,7 +198,7 @@ export const WaitingQueue: React.FC = () => {
       setQueue([...updated]);
       showNotification('Cliente removido da fila e mantido na Agenda.');
     } catch (error) {
-      showNotification(getActionErrorMessage(error, 'Não foi possível remover o cliente da fila.'), 'error');
+      showNotification(getActionErrorMessage(error, 'Não foi possível remover da fila.'), 'error');
     } finally {
       setActionLoadingId(null);
     }
@@ -211,7 +211,7 @@ export const WaitingQueue: React.FC = () => {
       setQueue([...updated]);
       showNotification(`${name} retornou para a fila da recepção.`);
     } catch (error) {
-      showNotification(getActionErrorMessage(error, 'Não foi possível retornar o cliente à fila.'), 'error');
+      showNotification(getActionErrorMessage(error, 'Não foi possível retornar à fila.'), 'error');
     } finally {
       setActionLoadingId(null);
     }
@@ -273,7 +273,7 @@ export const WaitingQueue: React.FC = () => {
       setQueue(updated);
       showNotification('Ordem da fila de espera atualizada!');
     } catch (error) {
-      showNotification(getActionErrorMessage(error, 'Não foi possível atualizar a ordem da fila.'), 'error');
+      showNotification(getActionErrorMessage(error, 'Não foi possível reordenar a fila.'), 'error');
     } finally {
       setActionLoadingId(null);
     }
@@ -325,7 +325,7 @@ export const WaitingQueue: React.FC = () => {
       setNewNotes('');
       showNotification(`${newClientName} adicionado à recepção!`);
     } catch (error) {
-      showNotification(getActionErrorMessage(error, 'Não foi possível adicionar o cliente à fila.'), 'error');
+      showNotification(getActionErrorMessage(error, 'Não foi possível adicionar à fila.'), 'error');
     } finally {
       setIsSavingWalkIn(false);
     }
@@ -468,15 +468,15 @@ export const WaitingQueue: React.FC = () => {
               </div>
               <span className="text-xs bg-status-success/10 text-status-success px-2.5 py-1 rounded-full font-black border border-status-success/20 whitespace-nowrap">{inChairList.length} na cadeira</span>
             </div>
-            <p className="text-xs text-content-muted -mt-1 shrink-0">Ações em curso: finalize somente após concluir o serviço.</p>
+            <p className="text-xs text-content-muted -mt-1 shrink-0">Finalize após o serviço.</p>
 
             {loading ? (
               <AdminListSkeleton rows={3} className="overflow-y-auto overscroll-contain pr-1" />
             ) : inChairList.length === 0 ? (
               <div className="p-5 text-center text-xs text-content-muted bg-surface-card rounded-xl border border-status-success/20 border-dashed space-y-1.5">
                 <Scissors className="w-6 h-6 text-status-success/60 mx-auto" />
-                <p className="font-semibold text-content-base">Nenhum atendimento em andamento</p>
-                <p className="text-xs text-content-muted">Chame o próximo cliente na recepção quando uma cadeira estiver livre.</p>
+                <p className="font-semibold text-content-base">Nenhum atendimento ativo</p>
+                <p className="text-xs text-content-muted">Chame o próximo quando a cadeira liberar.</p>
               </div>
             ) : (
               <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1 space-y-3" style={{ maxHeight: `${Math.max(180, operationSettings.queueVisibleLimit * 86)}px` }}>
@@ -530,7 +530,7 @@ export const WaitingQueue: React.FC = () => {
                       className="flex-1 py-1.5 rounded-xl bg-status-success text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-[0.97] transition-[transform,background-color] duration-150 disabled:opacity-60 disabled:cursor-wait"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>{actionLoadingId === item.id ? 'Processando…' : 'Finalizar Corte'}</span>
+                      <span>{actionLoadingId === item.id ? 'Processando…' : 'Finalizar'}</span>
                     </button>
                   </div>
                 </div>
@@ -568,7 +568,7 @@ export const WaitingQueue: React.FC = () => {
                       className="bg-gold-base text-surface-base px-3 py-1.5 rounded-xl text-xs font-extrabold inline-flex items-center gap-1"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Adicionar Cliente</span>
+                      <span>Adicionar</span>
                     </button>}
               </div>
             ) : (
@@ -757,13 +757,13 @@ export const WaitingQueue: React.FC = () => {
                 <RotateCcw className="w-4 h-4 text-gold-hover" />
                 <span>Removidos da fila ({abandonedList.length})</span>
               </h2>
-              <p className="text-xs text-content-muted mt-1">Agendamentos preservados podem retornar à fila ou ser cancelados.</p>
+              <p className="text-xs text-content-muted mt-1">Podem voltar à fila ou ser cancelados.</p>
             </div>
           </div>
 
           {abandonedList.length === 0 ? (
             <div className="py-8 text-center text-xs text-content-muted">
-              Nenhum cliente removido recentemente.
+              Nenhum removido recentemente.
             </div>
           ) : (
             <div className="space-y-2">
@@ -951,7 +951,7 @@ export const WaitingQueue: React.FC = () => {
             </div>
             <div className="p-4 sm:p-5 overflow-y-auto">
               {services.length === 0 ? (
-                <p className="py-10 text-center text-sm text-content-muted">Nenhum serviço disponível no catálogo.</p>
+                <p className="py-10 text-center text-sm text-content-muted">Nenhum serviço disponível.</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {services.map((service) => {

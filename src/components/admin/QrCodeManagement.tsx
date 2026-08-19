@@ -65,7 +65,7 @@ export const QrCodeManagement: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={QrCode}
-        title="Divulgação & QR Code do Agendamento"
+        title="QR do agendamento"
         action={{ label: 'Imprimir totem', onClick: handlePrintTotem, icon: Printer }}
       />
 
@@ -75,7 +75,7 @@ export const QrCodeManagement: React.FC = () => {
         className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
       >
         <Printer className="w-4 h-4" />
-        <span>Imprimir Totem para Balcão</span>
+        <span>Imprimir totem</span>
       </button>
 
       {/* Main Container */}
@@ -84,7 +84,7 @@ export const QrCodeManagement: React.FC = () => {
         <div className="qr-print-sheet bg-surface-card border border-gold-base/40 rounded-2xl p-6 text-center space-y-4 shadow-md bg-gold-base/5 font-serif relative overflow-hidden">
           <div className="qr-print-brand space-y-1">
             <h2 className="text-2xl font-bold tracking-widest uppercase text-content-base">NAVO PREMIUM</h2>
-            <p className="text-xs font-sans text-gold-base font-bold uppercase tracking-wider">Agende seu horário pelo celular</p>
+            <p className="text-xs font-sans text-gold-base font-bold uppercase tracking-wider">Agende pelo celular</p>
           </div>
 
           {/* QR Code Container */}
@@ -94,7 +94,7 @@ export const QrCodeManagement: React.FC = () => {
 
           <div className="qr-print-footer space-y-1 text-xs font-sans">
             <p className="text-content-base font-bold">Aponte a câmera para agendar</p>
-            <p className="text-content-muted text-xs">O QR abre diretamente a escolha do serviço.</p>
+            <p className="text-content-muted text-xs">Abre a escolha do serviço.</p>
           </div>
         </div>
 
@@ -103,10 +103,10 @@ export const QrCodeManagement: React.FC = () => {
           <div className="space-y-3">
             <h3 className="text-sm font-bold text-content-base flex items-center gap-2">
               <Share2 className="w-4 h-4 text-gold-base" />
-              <span>Link Direto de Agendamento</span>
+              <span>Link de agendamento</span>
             </h3>
             <p className="text-xs text-content-muted leading-relaxed">
-              Cole este link na bio do Instagram da barbearia, no WhatsApp Business ou envie diretamente para seus clientes.
+              Cole na bio, no WhatsApp ou envie aos clientes.
             </p>
 
             <div className="flex items-center gap-2 bg-surface-base p-2.5 rounded-xl border border-border-subtle">
@@ -124,11 +124,11 @@ export const QrCodeManagement: React.FC = () => {
                 <span>{copied ? 'Copiado!' : 'Copiar'}</span>
               </button>
             </div>
-            {copyError && <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-status-error"><AlertCircle className="h-3.5 w-3.5" /> Não foi possível copiar automaticamente. Selecione o link e copie manualmente.</p>}
+            {copyError && <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-status-error"><AlertCircle className="h-3.5 w-3.5" /> Não foi possível copiar. Copie o link manualmente.</p>}
           </div>
 
           <div className="pt-4 border-t border-border-subtle space-y-2">
-            <span className="text-xs font-bold uppercase text-content-muted block">Ações Rápidas</span>
+            <span className="text-xs font-bold uppercase text-content-muted block">Ações rápidas</span>
             <a
               href={bookingUrl}
               target="_blank"

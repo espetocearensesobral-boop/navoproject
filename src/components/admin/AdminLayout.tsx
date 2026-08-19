@@ -409,7 +409,7 @@ export const AdminLayout: React.FC = () => {
             <button
               onClick={toggleTheme}
               className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-base text-content-muted hover:text-gold-base active:bg-surface-elevated transition-colors shrink-0"
-              title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+              title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
               aria-label="Alternar tema"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-content-muted" />}
@@ -456,7 +456,7 @@ export const AdminLayout: React.FC = () => {
             type="button"
             onClick={toggleTheme}
             className="w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-content-muted hover:text-gold-base active:text-gold-base active:scale-[0.97] transition-[transform,color,background-color] duration-150"
-            title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+            title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
             aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
           >
             {theme === 'dark' ? <Sun className="w-5 h-5 text-gold-base" /> : <Moon className="w-5 h-5" />}
@@ -490,7 +490,7 @@ export const AdminLayout: React.FC = () => {
               }`}
             >
               <Icon className="w-5 h-5 shrink-0" />
-              <span className="text-[11px] font-semibold tracking-tight truncate max-w-[76px]">{item.label}</span>
+              <span className="admin-button-label text-[11px] font-semibold tracking-tight max-w-[76px]">{item.label}</span>
             </button>
           );
         })}
@@ -504,7 +504,7 @@ export const AdminLayout: React.FC = () => {
           }`}
         >
           <MoreHorizontal className="w-5 h-5 shrink-0" />
-          <span className="text-[11px] font-semibold tracking-tight truncate max-w-[76px]">Mais</span>
+          <span className="admin-button-label text-[11px] font-semibold tracking-tight max-w-[76px]">Mais</span>
         </button>
       </nav>
 
@@ -561,7 +561,7 @@ export const AdminLayout: React.FC = () => {
                 type="button"
                 onClick={toggleTheme}
                 className="h-11 w-11 flex items-center justify-center rounded-xl border border-border-subtle bg-surface-base text-content-muted hover:text-gold-base active:scale-[0.97] transition-[transform,color,background-color] duration-150 shrink-0"
-                title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+                title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
                 aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
               >
                 {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4" />}
@@ -572,7 +572,7 @@ export const AdminLayout: React.FC = () => {
                 className="flex-1 h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800 active:scale-[0.99] font-semibold text-xs transition-[transform,background-color] duration-150 min-w-0"
               >
                 <LogOut className="w-4 h-4 shrink-0" />
-                <span className="truncate">Sair do sistema</span>
+                <span className="admin-button-label">Sair</span>
               </button>
             </div>
           </div>

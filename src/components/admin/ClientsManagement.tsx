@@ -165,13 +165,13 @@ export const ClientsManagement: React.FC = () => {
       {/* HEADER (MD AND UP) */}
       <AdminPageHeader
         icon={Users}
-        title="Gestão de Clientes"
+        title="Clientes"
         stats={[
           { label: 'clientes', value: safeClients.length },
           { label: 'VIP', value: vipCount, tone: 'gold' },
           { label: 'pts totais', value: totalPoints, tone: 'info' },
         ]}
-        action={{ label: 'Novo Cliente', onClick: () => handleOpenModal() }}
+        action={{ label: 'Novo cliente', onClick: () => handleOpenModal() }}
       />
 
       {/* MOBILE CTA + TOP BAR: mesmo padrão de Produtos & Estoque */}
@@ -179,12 +179,12 @@ export const ClientsManagement: React.FC = () => {
         <Button
           type="button"
           onClick={() => handleOpenModal()}
-          title="Cadastrar novo cliente"
-          aria-label="Cadastrar novo cliente"
+          title="Novo cliente"
+          aria-label="Novo cliente"
           className="w-full h-10 shadow-md active:scale-95"
         >
           <Plus className="w-4 h-4" />
-          <span>Novo Cliente</span>
+          <span>Novo cliente</span>
         </Button>
       </div>
       <div className="md:hidden flex items-center gap-2">
@@ -192,7 +192,7 @@ export const ClientsManagement: React.FC = () => {
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
           <input
             type="text"
-            placeholder="Buscar por nome, email ou telefone..."
+            placeholder="Nome, e-mail ou telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-2 text-xs text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base"
@@ -205,7 +205,7 @@ export const ClientsManagement: React.FC = () => {
       <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-1 px-1">
         {[
           { id: 'all', label: 'Todos', count: safeClients.length },
-          { id: 'vip', label: 'VIP (Ouro/Diamante)', count: vipCount },
+          { id: 'vip', label: 'VIP', count: vipCount },
           { id: 'bronze', label: 'Bronze' },
           { id: 'prata', label: 'Prata' },
           { id: 'ouro', label: 'Ouro' },
@@ -239,7 +239,7 @@ export const ClientsManagement: React.FC = () => {
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
           <input
             type="text"
-            placeholder="Buscar por nome, email ou telefone..."
+            placeholder="Nome, e-mail ou telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
@@ -337,7 +337,7 @@ export const ClientsManagement: React.FC = () => {
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-sm font-bold text-content-base truncate">
-                    {editingClient ? `Editar: ${editingClient.name}` : 'Cadastrar Novo Cliente'}
+                    {editingClient ? `Editar: ${editingClient.name}` : 'Novo cliente'}
                   </h2>
                   <p className="text-xs text-content-muted truncate">Ajuste informações de contato e pontuação</p>
                 </div>

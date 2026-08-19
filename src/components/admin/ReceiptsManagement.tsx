@@ -123,8 +123,8 @@ export const ReceiptsManagement: React.FC = () => {
         <div className="p-4 sm:p-5 border-b border-border-subtle space-y-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
-              <h2 className="text-base font-serif font-bold text-content-base">Controle de recebimentos</h2>
-              <p className="mt-0.5 text-sm text-content-muted">Pendências são criadas ao encerrar o serviço. Apenas recebimentos confirmados entram no extrato.</p>
+              <h2 className="text-base font-serif font-bold text-content-base">Recebimentos</h2>
+              <p className="mt-0.5 text-sm text-content-muted">Pendências surgem ao finalizar. Confirmados entram no extrato.</p>
             </div>
             <div className="relative w-full md:w-72">
               <Search className="w-4 h-4 text-content-muted absolute left-3 top-1/2 -translate-y-1/2" />
@@ -145,7 +145,7 @@ export const ReceiptsManagement: React.FC = () => {
         {loading ? (
           <AdminListSkeleton rows={5} className="p-4 sm:p-5" />
         ) : visibleReceipts.length === 0 ? (
-          <div className="py-16 px-5 text-center"><CircleDollarSign className="w-10 h-10 mx-auto text-content-muted/50" /><h3 className="mt-3 text-base font-bold text-content-base">Nenhum recebimento encontrado</h3><p className="mt-1 text-sm text-content-muted">Os atendimentos finalizados aparecerão aqui como pendentes até o pagamento ser confirmado.</p></div>
+          <div className="py-16 px-5 text-center"><CircleDollarSign className="w-10 h-10 mx-auto text-content-muted/50" /><h3 className="mt-3 text-base font-bold text-content-base">Nenhum recebimento encontrado</h3><p className="mt-1 text-sm text-content-muted">Atendimentos finalizados ficam pendentes até a confirmação do pagamento.</p></div>
         ) : (
           <div className="divide-y divide-border-subtle">
             {visibleReceipts.map((item) => {
@@ -159,7 +159,7 @@ export const ReceiptsManagement: React.FC = () => {
                       <p className="mt-1 text-sm text-content-muted admin-clamp-2">{item.serviceTitle}</p>
                       <p className="mt-1 text-xs text-content-muted admin-safe-wrap">{item.professionalName || 'Profissional não informado'} · {new Date(getReceiptDate(item)).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</p>
                     </div>
-                    <div className="text-right shrink-0"><p className={`text-sm sm:text-base font-mono font-bold ${pending ? 'text-content-base' : 'finance-positive'}`}>{money(item.totalAmount)}</p><p className="mt-1 text-xs text-gold-base font-bold">Ver extrato</p></div>
+                    <div className="text-right shrink-0"><p className={`text-sm sm:text-base font-mono font-bold ${pending ? 'text-content-base' : 'finance-positive'}`}>{money(item.totalAmount)}</p><p className="mt-1 text-xs text-gold-base font-bold">Abrir</p></div>
                   </div>
                 </button>
               );
@@ -213,15 +213,15 @@ const ReceiptDetailsModal: React.FC<{ receipt: ReceiptItem; onClose: () => void;
   const received = receipt.status === 'received';
   const pending = receipt.status === 'pending';
   return (
-    <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-5" role="dialog" aria-modal="true" aria-label="Extrato do recebimento">
+    <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-5" role="dialog" aria-modal="true" aria-label="Extrato">
       <div className="admin-modal w-full max-w-xl max-h-[92dvh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-surface-card border border-border-subtle shadow-2xl">
-        <div className="sticky top-0 p-5 sm:p-6 bg-surface-card border-b border-border-subtle flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-gold-base">Extrato do recebimento</p><h2 className="mt-1 text-lg font-serif font-bold text-content-base admin-clamp-2">{receipt.clientName}</h2></div><button type="button" onClick={onClose} className="w-10 h-10 rounded-xl flex items-center justify-center text-content-muted hover:text-content-base hover:bg-surface-base"><X className="w-5 h-5" /></button></div>
+        <div className="sticky top-0 p-5 sm:p-6 bg-surface-card border-b border-border-subtle flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-gold-base">Extrato</p><h2 className="mt-1 text-lg font-serif font-bold text-content-base admin-clamp-2">{receipt.clientName}</h2></div><button type="button" onClick={onClose} className="w-10 h-10 rounded-xl flex items-center justify-center text-content-muted hover:text-content-base hover:bg-surface-base"><X className="w-5 h-5" /></button></div>
         <div className="p-5 sm:p-6 space-y-5">
           <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-sm text-content-muted admin-clamp-2">{receipt.serviceTitle}</p><p className="mt-1 text-xs text-content-muted admin-safe-wrap">{receipt.professionalName || 'Profissional não informado'}</p></div><StatusBadge status={receipt.status} /></div>
           <div className="p-4 rounded-xl bg-surface-base border border-border-subtle space-y-3 text-sm"><AmountRow label="Valor original" value={money(receipt.originalAmount)} /><AmountRow label="Valor revisado" value={money(receipt.enteredAmount)} />{receipt.discountAmount > 0 && <AmountRow label={`Desconto${receipt.discountPercent ? ` (${receipt.discountPercent.toFixed(2)}%)` : ''}`} value={`- ${money(receipt.discountAmount)}`} tone="negative" />}{receipt.surchargeAmount > 0 && <AmountRow label={`Acréscimo${receipt.surchargePercent ? ` (${receipt.surchargePercent.toFixed(2)}%)` : ''}`} value={`+ ${money(receipt.surchargeAmount)}`} tone="positive" />}<div className="pt-3 border-t border-border-subtle"><AmountRow label="Valor total" value={money(receipt.totalAmount)} strong tone={received ? 'positive' : undefined} /></div></div>
           {received && <div className="p-4 rounded-xl bg-status-success/5 border border-status-success/20 space-y-2 text-sm"><AmountRow label="Forma de pagamento" value={paymentLabel[receipt.paymentMethod || 'other']} /><AmountRow label="Recebido" value={money(receipt.amountReceived)} />{receipt.paymentMethod === 'cash' && <AmountRow label="Troco" value={money(receipt.changeAmount)} tone="positive" />}<AmountRow label="Confirmado em" value={receipt.receivedAt ? new Date(receipt.receivedAt).toLocaleString('pt-BR') : '—'} /></div>}
           {receipt.observations && <div className="p-4 rounded-xl bg-surface-base border border-border-subtle"><p className="text-xs font-bold uppercase tracking-wider text-content-muted">Observações</p><p className="mt-2 text-sm text-content-base whitespace-pre-wrap">{receipt.observations}</p></div>}
-          <div className="pt-4 border-t border-border-subtle flex flex-col-reverse sm:flex-row sm:justify-end gap-2"><button type="button" onClick={onClose} className="h-11 px-5 rounded-xl border border-border-subtle text-content-muted hover:text-content-base text-sm font-bold">Fechar</button>{pending && <button type="button" onClick={onRegister} className="h-11 px-5 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-2"><CreditCard className="w-4 h-4" />Registrar recebimento</button>}</div>
+          <div className="pt-4 border-t border-border-subtle flex flex-col-reverse sm:flex-row sm:justify-end gap-2"><button type="button" onClick={onClose} className="h-11 px-5 rounded-xl border border-border-subtle text-content-muted hover:text-content-base text-sm font-bold">Fechar</button>{pending && <button type="button" onClick={onRegister} className="h-11 px-5 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-2"><CreditCard className="w-4 h-4" />Registrar</button>}</div>
         </div>
       </div>
     </div>

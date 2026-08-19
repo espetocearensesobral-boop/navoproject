@@ -52,11 +52,11 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
       {/* TAB BAR */}
       <AdminTabs
         tabs={[
-          { id: 'email', label: 'E-mail (SMTP)', icon: Mail },
-          { id: 'whatsapp', label: 'Painel WhatsApp', icon: MessageSquare },
-          { id: 'qrcode', label: 'QR Code & Balcão', icon: QrCode },
-          { id: 'audit', label: 'Logs & Auditoria', icon: ShieldCheck },
-          { id: 'availability', label: 'Agenda e Disponibilidade', icon: CalendarDays },
+          { id: 'email', label: 'E-mail', icon: Mail },
+          { id: 'whatsapp', label: 'WhatsApp', icon: MessageSquare },
+          { id: 'qrcode', label: 'QR Code', icon: QrCode },
+          { id: 'audit', label: 'Auditoria', icon: ShieldCheck },
+          { id: 'availability', label: 'Agenda', icon: CalendarDays },
           { id: 'print', label: 'Impressões', icon: Printer },
         ]}
         activeId={activeTab}
@@ -133,7 +133,7 @@ const EmailSettingsTab: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="text-xs text-content-muted py-8 text-center">Carregando configurações de e-mail...</div>;
+    return <div className="text-xs text-content-muted py-8 text-center">Carregando e-mail...</div>;
   }
 
   return (
@@ -264,7 +264,7 @@ const EmailSettingsTab: React.FC = () => {
           <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">Responder para (opcional)</label>
           <input
             type="email"
-            placeholder="Deixe em branco para usar o e-mail de envio"
+            placeholder="Vazio = usar o e-mail de envio"
             value={settings.replyTo}
             onChange={(e) => update('replyTo', e.target.value)}
             className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
@@ -272,7 +272,7 @@ const EmailSettingsTab: React.FC = () => {
         </div>
 
         <div>
-          <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">E-mail padrão da barbearia</label>
+          <label className="text-xs font-bold text-content-muted uppercase tracking-wider block mb-1">E-mail da barbearia</label>
           <input
             type="email"
             placeholder="administrativo@suabarbearia.com"
@@ -280,7 +280,7 @@ const EmailSettingsTab: React.FC = () => {
             onChange={(e) => update('notificationEmail', e.target.value)}
             className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
           />
-          <p className="mt-1 text-xs text-content-muted">Receberá avisos de novos agendamentos, reagendamentos e cancelamentos. Se ficar vazio, o sistema não envia alertas administrativos por e-mail.</p>
+          <p className="mt-1 text-xs text-content-muted">Alertas de agenda, reagendamentos e cancelamentos. Vazio = sem envio.</p>
         </div>
 
         <div className="pt-2 space-y-2">
@@ -291,7 +291,7 @@ const EmailSettingsTab: React.FC = () => {
               onChange={(e) => update('notifyOnBooking', e.target.checked)}
               className="w-3.5 h-3.5 accent-gold-base"
             />
-            Enviar e-mail ao confirmar agendamento
+            Avisar ao confirmar
           </label>
           <label className="flex items-center gap-2 text-xs text-content-base">
             <input
@@ -433,7 +433,7 @@ const PrintSettingsTab: React.FC = () => {
     popup.document.close();
   };
 
-  if (loading) return <div className="text-xs text-content-muted py-8 text-center">Carregando configurações de impressão...</div>;
+  if (loading) return <div className="text-xs text-content-muted py-8 text-center">Carregando impressão...</div>;
 
   const toggles: Array<[keyof PrintSettings, string, string]> = [
     ['showLogo', 'Exibir marca da barbearia', 'Cabeçalho com Navo Barber & Club.'],

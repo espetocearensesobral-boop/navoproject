@@ -144,7 +144,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
       onPending(created);
       return created;
     } catch (requestError) {
-      const message = requestError instanceof Error ? requestError.message : 'Não foi possível criar o recebimento pendente.';
+      const message = requestError instanceof Error ? requestError.message : 'Não foi possível criar a pendência.';
       setError(message);
       return null;
     } finally {
@@ -182,12 +182,12 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
         ...(settings.showPayment ? [['Forma de pagamento', receipt.paymentMethod ? paymentLabel[receipt.paymentMethod] : 'Não informada']] : []),
         ...(settings.showPayment && receipt.paymentMethod === 'cash' ? [['Valor entregue', money(receipt.amountReceived)], ['Troco', money(receipt.changeAmount)]] : []),
       ].map(([label, value]) => `<div class="print-row"><span>${escapePrintHtml(label)}</span><strong>${escapePrintHtml(value)}</strong></div>`).join('');
-      const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' : ''}<h2 class="print-center">Comprovante de recebimento</h2><hr class="print-divider">${contextRows}<hr class="print-divider">${valueRows}${settings.showObservations && receipt.observations ? `<hr class="print-divider"><p><strong>Observações:</strong> ${escapePrintHtml(receipt.observations)}</p>` : ''}`;
-      if (!openPrintWindow({ title: 'Comprovante de recebimento', settings, format: settings.receiptFormat, bodyHtml })) {
-        setError('O comprovante foi bloqueado pelo navegador. Permita pop-ups para este site e tente novamente.');
+      const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' : ''}<h2 class="print-center">Comprovante</h2><hr class="print-divider">${contextRows}<hr class="print-divider">${valueRows}${settings.showObservations && receipt.observations ? `<hr class="print-divider"><p><strong>Observações:</strong> ${escapePrintHtml(receipt.observations)}</p>` : ''}`;
+      if (!openPrintWindow({ title: 'Comprovante', settings, format: settings.receiptFormat, bodyHtml })) {
+        setError('A impressão foi bloqueada. Permita pop-ups e tente novamente.');
       }
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Não foi possível preparar o comprovante para impressão.');
+      setError(requestError instanceof Error ? requestError.message : 'Não foi possível preparar a impressão.');
     }
   };
 
@@ -216,13 +216,13 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
       setReceipt(confirmed);
       onReceived(confirmed);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Não foi possível confirmar o recebimento.');
+      setError(requestError instanceof Error ? requestError.message : 'Não foi possível confirmar.');
     } finally {
       setIsConfirming(false);
     }
   };
 
-  const stepLabel = step === 'decision' ? 'Conclusão do atendimento' : `Recebimento · Etapa ${step} de 3`;
+  const stepLabel = step === 'decision' ? 'Recebimento' : `Recebimento · Etapa ${step} de 3`;
   const isConfirmed = receipt?.status === 'received';
 
   return (
@@ -245,17 +245,17 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
             <div className="p-4 rounded-xl bg-surface-base border border-border-subtle flex gap-3">
               <div className="w-10 h-10 rounded-xl bg-status-success/10 text-status-success flex items-center justify-center shrink-0"><CheckCircle2 className="w-5 h-5" /></div>
               <div className="min-w-0">
-                <p className="font-bold text-content-base">Atendimento de {source.clientName} concluído.</p>
+                <p className="font-bold text-content-base">Atendimento concluído.</p>
                 <p className="mt-1 text-sm text-content-muted truncate">{source.serviceTitle} · {money(originalAmount)}</p>
               </div>
             </div>
             <div>
-              <h3 className="text-base font-bold text-content-base">Deseja registrar o recebimento agora?</h3>
-              <p className="mt-1 text-sm text-content-muted">Caso deixe para depois, o atendimento será enviado para <strong className="text-content-base">Financeiro › Recebimentos</strong> como pendente.</p>
+              <h3 className="text-base font-bold text-content-base">Registrar agora?</h3>
+              <p className="mt-1 text-sm text-content-muted">Depois, ficará pendente em <strong className="text-content-base">Financeiro › Recebimentos</strong>.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button type="button" onClick={handleRegisterLater} disabled={isCreating} className="min-h-12 px-4 rounded-xl border border-border-subtle bg-surface-base text-content-base font-bold text-sm hover:bg-surface-elevated transition-colors disabled:opacity-50">
-                {isCreating ? 'Criando pendência…' : 'Registrar depois'}
+                {isCreating ? 'Criando…' : 'Registrar depois'}
               </button>
               <button type="button" onClick={handleRegisterNow} disabled={isCreating} className="min-h-12 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-sm flex items-center justify-center gap-2 hover:bg-gold-hover transition-colors active:scale-[0.98] disabled:opacity-50">
                 {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <ReceiptText className="w-4 h-4" />}
@@ -274,14 +274,14 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 {source.clientPhone && <p className="mt-0.5 text-xs text-content-muted">{source.clientPhone}</p>}
               </div>
               <div className="p-4 rounded-xl bg-surface-base border border-border-subtle">
-                <span className="text-xs font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5"><ReceiptText className="w-3.5 h-3.5 text-gold-base" /> Serviço concluído</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-content-muted flex items-center gap-1.5"><ReceiptText className="w-3.5 h-3.5 text-gold-base" /> Serviço</span>
                 <p className="mt-2 text-sm font-bold text-content-base truncate">{source.serviceTitle}</p>
                 <p className="mt-0.5 text-xs finance-positive font-bold">{money(originalAmount)}</p>
               </div>
             </div>
             <div>
-              <label className="text-sm font-bold text-content-base block mb-2">Observações do recebimento</label>
-              <textarea value={observations} onChange={(event) => setObservations(event.target.value)} rows={4} placeholder="Ex.: cliente pagará junto ao próximo atendimento" className="w-full rounded-xl bg-surface-base border border-border-subtle px-3 py-3 text-sm text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base resize-none" />
+              <label className="text-sm font-bold text-content-base block mb-2">Observações</label>
+              <textarea value={observations} onChange={(event) => setObservations(event.target.value)} rows={4} placeholder="Ex.: pagar no próximo atendimento" className="w-full rounded-xl bg-surface-base border border-border-subtle px-3 py-3 text-sm text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base resize-none" />
             </div>
             <div className="pt-4 border-t border-border-subtle flex flex-col-reverse sm:flex-row sm:justify-between gap-2">
               <button type="button" onClick={onClose} className="h-11 px-5 rounded-xl text-sm font-bold text-content-muted hover:text-content-base">Fechar</button>
@@ -357,8 +357,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
         {isConfirmed && receipt && (
           <div className="p-5 sm:p-6 space-y-5">
             <div className="text-center py-3"><span className="mx-auto w-14 h-14 rounded-full bg-status-success/15 text-status-success flex items-center justify-center"><CheckCircle2 className="w-7 h-7" /></span><h3 className="mt-3 text-lg font-bold text-content-base">Recebimento fechado</h3><p className="mt-1 text-sm text-content-muted">{money(receipt.totalAmount)} registrado em {paymentLabel[receipt.paymentMethod || 'other']}.</p></div>
-            <div className="p-5 rounded-2xl bg-surface-base border border-border-subtle text-sm space-y-3"><div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><FileText className="w-4 h-4 text-gold-base" /><span className="font-bold text-content-base">Comprovante de recebimento</span></div><strong className="text-content-muted font-mono text-xs">{receipt.id.slice(-8).toUpperCase()}</strong></div><div className="pt-3 border-t border-border-subtle grid grid-cols-1 sm:grid-cols-2 gap-2"><div><span className="text-xs text-content-muted">Cliente</span><p className="font-bold text-content-base">{receipt.clientName}</p></div><div><span className="text-xs text-content-muted">Serviço</span><p className="font-bold text-content-base">{receipt.serviceTitle}</p></div><div><span className="text-xs text-content-muted">Profissional</span><p className="font-bold text-content-base">{receipt.professionalName || 'Não informado'}</p></div><div><span className="text-xs text-content-muted">Pagamento</span><p className="font-bold text-content-base">{paymentLabel[receipt.paymentMethod || 'other']}</p></div><div><span className="text-xs text-content-muted">Total recebido</span><p className="font-mono font-bold finance-positive">{money(receipt.totalAmount)}</p></div><div><span className="text-xs text-content-muted">Confirmado em</span><p className="font-bold text-content-base">{new Date(receipt.receivedAt || Date.now()).toLocaleString('pt-BR')}</p></div></div>{receipt.observations && <div className="pt-3 border-t border-border-subtle"><span className="text-xs text-content-muted">Observações</span><p className="mt-1 text-content-base">{receipt.observations}</p></div>}</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2"><button type="button" onClick={handlePrintReceipt} className="h-11 rounded-xl border border-border-subtle bg-surface-base text-content-base text-sm font-bold flex items-center justify-center gap-2"><Printer className="w-4 h-4" />Imprimir comprovante</button><button type="button" onClick={onClose} className="h-11 rounded-xl bg-gold-base text-surface-base text-sm font-bold">Fechar</button></div>
+            <div className="p-5 rounded-2xl bg-surface-base border border-border-subtle text-sm space-y-3"><div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><FileText className="w-4 h-4 text-gold-base" /><span className="font-bold text-content-base">Comprovante</span></div><strong className="text-content-muted font-mono text-xs">{receipt.id.slice(-8).toUpperCase()}</strong></div><div className="pt-3 border-t border-border-subtle grid grid-cols-1 sm:grid-cols-2 gap-2"><div><span className="text-xs text-content-muted">Cliente</span><p className="font-bold text-content-base">{receipt.clientName}</p></div><div><span className="text-xs text-content-muted">Serviço</span><p className="font-bold text-content-base">{receipt.serviceTitle}</p></div><div><span className="text-xs text-content-muted">Profissional</span><p className="font-bold text-content-base">{receipt.professionalName || 'Não informado'}</p></div><div><span className="text-xs text-content-muted">Pagamento</span><p className="font-bold text-content-base">{paymentLabel[receipt.paymentMethod || 'other']}</p></div><div><span className="text-xs text-content-muted">Total recebido</span><p className="font-mono font-bold finance-positive">{money(receipt.totalAmount)}</p></div><div><span className="text-xs text-content-muted">Confirmado em</span><p className="font-bold text-content-base">{new Date(receipt.receivedAt || Date.now()).toLocaleString('pt-BR')}</p></div></div>{receipt.observations && <div className="pt-3 border-t border-border-subtle"><span className="text-xs text-content-muted">Observações</span><p className="mt-1 text-content-base">{receipt.observations}</p></div>}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2"><button type="button" onClick={handlePrintReceipt} className="h-11 rounded-xl border border-border-subtle bg-surface-base text-content-base text-sm font-bold flex items-center justify-center gap-2"><Printer className="w-4 h-4" />Imprimir</button><button type="button" onClick={onClose} className="h-11 rounded-xl bg-gold-base text-surface-base text-sm font-bold">Fechar</button></div>
           </div>
         )}
       </div>

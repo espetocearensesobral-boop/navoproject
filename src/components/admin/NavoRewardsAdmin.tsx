@@ -614,7 +614,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
             <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
               <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
                 <Users className="w-4 h-4 text-gold-base" />
-                <span>Maiores Embaixadores (Mural de Indicações)</span>
+                <span>Top embaixadores</span>
               </h3>
 
               {data?.ambassadors && data.ambassadors.length > 0 ? (
@@ -641,7 +641,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-content-muted py-6 text-center">Nenhum embaixador ativo ainda nesta semana.</p>
+                <p className="text-xs text-content-muted py-6 text-center">Nenhum embaixador nesta semana.</p>
               )}
             </div>
           </div>
@@ -656,7 +656,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               <div>
                 <h3 className="text-sm font-serif font-bold text-content-base flex items-center gap-2">
                   <Crown className="w-4 h-4 text-gold-base" />
-                  <span>Configuração de Pontos & Validade</span>
+                  <span>Pontos e validade</span>
                 </h3>
                 <p className="text-xs text-content-muted mt-0.5">Ajuste a taxa de conversão, multiplicadores e expiração.</p>
               </div>
@@ -919,8 +919,8 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
         <div className="space-y-4 min-w-0">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-xl border border-border-subtle">
             <div>
-              <h3 className="text-sm font-serif font-bold text-content-base">Catálogo de Prêmios e Cupons</h3>
-              <p className="text-xs text-content-muted mt-0.5">Ofertas ativas para troca de pontos e cupons.</p>
+              <h3 className="text-sm font-serif font-bold text-content-base">Prêmios e cupons</h3>
+              <p className="text-xs text-content-muted mt-0.5">Ofertas para trocar pontos.</p>
             </div>
 
             <button
@@ -928,7 +928,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               className="h-9 px-3.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0 hover:bg-gold-base/90 active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Criar Oferta / Cupom</span>
+              <span>Nova oferta</span>
             </button>
           </div>
 
@@ -1158,12 +1158,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
           <div className="bg-surface-card p-4 sm:p-5 rounded-xl border border-border-subtle space-y-3">
             <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
               <Share2 className="w-4 h-4 text-gold-base" />
-              <span>Gerador de Link de Indicação para Clientes</span>
+              <span>Link de indicação</span>
             </h3>
 
             <div className="space-y-3 max-w-2xl text-xs">
               <div>
-                <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Selecione o Cliente Remetente</label>
+                <label className="block text-xs font-bold text-content-muted uppercase tracking-wider mb-1">Cliente remetente</label>
                 <select
                   value={refClient?.id || ''}
                   onChange={(e) => {

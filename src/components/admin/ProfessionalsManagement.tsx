@@ -282,9 +282,9 @@ export const ProfessionalsManagement: React.FC = () => {
       {/* Header (desktop) */}
       <AdminPageHeader
         icon={Users}
-        title="Barbeiros & Equipe"
+        title="Equipe"
         stats={[{ label: 'ativos', value: activeBarbers, tone: 'gold' }]}
-        action={{ label: 'Cadastrar Barbeiro', onClick: handleOpenCreate, icon: Plus }}
+        action={{ label: 'Novo barbeiro', onClick: handleOpenCreate, icon: Plus }}
       />
 
       {/* TOAST MESSAGE */}
@@ -347,12 +347,12 @@ export const ProfessionalsManagement: React.FC = () => {
         <button
           type="button"
           onClick={handleOpenCreate}
-          title="Cadastrar profissional"
-          aria-label="Cadastrar profissional"
+          title="Novo profissional"
+          aria-label="Novo profissional"
           className="w-full h-10 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
         >
           <Plus className="w-4 h-4" />
-          <span>Cadastrar Barbeiro</span>
+          <span>Novo barbeiro</span>
         </button>
         <div className="bg-surface-card p-3 rounded-2xl border border-border-subtle">
           <div className="relative">
@@ -640,7 +640,7 @@ export const ProfessionalsManagement: React.FC = () => {
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-sm font-bold text-content-base truncate">
-                    {editingBarber ? `Editar Barbeiro: ${editingBarber.name}` : 'Novo Barbeiro'}
+                    {editingBarber ? `Editar: ${editingBarber.name}` : 'Novo Barbeiro'}
                   </h2>
                   <p className="text-xs text-content-muted truncate">Configuração de perfil, comissões e horários</p>
                 </div>
@@ -775,7 +775,7 @@ export const ProfessionalsManagement: React.FC = () => {
                       rows={2}
                       value={formData.bio || ''}
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                      placeholder="Descreva a experiência do profissional..."
+                      placeholder="Experiência profissional..."
                       className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base resize-none"
                     />
                   </div>
@@ -993,7 +993,7 @@ export const ProfessionalsManagement: React.FC = () => {
                   size="sm"
                 >
                   <Save className="w-3.5 h-3.5" />
-                  <span>Salvar Barbeiro</span>
+                  <span>Salvar</span>
                 </Button>
               </div>
             </form>

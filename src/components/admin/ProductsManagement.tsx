@@ -146,10 +146,10 @@ export const ProductsManagement: React.FC = () => {
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
       <AdminPageHeader
         icon={Package}
-        title="Produtos & Estoque"
+        title="Produtos"
         stats={[
           { label: 'produtos', value: products.length, tone: 'gold' },
-          { label: 'estoque baixo', value: lowStockCount, tone: lowStockCount > 0 ? 'warning' : 'success' },
+          { label: 'baixo estoque', value: lowStockCount, tone: lowStockCount > 0 ? 'warning' : 'success' },
         ]}
         action={{ label: 'Novo produto', onClick: openCreate, icon: Plus }}
       />
@@ -172,14 +172,14 @@ export const ProductsManagement: React.FC = () => {
       <div className="md:hidden space-y-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar produto, marca ou categoria" className="w-full h-10 rounded-xl border border-border-subtle bg-surface-card pl-9 pr-3 text-sm text-content-base outline-none focus:border-gold-base" />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Produto, marca ou categoria" className="w-full h-10 rounded-xl border border-border-subtle bg-surface-card pl-9 pr-3 text-sm text-content-base outline-none focus:border-gold-base" />
         </div>
         <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
           <button type="button" onClick={() => { setCategoryFilter('all'); setOnlyLowStock(false); }} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === 'all' && !onlyLowStock ? 'bg-gold-base text-surface-base' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Todos ({products.length})</button>
           {categories.map((category) => (
             <button key={category} type="button" onClick={() => { setCategoryFilter(category); setOnlyLowStock(false); }} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === category && !onlyLowStock ? 'bg-gold-base text-surface-base' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>{category}</button>
           ))}
-          <button type="button" onClick={() => setOnlyLowStock((value) => !value)} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors ${onlyLowStock ? 'bg-amber-500 text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}><AlertTriangle className="w-3.5 h-3.5" /> Estoque baixo ({lowStockCount})</button>
+          <button type="button" onClick={() => setOnlyLowStock((value) => !value)} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors ${onlyLowStock ? 'bg-amber-500 text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}><AlertTriangle className="w-3.5 h-3.5" /> Baixo estoque ({lowStockCount})</button>
         </div>
       </div>
 
@@ -187,17 +187,17 @@ export const ProductsManagement: React.FC = () => {
       <div className="hidden md:flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar produto, marca ou categoria" className="w-full h-10 rounded-xl border border-border-subtle bg-surface-card pl-9 pr-3 text-xs text-content-base outline-none focus:border-gold-base" />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Produto, marca ou categoria" className="w-full h-10 rounded-xl border border-border-subtle bg-surface-card pl-9 pr-3 text-xs text-content-base outline-none focus:border-gold-base" />
         </div>
         <button type="button" onClick={() => setOnlyLowStock((value) => !value)} className={`h-10 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 ${onlyLowStock ? 'border-amber-400/50 bg-amber-500/15 text-amber-300' : 'border-border-subtle bg-surface-card text-content-muted'}`}>
-          <AlertTriangle className="w-3.5 h-3.5" /> Estoque baixo ({lowStockCount})
+          <AlertTriangle className="w-3.5 h-3.5" /> Baixo estoque ({lowStockCount})
         </button>
       </div>
 
       {loading ? (
-        <div className="rounded-2xl border border-border-subtle bg-surface-card p-10 text-center text-xs text-content-muted">Carregando estoque real...</div>
+        <div className="rounded-2xl border border-border-subtle bg-surface-card p-10 text-center text-xs text-content-muted">Carregando estoque...</div>
       ) : filteredProducts.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border-subtle bg-surface-card p-10 text-center text-xs text-content-muted">Nenhum produto encontrado no estoque real.</div>
+        <div className="rounded-2xl border border-dashed border-border-subtle bg-surface-card p-10 text-center text-xs text-content-muted">Nenhum produto encontrado.</div>
       ) : (
         <div className="space-y-2">
           {filteredProducts.map((product) => {
@@ -235,7 +235,7 @@ export const ProductsManagement: React.FC = () => {
                 {isExpanded && (
                   <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-xs">
-                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Preço de venda</p><p className="font-bold finance-positive">{money(product.price)}</p></div>
+                      <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Preço</p><p className="font-bold finance-positive">{money(product.price)}</p></div>
                       <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Custo</p><p className="font-bold finance-negative">{money(product.cost_price)}</p></div>
                       <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Alerta mínimo</p><p className="font-bold text-content-base">{product.min_stock_alert} un.</p></div>
                       <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Comissão</p><p className="font-bold text-content-base">{product.commission_percentage}%</p></div>
@@ -256,7 +256,7 @@ export const ProductsManagement: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="w-full sm:max-w-lg max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-2xl border border-border-subtle bg-surface-card p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <div className="flex items-center justify-between gap-3 mb-4">
-              <div><h2 className="text-base font-bold text-content-base">{editingProduct ? 'Editar produto' : 'Novo produto'}</h2><p className="text-xs text-content-muted admin-safe-wrap">Dados persistidos no catálogo de produtos e estoque.</p></div>
+              <div><h2 className="text-base font-bold text-content-base">{editingProduct ? 'Editar produto' : 'Novo produto'}</h2><p className="text-xs text-content-muted admin-safe-wrap">Dados do catálogo e estoque.</p></div>
               <button type="button" onClick={() => { setEditingProduct(null); setIsModalOpen(false); }} className="h-9 w-9 rounded-xl text-content-muted flex items-center justify-center" aria-label="Fechar formulário"><X className="w-5 h-5" /></button>
             </div>
             <form onKeyDown={handleEnterAsTab} onSubmit={handleSave} className="space-y-3">
@@ -264,7 +264,7 @@ export const ProductsManagement: React.FC = () => {
                 <label className="text-xs font-semibold text-content-muted">Nome<input required value={form.name} onChange={(event) => updateForm('name', event.target.value)} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>
                 <label className="text-xs font-semibold text-content-muted">Marca<input required value={form.brand} onChange={(event) => updateForm('brand', event.target.value)} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>
                 <label className="text-xs font-semibold text-content-muted">Categoria<select value={form.category} onChange={(event) => updateForm('category', event.target.value)} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base">{categories.map((category) => <option key={category} value={category}>{category}</option>)}</select></label>
-                <label className="text-xs font-semibold text-content-muted">Preço de venda<input required type="number" min="0" step="0.01" value={form.price} onChange={(event) => updateForm('price', Number(event.target.value))} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>
+                <label className="text-xs font-semibold text-content-muted">Preço<input required type="number" min="0" step="0.01" value={form.price} onChange={(event) => updateForm('price', Number(event.target.value))} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>
                 <label className="text-xs font-semibold text-content-muted">Custo<input type="number" min="0" step="0.01" value={form.cost_price} onChange={(event) => updateForm('cost_price', Number(event.target.value))} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>
                 <label className="text-xs font-semibold text-content-muted">Estoque atual<input required type="number" min="0" step="1" value={form.stock_quantity} onChange={(event) => updateForm('stock_quantity', Number(event.target.value))} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>
                 <label className="text-xs font-semibold text-content-muted">Alerta mínimo<input required type="number" min="0" step="1" value={form.min_stock_alert} onChange={(event) => updateForm('min_stock_alert', Number(event.target.value))} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>

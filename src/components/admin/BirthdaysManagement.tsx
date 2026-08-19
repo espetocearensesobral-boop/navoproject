@@ -46,10 +46,10 @@ export const BirthdaysManagement: React.FC = () => {
       if (search.trim()) params.set('search', search.trim());
       const res = await authFetch(`/api/relationship/birthdays?${params.toString()}`);
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body.error || 'Não foi possível carregar os aniversariantes.');
+      if (!res.ok) throw new Error(body.error || 'Não foi possível carregar aniversariantes.');
       setData(body);
     } catch (err: any) {
-      setError(err.message || 'Não foi possível carregar os aniversariantes.');
+      setError(err.message || 'Não foi possível carregar aniversariantes.');
     } finally {
       setLoading(false);
     }
@@ -78,13 +78,13 @@ export const BirthdaysManagement: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && load()} placeholder="Buscar aniversariante..." className="w-full h-11 bg-surface-base border border-border-subtle rounded-xl pl-9 pr-3 text-sm text-content-base focus:outline-none focus:border-gold-base" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && load()} placeholder="Nome do cliente..." className="w-full h-11 bg-surface-base border border-border-subtle rounded-xl pl-9 pr-3 text-sm text-content-base focus:outline-none focus:border-gold-base" />
           </div>
           <button type="button" onClick={load} className="h-11 px-4 rounded-xl bg-gold-base text-surface-base text-xs font-bold flex items-center justify-center gap-2"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Atualizar</button>
         </div>
         <div data-gesture-scroll="horizontal" className="flex gap-2 overflow-x-auto no-scrollbar py-1">
           <button type="button" onClick={() => setPeriod('current')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'current' ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>Este mês</button>
-          <button type="button" onClick={() => setPeriod('upcoming')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'upcoming' ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>Próximos 30 dias</button>
+          <button type="button" onClick={() => setPeriod('upcoming')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'upcoming' ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>30 dias</button>
           <button type="button" onClick={() => setPeriod('all')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'all' ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>Ano inteiro</button>
           {fullMonthLabels.map((label, index) => (
             <button key={label} type="button" onClick={() => setPeriod(String(index + 1))} className={`shrink-0 min-h-10 px-3 rounded-xl border text-sm font-semibold ${period === String(index + 1) ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>{label}</button>
@@ -92,16 +92,16 @@ export const BirthdaysManagement: React.FC = () => {
         </div>
         <div data-gesture-scroll="horizontal" className="flex gap-2 overflow-x-auto no-scrollbar py-1">
           {['all', 'Bronze', 'Prata', 'Ouro', 'Diamante'].map((value) => (
-            <button key={value} type="button" onClick={() => setTier(value)} className={`shrink-0 min-h-9 px-3 rounded-xl border text-xs font-semibold ${tier === value ? 'bg-surface-card border-gold-base text-gold-base' : 'bg-surface-base border-border-subtle text-content-muted'}`}>{value === 'all' ? 'Todos os níveis' : value}</button>
+            <button key={value} type="button" onClick={() => setTier(value)} className={`shrink-0 min-h-9 px-3 rounded-xl border text-xs font-semibold ${tier === value ? 'bg-surface-card border-gold-base text-gold-base' : 'bg-surface-base border-border-subtle text-content-muted'}`}>{value === 'all' ? 'Todos' : value}</button>
           ))}
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">Próximos 30 dias</p><p className="text-xl font-black text-content-base mt-1">{summary.next30Days}</p></div>
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">30 dias</p><p className="text-xl font-black text-content-base mt-1">{summary.next30Days}</p></div>
         <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">Sem e-mail</p><p className="text-xl font-black text-status-warning mt-1">{summary.withoutEmail}</p></div>
         <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">Exibidos</p><p className="text-xl font-black text-gold-base mt-1">{summary.shown}</p></div>
-        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">Base completa</p><p className="text-xl font-black text-content-base mt-1">{summary.totalWithBirthday}</p></div>
+        <div className="bg-surface-card border border-border-subtle rounded-xl p-3"><p className="text-xs uppercase tracking-wider text-content-muted">Base</p><p className="text-xl font-black text-content-base mt-1">{summary.totalWithBirthday}</p></div>
       </div>
 
       <div className="bg-surface-card border border-border-subtle rounded-xl p-4">
@@ -116,10 +116,10 @@ export const BirthdaysManagement: React.FC = () => {
 
       {error && <div className="p-3 rounded-xl bg-status-error/10 border border-status-error/30 text-status-error text-sm font-semibold">{error}</div>}
       {loading ? <div className="py-16 flex justify-center"><div className="w-7 h-7 border-2 border-gold-base border-t-transparent rounded-full animate-spin" /></div> : clients.length === 0 ? (
-        <div className="bg-surface-card border border-border-subtle rounded-2xl p-10 text-center space-y-2"><Gift className="w-10 h-10 text-content-muted mx-auto" /><h3 className="text-base font-bold text-content-base">Nenhum aniversariante encontrado</h3><p className="text-sm text-content-muted">Cadastre a data de aniversário no perfil do cliente para incluí-lo nesta visão.</p></div>
+        <div className="bg-surface-card border border-border-subtle rounded-2xl p-10 text-center space-y-2"><Gift className="w-10 h-10 text-content-muted mx-auto" /><h3 className="text-base font-bold text-content-base">Nenhum aniversariante</h3><p className="text-sm text-content-muted">Cadastre o aniversário do cliente.</p></div>
       ) : (
         <div className="bg-surface-card border border-border-subtle rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-border-subtle flex items-center justify-between gap-3"><div><p className="text-sm font-bold text-content-base">Lista de aniversariantes</p><p className="text-xs text-content-muted">Use os canais manuais enquanto as automações não forem ativadas.</p></div><span className="text-xs font-bold text-gold-base">{clients.length} encontrados</span></div>
+          <div className="px-4 py-3 border-b border-border-subtle flex items-center justify-between gap-3"><div><p className="text-sm font-bold text-content-base">Aniversariantes</p><p className="text-xs text-content-muted">Use contato manual até ativar automações.</p></div><span className="text-xs font-bold text-gold-base">{clients.length} encontrados</span></div>
           <div className="divide-y divide-border-subtle">
             {clients.map((client) => (
               <article key={client.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">

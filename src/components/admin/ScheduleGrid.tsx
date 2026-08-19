@@ -118,7 +118,7 @@ export const ScheduleGrid: React.FC = () => {
         setManualBookingForm(prev => ({ ...prev, professional_id: filteredProfs[0].id, service_id: prev.service_id || srvs[0]?.id || '' }));
       }
     } catch (err: any) {
-      showNotification(err?.message || 'Não foi possível carregar a agenda. Tente atualizar.');
+      showNotification(err?.message || 'Não foi possível carregar a agenda.');
     } finally {
       setLoading(false);
     }
@@ -318,7 +318,7 @@ export const ScheduleGrid: React.FC = () => {
             <button
               onClick={() => setIsBlockModalOpen(true)}
               className="p-1.5 rounded-xl bg-surface-card text-red-400 border border-red-500/20 active:scale-[0.97] transition-[transform,background-color] duration-150"
-              title="Bloquear Horário"
+              title="Bloquear horário"
             >
               <Lock className="w-4 h-4" />
             </button>
@@ -418,9 +418,9 @@ export const ScheduleGrid: React.FC = () => {
                                 <div className="flex items-center justify-between text-xs font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-xl border border-amber-500/30">
                                   <div className="flex items-center gap-1">
                                     <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                                    <span>Fora do Expediente</span>
+                                    <span>Fora do horário</span>
                                   </div>
-                                  <span className="text-xs bg-amber-400 text-black px-1.5 rounded-xl font-extrabold">Aprovação Pendente</span>
+                                  <span className="text-xs bg-amber-400 text-black px-1.5 rounded-xl font-extrabold">Pendente</span>
                                 </div>
                               )}
                               {operationalState.isLate && (
@@ -451,7 +451,7 @@ export const ScheduleGrid: React.FC = () => {
                                       ? 'bg-status-info/10 text-status-info border border-status-info/20'
                                       : 'bg-status-success/15 text-status-success'
                                   }`}>
-                                    {isPending ? 'Requer Aprovação' : getAppointmentStatusLabel(apt.status)}
+                                    {isPending ? 'Aprovação' : getAppointmentStatusLabel(apt.status)}
                                   </span>
                                 </div>
                               </div>
@@ -468,7 +468,7 @@ export const ScheduleGrid: React.FC = () => {
                                     className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95"
                                   >
                                     <CheckCircle2 className="w-3 h-3" />
-                                    <span>ACEITAR AGENDAMENTO</span>
+                                    <span>Aceitar</span>
                                   </button>
                                 </div>
                               )}
@@ -510,7 +510,7 @@ export const ScheduleGrid: React.FC = () => {
         {/* Header Bar */}
         <AdminPageHeader
           icon={Calendar}
-          title="Agenda Interativa"
+          title="Agenda"
           action={{ label: 'Encaixe Manual', onClick: () => setIsManualBookingOpen(true), icon: Plus }}
         >
           <div className="flex flex-wrap items-center gap-3">
@@ -639,7 +639,7 @@ export const ScheduleGrid: React.FC = () => {
                                 <button
                                   onClick={() => handleUnblock(block.id)}
                                   className="text-red-400 hover:text-content-base text-xs underline ml-2"
-                                  title="Desbloquear Horário"
+                                  title="Desbloquear horário"
                                 >
                                   Desbloquear
                                 </button>
@@ -666,7 +666,7 @@ export const ScheduleGrid: React.FC = () => {
             <div className="p-4 bg-surface-card border-b border-border-subtle flex justify-between items-center">
               <h2 className="text-sm font-serif text-content-base font-semibold flex items-center space-x-2">
                 <Lock className="w-4 h-4 text-red-400" />
-                <span>Bloquear Horário na Agenda</span>
+                <span>Bloquear horário</span>
               </h2>
               <button onClick={() => setIsBlockModalOpen(false)} className="text-content-muted hover:text-content-base">
                 <X className="w-5 h-5" />
@@ -750,7 +750,7 @@ export const ScheduleGrid: React.FC = () => {
             <div className="p-4 bg-surface-card border-b border-border-subtle flex justify-between items-center">
               <h2 className="text-sm font-serif text-content-base font-semibold flex items-center space-x-2">
                 <Scissors className="w-4 h-4 text-gold-base" />
-                <span>Agendamento Presencial / Encaixe de Caixa</span>
+                <span>Encaixe presencial</span>
               </h2>
               <button onClick={() => setIsManualBookingOpen(false)} className="text-content-muted hover:text-content-base">
                 <X className="w-5 h-5" />

@@ -49,11 +49,11 @@ export const AgendaAvailabilitySettings: React.FC = () => {
   const handleSave = async () => {
     setStatusMsg(null);
     if (settings.maximumBookingHorizonDays < 1 || settings.maximumBookingHorizonDays > 730) {
-      setStatusMsg({ type: 'error', text: 'O horizonte deve ficar entre 1 e 730 dias.' });
+      setStatusMsg({ type: 'error', text: 'O limite deve ficar entre 1 e 730 dias.' });
       return;
     }
     if (!/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(settings.reportsDayStartTime)) {
-      setStatusMsg({ type: 'error', text: 'Informe um início do dia operacional válido, entre 00:00 e 23:59.' });
+      setStatusMsg({ type: 'error', text: 'Informe um início válido entre 00:00 e 23:59.' });
       return;
     }
     setIsSaving(true);
@@ -61,7 +61,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
       const saved = await saveOperationSettings(settings);
       setSettings(saved);
       setSavedSettings(saved);
-      setStatusMsg({ type: 'success', text: 'Configurações de Agenda salvas com sucesso.' });
+      setStatusMsg({ type: 'success', text: 'Configurações salvas.' });
     } catch (error: any) {
       setStatusMsg({ type: 'error', text: error.message || 'Não foi possível salvar as configurações.' });
     } finally {
@@ -70,7 +70,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="text-sm text-content-muted py-10 text-center">Carregando configurações de Agenda...</div>;
+    return <div className="text-sm text-content-muted py-10 text-center">Carregando agenda...</div>;
   }
 
   return (
@@ -78,10 +78,10 @@ export const AgendaAvailabilitySettings: React.FC = () => {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <CalendarDays className="w-5 h-5 text-gold-base" />
-          <h2 className="text-base sm:text-lg font-serif font-bold text-content-base">Agenda e Disponibilidade</h2>
+          <h2 className="text-base sm:text-lg font-serif font-bold text-content-base">Agenda e horários</h2>
         </div>
         <p className="text-xs sm:text-sm text-content-muted leading-relaxed">
-          Ajuste como o sistema cria horários, limita novas reservas e protege a distância entre atendimentos. As mudanças afetam o fluxo público e a grade da Agenda; agendamentos já registrados não são alterados.
+          Defina horários, reservas e intervalos. Agendamentos existentes não mudam.
         </p>
       </div>
 
@@ -95,43 +95,43 @@ export const AgendaAvailabilitySettings: React.FC = () => {
       <section className="space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-border-subtle">
           <Clock3 className="w-4 h-4 text-gold-base" />
-          <h3 className="text-sm font-bold text-content-base">Regras de horários</h3>
+          <h3 className="text-sm font-bold text-content-base">Horários</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className={labelClass}>Intervalo entre horários</label>
+            <label className={labelClass}>Intervalo</label>
             <select value={settings.slotIntervalMinutes} onChange={(e) => update('slotIntervalMinutes', Number(e.target.value))} className={fieldClass}>
               {[5, 10, 15, 20, 30, 60].map((value) => <option key={value} value={value}>{value} minutos</option>)}
             </select>
-            <p className="mt-1.5 text-xs text-content-muted">Define de quanto em quanto tempo os horários aparecem para o cliente e no Admin.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Define o intervalo exibido para o cliente e no Admin.</p>
           </div>
 
           <div>
-            <label className={labelClass}>Antecedência mínima no mesmo dia</label>
+            <label className={labelClass}>Antecedência no dia</label>
             <input type="number" min={0} max={1440} step={5} value={settings.sameDayBookingCutoffMinutes} onChange={(e) => update('sameDayBookingCutoffMinutes', Math.max(0, Number(e.target.value) || 0))} className={fieldClass} />
-            <p className="mt-1.5 text-xs text-content-muted">Ex.: 60 impede reservas para horários que começam em menos de uma hora.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Ex.: 60 bloqueia reservas com menos de 1 hora.</p>
           </div>
 
           <div>
-            <label className={labelClass}>Antecedência mínima geral</label>
+            <label className={labelClass}>Antecedência mínima</label>
             <input type="number" min={0} max={10080} step={5} value={settings.minimumBookingLeadMinutes} onChange={(e) => update('minimumBookingLeadMinutes', Math.max(0, Number(e.target.value) || 0))} className={fieldClass} />
-            <p className="mt-1.5 text-xs text-content-muted">Usada como regra de segurança para reservas feitas no dia atual.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Regra de segurança para reservas no dia.</p>
           </div>
 
           <div>
-            <label className={labelClass}>Horizonte máximo de agendamento</label>
+            <label className={labelClass}>Horizonte de reserva</label>
             <input type="number" min={1} max={730} step={1} value={settings.maximumBookingHorizonDays} onChange={(e) => update('maximumBookingHorizonDays', Math.max(1, Number(e.target.value) || 1))} className={fieldClass} />
-            <p className="mt-1.5 text-xs text-content-muted">Impede que o cliente escolha uma data além deste número de dias.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Limite de dias para escolher uma data.</p>
           </div>
 
           <div className="sm:col-span-2">
-            <label className={labelClass}>Margem entre atendimentos</label>
+            <label className={labelClass}>Intervalo entre atendimentos</label>
             <div className="relative">
               <Timer className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
               <input type="number" min={0} max={120} step={5} value={settings.bufferBetweenAppointmentsMinutes} onChange={(e) => update('bufferBetweenAppointmentsMinutes', Math.max(0, Number(e.target.value) || 0))} className={`${fieldClass} pl-10`} />
             </div>
-            <p className="mt-1.5 text-xs text-content-muted">Reserva esta margem antes e depois de cada atendimento para organização, limpeza e preparação.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Tempo para organização, limpeza e preparo.</p>
           </div>
         </div>
       </section>
@@ -139,7 +139,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
       <section className="space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-border-subtle">
           <ListOrdered className="w-4 h-4 text-gold-base" />
-          <h3 className="text-sm font-bold text-content-base">Operação da Fila</h3>
+          <h3 className="text-sm font-bold text-content-base">Fila</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -149,28 +149,28 @@ export const AgendaAvailabilitySettings: React.FC = () => {
               <RefreshCw className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
               <input type="number" min={5} max={300} step={5} value={settings.queueRefreshSeconds} onChange={(e) => update('queueRefreshSeconds', Math.max(5, Number(e.target.value) || 5))} className={`${fieldClass} pl-10`} />
             </div>
-            <p className="mt-1.5 text-xs text-content-muted">Define a frequência de atualização enquanto a tela da Fila estiver aberta.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Frequência de atualização da fila.</p>
           </div>
 
           <div>
-            <label className={labelClass}>Tempo-base de espera</label>
+            <label className={labelClass}>Espera base</label>
             <input type="number" min={1} max={240} step={5} value={settings.queueBaseWaitMinutes} onChange={(e) => update('queueBaseWaitMinutes', Math.max(1, Number(e.target.value) || 1))} className={fieldClass} />
-            <p className="mt-1.5 text-xs text-content-muted">Estimativa inicial usada para novos clientes que entram na recepção.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Estimativa para novos clientes.</p>
           </div>
 
           <div>
-            <label className={labelClass}>Limite visual de registros</label>
+            <label className={labelClass}>Limite visível</label>
             <input type="number" min={1} max={20} step={1} value={settings.queueVisibleLimit} onChange={(e) => update('queueVisibleLimit', Math.max(1, Number(e.target.value) || 1))} className={fieldClass} />
-            <p className="mt-1.5 text-xs text-content-muted">Mantém a operação compacta; registros excedentes permanecem acessíveis pela rolagem.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Mantém a fila compacta; o excesso rola.</p>
           </div>
 
           <div className="sm:col-span-2 space-y-3">
             <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
-              <span className="flex items-start gap-2.5"><UserRoundCheck className="w-4 h-4 text-gold-base mt-0.5 shrink-0" /><span><strong className="block text-sm text-content-base">Permitir cliente avulso</strong><span className="block mt-0.5 text-xs text-content-muted">Habilita o botão Novo encaixe para clientes sem agendamento.</span></span></span>
+              <span className="flex items-start gap-2.5"><UserRoundCheck className="w-4 h-4 text-gold-base mt-0.5 shrink-0" /><span><strong className="block text-sm text-content-base">Permitir encaixe</strong><span className="block mt-0.5 text-xs text-content-muted">Libera encaixe sem agendamento.</span></span></span>
               <input type="checkbox" checked={settings.allowWalkIn} onChange={(e) => update('allowWalkIn', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
             </label>
             <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
-              <span><strong className="block text-sm text-content-base">Exigir profissional no encaixe</strong><span className="block mt-0.5 text-xs text-content-muted">Impede salvar um cliente avulso sem barbeiro definido.</span></span>
+              <span><strong className="block text-sm text-content-base">Exigir barbeiro</strong><span className="block mt-0.5 text-xs text-content-muted">Não salva encaixe sem barbeiro.</span></span>
               <input type="checkbox" checked={settings.requireProfessionalForWalkIn} onChange={(e) => update('requireProfessionalForWalkIn', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
             </label>
           </div>
@@ -180,38 +180,38 @@ export const AgendaAvailabilitySettings: React.FC = () => {
       <section className="space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-border-subtle">
           <BarChart3 className="w-4 h-4 text-gold-base" />
-          <h3 className="text-sm font-bold text-content-base">Contadores e Relatórios</h3>
+          <h3 className="text-sm font-bold text-content-base">Relatórios</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className={labelClass}>Início do dia operacional</label>
+            <label className={labelClass}>Início do dia</label>
             <input type="time" value={settings.reportsDayStartTime} onChange={(e) => update('reportsDayStartTime', e.target.value)} className={fieldClass} />
-            <p className="mt-1.5 text-xs text-content-muted">Antes deste horário, os indicadores ainda pertencem ao dia operacional anterior em BRT.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Antes disso, vale o dia anterior em BRT.</p>
           </div>
           <div>
             <label className={labelClass}>Atualização dos relatórios</label>
             <input type="number" min={15} max={300} step={15} value={settings.reportsRefreshSeconds} onChange={(e) => update('reportsRefreshSeconds', Math.max(15, Number(e.target.value) || 15))} className={fieldClass} />
-            <p className="mt-1.5 text-xs text-content-muted">Define a frequência de consulta enquanto um dashboard estiver aberto.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Frequência de consulta do dashboard.</p>
           </div>
           <div>
-            <label className={labelClass}>Janela de comparação</label>
+            <label className={labelClass}>Comparação</label>
             <select value={settings.reportsComparisonWindow} onChange={(e) => update('reportsComparisonWindow', e.target.value as OperationSettings['reportsComparisonWindow'])} className={fieldClass}>
-              <option value="previous_period">Período anterior equivalente</option>
+              <option value="previous_period">Período anterior</option>
               <option value="none">Sem comparação</option>
             </select>
-            <p className="mt-1.5 text-xs text-content-muted">Mostra uma referência analítica sem alterar os valores atuais.</p>
+            <p className="mt-1.5 text-xs text-content-muted">Cria referência sem mudar os valores.</p>
           </div>
           <div className="sm:col-span-2 space-y-3">
             <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
-              <span><strong className="block text-sm text-content-base">Exibir valores pendentes</strong><span className="block mt-0.5 text-xs text-content-muted">Mostra contas a receber separadas, sem tratá-las como receita realizada.</span></span>
+              <span><strong className="block text-sm text-content-base">Mostrar pendentes</strong><span className="block mt-0.5 text-xs text-content-muted">Exibe a receber sem tratar como receita.</span></span>
               <input type="checkbox" checked={settings.reportsShowPendingValues} onChange={(e) => update('reportsShowPendingValues', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
             </label>
             <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
-              <span><strong className="block text-sm text-content-base">Incluir cancelados no volume</strong><span className="block mt-0.5 text-xs text-content-muted">Mantém cancelamentos visíveis nas séries, sem incluir receita ou taxa de conclusão.</span></span>
+              <span><strong className="block text-sm text-content-base">Incluir cancelados</strong><span className="block mt-0.5 text-xs text-content-muted">Mostra cancelamentos sem somar receita ou conclusão.</span></span>
               <input type="checkbox" checked={settings.reportsIncludeCancelled} onChange={(e) => update('reportsIncludeCancelled', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
             </label>
             <label className="flex items-start justify-between gap-4 rounded-xl border border-border-subtle bg-surface-base p-3.5 cursor-pointer">
-              <span><strong className="block text-sm text-content-base">Incluir não comparecimentos</strong><span className="block mt-0.5 text-xs text-content-muted">Exibe no-show na leitura operacional, sem contar como atendimento concluído.</span></span>
+              <span><strong className="block text-sm text-content-base">Incluir faltas</strong><span className="block mt-0.5 text-xs text-content-muted">Mostra faltas sem contar como concluído.</span></span>
               <input type="checkbox" checked={settings.reportsIncludeNoShow} onChange={(e) => update('reportsIncludeNoShow', e.target.checked)} className="mt-1 w-4 h-4 accent-gold-base" />
             </label>
           </div>
