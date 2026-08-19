@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, Clock } from 'lucide-react';
 import { Appointment } from '../../../types';
 import { AdminSkeleton } from './AdminSkeleton';
+import { AdminEmptyState } from './AdminEmptyState';
 
 interface AdminAppointmentFeedProps {
   appointments: Appointment[];
@@ -47,13 +48,13 @@ export const AdminAppointmentFeed: React.FC<AdminAppointmentFeedProps> = ({ appo
         ))}
       </div>
     ) : appointments.length === 0 ? (
-      <div className="py-10 px-4 text-center text-content-muted">
-        <Clock className="w-6 h-6 text-content-muted mx-auto mb-2" aria-hidden="true" />
-        <p className="text-xs font-medium">Nenhum agendamento hoje.</p>
-        <button type="button" onClick={onNavigateToAgenda} className="mt-2 text-xs font-bold text-gold-base hover:underline">
-          Abrir agenda completa
-        </button>
-      </div>
+      <AdminEmptyState
+        icon={Clock}
+        title="Nenhum agendamento hoje"
+        description="A agenda está livre por enquanto."
+        actionLabel="Abrir agenda"
+        onAction={onNavigateToAgenda}
+      />
     ) : appointments.map((appointment) => {
       const serviceName = Array.isArray(appointment.services) && appointment.services.length > 0
         ? (typeof appointment.services[0] === 'string' ? appointment.services[0] : appointment.services[0].title)

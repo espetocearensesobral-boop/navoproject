@@ -3,6 +3,7 @@ import { WaitingQueueItem, Professional, ServiceItem } from '../../types';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
 import { AdminListSkeleton } from './shared/AdminSkeleton';
+import { AdminEmptyState } from './shared/AdminEmptyState';
 import { ReceiptCheckoutModal } from './ReceiptCheckoutModal';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import {
@@ -473,11 +474,11 @@ export const WaitingQueue: React.FC = () => {
             {loading ? (
               <AdminListSkeleton rows={3} className="overflow-y-auto overscroll-contain pr-1" />
             ) : inChairList.length === 0 ? (
-              <div className="p-5 text-center text-xs text-content-muted bg-surface-card rounded-xl border border-status-success/20 border-dashed space-y-1.5">
-                <Scissors className="w-6 h-6 text-status-success/60 mx-auto" />
-                <p className="font-semibold text-content-base">Nenhum atendimento ativo</p>
-                <p className="text-xs text-content-muted">Chame o próximo quando a cadeira liberar.</p>
-              </div>
+              <AdminEmptyState
+                icon={Scissors}
+                title="Nenhum atendimento ativo"
+                description="Chame o próximo quando a cadeira liberar."
+              />
             ) : (
               <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1 space-y-3" style={{ maxHeight: `${Math.max(180, operationSettings.queueVisibleLimit * 86)}px` }}>
               {inChairList.map((item) => (
@@ -557,20 +558,13 @@ export const WaitingQueue: React.FC = () => {
             {loading ? (
               <AdminListSkeleton rows={4} className="overflow-y-auto overscroll-contain pr-1" />
             ) : waitingList.length === 0 ? (
-              <div className="p-8 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle space-y-2">
-                <UserCheck className="w-8 h-8 text-content-muted mx-auto" />
-                <p className="font-bold text-content-base">Nenhum cliente na recepção</p>
-                <p className="text-xs text-content-muted max-w-xs mx-auto">
-                  A recepção está limpa. Adicione um cliente avulso se houver um walk-in.
-                </p>
-                    {operationSettings.allowWalkIn && <button
-                      onClick={() => setIsAddModalOpen(true)}
-                      className="bg-gold-base text-surface-base px-3 py-1.5 rounded-xl text-xs font-extrabold inline-flex items-center gap-1"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Adicionar</span>
-                    </button>}
-              </div>
+              <AdminEmptyState
+                icon={UserCheck}
+                title="Nenhum cliente na recepção"
+                description="Adicione um cliente avulso se houver um walk-in."
+                actionLabel={operationSettings.allowWalkIn ? 'Adicionar' : undefined}
+                onAction={operationSettings.allowWalkIn ? () => setIsAddModalOpen(true) : undefined}
+              />
             ) : (
               <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1" style={{ maxHeight: `${Math.max(180, operationSettings.queueVisibleLimit * 76)}px` }}>
                 <div className="space-y-2">

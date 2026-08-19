@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { handleEnterAsTab } from '../../utils/formUtils';
+import { useDialogFocus } from '../../hooks/useDialogFocus';
 import {
   createReceiptInSupabase,
   receiveReceiptInSupabase,
@@ -94,6 +95,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
   const [isCreating, setIsCreating] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(true, dialogRef);
 
   const calculation = useMemo(() => {
     const entered = Math.max(0, Number(initialReceipt?.enteredAmount ?? originalAmount));
@@ -226,12 +229,13 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
   const isConfirmed = receipt?.status === 'received';
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-5" role="dialog" aria-modal="true" aria-label="Registrar recebimento">
-      <div className="admin-modal w-full max-w-5xl h-[100dvh] sm:h-auto sm:max-h-[94dvh] bg-surface-card border border-border-subtle rounded-none sm:rounded-2xl shadow-2xl overflow-y-auto flex flex-col">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-5" role="dialog" aria-modal="true" aria-labelledby="receipt-dialog-title">
+      <div ref={dialogRef} tabIndex={-1} className="admin-modal w-full max-w-5xl h-[100dvh] sm:h-auto sm:max-h-[94dvh] bg-surface-card border border-border-subtle rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-y-auto flex flex-col">
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 p-5 sm:p-6 bg-surface-card border-b border-border-subtle">
+          <div className="absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-border-subtle sm:hidden" aria-hidden="true" />
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-gold-base">{stepLabel}</p>
-            <h2 className="mt-1 text-lg sm:text-xl font-serif font-bold text-content-base">{isConfirmed ? 'Recebimento confirmado' : 'Finalizar recebimento'}</h2>
+            <h2 id="receipt-dialog-title" className="mt-1 text-lg sm:text-xl font-serif font-bold text-content-base">{isConfirmed ? 'Recebimento confirmado' : 'Finalizar recebimento'}</h2>
           </div>
           <button type="button" onClick={onClose} className="w-10 h-10 rounded-xl flex items-center justify-center text-content-muted hover:text-content-base hover:bg-surface-base transition-colors" aria-label="Fechar modal">
             <X className="w-5 h-5" />

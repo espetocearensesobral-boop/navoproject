@@ -57,7 +57,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       {children}
       
       {/* Toast Container */}
-      <div className="fixed top-4 right-4 z-[250] flex flex-col gap-2 max-w-sm pointer-events-none">
+      <div className="fixed top-[calc(0.75rem+env(safe-area-inset-top))] left-3 right-3 sm:left-auto sm:top-4 sm:right-4 z-[250] flex flex-col gap-2 max-w-none sm:max-w-sm pointer-events-none" aria-live="polite">
         {toasts.map((toast) => (
           <div
             key={toast.id}
@@ -67,8 +67,9 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               rounded-xl shadow-2xl backdrop-blur-xl
               p-4 flex items-start gap-3
               animate-toast-in
-              min-w-[280px] max-w-sm
+              w-full min-w-0 sm:min-w-[280px] max-w-sm
             `}
+            role={toast.type === 'error' ? 'alert' : 'status'}
           >
             <div className="shrink-0 mt-0.5">{icons[toast.type]}</div>
             <div className="flex-1 min-w-0">
@@ -78,8 +79,10 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               )}
             </div>
             <button
+              type="button"
               onClick={() => removeToast(toast.id)}
               className="shrink-0 p-1 rounded-lg text-content-inverse/70 hover:text-content-inverse hover:bg-content-inverse/10 transition-colors"
+              aria-label="Fechar notificação"
             >
               <X className="w-4 h-4" />
             </button>

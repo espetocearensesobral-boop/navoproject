@@ -1,12 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Users, Search, Edit2, Trash2, Plus, Star, Award, ShieldCheck, Mail, Phone, Calendar, CheckCircle2, X } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { ChevronDown, ChevronUp, Users, Search, Edit2, Trash2, Plus, Star, Award, ShieldCheck, Mail, Phone, Calendar, AlertCircle, X } from 'lucide-react';
 import { authFetch } from '../../lib/api';
+import { z } from 'zod';
 import { formatPhone } from '../../utils/masks';
 import { handleEnterAsTab } from '../../utils/formUtils';
+import { useDialogFocus } from '../../hooks/useDialogFocus';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminListSkeleton } from './shared/AdminSkeleton';
+import { AdminEmptyState } from './shared/AdminEmptyState';
+import { useToast } from '../ui/Toast';
 import { Button } from '../ui/Button';
 import { AdminLabel } from '../ui/AdminLabel';
+
+const clientFormSchema = z.object({
+  name: z.string().trim().min(1, 'Informe o nome.'),
+  email: z.string().trim().email('Informe um e-mail válido.'),
+  phone: z.string().trim().optional(),
+  birthday: z.string().optional(),
+});
+
+type ClientField = keyof z.infer<typeof clientFormSchema>;
+
+type ClientFieldErrors = Partial<Record<ClientField, string>>;
 
 interface Profile {
   id: string;
@@ -23,14 +38,19 @@ interface Profile {
 }
 
 export const ClientsManagement: React.FC = () => {
+  const { showToast } = useToast();
   const [clients, setClients] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [expandedClientId, setExpandedClientId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Profile | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<ClientFieldErrors>({});
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(isModalOpen, dialogRef);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -44,18 +64,27 @@ export const ClientsManagement: React.FC = () => {
   });
 
   useEffect(() => {
-    loadClients();
-  }, []);
+    loadClients(debouncedSearch);
+  }, [debouncedSearch]);
 
-  const loadClients = async () => {
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(search), 180);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  const loadClients = async (query = '') => {
     setLoading(true);
+    setLoadError(null);
     try {
-      const res = await authFetch('/api/profiles');
+      const params = new URLSearchParams();
+      if (query.trim()) params.set('q', query.trim());
+      const res = await authFetch(`/api/profiles${params.toString() ? `?${params.toString()}` : ''}`);
       const data = await res.json();
       setClients(Array.isArray(data) ? data : []);
     } catch (e) {
       console.warn(e);
       setClients([]);
+      setLoadError('Não foi possível carregar os clientes.');
     } finally {
       setLoading(false);
     }
@@ -64,7 +93,7 @@ export const ClientsManagement: React.FC = () => {
   const [selectedTier, setSelectedTier] = useState<string>('all');
 
   const safeClients = Array.isArray(clients) ? clients : [];
-  const normalizedSearch = search.trim().toLowerCase();
+  const normalizedSearch = debouncedSearch.trim().toLowerCase();
   const normalizedPhoneSearch = normalizedSearch.replace(/\D/g, '');
   const filteredClients = safeClients.filter(c => {
     const name = (c.name || '').toLowerCase();
@@ -93,6 +122,7 @@ export const ClientsManagement: React.FC = () => {
   }).length;
 
   const handleOpenModal = (client?: Profile) => {
+    setFieldErrors({});
     if (client) {
       setEditingClient(client);
       setFormData({
@@ -123,6 +153,24 @@ export const ClientsManagement: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const validation = clientFormSchema.safeParse({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      birthday: formData.birthday,
+    });
+
+    if (!validation.success) {
+      const nextErrors = validation.error.issues.reduce<ClientFieldErrors>((result, issue) => {
+        const field = issue.path[0] as ClientField;
+        if (!result[field]) result[field] = issue.message;
+        return result;
+      }, {});
+      setFieldErrors(nextErrors);
+      return;
+    }
+
+    setFieldErrors({});
     setErrorMsg(null);
     try {
       const method = editingClient ? 'PUT' : 'POST';
@@ -138,10 +186,10 @@ export const ClientsManagement: React.FC = () => {
         throw new Error(err.error || 'Erro ao salvar cliente');
       }
 
-      setSuccessMsg(`Cliente ${editingClient ? 'atualizado' : 'cadastrado'} com sucesso!`);
+      const successTitle = editingClient ? 'Cliente atualizado' : 'Cliente cadastrado';
+      showToast('success', successTitle, 'A lista de clientes foi atualizada.');
       setIsModalOpen(false);
-      loadClients();
-      setTimeout(() => setSuccessMsg(null), 3000);
+      loadClients(debouncedSearch);
     } catch (error: any) {
       setErrorMsg(error.message);
     }
@@ -152,9 +200,8 @@ export const ClientsManagement: React.FC = () => {
     try {
       const res = await authFetch(`/api/profiles/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Erro ao excluir');
-      setSuccessMsg('Cliente excluído com sucesso!');
-      loadClients();
-      setTimeout(() => setSuccessMsg(null), 3000);
+      showToast('success', 'Cliente excluído', 'A lista de clientes foi atualizada.');
+      loadClients(debouncedSearch);
     } catch (error: any) {
       console.warn(error);
     }
@@ -193,6 +240,7 @@ export const ClientsManagement: React.FC = () => {
           <input
             type="text"
             placeholder="Nome, e-mail ou telefone..."
+            title="Busca local nos clientes carregados"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-2 text-xs text-content-base placeholder:text-content-muted focus:outline-none focus:border-gold-base"
@@ -240,6 +288,7 @@ export const ClientsManagement: React.FC = () => {
           <input
             type="text"
             placeholder="Nome, e-mail ou telefone..."
+            title="Busca local nos clientes carregados"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
@@ -250,17 +299,19 @@ export const ClientsManagement: React.FC = () => {
         </p>
       </div>
 
-      {successMsg && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>{successMsg}</span>
-        </div>
-      )}
-
       {loading ? (
         <AdminListSkeleton rows={5} />
       ) : (
         <>
+          {loadError && (
+            <AdminEmptyState
+              icon={AlertCircle}
+              title="Não foi possível carregar"
+              description={loadError}
+              actionLabel="Tentar novamente"
+              onAction={() => loadClients(debouncedSearch)}
+            />
+          )}
           {/* RESPONSIVE CLIENT LIST */}
           <div className="space-y-2">
             {filteredClients.map((client) => {
@@ -317,26 +368,31 @@ export const ClientsManagement: React.FC = () => {
               );
             })}
 
-            {filteredClients.length === 0 && (
-              <div className="p-8 text-center text-sm text-content-muted bg-surface-card border border-border-subtle rounded-2xl">
-                Nenhum cliente encontrado.
-              </div>
+            {!loadError && filteredClients.length === 0 && (
+              <AdminEmptyState
+                icon={Users}
+                title={normalizedSearch || selectedTier !== 'all' ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}
+                description={normalizedSearch || selectedTier !== 'all' ? 'Ajuste a busca ou o filtro para tentar novamente.' : 'Cadastre o primeiro cliente para acompanhar contatos, fidelidade e agenda.'}
+                actionLabel={!normalizedSearch && selectedTier === 'all' ? 'Novo cliente' : undefined}
+                onAction={!normalizedSearch && selectedTier === 'all' ? () => handleOpenModal() : undefined}
+              />
             )}
           </div>        </>
       )}
 
       {/* COMPACT MODULAR CLIENT MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
+        <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden" onClick={() => setIsModalOpen(false)}>
+          <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="client-dialog-title" onClick={(event) => event.stopPropagation()} className="bg-surface-card border border-border-subtle sm:border-gold-base/30 rounded-t-2xl sm:rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[94dvh] sm:max-h-[90vh] animate-fade-in">
             {/* Header */}
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center gap-2 shrink-0">
+              <div className="absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-border-subtle sm:hidden" aria-hidden="true" />
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-hover shrink-0">
                   <Users className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-sm font-bold text-content-base truncate">
+                  <h2 id="client-dialog-title" className="text-sm font-bold text-content-base truncate">
                     {editingClient ? `Editar: ${editingClient.name}` : 'Novo cliente'}
                   </h2>
                   <p className="text-xs text-content-muted truncate">Ajuste informações de contato e pontuação</p>
@@ -345,6 +401,7 @@ export const ClientsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
+                aria-label="Fechar cliente"
                 className="w-7 h-7 rounded-xl bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors shrink-0"
               >
                 <X className="w-4 h-4" />
@@ -366,10 +423,13 @@ export const ClientsManagement: React.FC = () => {
                     type="text"
                     required
                     value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    onChange={e => { setFormData({ ...formData, name: e.target.value }); setFieldErrors((current) => ({ ...current, name: undefined })); }}
+                    aria-invalid={Boolean(fieldErrors.name)}
+                    aria-describedby={fieldErrors.name ? 'client-name-error' : undefined}
                     placeholder="Ex: Carlos Silva"
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                    className={`w-full bg-surface-base border rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base ${fieldErrors.name ? 'border-status-error' : 'border-border-subtle'}`}
                   />
+                  {fieldErrors.name && <p id="client-name-error" className="mt-1 text-xs text-status-error">{fieldErrors.name}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -379,20 +439,26 @@ export const ClientsManagement: React.FC = () => {
                       type="email"
                       required
                       value={formData.email}
-                      onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      onChange={e => { setFormData({ ...formData, email: e.target.value }); setFieldErrors((current) => ({ ...current, email: undefined })); }}
+                      aria-invalid={Boolean(fieldErrors.email)}
+                      aria-describedby={fieldErrors.email ? 'client-email-error' : undefined}
                       placeholder="carlos@email.com"
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                      className={`w-full bg-surface-base border rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base ${fieldErrors.email ? 'border-status-error' : 'border-border-subtle'}`}
                     />
+                    {fieldErrors.email && <p id="client-email-error" className="mt-1 text-xs text-status-error">{fieldErrors.email}</p>}
                   </div>
                   <div>
                     <AdminLabel tone="accent">Telefone</AdminLabel>
                     <input
                       type="tel"
                       value={formData.phone}
-                      onChange={e => setFormData({ ...formData, phone: formatPhone(e.target.value) })}
+                      onChange={e => { setFormData({ ...formData, phone: formatPhone(e.target.value) }); setFieldErrors((current) => ({ ...current, phone: undefined })); }}
+                      aria-invalid={Boolean(fieldErrors.phone)}
+                      aria-describedby={fieldErrors.phone ? 'client-phone-error' : undefined}
                       placeholder="(11) 99999-9999"
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                      className={`w-full bg-surface-base border rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base ${fieldErrors.phone ? 'border-status-error' : 'border-border-subtle'}`}
                     />
+                    {fieldErrors.phone && <p id="client-phone-error" className="mt-1 text-xs text-status-error">{fieldErrors.phone}</p>}
                   </div>
                 </div>
 

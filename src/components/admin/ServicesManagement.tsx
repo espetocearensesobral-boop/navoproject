@@ -3,6 +3,7 @@ import { ServiceItem } from '../../types';
 import { fetchServicesFromSupabase, saveServiceInSupabase, deleteServiceInSupabase, deleteAllServicesInSupabase } from '../../services/supabaseDataService';
 import { DEFAULT_CATEGORIES, getCategoryName } from '../../data/categories';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminEmptyState } from './shared/AdminEmptyState';
 import { Button } from '../ui/Button';
 import { AdminLabel } from '../ui/AdminLabel';
 import { handleEnterAsTab } from '../../utils/formUtils';
@@ -423,9 +424,13 @@ export const ServicesManagement: React.FC = () => {
               Carregando serviços...
             </div>
           ) : filteredServices.length === 0 ? (
-            <div className="p-8 text-center bg-surface-card rounded-2xl border border-border-subtle text-sm text-content-muted">
-              Nenhum serviço encontrado.
-            </div>
+            <AdminEmptyState
+              icon={Scissors}
+              title={searchQuery || selectedCategory !== 'all' || filterType !== 'all' ? 'Nenhum serviço encontrado' : 'Nenhum serviço cadastrado'}
+              description={searchQuery || selectedCategory !== 'all' || filterType !== 'all' ? 'Ajuste a busca ou os filtros para tentar novamente.' : 'Cadastre o primeiro serviço para começar a montar sua agenda.'}
+              actionLabel={!searchQuery && selectedCategory === 'all' && filterType === 'all' ? 'Novo serviço' : undefined}
+              onAction={!searchQuery && selectedCategory === 'all' && filterType === 'all' ? handleOpenCreate : undefined}
+            />
           ) : (
             filteredServices.map((service) => {
               const categoryName = getCategoryName(service.category_id);
@@ -781,9 +786,11 @@ export const ServicesManagement: React.FC = () => {
               Carregando cardápio de serviços...
             </div>
           ) : filteredServices.length === 0 ? (
-            <div className="py-10 text-center text-sm text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
-              Nenhum serviço encontrado com os filtros atuais.
-            </div>
+            <AdminEmptyState
+              icon={Scissors}
+              title="Nenhum serviço encontrado"
+              description="Ajuste a busca ou os filtros para tentar novamente."
+            />
           ) : (
             filteredServices.map((service) => {
               const categoryName = getCategoryName(service.category_id);

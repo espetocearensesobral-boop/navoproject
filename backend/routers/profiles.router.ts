@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { eq } from 'drizzle-orm';
+import { eq, ilike, or } from 'drizzle-orm';
 import { db, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { JWT_SECRET } from '../config/env.js';
@@ -18,8 +18,19 @@ profilesRouter.get("/", requireAuth, async (req: any, res) => {
     }
     const isAdmin = req.user.role === 'admin';
     const userId = req.user.id;
+    const query = String(req.query.q || '').trim().slice(0, 80);
+    const searchFilter = query
+      ? or(
+          ilike(schema.profiles.name, `%${query}%`),
+          ilike(schema.profiles.email, `%${query}%`),
+          ilike(schema.profiles.phone, `%${query}%`),
+        )
+      : undefined;
 
-    const dbProfiles = await db.query.profiles.findMany();
+    const dbProfiles = await db.query.profiles.findMany({
+      ...(searchFilter ? { where: searchFilter } : {}),
+      ...(isAdmin && query ? { limit: 100 } : {}),
+    });
     let safe = dbProfiles.map((p: any) => formatProfile(p));
     if (!isAdmin) {
       safe = safe.filter((p: any) => p.id === userId);
