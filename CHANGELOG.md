@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.2.0] — 2026-08-19
+
+### Experiência mobile do painel administrativo
+
+- Botão de alternância de tema reintroduzido na topbar mobile e disponibilizado também no drawer.
+- Shell mobile ajustado com topbar e bottom bar respeitando áreas seguras de notch e indicador de gesto.
+- Drawer mobile passou a usar entrada/saída por transform, overlay com fade, fechamento por toque externo e suporte a `inert` quando fechado.
+- Navegação mobile recebeu alvos de toque maiores, estados pressed, feedback háptico leve e indicação semântica da página ativa.
+- Conteúdo administrativo passou a usar transição curta de fade-through entre áreas, sem animações decorativas excessivas.
+- Política de animações do admin deixou de bloquear todo movimento e passou a manter somente `pulse` e `ping` decorativos bloqueados, respeitando `prefers-reduced-motion`.
+
+### Carregamento e leitura
+
+- Criado `AdminSkeleton`, `AdminListSkeleton` e `AdminPageSkeleton` com shimmer discreto e estados `aria-busy`.
+- Skeletons aplicados ao dashboard, agenda, fila, clientes, recebimentos e extrato financeiro.
+- Feed de atendimentos recebeu placeholders estruturais e ações com feedback de toque mais responsivo.
+
 ## [0.1.0] — 2026-08-19
 
 ### Segurança e integridade

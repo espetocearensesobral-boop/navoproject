@@ -18,6 +18,7 @@ import { authFetch } from '../../lib/api';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAdminOperationNotifications } from '../../hooks/useAdminOperationNotifications';
 import { useDialogFocus } from '../../hooks/useDialogFocus';
+import { hapticLight } from '../../lib/haptics';
 import {
   Calendar,
   Clock,
@@ -120,6 +121,21 @@ export const AdminLayout: React.FC = () => {
   useDialogFocus(sidebarOpen, sidebarRef);
   const notificationsActive = notificationsSupported && notificationPermission === 'granted' && backgroundPushEnabled;
 
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+    hapticLight();
+  };
+
+  const openMobileNavigation = () => {
+    hapticLight();
+    setSidebarOpen(true);
+  };
+
+  const closeMobileNavigation = () => {
+    hapticLight();
+    setSidebarOpen(false);
+  };
+
   const scrollSidebarNavigationToItem = (tab: AdminTab, mobile = false) => {
     window.requestAnimationFrame(() => {
       const navigation = document.querySelector<HTMLElement>(
@@ -143,6 +159,7 @@ export const AdminLayout: React.FC = () => {
   const handleSidebarTabChange = (tab: AdminTab, mobile = false) => {
     setActiveTab(tab);
     if (mobile) {
+      hapticLight();
       setSidebarOpen(false);
       return;
     }
@@ -307,6 +324,7 @@ export const AdminLayout: React.FC = () => {
               data-admin-sidebar-item={item.id}
               title={item.description}
               className={`admin-sidebar-item w-full ${mobile ? 'min-h-11 px-3 rounded-lg text-sm gap-3' : 'min-h-9 px-2 rounded-md text-xs gap-2'} font-medium flex items-center transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active' : ''}`}
+              aria-current={isActive ? 'page' : undefined}
             >
               <Icon className={`${mobile ? 'w-[18px] h-[18px]' : 'w-4 h-4'} shrink-0`} />
               <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
@@ -389,7 +407,7 @@ export const AdminLayout: React.FC = () => {
               <p className="text-[9px] font-medium text-content-muted uppercase tracking-wider">Admin</p>
             </div>
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={toggleTheme}
               className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-base text-content-muted hover:text-gold-base active:bg-surface-elevated transition-colors shrink-0"
               title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
               aria-label="Alternar tema"
@@ -416,7 +434,7 @@ export const AdminLayout: React.FC = () => {
       </aside>
 
       {/* Mobile Topbar */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-surface-card border-b border-border-subtle z-40 px-3 flex items-center justify-between">
+      <header className="admin-mobile-topbar lg:hidden fixed top-0 left-0 right-0 bg-surface-card border-b border-border-subtle z-40 px-3 flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0 px-2">
           <div className="w-7 h-7 bg-gold-base text-surface-base rounded-md flex items-center justify-center shrink-0">
             <Scissors className="w-4 h-4" />
@@ -435,8 +453,18 @@ export const AdminLayout: React.FC = () => {
             onToggleNotifications={toggleNotifications}
           />
           <button
-            onClick={() => setSidebarOpen(true)}
-            className="w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-content-muted active:text-gold-base active:scale-95 transition-transform"
+            type="button"
+            onClick={toggleTheme}
+            className="w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-content-muted hover:text-gold-base active:text-gold-base active:scale-[0.97] transition-[transform,color,background-color] duration-150"
+            title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+            aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5 text-gold-base" /> : <Moon className="w-5 h-5" />}
+          </button>
+          <button
+            type="button"
+            onClick={openMobileNavigation}
+            className="w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-content-muted active:text-gold-base active:scale-[0.97] transition-[transform,color,background-color] duration-150"
             aria-label="Abrir Menu de Navegação"
           >
             <Menu className="w-5 h-5" />
@@ -445,15 +473,17 @@ export const AdminLayout: React.FC = () => {
       </header>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 min-h-[60px] bg-surface-card border-t border-border-subtle z-40 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+      <nav className="admin-mobile-bottom-bar lg:hidden fixed bottom-0 left-0 right-0 bg-surface-card border-t border-border-subtle z-40 flex items-center justify-around px-2">
         {bottomBarItems.map(item => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
+              type="button"
               onClick={() => handleSidebarTabChange(item.id, true)}
-              className={`flex-1 min-h-12 flex flex-col items-center justify-center gap-0.5 rounded-md transition-all active:scale-95 ${
+              aria-current={isActive ? 'page' : undefined}
+              className={`admin-bottom-nav-item flex-1 min-h-14 flex flex-col items-center justify-center gap-0.5 rounded-md transition-[transform,color,background-color] duration-150 active:scale-[0.97] ${
                 isActive 
                   ? 'text-gold-base font-bold bg-gold-base/10' 
                   : 'text-content-muted hover:text-content-base'
@@ -467,8 +497,9 @@ export const AdminLayout: React.FC = () => {
 
         {/* 4th Item: Menu / Mais */}
         <button
-          onClick={() => setSidebarOpen(true)}
-          className={`flex-1 h-12 flex flex-col items-center justify-center gap-0.5 rounded-md transition-all active:scale-95 ${
+                      type="button"
+          onClick={openMobileNavigation}
+          className={`admin-bottom-nav-item flex-1 min-h-14 flex flex-col items-center justify-center gap-0.5 rounded-md transition-[transform,color,background-color] duration-150 active:scale-[0.97] ${
             isMoreActive ? 'text-gold-base font-bold' : 'text-content-muted hover:text-content-base'
           }`}
         >
@@ -478,62 +509,82 @@ export const AdminLayout: React.FC = () => {
       </nav>
 
       {/* Mobile Drawer (Side sheet) */}
-      {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex justify-start">
-          <div 
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
-            onClick={() => setSidebarOpen(false)}
-          />
-          
-          <aside ref={sidebarRef} tabIndex={-1} className="relative w-[min(280px,84vw)] bg-surface-card text-content-base flex flex-col animate-slide-in border-r border-border-subtle h-[100dvh] outline-none">
-            {/* Header */}
-            <div className="flex items-center justify-between h-14 px-4 border-b border-border-subtle shrink-0">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-6 h-6 bg-gold-base text-content-on-accent rounded-md flex items-center justify-center shrink-0 font-bold">
-                  <Scissors className="w-3.5 h-3.5" />
-                </div>
-                <h1 className="text-sm font-serif font-bold text-content-base truncate">Navo Premium</h1>
-              </div>
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl text-content-muted hover:text-content-base active:bg-surface-base"
-                aria-label="Fechar menu"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      <div
+        className={`admin-mobile-drawer lg:hidden fixed inset-0 z-50 flex justify-start ${sidebarOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        aria-hidden={!sidebarOpen}
+        inert={!sidebarOpen}
+      >
+        <div
+          className={`fixed inset-0 bg-black/55 transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
+          onClick={closeMobileNavigation}
+          aria-hidden="true"
+        />
 
-            {/* Navigation */}
-            {renderSidebarNavigation(true)}
-            
-            {/* Mobile Footer */}
-            <div className="p-3 border-t border-border-subtle shrink-0 space-y-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-              <AdminNotificationCenter
-                notificationsSupported={notificationsSupported}
-                notificationPermission={notificationPermission}
-                notificationsActive={notificationsActive}
-                notificationsBusy={notificationsBusy}
-                onToggleNotifications={toggleNotifications}
-                placement="drawer"
-              />
+        <aside
+          ref={sidebarRef}
+          tabIndex={-1}
+          className={`relative w-[min(280px,84vw)] bg-surface-card text-content-base flex flex-col border-r border-border-subtle h-[100dvh] outline-none transform transition-transform duration-200 ease-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between min-h-14 px-4 pt-[env(safe-area-inset-top)] border-b border-border-subtle shrink-0">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-6 h-6 bg-gold-base text-content-on-accent rounded-md flex items-center justify-center shrink-0 font-bold">
+                <Scissors className="w-3.5 h-3.5" />
+              </div>
+              <h1 className="text-sm font-serif font-bold text-content-base truncate">Navo Premium</h1>
+            </div>
+            <button
+              type="button"
+              onClick={closeMobileNavigation}
+              className="w-10 h-10 flex items-center justify-center rounded-xl text-content-muted hover:text-content-base active:bg-surface-base active:scale-[0.97] transition-[transform,color,background-color] duration-150"
+              aria-label="Fechar menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Navigation */}
+          {renderSidebarNavigation(true)}
+
+          {/* Mobile Footer */}
+          <div className="p-3 border-t border-border-subtle shrink-0 space-y-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+            <AdminNotificationCenter
+              notificationsSupported={notificationsSupported}
+              notificationPermission={notificationPermission}
+              notificationsActive={notificationsActive}
+              notificationsBusy={notificationsBusy}
+              onToggleNotifications={toggleNotifications}
+              placement="drawer"
+            />
+            <div className="flex items-center gap-2">
               <button
+                type="button"
+                onClick={toggleTheme}
+                className="h-11 w-11 flex items-center justify-center rounded-xl border border-border-subtle bg-surface-base text-content-muted hover:text-gold-base active:scale-[0.97] transition-[transform,color,background-color] duration-150 shrink-0"
+                title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+                aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4" />}
+              </button>
+              <button
+                type="button"
                 onClick={handleLogout}
-                className="w-full h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800 font-semibold text-xs transition-colors min-w-0"
+                className="flex-1 h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800 active:scale-[0.99] font-semibold text-xs transition-[transform,background-color] duration-150 min-w-0"
               >
                 <LogOut className="w-4 h-4 shrink-0" />
                 <span className="truncate">Sair do sistema</span>
               </button>
             </div>
-          </aside>
-        </div>
-      )}
+          </div>
+        </aside>
+      </div>
 
       {/* Main Content Area */}
-      <main ref={mainRef} className="flex-1 lg:ml-56 pt-14 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
+      <main ref={mainRef} className="flex-1 lg:ml-56 pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
         <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
-        <div className="max-w-[1320px] mx-auto px-3 sm:px-5 lg:px-6 py-5 lg:pt-6 lg:pb-10 pb-24 w-full min-w-0">
+        <div className="max-w-[1320px] mx-auto px-3 sm:px-5 lg:px-6 py-5 lg:pt-6 lg:pb-10 pb-[calc(6rem+env(safe-area-inset-bottom))] w-full min-w-0">
           {/* Tab Content */}
-          <div className="w-full min-w-0">
+          <div key={activeTab} className="admin-content-transition w-full min-w-0">
             {renderContent()}
           </div>
         </div>

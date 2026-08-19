@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, Clock } from 'lucide-react';
 import { Appointment } from '../../../types';
+import { AdminSkeleton } from './AdminSkeleton';
 
 interface AdminAppointmentFeedProps {
   appointments: Appointment[];
@@ -33,8 +34,17 @@ const statusClass: Record<string, string> = {
 export const AdminAppointmentFeed: React.FC<AdminAppointmentFeedProps> = ({ appointments, onNavigateToAgenda, loading = false }) => (
   <div className="divide-y divide-border-subtle">
     {loading ? (
-      <div className="space-y-3 px-4 py-5" aria-label="Carregando atendimentos">
-        {[1, 2, 3].map((item) => <div key={item} className="h-10 rounded-lg bg-surface-base" />)}
+      <div className="space-y-3 px-4 py-5" aria-label="Carregando atendimentos" aria-busy="true">
+        {[1, 2, 3].map((item) => (
+          <div key={item} className="flex items-center gap-3 rounded-lg bg-surface-base/70 px-2 py-2">
+            <AdminSkeleton className="h-8 w-8 shrink-0 rounded-lg" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <AdminSkeleton className="h-2.5 w-2/5" />
+              <AdminSkeleton className="h-2.5 w-3/5" />
+            </div>
+            <AdminSkeleton className="h-7 w-12 shrink-0 rounded-md" />
+          </div>
+        ))}
       </div>
     ) : appointments.length === 0 ? (
       <div className="py-10 px-4 text-center text-content-muted">
@@ -83,7 +93,7 @@ export const AdminAppointmentFeed: React.FC<AdminAppointmentFeedProps> = ({ appo
             <button
               type="button"
               onClick={onNavigateToAgenda}
-              className="h-8 w-8 flex items-center justify-center rounded-lg border border-border-subtle text-content-muted hover:text-gold-base"
+              className="h-8 w-8 flex items-center justify-center rounded-lg border border-border-subtle text-content-muted hover:text-gold-base active:scale-[0.97] transition-[transform,color,background-color] duration-150"
               aria-label="Ver agendamento na agenda"
             >
               <ArrowRight className="w-3.5 h-3.5" />

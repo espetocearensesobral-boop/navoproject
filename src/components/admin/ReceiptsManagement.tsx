@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
+import { AdminListSkeleton } from './shared/AdminSkeleton';
 import { ReceiptCheckoutModal } from './ReceiptCheckoutModal';
 import {
   fetchReceiptsFromSupabase,
@@ -142,7 +143,7 @@ export const ReceiptsManagement: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="py-20 flex items-center justify-center text-content-muted"><RefreshCw className="w-5 h-5 animate-spin mr-2" /> Carregando recebimentos…</div>
+          <AdminListSkeleton rows={5} className="p-4 sm:p-5" />
         ) : visibleReceipts.length === 0 ? (
           <div className="py-16 px-5 text-center"><CircleDollarSign className="w-10 h-10 mx-auto text-content-muted/50" /><h3 className="mt-3 text-base font-bold text-content-base">Nenhum recebimento encontrado</h3><p className="mt-1 text-sm text-content-muted">Os atendimentos finalizados aparecerão aqui como pendentes até o pagamento ser confirmado.</p></div>
         ) : (
@@ -150,7 +151,7 @@ export const ReceiptsManagement: React.FC = () => {
             {visibleReceipts.map((item) => {
               const pending = item.status === 'pending';
               return (
-                <button key={item.id} type="button" onClick={() => setSelectedReceipt(item)} className="w-full p-4 sm:px-5 text-left hover:bg-surface-base/70 transition-colors active:bg-surface-base">
+                <button key={item.id} type="button" onClick={() => setSelectedReceipt(item)} className="w-full p-4 sm:px-5 text-left hover:bg-surface-base/70 active:bg-surface-base active:scale-[0.998] transition-[transform,background-color] duration-150">
                   <div className="flex items-start gap-3">
                     <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${pending ? 'bg-amber-500/10 text-amber-500' : 'bg-status-success/10 text-status-success'}`}>{pending ? <Clock3 className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}</div>
                     <div className="flex-1 min-w-0">

@@ -13,6 +13,7 @@ import {
   PieChart 
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminListSkeleton, AdminSkeleton } from './shared/AdminSkeleton';
 import { fetchCashTransactionsFromSupabase } from '../../services/supabaseDataService';
 import { getTodayStringBRT } from '../../utils/dateUtils';
 
@@ -128,7 +129,7 @@ export const FinancialStatementManagement: React.FC = () => {
         <span>Baixar Extrato CSV</span>
       </button>
 
-      {loading && <div className="p-3 rounded-xl border border-border-subtle bg-surface-card text-xs text-content-muted">Carregando lançamentos reais...</div>}
+      {loading && <AdminSkeleton className="h-11 rounded-xl" label="Carregando lançamentos" />}
       {error && (
         <div className="p-3 rounded-xl border border-status-error/30 bg-status-error/10 text-status-error text-xs font-semibold flex items-center justify-between gap-3">
           <span>{error}</span>
@@ -137,7 +138,7 @@ export const FinancialStatementManagement: React.FC = () => {
       )}
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" aria-busy={loading}>
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-status-success mb-1">
             <span className="text-xs font-bold uppercase tracking-wider admin-safe-wrap">Entradas</span>
@@ -222,7 +223,9 @@ export const FinancialStatementManagement: React.FC = () => {
 
       {/* Transaction Table */}
       <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
+        {loading ? (
+          <AdminListSkeleton rows={6} className="p-4 sm:p-5" />
+        ) : <div className="overflow-x-auto">
           <table className="w-full text-left text-xs min-w-[760px]">
             <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-xs">
               <tr className="whitespace-nowrap">
@@ -275,7 +278,7 @@ export const FinancialStatementManagement: React.FC = () => {
               ))}
             </tbody>
           </table>
-        </div>
+        </div>}
       </div>
     </div>
   );

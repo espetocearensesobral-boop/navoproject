@@ -439,7 +439,52 @@ button, a, input, select, textarea {
   border: 1px solid color-mix(in srgb, var(--color-gold-base) 25%, transparent);
 }
 .transition-sharp {
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+:root {
+  --admin-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --admin-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+@keyframes admin-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes admin-skeleton-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.admin-content-transition {
+  animation: admin-content-enter 180ms var(--admin-ease-out) both;
+}
+
+.admin-skeleton {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: color-mix(in srgb, var(--color-content-muted) 10%, var(--color-surface-base));
+}
+
+.admin-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-content-base) 7%, transparent), transparent);
+  animation: admin-skeleton-shimmer 1.35s var(--admin-ease-in-out) infinite;
 }
 
 
@@ -952,6 +997,22 @@ button, a, input, select, textarea {
 }
 
 
+@media (max-width: 1023px) {
+  .admin-mobile-topbar {
+    min-height: calc(3.5rem + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .admin-mobile-bottom-bar {
+    min-height: 3.75rem;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .admin-shell .admin-sidebar-item {
+    min-height: 3rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -964,14 +1025,39 @@ button, a, input, select, textarea {
 }
 
 
-/* Admin: densidade e sobriedade visual. Feedback funcional, como loaders, permanece ativo. */
-.admin-shell .animate-fade-in,
-.admin-shell .animate-in,
+/* Admin: bloquear apenas efeitos decorativos; estados funcionais e navegação continuam com movimento. */
 .admin-shell .animate-pulse,
-.admin-shell .animate-ping,
-.admin-shell .animate-slide-in,
-.admin-shell .animate-slide-in-right {
+.admin-shell .animate-ping {
   animation: none !important;
+}
+
+.admin-sidebar-item {
+  position: relative;
+  overflow: hidden;
+  transition: transform 150ms var(--admin-ease-out), color 150ms ease, background-color 150ms ease;
+}
+
+.admin-sidebar-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--color-gold-base) 8%, transparent);
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+}
+
+.admin-sidebar-item > * {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-sidebar-item:active {
+  transform: scale(0.985);
+}
+
+.admin-sidebar-item:active::after {
+  opacity: 1;
 }
 
 .admin-shell [class*="shadow-"]:not(.admin-preserve-depth) {

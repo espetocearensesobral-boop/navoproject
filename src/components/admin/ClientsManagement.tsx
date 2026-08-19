@@ -4,6 +4,7 @@ import { authFetch } from '../../lib/api';
 import { formatPhone } from '../../utils/masks';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminListSkeleton } from './shared/AdminSkeleton';
 import { Button } from '../ui/Button';
 import { AdminLabel } from '../ui/AdminLabel';
 
@@ -257,9 +258,7 @@ export const ClientsManagement: React.FC = () => {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="w-6 h-6 border-2 border-gold-base border-t-transparent rounded-full animate-spin" />
-        </div>
+        <AdminListSkeleton rows={5} />
       ) : (
         <>
           {/* RESPONSIVE CLIENT LIST */}
@@ -275,7 +274,7 @@ export const ClientsManagement: React.FC = () => {
                     type="button"
                     onClick={() => setExpandedClientId(isExpanded ? null : client.id)}
                     aria-expanded={isExpanded}
-                    className="w-full min-h-[82px] p-3.5 sm:p-4 text-left flex items-center gap-3 sm:gap-4 hover:bg-surface-base/40"
+                    className="w-full min-h-[82px] p-3.5 sm:p-4 text-left flex items-center gap-3 sm:gap-4 hover:bg-surface-base/40 active:scale-[0.995] transition-[transform,background-color] duration-150"
                   >
                     <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-surface-base border border-border-subtle flex items-center justify-center text-gold-hover font-bold text-sm shrink-0 overflow-hidden">
                       {client.avatarUrl ? <img src={client.avatarUrl} alt="" className="w-full h-full object-cover" /> : (client.name || '?').charAt(0).toUpperCase()}

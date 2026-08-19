@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { WaitingQueueItem, Professional, ServiceItem } from '../../types';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
+import { AdminListSkeleton } from './shared/AdminSkeleton';
 import { ReceiptCheckoutModal } from './ReceiptCheckoutModal';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import {
@@ -400,7 +401,7 @@ export const WaitingQueue: React.FC = () => {
       {/* Ação (mobile) */}
       {operationSettings.allowWalkIn && <button
         onClick={() => { setIsServicePickerOpen(false); setIsAddModalOpen(true); }}
-        className="md:hidden w-full min-h-11 bg-gold-base text-surface-base px-4 py-2.5 rounded-xl text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 shrink-0"
+        className="md:hidden w-full min-h-11 bg-gold-base text-surface-base px-4 py-2.5 rounded-xl text-sm font-extrabold flex items-center justify-center gap-2 transition-[transform,background-color] duration-150 shadow-md active:scale-[0.97] shrink-0"
       >
         <Plus className="w-4 h-4" />
         <span>Novo encaixe</span>
@@ -470,9 +471,7 @@ export const WaitingQueue: React.FC = () => {
             <p className="text-xs text-content-muted -mt-1 shrink-0">Ações em curso: finalize somente após concluir o serviço.</p>
 
             {loading ? (
-              <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
-                Carregando cadeiras...
-              </div>
+              <AdminListSkeleton rows={3} className="overflow-y-auto overscroll-contain pr-1" />
             ) : inChairList.length === 0 ? (
               <div className="p-5 text-center text-xs text-content-muted bg-surface-card rounded-xl border border-status-success/20 border-dashed space-y-1.5">
                 <Scissors className="w-6 h-6 text-status-success/60 mx-auto" />
@@ -528,7 +527,7 @@ export const WaitingQueue: React.FC = () => {
                       type="button"
                       disabled={actionLoadingId === item.id}
                       onClick={() => handleFinishService(item)}
-                      className="flex-1 py-1.5 rounded-xl bg-status-success text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-95 disabled:opacity-60 disabled:cursor-wait"
+                      className="flex-1 py-1.5 rounded-xl bg-status-success text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-[0.97] transition-[transform,background-color] duration-150 disabled:opacity-60 disabled:cursor-wait"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>{actionLoadingId === item.id ? 'Processando…' : 'Finalizar Corte'}</span>
@@ -556,9 +555,7 @@ export const WaitingQueue: React.FC = () => {
             </div>
 
             {loading ? (
-              <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
-                Carregando fila...
-              </div>
+              <AdminListSkeleton rows={4} className="overflow-y-auto overscroll-contain pr-1" />
             ) : waitingList.length === 0 ? (
               <div className="p-8 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle space-y-2">
                 <UserCheck className="w-8 h-8 text-content-muted mx-auto" />

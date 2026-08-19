@@ -22,6 +22,7 @@ import { fetchOperationSettings, defaultOperationSettings, type OperationSetting
 import { Calendar, Clock, Plus, Lock, Unlock, UserCheck, ShieldAlert, CheckCircle2, X, Save, RefreshCw, Scissors, AlertTriangle, Timer } from 'lucide-react';
 import { getTodayStringBRT, getCurrentTimeBRT, timeToMinutes } from '../../utils/dateUtils';
 import { AdminPageHeader } from './shared/AdminPageHeader';
+import { AdminListSkeleton } from './shared/AdminSkeleton';
 
 const PROFESSIONAL_ACCENT_COUNT = 6;
 
@@ -309,14 +310,14 @@ export const ScheduleGrid: React.FC = () => {
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => setIsManualBookingOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-transform"
+              className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1 shadow-sm active:scale-[0.97] transition-[transform,background-color] duration-150"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Encaixe</span>
             </button>
             <button
               onClick={() => setIsBlockModalOpen(true)}
-              className="p-1.5 rounded-xl bg-surface-card text-red-400 border border-red-500/20 active:scale-95 transition-transform"
+              className="p-1.5 rounded-xl bg-surface-card text-red-400 border border-red-500/20 active:scale-[0.97] transition-[transform,background-color] duration-150"
               title="Bloquear Horário"
             >
               <Lock className="w-4 h-4" />
@@ -352,8 +353,10 @@ export const ScheduleGrid: React.FC = () => {
         </div>
 
         {/* Compact Timeline Feed */}
-        <div className="space-y-3">
-          {timeSlots.map(slot => {
+        <div className="space-y-3" aria-busy={loading}>
+          {loading ? (
+            <AdminListSkeleton rows={5} />
+          ) : timeSlots.map(slot => {
             // Find appointments or blocks in this time slot for active barbers
             const slotAppointments = activeBarbers.map(barber => {
               const apt = appointments.find(

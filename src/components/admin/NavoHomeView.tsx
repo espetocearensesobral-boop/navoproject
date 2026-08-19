@@ -5,6 +5,7 @@ import { Appointment } from '../../types';
 import { Receipt, Scissors, Users, CalendarCheck2 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminAppointmentFeed } from './shared/AdminAppointmentFeed';
+import { AdminSkeleton } from './shared/AdminSkeleton';
 
 interface NavoHomeViewProps {
   onNavigateToAgenda: () => void;
@@ -103,39 +104,49 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
       
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-gold-base mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider truncate">Faturamento</span>
-            <div className="w-6 h-6 rounded-lg bg-gold-base/10 flex items-center justify-center shrink-0">
-              <Receipt className="w-3.5 h-3.5" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5" aria-busy={loading}>
+        {loading ? (
+          <>
+            <AdminSkeleton className="h-[6.75rem] rounded-xl" />
+            <AdminSkeleton className="h-[6.75rem] rounded-xl" />
+            <AdminSkeleton className="h-[6.75rem] rounded-xl col-span-2 sm:col-span-1" />
+          </>
+        ) : (
+          <>
+            <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+              <div className="flex items-center justify-between text-gold-base mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider truncate">Faturamento</span>
+                <div className="w-6 h-6 rounded-lg bg-gold-base/10 flex items-center justify-center shrink-0">
+                  <Receipt className="w-3.5 h-3.5" />
+                </div>
+              </div>
+              <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <p className="text-xs text-content-muted mt-1 font-medium truncate">{operationalReport?.summary.completedAppointments || 0} concluídos hoje</p>
             </div>
-          </div>
-          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {totalRevenueToday.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-          <p className="text-xs text-content-muted mt-1 font-medium truncate">{operationalReport?.summary.completedAppointments || 0} concluídos hoje</p>
-        </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider truncate">Ticket Médio</span>
-            <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle text-gold-base flex items-center justify-center shrink-0">
-              <CalendarCheck2 className="w-3.5 h-3.5" />
+            <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+              <div className="flex items-center justify-between text-content-muted mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider truncate">Ticket Médio</span>
+                <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle text-gold-base flex items-center justify-center shrink-0">
+                  <CalendarCheck2 className="w-3.5 h-3.5" />
+                </div>
+              </div>
+              <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <p className="text-xs text-status-success mt-1 font-medium truncate">{inServiceToday} ativos agora</p>
             </div>
-          </div>
-          <p className="text-lg font-black finance-positive tabular-nums truncate">R$ {ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-          <p className="text-xs text-status-success mt-1 font-medium truncate">{inServiceToday} ativos agora</p>
-        </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider truncate">Clientes Cadastrados</span>
-            <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle text-gold-base flex items-center justify-center shrink-0">
-              <Users className="w-3.5 h-3.5" />
+            <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
+              <div className="flex items-center justify-between text-content-muted mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider truncate">Clientes Cadastrados</span>
+                <div className="w-6 h-6 rounded-lg bg-surface-base border border-border-subtle text-gold-base flex items-center justify-center shrink-0">
+                  <Users className="w-3.5 h-3.5" />
+                </div>
+              </div>
+              <p className="text-lg font-black text-content-base tabular-nums truncate">{uniqueClients}</p>
+              <p className="text-xs text-content-muted mt-1 font-medium truncate">{pendingToday} aguardando</p>
             </div>
-          </div>
-          <p className="text-lg font-black text-content-base tabular-nums truncate">{uniqueClients}</p>
-          <p className="text-xs text-content-muted mt-1 font-medium truncate">{pendingToday} aguardando</p>
-        </div>
+          </>
+        )}
       </div>
 
       {/* TODAY'S SCHEDULE / QUEUE FLOW */}
@@ -151,7 +162,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
           {/* Action Zone: Card Header Right Button (Mobile text-to-icon, >=40px touch) */}
           <button 
             onClick={onNavigateToAgenda}
-            className="h-9 sm:h-8 px-0 sm:px-3 w-9 sm:w-auto rounded-xl bg-gold-base/10 hover:bg-gold-base text-gold-base hover:text-surface-base border border-gold-base/30 transition-all text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap active:scale-95"
+            className="h-9 sm:h-8 px-0 sm:px-3 w-9 sm:w-auto rounded-xl bg-gold-base/10 hover:bg-gold-base text-gold-base hover:text-surface-base border border-gold-base/30 transition-[transform,color,background-color] duration-150 text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap active:scale-[0.97]"
             aria-label="Ver na Agenda"
           >
             <Scissors className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
