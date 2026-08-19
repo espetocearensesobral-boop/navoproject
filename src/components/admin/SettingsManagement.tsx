@@ -457,7 +457,7 @@ const PrintSettingsTab: React.FC = () => {
 
       <section className="space-y-3">
         <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2"><Printer className="w-4 h-4 text-gold-base" /> Modelo por documento</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="admin-card-grid admin-card-grid--3">
           {([['receiptFormat', 'Comprovantes', 'receipt'], ['reportFormat', 'Relatórios', 'report'], ['qrFormat', 'QR Code / Totem', 'qr']] as const).map(([key, label, kind]) => (
             <div key={key} className="bg-surface-base border border-border-subtle rounded-xl p-3 space-y-3">
               <div><p className="font-bold text-content-base">{label}</p><p className="text-xs text-content-muted mt-0.5">Escolha o padrão mais adequado.</p></div>

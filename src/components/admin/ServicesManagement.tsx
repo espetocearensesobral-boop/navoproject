@@ -469,7 +469,7 @@ export const ServicesManagement: React.FC = () => {
 
                   {isExpanded && (
                     <div className="border-t border-border-subtle bg-surface-base/35 p-3 space-y-3">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="admin-card-grid gap-3 text-xs">
                         <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Categoria</p><p className="font-semibold text-content-base">{categoryName}</p></div>
                         <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Duração</p><p className="font-semibold text-content-base">{service.duration_minutes} min</p></div>
                         <div className="rounded-xl bg-surface-base p-2.5"><p className="text-xs text-content-muted">Preço original</p><p className="font-semibold finance-positive">{service.original_price ? `R$ ${service.original_price.toFixed(2)}` : '—'}</p></div>

@@ -947,7 +947,7 @@ export const WaitingQueue: React.FC = () => {
               {services.length === 0 ? (
                 <p className="py-10 text-center text-sm text-content-muted">Nenhum serviço disponível.</p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="admin-card-grid gap-2.5">
                   {services.map((service) => {
                     const isSelected = service.title === newServiceTitle;
                     return (

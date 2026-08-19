@@ -40,7 +40,7 @@ export const WhatsAppManagement: React.FC = () => {
       </button>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="admin-card-grid admin-card-grid--3">
         <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-xs font-bold uppercase tracking-wider truncate">Saldo</span>
@@ -63,7 +63,7 @@ export const WhatsAppManagement: React.FC = () => {
           <p className="text-xs text-status-success mt-1 font-medium admin-safe-wrap">98.5% entregues</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-xs font-bold uppercase tracking-wider truncate">Menos Faltas</span>
             <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">

@@ -152,7 +152,7 @@ export const ReportsManagement: React.FC = () => {
       {error && <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">{error}</div>}
 
       {loading && !report ? <div className="bg-surface-card border border-border-subtle rounded-xl p-12 text-center text-content-muted"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Carregando relatório…</div> : report && summary && <>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="admin-card-grid admin-card-grid--4">
           <MetricCard label="Entradas" value={money(summary.totalIncome)} detail={`${summary.incomeCount} lançamento${summary.incomeCount === 1 ? '' : 's'} confirmado${summary.incomeCount === 1 ? '' : 's'}`} icon={ArrowUpRight} tone="positive" />
           <MetricCard label="Saídas" value={money(summary.totalExpenses)} detail={`${summary.expenseCount} despesa${summary.expenseCount === 1 ? '' : 's'} registrada${summary.expenseCount === 1 ? '' : 's'}`} icon={ArrowDownRight} tone="negative" />
           <MetricCard label="Resultado líquido" value={money(summary.netResult)} detail="Entradas menos saídas" icon={summary.netResult >= 0 ? TrendingUp : TrendingDown} tone={summary.netResult >= 0 ? 'positive' : 'negative'} />

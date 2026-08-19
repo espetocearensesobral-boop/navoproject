@@ -1140,6 +1140,43 @@ button, a, input, select, textarea {
 
 
 /* Admin UI system: compact, quiet and task-oriented. */
+.admin-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.admin-card-grid > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-card-grid--auto {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+}
+
+.admin-card-grid--3 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 359px) {
+  .admin-card-grid,
+  .admin-card-grid--3,
+  .admin-card-grid--4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-card-grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-card-grid--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .admin-shell {
   --admin-content-gap: 1rem;
   --admin-control-height: 2.5rem;

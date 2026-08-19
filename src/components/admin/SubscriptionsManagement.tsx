@@ -277,7 +277,7 @@ export const SubscriptionsManagement: React.FC = () => {
 
       {/* TAB 2: PLANS */}
       {activeTab === 'plans' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="admin-card-grid admin-card-grid--3 gap-4">
           {plans.map((plan) => (
             <div
               key={plan.id}

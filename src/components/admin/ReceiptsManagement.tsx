@@ -112,7 +112,7 @@ export const ReceiptsManagement: React.FC = () => {
 
       {error && <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">{error}</div>}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="admin-card-grid admin-card-grid--4">
         <SummaryCard label="Pendentes" value={String(summary.pending.length)} detail={money(summary.pendingAmount)} icon={Clock3} tone="warning" />
         <SummaryCard label="Recebidos" value={String(summary.received.length)} detail="Histórico consolidado" icon={CheckCircle2} tone="success" />
         <SummaryCard label="Dinheiro pendente" value={money(summary.pending.filter((item) => item.paymentMethod === 'cash').reduce((total, item) => total + item.totalAmount, 0))} detail="A definir no recebimento" icon={Banknote} tone="neutral" />
