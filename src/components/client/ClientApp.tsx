@@ -19,14 +19,13 @@ import { usePullToRefresh } from '../../hooks/usePullToRefresh';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Calendar, Crown, Award, Clock, Home, Menu, Smartphone, User, Sparkles, Scissors, Loader2, Sun, Moon, CheckCircle2, Info, AlertTriangle, Sliders, Download } from 'lucide-react';
 
-import { authFetch, setStoredToken, clearStoredToken, getStoredToken } from '../../lib/api';
+import { authFetch } from '../../lib/api';
 
 const ClientSubscriptions = lazy(() => import('./ClientSubscriptions').then(m => ({ default: m.ClientSubscriptions })));
 const ClientLoyalty = lazy(() => import('./ClientLoyalty').then(m => ({ default: m.ClientLoyalty })));
 const ClientAppointments = lazy(() => import('./ClientAppointments').then(m => ({ default: m.ClientAppointments })));
 const ClientProfileModal = lazy(() => import('./ClientProfileModal').then(m => ({ default: m.ClientProfileModal })));
 const ClientLoginModal = lazy(() => import('./ClientLoginModal').then(m => ({ default: m.ClientLoginModal })));
-const PaymentChoiceModal = lazy(() => import('./PaymentChoiceModal').then(m => ({ default: m.PaymentChoiceModal })));
 const GuestSignupPromptModal = lazy(() => import('./GuestSignupPromptModal').then(m => ({ default: m.GuestSignupPromptModal })));
 const ClientMoreDrawer = lazy(() => import('./ClientMoreDrawer').then(m => ({ default: m.ClientMoreDrawer })));
 const PWAInstallModal = lazy(() => import('../pwa/PWAInstallModal').then(m => ({ default: m.PWAInstallModal })));
@@ -40,7 +39,6 @@ export const ClientApp: React.FC = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginModalView, setLoginModalView] = useState<'login' | 'register'>('login');
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
   const [isPublicReviewOpen, setIsPublicReviewOpen] = useState(false);
   const [pendingTabChange, setPendingTabChange] = useState<string | null>(null);
@@ -86,8 +84,8 @@ export const ClientApp: React.FC = () => {
     }
 
     // Pre-fetch services and professionals in background for instant UI rendering
-    fetchServicesFromSupabase();
-    fetchProfessionalsFromSupabase();
+    fetchServicesFromSupabase().catch(() => {});
+    fetchProfessionalsFromSupabase().catch(() => {});
 
     const timer = setTimeout(() => {
       setIsAppInitializing(false);
@@ -100,31 +98,21 @@ export const ClientApp: React.FC = () => {
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(true);
   
   useEffect(() => {
-    // Restaura sessão no carregamento/recarregamento da página apenas se houver token salvo
-    const token = getStoredToken();
-    if (!token) {
-      setIsGuest(true);
-      setCurrentUser({ id: 'guest', name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
-      return;
-    }
-
+    // A sessão é restaurada exclusivamente pelo cookie HTTP-only.
     authFetch('/api/auth/me')
       .then(res => res.ok ? res.json() : null)
       .then(me => {
         if (me && me.id) {
           setCurrentUser(me);
           setIsGuest(false);
-          if (me.token) setStoredToken(me.token);
         } else {
           setIsGuest(true);
           setCurrentUser({ id: 'guest', name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
-          clearStoredToken();
         }
       })
       .catch(() => {
         setIsGuest(true);
         setCurrentUser({ id: 'guest', name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
-        clearStoredToken();
       });
   }, []);
 
@@ -133,7 +121,6 @@ export const ClientApp: React.FC = () => {
       await authFetch('/api/auth/logout', { method: 'POST' });
       await fetch('/api/appointments/lookup/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
     } catch (e) {}
-    clearStoredToken();
     setUserCreatedAppointments([]);
     setIsGuest(true);
     setCurrentUser({ id: `guest_${Date.now()}`, name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
@@ -149,7 +136,7 @@ export const ClientApp: React.FC = () => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
   const [totalPaid, setTotalPaid] = useState<number>(0);
   const [createdBookingCode, setCreatedBookingCode] = useState<string>('');
-  const [reviewDetails, setReviewDetails] = useState({ loyaltyDiscount: 0, couponDiscount: 0 });
+  const [createdBookingStatus, setCreatedBookingStatus] = useState<Appointment['status']>('confirmed');
   // O histórico é sempre carregado da API; este estado contém apenas a resposta da sessão atual.
   const [userCreatedAppointments, setUserCreatedAppointments] = useState<Appointment[]>([]);
   const [isConfirmingBooking, setIsConfirmingBooking] = useState(false);
@@ -250,12 +237,12 @@ export const ClientApp: React.FC = () => {
     const clientName = paymentDetails.clientName || currentUser.name || 'Cliente';
     const clientPhone = paymentDetails.clientPhone || currentUser.phone || '';
     const clientEmail = paymentDetails.clientEmail || (isGuest ? '' : currentUser.email || '');
-    const generatedVoucher = `BRX-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+    // O código oficial é gerado pelo servidor; o cliente não cria voucher provisório.
 
     // Create appointment object
     const newApt: Appointment = {
       id: `apt_${Date.now()}`,
-      booking_code: generatedVoucher,
+      booking_code: undefined,
       client_id: currentUser.id || `guest_${Date.now()}`,
       client_name: clientName,
       client_phone: clientPhone,
@@ -278,8 +265,9 @@ export const ClientApp: React.FC = () => {
     try {
       // Save into real Supabase Database
       const savedApt = await createAppointmentInSupabase(newApt);
-      const finalVoucherCode = savedApt.booking_code || generatedVoucher;
+      const finalVoucherCode = savedApt.booking_code || '';
       setCreatedBookingCode(finalVoucherCode);
+      setCreatedBookingStatus(savedApt.status || 'confirmed');
 
       setUserCreatedAppointments(prev => [savedApt, ...prev]);
       trackEvent('funnel_step', 'booking', 'step5_confirmed');
@@ -305,6 +293,8 @@ export const ClientApp: React.FC = () => {
     setSelectedDate('');
     setSelectedTimeSlot('');
     setTotalPaid(0);
+    setCreatedBookingCode('');
+    setCreatedBookingStatus('confirmed');
   };
 
   // Step & Tab Transition Loading States
@@ -676,9 +666,8 @@ export const ClientApp: React.FC = () => {
                       isGuest={isGuest}
                       isSubmitting={isConfirmingBooking}
                       onConfirmReview={(details) => {
-                        setReviewDetails(details);
                         handleConfirmBooking({ 
-                          method: 'in_store',
+                          method: 'pay_at_venue',
                           clientName: details.clientName,
                           clientPhone: details.clientPhone,
                           clientEmail: details.clientEmail,
@@ -703,6 +692,7 @@ export const ClientApp: React.FC = () => {
                       selectedTimeSlot={selectedTimeSlot}
                       totalPaid={totalPaid}
                       bookingCode={createdBookingCode}
+                      bookingStatus={createdBookingStatus}
                       onResetBooking={() => handleBookingFinished(executeResetBooking)}
                       onViewAppointments={() => handleBookingFinished(() => {
                         executeResetBooking();
@@ -798,9 +788,6 @@ export const ClientApp: React.FC = () => {
           setIsGuest(false);
           setCurrentUser(user);
           setUserCreatedAppointments([]);
-          if (user.token) {
-            setStoredToken(user.token);
-          }
           if (user.role === 'admin') {
             window.location.href = '/admin';
             return;
@@ -823,25 +810,6 @@ export const ClientApp: React.FC = () => {
       />
       </Suspense>
 
-      <Suspense fallback={null}>
-      <PaymentChoiceModal
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        onPayNow={() => {
-          setIsPaymentModalOpen(false);
-          setBookingStep(4);
-        }}
-        onPayLater={() => {
-          setIsPaymentModalOpen(false);
-          const totalAmount = selectedServices.reduce((a, b) => a + b.price, 0);
-          handleConfirmBooking({
-            method: 'Pagamento no Local',
-            loyaltyDiscount: 0,
-            totalPaid: totalAmount
-          });
-        }}
-      />
-      </Suspense>
 
       <Suspense fallback={null}>
       <PWAInstallModal

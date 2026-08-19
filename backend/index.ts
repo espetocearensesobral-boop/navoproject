@@ -110,7 +110,32 @@ dbReadyPromise = initializeDb();
 
 app.use(validateOrigin);
 
-app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false, frameguard: { action: 'deny' } }));
+const contentSecurityPolicy = process.env.NODE_ENV === 'production'
+  ? {
+      directives: {
+        defaultSrc: ["'self'"],
+        baseUri: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+        formAction: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+        imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+        connectSrc: ["'self'", 'https:', 'wss:'],
+        frameSrc: ["'self'", 'https://www.google.com', 'https://www.google.com/maps', 'https://maps.google.com'],
+        manifestSrc: ["'self'"],
+        upgradeInsecureRequests: [],
+      },
+    }
+  : false;
+
+app.use(helmet({
+  contentSecurityPolicy,
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: false,
+  frameguard: { action: 'deny' },
+}));
 app.use("/api/", apiLimiter);
 app.use("/api", async (req, res, next) => {
   // Rotas públicas que não precisam de banco ou possuem dados de fallback

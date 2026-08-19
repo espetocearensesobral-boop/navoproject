@@ -136,8 +136,13 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
         return true;
       });
 
+      const appointmentSortKey = (appointment: Appointment) => {
+        const date = appointment.date || appointment.created_at?.slice(0, 10) || '';
+        const time = appointment.time_slot || '00:00';
+        return `${date}T${time}`;
+      };
       const merged = [...uniqueLocal, ...userApts].sort(
-        (a, b) => new Date(b.date || b.created_at || '').getTime() - new Date(a.date || a.created_at || '').getTime()
+        (a, b) => appointmentSortKey(b).localeCompare(appointmentSortKey(a))
       );
 
       setAppointments(merged);
@@ -343,7 +348,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
       case 'pending_approval':
         return (
           <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 inline-flex items-center space-x-1 animate-pulse">
-            <span>⚠️ Aguardando Aprovação</span>
+            <span>Aguardando aprovação</span>
           </span>
         );
       case 'confirmed':
@@ -621,8 +626,17 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
       {/* SMART CARD 1: AGENDAMENTO ATUAL (Compact & Minimalist with Gold Accent) */}
       {!isSearchingGuest && currentAppointment && (
         <div
+          role="button"
+          tabIndex={0}
+          aria-label="Abrir detalhes do agendamento atual"
           onClick={() => setSelectedAppointment(currentAppointment)}
-          className="relative bg-gradient-to-br from-surface-card via-surface-base to-surface-card p-3.5 sm:p-4 rounded-2xl border border-gold-base/40 shadow-xl cursor-pointer hover:border-content-base transition-all group overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              setSelectedAppointment(currentAppointment);
+            }
+          }}
+          className="relative bg-gradient-to-br from-surface-card via-surface-base to-surface-card p-3.5 sm:p-4 rounded-2xl border border-gold-base/40 shadow-xl cursor-pointer hover:border-content-base focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base transition-all group overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
           {/* Subtle Golden Glow */}
           <div className="absolute top-0 right-0 w-28 h-28 bg-gold-base/10 rounded-full blur-xl pointer-events-none" />
@@ -707,8 +721,17 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
                   {historyAppointments.slice(0, 5).map(apt => (
                     <tr
                       key={apt.id}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Abrir detalhes do agendamento de ${apt.date} às ${apt.time_slot}`}
                       onClick={() => setSelectedAppointment(apt)}
-                      className="transition-colors hover:bg-border-subtle cursor-pointer"
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          setSelectedAppointment(apt);
+                        }
+                      }}
+                      className="transition-colors hover:bg-border-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold-base cursor-pointer"
                     >
                       <td className="py-2.5 px-3 font-semibold text-content-base capitalize whitespace-nowrap">
                         {apt.date} <span className="text-content-base font-bold">({apt.time_slot})</span>
@@ -747,8 +770,17 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
               {historyAppointments.slice(0, 5).map(apt => (
                 <div
                   key={apt.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Abrir detalhes do agendamento de ${apt.date} às ${apt.time_slot}`}
                   onClick={() => setSelectedAppointment(apt)}
-                  className="p-3 space-y-1.5 transition-colors cursor-pointer hover:bg-border-subtle"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      setSelectedAppointment(apt);
+                    }
+                  }}
+                  className="p-3 space-y-1.5 transition-colors cursor-pointer hover:bg-border-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold-base"
                 >
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-bold text-content-base capitalize">

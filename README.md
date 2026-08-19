@@ -2,6 +2,8 @@
 
 Aplicação web da **Navo Premium — Heritage Barber & Club**, com fluxo público de agendamento e painel administrativo para operação da barbearia.
 
+**Versão atual:** `0.1.0`
+
 ## Stack
 
 O projeto utiliza React 19, Vite 6, TypeScript, Express, Drizzle ORM e PostgreSQL/Supabase. A interface é publicada na Vercel; as APIs ficam sob `/api` e usam o banco configurado em `DATABASE_URL`.
@@ -40,7 +42,10 @@ Antes de publicar alterações, execute:
 
 ```bash
 pnpm lint
+pnpm test
 pnpm build:vercel
 ```
 
-O build da Vercel usa `npm run build:vercel`, conforme `vercel.json`. O `package-lock.json` é mantido para garantir compatibilidade com o ambiente de instalação da Vercel; o `pnpm-lock.yaml` permanece como lockfile de desenvolvimento.
+O build da Vercel usa `pnpm run build:vercel`, conforme `vercel.json`, com `pnpm install --frozen-lockfile`. O `pnpm-lock.yaml` é o lockfile oficial do projeto; evite alternar o gerenciador de pacotes no deploy.
+
+A sessão do cliente e do painel usa cookie HTTP-only; o frontend não persiste JWT em `localStorage`. Em produção, configure `PUBLIC_APP_ORIGIN` ou `APP_URL` para restringir CORS ao domínio publicado.

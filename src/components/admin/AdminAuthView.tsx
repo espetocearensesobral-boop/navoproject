@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { authFetch, setStoredToken } from '../../lib/api';
+import { authFetch } from '../../lib/api';
 import {
   ShieldCheck,
   Lock,
@@ -71,7 +71,6 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
         throw new Error(data.error || 'Credenciais de administrador inválidas.');
       }
 
-      if (data.token) setStoredToken(data.token);
       setSuccessMsg('Acesso autorizado. Carregando painel...');
       window.setTimeout(() => onLoginSuccess(data), 400);
     } catch (error: any) {

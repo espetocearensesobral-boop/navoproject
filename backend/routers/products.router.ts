@@ -14,8 +14,7 @@ export const productsRouter = express.Router();
 productsRouter.get('/', async (req: any, res) => {
   try {
     let isAdmin = false;
-    const authHeader = req.headers.authorization;
-    const token = req.cookies?.token || (authHeader && authHeader.split(' ')[1]);
+    const token = req.cookies?.token;
     if (token) {
       try { isAdmin = (jwt.verify(token, JWT_SECRET) as any).role === 'admin'; } catch {}
     }

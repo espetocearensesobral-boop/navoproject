@@ -12,8 +12,7 @@ import { professionalPayloadSchema } from '../utils/validation.js';
 export const professionalsRouter = express.Router();
 
 professionalsRouter.get('/', async (req: any, res) => {
-  const authHeader = req.headers.authorization;
-  const token = req.cookies?.token || (authHeader && authHeader.split(' ')[1]);
+  const token = req.cookies?.token;
   if (!token) res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
   try {
     let isAdmin = false;

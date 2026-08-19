@@ -131,7 +131,8 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
 
         const allQueue = await db.select().from(schema.waitingQueue);
         const guestQueueToLink = allQueue.filter((q: any) =>
-          (!q.clientId || q.clientId === 'usr_guest' || q.clientId.startsWith('guest_'))
+          (!q.clientId || q.clientId === 'usr_guest' || q.clientId.startsWith('guest_')) &&
+          matchPhoneNumbers(q.clientPhone, cleanPhone)
         );
         for (const q of guestQueueToLink) {
           await db.update(schema.waitingQueue)
@@ -153,10 +154,7 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
     
     setAuthCookie(res, token);
 
-    res.json({
-      ...safeProfile,
-      token: token,
-    });
+    res.json(safeProfile);
   } catch (e: any) {
     console.error('Error in POST /api/profiles:', e);
     return handleError(res, e, req.path);

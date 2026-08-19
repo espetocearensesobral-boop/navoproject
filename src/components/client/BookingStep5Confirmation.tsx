@@ -19,12 +19,14 @@ interface BookingStep5Props {
   selectedTimeSlot: string;
   totalPaid: number;
   bookingCode?: string;
+  bookingStatus?: 'pending' | 'pending_approval' | 'confirmed' | 'in_queue' | 'in_service' | 'completed' | 'cancelled' | 'no_show';
   onResetBooking: () => void;
   onViewAppointments: () => void;
 }
 
 export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
   bookingCode,
+  bookingStatus = 'confirmed',
   onResetBooking,
   onViewAppointments
 }) => {
@@ -37,18 +39,21 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
   }, []);
 
   useEffect(() => {
-    try {
-      playConfirmationChime();
-      confetti({
-        particleCount: 90,
-        spread: 80,
-        origin: { y: 0.55 },
-        colors: ['#C9A96E', '#F2EFE7', '#121212', '#000000']
-      });
-    } catch (e) {
-      console.log('Confetti failed to run', e);
+    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (bookingStatus !== 'pending_approval' && !prefersReducedMotion) {
+      try {
+        playConfirmationChime();
+        confetti({
+          particleCount: 90,
+          spread: 80,
+          origin: { y: 0.55 },
+          colors: ['#C9A96E', '#F2EFE7', '#121212', '#000000']
+        });
+      } catch (e) {
+        console.log('Confirmation effects failed to run', e);
+      }
     }
-  }, []);
+  }, [bookingStatus]);
 
   const handleCopyVoucher = () => {
     if (!bookingCode) return;
@@ -74,9 +79,9 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
           tabIndex={-1}
           role="status"
           aria-live="polite"
-          className="text-xs font-bold text-status-success uppercase tracking-widest outline-none"
+          className={`text-xs font-bold uppercase tracking-widest outline-none ${bookingStatus === 'pending_approval' ? 'text-status-warning' : 'text-status-success'}`}
         >
-          Agendamento Confirmado!
+          {bookingStatus === 'pending_approval' ? 'Solicitação enviada para aprovação' : 'Agendamento Confirmado!'}
         </span>
       </div>
 
@@ -115,8 +120,17 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
 
       {/* Uncontained Notice */}
       <div className="space-y-1.5 py-1 text-center text-xs text-content-muted leading-relaxed max-w-xs mx-auto">
-        <p className="font-bold text-content-base">Precisa cancelar ou reagendar?</p>
-        <p>Solicite com pelo menos 2 horas de antecedência pelo menu "Meus Agendamentos" ou pelo WhatsApp.</p>
+        {bookingStatus === 'pending_approval' ? (
+          <>
+            <p className="font-bold text-status-warning">A equipe ainda precisa aprovar este horário.</p>
+            <p>Você receberá a confirmação final pelo WhatsApp assim que a barbearia analisar a solicitação.</p>
+          </>
+        ) : (
+          <>
+            <p className="font-bold text-content-base">Precisa cancelar ou reagendar?</p>
+            <p>Solicite com pelo menos 2 horas de antecedência pelo menu "Meus Agendamentos" ou pelo WhatsApp.</p>
+          </>
+        )}
         <p className="text-content-muted font-medium">Agradecemos sua compreensão!</p>
       </div>
 

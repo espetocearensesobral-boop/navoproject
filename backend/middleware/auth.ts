@@ -1,29 +1,36 @@
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/env.js";
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+export const authCookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: 'lax' as const,
+  path: '/',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
 export const requireAuth = async (req: any, res: any, next: any) => {
   let token = null;
-  
+
   if (req.cookies?.token) {
     token = req.cookies.token;
   }
-  else if (req.headers.authorization?.startsWith('Bearer ')) {
-    token = req.headers.authorization.split(' ')[1];
-  }
-  
+
   if (!token) {
-    return res.status(401).json({ 
-      error: 'Sessão expirada. Faça login novamente.' 
+    return res.status(401).json({
+      error: 'Sessão expirada. Faça login novamente.'
     });
   }
-  
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(401).json({ 
-      error: 'Sessão expirada. Faça login novamente.' 
+    return res.status(401).json({
+      error: 'Sessão expirada. Faça login novamente.'
     });
   }
 };
@@ -40,9 +47,6 @@ export const optionalAuth = (req: any, res: any, next: any) => {
   if (req.cookies?.token) {
     token = req.cookies.token;
   }
-  else if (req.headers.authorization?.startsWith('Bearer ')) {
-    token = req.headers.authorization.split(' ')[1];
-  }
 
   if (token) {
     try {
@@ -58,11 +62,10 @@ export const optionalAuth = (req: any, res: any, next: any) => {
 };
 
 export const setAuthCookie = (res: any, token: string) => {
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  res.cookie('token', token, authCookieOptions);
+};
+
+export const clearAuthCookie = (res: any) => {
+  const { maxAge: _maxAge, ...clearOptions } = authCookieOptions;
+  res.clearCookie('token', clearOptions);
 };

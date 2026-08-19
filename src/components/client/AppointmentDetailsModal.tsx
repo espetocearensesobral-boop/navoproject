@@ -30,6 +30,7 @@ import { LoadingButton } from '../ui/LoadingButton';
 import { getTodayStringBRT, getCurrentTimeBRT, timeToMinutes, addDaysBRT } from '../../utils/dateUtils';
 import { fetchShopProfile, isDateOpenInProfile, generateTimeSlotsFromProfile, defaultShopProfile, ShopProfile } from '../../services/shopProfileService';
 import { fetchOperationSettings, defaultOperationSettings, type OperationSettings } from '../../services/operationSettingsService';
+import { useDialogFocus } from '../../hooks/useDialogFocus';
 
 interface AppointmentDetailsModalProps {
   isOpen: boolean;
@@ -57,9 +58,9 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const rescheduleModalRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (showRescheduleModal) { setTimeout(() => rescheduleModalRef.current?.focus(), 50); } else if (isOpen) { setTimeout(() => modalRef.current?.focus(), 50); } }, [showRescheduleModal, isOpen]);
   const modalRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (isOpen) modalRef.current?.focus(); }, [isOpen]);
+  useDialogFocus(isOpen && !showRescheduleModal, modalRef);
+  useDialogFocus(showRescheduleModal, rescheduleModalRef);
   const [cancelReason, setCancelReason] = useState('Compromisso inesperado');
   const [cancelOtherReason, setCancelOtherReason] = useState('');
 
@@ -431,7 +432,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   return (
     <>
       {/* Main Voucher/Receipt Modal */}
-      <div role="dialog" aria-modal="true" aria-labelledby="receipt-title" tabIndex={-1} className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-surface-inverse/70 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto outline-none" onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}>
+      <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="receipt-title" tabIndex={-1} className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-surface-inverse/70 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto outline-none" onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}>
         <div className="w-full max-w-[380px] my-auto flex flex-col items-center animate-in zoom-in-95 duration-200">
           
           {/* VOUCHER TICKET CARD */}
@@ -453,11 +454,12 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                   <div className="w-8 h-8 rounded-lg bg-gold-base flex items-center justify-center text-surface-base shadow-sm">
                     <Scissors className="w-4 h-4 stroke-[2.5]" />
                   </div>
-                  <h2 className="text-[15px] font-semibold text-content-base">Comprovante</h2>
+                  <h2 id="receipt-title" className="text-[15px] font-semibold text-content-base">Comprovante</h2>
                 </div>
                 <button
                   type="button"
                   onClick={onClose}
+                  aria-label="Fechar comprovante"
                   className="w-7 h-7 rounded-full bg-[#f0ebe3] hover:bg-[#e5ddd2] flex items-center justify-center text-[#9a9188] hover:text-content-base transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -774,8 +776,8 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
         <div role="dialog" aria-modal="true" aria-labelledby="reschedule-title" tabIndex={-1} className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-surface-inverse/80 backdrop-blur-sm animate-in fade-in duration-200 outline-none" onKeyDown={(e) => { if (e.key === "Escape") setShowRescheduleModal(false); }} ref={rescheduleModalRef}>
           <div className="w-full sm:w-[380px] bg-surface-card rounded-2xl border border-border-subtle shadow-2xl p-5 space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center">
-              <h3 className="text-base font-serif text-content-base font-semibold">Reagendar</h3>
-              <button onClick={() => setShowRescheduleModal(false)} className="p-2 -mr-2 text-content-muted hover:text-content-base rounded-full">
+              <h3 id="reschedule-title" className="text-base font-serif text-content-base font-semibold">Reagendar</h3>
+              <button type="button" aria-label="Fechar reagendamento" onClick={() => setShowRescheduleModal(false)} className="p-2 -mr-2 text-content-muted hover:text-content-base rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base">
                 <X className="w-5 h-5" />
               </button>
             </div>

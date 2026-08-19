@@ -54,10 +54,10 @@ export async function fetchServicesFromSupabase(forceRefresh = false): Promise<S
       servicesCachedAt = Date.now();
       return cachedServices;
     } catch (err) {
-      console.warn('Aviso ao carregar serviços do servidor, usando fallback local:', err);
-      cachedServices = [];
-      servicesCachedAt = Date.now();
-      return cachedServices;
+      console.error('Erro ao carregar serviços do servidor:', err);
+      cachedServices = null;
+      servicesCachedAt = 0;
+      throw err;
     } finally {
       servicesFetchPromise = null;
     }
@@ -114,10 +114,10 @@ export async function fetchProfessionalsFromSupabase(forceRefresh = false): Prom
       professionalsCachedAt = Date.now();
       return cachedProfessionals;
     } catch (err) {
-      console.error('Erro ao carregar profissionais do Supabase:', err);
-      cachedProfessionals = [];
-      professionalsCachedAt = Date.now();
-      return cachedProfessionals;
+      console.error('Erro ao carregar profissionais do servidor:', err);
+      cachedProfessionals = null;
+      professionalsCachedAt = 0;
+      throw err;
     } finally {
       professionalsFetchPromise = null;
     }

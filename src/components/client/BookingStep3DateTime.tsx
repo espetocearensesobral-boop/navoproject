@@ -60,6 +60,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const [availabilityRetryKey, setAvailabilityRetryKey] = useState(0);
   const [unavailabilityReason, setUnavailabilityReason] = useState<string | null>(null);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
   const [operationSettings, setOperationSettings] = useState<OperationSettings>(defaultOperationSettings);
@@ -165,7 +166,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     return () => {
       isMounted = false;
     };
-  }, [selectedDate, selectedBarber, totalDurationMinutes, shopProfile, todayStr, onSelectDate]);
+  }, [selectedDate, selectedBarber, totalDurationMinutes, shopProfile, todayStr, onSelectDate, availabilityRetryKey]);
 
   // Base Time Slots list dynamically generated from shopProfile and duration
   const baseSlots = useMemo(() => {
@@ -338,12 +339,23 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
             <span>Carregando horários para {formatDateBR(selectedDate)}...</span>
           </div>
         ) : availabilityError ? (
-          <div className="p-6 bg-surface-card border border-status-warning/30 rounded-card text-center text-xs text-content-muted">
-            {availabilityError}
+          <div className="p-6 bg-surface-card border border-status-warning/30 rounded-card text-center flex flex-col items-center gap-3 text-xs text-content-muted">
+            <AlertTriangle className="h-6 w-6 text-status-warning" />
+            <p>{availabilityError}</p>
+            <button
+              type="button"
+              onClick={() => setAvailabilityRetryKey((value) => value + 1)}
+              className="inline-flex items-center gap-2 rounded-xl border border-status-warning/30 bg-status-warning/10 px-4 py-2 font-bold text-status-warning hover:bg-status-warning/20"
+            >
+              <Loader2 className="h-3.5 w-3.5" />
+              Tentar novamente
+            </button>
           </div>
         ) : baseSlots.length === 0 ? (
-          <div className="p-6 bg-surface-card border border-border-subtle rounded-card text-center text-xs text-content-muted">
-            Nenhum horário disponível para esta data.
+          <div className="p-6 bg-surface-card border border-border-subtle rounded-card text-center flex flex-col items-center gap-2 text-xs text-content-muted">
+            <CalendarOff className="h-6 w-6 text-content-muted" />
+            <p>Nenhum horário disponível para esta data.</p>
+            <p className="max-w-xs leading-relaxed">Escolha outra data ou volte para selecionar outro profissional.</p>
           </div>
         ) : unavailabilityReason ? (
           <div className="p-6 bg-surface-card border border-border-subtle rounded-card text-center flex flex-col items-center justify-center space-y-4 animate-fade-in shadow-sm">

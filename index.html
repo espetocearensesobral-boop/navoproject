@@ -1,16 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
-    <script>
-      // Remove warnings de lazy loading (comportamento esperado)
-      const originalConsoleWarn = console.warn;
-      console.warn = (...args) => {
-        if (typeof args[0] === 'string' && (args[0].includes('lazy') || args[0].includes('Intervention'))) {
-          return; // Silencia warnings de lazy loading
-        }
-        originalConsoleWarn.apply(console, args);
-      };
-    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Navo Premium | Barbearia & Club | Agendamento Online</title>
@@ -51,51 +41,7 @@
     <link id="pwa-favicon" rel="icon" type="image/svg+xml" href="/pwa-192x192.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   
-    <!-- PWA Context Script -->
-    <script>
-      (function() {
-        var isAdmin = window.location.pathname.indexOf('/admin') === 0;
-        var identity = isAdmin ? {
-          manifest: '/manifest-admin.json',
-          title: 'Administrativo',
-          icon: '/pwa-admin-192x192.svg',
-          themeColor: '#10131A'
-        } : {
-          manifest: '/manifest.json',
-          title: 'Agendamentos',
-          icon: '/pwa-192x192.svg',
-          themeColor: '#0A0A0A'
-        };
-        var manifest = document.getElementById('pwa-manifest');
-        var themeColor = document.getElementById('pwa-theme-color');
-        var appleTitle = document.getElementById('pwa-apple-title');
-        var appleIcon = document.getElementById('pwa-apple-icon');
-        var favicon = document.getElementById('pwa-favicon');
-        if (manifest) manifest.setAttribute('href', identity.manifest);
-        if (themeColor) themeColor.setAttribute('content', identity.themeColor);
-        if (appleTitle) appleTitle.setAttribute('content', identity.title);
-        if (appleIcon) appleIcon.setAttribute('href', identity.icon);
-        if (favicon) favicon.setAttribute('href', identity.icon);
-      })();
-    </script>
-
-    <!-- Theme Script -->
-    <script>
-      (function() {
-        try {
-          var isAdmin = window.location.pathname.indexOf('/admin') === 0;
-          var themeKey = isAdmin ? 'navo_theme_mode_admin' : 'navo_theme_mode_client';
-          var saved = localStorage.getItem(themeKey) || localStorage.getItem('navo_theme_mode');
-          var theme = saved === 'light' || saved === 'dark' ? saved : 'dark';
-          var themeColor = document.getElementById('pwa-theme-color');
-          var colorScheme = document.getElementById('pwa-color-scheme');
-          document.documentElement.setAttribute('data-theme', theme);
-          document.documentElement.style.colorScheme = 'only ' + theme;
-          if (colorScheme) colorScheme.setAttribute('content', theme);
-          if (themeColor) themeColor.setAttribute('content', theme === 'light' ? '#F5F5F2' : (isAdmin ? '#10131A' : '#0A0A0A'));
-        } catch (e) {}
-      })();
-    </script>
+    <script src="/bootstrap.js" defer></script>
   </head>
 
   <body class="antialiased bg-surface-base text-content-base">

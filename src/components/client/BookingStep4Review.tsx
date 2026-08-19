@@ -42,7 +42,6 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
   onCancel
 }) => {
   const { theme } = useTheme();
-  const [useLoyaltyPoints, setUseLoyaltyPoints] = useState<boolean>(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [modalTab, setModalTab] = useState<'terms' | 'privacy' | null>(null);
 
@@ -113,9 +112,11 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
   };
 
   const subtotal = selectedServices.reduce((acc, curr) => acc + curr.price, 0);
-  const loyaltyDiscount = 0.00;
-  const couponDiscount = 0.00;
-  const totalDiscount = loyaltyDiscount + couponDiscount;
+  // Descontos permanecem zerados até que a regra seja validada no servidor.
+  // A revisão não apresenta controles de fidelidade/cupom que possam sugerir um benefício inexistente.
+  const loyaltyDiscount = 0;
+  const couponDiscount = 0;
+  const totalDiscount = 0;
   const finalTotal = Math.max(0, subtotal - totalDiscount);
 
   const dateObj = new Date(`${selectedDate}T12:00:00`);
@@ -389,6 +390,11 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
         )}
       </div>
 
+      <div className="mt-4 rounded-xl border border-gold-base/20 bg-gold-base/5 px-4 py-3 text-center">
+        <p className="text-xs font-bold text-gold-base">Pagamento no local</p>
+        <p className="mt-1 text-[11px] leading-relaxed text-content-muted">O valor será pago diretamente na barbearia no dia do atendimento.</p>
+      </div>
+
       {/* Privacy Notice */}
       <div className="mt-4 text-center px-4 mb-20">
         <p className="text-[11px] text-content-muted leading-relaxed">
@@ -433,11 +439,11 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
           title: 'Cancelar agendamento'
         }}
         primaryAction={{
-          label: 'Confirmar',
+          label: 'Confirmar agendamento',
           onClick: handleNext,
           disabled: isSubmitting,
           loading: isSubmitting,
-          title: 'Confirmar agendamento',
+          title: 'Confirmar agendamento e pagar no local',
           icon: <CheckCircle2 className="h-4 w-4" />
         }}
         confirmation={showCancelConfirm ? {

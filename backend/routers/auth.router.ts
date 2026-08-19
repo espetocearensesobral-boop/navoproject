@@ -5,7 +5,7 @@ import { eq, or } from 'drizzle-orm';
 import { db, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { JWT_SECRET } from '../config/env.js';
-import { authLimiter, requireAuth, setAuthCookie } from '../middleware/index.js';
+import { authLimiter, requireAuth, setAuthCookie, clearAuthCookie } from '../middleware/index.js';
 import { sanitizePhone, matchPhoneNumbers, handleError, formatProfile, userErrors } from '../utils/index.js';
 import { sendWhatsAppMessage } from '../whatsapp.js';
 import { z } from 'zod';
@@ -36,13 +36,8 @@ authRouter.get("/me", requireAuth, async (req: any, res) => {
 });
 
 // /api/auth/logout
-authRouter.post("/logout", (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'lax',
-    path: '/',
-  });
+authRouter.post("/logout", (_req, res) => {
+  clearAuthCookie(res);
   res.json({ success: true });
 });
 
@@ -123,10 +118,7 @@ authRouter.post("/login", authLimiter, async (req, res) => {
     
     setAuthCookie(res, token);
 
-    res.json({
-      ...safeUser,
-      token: token,
-    });
+    res.json(safeUser);
   } catch (e: any) {
     return handleError(res, e, 'POST /api/auth/login');
   }
@@ -194,10 +186,7 @@ const handleAdminLogin = async (req: express.Request, res: express.Response) => 
     
     setAuthCookie(res, token);
 
-    return res.json({
-      ...safeUser,
-      token,
-    });
+    return res.json(safeUser);
   } catch (e: any) {
     console.error('Error in POST admin login:', e);
     return res.status(500).json({ error: 'Erro ao realizar login administrativo.' });
@@ -255,8 +244,9 @@ authRouter.post("/reset-password", authLimiter, async (req, res) => {
     if (!loginId || !code || !newPassword) {
       return res.status(400).json({ error: 'Código e nova senha são obrigatórios.' });
     }
-    if (String(newPassword).length < 6) {
-      return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres.' });
+    const passwordValue = String(newPassword);
+    if (passwordValue.length < 8 || !/\d/.test(passwordValue) || !/[A-Z]/.test(passwordValue)) {
+      return res.status(400).json({ error: 'A nova senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um número.' });
     }
 
     const cleanLoginId = sanitizePhone(loginId);
@@ -308,8 +298,7 @@ preferencesRouter.get("/theme", async (req: any, res) => {
     }
 
     let userPalette = null;
-    const authHeader = req.headers.authorization;
-    const token = req.cookies?.token || (authHeader && authHeader.split(' ')[1]);
+    const token = req.cookies?.token;
 
     if (token) {
       try {

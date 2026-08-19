@@ -187,8 +187,8 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
       setErrorMsg('Digite o código de 6 dígitos recebido no WhatsApp.');
       return;
     }
-    if (resetNewPassword.length < 6) {
-      setErrorMsg('A nova senha deve ter pelo menos 6 caracteres.');
+    if (resetNewPassword.length < 8 || !/\d/.test(resetNewPassword) || !/[A-Z]/.test(resetNewPassword)) {
+      setErrorMsg('A nova senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um número.');
       return;
     }
     setIsSubmittingReset(true);
@@ -391,11 +391,11 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
                   id="reset-new-password"
                   type={showResetPassword ? 'text' : 'password'}
                   required
-                  minLength={6}
+                  minLength={8}
                   value={resetNewPassword}
                   onChange={(e) => setResetNewPassword(e.target.value)}
                   className="w-full bg-surface-base border border-border-subtle rounded-xl py-3 pl-10 pr-10 text-content-base text-sm focus:border-gold-base focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="8 caracteres, número e maiúscula"
                 />
                 <button
                   type="button"

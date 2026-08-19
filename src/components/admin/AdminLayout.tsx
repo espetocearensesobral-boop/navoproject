@@ -23,7 +23,7 @@ import { BirthdaysManagement } from './BirthdaysManagement';
 import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { AdminAuthView } from './AdminAuthView';
 import { AdminNotificationCenter } from './AdminNotificationCenter';
-import { authFetch, setStoredToken, clearStoredToken } from '../../lib/api';
+import { authFetch } from '../../lib/api';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAdminOperationNotifications } from '../../hooks/useAdminOperationNotifications';
 import { 
@@ -306,9 +306,6 @@ export const AdminLayout: React.FC = () => {
     return (
       <AdminAuthView 
         onLoginSuccess={(user) => {
-          if (user?.token) {
-            setStoredToken(user.token);
-          }
           setIsAuthorized(true);
           setAdminName(user.name || 'Admin');
         }} 
@@ -554,7 +551,6 @@ export const AdminLayout: React.FC = () => {
     try {
       await authFetch('/api/auth/logout', { method: 'POST' });
     } catch (e) {}
-    clearStoredToken();
     try {
       window.sessionStorage.removeItem(ADMIN_ACTIVE_TAB_KEY);
     } catch {}

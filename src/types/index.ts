@@ -80,7 +80,7 @@ export interface Appointment {
   loyalty_points_used: number;
   date: string; // YYYY-MM-DD
   time_slot: string; // HH:mm
-  status: 'pending' | 'confirmed' | 'in_queue' | 'in_service' | 'completed' | 'cancelled' | 'no_show';
+  status: 'pending' | 'pending_approval' | 'confirmed' | 'in_queue' | 'in_service' | 'completed' | 'cancelled' | 'no_show';
   payment_method: 'credit_card' | 'pix' | 'loyalty_balance' | 'pay_at_venue' | 'in_store';
   cancellation_reason?: string;
   is_reviewed?: boolean;

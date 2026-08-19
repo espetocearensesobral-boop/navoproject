@@ -8,6 +8,7 @@ import { BookingActionDock } from './BookingActionDock';
 import { ImageWithFallback } from '../ui/ImageWithFallback';
 import { hapticLight, hapticMedium, hapticSuccess } from '../../lib/haptics';
 import { optimizeImageUrl } from '../../lib/imageUtils';
+import { useDialogFocus } from '../../hooks/useDialogFocus';
 import {
   Sparkles,
   Clock,
@@ -61,19 +62,15 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
   const [modalService, setModalService] = useState<ServiceItem | null>(null);
   const serviceModalRef = useRef<HTMLDivElement>(null);
 
+  useDialogFocus(!!modalService, serviceModalRef);
+
   useEffect(() => {
     if (!modalService) return;
-    const previousActive = document.activeElement as HTMLElement | null;
-    const focusTimer = window.setTimeout(() => serviceModalRef.current?.focus(), 0);
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setModalService(null);
     };
     document.addEventListener('keydown', handleEscape);
-    return () => {
-      window.clearTimeout(focusTimer);
-      document.removeEventListener('keydown', handleEscape);
-      previousActive?.focus?.();
-    };
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [modalService]);
 
   const getServiceImages = (s: ServiceItem): string[] => {
@@ -312,19 +309,27 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
           <div className="w-16 h-16 rounded-2xl bg-gold-base/10 border border-gold-base/30 text-gold-base flex items-center justify-center">
             <Search className="w-8 h-8 stroke-[2]" />
           </div>
-          <p className="text-content-base font-extrabold text-base">Nenhum serviço encontrado</p>
+          <p className="text-content-base font-extrabold text-base">
+            {services.length === 0 ? 'Catálogo sem serviços disponíveis' : 'Nenhum serviço encontrado'}
+          </p>
           <p className="text-xs text-content-muted max-w-xs leading-relaxed">
-            Não encontramos resultados para sua busca ou filtros ativos. Tente buscar por outros termos ou selecione outra categoria.
+            {services.length === 0
+              ? 'A equipe ainda não publicou serviços para agendamento. Tente atualizar novamente em instantes.'
+              : 'Não encontramos resultados para sua busca ou filtros ativos. Tente buscar por outros termos ou selecione outra categoria.'}
           </p>
           <button
             onClick={() => {
+              if (services.length === 0) {
+                loadData();
+                return;
+              }
               setActiveCategory('cat_all');
               setSearchQuery('');
             }}
             className="mt-3 px-5 py-2.5 rounded-xl bg-gold-base/20 hover:bg-gold-base/30 text-gold-hover text-xs font-extrabold border border-gold-base/30 transition-all active:scale-95 flex items-center gap-2"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>Limpar Filtros de Busca</span>
+            <span>{services.length === 0 ? 'Atualizar catálogo' : 'Limpar Filtros de Busca'}</span>
           </button>
         </div>
       ) : (

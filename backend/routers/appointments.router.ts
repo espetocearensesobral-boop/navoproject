@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import { db, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { requireAuth, requireAdmin, optionalAuth, authLimiter, sensitiveOpsLimiter, apiLimiter, setAuthCookie } from '../middleware/index.js';
-import { handleError, userErrors, sanitizePhone, matchPhoneNumbers, generateBookingCode, bookingSchema } from '../utils/index.js';
+import { handleError, userErrors, sanitizePhone, normalizePhone, matchPhoneNumbers, generateBookingCode, bookingSchema } from '../utils/index.js';
 import { timeToMinutes, minutesToTime, getDayOfWeekKey, getTodayStringBRT, getCurrentTimeBRT } from '../utils/datetime.js';
 import { dateSchema, timeSchema } from '../utils/validation.js';
 import { JWT_SECRET } from '../config/env.js';
@@ -21,6 +21,30 @@ import { sendAdminPush } from '../services/admin-push.service.js';
 import { getOperationSettings } from '../services/operation-settings.service.js';
 
 export const appointmentsRouter = express.Router();
+
+/**
+ * Busca somente registros cujo telefone normalizado termina com os últimos
+ * oito dígitos informados. O filtro final em memória preserva as regras de
+ * compatibilidade de DDD e do nono dígito sem carregar centenas de registros.
+ */
+async function findAppointmentsByPhone(phone: string, includeCancelled = true): Promise<any[]> {
+  const normalized = normalizePhone(phone);
+  const suffix = normalized.slice(-8);
+  if (suffix.length < 8) return [];
+
+  const phoneCondition = sql`regexp_replace(coalesce(${schema.appointments.clientPhone}, ''), '[^0-9]', '', 'g') LIKE ${`%${suffix}`}`;
+  const whereCondition = includeCancelled
+    ? phoneCondition
+    : and(phoneCondition, sql`${schema.appointments.status} <> 'cancelled'`);
+
+  const candidates = await db
+    .select()
+    .from(schema.appointments)
+    .where(whereCondition)
+    .orderBy(desc(schema.appointments.createdAt));
+
+  return candidates.filter((apt: any) => matchPhoneNumbers(apt.clientPhone, phone));
+}
 
 // =====================================
 // Guest Appointments Lookup API (2 Etapas)
@@ -45,15 +69,7 @@ appointmentsRouter.get("/lookup/step1", sensitiveOpsLimiter, async (req: any, re
       return res.status(400).json({ error: 'Telefone inválido. Digite DDD + número.' });
     }
 
-    const allApts = await db
-      .select()
-      .from(schema.appointments)
-      .orderBy(desc(schema.appointments.createdAt))
-      .limit(500);
-
-    const appointments = allApts.filter((apt: any) => 
-      apt.status !== 'cancelled' && matchPhoneNumbers(apt.clientPhone, inputPhone)
-    );
+    const appointments = await findAppointmentsByPhone(inputPhone, false);
 
     if (!appointments || appointments.length === 0) {
       return res.status(404).json({ 
@@ -89,13 +105,7 @@ appointmentsRouter.post("/lookup/verify", sensitiveOpsLimiter, async (req: any, 
     const inputPhone = phone.toString().trim();
     const cleanCode = code.toString().toUpperCase().trim();
     
-    const allApts = await db
-      .select()
-      .from(schema.appointments)
-      .orderBy(desc(schema.appointments.createdAt))
-      .limit(500);
-      
-    const candidates = allApts.filter((apt: any) => matchPhoneNumbers(apt.clientPhone, inputPhone));
+    const candidates = await findAppointmentsByPhone(inputPhone);
     
     const matchedApt = candidates.find((apt: any) => {
       const aptCode = (apt.bookingCode || apt.id || '').toUpperCase();
@@ -182,15 +192,7 @@ appointmentsRouter.get("/lookup/step2", optionalAuth, async (req: any, res) => {
       return res.status(401).json({ error: 'Acesso negado: Sessão de busca inválida ou expirada.' });
     }
 
-    const allApts = await db
-      .select()
-      .from(schema.appointments)
-      .orderBy(desc(schema.appointments.createdAt))
-      .limit(500);
-
-    const candidates = allApts.filter((apt: any) => 
-      matchPhoneNumbers(apt.clientPhone, inputPhone)
-    );
+    const candidates = await findAppointmentsByPhone(inputPhone);
 
     const appointment = candidates.find((apt: any) => {
       const aptCode = (apt.bookingCode || apt.id || '').toUpperCase();
@@ -281,15 +283,7 @@ appointmentsRouter.patch("/lookup/cancel", sensitiveOpsLimiter, optionalAuth, as
       return res.status(401).json({ error: 'Acesso negado: Sessão de busca inválida ou expirada.' });
     }
 
-    const allApts = await db
-      .select()
-      .from(schema.appointments)
-      .orderBy(desc(schema.appointments.createdAt))
-      .limit(500);
-
-    const candidates = allApts.filter((apt: any) => 
-      matchPhoneNumbers(apt.clientPhone, inputPhone)
-    );
+    const candidates = await findAppointmentsByPhone(inputPhone);
 
     const appointment = candidates.find((apt: any) => {
       const aptCode = (apt.bookingCode || apt.id || '').toUpperCase();
@@ -370,8 +364,7 @@ appointmentsRouter.get("/", optionalAuth, async (req: any, res) => {
     const dbApts = await db
       .select()
       .from(schema.appointments)
-      .orderBy(desc(schema.appointments.createdAt))
-      .limit(500);
+      .orderBy(desc(schema.appointments.createdAt));
 
     // Se a requisição passou telefone para busca (ex: consulta do cliente por telefone)
     if (searchPhone) {
@@ -397,7 +390,7 @@ appointmentsRouter.get("/", optionalAuth, async (req: any, res) => {
         return res.status(401).json({ error: 'Sessão expirada ou não autorizada. Valide o código novamente.' });
       }
 
-      let filtered = dbApts.filter(a => matchPhoneNumbers(a.clientPhone, searchPhone));
+      let filtered = await findAppointmentsByPhone(searchPhone);
       if (!isAdmin && !(req.user?.phone && matchPhoneNumbers(req.user.phone, searchPhone)) && req.user?.guestAppointmentId) {
         filtered = filtered.filter(a => a.id === req.user.guestAppointmentId);
       }
@@ -427,7 +420,19 @@ appointmentsRouter.get("/", optionalAuth, async (req: any, res) => {
 
 appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
   try {
-    const data = req.body;
+    const rawData = req.body || {};
+    const rawPaymentMethod = rawData.paymentMethod ?? rawData.payment_method;
+    const normalizedPaymentMethod = typeof rawPaymentMethod === 'string'
+      ? ({
+          PIX: 'pix',
+          Pix: 'pix',
+          'Pagamento no Local': 'pay_at_venue',
+          in_store: 'pay_at_venue',
+        } as Record<string, string>)[rawPaymentMethod] || rawPaymentMethod
+      : rawPaymentMethod;
+    const data = normalizedPaymentMethod
+      ? { ...rawData, paymentMethod: normalizedPaymentMethod }
+      : rawData;
     
     // LGPD & Validation
     try {
@@ -586,6 +591,13 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
       }
     }
 
+    const requestedPaymentMethod = data.paymentMethod || data.payment_method || 'pay_at_venue';
+    const paymentMethod = requestedPaymentMethod === 'in_store' ? 'pay_at_venue' : requestedPaymentMethod;
+    const allowedPaymentMethods = new Set(['credit_card', 'pix', 'loyalty_balance', 'pay_at_venue']);
+    if (!allowedPaymentMethods.has(paymentMethod)) {
+      return res.status(400).json({ error: 'Método de pagamento inválido.' });
+    }
+
     const isPendingApproval = checkRes.requiresApproval || data.status === 'pending_approval';
 
     const newApt = {
@@ -603,7 +615,7 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
       originalAmount: originalAmount.toString(),
       discountAmount: discountAmount.toString(),
       finalAmount: finalAmount.toString(),
-      paymentMethod: data.paymentMethod || data.payment_method || 'PIX',
+      paymentMethod,
       bookingCode: generateBookingCode(),
       services: data.services || [],
       createdAt: new Date().toISOString()
@@ -828,14 +840,7 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
     if (!dbApt) return res.status(404).json({ error: 'Agendamento não encontrado' });
 
     if (!isAdmin) {
-      let userPhone = req.user?.phone;
-      if (!userPhone && req.user?.id && req.user.id !== 'usr_guest') {
-        const dbUser = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, req.user.id) });
-        if (dbUser) userPhone = dbUser.phone;
-      }
-
       const isOwner = req.user?.id && req.user.id !== 'usr_guest' && dbApt.clientId === req.user.id;
-      const isPhoneMatch = userPhone && dbApt.clientPhone && matchPhoneNumbers(userPhone, dbApt.clientPhone);
       
       const reqPhone = req.body.clientPhone || req.body.client_phone;
       const reqCode = req.body.bookingCode || req.body.booking_code;
@@ -855,8 +860,8 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
         } catch (e) {}
       }
 
-      if (!isOwner && !isPhoneMatch && !isLookupMatch && !isGuestTokenMatch) {
-        return res.status(403).json({ error: 'Acesso negado: Você não tem autorização para cancelar este agendamento' });
+      if (!isOwner && !isLookupMatch && !isGuestTokenMatch) {
+        return res.status(403).json({ error: 'Acesso negado: valide o voucher ou entre na conta vinculada ao agendamento.' });
       }
     }
 
@@ -929,14 +934,7 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
     }
 
     if (!isAdmin) {
-      let userPhone = req.user?.phone;
-      if (!userPhone && req.user?.id && req.user.id !== 'usr_guest') {
-        const dbUser = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, req.user.id) });
-        if (dbUser) userPhone = dbUser.phone;
-      }
-
       const isOwner = req.user?.id && req.user.id !== 'usr_guest' && dbApt.clientId === req.user.id;
-      const isPhoneMatch = userPhone && dbApt.clientPhone && matchPhoneNumbers(userPhone, dbApt.clientPhone);
       
       const reqPhone = req.body.clientPhone || req.body.client_phone;
       const reqCode = req.body.bookingCode || req.body.booking_code;
@@ -956,8 +954,8 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
         } catch (e) {}
       }
 
-      if (!isOwner && !isPhoneMatch && !isLookupMatch && !isGuestTokenMatch) {
-        return res.status(403).json({ error: 'Acesso negado: Você não tem autorização para editar este agendamento' });
+      if (!isOwner && !isLookupMatch && !isGuestTokenMatch) {
+        return res.status(403).json({ error: 'Acesso negado: valide o voucher ou entre na conta vinculada ao agendamento.' });
       }
     }
 
@@ -1089,8 +1087,21 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
           updateData.finalAmount = Math.max(0, baseAmount - cappedDiscount).toString();
         }
 
-        if (data.paymentMethod !== undefined) updateData.paymentMethod = data.paymentMethod;
-        if (data.payment_method !== undefined) updateData.paymentMethod = data.payment_method;
+        if (data.paymentMethod !== undefined || data.payment_method !== undefined) {
+          const requestedMethod = data.paymentMethod ?? data.payment_method;
+          const normalizedMethod = typeof requestedMethod === 'string'
+            ? ({
+                PIX: 'pix',
+                Pix: 'pix',
+                'Pagamento no Local': 'pay_at_venue',
+                in_store: 'pay_at_venue',
+              } as Record<string, string>)[requestedMethod] || requestedMethod
+            : requestedMethod;
+          if (!['credit_card', 'pix', 'loyalty_balance', 'pay_at_venue'].includes(normalizedMethod)) {
+            return res.status(400).json({ error: 'Método de pagamento inválido.' });
+          }
+          updateData.paymentMethod = normalizedMethod;
+        }
 
         if (typeof db.transaction !== 'function') {
           return res.status(503).json({ error: 'O banco não oferece transação para atualizar o agendamento com segurança.' });

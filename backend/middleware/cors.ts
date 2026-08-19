@@ -1,29 +1,62 @@
-export const corsMiddleware = (req: any, res: any, next: any) => {
+import type { Request, Response, NextFunction } from 'express';
+
+const configuredOrigins = [
+  process.env.PUBLIC_APP_ORIGIN,
+  process.env.APP_URL,
+  'https://navopremium.vercel.app',
+]
+  .filter(Boolean)
+  .map((value) => normalizeOrigin(value as string));
+
+function normalizeOrigin(value: string): string {
+  try {
+    return new URL(value).origin;
+  } catch {
+    return '';
+  }
+}
+
+function isLocalOrigin(origin: string): boolean {
+  try {
+    const hostname = new URL(origin).hostname;
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+  } catch {
+    return false;
+  }
+}
+
+function isAllowedOrigin(origin: string | undefined, host: string): boolean {
+  if (!origin) return true;
+
+  const normalized = normalizeOrigin(origin);
+  if (!normalized) return false;
+
+  if (configuredOrigins.includes(normalized)) return true;
+  if (process.env.NODE_ENV !== 'production' && isLocalOrigin(normalized)) return true;
+
+  try {
+    return new URL(normalized).host === host;
+  } catch {
+    return false;
+  }
+}
+
+export const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const origin = req.headers.origin;
   const host = req.headers.host || '';
+  const allowed = isAllowedOrigin(origin, host);
 
-  const isAllowedOrigin = 
-    !origin ||
-    origin.includes('navopremium.vercel.app') ||
-    origin.endsWith('.vercel.app') ||
-    origin.endsWith('.run.app') ||
-    origin.includes('localhost') ||
-    origin.includes('127.0.0.1') ||
-    (host && origin.includes(host));
-
-  if (origin && isAllowedOrigin) {
+  if (origin && allowed) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Auth-Token');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token');
     res.setHeader('Access-Control-Expose-Headers', 'X-Auth-Token');
+    res.setHeader('Vary', 'Origin');
   }
 
   if (req.method === 'OPTIONS') {
-    if (origin && isAllowedOrigin) {
-      return res.status(204).end();
-    }
-    return res.status(403).end();
+    return allowed ? res.status(204).end() : res.status(403).json({ error: 'Origem não autorizada' });
   }
 
   next();
@@ -33,25 +66,9 @@ export const validateOrigin = (req: any, res: any, next: any) => {
   const origin = req.headers.origin || req.headers.referer || '';
   const host = req.headers.host || '';
 
-  // Para operações sensíveis (POST/PUT/PATCH/DELETE), valida origem
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-    // Se não houver origin/referer, é chamada interna do mesmo host/backend ou Postman/Mobile
-    if (!origin) {
-      return next();
-    }
-
-    const isAllowedDomain = 
-      origin.includes('navopremium.vercel.app') ||
-      origin.includes('.vercel.app') ||
-      origin.includes('.run.app') ||
-      origin.includes('localhost') ||
-      origin.includes('127.0.0.1') ||
-      (host && origin.includes(host));
-
-    if (!isAllowedDomain) {
-      console.warn(`[SECURITY] Blocked request from origin: ${origin}`);
-      return res.status(403).json({ error: 'Origem não autorizada' });
-    }
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && origin && !isAllowedOrigin(origin, host)) {
+    console.warn(`[SECURITY] Blocked request from origin: ${origin}`);
+    return res.status(403).json({ error: 'Origem não autorizada' });
   }
 
   next();
