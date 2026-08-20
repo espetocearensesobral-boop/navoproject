@@ -141,6 +141,7 @@ app.use("/api", async (req, res, next) => {
   // Rotas públicas que não precisam de banco ou possuem dados de fallback
   const publicRoutes = [
     '/whatsapp/status',
+    '/evolution/webhook',
     '/health'
   ];
   if (publicRoutes.includes(req.path)) {
@@ -245,6 +246,10 @@ const { router: emailRouter, sendEmail, getEmailSettings } = createEmailModule((
 app.use('/api/email/config', requireAuth, requireAdmin);
 app.use('/api/email/test', requireAuth, requireAdmin);
 app.use('/api/email', emailRouter);
+
+import { createEvolutionApiModule } from './evolution-api.js';
+const { router: evolutionApiRouter } = createEvolutionApiModule({ getDb: () => db, schema, eq });
+app.use('/api/evolution', evolutionApiRouter);
 
 /** Busca o e-mail do cliente pelo clientId (perfil), sem derrubar o fluxo principal se falhar. */
 export async function getClientEmail(clientId: string | undefined | null, appointmentEmail?: string | null): Promise<string | null> {

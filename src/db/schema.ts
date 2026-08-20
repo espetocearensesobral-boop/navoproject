@@ -588,3 +588,16 @@ export const printSettings = pgTable('print_settings', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// Credenciais e comportamento da Evolution API. Nunca é lida pelo endpoint público de perfil.
+export const evolutionApiSettings = pgTable('evolution_api_settings', {
+  id: text('id').primaryKey().default('default'),
+  enabled: boolean('enabled').notNull().default(false),
+  baseUrl: text('base_url').notNull().default(''),
+  instanceName: text('instance_name').notNull().default(''),
+  apiKey: text('api_key').notNull().default(''),
+  webhookEnabled: boolean('webhook_enabled').notNull().default(false),
+  webhookUrl: text('webhook_url').notNull().default(''),
+  webhookSecret: text('webhook_secret').notNull().default(''),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+

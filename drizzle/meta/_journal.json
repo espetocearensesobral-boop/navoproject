@@ -22,6 +22,13 @@
       "when": 1786636527868,
       "tag": "0008_data_integrity_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1787253916161,
+      "tag": "0027_evolution_api_settings",
+      "breakpoints": true
     }
   ]
 }
