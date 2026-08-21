@@ -84,6 +84,19 @@ test('extracts only direct incoming text messages', () => {
   assert.equal(extractEvolutionMessage({ event: 'MESSAGES_UPSERT', data: { key: { remoteJid: '123@g.us', fromMe: false }, message: { conversation: 'grupo' } } }), null);
 });
 
+test('extracts clickable service selections from WhatsApp list responses', () => {
+  const incoming = extractEvolutionMessage({
+    event: 'messages.upsert',
+    instance: 'navo-bot',
+    data: {
+      key: { remoteJid: '5588999999999@s.whatsapp.net', fromMe: false, id: 'service-row-1' },
+      message: { listResponseMessage: { singleSelectReply: { selectedRowId: 'service:svc-corte' } } },
+    },
+  });
+  assert.equal(incoming?.phone, '5588999999999');
+  assert.equal(incoming?.text, 'service:svc-corte');
+});
+
 test('resolves WhatsApp LID messages through the alternate phone JID', () => {
   const incoming = extractEvolutionMessage({
     event: 'messages.upsert',

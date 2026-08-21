@@ -381,6 +381,11 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (time) context.timeSlot = time;
   }
 
+  function compactServiceTitle(value: unknown, maxLength = 30): string {
+    const title = String(value || '').replace(/\s+/g, ' ').trim();
+    return title.length > maxLength ? `${title.slice(0, maxLength - 1).trimEnd()}…` : title;
+  }
+
   async function listServices(conversation: Conversation, context: BotContext) {
     const db = getDb();
     const services = await db.query.services.findMany();
@@ -388,9 +393,9 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     context.servicePage = 0;
     context.serviceOptions = activeServices.map((service: any) => service.id);
     await updateConversation(conversation, 'awaiting_service', context);
-    const fallback = `Escolha um serviço:\n\n` + activeServices.map((service: any, index: number) => `${index + 1}. *${service.title}* · ${money(service.price)}`).join('\n') + `\n\nSe preferir, acesse o catálogo completo e faça o agendamento diretamente pela plataforma Navo:\n${NAVO_CATALOG_URL}\n\nApós concluir pelo site, a confirmação será enviada automaticamente para este WhatsApp.`;
+    const fallback = `Escolha um serviço (responda com o número ou nome):\n\n` + activeServices.map((service: any, index: number) => `${index + 1}. *${compactServiceTitle(service.title)}* · ${money(service.price)}`).join('\n') + `\n\nSe preferir, acesse o catálogo completo e faça o agendamento diretamente pela plataforma Navo:\n${NAVO_CATALOG_URL}\n\nApós concluir pelo site, a confirmação será enviada automaticamente para este WhatsApp.`;
     const rows = activeServices.map((service: any, index: number) => ({
-      title: `${index + 1}. ${String(service.title).slice(0, 24)}`,
+      title: `${index + 1}. ${compactServiceTitle(service.title, 24)}`,
       rowId: `service:${service.id}`,
       description: money(service.price),
     }));
