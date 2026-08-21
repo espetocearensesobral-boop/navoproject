@@ -2882,3 +2882,59 @@ button, a, input, select, textarea {
   overflow-x: clip !important;
   overflow-y: visible !important;
 }
+
+
+/* Mobile hardening: scoped to the admin shell, preserving desktop and checkout geometry. */
+@media (max-width: 1023px) {
+  .admin-shell,
+  .admin-shell main {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .admin-shell main > div {
+    width: 100%;
+    max-width: 100%;
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  }
+
+  .admin-shell .admin-table-wrap,
+  .admin-shell .overflow-x-auto {
+    width: 100%;
+    max-width: 100%;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-shell .admin-table-wrap table {
+    min-width: 42rem;
+  }
+
+  .admin-shell .admin-mobile-drawer aside {
+    width: min(85vw, 300px);
+    max-width: 300px;
+  }
+
+  .admin-shell .admin-mobile-topbar {
+    min-height: calc(3.5rem + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .admin-shell .admin-mobile-bottom-bar {
+    min-height: 3.75rem;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (max-width: 639px) {
+  .admin-shell .admin-action-group {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-shell .admin-modal {
+    max-height: calc(100dvh - 1rem);
+  }
+}
