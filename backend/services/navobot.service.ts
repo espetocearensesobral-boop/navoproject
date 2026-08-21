@@ -21,6 +21,7 @@ import {
 const ACTIVE_STATUSES = new Set(['confirmed', 'pending', 'pending_approval', 'in_queue', 'in_service']);
 const TERMINAL_STATUSES = new Set(['cancelled', 'completed', 'no_show']);
 const CONVERSATION_TTL_MS = 30 * 60 * 1000;
+const NAVO_CATALOG_URL = 'https://navoproject.vercel.app/?catalog=1';
 
 export type NavoBotDeps = {
   getDb: () => any;
@@ -372,7 +373,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     context.servicePage = page;
     context.serviceOptions = pageServices.map((service: any) => service.id);
     await updateConversation(conversation, 'awaiting_service', context);
-    const fallback = `Escolha um serviço (página ${page + 1}/${Math.max(1, Math.ceil(activeServices.length / pageSize))}):\n\n` + pageServices.map((service: any, index: number) => `${index + 1}. *${service.title}* — ${service.durationMinutes} min · ${money(service.price)}`).join('\n') + (hasNextPage ? '\n\nResponda *MAIS* para ver outros serviços.' : '');
+    const fallback = `Escolha um serviço (página ${page + 1}/${Math.max(1, Math.ceil(activeServices.length / pageSize))}):\n\n` + pageServices.map((service: any, index: number) => `${index + 1}. *${service.title}* — ${service.durationMinutes} min · ${money(service.price)}`).join('\n') + (hasNextPage ? '\n\nResponda *MAIS* para ver outros serviços.' : '') + `\n\nSe preferir, acesse o catálogo completo e faça o agendamento diretamente pela plataforma Navo:\n${NAVO_CATALOG_URL}\n\nApós concluir pelo site, a confirmação será enviada automaticamente para este WhatsApp.`;
     const rows = pageServices.map((service: any, index: number) => ({
       title: `${index + 1}. ${String(service.title).slice(0, 20)}`,
       rowId: `service:${service.id}`,
@@ -381,7 +382,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (hasNextPage) rows.push({ title: 'Ver mais serviços', rowId: `service:page:${page + 1}`, description: 'Continuar navegando' } as any);
     const payload = {
       title: 'Serviços da Navo',
-      description: `Escolha um serviço · Página ${page + 1}`,
+      description: `Página ${page + 1} · Catálogo completo: ${NAVO_CATALOG_URL}`,
       buttonText: 'Ver serviços',
       footerText: 'NavoBot',
       sections: [{ title: 'Serviços disponíveis', rows }],

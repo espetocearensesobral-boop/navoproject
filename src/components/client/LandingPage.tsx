@@ -126,6 +126,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   const [testimonialIndex, setTestimonialIndex] = useState(0);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('catalog') === '1') setIsCatalogOpen(true);
+  }, []);
+
+  useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(mediaQuery.matches);
     const listener = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
