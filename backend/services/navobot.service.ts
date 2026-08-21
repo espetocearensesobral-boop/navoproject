@@ -385,28 +385,25 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const db = getDb();
     const services = await db.query.services.findMany();
     const activeServices = services.filter((service: any) => service.title && Number(service.durationMinutes) > 0);
-    const pageSize = 8;
-    const page = Math.max(0, Number(context.servicePage || 0));
-    const pageServices = activeServices.slice(page * pageSize, (page + 1) * pageSize);
-    const hasNextPage = (page + 1) * pageSize < activeServices.length;
-    context.servicePage = page;
-    context.serviceOptions = pageServices.map((service: any) => service.id);
+    context.servicePage = 0;
+    context.serviceOptions = activeServices.map((service: any) => service.id);
     await updateConversation(conversation, 'awaiting_service', context);
-    const fallback = `Escolha um serviço (página ${page + 1}/${Math.max(1, Math.ceil(activeServices.length / pageSize))}):\n\n` + pageServices.map((service: any, index: number) => `${index + 1}. *${service.title}* — ${service.durationMinutes} min · ${money(service.price)}`).join('\n') + (hasNextPage ? '\n\nResponda *MAIS* para ver outros serviços.' : '') + `\n\nSe preferir, acesse o catálogo completo e faça o agendamento diretamente pela plataforma Navo:\n${NAVO_CATALOG_URL}\n\nApós concluir pelo site, a confirmação será enviada automaticamente para este WhatsApp.`;
-    const rows = pageServices.map((service: any, index: number) => ({
-      title: `${index + 1}. ${String(service.title).slice(0, 20)}`,
+    const fallback = `Escolha um serviço:\n\n` + activeServices.map((service: any, index: number) => `${index + 1}. *${service.title}* · ${money(service.price)}`).join('\n') + `\n\nSe preferir, acesse o catálogo completo e faça o agendamento diretamente pela plataforma Navo:\n${NAVO_CATALOG_URL}\n\nApós concluir pelo site, a confirmação será enviada automaticamente para este WhatsApp.`;
+    const rows = activeServices.map((service: any, index: number) => ({
+      title: `${index + 1}. ${String(service.title).slice(0, 24)}`,
       rowId: `service:${service.id}`,
-      description: `${service.durationMinutes} min · ${money(service.price)}`,
+      description: money(service.price),
     }));
-    if (hasNextPage) rows.push({ title: 'Ver mais serviços', rowId: `service:page:${page + 1}`, description: 'Continuar navegando' } as any);
     const payload = {
       title: 'Serviços da Navo',
-      description: `Página ${page + 1} · Catálogo completo: ${NAVO_CATALOG_URL}`,
+      description: `Catálogo completo: ${NAVO_CATALOG_URL}`,
       buttonText: 'Ver serviços',
       footerText: 'NavoBot',
       sections: [{ title: 'Serviços disponíveis', rows }],
     };
-    return replyList(conversation, fallback, payload);
+    // Listas interativas do WhatsApp têm limite de linhas; quando houver mais
+    // serviços, o fallback textual mantém todos visíveis sem paginação.
+    return activeServices.length > 10 ? reply(conversation, fallback) : replyList(conversation, fallback, payload);
   }
 
   async function getServices(context: BotContext) {
@@ -505,7 +502,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         serviceId: undefined,
       });
       await updateConversation(conversation, 'awaiting_availability_service', nextContext);
-      return reply(conversation, 'Posso consultar a disponibilidade. Qual serviço você deseja verificar?\n\n' + matchedServices.map((service: any, index: number) => `${index + 1}. *${service.title}* — ${service.durationMinutes} min`).join('\n'));
+      return reply(conversation, 'Posso consultar a disponibilidade. Qual serviço você deseja verificar?\n\n' + matchedServices.map((service: any, index: number) => `${index + 1}. *${service.title}*`).join('\n'));
     }
     if (matchedServices.length === 0) {
       const nextContext = contextForNewIntent(context, {
@@ -820,7 +817,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       if (!selectedId && matchedServices.length > 1) {
         context.serviceOptions = matchedServices.map((service: any) => service.id);
         await updateConversation(conversation, 'awaiting_service', context);
-        return reply(conversation, 'Encontrei mais de uma opção. Qual delas você deseja?\n\n' + matchedServices.map((service: any, optionIndex: number) => `${optionIndex + 1}. *${service.title}* — ${service.durationMinutes} min · ${money(service.price)}`).join('\n'));
+        return reply(conversation, 'Encontrei mais de uma opção. Qual delas você deseja?\n\n' + matchedServices.map((service: any, optionIndex: number) => `${optionIndex + 1}. *${service.title}* · ${money(service.price)}`).join('\n'));
       }
       context.serviceIds = context.serviceIds || [];
       context.servicePage = 0;
