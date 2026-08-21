@@ -45,6 +45,8 @@ type BotContext = {
   timeSlot?: string;
   professionalId?: string;
   clientName?: string;
+  availabilityDate?: string;
+  availabilityOptions?: string[];
   inactivityReminderSentAt?: string;
 };
 
@@ -67,6 +69,13 @@ const ai = process.env.GEMINI_API_KEY
 function normalizeContext(value: unknown): BotContext {
   if (!value || typeof value !== 'object') return {};
   return value as BotContext;
+}
+
+function contextForNewIntent(context: BotContext, extra: Partial<BotContext> = {}): BotContext {
+  return {
+    ...(context.clientName ? { clientName: context.clientName } : {}),
+    ...extra,
+  };
 }
 
 function money(value: unknown): string {
@@ -489,15 +498,31 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const phraseMatches = services.filter((service: any) => String(service.title).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).some((token) => token.length >= 3 && normalizedText.includes(token)));
     const matchedServices = contextServices.length ? contextServices : deterministicMatches.length ? deterministicMatches : phraseMatches;
     if (matchedServices.length > 1) {
+      const nextContext = contextForNewIntent(context, {
+        availabilityDate: parseDateFromText(text) || context.availabilityDate || getTodayStringBRT(),
+        availabilityOptions: matchedServices.map((service: any) => service.id),
+        serviceIds: [],
+        serviceId: undefined,
+      });
+      await updateConversation(conversation, 'awaiting_availability_service', nextContext);
       return reply(conversation, 'Posso consultar a disponibilidade. Qual serviço você deseja verificar?\n\n' + matchedServices.map((service: any, index: number) => `${index + 1}. *${service.title}* — ${service.durationMinutes} min`).join('\n'));
     }
     if (matchedServices.length === 0) {
+      const nextContext = contextForNewIntent(context, {
+        availabilityDate: parseDateFromText(text) || context.availabilityDate || getTodayStringBRT(),
+        availabilityOptions: [],
+        serviceIds: [],
+        serviceId: undefined,
+      });
+      await updateConversation(conversation, 'awaiting_availability_service', nextContext);
       return reply(conversation, 'Consigo consultar os horários disponíveis. Para calcular corretamente, preciso saber qual serviço você deseja fazer, pois cada serviço tem uma duração diferente.\n\nResponda com o nome do serviço ou acesse o catálogo completo: https://navoproject.vercel.app/?catalog=1');
     }
 
     const service: any = matchedServices[0];
-    const date = parseDateFromText(text) || getTodayStringBRT();
+    const date = parseDateFromText(text) || context.availabilityDate || getTodayStringBRT();
     const slots = await suggestSlots(date, Number(service.durationMinutes || 30), context.professionalId || '');
+    const nextContext = contextForNewIntent(context, { availabilityDate: date, availabilityOptions: [], serviceIds: [service.id], serviceId: service.id });
+    await updateConversation(conversation, 'idle', nextContext);
     if (!slots.length) {
       return reply(conversation, `Não encontrei horários livres para *${dateLabel(date)}* para o serviço *${service.title}*. Posso consultar outro dia se você quiser.`);
     }
@@ -730,20 +755,47 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       return reply(conversation, menuText());
     }
     if (stateIntent === 'availability') return handleAvailabilityRequest(conversation, context, text);
-    const canInterruptFlow = ['awaiting_service', 'awaiting_more_services', 'awaiting_professional', 'awaiting_date', 'awaiting_time'].includes(conversation.state);
+    const isBareNumber = /^\s*\d+\s*$/.test(text);
+    const canInterruptFlow = !isBareNumber && conversation.state !== 'idle' && conversation.state !== 'human' && stateIntent !== 'confirm';
     if (canInterruptFlow && stateIntent === 'appointments') {
-      await updateConversation(conversation, 'idle', context);
+      const nextContext = contextForNewIntent(context);
+      await updateConversation(conversation, 'idle', nextContext);
       return listAppointments(conversation);
     }
     if (canInterruptFlow && stateIntent === 'book') {
-      await updateConversation(conversation, 'idle', context);
-      return startBooking(conversation, context, text);
+      const nextContext = contextForNewIntent(context, { pendingAction: 'book' });
+      await updateConversation(conversation, 'idle', nextContext);
+      return startBooking(conversation, nextContext, text);
     }
-    if (canInterruptFlow && stateIntent === 'cancel') return beginAppointmentAction(conversation, context, 'cancel');
-    if (canInterruptFlow && stateIntent === 'reschedule') return beginAppointmentAction(conversation, context, 'reschedule');
+    if (canInterruptFlow && stateIntent === 'cancel') {
+      const nextContext = contextForNewIntent(context, { pendingAction: 'cancel' });
+      await updateConversation(conversation, 'idle', nextContext);
+      return beginAppointmentAction(conversation, nextContext, 'cancel');
+    }
+    if (canInterruptFlow && stateIntent === 'reschedule') {
+      const nextContext = contextForNewIntent(context, { pendingAction: 'reschedule' });
+      await updateConversation(conversation, 'idle', nextContext);
+      return beginAppointmentAction(conversation, nextContext, 'reschedule');
+    }
     if (canInterruptFlow && stateIntent === 'human') {
-      await updateConversation(conversation, 'human', context, true);
+      const nextContext = contextForNewIntent(context);
+      await updateConversation(conversation, 'human', nextContext, true);
       return reply(conversation, 'Vou encaminhar sua conversa para a equipe. Em breve alguém continuará o atendimento por aqui.');
+    }
+    if (conversation.state === 'awaiting_availability_service') {
+      const db = getDb();
+      const services = (await db.query.services.findMany()).filter((service: any) => service.title && Number(service.durationMinutes) > 0);
+      const rawText = text.trim().toLowerCase();
+      const index = numericSelection(text);
+      const rawSelection = rawText.startsWith('service:') ? rawText.slice(8) : '';
+      const selectedId = rawSelection || (index !== null && context.availabilityOptions?.[index] ? context.availabilityOptions[index] : '');
+      const matches = selectedId
+        ? services.filter((service: any) => service.id === selectedId)
+        : findServiceMatches(services, text);
+      if (!matches.length) return reply(conversation, 'Não identifiquei esse serviço. Responda com o nome ou número do serviço para consultar os horários.');
+      context.serviceIds = [matches[0].id];
+      context.serviceId = matches[0].id;
+      return handleAvailabilityRequest(conversation, context, text);
     }
     if (conversation.state === 'awaiting_appointment') return handleAwaitingAppointment(conversation, context, text);
     if (conversation.state === 'awaiting_service') {
@@ -867,7 +919,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const aiIntent = !deterministic && conversation.state !== 'idle' && conversation.state !== 'human'
       ? await classifyWithAi(message.text, conversation.state, context)
       : null;
-    const interruptIntents = new Set<NavoBotIntent>(['menu', 'appointments', 'availability', 'cancel', 'reschedule', 'human']);
+    const interruptIntents = new Set<NavoBotIntent>(['menu', 'appointments', 'availability', 'book', 'cancel', 'reschedule', 'human']);
     const contextualIntent = deterministic || (aiIntent && interruptIntents.has(aiIntent) ? aiIntent : null);
     const stateReply = await handleState(conversation, context, message.text, contextualIntent);
     if (stateReply !== null) return { handled: true, intent: contextualIntent || aiIntent || 'state' };
@@ -957,6 +1009,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
   function inactivityMessage(state: string, clientName?: string): string {
     const greeting = clientName ? ` ${clientName}` : '';
     if (state === 'awaiting_service') return `Ainda está comigo${greeting}? Posso continuar escolhendo o serviço. Responda com o número ou escreva o nome do serviço.`;
+    if (state === 'awaiting_availability_service') return `Ainda está comigo${greeting}? Qual serviço você deseja usar para consultar os horários?`;
     if (state === 'awaiting_more_services') return `Ainda está comigo${greeting}? Deseja adicionar outro serviço ou continuar? Responda *ADICIONAR* ou *CONTINUAR*.`;
     if (state === 'awaiting_professional') return `Ainda está comigo${greeting}? Falta escolher o profissional. Responda com o número ou *QUALQUER PROFISSIONAL*.`;
     if (state === 'awaiting_date') return `Ainda está comigo${greeting}? Qual dia você prefere para o atendimento?`;
