@@ -4,6 +4,7 @@ import {
   classifyDeterministicIntent,
   extractBookingCode,
   extractEvolutionMessage,
+  findServiceMatches,
   isPositiveConfirmation,
   parseDateFromText,
   parseTimeFromText,
@@ -26,6 +27,15 @@ test('classifies core NavoBot intents deterministically', () => {
   assert.equal(classifyDeterministicIntent('pode cancelar'), 'cancel');
   assert.equal(classifyDeterministicIntent('quero falar com atendente'), 'human');
   assert.equal(classifyDeterministicIntent('meu agendamento'), 'appointments');
+});
+
+test('does not confuse greetings with service names and supports partial service names', () => {
+  const services = [
+    { id: 'svc-noivo', title: 'Combo Dia do Noivo / Evento VIP' },
+    { id: 'svc-barba', title: 'Modelagem de Barba com Toalha Quente' },
+  ];
+  assert.deepEqual(findServiceMatches(services, 'oi'), []);
+  assert.deepEqual(findServiceMatches(services, 'Modelagem de barba').map((service) => service.id), ['svc-barba']);
 });
 
 test('parses relative dates and WhatsApp time formats', () => {

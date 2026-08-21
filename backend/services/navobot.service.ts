@@ -13,6 +13,7 @@ import {
   normalizeIntentName,
   parseDateFromText,
   parseTimeFromText,
+  findServiceMatches,
   type ExtractedEvolutionMessage,
   type NavoBotIntent,
 } from './navobot-intent.js';
@@ -122,37 +123,6 @@ function confirmationText(action: 'book' | 'reschedule' | 'cancel', appointment:
 function numericSelection(text: string): number | null {
   const value = Number(text.trim());
   return Number.isInteger(value) && value > 0 ? value - 1 : null;
-}
-
-const SERVICE_STOP_WORDS = new Set(['a', 'as', 'o', 'os', 'um', 'uma', 'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'para', 'por']);
-
-function serviceTokens(value: string): string[] {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter((token) => token.length >= 2 && !SERVICE_STOP_WORDS.has(token));
-}
-
-export function findServiceMatches(services: any[], text: string): any[] {
-  const normalizedText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-  const exact = services.filter((service) => {
-    const title = String(service.title).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    return normalizedText.includes(title) || title.includes(normalizedText);
-  });
-  if (exact.length) return exact;
-  const queryTokens = serviceTokens(text);
-  if (!queryTokens.length) return [];
-  const scored = services.map((service) => {
-    const titleTokens = serviceTokens(String(service.title));
-    const matched = queryTokens.filter((queryToken) => titleTokens.some((titleToken) => titleToken === queryToken || titleToken.startsWith(queryToken))).length;
-    return { service, matched, coverage: matched / queryTokens.length };
-  }).filter((item) => item.matched > 0 && item.coverage >= 0.5);
-  if (!scored.length) return [];
-  const bestCoverage = Math.max(...scored.map((item) => item.coverage));
-  const best = scored.filter((item) => item.coverage === bestCoverage).sort((a, b) => b.matched - a.matched);
-  return best.map((item) => item.service);
 }
 
 async function classifyWithAi(text: string, state: string, context: BotContext = {}): Promise<NavoBotIntent> {
@@ -674,6 +644,11 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         return reply(conversation, menuText());
       }
       return reply(conversation, 'Sua solicitação foi encaminhada para a equipe. Se quiser voltar ao menu automático, responda *MENU*.');
+    }
+    if (classifyDeterministicIntent(text) === 'menu') {
+      const preservedContext = context.clientName ? { clientName: context.clientName } : {};
+      await updateConversation(conversation, 'idle', preservedContext);
+      return reply(conversation, menuText());
     }
     if (conversation.state === 'awaiting_appointment') return handleAwaitingAppointment(conversation, context, text);
     if (conversation.state === 'awaiting_service') {

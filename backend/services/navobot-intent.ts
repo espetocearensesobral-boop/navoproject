@@ -216,3 +216,33 @@ export function normalizeIntentName(value: unknown): NavoBotIntent {
   if (['human', 'humano', 'atendente'].includes(normalized)) return 'human';
   return 'unknown';
 }
+
+const SERVICE_STOP_WORDS = new Set(['a', 'as', 'o', 'os', 'um', 'uma', 'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'para', 'por']);
+
+function serviceTokens(value: string): string[] {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((token) => token.length >= 2 && !SERVICE_STOP_WORDS.has(token));
+}
+
+export function findServiceMatches(services: Array<{ id: string; title: string }>, text: string): Array<{ id: string; title: string }> {
+  const queryTokens = serviceTokens(text);
+  if (!queryTokens.length) return [];
+  const exact = services.filter((service) => {
+    const titleTokens = serviceTokens(String(service.title));
+    return queryTokens.every((queryToken) => titleTokens.some((titleToken) => titleToken === queryToken || titleToken.startsWith(queryToken)));
+  });
+  if (exact.length) return exact;
+  const scored = services.map((service) => {
+    const titleTokens = serviceTokens(String(service.title));
+    const matched = queryTokens.filter((queryToken) => titleTokens.some((titleToken) => titleToken === queryToken || titleToken.startsWith(queryToken))).length;
+    return { service, matched, coverage: matched / queryTokens.length };
+  }).filter((item) => item.matched > 0 && item.coverage >= 0.5);
+  if (!scored.length) return [];
+  const bestCoverage = Math.max(...scored.map((item) => item.coverage));
+  const best = scored.filter((item) => item.coverage === bestCoverage).sort((a, b) => b.matched - a.matched);
+  return best.map((item) => item.service);
+}
