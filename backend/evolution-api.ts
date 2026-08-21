@@ -281,8 +281,14 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
       const instance = String(req.body?.instance || settings.instanceName || 'unknown');
       if (settings.instanceName && instance !== settings.instanceName) return res.status(403).json({ error: 'Instância não autorizada.' });
       console.log(`[Evolution Webhook] ${event} recebido para ${instance}`);
-      // Acknowledge immediately; the NavoBot processes the event asynchronously.
-      if (settings.navoBotEnabled && onWebhook) void onWebhook(req.body).catch((error) => console.error('[NavoBot] Falha ao processar webhook:', error));
+      // Aguarda o processamento para que ambientes serverless não encerrem a execução antes do envio da resposta.
+      if (settings.navoBotEnabled && onWebhook) {
+        try {
+          await onWebhook(req.body);
+        } catch (error) {
+          console.error('[NavoBot] Falha ao processar webhook:', error);
+        }
+      }
       return res.status(200).json({ received: true });
     } catch (error) {
       console.error('[Evolution Webhook] Falha ao processar evento:', error);
