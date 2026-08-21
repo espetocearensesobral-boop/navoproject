@@ -53,6 +53,8 @@ test('parses relative dates and WhatsApp time formats', () => {
 test('recognizes confirmations and booking codes', () => {
   assert.equal(isPositiveConfirmation('sim, pode confirmar'), true);
   assert.equal(extractBookingCode('Meu voucher é NV123456'), 'NV123456');
+  assert.equal(extractBookingCode('BRX-8Q4TD'), 'BRX-8Q4TD');
+  assert.equal(extractBookingCode('voucher: BRX-8Q4TD'), 'BRX-8Q4TD');
 });
 
 test('extracts only direct incoming text messages', () => {

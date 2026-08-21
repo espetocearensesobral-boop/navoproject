@@ -165,10 +165,10 @@ export function parseDateFromText(text: string, today = getTodayStringBRT()): st
 
 export function extractBookingCode(text: string): string | null {
   const normalized = text.toUpperCase();
-  const labeled = normalized.match(/\b(?:VOUCHER|CÓDIGO|CODIGO|RESERVA)\b\s*(?:É|E|:|-)?\s*([A-Z0-9]{4,})\b/);
+  const labeled = normalized.match(/\b(?:VOUCHER|CÓDIGO|CODIGO|RESERVA)\b\s*(?:É|E|:|-)?\s*([A-Z0-9]+(?:-[A-Z0-9]+)*)\b/);
   if (labeled?.[1] && /\d/.test(labeled[1])) return labeled[1];
-  const match = normalized.match(/\b[A-Z]{2,8}[A-Z0-9]*\d[A-Z0-9]*\b/);
-  return match?.[0] || null;
+  const candidates = normalized.match(/\b[A-Z]{2,8}-?[A-Z0-9]{3,}\b/g) || [];
+  return candidates.find((candidate) => /\d/.test(candidate)) || null;
 }
 
 export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage | null {
