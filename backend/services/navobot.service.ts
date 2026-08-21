@@ -41,6 +41,7 @@ type BotContext = {
   date?: string;
   timeSlot?: string;
   professionalId?: string;
+  clientName?: string;
 };
 
 type Conversation = {
@@ -460,7 +461,12 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const profiles = await db.query.profiles.findMany();
     const existingProfile = profiles.find((profile: any) => profile.phone && matchPhoneNumbers(profile.phone, conversation.phone));
     const clientId = existingProfile?.id || `wa_${conversation.phone}`;
-    const clientName = existingProfile?.name || 'Cliente WhatsApp';
+    const recognizedName = String(context.clientName || '').trim();
+    const clientName = recognizedName || existingProfile?.name || 'Cliente WhatsApp';
+    const internalContact = `wa_${sanitizePhone(conversation.phone)}`;
+    const clientEmail = existingProfile?.email && !String(existingProfile.email).endsWith('@whatsapp.navo.local')
+      ? existingProfile.email
+      : null;
     const appointmentId = `apt_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
     const isPendingApproval = !!check.requiresApproval;
     const originalAmount = services.reduce((total, service: any) => total + Number(service.price || 0), 0);
@@ -469,7 +475,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       clientId,
       clientName,
       clientPhone: sanitizePhone(conversation.phone),
-      clientEmail: existingProfile?.email || null,
+      clientEmail,
       professionalId: check.chosenProf.id,
       professionalName: check.chosenProf.name,
       date: context.date,
@@ -492,12 +498,20 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
           await tx.insert(schema.profiles).values({
             id: clientId,
             name: clientName,
-            email: `${clientId}@whatsapp.navo.local`,
+            email: internalContact,
             phone: sanitizePhone(conversation.phone),
             role: 'client',
             loyaltyPoints: 0,
             loyaltyTier: 'Bronze',
           }).onConflictDoNothing();
+        } else {
+          const profileUpdates: Record<string, unknown> = { updatedAt: new Date() };
+          const hasGenericName = !existingProfile.name || /^cliente whatsapp$/i.test(String(existingProfile.name).trim());
+          if (recognizedName && hasGenericName) profileUpdates.name = recognizedName;
+          if (String(existingProfile.email || '').endsWith('@whatsapp.navo.local')) profileUpdates.email = internalContact;
+          if (Object.keys(profileUpdates).length > 1) {
+            await tx.update(schema.profiles).set(profileUpdates).where(eq(schema.profiles.id, existingProfile.id));
+          }
         }
         await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${`${appointment.professionalId}:${appointment.date}`}, 0))`);
         const locked = await checkSlotAvailability({
@@ -691,17 +705,19 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const deterministic = classifyDeterministicIntent(message.text);
     if (!(await recordInbound(conversation, message, deterministic))) return { ignored: true, reason: 'duplicate' };
     const context = normalizeContext(conversation.context);
+    const pushName = String(message.pushName || '').trim();
+    if (pushName && !/^cliente whatsapp$/i.test(pushName)) context.clientName = pushName;
     const stateReply = await handleState(conversation, context, message.text);
     if (stateReply !== null) return { handled: true, intent: deterministic || 'state' };
 
     const intent = deterministic || await classifyWithAi(message.text, conversation.state);
     if (intent === 'menu' || intent === 'unknown') {
-      await updateConversation(conversation, 'idle', {});
+      await updateConversation(conversation, 'idle', context);
       await reply(conversation, menuText(message.pushName));
       return { handled: true, intent };
     }
     if (intent === 'human') {
-      await updateConversation(conversation, 'human', {}, true);
+      await updateConversation(conversation, 'human', context, true);
       await reply(conversation, 'Vou encaminhar sua conversa para a equipe. Em breve alguém continuará o atendimento por aqui.');
       return { handled: true, intent };
     }
