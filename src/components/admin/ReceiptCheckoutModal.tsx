@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -103,23 +104,37 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
   useEffect(() => {
     const body = document.body;
     const html = document.documentElement;
+    const adminMain = document.querySelector<HTMLElement>('.admin-shell main');
     const previous = {
       bodyOverflow: body.style.overflow,
       bodyOverscroll: body.style.overscrollBehavior,
       htmlOverflow: html.style.overflow,
       htmlOverscroll: html.style.overscrollBehavior,
+      mainOverflow: adminMain?.style.overflow || '',
+      mainOverscroll: adminMain?.style.overscrollBehavior || '',
+      mainTouchAction: adminMain?.style.touchAction || '',
     };
 
     body.style.overflow = 'hidden';
     body.style.overscrollBehavior = 'none';
     html.style.overflow = 'hidden';
     html.style.overscrollBehavior = 'none';
+    if (adminMain) {
+      adminMain.style.overflow = 'hidden';
+      adminMain.style.overscrollBehavior = 'none';
+      adminMain.style.touchAction = 'none';
+    }
 
     return () => {
       body.style.overflow = previous.bodyOverflow;
       body.style.overscrollBehavior = previous.bodyOverscroll;
       html.style.overflow = previous.htmlOverflow;
       html.style.overscrollBehavior = previous.htmlOverscroll;
+      if (adminMain) {
+        adminMain.style.overflow = previous.mainOverflow;
+        adminMain.style.overscrollBehavior = previous.mainOverscroll;
+        adminMain.style.touchAction = previous.mainTouchAction;
+      }
     };
   }, []);
 
@@ -259,7 +274,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
       ].filter(Boolean).join(' · ')
     : 'Sem ajustes';
 
-  return (
+  return createPortal(
     <div className="receipt-v2-overlay" role="dialog" aria-modal="true" aria-labelledby="receipt-dialog-title">
       <div ref={dialogRef} tabIndex={-1} className="receipt-v2-dialog">
         <header className="receipt-v2-header">
@@ -391,7 +406,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 
