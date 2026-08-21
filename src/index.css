@@ -2978,3 +2978,63 @@ button, a, input, select, textarea {
 .admin-shell .admin-system-workspace .text-gold-accent {
   color: var(--color-accent-text) !important;
 }
+
+
+/* Filled-control contrast: strong backgrounds get readable foregrounds; soft surfaces keep base text. */
+[data-palette="emerald"] .admin-shell,
+[data-palette="teal"] .admin-shell,
+[data-palette="indigo"] .admin-shell,
+[data-palette="crimson"] .admin-shell,
+[data-palette="violet"] .admin-shell,
+[data-palette="mint"] .admin-shell,
+[data-palette="titanium"] .admin-shell,
+[data-palette="cobalt"] .admin-shell,
+[data-palette="jade"] .admin-shell,
+[data-palette="plum"] .admin-shell,
+[data-palette="midnight"] .admin-shell,
+[data-palette="bordeaux"] .admin-shell {
+  --color-content-on-accent: #FFFFFF;
+}
+
+.admin-shell button[class~="bg-gold-base"],
+.admin-shell a[class~="bg-gold-base"],
+.admin-shell button[class~="bg-gold-hover"],
+.admin-shell a[class~="bg-gold-hover"] {
+  color: var(--color-content-on-accent) !important;
+}
+
+.admin-shell button[class~="bg-status-success"],
+.admin-shell a[class~="bg-status-success"],
+.admin-shell button[class~="bg-status-error"],
+.admin-shell a[class~="bg-status-error"],
+.admin-shell button[class~="bg-status-info"],
+.admin-shell a[class~="bg-status-info"],
+.admin-shell button[class~="bg-blue-500"],
+.admin-shell a[class~="bg-blue-500"],
+.admin-shell button[class~="bg-purple-500"],
+.admin-shell a[class~="bg-purple-500"],
+.admin-shell button[class~="bg-red-600"],
+.admin-shell a[class~="bg-red-600"] {
+  color: #FFFFFF !important;
+}
+
+.admin-shell button[class~="bg-status-warning"],
+.admin-shell a[class~="bg-status-warning"],
+.admin-shell button[class~="bg-amber-500"],
+.admin-shell a[class~="bg-amber-500"] {
+  color: #12131A !important;
+}
+
+.admin-shell button[class~="bg-whatsapp"],
+.admin-shell a[class~="bg-whatsapp"] {
+  color: var(--color-whatsapp-on) !important;
+}
+
+.admin-shell button[class~="bg-surface-base"],
+.admin-shell a[class~="bg-surface-base"],
+.admin-shell button[class~="bg-surface-card"],
+.admin-shell a[class~="bg-surface-card"],
+.admin-shell button[class~="bg-surface-elevated"],
+.admin-shell a[class~="bg-surface-elevated"] {
+  color: var(--color-content-base) !important;
+}
