@@ -457,7 +457,7 @@ export const ClientApp: React.FC = () => {
       </a>
 
       {/* Web App View */}
-      <div className="w-full max-w-3xl lg:max-w-4xl bg-surface-base flex flex-col flex-1 relative overflow-hidden shadow-2xl mx-auto">
+      <div className={`w-full ${activeTab === 'home' ? 'max-w-none lg:shadow-none' : 'max-w-3xl lg:max-w-4xl shadow-2xl'} bg-surface-base flex flex-col flex-1 relative overflow-hidden mx-auto transition-[max-width] duration-300`}>
 
         {/* Client App Header (hidden on home/landing page) */}
         {activeTab !== 'home' && (
