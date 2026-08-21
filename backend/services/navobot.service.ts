@@ -120,6 +120,20 @@ function confirmationText(action: 'book' | 'reschedule' | 'cancel', appointment:
   return `Vou registrar este agendamento:\n\n${serviceLines}\n\n⏱️ Duração total: *${services.reduce((total, service) => total + Number(service.durationMinutes || 0), 0)} min*\n📅 *${dateLabel(context.date || '')}* às *${context.timeSlot || ''}*\n✂️ *${appointment?.professionalName || 'profissional a definir'}*\n💳 Pagamento no local\n\nConfirma? Responda *SIM* ou *NÃO*.`;
 }
 
+function confirmationPayload(action: 'book' | 'reschedule' | 'cancel', appointment: any, context: BotContext, services: any[] = []) {
+  const text = confirmationText(action, appointment, context, services);
+  const buttons = action === 'cancel'
+    ? [
+        { buttonId: 'confirm:yes', buttonText: { displayText: 'Sim, cancelar' } },
+        { buttonId: 'confirm:no', buttonText: { displayText: 'Não, manter' } },
+      ]
+    : [
+        { buttonId: 'confirm:yes', buttonText: { displayText: 'Sim, confirmar' } },
+        { buttonId: 'confirm:no', buttonText: { displayText: 'Não, voltar' } },
+      ];
+  return { text, footerText: 'NavoBot', buttons };
+}
+
 function numericSelection(text: string): number | null {
   const value = Number(text.trim());
   return Number.isInteger(value) && value > 0 ? value - 1 : null;
@@ -251,6 +265,11 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (!sent) return reply(conversation, fallbackText);
     await recordOutbound(conversation, fallbackText);
     return sent;
+  }
+
+  async function replyConfirmation(conversation: Conversation, action: 'book' | 'reschedule' | 'cancel', appointment: any, context: BotContext, services: any[] = []) {
+    const fallback = confirmationText(action, appointment, context, services);
+    return replyButtons(conversation, fallback, confirmationPayload(action, appointment, context, services));
   }
 
   async function syncClientIdentity(phone: string, pushName?: string) {
@@ -473,7 +492,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     }
     context.professionalId = check.chosenProf?.id || context.professionalId || 'prof_any';
     await updateConversation(conversation, 'awaiting_confirmation', context);
-    return reply(conversation, confirmationText('book', { professionalName: check.chosenProf?.name }, context, services));
+    return replyConfirmation(conversation, 'book', { professionalName: check.chosenProf?.name }, context, services);
   }
 
   async function executeBooking(conversation: Conversation, context: BotContext) {
@@ -619,7 +638,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     context.appointmentId = appointment.id;
     if (action === 'cancel') {
       await updateConversation(conversation, 'awaiting_confirmation', context);
-      return reply(conversation, confirmationText('cancel', appointment, context));
+      return replyConfirmation(conversation, 'cancel', appointment, context);
     }
     await updateConversation(conversation, 'awaiting_date', context);
     return reply(conversation, `Certo. Vamos reagendar ${appointmentLabel(appointment)}. Qual novo dia você prefere?`);
@@ -631,7 +650,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     context.appointmentId = appointment.id;
     if (context.pendingAction === 'cancel') {
       await updateConversation(conversation, 'awaiting_confirmation', context);
-      return reply(conversation, confirmationText('cancel', appointment, context));
+      return replyConfirmation(conversation, 'cancel', appointment, context);
     }
     await updateConversation(conversation, 'awaiting_date', context);
     return reply(conversation, `Certo. Vamos reagendar ${appointmentLabel(appointment)}. Qual novo dia você prefere?`);
@@ -742,7 +761,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       });
       if (!check.available) return reply(conversation, 'Esse horário está ocupado. Responda com outro horário para eu consultar novamente.');
       await updateConversation(conversation, 'awaiting_confirmation', context);
-      return reply(conversation, confirmationText('reschedule', appointment, context));
+      return replyConfirmation(conversation, 'reschedule', appointment, context);
     }
     if (conversation.state === 'awaiting_confirmation') {
       const appointment = context.appointmentId ? await findAppointment(conversation, context) : null;

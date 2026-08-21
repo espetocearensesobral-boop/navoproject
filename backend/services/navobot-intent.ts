@@ -89,11 +89,13 @@ export function classifyDeterministicIntent(text: string): NavoBotIntent | null 
 }
 
 export function isPositiveConfirmation(text: string): boolean {
-  return /^(sim|s|ok|okay|pode|confirmo|confirmar|isso|perfeito|fechar|fechado|vamos|pode ser|pode fazer)\b/i.test(normalizeText(text));
+  const normalized = normalizeText(text);
+  return /^(confirm:yes|confirm_yes|yes|sim|s|ok|okay|pode|confirmo|confirmar|isso|perfeito|fechar|fechado|vamos|pode ser|pode fazer)\b/.test(normalized);
 }
 
 export function isNegativeConfirmation(text: string): boolean {
-  return /^(nao|não|n|cancelar|cancela|desistir|voltar|sair)\b/i.test(normalizeText(text));
+  const normalized = normalizeText(text);
+  return /^(confirm:no|confirm_no|no|nao|n|cancelar|cancela|desistir|voltar|sair)\b/.test(normalized);
 }
 
 export function parseTimeFromText(text: string, allowBareHour = false): string | null {
