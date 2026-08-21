@@ -319,7 +319,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
       if (number.length < 8 || number.length > 15) return false;
       await evolutionRequest(settings.baseUrl, settings.apiKey, `/message/sendText/${encodeURIComponent(settings.instanceName)}`, {
         method: 'POST',
-        body: JSON.stringify({ number, textMessage: { text } }),
+        body: JSON.stringify({ number, text }),
       });
       return true;
     } catch (error) {
@@ -345,7 +345,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
       if (number.length < 8 || number.length > 15) return res.status(400).json({ error: 'Informe o telefone com DDD e código do país, somente números.' });
       await evolutionRequest(settings.baseUrl, settings.apiKey, `/message/sendText/${encodeURIComponent(settings.instanceName)}`, {
         method: 'POST',
-        body: JSON.stringify({ number, textMessage: { text: parsed.data.text } }),
+        body: JSON.stringify({ number, text: parsed.data.text }),
       });
       return res.json({ success: true, message: `Mensagem de teste enviada para ${number}.` });
     } catch (error: any) {
