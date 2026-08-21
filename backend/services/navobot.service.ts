@@ -262,8 +262,19 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (!profile) return;
     const updates: Record<string, unknown> = { updatedAt: new Date() };
     if (!profile.name || /^cliente whatsapp$/i.test(String(profile.name).trim())) updates.name = recognizedName;
-    if (String(profile.email || '').endsWith('@whatsapp.navo.local')) updates.email = `wa_${normalizedPhone}`;
-    if (Object.keys(updates).length > 1) await db.update(schema.profiles).set(updates).where(eq(schema.profiles.id, profile.id));
+    const hasLegacyEmail = String(profile.email || '').endsWith('@whatsapp.navo.local');
+    if (hasLegacyEmail) updates.email = `wa_${normalizedPhone}`;
+    if (Object.keys(updates).length > 1) {
+      await db.transaction(async (tx: any) => {
+        await tx.update(schema.profiles).set(updates).where(eq(schema.profiles.id, profile.id));
+        const appointmentUpdates: Record<string, unknown> = {};
+        if (updates.name) appointmentUpdates.clientName = recognizedName;
+        if (hasLegacyEmail) appointmentUpdates.clientEmail = null;
+        if (Object.keys(appointmentUpdates).length > 0) {
+          await tx.update(schema.appointments).set(appointmentUpdates).where(eq(schema.appointments.clientId, profile.id));
+        }
+      });
+    }
   }
 
   async function findAppointments(phone: string) {
