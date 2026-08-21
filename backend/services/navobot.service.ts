@@ -124,14 +124,19 @@ function confirmationPayload(action: 'book' | 'reschedule' | 'cancel', appointme
   const text = confirmationText(action, appointment, context, services);
   const buttons = action === 'cancel'
     ? [
-        { buttonId: 'confirm:yes', buttonText: { displayText: 'Sim, cancelar' } },
-        { buttonId: 'confirm:no', buttonText: { displayText: 'Não, manter' } },
+        { type: 'reply' as const, id: 'confirm:yes', displayText: 'Sim, cancelar' },
+        { type: 'reply' as const, id: 'confirm:no', displayText: 'Não, manter' },
       ]
     : [
-        { buttonId: 'confirm:yes', buttonText: { displayText: 'Sim, confirmar' } },
-        { buttonId: 'confirm:no', buttonText: { displayText: 'Não, voltar' } },
+        { type: 'reply' as const, id: 'confirm:yes', displayText: 'Sim, confirmar' },
+        { type: 'reply' as const, id: 'confirm:no', displayText: 'Não, voltar' },
       ];
-  return { text, footerText: 'NavoBot', buttons };
+  return {
+    title: action === 'cancel' ? 'Confirmar cancelamento' : action === 'reschedule' ? 'Confirmar reagendamento' : 'Confirmar agendamento',
+    description: text,
+    footerText: 'NavoBot',
+    buttons,
+  };
 }
 
 function numericSelection(text: string): number | null {
@@ -383,11 +388,12 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const fallback = `Serviço selecionado:\n${selected}\n\nDeseja adicionar outro serviço? Responda *ADICIONAR* ou *CONTINUAR*.`;
     await updateConversation(conversation, 'awaiting_more_services', context);
     return replyButtons(conversation, fallback, {
-      text: `Serviço selecionado:\n${selected}\n\nDeseja adicionar outro serviço?`,
+      title: 'Serviço selecionado',
+      description: `Você selecionou:\n${selected}`,
       footerText: 'NavoBot',
       buttons: [
-        { buttonId: 'service:add', buttonText: { displayText: 'Adicionar outro' } },
-        { buttonId: 'service:done', buttonText: { displayText: 'Continuar' } },
+        { type: 'reply', id: 'service:add', displayText: 'Adicionar outro' },
+        { type: 'reply', id: 'service:done', displayText: 'Continuar' },
       ],
     });
   }

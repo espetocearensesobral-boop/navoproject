@@ -328,7 +328,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
     }
   }
 
-  async function sendButtons(phone: string, payload: { text: string; footerText?: string; buttons: Array<{ buttonId: string; buttonText: { displayText: string } }> }): Promise<boolean> {
+  async function sendButtons(phone: string, payload: { title: string; description: string; footerText: string; buttons: Array<{ type: 'reply'; displayText: string; id: string }> }): Promise<boolean> {
     return sendEvolutionPayload('/message/sendButtons', phone, payload);
   }
 
