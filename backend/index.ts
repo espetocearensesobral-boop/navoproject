@@ -248,7 +248,21 @@ app.use('/api/email/test', requireAuth, requireAdmin);
 app.use('/api/email', emailRouter);
 
 import { createEvolutionApiModule } from './evolution-api.js';
-const { router: evolutionApiRouter } = createEvolutionApiModule({ getDb: () => db, schema, eq });
+import { createNavoBotService } from './services/navobot.service.js';
+
+let evolutionSendText: (phone: string, text: string) => Promise<boolean> = async () => false;
+const navoBotService = createNavoBotService({
+  getDb: () => db,
+  schema,
+  sendText: (phone, text) => evolutionSendText(phone, text),
+});
+const { router: evolutionApiRouter, sendText: configuredEvolutionSendText } = createEvolutionApiModule({
+  getDb: () => db,
+  schema,
+  eq,
+  onWebhook: (payload) => navoBotService.handleWebhook(payload),
+});
+evolutionSendText = configuredEvolutionSendText;
 app.use('/api/evolution', evolutionApiRouter);
 
 /** Busca o e-mail do cliente pelo clientId (perfil), sem derrubar o fluxo principal se falhar. */

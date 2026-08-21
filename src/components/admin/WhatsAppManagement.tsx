@@ -75,6 +75,7 @@ export const WhatsAppManagement: React.FC = () => {
         instanceName: settings.instanceName,
         webhookEnabled: settings.webhookEnabled,
         webhookUrl: settings.webhookUrl,
+        navoBotEnabled: settings.navoBotEnabled,
       };
       if (apiKeyInput.trim()) payload.apiKey = apiKeyInput.trim();
       if (webhookSecretInput.trim()) payload.webhookSecret = webhookSecretInput.trim();
@@ -174,6 +175,13 @@ export const WhatsAppManagement: React.FC = () => {
           </button>
         </div>
 
+        <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl border border-gold-base/30 bg-gold-base/5">
+          <div className="min-w-0"><p className="text-xs font-bold text-content-base">Ativar NavoBot</p><p className="text-xs text-content-muted mt-0.5">Processa mensagens recebidas, consulta a agenda e conduz confirmações, reagendamentos, cancelamentos e novos agendamentos.</p></div>
+          <button type="button" role="switch" aria-checked={settings.navoBotEnabled} onClick={() => update('navoBotEnabled', !settings.navoBotEnabled)} className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${settings.navoBotEnabled ? 'bg-gold-base' : 'bg-border-subtle'}`}>
+            <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${settings.navoBotEnabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label className="space-y-1 sm:col-span-2"><span className="block text-xs font-bold text-content-muted uppercase tracking-wider">URL base da Evolution API</span><input value={settings.baseUrl} onChange={(event) => update('baseUrl', event.target.value)} placeholder="http://129.159.50.100:8080" className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0" /><span className="block text-xs text-content-muted">Não inclua a rota final, como `/instance` ou `/message`.</span></label>
           <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase tracking-wider">Nome da instância</span><input value={settings.instanceName} onChange={(event) => update('instanceName', event.target.value)} placeholder="navo-bot" className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0" /></label>
@@ -206,7 +214,7 @@ export const WhatsAppManagement: React.FC = () => {
         <div className="flex justify-end"><button type="button" onClick={() => void handleSendTest()} disabled={sending || !testNumber.trim() || !testText.trim()} className="h-10 w-full sm:w-auto px-4 rounded-xl bg-surface-base border border-border-subtle text-content-base font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"><Send className="w-4 h-4" />{sending ? 'Enviando...' : 'Enviar mensagem de teste'}</button></div>
       </section>
 
-      <div className="p-3 rounded-xl border border-border-subtle bg-surface-base text-xs text-content-muted">Para conectar um número, crie ou selecione a instância no Manager da Evolution API e leia o QR Code. Depois mantenha o mesmo nome da instância neste painel.</div>
+      <div className="p-3 rounded-xl border border-border-subtle bg-surface-base text-xs text-content-muted">Para ativar o NavoBot, informe uma URL pública HTTPS no webhook, defina um segredo, salve a configuração, aplique o webhook e só então ative o agente. A Evolution API enviará eventos da instância para <code className="text-content-base">/api/evolution/webhook</code>.</div>
     </div>
   );
 };

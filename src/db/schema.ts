@@ -598,6 +598,48 @@ export const evolutionApiSettings = pgTable('evolution_api_settings', {
   webhookEnabled: boolean('webhook_enabled').notNull().default(false),
   webhookUrl: text('webhook_url').notNull().default(''),
   webhookSecret: text('webhook_secret').notNull().default(''),
+  navoBotEnabled: boolean('navobot_enabled').notNull().default(false),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+
+
+// Estado conversacional e auditoria mínima do agente híbrido de WhatsApp.
+export const navoBotConversations = pgTable('navobot_conversations', {
+  id: text('id').primaryKey(),
+  phone: text('phone').notNull(),
+  instanceName: text('instance_name').notNull().default(''),
+  state: text('state').notNull().default('idle'),
+  context: jsonb('context').notNull().default({}),
+  lastInboundMessageId: text('last_inbound_message_id'),
+  lastInboundAt: timestamp('last_inbound_at'),
+  lastOutboundAt: timestamp('last_outbound_at'),
+  handoffRequested: boolean('handoff_requested').notNull().default(false),
+  expiresAt: timestamp('expires_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  phoneInstanceIdx: uniqueIndex('navobot_conversations_phone_instance_idx').on(table.phone, table.instanceName),
+}));
+
+export const navoBotMessages = pgTable('navobot_messages', {
+  id: text('id').primaryKey(),
+  conversationId: text('conversation_id').notNull().references(() => navoBotConversations.id, { onDelete: 'cascade' }),
+  messageId: text('message_id').notNull().unique(),
+  phone: text('phone').notNull(),
+  direction: text('direction').notNull(),
+  text: text('text').notNull().default(''),
+  intent: text('intent'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const navoBotConversationsRelations = relations(navoBotConversations, ({ many }) => ({
+  messages: many(navoBotMessages),
+}));
+
+export const navoBotMessagesRelations = relations(navoBotMessages, ({ one }) => ({
+  conversation: one(navoBotConversations, {
+    fields: [navoBotMessages.conversationId],
+    references: [navoBotConversations.id],
+  }),
+}));

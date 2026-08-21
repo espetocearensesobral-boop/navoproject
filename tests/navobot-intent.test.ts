@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {
+  classifyDeterministicIntent,
+  extractBookingCode,
+  extractEvolutionMessage,
+  isPositiveConfirmation,
+  parseDateFromText,
+  parseTimeFromText,
+} from '../backend/services/navobot-intent.ts';
+
+test('classifies core NavoBot intents deterministically', () => {
+  assert.equal(classifyDeterministicIntent('quero agendar um corte'), 'book');
+  assert.equal(classifyDeterministicIntent('preciso remarcar meu horário'), 'reschedule');
+  assert.equal(classifyDeterministicIntent('pode cancelar'), 'cancel');
+  assert.equal(classifyDeterministicIntent('quero falar com atendente'), 'human');
+  assert.equal(classifyDeterministicIntent('meu agendamento'), 'appointments');
+});
+
+test('parses relative dates and WhatsApp time formats', () => {
+  assert.equal(parseDateFromText('amanhã', '2026-08-21'), '2026-08-22');
+  assert.equal(parseDateFromText('sábado', '2026-08-21'), '2026-08-22');
+  assert.equal(parseTimeFromText('às 15h'), '15:00');
+  assert.equal(parseTimeFromText('15:30'), '15:30');
+});
+
+test('recognizes confirmations and booking codes', () => {
+  assert.equal(isPositiveConfirmation('sim, pode confirmar'), true);
+  assert.equal(extractBookingCode('Meu voucher é NV123456'), 'NV123456');
+});
+
+test('extracts only direct incoming text messages', () => {
+  const incoming = extractEvolutionMessage({
+    event: 'MESSAGES_UPSERT',
+    instance: 'navo-bot',
+    data: {
+      key: { remoteJid: '5588999999999@s.whatsapp.net', fromMe: false, id: 'msg-1' },
+      pushName: 'Cliente',
+      message: { conversation: 'quero agendar' },
+    },
+  });
+  assert.deepEqual(incoming, {
+    instanceName: 'navo-bot',
+    messageId: 'msg-1',
+    phone: '5588999999999',
+    text: 'quero agendar',
+    pushName: 'Cliente',
+  });
+  assert.equal(extractEvolutionMessage({ event: 'MESSAGES_UPSERT', data: { key: { fromMe: true, remoteJid: '5588999999999@s.whatsapp.net' }, message: { conversation: 'echo' } } }), null);
+  assert.equal(extractEvolutionMessage({ event: 'MESSAGES_UPSERT', data: { key: { remoteJid: '123@g.us', fromMe: false }, message: { conversation: 'grupo' } } }), null);
+});

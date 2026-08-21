@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
     webhookEnabled: false,
     webhookUrl: '',
     webhookSecret: '',
+  navoBotEnabled: false,
 };
 
 const configSchema = z.object({
@@ -22,6 +23,7 @@ const configSchema = z.object({
   webhookEnabled: z.boolean().optional(),
   webhookUrl: z.string().trim().max(500).optional(),
   webhookSecret: z.string().max(300).optional(),
+  navoBotEnabled: z.boolean().optional(),
 }).strict();
 
 const testMessageSchema = z.object({
@@ -35,6 +37,7 @@ type EvolutionModuleDeps = {
   getDb: () => any;
   schema: any;
   eq: any;
+  onWebhook?: (payload: any) => Promise<unknown>;
 };
 
 function normalizeBaseUrl(value: string): string {
@@ -60,6 +63,7 @@ function publicConfig(row: any) {
     webhookUrl: row?.webhookUrl || '',
     hasWebhookSecret: !!row?.webhookSecret,
     hasApiKey: !!row?.apiKey,
+    navoBotEnabled: !!row?.navoBotEnabled,
   };
 }
 
@@ -94,7 +98,7 @@ async function evolutionRequest(baseUrl: string, apiKey: string, path: string, i
   }
 }
 
-export function createEvolutionApiModule({ getDb, schema, eq }: EvolutionModuleDeps) {
+export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: EvolutionModuleDeps) {
   const router = express.Router();
 
   async function getSettings(): Promise<any> {
@@ -123,6 +127,7 @@ export function createEvolutionApiModule({ getDb, schema, eq }: EvolutionModuleD
       webhookSecret: typeof data.webhookSecret === 'string' && data.webhookSecret.trim() && data.webhookSecret !== '••••••••'
         ? data.webhookSecret.trim()
         : (existing?.webhookSecret || ''),
+      navoBotEnabled: data.navoBotEnabled !== undefined ? !!data.navoBotEnabled : !!existing?.navoBotEnabled,
       updatedAt: new Date(),
     };
 
@@ -154,6 +159,7 @@ export function createEvolutionApiModule({ getDb, schema, eq }: EvolutionModuleD
           webhookEnabled: payload.webhookEnabled,
           webhookUrl: payload.webhookUrl,
           webhookSecret: payload.webhookSecret,
+          navoBotEnabled: payload.navoBotEnabled,
           updatedAt: payload.updatedAt,
         },
       })
@@ -262,13 +268,32 @@ export function createEvolutionApiModule({ getDb, schema, eq }: EvolutionModuleD
       if (authorization !== `Bearer ${settings.webhookSecret}`) return res.status(401).json({ error: 'Webhook não autorizado.' });
       const event = String(req.body?.event || 'UNKNOWN');
       const instance = String(req.body?.instance || settings.instanceName || 'unknown');
+      if (settings.instanceName && instance !== settings.instanceName) return res.status(403).json({ error: 'Instância não autorizada.' });
       console.log(`[Evolution Webhook] ${event} recebido para ${instance}`);
+      // Acknowledge immediately; the NavoBot processes the event asynchronously.
+      if (settings.navoBotEnabled && onWebhook) void onWebhook(req.body).catch((error) => console.error('[NavoBot] Falha ao processar webhook:', error));
       return res.status(200).json({ received: true });
     } catch (error) {
       console.error('[Evolution Webhook] Falha ao processar evento:', error);
       return res.status(200).json({ received: true });
     }
   });
+
+  async function sendText(phone: string, text: string): Promise<boolean> {
+    try {
+      const settings = await requireConfigured();
+      const number = normalizePhone(phone);
+      if (number.length < 8 || number.length > 15) return false;
+      await evolutionRequest(settings.baseUrl, settings.apiKey, `/message/sendText/${encodeURIComponent(settings.instanceName)}`, {
+        method: 'POST',
+        body: JSON.stringify({ number, text }),
+      });
+      return true;
+    } catch (error) {
+      console.error('[Evolution API] Falha ao enviar mensagem:', error);
+      return false;
+    }
+  }
 
   router.post('/send-test', requireAuth, requireAdmin, async (req, res) => {
     try {
@@ -287,5 +312,5 @@ export function createEvolutionApiModule({ getDb, schema, eq }: EvolutionModuleD
     }
   });
 
-  return { router, getSettings };
+  return { router, getSettings, sendText };
 }
