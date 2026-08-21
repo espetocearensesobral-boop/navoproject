@@ -83,9 +83,9 @@ export function classifyDeterministicIntent(text: string): NavoBotIntent | null 
   if (/\b(cancelar|cancela|cancelamento|desmarcar|desmarque|nao vou conseguir ir|nao posso ir)\b/.test(normalized)) return 'cancel';
   if (/\b(reagendar|remarcar|mudar (o )?horario|trocar (o )?horario|alterar (o )?agendamento|mudar minha reserva|outro dia|outro horario|adiar)\b/.test(normalized)) return 'reschedule';
   if (/\b(meu|minha|minhas)\b.*\b(agendamento|agenda|reserva|horario|marcacao|voucher)\b/.test(normalized)) return 'appointments';
+  if (/\b(servicos?|precos?|ver (os )?servicos?|mostrar (os )?servicos?|lista de servicos?)\b/.test(normalized)) return 'book';
   if (!/\b(agendar|marcar|reservar|cortar|novo agendamento|fazer um agendamento)\b/.test(normalized) && /\b(quais?|qual|me mostre|mostrar|ver|consultar|saber)\b.*\b(horarios?|horas?|disponiveis?|disponibilidade|vagas?|livres?)\b|\b(horarios?|horas?|disponiveis?|disponibilidade|vagas?|livres?)\b.*\b(hoje|amanha|dia|segunda|terca|quarta|quinta|sexta|sabado|domingo)\b/.test(normalized)) return 'availability';
   if (/\b(consultar|consulto|ver|checar|saber)\b.*\b(agendamento|horario|reserva|marcacao)\b|\b(meu agendamento|minha agenda|minhas reservas|minha reserva|meus horarios|minhas marcacoes|qual (e o )?meu horario|voucher)\b/.test(normalized)) return 'appointments';
-  if (/\b(servicos?|precos?|ver (os )?servicos?|mostrar (os )?servicos?|lista de servicos?)\b/.test(normalized)) return 'book';
   if (/\b(agendar|agenda[r]?|marcar|novo agendamento|fazer um agendamento|gostaria de agendar|quero reservar|quero cortar|quero fazer|tem (um )?horario|tem vaga|disponibilidade|marcar um horario|quero (um )?horario)\b/.test(normalized)) return 'book';
   if (/\b(confirmar|confirmo|confirma|confirmacao|confirmado|esta confirmado)\b/.test(normalized)) return 'confirm';
   return null;

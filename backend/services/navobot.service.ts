@@ -175,7 +175,7 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
           },
           required: ['intent', 'confidence'],
         } as any,
-        systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Entenda frases naturais e variações informais em português. Se o cliente pedir para marcar ou reservar, use book. Se perguntar quais horários estão disponíveis, se há vagas ou os horários de hoje/amanhã, use availability. Se pedir para consultar uma reserva existente, use appointments. Se quiser mudar dia ou horário, use reschedule. Se quiser desmarcar, use cancel. Se pedir uma pessoa, use human. Se estiver apenas cumprimentando, use menu. Considere o estado e o contexto já coletado. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
+        systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Entenda frases naturais e variações informais em português. Se o cliente pedir para marcar, reservar ou ver quais serviços a barbearia oferece, use book. A palavra “disponíveis” em “serviços disponíveis” significa catálogo, não agenda. Se perguntar quais horários estão disponíveis, se há vagas ou os horários de hoje/amanhã, use availability. Se pedir para consultar uma reserva existente, use appointments. Se quiser mudar dia ou horário, use reschedule. Se quiser desmarcar, use cancel. Se pedir uma pessoa, use human. Se estiver apenas cumprimentando, use menu. Considere o estado e o contexto já coletado. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
       },
     });
     const parsed = JSON.parse(response.text || '{}');
