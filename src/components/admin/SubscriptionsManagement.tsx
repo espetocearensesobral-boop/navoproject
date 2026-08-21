@@ -235,7 +235,7 @@ export const SubscriptionsManagement: React.FC = () => {
       {/* TAB 1: MEMBERS */}
       {activeTab === 'members' && (
         <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto admin-table-wrap">
             <table className="w-full text-left text-xs min-w-[680px]">
               <thead className="bg-surface-base border-b border-border-subtle text-content-muted uppercase font-bold text-xs">
                 <tr className="whitespace-nowrap">
@@ -271,6 +271,30 @@ export const SubscriptionsManagement: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="md:hidden divide-y divide-border-subtle">
+            {members.map((m) => (
+              <article key={m.id} className="p-4 space-y-3 bg-surface-card">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-bold text-content-base truncate">{m.clientName}</p>
+                    <p className="mt-0.5 text-xs text-content-muted font-mono truncate">{m.clientPhone}</p>
+                  </div>
+                  <span className="shrink-0 bg-status-success/15 text-status-success font-bold text-[11px] px-2 py-1 rounded-full uppercase">
+                    {m.status === 'active' ? 'Ativo' : 'Pendente'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div><span className="block text-[10px] uppercase tracking-wider text-content-muted">Plano</span><strong className="block mt-0.5 text-content-base truncate">{m.planName}</strong></div>
+                  <div><span className="block text-[10px] uppercase tracking-wider text-content-muted">Próxima cobrança</span><strong className="block mt-0.5 text-content-base font-mono">{new Date(m.nextBillingDate).toLocaleDateString('pt-BR')}</strong></div>
+                </div>
+                <div className="flex items-center justify-between gap-3 pt-3 border-t border-border-subtle">
+                  <span className="text-xs text-content-muted">Usos no mês</span>
+                  <strong className="text-sm text-content-base">{m.cutsUsedThisMonth} cortes</strong>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       )}

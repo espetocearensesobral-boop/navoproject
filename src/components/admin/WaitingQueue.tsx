@@ -707,7 +707,8 @@ export const WaitingQueue: React.FC = () => {
               Nenhum atendimento finalizado ou cancelado ainda hoje.
             </div>
           ) : (
-            <div className="overflow-x-auto custom-scrollbar">
+            <>
+            <div className="hidden md:block overflow-x-auto custom-scrollbar admin-table-wrap">
               <table className="w-full text-left text-xs whitespace-nowrap">
                 <thead className="bg-surface-base text-content-muted border-b border-border-subtle">
                   <tr>
@@ -740,6 +741,22 @@ export const WaitingQueue: React.FC = () => {
                 </tbody>
               </table>
             </div>
+
+            <div className="md:hidden divide-y divide-border-subtle">
+              {historyList.map((item) => {
+                const isCancelled = item.status === 'cancelled';
+                return (
+                  <article key={item.id} className="py-3.5 space-y-2.5 border-b border-border-subtle last:border-b-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0"><p className="font-bold text-content-base truncate">{item.client_name}</p><p className="mt-0.5 text-xs text-gold-hover truncate">{item.service_title}</p></div>
+                      <span className={`shrink-0 px-2 py-1 rounded-full text-[11px] font-bold ${isCancelled ? 'bg-status-error/15 text-status-error' : 'bg-status-success/15 text-status-success'}`}>{isCancelled ? 'Cancelado' : 'Concluído'}</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-xs"><div><span className="block text-[10px] uppercase tracking-wider text-content-muted">Barbeiro</span><strong className="block mt-0.5 text-content-base truncate">{item.professional_name}</strong></div><div><span className="block text-[10px] uppercase tracking-wider text-content-muted">Encerramento</span><strong className={`block mt-0.5 truncate ${isCancelled ? 'text-status-error' : 'text-status-success'}`}>{isCancelled ? 'Cancelado' : item.completed_at || 'Concluído'}</strong></div></div>
+                  </article>
+                );
+              })}
+            </div>
+            </>
           )}
         </div>
       ) : (
