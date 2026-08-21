@@ -84,13 +84,13 @@ export const FollowUpManagement: React.FC = () => {
               className="w-full h-11 bg-surface-base border border-border-subtle rounded-xl pl-9 pr-3 text-sm text-content-base focus:outline-none focus:border-gold-base"
             />
           </div>
-          <button type="button" onClick={load} className="h-11 px-4 rounded-xl bg-gold-base text-surface-base text-xs font-bold flex items-center justify-center gap-2">
+          <button type="button" onClick={load} className="h-11 px-4 rounded-xl bg-gold-base text-content-on-accent text-xs font-bold flex items-center justify-center gap-2">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Atualizar
           </button>
         </div>
         <div data-gesture-scroll="horizontal" className="flex gap-2 overflow-x-auto no-scrollbar py-1">
           {[30, 60, 90, 120].map((days) => (
-            <button key={days} type="button" onClick={() => setThresholdDays(days)} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${thresholdDays === days ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>
+            <button key={days} type="button" onClick={() => setThresholdDays(days)} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${thresholdDays === days ? 'bg-gold-base text-content-on-accent border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>
               {days} dias sem retorno
             </button>
           ))}

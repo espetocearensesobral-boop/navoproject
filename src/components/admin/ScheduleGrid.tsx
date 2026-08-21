@@ -310,7 +310,7 @@ export const ScheduleGrid: React.FC = () => {
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => setIsManualBookingOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1 shadow-sm active:scale-[0.97] transition-[transform,background-color] duration-150"
+              className="px-3 py-1.5 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center gap-1 shadow-sm active:scale-[0.97] transition-[transform,background-color] duration-150"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Encaixe</span>
@@ -331,7 +331,7 @@ export const ScheduleGrid: React.FC = () => {
             onClick={() => setSelectedBarberId('all')}
             className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
               selectedBarberId === 'all'
-                ? 'bg-gold-base text-surface-base border-gold-base'
+                ? 'bg-gold-base text-content-on-accent border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
@@ -343,7 +343,7 @@ export const ScheduleGrid: React.FC = () => {
               onClick={() => setSelectedBarberId(b.id)}
               className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-2 border ${
                 selectedBarberId === b.id
-                  ? 'bg-gold-base text-surface-base border-gold-base'
+                  ? 'bg-gold-base text-content-on-accent border-gold-base'
                   : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
               }`}
             >
@@ -733,7 +733,7 @@ export const ScheduleGrid: React.FC = () => {
                 <button
                   type="submit"
                   disabled={savingBlock}
-                  className="px-5 py-2 rounded-xl bg-red-600 text-content-base text-xs font-extrabold shadow-md hover:bg-red-700 disabled:opacity-60 disabled:cursor-wait"
+                  className="px-5 py-2 rounded-xl bg-red-600 text-white text-xs font-extrabold shadow-md hover:bg-red-700 disabled:opacity-60 disabled:cursor-wait"
                 >
                   {savingBlock ? 'Salvando...' : 'Confirmar Bloqueio'}
                 </button>
@@ -839,7 +839,7 @@ export const ScheduleGrid: React.FC = () => {
                 <button
                   type="submit"
                   disabled={savingManualBooking}
-                  className="px-5 py-2 rounded-xl bg-gold-base text-surface-base text-xs font-extrabold shadow-md disabled:opacity-60 disabled:cursor-wait"
+                  className="px-5 py-2 rounded-xl bg-gold-base text-content-on-accent text-xs font-extrabold shadow-md disabled:opacity-60 disabled:cursor-wait"
                 >
                   {savingManualBooking ? 'Salvando...' : 'Confirmar Agendamento'}
                 </button>

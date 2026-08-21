@@ -80,14 +80,14 @@ export const BirthdaysManagement: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
             <input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && load()} placeholder="Nome do cliente..." className="w-full h-11 bg-surface-base border border-border-subtle rounded-xl pl-9 pr-3 text-sm text-content-base focus:outline-none focus:border-gold-base" />
           </div>
-          <button type="button" onClick={load} className="h-11 px-4 rounded-xl bg-gold-base text-surface-base text-xs font-bold flex items-center justify-center gap-2"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Atualizar</button>
+          <button type="button" onClick={load} className="h-11 px-4 rounded-xl bg-gold-base text-content-on-accent text-xs font-bold flex items-center justify-center gap-2"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Atualizar</button>
         </div>
         <div data-gesture-scroll="horizontal" className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-          <button type="button" onClick={() => setPeriod('current')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'current' ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>Este mês</button>
-          <button type="button" onClick={() => setPeriod('upcoming')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'upcoming' ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>30 dias</button>
-          <button type="button" onClick={() => setPeriod('all')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'all' ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>Ano inteiro</button>
+          <button type="button" onClick={() => setPeriod('current')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'current' ? 'bg-gold-base text-content-on-accent border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>Este mês</button>
+          <button type="button" onClick={() => setPeriod('upcoming')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'upcoming' ? 'bg-gold-base text-content-on-accent border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>30 dias</button>
+          <button type="button" onClick={() => setPeriod('all')} className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${period === 'all' ? 'bg-gold-base text-content-on-accent border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>Ano inteiro</button>
           {fullMonthLabels.map((label, index) => (
-            <button key={label} type="button" onClick={() => setPeriod(String(index + 1))} className={`shrink-0 min-h-10 px-3 rounded-xl border text-sm font-semibold ${period === String(index + 1) ? 'bg-gold-base text-surface-base border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>{label}</button>
+            <button key={label} type="button" onClick={() => setPeriod(String(index + 1))} className={`shrink-0 min-h-10 px-3 rounded-xl border text-sm font-semibold ${period === String(index + 1) ? 'bg-gold-base text-content-on-accent border-gold-base' : 'bg-surface-base text-content-muted border-border-subtle'}`}>{label}</button>
           ))}
         </div>
         <div data-gesture-scroll="horizontal" className="flex gap-2 overflow-x-auto no-scrollbar py-1">

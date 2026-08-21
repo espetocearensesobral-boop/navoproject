@@ -328,7 +328,7 @@ export const ServicesManagement: React.FC = () => {
         onClick={handleOpenCreate}
         title="Novo serviço"
         aria-label="Novo serviço"
-        className="md:hidden w-full h-10 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
+        className="md:hidden w-full h-10 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
       >
         <Plus className="w-4 h-4" />
         <span>Novo serviço</span>
@@ -372,7 +372,7 @@ export const ServicesManagement: React.FC = () => {
             onClick={() => { setSelectedCategory('all'); setFilterType('all'); }}
             className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
               selectedCategory === 'all' && filterType === 'all'
-                ? 'bg-gold-base text-surface-base border-gold-base'
+                ? 'bg-gold-base text-content-on-accent border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
@@ -383,7 +383,7 @@ export const ServicesManagement: React.FC = () => {
             onClick={() => setFilterType(filterType === 'combos' ? 'all' : 'combos')}
             className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
               filterType === 'combos'
-                ? 'bg-status-success text-surface-base border-status-success'
+                ? 'bg-status-success text-white border-status-success'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
@@ -394,7 +394,7 @@ export const ServicesManagement: React.FC = () => {
             onClick={() => setFilterType(filterType === 'popular' ? 'all' : 'popular')}
             className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
               filterType === 'popular'
-                ? 'bg-gold-base text-surface-base border-gold-base'
+                ? 'bg-gold-base text-content-on-accent border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
             }`}
           >
@@ -407,7 +407,7 @@ export const ServicesManagement: React.FC = () => {
               onClick={() => { setSelectedCategory(cat.id); setFilterType('all'); }}
               className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
                 selectedCategory === cat.id && filterType === 'all'
-                  ? 'bg-gold-base text-surface-base border-gold-base'
+                  ? 'bg-gold-base text-content-on-accent border-gold-base'
                   : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
               }`}
             >
@@ -479,7 +479,7 @@ export const ServicesManagement: React.FC = () => {
                       <div className="admin-action-group">
                         <button type="button" onClick={() => handleToggleCombo(service)} title={service.is_combo ? 'Desativar Combo VIP' : 'Ativar Combo VIP'} aria-label={service.is_combo ? 'Desativar Combo VIP' : 'Ativar Combo VIP'} className={`admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-1.5 ${service.is_combo ? 'border-status-success/30 text-status-success' : 'border-border-subtle text-content-muted'}`}><Flame className="w-4 h-4" /><span className="hidden sm:inline">{service.is_combo ? 'Combo ativo' : 'Combo VIP'}</span></button>
                         <button type="button" onClick={() => handleTogglePopular(service)} title={service.popular ? 'Remover destaque' : 'Marcar como destaque'} aria-label={service.popular ? 'Remover destaque' : 'Marcar como destaque'} className={`admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-1.5 ${service.popular ? 'border-gold-base/40 text-gold-base' : 'border-border-subtle text-content-muted'}`}><Star className="w-4 h-4" /><span className="hidden sm:inline">{service.popular ? 'Destaque ativo' : 'Destaque'}</span>                        </button>
-                        <button type="button" onClick={() => handleOpenEdit(service)} title="Editar serviço" aria-label="Editar serviço" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
+                        <button type="button" onClick={() => handleOpenEdit(service)} title="Editar serviço" aria-label="Editar serviço" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl bg-gold-base text-content-on-accent text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
                         <button type="button" onClick={() => handleDelete(service.id)} title="Excluir serviço" aria-label="Excluir serviço" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5"><Trash2 className="w-4 h-4" /><span className="hidden sm:inline">Excluir</span></button>
                       </div>
                     </div>
@@ -543,7 +543,7 @@ export const ServicesManagement: React.FC = () => {
             <button
               onClick={() => setFilterType('all')}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                filterType === 'all' ? 'bg-gold-base text-surface-base shadow' : 'text-content-muted hover:text-content-base'
+                filterType === 'all' ? 'bg-gold-base text-content-on-accent shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
               Todos
@@ -551,7 +551,7 @@ export const ServicesManagement: React.FC = () => {
             <button
               onClick={() => setFilterType('combos')}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                filterType === 'combos' ? 'bg-status-success text-surface-base shadow' : 'text-content-muted hover:text-content-base'
+                filterType === 'combos' ? 'bg-status-success text-white shadow' : 'text-content-muted hover:text-content-base'
               }`}
             >
               Combos VIP
@@ -725,7 +725,7 @@ export const ServicesManagement: React.FC = () => {
                             title="Clique para alterar Combo VIP"
                             className={`px-2 py-1 rounded-lg text-xs font-black uppercase transition-all border ${
                               service.is_combo
-                                ? 'bg-status-success text-surface-base border-[#00A86B] shadow-sm'
+                                ? 'bg-status-success text-white border-[#00A86B] shadow-sm'
                                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base'
                             }`}
                           >
@@ -849,7 +849,7 @@ export const ServicesManagement: React.FC = () => {
                         <button type="button" onClick={() => handleTogglePopular(service)} className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.popular ? 'border-gold-base/40 text-gold-base' : 'border-border-subtle text-content-muted'}`}>{service.popular ? 'Destaque ativo' : '+ Marcar destaque'}</button>
                       </div>
                       <div className="flex flex-wrap gap-2 pt-1">
-                        <button type="button" onClick={() => handleOpenEdit(service)} className="min-h-10 px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center gap-1.5"><Edit2 className="w-4 h-4" /> Editar</button>
+                        <button type="button" onClick={() => handleOpenEdit(service)} className="min-h-10 px-4 rounded-xl bg-gold-base text-content-on-accent text-sm font-bold flex items-center gap-1.5"><Edit2 className="w-4 h-4" /> Editar</button>
                         <button type="button" onClick={() => handleDelete(service.id)} className="min-h-10 px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center gap-1.5"><Trash2 className="w-4 h-4" /> Excluir</button>
                       </div>
                     </div>
@@ -900,7 +900,7 @@ export const ServicesManagement: React.FC = () => {
                   onClick={() => setActiveFormTab('general')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-left ${
                     activeFormTab === 'general'
-                      ? 'bg-gold-base text-surface-base'
+                      ? 'bg-gold-base text-content-on-accent'
                       : 'text-content-muted hover:bg-surface-card hover:text-content-base'
                   }`}
                 >
@@ -913,7 +913,7 @@ export const ServicesManagement: React.FC = () => {
                   onClick={() => setActiveFormTab('pricing')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-left ${
                     activeFormTab === 'pricing'
-                      ? 'bg-gold-base text-surface-base'
+                      ? 'bg-gold-base text-content-on-accent'
                       : 'text-content-muted hover:bg-surface-card hover:text-content-base'
                   }`}
                 >
@@ -926,7 +926,7 @@ export const ServicesManagement: React.FC = () => {
                   onClick={() => setActiveFormTab('gallery')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-left ${
                     activeFormTab === 'gallery'
-                      ? 'bg-gold-base text-surface-base'
+                      ? 'bg-gold-base text-content-on-accent'
                       : 'text-content-muted hover:bg-surface-card hover:text-content-base'
                   }`}
                 >
@@ -1133,7 +1133,7 @@ export const ServicesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={handleAddGalleryUrl}
-                            className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs shrink-0"
+                            className="px-3 py-1.5 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs shrink-0"
                           >
                             Adicionar
                           </button>
@@ -1170,7 +1170,7 @@ export const ServicesManagement: React.FC = () => {
                                 <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-surface-base border border-border-subtle">
                                   <img src={imgUrl} alt="Galeria" className="w-full h-full object-cover" />
                                   {isCover && (
-                                    <span className="absolute top-1 left-1 bg-gold-base text-surface-base text-xs font-black px-1 rounded-xl">Capa</span>
+                                    <span className="absolute top-1 left-1 bg-gold-base text-content-on-accent text-xs font-black px-1 rounded-xl">Capa</span>
                                   )}
                                   <div className="absolute bottom-1 right-1 flex gap-1">
                                     {!isCover && (
@@ -1185,7 +1185,7 @@ export const ServicesManagement: React.FC = () => {
                                     <button
                                       type="button"
                                       onClick={() => handleRemoveGalleryImage(index)}
-                                      className="p-1 rounded-xl bg-red-600 text-content-base"
+                                      className="p-1 rounded-xl bg-red-600 text-white"
                                     >
                                       <Trash2 className="w-3 h-3" />
                                     </button>

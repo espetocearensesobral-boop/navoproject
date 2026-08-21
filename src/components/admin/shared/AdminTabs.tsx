@@ -52,7 +52,7 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, 
               tab.disabled
                 ? 'bg-surface-base/60 text-content-muted/50 border border-border-subtle/60 cursor-not-allowed'
                 : isActive
-                  ? 'bg-gold-base text-surface-base'
+                  ? 'bg-gold-base text-content-on-accent'
                   : 'bg-surface-card text-content-muted border border-border-subtle hover:text-content-base'
             }`}
           >

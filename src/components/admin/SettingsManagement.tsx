@@ -336,7 +336,7 @@ const EmailSettingsTab: React.FC = () => {
           type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+          className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-content-on-accent hover:bg-gold-base/90 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
         >
           <Save className="w-4 h-4" />
           <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
@@ -491,7 +491,7 @@ const PrintSettingsTab: React.FC = () => {
         <label className="flex items-start gap-2 p-2.5 rounded-xl border border-border-subtle bg-surface-card"><input type="checkbox" checked={settings.reportIncludeDetails} onChange={(e) => update('reportIncludeDetails', e.target.checked)} className="mt-0.5 accent-gold-base" /><span><strong className="text-content-base">Incluir detalhes e rankings</strong><span className="block text-xs text-content-muted mt-0.5">Inclui serviços, formas de pagamento, despesas e clientes.</span></span></label>
       </section>
 
-      <div className="pt-4 border-t border-border-subtle flex flex-col sm:flex-row sm:justify-end gap-2"><button type="button" onClick={handleReset} disabled={saving} className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl border border-border-subtle bg-surface-card text-content-muted font-bold flex items-center justify-center gap-2"><RotateCcw className="w-4 h-4" />Cancelar</button><button type="button" onClick={handleSave} disabled={saving} className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl bg-gold-base text-surface-base font-bold flex items-center justify-center gap-2 disabled:opacity-50"><Save className="w-4 h-4" />{saving ? 'Salvando...' : 'Salvar Alterações'}</button></div>
+      <div className="pt-4 border-t border-border-subtle flex flex-col sm:flex-row sm:justify-end gap-2"><button type="button" onClick={handleReset} disabled={saving} className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl border border-border-subtle bg-surface-card text-content-muted font-bold flex items-center justify-center gap-2"><RotateCcw className="w-4 h-4" />Cancelar</button><button type="button" onClick={handleSave} disabled={saving} className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl bg-gold-base text-content-on-accent font-bold flex items-center justify-center gap-2 disabled:opacity-50"><Save className="w-4 h-4" />{saving ? 'Salvando...' : 'Salvar Alterações'}</button></div>
     </div>
   );
 };

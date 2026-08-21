@@ -87,7 +87,7 @@ export const OperationalReportsManagement: React.FC = () => {
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div data-gesture-scroll="horizontal" className="admin-category-scroll flex gap-2 overflow-x-auto no-scrollbar pb-1">
-          {periodOptions.map((option) => <button key={option.id} type="button" onClick={() => setPeriod(option.id)} className={`shrink-0 h-10 px-4 rounded-full text-sm font-bold transition-colors ${period === option.id ? 'bg-gold-base text-surface-base' : 'bg-surface-card border border-border-subtle text-content-muted hover:text-content-base'}`}>{option.label}</button>)}
+          {periodOptions.map((option) => <button key={option.id} type="button" onClick={() => setPeriod(option.id)} className={`shrink-0 h-10 px-4 rounded-full text-sm font-bold transition-colors ${period === option.id ? 'bg-gold-base text-content-on-accent' : 'bg-surface-card border border-border-subtle text-content-muted hover:text-content-base'}`}>{option.label}</button>)}
         </div>
         <div data-gesture-scroll="horizontal" className="admin-category-scroll flex gap-2 overflow-x-auto no-scrollbar">
           {[

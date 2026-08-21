@@ -162,7 +162,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({ onNavigateToAgenda }
           {/* Action Zone: Card Header Right Button (Mobile text-to-icon, >=40px touch) */}
           <button 
             onClick={onNavigateToAgenda}
-            className="h-9 sm:h-8 px-0 sm:px-3 w-9 sm:w-auto rounded-xl bg-gold-base/10 hover:bg-gold-base text-gold-base hover:text-surface-base border border-gold-base/30 transition-[transform,color,background-color] duration-150 text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap active:scale-[0.97]"
+            className="h-9 sm:h-8 px-0 sm:px-3 w-9 sm:w-auto rounded-xl bg-gold-base/10 hover:bg-gold-base text-gold-base hover:text-content-on-accent border border-gold-base/30 transition-[transform,color,background-color] duration-150 text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap active:scale-[0.97]"
             aria-label="Ver na Agenda"
           >
             <Scissors className="w-4 h-4 sm:w-3.5 sm:h-3.5" />

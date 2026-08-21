@@ -518,7 +518,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
         <button
           onClick={handleTriggerCampaign}
           disabled={campaignLoading}
-          className="h-9 px-4 rounded-xl bg-gold-base text-surface-base hover:bg-gold-base/90 transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 whitespace-nowrap active:scale-95 disabled:opacity-50"
+          className="h-9 px-4 rounded-xl bg-gold-base text-content-on-accent hover:bg-gold-base/90 transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 whitespace-nowrap active:scale-95 disabled:opacity-50"
         >
           <Megaphone className="w-3.5 h-3.5" />
           <span>{campaignLoading ? 'Disparando...' : 'Disparar'}</span>
@@ -623,7 +623,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                     <div key={amb.id || idx} className="pt-2 flex items-center justify-between min-w-0">
                       <div className="flex items-center space-x-2.5 min-w-0">
                         <span className={`w-6 h-6 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 ${
-                          idx === 0 ? 'bg-gold-base text-surface-base' : 'bg-surface-base text-content-muted border border-border-subtle'
+                          idx === 0 ? 'bg-gold-base text-content-on-accent' : 'bg-surface-base text-content-muted border border-border-subtle'
                         }`}>
                           #{idx + 1}
                         </span>
@@ -664,7 +664,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               <button
                 type="submit"
                 disabled={savingConfig}
-                className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+                className="h-9 px-4 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{savingConfig ? 'Salvando...' : 'Salvar Regras'}</span>
@@ -734,7 +734,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                 <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2"><Crown className="w-4 h-4 text-gold-base" /> Níveis VIP reais</h3>
                 <p className="text-xs text-content-muted mt-1">Defina o mínimo de pontos e o multiplicador usado no próximo checkout confirmado.</p>
               </div>
-              <div className="flex gap-2"><button type="button" onClick={() => setTiers((current) => [...current, { name: 'Novo nível', minimumPoints: 0, multiplier: 1, displayOrder: current.length, color: '#D4AF5A', isActive: true }])} className="h-9 px-3 rounded-xl border border-border-subtle text-content-base font-bold text-xs flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> Novo nível</button><button type="button" onClick={handleSaveTiers} disabled={savingTiers || tiers.length === 0} className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs disabled:opacity-50">{savingTiers ? 'Salvando...' : 'Salvar níveis'}</button></div>
+              <div className="flex gap-2"><button type="button" onClick={() => setTiers((current) => [...current, { name: 'Novo nível', minimumPoints: 0, multiplier: 1, displayOrder: current.length, color: '#D4AF5A', isActive: true }])} className="h-9 px-3 rounded-xl border border-border-subtle text-content-base font-bold text-xs flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> Novo nível</button><button type="button" onClick={handleSaveTiers} disabled={savingTiers || tiers.length === 0} className="h-9 px-4 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs disabled:opacity-50">{savingTiers ? 'Salvando...' : 'Salvar níveis'}</button></div>
             </div>
             <div className="space-y-2">
               {tiers.map((tier, index) => (
@@ -757,7 +757,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   <h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Benefícios do Club</h3>
                   <p className="text-xs text-content-muted mt-1">Crie vantagens, descontos, cortes, produtos e regras de uso.</p>
                 </div>
-                <button type="button" onClick={() => openBenefitEditor()} className="h-9 px-3 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0"><Plus className="w-3.5 h-3.5" /> Novo benefício</button>
+                <button type="button" onClick={() => openBenefitEditor()} className="h-9 px-3 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center gap-1.5 shrink-0"><Plus className="w-3.5 h-3.5" /> Novo benefício</button>
               </div>
               <div className="space-y-2">
                 {benefits.length === 0 ? <p className="text-xs text-content-muted py-5 text-center">Nenhum benefício cadastrado.</p> : benefits.map((benefit) => (
@@ -785,7 +785,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   <h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Planos do Club</h3>
                   <p className="text-xs text-content-muted mt-1">Defina nome, preço, periodicidade, bônus e benefícios. Ainda sem cobrança automática.</p>
                 </div>
-                <button type="button" onClick={() => openPlanEditor()} className="h-9 px-3 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0"><Plus className="w-3.5 h-3.5" /> Novo plano</button>
+                <button type="button" onClick={() => openPlanEditor()} className="h-9 px-3 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center gap-1.5 shrink-0"><Plus className="w-3.5 h-3.5" /> Novo plano</button>
               </div>
               <div className="space-y-2">
                 {plans.length === 0 ? <p className="text-xs text-content-muted py-5 text-center">Nenhum plano cadastrado.</p> : plans.map((plan) => (
@@ -829,7 +829,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                     <label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Produto relacionado</span><select value={benefitDraft.productId || ''} onChange={(e) => setBenefitDraft({ ...benefitDraft, productId: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="">Todos os produtos</option>{products.map((product) => <option key={product.id} value={product.id}>{product.name} — R$ {Number(product.price || 0).toFixed(2).replace('.', ',')}</option>)}</select></label>
                   </div>
                   <div><span className="block text-xs font-bold text-content-muted uppercase mb-2">Níveis elegíveis</span><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">{tiers.map((tier) => <label key={tier.id} className="flex items-start gap-2 rounded-xl border border-border-subtle bg-surface-base p-2 text-xs text-content-base"><input type="checkbox" disabled={!tier.id} checked={Boolean(tier.id && (benefitDraft.tierIds || []).includes(tier.id))} onChange={(e) => setBenefitDraft({ ...benefitDraft, tierIds: e.target.checked ? [...(benefitDraft.tierIds || []), tier.id] : (benefitDraft.tierIds || []).filter((id: string) => id !== tier.id) })} />{tier.name}{!tier.id && <span className="text-xs text-content-muted">(salve primeiro)</span>}</label>)}</div></div>
-                  <div className="flex gap-2 pt-2"><button type="button" onClick={() => { setShowBenefitModal(false); setEditingBenefit(null); }} className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted font-bold">Cancelar</button><button type="submit" disabled={savingCatalogItem} className="flex-1 h-10 rounded-xl bg-gold-base text-surface-base font-bold disabled:opacity-50">{savingCatalogItem ? 'Salvando...' : 'Salvar benefício'}</button></div>
+                  <div className="flex gap-2 pt-2"><button type="button" onClick={() => { setShowBenefitModal(false); setEditingBenefit(null); }} className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted font-bold">Cancelar</button><button type="submit" disabled={savingCatalogItem} className="flex-1 h-10 rounded-xl bg-gold-base text-content-on-accent font-bold disabled:opacity-50">{savingCatalogItem ? 'Salvando...' : 'Salvar benefício'}</button></div>
                 </form>
               </div>
             </div>
@@ -845,7 +845,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3"><label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Periodicidade</span><select value={planDraft.billingPeriod} onChange={(e) => setPlanDraft({ ...planDraft, billingPeriod: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="none">Pagamento único / catálogo</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option><option value="annual">Anual</option></select></label><label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Bônus de pontos</span><input type="number" min="0" value={planDraft.pointsBonus} onChange={(e) => setPlanDraft({ ...planDraft, pointsBonus: Number(e.target.value) })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base" /></label><label className="space-y-1"><span className="block text-xs font-bold text-content-muted uppercase">Status</span><select value={planDraft.status} onChange={(e) => setPlanDraft({ ...planDraft, status: e.target.value })} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base"><option value="draft">Rascunho</option><option value="active">Ativo</option><option value="archived">Arquivado</option></select></label></div>
                   <label className="flex items-center gap-2 text-xs text-content-base"><input type="checkbox" checked={Boolean(planDraft.isFeatured)} onChange={(e) => setPlanDraft({ ...planDraft, isFeatured: e.target.checked })} /> Destacar este plano para o cliente</label>
                   <div><span className="block text-xs font-bold text-content-muted uppercase mb-2">Benefícios incluídos</span><div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto">{benefits.filter((benefit) => benefit.isActive).map((benefit) => <label key={benefit.id} className="flex items-start gap-2 rounded-xl border border-border-subtle bg-surface-base p-2 text-xs text-content-base"><input type="checkbox" checked={(planDraft.benefitIds || []).includes(benefit.id)} onChange={(e) => setPlanDraft({ ...planDraft, benefitIds: e.target.checked ? [...(planDraft.benefitIds || []), benefit.id] : (planDraft.benefitIds || []).filter((id: string) => id !== benefit.id) })} /><span><strong>{benefit.name}</strong><span className="block text-content-muted mt-0.5">{benefit.description}</span></span></label>)}</div></div>
-                  <div className="flex gap-2 pt-2"><button type="button" onClick={() => { setShowPlanModal(false); setEditingPlan(null); }} className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted font-bold">Cancelar</button><button type="submit" disabled={savingCatalogItem} className="flex-1 h-10 rounded-xl bg-gold-base text-surface-base font-bold disabled:opacity-50">{savingCatalogItem ? 'Salvando...' : 'Salvar plano'}</button></div>
+                  <div className="flex gap-2 pt-2"><button type="button" onClick={() => { setShowPlanModal(false); setEditingPlan(null); }} className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted font-bold">Cancelar</button><button type="submit" disabled={savingCatalogItem} className="flex-1 h-10 rounded-xl bg-gold-base text-content-on-accent font-bold disabled:opacity-50">{savingCatalogItem ? 'Salvando...' : 'Salvar plano'}</button></div>
                 </form>
               </div>
             </div>
@@ -899,7 +899,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
               <button
                 type="submit"
-                className="h-9 px-4 bg-gold-base text-surface-base font-bold rounded-xl hover:bg-gold-base/90 text-xs active:scale-95"
+                className="h-9 px-4 bg-gold-base text-content-on-accent font-bold rounded-xl hover:bg-gold-base/90 text-xs active:scale-95"
               >
                 Aplicar Ajuste de Pontos
               </button>
@@ -925,7 +925,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
             <button
               onClick={() => setShowAddRewardModal(true)}
-              className="h-9 px-3.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0 hover:bg-gold-base/90 active:scale-95 whitespace-nowrap"
+              className="h-9 px-3.5 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center gap-1.5 shrink-0 hover:bg-gold-base/90 active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Nova oferta</span>
@@ -947,7 +947,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               />
               <button
                 onClick={handleValidateVoucher}
-                className="h-10 sm:h-9 w-full sm:w-auto px-4 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 active:scale-95 shrink-0 whitespace-nowrap"
+                className="h-10 sm:h-9 w-full sm:w-auto px-4 bg-gold-base text-content-on-accent font-bold text-xs rounded-xl hover:bg-gold-base/90 active:scale-95 shrink-0 whitespace-nowrap"
               >
                 Validar Voucher
               </button>
@@ -1052,7 +1052,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 h-9 rounded-xl bg-gold-base text-surface-base font-bold text-xs"
+                      className="flex-1 h-9 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs"
                     >
                       Salvar Oferta
                     </button>
@@ -1080,7 +1080,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
               <button
                 type="submit"
                 disabled={savingConfig}
-                className="h-9 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+                className="h-9 px-4 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{savingConfig ? 'Salvando...' : 'Salvar Regras'}</span>
@@ -1198,7 +1198,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                   />
                   <button
                     onClick={() => copyToClipboard(generatedRefUrl)}
-                    className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center justify-center gap-1"
+                    className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-gold-base text-content-on-accent font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center justify-center gap-1"
                   >
                     {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedLink ? 'Copiado!' : 'Copiar'}</span>
@@ -1246,7 +1246,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
                 />
                 <button
                   onClick={() => copyToClipboard(generatedEvalUrl, true)}
-                  className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center justify-center gap-1"
+                  className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-gold-base text-content-on-accent font-bold text-xs rounded-xl hover:bg-gold-base/90 shrink-0 flex items-center justify-center gap-1"
                 >
                   {copiedEvalLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedEvalLink ? 'Copiado!' : 'Copiar'}</span>
@@ -1398,7 +1398,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
                 <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   <button type="button" onClick={() => setSelectedReview(null)} className="h-10 rounded-xl border border-border-subtle px-4 text-xs font-bold text-content-muted hover:bg-surface-base">Cancelar</button>
-                  <button type="submit" disabled={savingReviewFollowup} className="h-10 rounded-xl bg-gold-base px-5 text-xs font-bold text-surface-base hover:bg-gold-base/90 disabled:cursor-not-allowed disabled:opacity-60">{savingReviewFollowup ? 'Salvando...' : 'Salvar acompanhamento'}</button>
+                  <button type="submit" disabled={savingReviewFollowup} className="h-10 rounded-xl bg-gold-base px-5 text-xs font-bold text-content-on-accent hover:bg-gold-base/90 disabled:cursor-not-allowed disabled:opacity-60">{savingReviewFollowup ? 'Salvando...' : 'Salvar acompanhamento'}</button>
                 </div>
               </form>
             </div>
@@ -1429,7 +1429,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({ initialTab }
 
                 <button
                   onClick={() => setShowQrModal(false)}
-                  className="w-full h-9 bg-gold-base text-surface-base font-bold rounded-xl text-xs"
+                  className="w-full h-9 bg-gold-base text-content-on-accent font-bold rounded-xl text-xs"
                 >
                   Fechar QR Code
                 </button>

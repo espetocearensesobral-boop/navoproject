@@ -181,7 +181,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({ onLoginSuccess }) 
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gold-base px-4 text-sm font-extrabold text-surface-base shadow-lg shadow-gold-base/20 transition-all hover:brightness-110 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50"
+              className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gold-base px-4 text-sm font-extrabold text-content-on-accent shadow-lg shadow-gold-base/20 transition-all hover:brightness-110 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50"
             >
               {isLoading ? (
                 <>

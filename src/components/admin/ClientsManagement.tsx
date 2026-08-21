@@ -280,7 +280,7 @@ export const ClientsManagement: React.FC = () => {
             onClick={() => setSelectedTier(pill.id)}
             className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
               selectedTier === pill.id
-                ? 'bg-gold-base text-surface-base border-gold-base'
+                ? 'bg-gold-base text-content-on-accent border-gold-base'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base hover:border-border-subtle'
             }`}
           >
@@ -373,7 +373,7 @@ export const ClientsManagement: React.FC = () => {
                       </div>
                       <div className="admin-action-group">
                         {client.phone && <a href={`https://wa.me/55${client.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" title="Abrir WhatsApp" aria-label="Abrir WhatsApp" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-success/30 text-status-success text-sm font-semibold flex items-center justify-center gap-1.5"><Phone className="w-4 h-4" /><span className="hidden sm:inline">WhatsApp</span></a>}
-                        <button type="button" onClick={() => handleOpenModal(client)} title="Editar cliente" aria-label="Editar cliente" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
+                        <button type="button" onClick={() => handleOpenModal(client)} title="Editar cliente" aria-label="Editar cliente" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-gold-base text-content-on-accent text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
                         <button type="button" onClick={() => handleDelete(client.id)} disabled={isDeleting} title="Excluir cliente" aria-label="Excluir cliente" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5 hover:bg-status-error/10 disabled:cursor-not-allowed disabled:opacity-50 transition-colors">
                           {isDeleting && deleteTargetId === client.id ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-status-error/30 border-t-status-error" aria-hidden="true" /> : <Trash2 className="w-4 h-4" />}
                           <span className="hidden sm:inline">{isDeleting && deleteTargetId === client.id ? 'Excluindo…' : 'Excluir'}</span>

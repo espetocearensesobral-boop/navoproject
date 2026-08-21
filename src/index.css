@@ -2981,18 +2981,10 @@ button, a, input, select, textarea {
 
 
 /* Filled-control contrast: strong backgrounds get readable foregrounds; soft surfaces keep base text. */
-[data-palette="emerald"] .admin-shell,
-[data-palette="teal"] .admin-shell,
 [data-palette="indigo"] .admin-shell,
 [data-palette="crimson"] .admin-shell,
-[data-palette="violet"] .admin-shell,
-[data-palette="mint"] .admin-shell,
 [data-palette="titanium"] .admin-shell,
-[data-palette="cobalt"] .admin-shell,
-[data-palette="jade"] .admin-shell,
-[data-palette="plum"] .admin-shell,
-[data-palette="midnight"] .admin-shell,
-[data-palette="bordeaux"] .admin-shell {
+[data-palette="cobalt"] .admin-shell {
   --color-content-on-accent: #FFFFFF;
 }
 

@@ -349,7 +349,7 @@ export const ProfessionalsManagement: React.FC = () => {
           onClick={handleOpenCreate}
           title="Novo profissional"
           aria-label="Novo profissional"
-          className="w-full h-10 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
+          className="w-full h-10 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
         >
           <Plus className="w-4 h-4" />
           <span>Novo barbeiro</span>
@@ -367,7 +367,7 @@ export const ProfessionalsManagement: React.FC = () => {
           </div>
         </div>
         <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          <button type="button" onClick={() => setStatusFilter('all')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'all' ? 'bg-gold-base text-surface-base' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Todos ({totalBarbers})</button>
+          <button type="button" onClick={() => setStatusFilter('all')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'all' ? 'bg-gold-base text-content-on-accent' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Todos ({totalBarbers})</button>
           <button type="button" onClick={() => setStatusFilter('active')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'active' ? 'bg-status-success text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Ativos ({activeBarbers})</button>
           <button type="button" onClick={() => setStatusFilter('inactive')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'inactive' ? 'bg-red-500 text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Pausados ({totalBarbers - activeBarbers})</button>
         </div>
@@ -392,7 +392,7 @@ export const ProfessionalsManagement: React.FC = () => {
               onClick={() => setStatusFilter('all')}
               className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
                 statusFilter === 'all'
-                  ? 'bg-gold-base text-surface-base'
+                  ? 'bg-gold-base text-content-on-accent'
                   : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
               }`}
             >
@@ -402,7 +402,7 @@ export const ProfessionalsManagement: React.FC = () => {
               onClick={() => setStatusFilter('active')}
               className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
                 statusFilter === 'active'
-                  ? 'bg-gold-base text-surface-base'
+                  ? 'bg-gold-base text-content-on-accent'
                   : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
               }`}
             >
@@ -412,7 +412,7 @@ export const ProfessionalsManagement: React.FC = () => {
               onClick={() => setStatusFilter('inactive')}
               className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
                 statusFilter === 'inactive'
-                  ? 'bg-gold-base text-surface-base'
+                  ? 'bg-gold-base text-content-on-accent'
                   : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
               }`}
             >
@@ -530,7 +530,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           <Power className="w-4 h-4" /><span className="hidden sm:inline">{isActive ? 'Pausar agenda' : 'Ativar agenda'}</span>
                         </button>
                         {barber.phone && <a href={`https://wa.me/55${barber.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" title="Abrir WhatsApp" aria-label="Abrir WhatsApp" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-success/30 text-status-success text-sm font-semibold flex items-center justify-center gap-1.5"><MessageCircle className="w-4 h-4" /><span className="hidden sm:inline">WhatsApp</span></a>}
-                        <button type="button" onClick={() => handleOpenEdit(barber)} title="Editar profissional" aria-label="Editar profissional" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-gold-base text-surface-base text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
+                        <button type="button" onClick={() => handleOpenEdit(barber)} title="Editar profissional" aria-label="Editar profissional" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-gold-base text-content-on-accent text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
                         <button type="button" onClick={() => handleDelete(barber.id)} title="Excluir profissional" aria-label="Excluir profissional" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5"><Trash2 className="w-4 h-4" /><span className="hidden sm:inline">Excluir</span></button>
                       </div>
                     </div>
@@ -607,7 +607,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleOpenEdit(barber)}
-                            className="px-2 py-1 bg-gold-base text-surface-base font-bold rounded-xl text-xs"
+                            className="px-2 py-1 bg-gold-base text-content-on-accent font-bold rounded-xl text-xs"
                           >
                             Editar
                           </button>
@@ -908,7 +908,7 @@ export const ProfessionalsManagement: React.FC = () => {
                       type="button"
                       onClick={() => setFormData({ ...formData, is_active: !(formData.is_active ?? true) })}
                       className={`px-3 py-1 rounded-xl text-xs font-bold ${
-                        (formData.is_active ?? true) ? 'bg-status-success text-surface-base' : 'bg-red-500/20 text-red-400'
+                        (formData.is_active ?? true) ? 'bg-status-success text-white' : 'bg-red-500/20 text-red-400'
                       }`}
                     >
                       {(formData.is_active ?? true) ? 'Ativo' : 'Pausado'}
@@ -964,7 +964,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             type="button"
                             onClick={() => toggleDay(day)}
                             className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
-                              isActive ? 'bg-gold-base text-surface-base' : 'bg-surface-base text-content-muted border border-border-subtle'
+                              isActive ? 'bg-gold-base text-content-on-accent' : 'bg-surface-base text-content-muted border border-border-subtle'
                             }`}
                           >
                             {dayLabels[day]}

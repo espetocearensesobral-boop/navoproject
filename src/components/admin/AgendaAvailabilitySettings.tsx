@@ -237,7 +237,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
         <button type="button" onClick={handleCancel} disabled={isSaving} className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl border border-border-subtle bg-surface-card text-content-muted hover:text-content-base hover:bg-surface-base text-sm font-bold transition-colors disabled:opacity-50">
           Cancelar
         </button>
-        <button type="button" onClick={handleSave} disabled={isSaving} className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap">
+        <button type="button" onClick={handleSave} disabled={isSaving} className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-content-on-accent hover:bg-gold-base/90 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap">
           <Save className="w-4 h-4" />
           <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
         </button>

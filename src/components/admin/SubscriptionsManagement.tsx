@@ -179,7 +179,7 @@ export const SubscriptionsManagement: React.FC = () => {
       {/* Ação (mobile) */}
       <button
         onClick={() => setIsPlanModalOpen(true)}
-        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
+        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-content-on-accent px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
       >
         <Plus className="w-4 h-4 stroke-[2.5]" />
         <span>Novo plano</span>
@@ -286,7 +286,7 @@ export const SubscriptionsManagement: React.FC = () => {
               }`}
             >
               {plan.popular && (
-                <span className="absolute -top-3 right-4 bg-gold-base text-surface-base text-xs font-extrabold uppercase px-2.5 py-0.5 rounded-full shadow-xs">
+                <span className="absolute -top-3 right-4 bg-gold-base text-content-on-accent text-xs font-extrabold uppercase px-2.5 py-0.5 rounded-full shadow-xs">
                   Mais Vendido
                 </span>
               )}
@@ -432,7 +432,7 @@ export const SubscriptionsManagement: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="bg-gold-base hover:bg-gold-hover text-surface-base px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95"
+                className="bg-gold-base hover:bg-gold-hover text-content-on-accent px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95"
               >
                 Criar Plano
               </button>

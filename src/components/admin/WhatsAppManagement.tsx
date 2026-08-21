@@ -186,7 +186,7 @@ export const WhatsAppManagement: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-2 border-t border-border-subtle">
           <button type="button" onClick={() => void handleTest()} disabled={testing || saving} className="h-10 px-4 rounded-xl border border-border-subtle bg-surface-card text-content-base font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"><RefreshCw className={`w-4 h-4 ${testing ? 'animate-spin' : ''}`} />{testing ? 'Testando...' : 'Testar conexão'}</button>
-          <button type="button" onClick={() => void handleSave()} disabled={saving} className="h-10 px-4 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"><Save className="w-4 h-4" />{saving ? 'Salvando...' : 'Salvar configuração'}</button>
+          <button type="button" onClick={() => void handleSave()} disabled={saving} className="h-10 px-4 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"><Save className="w-4 h-4" />{saving ? 'Salvando...' : 'Salvar configuração'}</button>
         </div>
       </section>
 

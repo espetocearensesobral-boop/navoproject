@@ -402,7 +402,7 @@ export const WaitingQueue: React.FC = () => {
       {/* Ação (mobile) */}
       {operationSettings.allowWalkIn && <button
         onClick={() => { setIsServicePickerOpen(false); setIsAddModalOpen(true); }}
-        className="md:hidden w-full min-h-11 bg-gold-base text-surface-base px-4 py-2.5 rounded-xl text-sm font-extrabold flex items-center justify-center gap-2 transition-[transform,background-color] duration-150 shadow-md active:scale-[0.97] shrink-0"
+        className="md:hidden w-full min-h-11 bg-gold-base text-content-on-accent px-4 py-2.5 rounded-xl text-sm font-extrabold flex items-center justify-center gap-2 transition-[transform,background-color] duration-150 shadow-md active:scale-[0.97] shrink-0"
       >
         <Plus className="w-4 h-4" />
         <span>Novo encaixe</span>
@@ -528,7 +528,7 @@ export const WaitingQueue: React.FC = () => {
                       type="button"
                       disabled={actionLoadingId === item.id}
                       onClick={() => handleFinishService(item)}
-                      className="flex-1 py-1.5 rounded-xl bg-status-success text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-[0.97] transition-[transform,background-color] duration-150 disabled:opacity-60 disabled:cursor-wait"
+                      className="flex-1 py-1.5 rounded-xl bg-status-success text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-[0.97] transition-[transform,background-color] duration-150 disabled:opacity-60 disabled:cursor-wait"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>{actionLoadingId === item.id ? 'Processando…' : 'Finalizar'}</span>
@@ -578,7 +578,7 @@ export const WaitingQueue: React.FC = () => {
                     >
                       <div className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-gold-base text-surface-base font-black text-xs flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-lg bg-gold-base text-content-on-accent font-black text-xs flex items-center justify-center shrink-0">
                             #{index + 1}
                           </div>
                           <div className="min-w-0">
@@ -602,7 +602,7 @@ export const WaitingQueue: React.FC = () => {
                             type="button"
                             disabled={actionLoadingId === item.id}
                             onClick={() => handleAdvanceToChair(item.id)}
-                            className="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-gold-base text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 hover:bg-gold-base/80 active:scale-95 disabled:opacity-60 disabled:cursor-wait"
+                            className="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-gold-base text-content-on-accent font-extrabold text-xs flex items-center justify-center gap-1 hover:bg-gold-base/80 active:scale-95 disabled:opacity-60 disabled:cursor-wait"
                           >
                             <Play className="w-3 h-3 fill-surface-base" />
                             <span>{actionLoadingId === item.id ? 'Chamando…' : 'Chamar Cadeira'}</span>
@@ -779,7 +779,7 @@ export const WaitingQueue: React.FC = () => {
                       type="button"
                       disabled={actionLoadingId === item.id}
                       onClick={() => handleReturnToQueue(item.id, item.client_name)}
-                      className="px-3 py-2 rounded-lg bg-gold-base text-surface-base font-extrabold text-xs flex items-center gap-1.5 hover:bg-gold-base/80 disabled:opacity-60"
+                      className="px-3 py-2 rounded-lg bg-gold-base text-content-on-accent font-extrabold text-xs flex items-center gap-1.5 hover:bg-gold-base/80 disabled:opacity-60"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       Retornar à fila
@@ -922,7 +922,7 @@ export const WaitingQueue: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSavingWalkIn}
-                  className="min-h-11 px-5 rounded-xl bg-gold-base text-surface-base font-black text-sm shadow disabled:opacity-60 disabled:cursor-wait"
+                  className="min-h-11 px-5 rounded-xl bg-gold-base text-content-on-accent font-black text-sm shadow disabled:opacity-60 disabled:cursor-wait"
                 >
                   {isSavingWalkIn ? 'Inserindo…' : 'Inserir na fila'}
                 </button>
@@ -1033,7 +1033,7 @@ export const WaitingQueue: React.FC = () => {
 
                 <button
                   onClick={handleSendWhatsAppDirect}
-                  className="px-4 py-1.5 bg-whatsapp text-surface-base rounded-xl text-xs font-black flex items-center gap-1 shadow"
+                  className="px-4 py-1.5 bg-whatsapp text-whatsapp-on rounded-xl text-xs font-black flex items-center gap-1 shadow"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Enviar no WhatsApp</span>

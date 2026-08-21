@@ -436,7 +436,7 @@ export const AdminLayout: React.FC = () => {
       {/* Mobile Topbar */}
       <header className="admin-mobile-topbar lg:hidden fixed top-0 left-0 right-0 bg-surface-card border-b border-border-subtle z-40 px-3 flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0 px-2">
-          <div className="w-7 h-7 bg-gold-base text-surface-base rounded-md flex items-center justify-center shrink-0">
+          <div className="w-7 h-7 bg-gold-base text-content-on-accent rounded-md flex items-center justify-center shrink-0">
             <Scissors className="w-4 h-4" />
           </div>
           <h1 className="text-sm font-serif font-bold text-content-base truncate">

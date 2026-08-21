@@ -144,7 +144,7 @@ export const ReportsManagement: React.FC = () => {
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="admin-category-scroll flex gap-2 overflow-x-auto no-scrollbar pb-1" data-gesture-scroll="horizontal">
-          {periodOptions.map((option) => <button key={option.id} type="button" onClick={() => setPeriod(option.id)} className={`shrink-0 h-10 px-4 rounded-full text-sm font-bold transition-colors ${period === option.id ? 'bg-gold-base text-surface-base' : 'bg-surface-card border border-border-subtle text-content-muted hover:text-content-base'}`}>{option.label}</button>)}
+          {periodOptions.map((option) => <button key={option.id} type="button" onClick={() => setPeriod(option.id)} className={`shrink-0 h-10 px-4 rounded-full text-sm font-bold transition-colors ${period === option.id ? 'bg-gold-base text-content-on-accent' : 'bg-surface-card border border-border-subtle text-content-muted hover:text-content-base'}`}>{option.label}</button>)}
         </div>
         <div className="flex gap-2"><button type="button" onClick={printReport} disabled={!report || loading} className="h-10 px-4 rounded-xl border border-border-subtle bg-surface-card text-sm font-bold text-content-muted hover:text-content-base flex items-center justify-center gap-2 disabled:opacity-50"><Printer className="w-4 h-4" />Imprimir</button><button type="button" onClick={() => loadReport()} className="h-10 px-4 rounded-xl border border-border-subtle bg-surface-card text-sm font-bold text-content-muted hover:text-content-base flex items-center justify-center gap-2"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />Atualizar</button></div>
       </div>

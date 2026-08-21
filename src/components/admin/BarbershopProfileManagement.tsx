@@ -286,7 +286,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               {/* Upload & Link Controls */}
               <div className="flex-1 w-full space-y-3 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <label className="cursor-pointer h-9 px-3.5 bg-gold-base hover:opacity-90 text-surface-base rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-sm">
+                  <label className="cursor-pointer h-9 px-3.5 bg-gold-base hover:opacity-90 text-content-on-accent rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-sm">
                     <Upload className="w-3.5 h-3.5" />
                     <span>Carregar Imagem do Dispositivo</span>
                     <input 
@@ -656,7 +656,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="h-11 px-6 bg-gold-base hover:bg-gold-hover text-surface-base rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 w-full sm:w-auto"
+          className="h-11 px-6 bg-gold-base hover:bg-gold-hover text-content-on-accent rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 w-full sm:w-auto"
         >
           <Save className="w-4 h-4" />
           <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
@@ -700,7 +700,7 @@ const AppearanceTabContent: React.FC = () => {
                     <span className="block text-xs text-content-muted admin-clamp-2">{item.description}</span>
                   </span>
                 </div>
-                {selected && <span className="w-5 h-5 rounded-full flex items-center justify-center bg-gold-base text-surface-base"><Check className="w-3 h-3" /></span>}
+                {selected && <span className="w-5 h-5 rounded-full flex items-center justify-center bg-gold-base text-content-on-accent"><Check className="w-3 h-3" /></span>}
               </div>
               <div className="flex gap-1.5" aria-hidden="true">
                 <span className="h-1.5 flex-1 rounded-full" style={{ backgroundColor: item.deep }} />

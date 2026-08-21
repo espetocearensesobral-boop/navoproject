@@ -155,7 +155,7 @@ export const ProductsManagement: React.FC = () => {
       />
 
       <div className="md:hidden">
-        <button type="button" onClick={openCreate} className="w-full h-10 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center justify-center gap-2 active:scale-95">
+        <button type="button" onClick={openCreate} className="w-full h-10 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center justify-center gap-2 active:scale-95">
           <Plus className="w-4 h-4" /> Novo produto
         </button>
       </div>
@@ -175,9 +175,9 @@ export const ProductsManagement: React.FC = () => {
           <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Produto, marca ou categoria" className="w-full h-10 rounded-xl border border-border-subtle bg-surface-card pl-9 pr-3 text-sm text-content-base outline-none focus:border-gold-base" />
         </div>
         <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          <button type="button" onClick={() => { setCategoryFilter('all'); setOnlyLowStock(false); }} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === 'all' && !onlyLowStock ? 'bg-gold-base text-surface-base' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Todos ({products.length})</button>
+          <button type="button" onClick={() => { setCategoryFilter('all'); setOnlyLowStock(false); }} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === 'all' && !onlyLowStock ? 'bg-gold-base text-content-on-accent' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Todos ({products.length})</button>
           {categories.map((category) => (
-            <button key={category} type="button" onClick={() => { setCategoryFilter(category); setOnlyLowStock(false); }} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === category && !onlyLowStock ? 'bg-gold-base text-surface-base' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>{category}</button>
+            <button key={category} type="button" onClick={() => { setCategoryFilter(category); setOnlyLowStock(false); }} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === category && !onlyLowStock ? 'bg-gold-base text-content-on-accent' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>{category}</button>
           ))}
           <button type="button" onClick={() => setOnlyLowStock((value) => !value)} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors ${onlyLowStock ? 'bg-amber-500 text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}><AlertTriangle className="w-3.5 h-3.5" /> Baixo estoque ({lowStockCount})</button>
         </div>
@@ -273,7 +273,7 @@ export const ProductsManagement: React.FC = () => {
               <label className="text-xs font-semibold text-content-muted">Imagem (URL opcional)<input type="url" value={form.image_url || ''} onChange={(event) => updateForm('image_url', event.target.value)} className="mt-1 w-full h-10 rounded-xl border border-border-subtle bg-surface-base px-3 text-xs text-content-base outline-none focus:border-gold-base" /></label>
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={() => { setEditingProduct(null); setIsModalOpen(false); }} className="flex-1 h-10 rounded-xl border border-border-subtle text-content-muted text-xs font-semibold">Cancelar</button>
-                <button type="submit" disabled={saving} className="flex-1 h-10 rounded-xl bg-gold-base text-surface-base text-xs font-bold disabled:opacity-50">{saving ? 'Salvando...' : 'Salvar produto'}</button>
+                <button type="submit" disabled={saving} className="flex-1 h-10 rounded-xl bg-gold-base text-content-on-accent text-xs font-bold disabled:opacity-50">{saving ? 'Salvando...' : 'Salvar produto'}</button>
               </div>
             </form>
           </div>

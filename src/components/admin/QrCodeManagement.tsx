@@ -72,7 +72,7 @@ export const QrCodeManagement: React.FC = () => {
       {/* Ação (mobile) */}
       <button
         onClick={handlePrintTotem}
-        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
+        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-content-on-accent px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
       >
         <Printer className="w-4 h-4" />
         <span>Imprimir totem</span>
@@ -118,7 +118,7 @@ export const QrCodeManagement: React.FC = () => {
               />
               <button
                 onClick={handleCopy}
-                className="bg-gold-base/15 text-gold-base hover:bg-gold-base hover:text-surface-base px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shrink-0"
+                className="bg-gold-base/15 text-gold-base hover:bg-gold-base hover:text-content-on-accent px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shrink-0"
               >
                 {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copiado!' : 'Copiar'}</span>

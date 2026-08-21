@@ -205,7 +205,7 @@ export const FinancialStatementManagement: React.FC = () => {
               { id: 'week', label: '7 dias' },
               { id: 'month', label: 'Mês' },
               { id: 'all', label: 'Tudo' }
-            ].map((item) => <button key={item.id} onClick={() => setPeriodFilter(item.id as typeof periodFilter)} className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${periodFilter === item.id ? 'bg-gold-base text-surface-base shadow-xs' : 'text-content-muted'}`}>{item.label}</button>)}
+            ].map((item) => <button key={item.id} onClick={() => setPeriodFilter(item.id as typeof periodFilter)} className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${periodFilter === item.id ? 'bg-gold-base text-content-on-accent shadow-xs' : 'text-content-muted'}`}>{item.label}</button>)}
           </div>
         </div>
         <div data-gesture-scroll="horizontal" className="admin-category-scroll flex gap-2 overflow-x-auto no-scrollbar pb-1">
@@ -213,7 +213,7 @@ export const FinancialStatementManagement: React.FC = () => {
             { id: 'all', label: 'Todos' },
             { id: 'income', label: 'Entradas' },
             { id: 'expense', label: 'Saídas' }
-          ].map((item) => <button key={item.id} onClick={() => setFilterType(item.id as typeof filterType)} className={`shrink-0 h-9 px-3.5 rounded-full border text-xs font-bold transition-colors ${filterType === item.id ? 'bg-gold-base border-gold-base text-surface-base' : 'bg-surface-card border-border-subtle text-content-muted'}`}>{item.label}</button>)}
+          ].map((item) => <button key={item.id} onClick={() => setFilterType(item.id as typeof filterType)} className={`shrink-0 h-9 px-3.5 rounded-full border text-xs font-bold transition-colors ${filterType === item.id ? 'bg-gold-base border-gold-base text-content-on-accent' : 'bg-surface-card border-border-subtle text-content-muted'}`}>{item.label}</button>)}
           {[
             { id: 'completed', label: 'Confirmados' },
             { id: 'pending', label: 'Pendentes' }

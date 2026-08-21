@@ -384,7 +384,7 @@ export const ComandasManagement: React.FC = () => {
     <div className="space-y-4 animate-fade-in text-content-base min-w-0">
       {/* Toast Notification */}
       {toastMsg && (
-        <div className="fixed top-4 right-4 z-50 bg-gold-base text-surface-base px-4 py-2.5 rounded-xl font-bold text-xs shadow-xl flex items-center gap-2 animate-bounce">
+        <div className="fixed top-4 right-4 z-50 bg-gold-base text-content-on-accent px-4 py-2.5 rounded-xl font-bold text-xs shadow-xl flex items-center gap-2 animate-bounce">
           <CheckCircle2 className="w-4 h-4" />
           <span>{toastMsg}</span>
         </div>
@@ -403,7 +403,7 @@ export const ComandasManagement: React.FC = () => {
       {/* Ação (mobile) */}
       <button
         onClick={() => setActiveTab('new')}
-        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-surface-base px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 shrink-0"
+        className="md:hidden w-full bg-gold-base hover:bg-gold-hover text-content-on-accent px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 shrink-0"
       >
         <Plus className="w-4 h-4 stroke-[2.5]" />
         <span>Nova comanda</span>
@@ -448,7 +448,7 @@ export const ComandasManagement: React.FC = () => {
               </p>
               <button
                 onClick={() => setActiveTab('new')}
-                className="bg-gold-base text-surface-base px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-2 hover:bg-gold-hover transition-all"
+                className="bg-gold-base text-content-on-accent px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-2 hover:bg-gold-hover transition-all"
               >
                 <Plus className="w-4 h-4" />
                 <span>Abrir comanda</span>
@@ -524,7 +524,7 @@ export const ComandasManagement: React.FC = () => {
 
                     <button
                       onClick={() => handleStartCloseComanda(cmd)}
-                      className="bg-gold-base hover:bg-gold-hover text-surface-base px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
+                      className="bg-gold-base hover:bg-gold-hover text-content-on-accent px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
                     >
                       <Receipt className="w-4 h-4" />
                       <span>Fechar Conta</span>
@@ -676,7 +676,7 @@ export const ComandasManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={handleAddServiceToCart}
-                className="bg-gold-base text-surface-base px-3 py-2 rounded-xl text-xs font-bold hover:bg-gold-hover transition-colors shrink-0"
+                className="bg-gold-base text-content-on-accent px-3 py-2 rounded-xl text-xs font-bold hover:bg-gold-hover transition-colors shrink-0"
               >
                 Adicionar
               </button>
@@ -699,7 +699,7 @@ export const ComandasManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={handleAddProductToCart}
-                className="bg-gold-base text-surface-base px-3 py-2 rounded-xl text-xs font-bold hover:bg-gold-hover transition-colors shrink-0"
+                className="bg-gold-base text-content-on-accent px-3 py-2 rounded-xl text-xs font-bold hover:bg-gold-hover transition-colors shrink-0"
               >
                 Adicionar
               </button>
@@ -749,7 +749,7 @@ export const ComandasManagement: React.FC = () => {
 
             <button
               type="submit"
-              className="bg-gold-base hover:bg-gold-hover text-surface-base px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95"
+              className="bg-gold-base hover:bg-gold-hover text-content-on-accent px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95"
             >
               Abrir comanda
             </button>
@@ -862,7 +862,7 @@ export const ComandasManagement: React.FC = () => {
               </button>
               <button
                 onClick={handleConfirmCloseComanda}
-                className="bg-gold-base hover:bg-gold-hover text-surface-base px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95 flex items-center gap-1.5"
+                className="bg-gold-base hover:bg-gold-hover text-content-on-accent px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95 flex items-center gap-1.5"
               >
                 <Check className="w-4 h-4 stroke-[3]" />
                 <span>Confirmar</span>
@@ -952,7 +952,7 @@ export const ComandasManagement: React.FC = () => {
                   const msg = `Olá! Segue o comprovante da comanda ${receiptModalComanda.code} no Navo Premium no valor de R$ ${receiptModalComanda.total.toFixed(2)}. Obrigado pela preferência!`;
                   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
                 }}
-                className="bg-status-success text-surface-base px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5"
+                className="bg-status-success text-white px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5"
               >
                 <Share2 className="w-4 h-4" />
                 <span>Enviar Whats</span>

@@ -90,7 +90,7 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
           <button
             onClick={action.onClick}
             disabled={action.disabled}
-            className="min-h-9 min-w-0 px-3 py-1.5 rounded-md bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 hover:bg-gold-hover active:scale-95 transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap shrink-0"
+            className="min-h-9 min-w-0 px-3 py-1.5 rounded-md bg-gold-base text-content-on-accent font-bold text-xs flex items-center gap-1.5 hover:bg-gold-hover active:scale-95 transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap shrink-0"
           >
             <ActionIcon className="w-4 h-4 stroke-[3] shrink-0" />
             <span className="admin-button-label">{action.label}</span>
