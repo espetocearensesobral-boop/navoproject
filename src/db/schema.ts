@@ -599,6 +599,7 @@ export const evolutionApiSettings = pgTable('evolution_api_settings', {
   webhookUrl: text('webhook_url').notNull().default(''),
   webhookSecret: text('webhook_secret').notNull().default(''),
   navoBotEnabled: boolean('navobot_enabled').notNull().default(false),
+  whatsappAccountType: text('whatsapp_account_type').notNull().default('personal_qr'),
   useInteractiveMessages: boolean('use_interactive_messages').notNull().default(false),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

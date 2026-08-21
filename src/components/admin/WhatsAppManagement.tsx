@@ -80,6 +80,7 @@ export const WhatsAppManagement: React.FC = () => {
         webhookEnabled: settings.webhookEnabled,
         webhookUrl: settings.webhookUrl,
         navoBotEnabled: settings.navoBotEnabled,
+        whatsappAccountType: settings.whatsappAccountType,
         useInteractiveMessages: settings.useInteractiveMessages,
       };
       if (apiKeyInput.trim()) payload.apiKey = apiKeyInput.trim();
@@ -206,10 +207,19 @@ export const WhatsAppManagement: React.FC = () => {
           </button>
         </div>
 
+        <label className="block p-3.5 rounded-xl border border-border-subtle bg-surface-card space-y-2">
+          <span className="block text-xs font-bold text-content-base">Tipo de conta conectada por QR Code</span>
+          <select value={settings.whatsappAccountType} onChange={(event) => update('whatsappAccountType', event.target.value as EvolutionApiSettings['whatsappAccountType'])} className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base">
+            <option value="personal_qr">WhatsApp pessoal</option>
+            <option value="business_qr">WhatsApp Business</option>
+          </select>
+          <span className="block text-xs text-content-muted">Selecione WhatsApp Business somente depois de conectar a conta Business no QR Code. A opção não transforma uma conta pessoal em Business.</span>
+        </label>
+
         <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl border border-border-subtle bg-surface-card">
           <div className="min-w-0">
             <p className="text-xs font-bold text-content-base">Mensagens interativas (botões e listas)</p>
-            <p className="text-xs text-content-muted mt-0.5">Desative para usar somente texto e evitar o erro “Não foi possível carregar a mensagem”. Recomendado para contas pessoais conectadas por QR Code.</p>
+            <p className="text-xs text-content-muted mt-0.5">{settings.whatsappAccountType === 'business_qr' ? 'Recomendado para a conta WhatsApp Business conectada por QR Code; teste no celular, Web e Desktop antes de manter ativo.' : 'Desative para usar somente texto e evitar o erro “Não foi possível carregar a mensagem”. Recomendado para contas pessoais conectadas por QR Code.'}</p>
           </div>
           <button type="button" role="switch" aria-checked={settings.useInteractiveMessages} onClick={() => update('useInteractiveMessages', !settings.useInteractiveMessages)} className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${settings.useInteractiveMessages ? 'bg-gold-base' : 'bg-border-subtle'}`}>
             <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${settings.useInteractiveMessages ? 'translate-x-5' : 'translate-x-0.5'}`} />

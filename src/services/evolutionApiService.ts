@@ -9,6 +9,7 @@ export interface EvolutionApiSettings {
   hasWebhookSecret: boolean;
   hasApiKey: boolean;
   navoBotEnabled: boolean;
+  whatsappAccountType: 'personal_qr' | 'business_qr';
   useInteractiveMessages: boolean;
 }
 
@@ -19,6 +20,7 @@ export interface EvolutionApiSettingsInput {
   webhookEnabled: boolean;
   webhookUrl: string;
   navoBotEnabled: boolean;
+  whatsappAccountType: 'personal_qr' | 'business_qr';
   useInteractiveMessages: boolean;
   apiKey?: string;
   webhookSecret?: string;
@@ -52,6 +54,7 @@ export const defaultEvolutionApiSettings: EvolutionApiSettings = {
   hasWebhookSecret: false,
   hasApiKey: false,
   navoBotEnabled: false,
+  whatsappAccountType: 'personal_qr',
   useInteractiveMessages: false,
 };
 

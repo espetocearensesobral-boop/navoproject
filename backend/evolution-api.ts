@@ -13,6 +13,7 @@ const DEFAULT_SETTINGS = {
     webhookUrl: '',
     webhookSecret: '',
   navoBotEnabled: false,
+  whatsappAccountType: 'personal_qr',
   useInteractiveMessages: false,
 };
 
@@ -25,6 +26,7 @@ const configSchema = z.object({
   webhookUrl: z.string().trim().max(500).optional(),
   webhookSecret: z.string().max(300).optional(),
   navoBotEnabled: z.boolean().optional(),
+  whatsappAccountType: z.enum(['personal_qr', 'business_qr']).optional(),
   useInteractiveMessages: z.boolean().optional(),
 }).strict();
 
@@ -67,6 +69,7 @@ function publicConfig(row: any) {
     hasWebhookSecret: !!row?.webhookSecret,
     hasApiKey: !!row?.apiKey,
     navoBotEnabled: !!row?.navoBotEnabled,
+    whatsappAccountType: row?.whatsappAccountType === 'business_qr' ? 'business_qr' : 'personal_qr',
     useInteractiveMessages: row?.useInteractiveMessages === true,
   };
 }
@@ -132,6 +135,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
         ? data.webhookSecret.trim()
         : (existing?.webhookSecret || ''),
       navoBotEnabled: data.navoBotEnabled !== undefined ? !!data.navoBotEnabled : !!existing?.navoBotEnabled,
+      whatsappAccountType: data.whatsappAccountType === 'business_qr' || existing?.whatsappAccountType === 'business_qr' ? 'business_qr' : 'personal_qr',
       useInteractiveMessages: data.useInteractiveMessages !== undefined ? !!data.useInteractiveMessages : existing?.useInteractiveMessages === true,
       updatedAt: new Date(),
     };
@@ -165,6 +169,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
           webhookUrl: payload.webhookUrl,
           webhookSecret: payload.webhookSecret,
           navoBotEnabled: payload.navoBotEnabled,
+          whatsappAccountType: payload.whatsappAccountType,
           useInteractiveMessages: payload.useInteractiveMessages,
           updatedAt: payload.updatedAt,
         },
