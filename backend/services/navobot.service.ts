@@ -369,6 +369,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       title: 'Serviços da Navo',
       description: `Escolha um serviço · Página ${page + 1}`,
       buttonText: 'Ver serviços',
+      footerText: 'NavoBot',
       sections: [{ title: 'Serviços disponíveis', rows }],
     };
     return replyList(conversation, fallback, payload);
@@ -408,6 +409,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       title: 'Escolha o profissional',
       description: 'Você pode escolher alguém ou deixar a Navo encontrar o primeiro horário disponível.',
       buttonText: 'Ver profissionais',
+      footerText: 'NavoBot',
       sections: [{
         title: 'Profissionais ativos',
         rows: [

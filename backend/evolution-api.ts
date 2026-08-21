@@ -328,12 +328,25 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
     }
   }
 
-  async function sendButtons(phone: string, payload: { title: string; description: string; footerText: string; buttons: Array<{ type: 'reply'; displayText: string; id: string }> }): Promise<boolean> {
-    return sendEvolutionPayload('/message/sendButtons', phone, payload);
+  async function sendButtons(phone: string, payload: { title?: string; description?: string; text?: string; footerText?: string; buttons: Array<{ type?: 'reply'; displayText?: string; id?: string; buttonId?: string; buttonText?: { displayText?: string } }> }): Promise<boolean> {
+    const normalizedPayload = {
+      title: payload.title || 'NavoBot',
+      description: payload.description || payload.text || 'Escolha uma opção',
+      footerText: payload.footerText || 'NavoBot',
+      buttons: payload.buttons.map((button) => ({
+        type: 'reply' as const,
+        displayText: button.displayText || button.buttonText?.displayText || 'Escolher',
+        id: button.id || button.buttonId || 'option',
+      })),
+    };
+    return sendEvolutionPayload('/message/sendButtons', phone, normalizedPayload);
   }
 
-  async function sendList(phone: string, payload: { title: string; description: string; buttonText: string; sections: Array<Record<string, unknown>> }): Promise<boolean> {
-    return sendEvolutionPayload('/message/sendList', phone, payload);
+  async function sendList(phone: string, payload: { title: string; description: string; buttonText: string; footerText?: string; sections: Array<Record<string, unknown>> }): Promise<boolean> {
+    return sendEvolutionPayload('/message/sendList', phone, {
+      ...payload,
+      footerText: payload.footerText || 'NavoBot',
+    });
   }
 
   router.post('/send-test', requireAuth, requireAdmin, async (req, res) => {
