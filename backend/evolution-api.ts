@@ -38,6 +38,7 @@ type EvolutionModuleDeps = {
   schema: any;
   eq: any;
   onWebhook?: (payload: any) => Promise<unknown>;
+  onInactivitySweep?: () => Promise<unknown>;
 };
 
 function normalizeBaseUrl(value: string): string {
@@ -98,7 +99,7 @@ async function evolutionRequest(baseUrl: string, apiKey: string, path: string, i
   }
 }
 
-export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: EvolutionModuleDeps) {
+export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInactivitySweep }: EvolutionModuleDeps) {
   const router = express.Router();
 
   async function getSettings(): Promise<any> {
@@ -269,6 +270,21 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
       configured: !!(settings?.webhookEnabled && settings?.webhookSecret),
       navobotEnabled: !!settings?.navoBotEnabled,
     });
+  });
+
+  router.post('/inactivity-sweep', async (req, res) => {
+    try {
+      const settings = await getSettings();
+      if (!settings?.enabled || !settings.apiKey) return res.status(503).json({ error: 'Evolution API não configurada.' });
+      const authorization = String(req.headers.authorization || '');
+      if (authorization !== `Bearer ${settings.apiKey}`) return res.status(401).json({ error: 'Monitor não autorizado.' });
+      if (!settings.navoBotEnabled || !onInactivitySweep) return res.json({ skipped: true, reason: 'navobot_disabled', reminded: 0, reset: 0 });
+      const result = await onInactivitySweep();
+      return res.json({ ok: true, ...(result as Record<string, unknown>) });
+    } catch (error) {
+      console.error('[NavoBot] Falha no monitor de inatividade:', error);
+      return res.status(500).json({ error: 'Não foi possível processar o monitor de inatividade.' });
+    }
   });
 
   router.post('/webhook', async (req, res) => {

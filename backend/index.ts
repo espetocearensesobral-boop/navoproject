@@ -265,6 +265,7 @@ const { router: evolutionApiRouter, sendText: configuredEvolutionSendText, sendB
   schema,
   eq,
   onWebhook: (payload) => navoBotService.handleWebhook(payload),
+  onInactivitySweep: () => navoBotService.processInactivitySweep(),
 });
 evolutionSendText = configuredEvolutionSendText;
 evolutionSendButtons = configuredEvolutionSendButtons;

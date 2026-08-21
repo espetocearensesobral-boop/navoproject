@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, ne, sql } from 'drizzle-orm';
 import { GoogleGenAI } from '@google/genai';
 import { checkSlotAvailability, fetchDaySlotContext, invalidateAvailabilityCache } from './availability.service.js';
 import { getCurrentTimeBRT, getDayOfWeekKey, getTodayStringBRT, minutesToTime, timeToMinutes } from '../utils/datetime.js';
@@ -43,6 +43,7 @@ type BotContext = {
   timeSlot?: string;
   professionalId?: string;
   clientName?: string;
+  inactivityReminderSentAt?: string;
 };
 
 type Conversation = {
@@ -790,6 +791,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const deterministic = classifyDeterministicIntent(message.text);
     if (!(await recordInbound(conversation, message, deterministic))) return { ignored: true, reason: 'duplicate' };
     const context = normalizeContext(conversation.context);
+    delete context.inactivityReminderSentAt;
     const pushName = String(message.pushName || '').trim();
     if (pushName && !/^cliente whatsapp$/i.test(pushName)) {
       context.clientName = pushName;
@@ -844,5 +846,54 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     return handleMessage(message);
   }
 
-  return { handleWebhook };
+  function inactivityMessage(state: string, clientName?: string): string {
+    const greeting = clientName ? ` ${clientName}` : '';
+    if (state === 'awaiting_service') return `Ainda está comigo${greeting}? Posso continuar escolhendo o serviço. Responda com o número ou escreva o nome do serviço.`;
+    if (state === 'awaiting_more_services') return `Ainda está comigo${greeting}? Deseja adicionar outro serviço ou continuar? Responda *ADICIONAR* ou *CONTINUAR*.`;
+    if (state === 'awaiting_professional') return `Ainda está comigo${greeting}? Falta escolher o profissional. Responda com o número ou *QUALQUER PROFISSIONAL*.`;
+    if (state === 'awaiting_date') return `Ainda está comigo${greeting}? Qual dia você prefere para o atendimento?`;
+    if (state === 'awaiting_time') return `Ainda está comigo${greeting}? Qual horário você prefere?`;
+    if (state === 'awaiting_appointment') return `Ainda está comigo${greeting}? Envie o voucher do agendamento para continuar.`;
+    if (state === 'awaiting_confirmation') return `Ainda está comigo${greeting}? Responda *SIM* para confirmar ou *NÃO* para voltar.`;
+    return `Ainda está comigo${greeting}? Responda à última pergunta para continuar ou envie *MENU* para reiniciar.`;
+  }
+
+  async function processInactivitySweep() {
+    const db = getDb();
+    if (!db) return { skipped: true, reason: 'database_unavailable', reminded: 0, reset: 0 };
+    const now = Date.now();
+    const reminderAfter = 5 * 60 * 1000;
+    const resetAfter = 10 * 60 * 1000;
+    const active = await db.select().from(schema.navoBotConversations).where(and(
+      ne(schema.navoBotConversations.state, 'idle'),
+      ne(schema.navoBotConversations.state, 'human'),
+      eq(schema.navoBotConversations.handoffRequested, false),
+    )).limit(200);
+    let reminded = 0;
+    let reset = 0;
+    for (const row of active) {
+      const latest = (await db.select().from(schema.navoBotConversations).where(eq(schema.navoBotConversations.id, row.id)).limit(1))[0];
+      if (!latest || latest.state === 'idle' || latest.state === 'human' || latest.handoffRequested) continue;
+      const context = normalizeContext(latest.context);
+      const activityValue = latest.lastOutboundAt || latest.lastInboundAt || latest.updatedAt;
+      const inactiveFor = activityValue ? now - new Date(activityValue).getTime() : 0;
+      if (inactiveFor < reminderAfter) continue;
+      const conversation = { ...latest, context } as Conversation;
+      if (inactiveFor >= resetAfter) {
+        const preservedContext = context.clientName ? { clientName: context.clientName } : {};
+        await updateConversation(conversation, 'idle', preservedContext);
+        await reply(conversation, `Como não recebemos uma resposta nos últimos minutos, encerrei este atendimento para não deixar a conversa presa. Quando quiser continuar, envie *OI* ou *MENU*.`);
+        reset += 1;
+        continue;
+      }
+      if (context.inactivityReminderSentAt) continue;
+      context.inactivityReminderSentAt = new Date(now).toISOString();
+      await updateConversation(conversation, latest.state, context);
+      await reply(conversation, inactivityMessage(latest.state, context.clientName));
+      reminded += 1;
+    }
+    return { skipped: false, reminded, reset };
+  }
+
+  return { handleWebhook, processInactivitySweep };
 }
