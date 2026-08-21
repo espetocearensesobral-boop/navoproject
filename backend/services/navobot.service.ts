@@ -124,12 +124,12 @@ function numericSelection(text: string): number | null {
   return Number.isInteger(value) && value > 0 ? value - 1 : null;
 }
 
-async function classifyWithAi(text: string, state: string): Promise<NavoBotIntent> {
+async function classifyWithAi(text: string, state: string, context: BotContext = {}): Promise<NavoBotIntent> {
   if (!ai || text.length > 1200) return 'unknown';
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: [{ role: 'user', parts: [{ text: `Estado atual: ${state}\nMensagem do cliente: ${text}` }] }],
+      contents: [{ role: 'user', parts: [{ text: `Estado atual: ${state}\nContexto já coletado: ${JSON.stringify({ pendingAction: context.pendingAction, appointmentId: context.appointmentId, serviceIds: context.serviceIds, date: context.date, timeSlot: context.timeSlot, professionalId: context.professionalId })}\nMensagem do cliente: ${text}` }] }],
       config: {
         temperature: 0.1,
         responseMimeType: 'application/json',
@@ -144,7 +144,7 @@ async function classifyWithAi(text: string, state: string): Promise<NavoBotInten
           },
           required: ['intent', 'confidence'],
         } as any,
-        systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
+        systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Entenda frases naturais e variações informais em português. Se o cliente pedir para marcar, reservar, ver disponibilidade ou escolher um horário, use book. Se pedir para consultar uma reserva existente, use appointments. Se quiser mudar dia ou horário, use reschedule. Se quiser desmarcar, use cancel. Se pedir uma pessoa, use human. Se estiver apenas cumprimentando, use menu. Considere o estado e o contexto já coletado. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
       },
     });
     const parsed = JSON.parse(response.text || '{}');
@@ -313,6 +313,13 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       return reply(conversation, 'Não encontrei agendamentos ativos para este número. Para criar um novo, responda *AGENDAR*.');
     }
     return reply(conversation, 'Seus agendamentos ativos:\n\n' + appointments.map((appointment: any) => `• *${appointment.bookingCode || appointment.id}* — ${appointmentLabel(appointment)}\nStatus: ${appointment.status}`).join('\n\n'));
+  }
+
+  function captureInlineDateTime(context: BotContext, text: string) {
+    const date = parseDateFromText(text);
+    const time = parseTimeFromText(text);
+    if (date) context.date = date;
+    if (time) context.timeSlot = time;
   }
 
   async function listServices(conversation: Conversation, context: BotContext) {
@@ -653,45 +660,61 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       }
       const index = numericSelection(text);
       const selectedId = rawSelection || (index !== null && context.serviceOptions?.[index] ? context.serviceOptions[index] : '');
-      const selected = selectedId ? services.find((service: any) => service.id === selectedId) : services.find((service: any) => text.toLowerCase().includes(String(service.title).toLowerCase()));
-      if (!selected) return reply(conversation, 'Não identifiquei esse serviço. Escolha uma opção da lista ou responda com o número correspondente.');
+      const normalizedText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const matchedServices = selectedId
+        ? services.filter((service: any) => service.id === selectedId)
+        : services.filter((service: any) => normalizedText.includes(String(service.title).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
+      if (!matchedServices.length) return reply(conversation, 'Não identifiquei esse serviço. Escolha uma opção da lista ou responda com o número correspondente.');
       context.serviceIds = context.serviceIds || [];
       context.servicePage = 0;
-      if (!context.serviceIds.includes(selected.id)) context.serviceIds.push(selected.id);
+      for (const selected of matchedServices) {
+        if (!context.serviceIds.includes(selected.id)) context.serviceIds.push(selected.id);
+      }
       context.serviceId = context.serviceIds[0];
+      captureInlineDateTime(context, text);
       return askMoreServices(conversation, context);
     }
     if (conversation.state === 'awaiting_more_services') {
       const normalized = text.trim().toLowerCase();
-      if (normalized === 'service:add' || normalized.includes('adicionar') || normalized === 'sim' || normalized === 's') {
-        return listServices(conversation, context);
-      }
-      if (normalized === 'service:done' || normalized.includes('continuar') || normalized.includes('pronto') || normalized === 'nao' || normalized === 'não' || normalized === 'n') {
-        return askProfessional(conversation, context);
-      }
+      captureInlineDateTime(context, text);
+      const wantsAdd = normalized === 'service:add' || normalized.includes('adicionar') || isPositiveConfirmation(text);
+      const wantsContinue = normalized === 'service:done' || normalized.includes('continuar') || normalized.includes('pronto') || isNegativeConfirmation(text);
+      if (wantsAdd && !wantsContinue) return listServices(conversation, context);
+      if (wantsContinue) return askProfessional(conversation, context);
       return reply(conversation, 'Deseja adicionar outro serviço? Responda *ADICIONAR* ou *CONTINUAR*.');
     }
     if (conversation.state === 'awaiting_professional') {
       const db = getDb();
       const professionals = (await db.query.professionals.findMany()).filter((professional: any) => professional.isActive !== false);
-      const rawSelection = text.trim().toLowerCase().startsWith('professional:') ? text.trim().slice(13) : '';
+      const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const rawSelection = normalized.startsWith('professional:') ? text.trim().slice(13) : '';
       const index = numericSelection(text);
-      const selectedId = rawSelection || (text.trim() === '0' ? 'prof_any' : index !== null && context.professionalOptions?.[index + 1] ? context.professionalOptions[index + 1] : '');
+      const wantsAny = /\b(qualquer|tanto faz|nao importa|sem preferencia)\b/.test(normalized);
+      const selectedId = rawSelection || (wantsAny || text.trim() === '0' ? 'prof_any' : index !== null && context.professionalOptions?.[index + 1] ? context.professionalOptions[index + 1] : '');
       const selected = selectedId === 'prof_any'
         ? null
         : selectedId ? professionals.find((professional: any) => professional.id === selectedId) : professionals.find((professional: any) => text.toLowerCase().includes(String(professional.name).toLowerCase()));
       if (!selectedId && !selected) return reply(conversation, 'Escolha um profissional da lista, “Qualquer profissional” ou responda com o número correspondente.');
       context.professionalId = selectedId || selected?.id || 'prof_any';
+      captureInlineDateTime(context, text);
       return continueAfterProfessional(conversation, context);
     }
     if (conversation.state === 'awaiting_date') {
       const date = parseDateFromText(text);
       if (!date) return reply(conversation, 'Não consegui identificar o dia. Responda, por exemplo, *amanhã*, *sábado* ou *25/08*.');
       context.date = date;
+      const inlineTime = parseTimeFromText(text, true);
+      if (inlineTime) {
+        context.timeSlot = inlineTime;
+        await updateConversation(conversation, 'awaiting_time', context);
+        return handleState(conversation, context, text);
+      }
       await updateConversation(conversation, 'awaiting_time', context);
       return reply(conversation, `Ótimo. Para *${dateLabel(date)}*, qual horário você prefere?`);
     }
     if (conversation.state === 'awaiting_time') {
+      const inlineDate = parseDateFromText(text);
+      if (inlineDate) context.date = inlineDate;
       const time = parseTimeFromText(text, true);
       if (!time) return reply(conversation, 'Não consegui identificar o horário. Responda, por exemplo, *15h* ou *15:30*.');
       context.timeSlot = time;
@@ -738,7 +761,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const stateReply = await handleState(conversation, context, message.text);
     if (stateReply !== null) return { handled: true, intent: deterministic || 'state' };
 
-    const intent = deterministic || await classifyWithAi(message.text, conversation.state);
+    const intent = deterministic || await classifyWithAi(message.text, conversation.state, context);
     if (intent === 'menu' || intent === 'unknown') {
       await updateConversation(conversation, 'idle', context);
       await reply(conversation, menuText(message.pushName));

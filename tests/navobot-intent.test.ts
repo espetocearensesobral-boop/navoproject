@@ -17,6 +17,11 @@ test('classifies core NavoBot intents deterministically', () => {
   assert.equal(classifyDeterministicIntent('5'), 'human');
   assert.equal(classifyDeterministicIntent('quero agendar um corte'), 'book');
   assert.equal(classifyDeterministicIntent('Gostaria de ver os serviços'), 'book');
+  assert.equal(classifyDeterministicIntent('quero agendar um horário para amanhã'), 'book');
+  assert.equal(classifyDeterministicIntent('gostaria de consultar meu agendamento'), 'appointments');
+  assert.equal(classifyDeterministicIntent('tem vaga amanhã?'), 'book');
+  assert.equal(classifyDeterministicIntent('não vou conseguir ir, pode desmarcar?'), 'cancel');
+  assert.equal(classifyDeterministicIntent('quero mudar minha reserva para outro dia'), 'reschedule');
   assert.equal(classifyDeterministicIntent('preciso remarcar meu horário'), 'reschedule');
   assert.equal(classifyDeterministicIntent('pode cancelar'), 'cancel');
   assert.equal(classifyDeterministicIntent('quero falar com atendente'), 'human');
@@ -31,6 +36,8 @@ test('parses relative dates and WhatsApp time formats', () => {
   assert.equal(parseTimeFromText('às 15h'), '15:00');
   assert.equal(parseTimeFromText('15:30'), '15:30');
   assert.equal(parseTimeFromText('15', true), '15:00');
+  assert.equal(parseDateFromText('dia 22 às 15h', '2026-08-21'), '2026-08-22');
+  assert.equal(parseTimeFromText('dia 22 às 15h'), '15:00');
 });
 
 test('recognizes confirmations and booking codes', () => {
