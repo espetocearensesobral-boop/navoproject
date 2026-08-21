@@ -10,6 +10,11 @@ import {
 } from '../backend/services/navobot-intent.ts';
 
 test('classifies core NavoBot intents deterministically', () => {
+  assert.equal(classifyDeterministicIntent('1'), 'book');
+  assert.equal(classifyDeterministicIntent('2 - consultar'), 'appointments');
+  assert.equal(classifyDeterministicIntent('3'), 'reschedule');
+  assert.equal(classifyDeterministicIntent('4. Cancelar'), 'cancel');
+  assert.equal(classifyDeterministicIntent('5'), 'human');
   assert.equal(classifyDeterministicIntent('quero agendar um corte'), 'book');
   assert.equal(classifyDeterministicIntent('preciso remarcar meu horário'), 'reschedule');
   assert.equal(classifyDeterministicIntent('pode cancelar'), 'cancel');

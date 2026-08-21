@@ -57,6 +57,11 @@ function normalizeText(value: string): string {
 export function classifyDeterministicIntent(text: string): NavoBotIntent | null {
   const normalized = normalizeText(text);
   if (!normalized) return null;
+  if (/^1(?:\s*[-.)]|\s|$)/.test(normalized)) return 'book';
+  if (/^2(?:\s*[-.)]|\s|$)/.test(normalized)) return 'appointments';
+  if (/^3(?:\s*[-.)]|\s|$)/.test(normalized)) return 'reschedule';
+  if (/^4(?:\s*[-.)]|\s|$)/.test(normalized)) return 'cancel';
+  if (/^5(?:\s*[-.)]|\s|$)/.test(normalized)) return 'human';
   if (/^(oi|ola|olá|menu|inicio|início|ajuda|bom dia|boa tarde|boa noite)\b/.test(normalized)) return 'menu';
   if (/\b(atendente|humano|pessoa|equipe|falar com alguem|falar com alguém)\b/.test(normalized)) return 'human';
   if (/\b(cancelar|cancela|cancelamento)\b/.test(normalized)) return 'cancel';
