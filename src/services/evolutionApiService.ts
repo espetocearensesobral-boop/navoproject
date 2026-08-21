@@ -10,6 +10,16 @@ export interface EvolutionApiSettings {
   hasApiKey: boolean;
 }
 
+export interface EvolutionApiSettingsInput {
+  enabled: boolean;
+  baseUrl: string;
+  instanceName: string;
+  webhookEnabled: boolean;
+  webhookUrl: string;
+  apiKey?: string;
+  webhookSecret?: string;
+}
+
 export interface EvolutionApiStatus {
   configured: boolean;
   reachable: boolean;
@@ -41,7 +51,7 @@ export async function fetchEvolutionApiSettings(): Promise<EvolutionApiSettings>
   return { ...defaultEvolutionApiSettings, ...data };
 }
 
-export async function saveEvolutionApiSettings(data: Partial<EvolutionApiSettings> & { apiKey?: string; webhookSecret?: string }): Promise<EvolutionApiSettings> {
+export async function saveEvolutionApiSettings(data: EvolutionApiSettingsInput): Promise<EvolutionApiSettings> {
   const response = await authFetch('/api/evolution/config', {
     method: 'PUT',
     body: JSON.stringify(data),

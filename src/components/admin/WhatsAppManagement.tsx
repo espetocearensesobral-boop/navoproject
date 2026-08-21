@@ -10,6 +10,7 @@ import {
   sendEvolutionApiTest,
   testEvolutionApi,
   type EvolutionApiSettings,
+  type EvolutionApiSettingsInput,
   type EvolutionApiStatus,
 } from '../../services/evolutionApiService';
 
@@ -68,7 +69,13 @@ export const WhatsAppManagement: React.FC = () => {
     setSaving(true);
     setMessage(null);
     try {
-      const payload: Partial<EvolutionApiSettings> & { apiKey?: string; webhookSecret?: string } = { ...settings };
+      const payload: EvolutionApiSettingsInput = {
+        enabled: settings.enabled,
+        baseUrl: settings.baseUrl,
+        instanceName: settings.instanceName,
+        webhookEnabled: settings.webhookEnabled,
+        webhookUrl: settings.webhookUrl,
+      };
       if (apiKeyInput.trim()) payload.apiKey = apiKeyInput.trim();
       if (webhookSecretInput.trim()) payload.webhookSecret = webhookSecretInput.trim();
       const saved = await saveEvolutionApiSettings(payload);
