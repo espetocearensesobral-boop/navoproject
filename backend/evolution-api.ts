@@ -260,6 +260,17 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
     }
   });
 
+  router.get('/webhook', async (_req, res) => {
+    const settings = await getSettings();
+    return res.status(200).json({
+      ok: true,
+      endpoint: '/api/evolution/webhook',
+      accepts: 'POST',
+      configured: !!(settings?.webhookEnabled && settings?.webhookSecret),
+      navobotEnabled: !!settings?.navoBotEnabled,
+    });
+  });
+
   router.post('/webhook', async (req, res) => {
     try {
       const settings = await getSettings();
