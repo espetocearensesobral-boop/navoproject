@@ -46,6 +46,28 @@ async function findAppointmentsByPhone(phone: string, includeCancelled = true): 
   return candidates.filter((apt: any) => matchPhoneNumbers(apt.clientPhone, phone));
 }
 
+/**
+ * Aguarda o envio porque este endpoint pode executar como função serverless.
+ * Disparar a Promise sem await permite que o processo seja encerrado antes da
+ * Evolution API receber a confirmação.
+ */
+async function sendAppointmentWhatsApp(phone: string | null | undefined, message: string): Promise<boolean> {
+  const cleanPhone = sanitizePhone(phone || '');
+  if (cleanPhone.length < 12 || cleanPhone.length > 15) {
+    console.warn(`[WhatsApp] Confirmação não enviada: telefone inválido (${cleanPhone || 'vazio'}).`);
+    return false;
+  }
+
+  try {
+    const sent = await sendWhatsAppMessage(cleanPhone, message);
+    if (!sent) console.error(`[WhatsApp] Confirmação não enviada para ${cleanPhone}: nenhum canal aceitou a mensagem.`);
+    return sent;
+  } catch (error) {
+    console.error(`[WhatsApp] Erro ao enviar confirmação para ${cleanPhone}:`, error);
+    return false;
+  }
+}
+
 // =====================================
 // Guest Appointments Lookup API (2 Etapas)
 // =====================================
@@ -328,7 +350,7 @@ appointmentsRouter.patch("/lookup/cancel", sensitiveOpsLimiter, optionalAuth, as
       `Seu agendamento para *${appointment.date}* às *${appointment.timeSlot}* foi *CANCELADO*.\n\n` +
       `Ficamos à disposição para remarcar quando desejar! 💈`;
     
-    sendWhatsAppMessage(appointment.clientPhone || inputPhone, msg).catch(() => {});
+    await sendAppointmentWhatsApp(appointment.clientPhone || inputPhone, msg);
     notifyClientByEmail(appointment.clientId, appointment, 'cancel');
     notifyShopByEmail(appointment, 'cancel');
     sendAdminPush({
@@ -733,25 +755,20 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
 
 
     // Disparo de mensagem WhatsApp (Confirmação ou Cancelamento)
-    let phone = newApt.clientPhone || '5511999999999';
+    let phone = newApt.clientPhone || '';
     if (!newApt.clientPhone && newApt.clientId) {
       const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, newApt.clientId) });
       if (profile && profile.phone) phone = sanitizePhone(profile.phone);
     }
 
-    // Garantir que o número tem o tamanho certo para o WhatsApp (mínimo 12 dígitos com o 55)
-    if (!phone || phone.length < 12) {
-      console.warn(`[WhatsApp] Número inválido para envio: ${phone}. Usando fallback.`);
-      phone = '5511999999999'; 
-    }
     if (newApt.status === 'cancelled') {
       const msg = `❌ *NAVO BARBER & CLUB*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\nSeu agendamento para *${newApt.date}* às *${newApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
-      sendWhatsAppMessage(phone, msg).catch(() => {});
+      await sendAppointmentWhatsApp(phone, msg);
       notifyClientByEmail(newApt.clientId, newApt, 'cancel');
       notifyShopByEmail(newApt, 'cancel');
     } else {
       const msg = `💈 *NAVO BARBER & CLUB*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *confirmado* com sucesso:\n\n🔑 *Código:* ${newApt.bookingCode || newApt.id}\n📅 *Data:* ${newApt.date}\n⏰ *Horário:* ${newApt.timeSlot}\n✂️ *Barbeiro:* ${newApt.professionalName || 'Profissional Navo'}\n\n📍 *Local:* Navo Barber & Club - Rua Fortaleza, 1420 - Expectativa, Sobral - CE\n\nTe esperamos com o café pronto! ☕`;
-      sendWhatsAppMessage(phone, msg).catch(() => {});
+      await sendAppointmentWhatsApp(phone, msg);
       notifyClientByEmail(newApt.clientId, newApt, 'booking');
       notifyShopByEmail(newApt, 'booking');
     }
@@ -892,14 +909,14 @@ appointmentsRouter.patch("/:id/cancel", sensitiveOpsLimiter, optionalAuth, async
     updatedApt = { ...dbApt, status: 'cancelled', cancellationReason: reason };
 
     if (updatedApt) {
-      let phone = updatedApt.clientPhone || '5511999999999';
+      let phone = updatedApt.clientPhone || '';
       if (!updatedApt.clientPhone && updatedApt.clientId) {
         const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, updatedApt.clientId) });
         if (profile && profile.phone) phone = profile.phone;
       }
       const msg = `❌ *NAVO BARBER & CLUB*\n\nOlá, *${updatedApt.clientName || 'Cliente'}*!\nSeu agendamento para *${updatedApt.date}* às *${updatedApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
 
-      sendWhatsAppMessage(phone, msg).catch(() => {});
+      await sendAppointmentWhatsApp(phone, msg);
       notifyClientByEmail(updatedApt.clientId, updatedApt, 'cancel');
       notifyShopByEmail(updatedApt, 'cancel');
       const serviceTitle = Array.isArray(updatedApt.services) ? updatedApt.services[0]?.title || 'Serviço agendado' : 'Serviço agendado';
@@ -1210,14 +1227,14 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
 
         const scheduleChanged = newDate !== dbApt.date || newTimeSlot !== dbApt.timeSlot || newProfessionalId !== dbApt.professionalId || data.services !== undefined;
         if (scheduleChanged) {
-          let phone = updatedApt.clientPhone || '5511999999999';
+          let phone = updatedApt.clientPhone || '';
           if (!updatedApt.clientPhone && updatedApt.clientId) {
             const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, updatedApt.clientId) });
             if (profile && profile.phone) phone = profile.phone;
           }
           const msg = `🔄 *NAVO BARBER & CLUB*\n\nOlá, *${updatedApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *REAGENDADO* com sucesso:\n\n📅 *Nova Data:* ${updatedApt.date}\n⏰ *Novo Horário:* ${updatedApt.timeSlot}\n✂️ *Barbeiro:* ${updatedApt.professionalName || 'Profissional Navo'}\n\n📍 *Local:* Navo Barber & Club - Rua Fortaleza, 1420 - Expectativa, Sobral - CE\n\nTe esperamos com o café pronto! ☕`;
 
-          sendWhatsAppMessage(phone, msg).catch(() => {});
+          await sendAppointmentWhatsApp(phone, msg);
           notifyClientByEmail(updatedApt.clientId, updatedApt, 'reschedule', dbApt);
           notifyShopByEmail(updatedApt, 'reschedule', dbApt);
         }
