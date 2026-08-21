@@ -296,6 +296,22 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
     }
   });
 
+  async function sendEvolutionPayload(path: string, phone: string, payload: Record<string, unknown>): Promise<boolean> {
+    try {
+      const settings = await requireConfigured();
+      const number = normalizePhone(phone);
+      if (number.length < 8 || number.length > 15) return false;
+      await evolutionRequest(settings.baseUrl, settings.apiKey, `${path}/${encodeURIComponent(settings.instanceName)}`, {
+        method: 'POST',
+        body: JSON.stringify({ number, ...payload }),
+      });
+      return true;
+    } catch (error) {
+      console.error(`[Evolution API] Falha ao enviar mensagem interativa (${path}):`, error);
+      return false;
+    }
+  }
+
   async function sendText(phone: string, text: string): Promise<boolean> {
     try {
       const settings = await requireConfigured();
@@ -303,13 +319,21 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
       if (number.length < 8 || number.length > 15) return false;
       await evolutionRequest(settings.baseUrl, settings.apiKey, `/message/sendText/${encodeURIComponent(settings.instanceName)}`, {
         method: 'POST',
-        body: JSON.stringify({ number, text }),
+        body: JSON.stringify({ number, textMessage: { text } }),
       });
       return true;
     } catch (error) {
       console.error('[Evolution API] Falha ao enviar mensagem:', error);
       return false;
     }
+  }
+
+  async function sendButtons(phone: string, payload: { text: string; footerText?: string; buttons: Array<{ buttonId: string; buttonText: { displayText: string } }> }): Promise<boolean> {
+    return sendEvolutionPayload('/message/sendButtons', phone, payload);
+  }
+
+  async function sendList(phone: string, payload: { title: string; description: string; buttonText: string; sections: Array<Record<string, unknown>> }): Promise<boolean> {
+    return sendEvolutionPayload('/message/sendList', phone, payload);
   }
 
   router.post('/send-test', requireAuth, requireAdmin, async (req, res) => {
@@ -321,7 +345,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
       if (number.length < 8 || number.length > 15) return res.status(400).json({ error: 'Informe o telefone com DDD e código do país, somente números.' });
       await evolutionRequest(settings.baseUrl, settings.apiKey, `/message/sendText/${encodeURIComponent(settings.instanceName)}`, {
         method: 'POST',
-        body: JSON.stringify({ number, text: parsed.data.text }),
+        body: JSON.stringify({ number, textMessage: { text: parsed.data.text } }),
       });
       return res.json({ success: true, message: `Mensagem de teste enviada para ${number}.` });
     } catch (error: any) {
@@ -329,5 +353,5 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook }: Evolu
     }
   });
 
-  return { router, getSettings, sendText };
+  return { router, getSettings, sendText, sendButtons, sendList };
 }

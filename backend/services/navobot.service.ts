@@ -25,6 +25,8 @@ export type NavoBotDeps = {
   getDb: () => any;
   schema: any;
   sendText: (phone: string, text: string) => Promise<boolean>;
+  sendButtons: (phone: string, payload: any) => Promise<boolean>;
+  sendList: (phone: string, payload: any) => Promise<boolean>;
 };
 
 type BotContext = {
@@ -32,7 +34,10 @@ type BotContext = {
   appointmentId?: string;
   candidateAppointmentIds?: string[];
   serviceId?: string;
+  serviceIds?: string[];
   serviceOptions?: string[];
+  servicePage?: number;
+  professionalOptions?: string[];
   date?: string;
   timeSlot?: string;
   professionalId?: string;
@@ -100,14 +105,17 @@ function appointmentLabel(appointment: any): string {
   return `*${service || 'Serviço agendado'}* em *${dateLabel(appointment.date)}* às *${appointment.timeSlot}* com *${appointment.professionalName || 'profissional Navo'}*`;
 }
 
-function confirmationText(action: 'book' | 'reschedule' | 'cancel', appointment: any, context: BotContext, service?: any): string {
+function confirmationText(action: 'book' | 'reschedule' | 'cancel', appointment: any, context: BotContext, services: any[] = []): string {
   if (action === 'cancel') {
     return `Confirma o cancelamento do agendamento ${appointmentLabel(appointment)}?\n\nResponda *SIM* para confirmar ou *NÃO* para voltar.`;
   }
   if (action === 'reschedule') {
     return `Confirma o reagendamento para *${dateLabel(context.date || appointment.date)}* às *${context.timeSlot || appointment.timeSlot}*?\n\nResponda *SIM* para confirmar ou *NÃO* para voltar.`;
   }
-  return `Vou registrar este agendamento:\n\n*${service?.title || 'Serviço'}* · ${money(service?.price)}\n📅 *${dateLabel(context.date || '')}* às *${context.timeSlot || ''}*\n✂️ *${appointment?.professionalName || 'profissional a definir'}*\n💳 Pagamento no local\n\nConfirma? Responda *SIM* ou *NÃO*.`;
+  const serviceLines = services.length
+    ? services.map((service) => `• ${service.title} · ${service.durationMinutes} min · ${money(service.price)}`).join('\n')
+    : '• Serviço a definir';
+  return `Vou registrar este agendamento:\n\n${serviceLines}\n\n⏱️ Duração total: *${services.reduce((total, service) => total + Number(service.durationMinutes || 0), 0)} min*\n📅 *${dateLabel(context.date || '')}* às *${context.timeSlot || ''}*\n✂️ *${appointment?.professionalName || 'profissional a definir'}*\n💳 Pagamento no local\n\nConfirma? Responda *SIM* ou *NÃO*.`;
 }
 
 function numericSelection(text: string): number | null {
@@ -147,7 +155,7 @@ async function classifyWithAi(text: string, state: string): Promise<NavoBotInten
   }
 }
 
-export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
+export function createNavoBotService({ getDb, schema, sendText, sendButtons, sendList }: NavoBotDeps) {
   async function getConversation(phone: string, instanceName: string): Promise<Conversation> {
     const db = getDb();
     const normalizedPhone = sanitizePhone(phone);
@@ -209,9 +217,8 @@ export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
     return true;
   }
 
-  async function reply(conversation: Conversation, text: string) {
+  async function recordOutbound(conversation: Conversation, text: string) {
     const db = getDb();
-    const sent = await sendText(conversation.phone, text);
     await db.insert(schema.navoBotMessages).values({
       id: `nbm_out_${crypto.randomUUID()}`,
       conversationId: conversation.id,
@@ -222,6 +229,25 @@ export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
       intent: null,
     }).onConflictDoNothing();
     await db.update(schema.navoBotConversations).set({ lastOutboundAt: new Date(), updatedAt: new Date() }).where(eq(schema.navoBotConversations.id, conversation.id));
+  }
+
+  async function reply(conversation: Conversation, text: string) {
+    const sent = await sendText(conversation.phone, text);
+    await recordOutbound(conversation, text);
+    return sent;
+  }
+
+  async function replyList(conversation: Conversation, fallbackText: string, payload: any) {
+    const sent = await sendList(conversation.phone, payload);
+    if (!sent) return reply(conversation, fallbackText);
+    await recordOutbound(conversation, fallbackText);
+    return sent;
+  }
+
+  async function replyButtons(conversation: Conversation, fallbackText: string, payload: any) {
+    const sent = await sendButtons(conversation.phone, payload);
+    if (!sent) return reply(conversation, fallbackText);
+    await recordOutbound(conversation, fallbackText);
     return sent;
   }
 
@@ -267,38 +293,103 @@ export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
     const db = getDb();
     const services = await db.query.services.findMany();
     const activeServices = services.filter((service: any) => service.title && Number(service.durationMinutes) > 0);
-    context.serviceOptions = activeServices.map((service: any) => service.id);
+    const pageSize = 8;
+    const page = Math.max(0, Number(context.servicePage || 0));
+    const pageServices = activeServices.slice(page * pageSize, (page + 1) * pageSize);
+    const hasNextPage = (page + 1) * pageSize < activeServices.length;
+    context.servicePage = page;
+    context.serviceOptions = pageServices.map((service: any) => service.id);
     await updateConversation(conversation, 'awaiting_service', context);
-    return reply(conversation, 'Claro. Escolha um serviço respondendo com o número:\n\n' + activeServices.map((service: any, index: number) => `${index + 1}. ${serviceLabel(service)}`).join('\n'));
+    const fallback = `Escolha um serviço (página ${page + 1}/${Math.max(1, Math.ceil(activeServices.length / pageSize))}):\n\n` + pageServices.map((service: any, index: number) => `${index + 1}. *${service.title}* — ${service.durationMinutes} min · ${money(service.price)}`).join('\n') + (hasNextPage ? '\n\nResponda *MAIS* para ver outros serviços.' : '');
+    const rows = pageServices.map((service: any, index: number) => ({
+      title: `${index + 1}. ${String(service.title).slice(0, 20)}`,
+      rowId: `service:${service.id}`,
+      description: `${service.durationMinutes} min · ${money(service.price)}`,
+    }));
+    if (hasNextPage) rows.push({ title: 'Ver mais serviços', rowId: `service:page:${page + 1}`, description: 'Continuar navegando' } as any);
+    const payload = {
+      title: 'Serviços da Navo',
+      description: `Escolha um serviço · Página ${page + 1}`,
+      buttonText: 'Ver serviços',
+      sections: [{ title: 'Serviços disponíveis', rows }],
+    };
+    return replyList(conversation, fallback, payload);
   }
 
-  async function getService(context: BotContext) {
+  async function getServices(context: BotContext) {
     const db = getDb();
-    if (!context.serviceId) return null;
-    return db.query.services.findFirst({ where: eq(schema.services.id, context.serviceId) });
-  }
-
-  async function startBooking(conversation: Conversation, context: BotContext, text: string) {
-    context.pendingAction = 'book';
-    const db = getDb();
+    const ids = context.serviceIds?.length ? context.serviceIds : context.serviceId ? [context.serviceId] : [];
+    if (!ids.length) return [];
     const services = await db.query.services.findMany();
-    const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const matchedService = services.find((service: any) => normalized.includes(String(service.title).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
-    if (matchedService) context.serviceId = matchedService.id;
-    if (!context.serviceId) return listServices(conversation, context);
-    const date = parseDateFromText(text);
-    const time = parseTimeFromText(text);
-    if (date) context.date = date;
-    if (time) context.timeSlot = time;
+    return ids.map((id) => services.find((service: any) => service.id === id)).filter(Boolean);
+  }
+
+  async function askMoreServices(conversation: Conversation, context: BotContext) {
+    const services = await getServices(context);
+    const selected = services.map((service: any) => `• ${service.title}`).join('\n') || 'Nenhum serviço selecionado';
+    const fallback = `Serviço selecionado:\n${selected}\n\nDeseja adicionar outro serviço? Responda *ADICIONAR* ou *CONTINUAR*.`;
+    await updateConversation(conversation, 'awaiting_more_services', context);
+    return replyButtons(conversation, fallback, {
+      text: `Serviço selecionado:\n${selected}\n\nDeseja adicionar outro serviço?`,
+      footerText: 'NavoBot',
+      buttons: [
+        { buttonId: 'service:add', buttonText: { displayText: 'Adicionar outro' } },
+        { buttonId: 'service:done', buttonText: { displayText: 'Continuar' } },
+      ],
+    });
+  }
+
+  async function askProfessional(conversation: Conversation, context: BotContext) {
+    const db = getDb();
+    const professionals = (await db.query.professionals.findMany()).filter((professional: any) => professional.isActive !== false);
+    context.professionalOptions = ['prof_any', ...professionals.map((professional: any) => professional.id)];
+    await updateConversation(conversation, 'awaiting_professional', context);
+    const fallback = 'Você prefere algum profissional?\n\n0. Qualquer profissional\n' + professionals.map((professional: any, index: number) => `${index + 1}. ${professional.name}`).join('\n') + '\n\nResponda com o número.';
+    const payload = {
+      title: 'Escolha o profissional',
+      description: 'Você pode escolher alguém ou deixar a Navo encontrar o primeiro horário disponível.',
+      buttonText: 'Ver profissionais',
+      sections: [{
+        title: 'Profissionais ativos',
+        rows: [
+          { title: 'Qualquer profissional', rowId: 'professional:prof_any', description: 'Mais opções de horário' },
+          ...professionals.map((professional: any) => ({
+            title: String(professional.name).slice(0, 24),
+            rowId: `professional:${professional.id}`,
+            description: professional.roleTitle || 'Profissional Navo',
+          })),
+        ],
+      }],
+    };
+    return replyList(conversation, fallback, payload);
+  }
+
+  async function continueAfterProfessional(conversation: Conversation, context: BotContext) {
     if (!context.date) {
       await updateConversation(conversation, 'awaiting_date', context);
-      return reply(conversation, 'Qual dia você prefere? Pode responder, por exemplo, *amanhã*, *sábado* ou *25/08*.');
+      return reply(conversation, 'Qual dia você prefere? Pode responder *amanhã*, *sábado*, *dia 22* ou *25/08*.');
     }
     if (!context.timeSlot) {
       await updateConversation(conversation, 'awaiting_time', context);
       return reply(conversation, `Perfeito. Para *${dateLabel(context.date)}*, qual horário você prefere?`);
     }
     return prepareBookingConfirmation(conversation, context);
+  }
+
+  async function startBooking(conversation: Conversation, context: BotContext, text: string) {
+    context.pendingAction = 'book';
+    context.serviceIds = context.serviceIds || [];
+    const db = getDb();
+    const services = await db.query.services.findMany();
+    const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const matchedService = services.find((service: any) => normalized.includes(String(service.title).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
+    if (matchedService && !context.serviceIds.includes(matchedService.id)) context.serviceIds.push(matchedService.id);
+    const date = parseDateFromText(text);
+    const time = parseTimeFromText(text);
+    if (date) context.date = date;
+    if (time) context.timeSlot = time;
+    if (!context.serviceIds.length) return listServices(conversation, context);
+    return askMoreServices(conversation, context);
   }
 
   async function suggestSlots(date: string, duration: number, professionalId = '', excludeAppointmentId = '') {
@@ -329,35 +420,37 @@ export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
   }
 
   async function prepareBookingConfirmation(conversation: Conversation, context: BotContext) {
-    const service = await getService(context);
-    if (!service || !context.date || !context.timeSlot) return reply(conversation, 'Preciso do serviço, dia e horário para continuar. Responda *AGENDAR* para começar novamente.');
+    const services = await getServices(context);
+    const totalDuration = services.reduce((total, service: any) => total + Number(service.durationMinutes || 0), 0);
+    if (!services.length || !context.date || !context.timeSlot) return reply(conversation, 'Preciso do serviço, dia e horário para continuar. Responda *AGENDAR* para começar novamente.');
     const check = await checkSlotAvailability({
       dateStr: context.date,
       startMins: timeToMinutes(context.timeSlot),
-      reqDuration: Number(service.durationMinutes),
+      reqDuration: totalDuration,
       profId: context.professionalId || '',
       todayBRT: getTodayStringBRT(),
       currTimeBRT: getCurrentTimeBRT(),
     });
     if (!check.available) {
-      const suggestions = await suggestSlots(context.date, Number(service.durationMinutes), context.professionalId || '');
+      const suggestions = await suggestSlots(context.date, totalDuration, context.professionalId || '');
       return reply(conversation, suggestions.length
         ? `Esse horário não está disponível. Para *${dateLabel(context.date)}*, posso oferecer: ${suggestions.join(', ')}. Responda com um deles ou escolha outro dia.`
         : `Não encontrei horários livres para *${dateLabel(context.date)}*. Responda com outro dia para eu consultar.`);
     }
     context.professionalId = check.chosenProf?.id || context.professionalId || 'prof_any';
     await updateConversation(conversation, 'awaiting_confirmation', context);
-    return reply(conversation, confirmationText('book', { professionalName: check.chosenProf?.name }, context, service));
+    return reply(conversation, confirmationText('book', { professionalName: check.chosenProf?.name }, context, services));
   }
 
   async function executeBooking(conversation: Conversation, context: BotContext) {
     const db = getDb();
-    const service = await getService(context);
-    if (!service || !context.date || !context.timeSlot) return reply(conversation, 'A sessão expirou. Responda *AGENDAR* para iniciar novamente.');
+    const services = await getServices(context);
+    const totalDuration = services.reduce((total, service: any) => total + Number(service.durationMinutes || 0), 0);
+    if (!services.length || !context.date || !context.timeSlot) return reply(conversation, 'A sessão expirou. Responda *AGENDAR* para iniciar novamente.');
     const check = await checkSlotAvailability({
       dateStr: context.date,
       startMins: timeToMinutes(context.timeSlot),
-      reqDuration: Number(service.durationMinutes),
+      reqDuration: totalDuration,
       profId: context.professionalId || '',
       todayBRT: getTodayStringBRT(),
       currTimeBRT: getCurrentTimeBRT(),
@@ -370,7 +463,7 @@ export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
     const clientName = existingProfile?.name || 'Cliente WhatsApp';
     const appointmentId = `apt_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
     const isPendingApproval = !!check.requiresApproval;
-    const originalAmount = Number(service.price || 0);
+    const originalAmount = services.reduce((total, service: any) => total + Number(service.price || 0), 0);
     const appointment = {
       id: appointmentId,
       clientId,
@@ -382,13 +475,13 @@ export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
       date: context.date,
       timeSlot: context.timeSlot,
       status: isPendingApproval ? 'pending_approval' : 'confirmed',
-      totalDurationMinutes: Number(service.durationMinutes),
+      totalDurationMinutes: totalDuration,
       originalAmount: originalAmount.toFixed(2),
       discountAmount: '0.00',
       finalAmount: originalAmount.toFixed(2),
       paymentMethod: 'pay_at_venue',
       bookingCode: generateBookingCode(),
-      services: [{ id: service.id, title: service.title, price: service.price, durationMinutes: service.durationMinutes }],
+      services: services.map((service: any) => ({ id: service.id, title: service.title, price: service.price, durationMinutes: service.durationMinutes })),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -428,7 +521,7 @@ export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
 
     invalidateAvailabilityCache();
     await updateConversation(conversation, 'idle', {});
-    return reply(conversation, `Agendamento ${isPendingApproval ? 'enviado para aprovação' : 'confirmado'} com sucesso.\n\n🔑 Código: *${appointment.bookingCode}*\n📅 ${dateLabel(appointment.date)} às ${appointment.timeSlot}\n✂️ ${appointment.professionalName}\n💈 ${service.title}\n\nGuarde esse código para consultar, reagendar ou cancelar.`);
+    return reply(conversation, `Agendamento ${isPendingApproval ? 'enviado para aprovação' : 'confirmado'} com sucesso.\n\n🔑 Código: *${appointment.bookingCode}*\n📅 ${dateLabel(appointment.date)} às ${appointment.timeSlot}\n✂️ ${appointment.professionalName}\n💈 ${services.map((service: any) => service.title).join(', ')}\n\nGuarde esse código para consultar, reagendar ou cancelar.`);
   }
 
   async function executeCancellation(conversation: Conversation, appointment: any) {
@@ -509,13 +602,48 @@ export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
     if (conversation.state === 'awaiting_service') {
       const db = getDb();
       const services = await db.query.services.findMany();
+      const rawText = text.trim().toLowerCase();
+      if (rawText === 'mais' || rawText === 'service:more') {
+        context.servicePage = Number(context.servicePage || 0) + 1;
+        return listServices(conversation, context);
+      }
+      const rawSelection = rawText.startsWith('service:') ? rawText.slice(8) : '';
+      if (rawSelection.startsWith('page:')) {
+        context.servicePage = Number(rawSelection.slice(5)) || 0;
+        return listServices(conversation, context);
+      }
       const index = numericSelection(text);
-      const selectedId = index !== null && context.serviceOptions?.[index] ? context.serviceOptions[index] : null;
+      const selectedId = rawSelection || (index !== null && context.serviceOptions?.[index] ? context.serviceOptions[index] : '');
       const selected = selectedId ? services.find((service: any) => service.id === selectedId) : services.find((service: any) => text.toLowerCase().includes(String(service.title).toLowerCase()));
-      if (!selected) return reply(conversation, 'Não identifiquei esse serviço. Responda com um dos números da lista ou *MENU*.');
-      context.serviceId = selected.id;
-      await updateConversation(conversation, 'awaiting_date', context);
-      return reply(conversation, `Perfeito: *${selected.title}*. Qual dia você prefere?`);
+      if (!selected) return reply(conversation, 'Não identifiquei esse serviço. Escolha uma opção da lista ou responda com o número correspondente.');
+      context.serviceIds = context.serviceIds || [];
+      context.servicePage = 0;
+      if (!context.serviceIds.includes(selected.id)) context.serviceIds.push(selected.id);
+      context.serviceId = context.serviceIds[0];
+      return askMoreServices(conversation, context);
+    }
+    if (conversation.state === 'awaiting_more_services') {
+      const normalized = text.trim().toLowerCase();
+      if (normalized === 'service:add' || normalized.includes('adicionar') || normalized === 'sim' || normalized === 's') {
+        return listServices(conversation, context);
+      }
+      if (normalized === 'service:done' || normalized.includes('continuar') || normalized.includes('pronto') || normalized === 'nao' || normalized === 'não' || normalized === 'n') {
+        return askProfessional(conversation, context);
+      }
+      return reply(conversation, 'Deseja adicionar outro serviço? Responda *ADICIONAR* ou *CONTINUAR*.');
+    }
+    if (conversation.state === 'awaiting_professional') {
+      const db = getDb();
+      const professionals = (await db.query.professionals.findMany()).filter((professional: any) => professional.isActive !== false);
+      const rawSelection = text.trim().toLowerCase().startsWith('professional:') ? text.trim().slice(13) : '';
+      const index = numericSelection(text);
+      const selectedId = rawSelection || (text.trim() === '0' ? 'prof_any' : index !== null && context.professionalOptions?.[index + 1] ? context.professionalOptions[index + 1] : '');
+      const selected = selectedId === 'prof_any'
+        ? null
+        : selectedId ? professionals.find((professional: any) => professional.id === selectedId) : professionals.find((professional: any) => text.toLowerCase().includes(String(professional.name).toLowerCase()));
+      if (!selectedId && !selected) return reply(conversation, 'Escolha um profissional da lista, “Qualquer profissional” ou responda com o número correspondente.');
+      context.professionalId = selectedId || selected?.id || 'prof_any';
+      return continueAfterProfessional(conversation, context);
     }
     if (conversation.state === 'awaiting_date') {
       const date = parseDateFromText(text);
@@ -525,7 +653,7 @@ export function createNavoBotService({ getDb, schema, sendText }: NavoBotDeps) {
       return reply(conversation, `Ótimo. Para *${dateLabel(date)}*, qual horário você prefere?`);
     }
     if (conversation.state === 'awaiting_time') {
-      const time = parseTimeFromText(text);
+      const time = parseTimeFromText(text, true);
       if (!time) return reply(conversation, 'Não consegui identificar o horário. Responda, por exemplo, *15h* ou *15:30*.');
       context.timeSlot = time;
       if (context.pendingAction === 'book') return prepareBookingConfirmation(conversation, context);

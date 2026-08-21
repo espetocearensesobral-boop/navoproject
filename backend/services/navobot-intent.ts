@@ -46,6 +46,21 @@ const WEEKDAY_OFFSETS = {
   saturday: 6,
 } as const;
 
+const MONTH_ALIASES: Record<string, number> = {
+  janeiro: 1,
+  fevereiro: 2,
+  marco: 3,
+  abril: 4,
+  maio: 5,
+  junho: 6,
+  julho: 7,
+  agosto: 8,
+  setembro: 9,
+  outubro: 10,
+  novembro: 11,
+  dezembro: 12,
+};
+
 function normalizeText(value: string): string {
   return value
     .normalize('NFD')
@@ -66,6 +81,7 @@ export function classifyDeterministicIntent(text: string): NavoBotIntent | null 
   if (/\b(atendente|humano|pessoa|equipe|falar com alguem|falar com alguém)\b/.test(normalized)) return 'human';
   if (/\b(cancelar|cancela|cancelamento)\b/.test(normalized)) return 'cancel';
   if (/\b(reagendar|remarcar|mudar (o )?horario|trocar (o )?horario|alterar (o )?agendamento)\b/.test(normalized)) return 'reschedule';
+  if (/\b(servicos?|precos?|ver (os )?servicos?|mostrar (os )?servicos?|lista de servicos?)\b/.test(normalized)) return 'book';
   if (/\b(agendar|agenda[r]?|marcar|novo agendamento|quero cortar|quero fazer)\b/.test(normalized)) return 'book';
   if (/\b(confirmar|confirmo|confirma|confirmacao|confirmação|esta confirmado|está confirmado)\b/.test(normalized)) return 'confirm';
   if (/\b(meu agendamento|minha agenda|minhas reservas|minha reserva|ver agendamento|consultar agendamento|voucher)\b/.test(normalized)) return 'appointments';
@@ -80,12 +96,14 @@ export function isNegativeConfirmation(text: string): boolean {
   return /^(nao|não|n|cancelar|cancela|desistir|voltar|sair)\b/i.test(normalizeText(text));
 }
 
-export function parseTimeFromText(text: string): string | null {
+export function parseTimeFromText(text: string, allowBareHour = false): string | null {
   const normalized = normalizeText(text);
-  const match = normalized.match(/\b(?:as|a|horario|horas)?\s*(\d{1,2})(?:\s*[:h]\s*(\d{2}))?\s*(?:h|horas)?\b/);
+  const explicitMatch = normalized.match(/(?:\b(?:as|a|horario|horas)\s*)(\d{1,2})(?:\s*[:h]\s*(\d{2}))?\s*(?:h|horas)?\b|\b(\d{1,2}):(\d{2})\b|\b(\d{1,2})h(?:\s*(\d{2}))?\b/);
+  const bareMatch = allowBareHour && /^\d{1,2}$/.test(normalized) ? [normalized, normalized, '0'] : null;
+  const match = explicitMatch || bareMatch;
   if (!match) return null;
-  const hours = Number(match[1]);
-  const minutes = match[2] ? Number(match[2]) : 0;
+  const hours = Number(match[1] || match[3] || match[5]);
+  const minutes = Number(match[2] || match[4] || match[6] || 0);
   if (!Number.isInteger(hours) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
@@ -107,6 +125,30 @@ export function parseDateFromText(text: string, today = getTodayStringBRT()): st
     if (day >= 1 && day <= 31 && month >= 1 && month <= 12) {
       return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     }
+  }
+
+  const monthMatch = normalized.match(/\bdia\s+(\d{1,2})(?:\s+de)?\s+(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\b/);
+  const dayOnlyMatch = normalized.match(/\bdia\s+(\d{1,2})\b/);
+  if (monthMatch || dayOnlyMatch) {
+    const day = Number((monthMatch || dayOnlyMatch)![1]);
+    const explicitMonth = monthMatch ? MONTH_ALIASES[monthMatch[2]] : Number(today.slice(5, 7));
+    const explicitYear = normalized.match(/\b(20\d{2})\b/)?.[1];
+    let year = Number(explicitYear || today.slice(0, 4));
+    let month = explicitMonth;
+    const daysInMonth = (targetYear: number, targetMonth: number) => new Date(Date.UTC(targetYear, targetMonth, 0)).getUTCDate();
+    if (day < 1 || day > daysInMonth(year, month)) return null;
+    let candidate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    if (!explicitYear && candidate < today) {
+      if (!monthMatch) {
+        month += 1;
+        if (month === 13) { month = 1; year += 1; }
+      } else {
+        year += 1;
+      }
+      if (day > daysInMonth(year, month)) return null;
+      candidate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+    return candidate;
   }
 
   const weekday = Object.entries(WEEKDAY_ALIASES).find(([alias]) => normalized.includes(alias))?.[1];
