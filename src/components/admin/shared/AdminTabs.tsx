@@ -35,7 +35,7 @@ interface AdminTabsProps {
 
 export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, className = '' }) => {
   return (
-    <div className={`flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 ${className}`}>
+    <div className={`admin-tabs flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 ${className}`}>
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeId === tab.id;

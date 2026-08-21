@@ -20,8 +20,9 @@ export const SystemWorkspace: React.FC<{ initialTab?: SystemTab }> = ({ initialT
   };
 
   return (
-    <AdminWorkspace
-      tabs={[
+    <div className="admin-system-workspace">
+      <AdminWorkspace
+        tabs={[
         { id: 'unit', label: 'Unidade', icon: Store },
         { id: 'preferences', label: 'Preferências', icon: Settings },
         { id: 'availability', label: 'Agenda', icon: CalendarDays },
@@ -33,7 +34,8 @@ export const SystemWorkspace: React.FC<{ initialTab?: SystemTab }> = ({ initialT
       activeId={activeTab}
       onChange={(id) => setActiveTab(id as SystemTab)}
     >
-      {renderContent()}
-    </AdminWorkspace>
+        {renderContent()}
+      </AdminWorkspace>
+    </div>
   );
 };

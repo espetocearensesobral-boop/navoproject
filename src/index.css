@@ -2938,3 +2938,43 @@ button, a, input, select, textarea {
     max-height: calc(100dvh - 1rem);
   }
 }
+
+
+/* Contrast refinement for admin system surfaces. */
+[data-theme="dark"] .admin-shell {
+  --color-content-muted: #AAB2BF;
+  --color-border-subtle: rgba(242, 237, 228, 0.14);
+}
+
+[data-theme="light"] .admin-shell {
+  --color-content-muted: #4B5563;
+  --color-border-subtle: rgba(26, 28, 30, 0.14);
+}
+
+.admin-shell .admin-system-workspace .admin-tabs button:not([disabled]):not([aria-current="page"]) {
+  color: var(--color-content-base) !important;
+  border-color: color-mix(in srgb, var(--color-content-base) 18%, var(--color-border-subtle)) !important;
+}
+
+.admin-shell .admin-system-workspace .admin-tabs button:not([disabled]):not([aria-current="page"]):hover,
+.admin-shell .admin-system-workspace .admin-tabs button:not([disabled]):not([aria-current="page"]):focus-visible {
+  color: var(--color-accent-text) !important;
+  border-color: color-mix(in srgb, var(--color-gold-base) 55%, var(--color-border-subtle)) !important;
+}
+
+.admin-shell .admin-system-workspace .admin-tabs button[aria-current="page"] {
+  color: var(--color-content-on-accent) !important;
+}
+
+.admin-shell .admin-system-workspace .admin-copy-label,
+.admin-shell .admin-system-workspace .admin-copy-title,
+.admin-shell .admin-system-workspace h2,
+.admin-shell .admin-system-workspace h3 {
+  color: var(--color-content-base);
+}
+
+.admin-shell .admin-system-workspace .text-gold-base,
+.admin-shell .admin-system-workspace .text-gold-deep,
+.admin-shell .admin-system-workspace .text-gold-accent {
+  color: var(--color-accent-text) !important;
+}
