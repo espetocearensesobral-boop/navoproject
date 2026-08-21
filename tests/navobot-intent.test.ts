@@ -49,3 +49,22 @@ test('extracts only direct incoming text messages', () => {
   assert.equal(extractEvolutionMessage({ event: 'MESSAGES_UPSERT', data: { key: { fromMe: true, remoteJid: '5588999999999@s.whatsapp.net' }, message: { conversation: 'echo' } } }), null);
   assert.equal(extractEvolutionMessage({ event: 'MESSAGES_UPSERT', data: { key: { remoteJid: '123@g.us', fromMe: false }, message: { conversation: 'grupo' } } }), null);
 });
+
+test('resolves WhatsApp LID messages through the alternate phone JID', () => {
+  const incoming = extractEvolutionMessage({
+    event: 'messages.upsert',
+    instance: 'navo-bot',
+    sender: '5588999999999',
+    data: {
+      key: {
+        remoteJid: '236425802952777@lid',
+        remoteJidAlt: '5588999999999@s.whatsapp.net',
+        fromMe: false,
+        id: 'lid-msg-1',
+      },
+      message: { conversation: 'oi navobot' },
+    },
+  });
+  assert.equal(incoming?.phone, '5588999999999');
+  assert.equal(incoming?.text, 'oi navobot');
+});

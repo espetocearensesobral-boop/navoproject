@@ -132,8 +132,11 @@ export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage
   const key = data?.key || {};
   if (key.fromMe === true) return null;
 
-  const remoteJid = String(key.remoteJid || payload?.sender || '').trim();
+  const remoteJid = String(key.remoteJid || '').trim();
   if (!remoteJid || remoteJid.endsWith('@g.us') || remoteJid.endsWith('@broadcast')) return null;
+  const alternativeJid = String(key.remoteJidAlt || key.senderPn || data?.sender || payload?.sender || '').trim();
+  const resolvedJid = remoteJid.endsWith('@lid') ? alternativeJid : remoteJid;
+  if (!resolvedJid || resolvedJid.endsWith('@lid')) return null;
 
   const rawText = data?.message?.conversation
     || data?.message?.extendedTextMessage?.text
@@ -143,7 +146,7 @@ export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage
     || data?.message?.templateButtonReplyMessage?.selectedId
     || '';
   const text = String(rawText).trim();
-  const digits = remoteJid.replace(/\D/g, '');
+  const digits = resolvedJid.replace(/\D/g, '');
   if (!text || digits.length < 8) return null;
 
   return {
