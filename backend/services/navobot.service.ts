@@ -252,6 +252,20 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     return sent;
   }
 
+  async function syncClientIdentity(phone: string, pushName?: string) {
+    const recognizedName = String(pushName || '').trim();
+    if (!recognizedName || /^cliente whatsapp$/i.test(recognizedName)) return;
+    const db = getDb();
+    const normalizedPhone = sanitizePhone(phone);
+    const profiles = await db.query.profiles.findMany();
+    const profile = profiles.find((candidate: any) => candidate.phone && matchPhoneNumbers(candidate.phone, normalizedPhone));
+    if (!profile) return;
+    const updates: Record<string, unknown> = { updatedAt: new Date() };
+    if (!profile.name || /^cliente whatsapp$/i.test(String(profile.name).trim())) updates.name = recognizedName;
+    if (String(profile.email || '').endsWith('@whatsapp.navo.local')) updates.email = `wa_${normalizedPhone}`;
+    if (Object.keys(updates).length > 1) await db.update(schema.profiles).set(updates).where(eq(schema.profiles.id, profile.id));
+  }
+
   async function findAppointments(phone: string) {
     const db = getDb();
     const appointments = await db.query.appointments.findMany({ orderBy: [desc(schema.appointments.date), desc(schema.appointments.timeSlot)] });
@@ -706,7 +720,10 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (!(await recordInbound(conversation, message, deterministic))) return { ignored: true, reason: 'duplicate' };
     const context = normalizeContext(conversation.context);
     const pushName = String(message.pushName || '').trim();
-    if (pushName && !/^cliente whatsapp$/i.test(pushName)) context.clientName = pushName;
+    if (pushName && !/^cliente whatsapp$/i.test(pushName)) {
+      context.clientName = pushName;
+      await syncClientIdentity(message.phone, pushName);
+    }
     const stateReply = await handleState(conversation, context, message.text);
     if (stateReply !== null) return { handled: true, intent: deterministic || 'state' };
 
