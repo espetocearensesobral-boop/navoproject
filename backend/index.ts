@@ -253,14 +253,16 @@ import { createNavoBotService } from './services/navobot.service.js';
 let evolutionSendText: (phone: string, text: string) => Promise<boolean> = async () => false;
 let evolutionSendButtons: (phone: string, payload: any) => Promise<boolean> = async () => false;
 let evolutionSendList: (phone: string, payload: any) => Promise<boolean> = async () => false;
+let evolutionGetSettings: () => Promise<any> = async () => null;
 const navoBotService = createNavoBotService({
   getDb: () => db,
   schema,
   sendText: (phone, text) => evolutionSendText(phone, text),
   sendButtons: (phone, payload) => evolutionSendButtons(phone, payload),
   sendList: (phone, payload) => evolutionSendList(phone, payload),
+  useInteractiveMessages: async () => (await evolutionGetSettings())?.useInteractiveMessages === true,
 });
-const { router: evolutionApiRouter, sendText: configuredEvolutionSendText, sendButtons: configuredEvolutionSendButtons, sendList: configuredEvolutionSendList } = createEvolutionApiModule({
+const { router: evolutionApiRouter, sendText: configuredEvolutionSendText, sendButtons: configuredEvolutionSendButtons, sendList: configuredEvolutionSendList, getSettings: configuredEvolutionGetSettings } = createEvolutionApiModule({
   getDb: () => db,
   schema,
   eq,
@@ -270,6 +272,7 @@ const { router: evolutionApiRouter, sendText: configuredEvolutionSendText, sendB
 evolutionSendText = configuredEvolutionSendText;
 evolutionSendButtons = configuredEvolutionSendButtons;
 evolutionSendList = configuredEvolutionSendList;
+evolutionGetSettings = configuredEvolutionGetSettings;
 app.use('/api/evolution', evolutionApiRouter);
 
 /** Busca o e-mail do cliente pelo clientId (perfil), sem derrubar o fluxo principal se falhar. */

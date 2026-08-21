@@ -9,6 +9,7 @@ export interface EvolutionApiSettings {
   hasWebhookSecret: boolean;
   hasApiKey: boolean;
   navoBotEnabled: boolean;
+  useInteractiveMessages: boolean;
 }
 
 export interface EvolutionApiSettingsInput {
@@ -18,6 +19,7 @@ export interface EvolutionApiSettingsInput {
   webhookEnabled: boolean;
   webhookUrl: string;
   navoBotEnabled: boolean;
+  useInteractiveMessages: boolean;
   apiKey?: string;
   webhookSecret?: string;
 }
@@ -40,6 +42,7 @@ export const defaultEvolutionApiSettings: EvolutionApiSettings = {
   hasWebhookSecret: false,
   hasApiKey: false,
   navoBotEnabled: false,
+  useInteractiveMessages: false,
 };
 
 async function parseResponse<T>(response: Response, fallback: string): Promise<T> {

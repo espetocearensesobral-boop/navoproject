@@ -28,6 +28,7 @@ export type NavoBotDeps = {
   sendText: (phone: string, text: string) => Promise<boolean>;
   sendButtons: (phone: string, payload: any) => Promise<boolean>;
   sendList: (phone: string, payload: any) => Promise<boolean>;
+  useInteractiveMessages?: () => Promise<boolean>;
 };
 
 type BotContext = {
@@ -177,7 +178,7 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
   }
 }
 
-export function createNavoBotService({ getDb, schema, sendText, sendButtons, sendList }: NavoBotDeps) {
+export function createNavoBotService({ getDb, schema, sendText, sendButtons, sendList, useInteractiveMessages }: NavoBotDeps) {
   async function getConversation(phone: string, instanceName: string): Promise<Conversation> {
     const db = getDb();
     const normalizedPhone = sanitizePhone(phone);
@@ -259,7 +260,18 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     return sent;
   }
 
+  async function interactiveMessagesEnabled() {
+    if (!useInteractiveMessages) return false;
+    try {
+      return await useInteractiveMessages();
+    } catch (error) {
+      console.warn('[NavoBot] Não foi possível ler a configuração de mensagens interativas; usando somente texto.', error);
+      return false;
+    }
+  }
+
   async function replyList(conversation: Conversation, fallbackText: string, payload: any) {
+    if (!(await interactiveMessagesEnabled())) return reply(conversation, fallbackText);
     const sent = await sendList(conversation.phone, payload);
     if (!sent) return reply(conversation, fallbackText);
     await recordOutbound(conversation, fallbackText);
@@ -267,6 +279,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
   }
 
   async function replyButtons(conversation: Conversation, fallbackText: string, payload: any) {
+    if (!(await interactiveMessagesEnabled())) return reply(conversation, fallbackText);
     const sent = await sendButtons(conversation.phone, payload);
     if (!sent) return reply(conversation, fallbackText);
     await recordOutbound(conversation, fallbackText);

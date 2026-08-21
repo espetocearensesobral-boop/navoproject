@@ -13,6 +13,7 @@ const DEFAULT_SETTINGS = {
     webhookUrl: '',
     webhookSecret: '',
   navoBotEnabled: false,
+  useInteractiveMessages: false,
 };
 
 const configSchema = z.object({
@@ -24,6 +25,7 @@ const configSchema = z.object({
   webhookUrl: z.string().trim().max(500).optional(),
   webhookSecret: z.string().max(300).optional(),
   navoBotEnabled: z.boolean().optional(),
+  useInteractiveMessages: z.boolean().optional(),
 }).strict();
 
 const testMessageSchema = z.object({
@@ -65,6 +67,7 @@ function publicConfig(row: any) {
     hasWebhookSecret: !!row?.webhookSecret,
     hasApiKey: !!row?.apiKey,
     navoBotEnabled: !!row?.navoBotEnabled,
+    useInteractiveMessages: row?.useInteractiveMessages === true,
   };
 }
 
@@ -129,6 +132,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
         ? data.webhookSecret.trim()
         : (existing?.webhookSecret || ''),
       navoBotEnabled: data.navoBotEnabled !== undefined ? !!data.navoBotEnabled : !!existing?.navoBotEnabled,
+      useInteractiveMessages: data.useInteractiveMessages !== undefined ? !!data.useInteractiveMessages : existing?.useInteractiveMessages === true,
       updatedAt: new Date(),
     };
 
@@ -161,6 +165,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
           webhookUrl: payload.webhookUrl,
           webhookSecret: payload.webhookSecret,
           navoBotEnabled: payload.navoBotEnabled,
+          useInteractiveMessages: payload.useInteractiveMessages,
           updatedAt: payload.updatedAt,
         },
       })

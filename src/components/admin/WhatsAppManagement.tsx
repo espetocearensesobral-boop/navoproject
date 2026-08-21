@@ -76,6 +76,7 @@ export const WhatsAppManagement: React.FC = () => {
         webhookEnabled: settings.webhookEnabled,
         webhookUrl: settings.webhookUrl,
         navoBotEnabled: settings.navoBotEnabled,
+        useInteractiveMessages: settings.useInteractiveMessages,
       };
       if (apiKeyInput.trim()) payload.apiKey = apiKeyInput.trim();
       if (webhookSecretInput.trim()) payload.webhookSecret = webhookSecretInput.trim();
@@ -179,6 +180,16 @@ export const WhatsAppManagement: React.FC = () => {
           <div className="min-w-0"><p className="text-xs font-bold text-content-base">Ativar NavoBot</p><p className="text-xs text-content-muted mt-0.5">Processa mensagens recebidas, consulta a agenda e conduz confirmações, reagendamentos, cancelamentos e novos agendamentos.</p></div>
           <button type="button" role="switch" aria-checked={settings.navoBotEnabled} onClick={() => update('navoBotEnabled', !settings.navoBotEnabled)} className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${settings.navoBotEnabled ? 'bg-gold-base' : 'bg-border-subtle'}`}>
             <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${settings.navoBotEnabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl border border-border-subtle bg-surface-card">
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-content-base">Mensagens interativas (botões e listas)</p>
+            <p className="text-xs text-content-muted mt-0.5">Desative para usar somente texto e evitar o erro “Não foi possível carregar a mensagem”. Recomendado para contas pessoais conectadas por QR Code.</p>
+          </div>
+          <button type="button" role="switch" aria-checked={settings.useInteractiveMessages} onClick={() => update('useInteractiveMessages', !settings.useInteractiveMessages)} className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${settings.useInteractiveMessages ? 'bg-gold-base' : 'bg-border-subtle'}`}>
+            <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${settings.useInteractiveMessages ? 'translate-x-5' : 'translate-x-0.5'}`} />
           </button>
         </div>
 
