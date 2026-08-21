@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, CheckCircle2, Eye, EyeOff, Loader2, MessageSquare, RefreshCw, Save, Send, Settings2, Wifi, WifiOff } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Eye, EyeOff, Loader2, MessageSquare, RefreshCw, Save, Send, Settings2, Sparkles, Wifi, WifiOff } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import {
   applyEvolutionWebhook,
@@ -9,9 +9,11 @@ import {
   saveEvolutionApiSettings,
   sendEvolutionApiTest,
   testEvolutionApi,
+  testNavoBotAi,
   type EvolutionApiSettings,
   type EvolutionApiSettingsInput,
   type EvolutionApiStatus,
+  type NavoBotAiTestResult,
 } from '../../services/evolutionApiService';
 
 type StatusMessage = { type: 'success' | 'error'; text: string } | null;
@@ -36,6 +38,8 @@ export const WhatsAppManagement: React.FC = () => {
   const [testing, setTesting] = useState(false);
   const [sending, setSending] = useState(false);
   const [applyingWebhook, setApplyingWebhook] = useState(false);
+  const [testingAi, setTestingAi] = useState(false);
+  const [aiResult, setAiResult] = useState<NavoBotAiTestResult | null>(null);
   const [testNumber, setTestNumber] = useState('');
   const [testText, setTestText] = useState('Olá! Esta é uma mensagem de teste do Navo Premium.');
 
@@ -117,6 +121,25 @@ export const WhatsAppManagement: React.FC = () => {
       setMessage({ type: 'error', text: error?.message || 'Não foi possível aplicar o webhook.' });
     } finally {
       setApplyingWebhook(false);
+    }
+  };
+
+  const handleAiTest = async () => {
+    setTestingAi(true);
+    setAiResult(null);
+    try {
+      setAiResult(await testNavoBotAi());
+    } catch (error: any) {
+      setAiResult({
+        ok: false,
+        configured: false,
+        usedGemini: false,
+        model: 'gemini-2.5-flash',
+        latencyMs: 0,
+        message: error?.message || 'Não foi possível testar o Gemini do NavoBot.',
+      });
+    } finally {
+      setTestingAi(false);
     }
   };
 
@@ -214,6 +237,17 @@ export const WhatsAppManagement: React.FC = () => {
           <button type="button" onClick={() => void handleTest()} disabled={testing || saving} className="h-10 px-4 rounded-xl border border-border-subtle bg-surface-card text-content-base font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"><RefreshCw className={`w-4 h-4 ${testing ? 'animate-spin' : ''}`} />{testing ? 'Testando...' : 'Testar conexão'}</button>
           <button type="button" onClick={() => void handleSave()} disabled={saving} className="h-10 px-4 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"><Save className="w-4 h-4" />{saving ? 'Salvando...' : 'Salvar configuração'}</button>
         </div>
+      </section>
+
+      <section className="p-4 bg-surface-card border border-border-subtle rounded-xl space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-content-base flex items-center gap-2"><Sparkles className="w-4 h-4 text-gold-base" /> Diagnóstico do Gemini</h2>
+            <p className="text-xs text-content-muted mt-1">Executa uma chamada real ao <code>gemini-2.5-flash</code> usado pelo NavoBot. Use para confirmar a chave e a comunicação com a API.</p>
+          </div>
+          <button type="button" onClick={() => void handleAiTest()} disabled={testingAi} className="h-9 px-3 rounded-xl border border-border-subtle bg-surface-base text-content-base font-bold text-xs flex items-center gap-2 shrink-0 disabled:opacity-50"><Loader2 className={`w-3.5 h-3.5 ${testingAi ? 'animate-spin' : ''}`} />{testingAi ? 'Testando...' : 'Testar Gemini'}</button>
+        </div>
+        {aiResult && <div className={`p-3 rounded-xl border text-xs ${aiResult.ok ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-status-error/30 bg-status-error/10 text-status-error'}`}><p className="font-bold">{aiResult.message}</p><p className="mt-1">Modelo: {aiResult.model} · Latência: {aiResult.latencyMs} ms · Gemini utilizado: {aiResult.usedGemini ? 'sim' : 'não'}{aiResult.response ? ` · Resposta: ${aiResult.response}` : ''}</p></div>}
       </section>
 
       <section className="p-4 bg-surface-card border border-border-subtle rounded-xl space-y-3">

@@ -275,6 +275,11 @@ evolutionSendList = configuredEvolutionSendList;
 evolutionGetSettings = configuredEvolutionGetSettings;
 app.use('/api/evolution', evolutionApiRouter);
 
+app.post('/api/admin/navobot/ai-test', requireAuth, requireAdmin, async (_req, res) => {
+  const result = await navoBotService.testAiConnection();
+  return res.status(result.ok ? 200 : 503).json(result);
+});
+
 /** Busca o e-mail do cliente pelo clientId (perfil), sem derrubar o fluxo principal se falhar. */
 export async function getClientEmail(clientId: string | undefined | null, appointmentEmail?: string | null): Promise<string | null> {
   const explicitEmail = typeof appointmentEmail === 'string' ? appointmentEmail.trim().toLowerCase() : '';

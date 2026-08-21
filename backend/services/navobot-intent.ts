@@ -3,6 +3,7 @@ import { addDaysBRT, getDayOfWeekKey, getTodayStringBRT } from '../utils/datetim
 export type NavoBotIntent =
   | 'menu'
   | 'appointments'
+  | 'availability'
   | 'book'
   | 'confirm'
   | 'reschedule'
@@ -81,6 +82,8 @@ export function classifyDeterministicIntent(text: string): NavoBotIntent | null 
   if (/\b(atendente|humano|pessoa|equipe|falar com alguem|falar com alguém)\b/.test(normalized)) return 'human';
   if (/\b(cancelar|cancela|cancelamento|desmarcar|desmarque|nao vou conseguir ir|nao posso ir)\b/.test(normalized)) return 'cancel';
   if (/\b(reagendar|remarcar|mudar (o )?horario|trocar (o )?horario|alterar (o )?agendamento|mudar minha reserva|outro dia|outro horario|adiar)\b/.test(normalized)) return 'reschedule';
+  if (/\b(meu|minha|minhas)\b.*\b(agendamento|agenda|reserva|horario|marcacao|voucher)\b/.test(normalized)) return 'appointments';
+  if (!/\b(agendar|marcar|reservar|cortar|novo agendamento|fazer um agendamento)\b/.test(normalized) && /\b(quais?|qual|me mostre|mostrar|ver|consultar|saber)\b.*\b(horarios?|horas?|disponiveis?|disponibilidade|vagas?|livres?)\b|\b(horarios?|horas?|disponiveis?|disponibilidade|vagas?|livres?)\b.*\b(hoje|amanha|dia|segunda|terca|quarta|quinta|sexta|sabado|domingo)\b/.test(normalized)) return 'availability';
   if (/\b(consultar|consulto|ver|checar|saber)\b.*\b(agendamento|horario|reserva|marcacao)\b|\b(meu agendamento|minha agenda|minhas reservas|minha reserva|meus horarios|minhas marcacoes|qual (e o )?meu horario|voucher)\b/.test(normalized)) return 'appointments';
   if (/\b(servicos?|precos?|ver (os )?servicos?|mostrar (os )?servicos?|lista de servicos?)\b/.test(normalized)) return 'book';
   if (/\b(agendar|agenda[r]?|marcar|novo agendamento|fazer um agendamento|gostaria de agendar|quero reservar|quero cortar|quero fazer|tem (um )?horario|tem vaga|disponibilidade|marcar um horario|quero (um )?horario)\b/.test(normalized)) return 'book';
@@ -211,6 +214,7 @@ export function normalizeIntentName(value: unknown): NavoBotIntent {
   const normalized = normalizeText(String(value || ''));
   if (['menu', 'inicio', 'ajuda'].includes(normalized)) return 'menu';
   if (['appointments', 'agendamentos', 'agenda'].includes(normalized)) return 'appointments';
+  if (['availability', 'disponibilidade', 'horarios', 'horas', 'vagas'].includes(normalized)) return 'availability';
   if (['book', 'agendar', 'marcar'].includes(normalized)) return 'book';
   if (['confirm', 'confirmar'].includes(normalized)) return 'confirm';
   if (['reschedule', 'reagendar', 'remarcar'].includes(normalized)) return 'reschedule';

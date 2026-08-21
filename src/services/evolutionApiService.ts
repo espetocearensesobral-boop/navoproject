@@ -24,6 +24,16 @@ export interface EvolutionApiSettingsInput {
   webhookSecret?: string;
 }
 
+export interface NavoBotAiTestResult {
+  ok: boolean;
+  configured: boolean;
+  usedGemini: boolean;
+  model: string;
+  latencyMs: number;
+  response?: string;
+  message: string;
+}
+
 export interface EvolutionApiStatus {
   configured: boolean;
   reachable: boolean;
@@ -47,7 +57,7 @@ export const defaultEvolutionApiSettings: EvolutionApiSettings = {
 
 async function parseResponse<T>(response: Response, fallback: string): Promise<T> {
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data?.error || fallback);
+  if (!response.ok) throw new Error(data?.error || data?.message || fallback);
   return data as T;
 }
 
@@ -90,4 +100,9 @@ export async function sendEvolutionApiTest(number: string, text: string): Promis
   });
   const data = await parseResponse<{ message?: string }>(response, 'Não foi possível enviar a mensagem de teste.');
   return data.message || 'Mensagem de teste enviada.';
+}
+
+export async function testNavoBotAi(): Promise<NavoBotAiTestResult> {
+  const response = await authFetch('/api/admin/navobot/ai-test', { method: 'POST' });
+  return parseResponse<NavoBotAiTestResult>(response, 'Não foi possível testar o Gemini do NavoBot.');
 }

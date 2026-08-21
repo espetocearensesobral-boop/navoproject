@@ -20,8 +20,9 @@ test('classifies core NavoBot intents deterministically', () => {
   assert.equal(classifyDeterministicIntent('quero agendar um corte'), 'book');
   assert.equal(classifyDeterministicIntent('Gostaria de ver os serviços'), 'book');
   assert.equal(classifyDeterministicIntent('quero agendar um horário para amanhã'), 'book');
+  assert.equal(classifyDeterministicIntent('quais os horários disponíveis hoje?'), 'availability');
+  assert.equal(classifyDeterministicIntent('tem vaga amanhã?'), 'availability');
   assert.equal(classifyDeterministicIntent('gostaria de consultar meu agendamento'), 'appointments');
-  assert.equal(classifyDeterministicIntent('tem vaga amanhã?'), 'book');
   assert.equal(classifyDeterministicIntent('não vou conseguir ir, pode desmarcar?'), 'cancel');
   assert.equal(classifyDeterministicIntent('quero mudar minha reserva para outro dia'), 'reschedule');
   assert.equal(classifyDeterministicIntent('preciso remarcar meu horário'), 'reschedule');

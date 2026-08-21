@@ -148,8 +148,16 @@ function numericSelection(text: string): number | null {
 }
 
 async function classifyWithAi(text: string, state: string, context: BotContext = {}): Promise<NavoBotIntent> {
-  if (!ai || text.length > 1200) return 'unknown';
+  if (!ai) {
+    console.warn('[NavoBot][Gemini] Fallback não utilizado: GEMINI_API_KEY ausente.');
+    return 'unknown';
+  }
+  if (text.length > 1200) {
+    console.info('[NavoBot][Gemini] Fallback ignorado: mensagem acima de 1200 caracteres.');
+    return 'unknown';
+  }
   try {
+    console.info(`[NavoBot][Gemini] Classificando mensagem no estado ${state}.`);
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: [{ role: 'user', parts: [{ text: `Estado atual: ${state}\nContexto já coletado: ${JSON.stringify({ pendingAction: context.pendingAction, appointmentId: context.appointmentId, serviceIds: context.serviceIds, date: context.date, timeSlot: context.timeSlot, professionalId: context.professionalId })}\nMensagem do cliente: ${text}` }] }],
@@ -161,18 +169,20 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
           properties: {
             intent: {
               type: 'STRING',
-              enum: ['menu', 'appointments', 'book', 'confirm', 'reschedule', 'cancel', 'human', 'unknown'],
+              enum: ['menu', 'appointments', 'availability', 'book', 'confirm', 'reschedule', 'cancel', 'human', 'unknown'],
             },
             confidence: { type: 'NUMBER' },
           },
           required: ['intent', 'confidence'],
         } as any,
-        systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Entenda frases naturais e variações informais em português. Se o cliente pedir para marcar, reservar, ver disponibilidade ou escolher um horário, use book. Se pedir para consultar uma reserva existente, use appointments. Se quiser mudar dia ou horário, use reschedule. Se quiser desmarcar, use cancel. Se pedir uma pessoa, use human. Se estiver apenas cumprimentando, use menu. Considere o estado e o contexto já coletado. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
+        systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Entenda frases naturais e variações informais em português. Se o cliente pedir para marcar ou reservar, use book. Se perguntar quais horários estão disponíveis, se há vagas ou os horários de hoje/amanhã, use availability. Se pedir para consultar uma reserva existente, use appointments. Se quiser mudar dia ou horário, use reschedule. Se quiser desmarcar, use cancel. Se pedir uma pessoa, use human. Se estiver apenas cumprimentando, use menu. Considere o estado e o contexto já coletado. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
       },
     });
     const parsed = JSON.parse(response.text || '{}');
     const confidence = Number(parsed.confidence || 0);
-    return confidence >= 0.65 ? normalizeIntentName(parsed.intent) : 'unknown';
+    const intent = confidence >= 0.65 ? normalizeIntentName(parsed.intent) : 'unknown';
+    console.info(`[NavoBot][Gemini] Resultado: ${intent} (confiança ${confidence.toFixed(2)}).`);
+    return intent;
   } catch (error) {
     console.warn('[NavoBot] Falha no classificador de IA; seguindo com fluxo determinístico.', error);
     return 'unknown';
@@ -468,6 +478,32 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     return askMoreServices(conversation, context);
   }
 
+  async function handleAvailabilityRequest(conversation: Conversation, context: BotContext, text: string) {
+    const db = getDb();
+    const services = (await db.query.services.findMany()).filter((service: any) => service.title && Number(service.durationMinutes) > 0);
+    const contextServices = context.serviceIds?.length
+      ? services.filter((service: any) => context.serviceIds?.includes(service.id))
+      : [];
+    const deterministicMatches = findServiceMatches(services, text);
+    const normalizedText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const phraseMatches = services.filter((service: any) => String(service.title).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).some((token) => token.length >= 3 && normalizedText.includes(token)));
+    const matchedServices = contextServices.length ? contextServices : deterministicMatches.length ? deterministicMatches : phraseMatches;
+    if (matchedServices.length > 1) {
+      return reply(conversation, 'Posso consultar a disponibilidade. Qual serviço você deseja verificar?\n\n' + matchedServices.map((service: any, index: number) => `${index + 1}. *${service.title}* — ${service.durationMinutes} min`).join('\n'));
+    }
+    if (matchedServices.length === 0) {
+      return reply(conversation, 'Consigo consultar os horários disponíveis. Para calcular corretamente, preciso saber qual serviço você deseja fazer, pois cada serviço tem uma duração diferente.\n\nResponda com o nome do serviço ou acesse o catálogo completo: https://navoproject.vercel.app/?catalog=1');
+    }
+
+    const service: any = matchedServices[0];
+    const date = parseDateFromText(text) || getTodayStringBRT();
+    const slots = await suggestSlots(date, Number(service.durationMinutes || 30), context.professionalId || '');
+    if (!slots.length) {
+      return reply(conversation, `Não encontrei horários livres para *${dateLabel(date)}* para o serviço *${service.title}*. Posso consultar outro dia se você quiser.`);
+    }
+    return reply(conversation, `Horários disponíveis para *${service.title}* em *${dateLabel(date)}*:\n\n${slots.map((slot) => `• *${slot}*`).join('\n')}\n\nPara iniciar o agendamento, responda *AGENDAR* ou acesse:\nhttps://navoproject.vercel.app/?catalog=1`);
+  }
+
   async function suggestSlots(date: string, duration: number, professionalId = '', excludeAppointmentId = '') {
     const today = getTodayStringBRT();
     const current = getCurrentTimeBRT();
@@ -679,7 +715,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     return reply(conversation, `Certo. Vamos reagendar ${appointmentLabel(appointment)}. Qual novo dia você prefere?`);
   }
 
-  async function handleState(conversation: Conversation, context: BotContext, text: string) {
+  async function handleState(conversation: Conversation, context: BotContext, text: string, contextualIntent: NavoBotIntent | null = null) {
     if (conversation.state === 'human') {
       if (classifyDeterministicIntent(text) === 'menu') {
         await updateConversation(conversation, 'idle', {});
@@ -687,10 +723,27 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       }
       return reply(conversation, 'Sua solicitação foi encaminhada para a equipe. Se quiser voltar ao menu automático, responda *MENU*.');
     }
-    if (classifyDeterministicIntent(text) === 'menu') {
+    const stateIntent = contextualIntent || classifyDeterministicIntent(text);
+    if (stateIntent === 'menu') {
       const preservedContext = context.clientName ? { clientName: context.clientName } : {};
       await updateConversation(conversation, 'idle', preservedContext);
       return reply(conversation, menuText());
+    }
+    if (stateIntent === 'availability') return handleAvailabilityRequest(conversation, context, text);
+    const canInterruptFlow = ['awaiting_service', 'awaiting_more_services', 'awaiting_professional', 'awaiting_date', 'awaiting_time'].includes(conversation.state);
+    if (canInterruptFlow && stateIntent === 'appointments') {
+      await updateConversation(conversation, 'idle', context);
+      return listAppointments(conversation);
+    }
+    if (canInterruptFlow && stateIntent === 'book') {
+      await updateConversation(conversation, 'idle', context);
+      return startBooking(conversation, context, text);
+    }
+    if (canInterruptFlow && stateIntent === 'cancel') return beginAppointmentAction(conversation, context, 'cancel');
+    if (canInterruptFlow && stateIntent === 'reschedule') return beginAppointmentAction(conversation, context, 'reschedule');
+    if (canInterruptFlow && stateIntent === 'human') {
+      await updateConversation(conversation, 'human', context, true);
+      return reply(conversation, 'Vou encaminhar sua conversa para a equipe. Em breve alguém continuará o atendimento por aqui.');
     }
     if (conversation.state === 'awaiting_appointment') return handleAwaitingAppointment(conversation, context, text);
     if (conversation.state === 'awaiting_service') {
@@ -811,10 +864,15 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       context.clientName = pushName;
       await syncClientIdentity(message.phone, pushName);
     }
-    const stateReply = await handleState(conversation, context, message.text);
-    if (stateReply !== null) return { handled: true, intent: deterministic || 'state' };
+    const aiIntent = !deterministic && conversation.state !== 'idle' && conversation.state !== 'human'
+      ? await classifyWithAi(message.text, conversation.state, context)
+      : null;
+    const interruptIntents = new Set<NavoBotIntent>(['menu', 'appointments', 'availability', 'cancel', 'reschedule', 'human']);
+    const contextualIntent = deterministic || (aiIntent && interruptIntents.has(aiIntent) ? aiIntent : null);
+    const stateReply = await handleState(conversation, context, message.text, contextualIntent);
+    if (stateReply !== null) return { handled: true, intent: contextualIntent || aiIntent || 'state' };
 
-    const intent = deterministic || await classifyWithAi(message.text, conversation.state, context);
+    const intent = contextualIntent || aiIntent || await classifyWithAi(message.text, conversation.state, context);
     if (intent === 'menu' || intent === 'unknown') {
       await updateConversation(conversation, 'idle', context);
       await reply(conversation, menuText(message.pushName));
@@ -828,6 +886,10 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (intent === 'appointments') {
       await updateConversation(conversation, 'idle', {});
       await listAppointments(conversation);
+      return { handled: true, intent };
+    }
+    if (intent === 'availability') {
+      await handleAvailabilityRequest(conversation, context, message.text);
       return { handled: true, intent };
     }
     if (intent === 'book') {
@@ -852,6 +914,38 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     }
     await reply(conversation, menuText(message.pushName));
     return { handled: true, intent: 'menu' };
+  }
+
+  async function testAiConnection() {
+    if (!ai) {
+      return { ok: false, configured: false, usedGemini: false, model: 'gemini-2.5-flash', latencyMs: 0, message: 'GEMINI_API_KEY não está configurada no ambiente.' };
+    }
+    const startedAt = Date.now();
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{ role: 'user', parts: [{ text: 'Responda somente com a palavra OK.' }] }],
+        config: { temperature: 0, maxOutputTokens: 8 },
+      });
+      return {
+        ok: !!response.text,
+        configured: true,
+        usedGemini: true,
+        model: 'gemini-2.5-flash',
+        latencyMs: Date.now() - startedAt,
+        response: String(response.text || '').trim().slice(0, 40),
+        message: response.text ? 'Gemini respondeu com sucesso.' : 'Gemini respondeu sem texto.',
+      };
+    } catch (error: any) {
+      return {
+        ok: false,
+        configured: true,
+        usedGemini: false,
+        model: 'gemini-2.5-flash',
+        latencyMs: Date.now() - startedAt,
+        message: `Falha ao chamar o Gemini: ${String(error?.message || 'erro desconhecido').slice(0, 240)}`,
+      };
+    }
   }
 
   async function handleWebhook(payload: any) {
@@ -909,5 +1003,5 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     return { skipped: false, reminded, reset };
   }
 
-  return { handleWebhook, processInactivitySweep };
+  return { handleWebhook, processInactivitySweep, testAiConnection };
 }
