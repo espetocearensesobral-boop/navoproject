@@ -107,5 +107,10 @@ export async function sendEvolutionApiTest(number: string, text: string): Promis
 
 export async function testNavoBotAi(): Promise<NavoBotAiTestResult> {
   const response = await authFetch('/api/admin/navobot/ai-test', { method: 'POST' });
-  return parseResponse<NavoBotAiTestResult>(response, 'Não foi possível testar o Gemini do NavoBot.');
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    if (data && typeof data === 'object' && 'model' in data && 'usedGemini' in data) return data as NavoBotAiTestResult;
+    throw new Error(data?.error || data?.message || 'Não foi possível testar o Gemini do NavoBot.');
+  }
+  return data as NavoBotAiTestResult;
 }

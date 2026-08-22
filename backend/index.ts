@@ -7,7 +7,7 @@ import { eq, or, and, desc, like, sql } from "drizzle-orm";
 import postgres from "postgres";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import * as schema from "../src/db/schema.js";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
@@ -427,6 +427,24 @@ export async function notifyShopByEmail(apt: any, kind: 'booking' | 'reschedule'
 // Bot Chat API
 // =====================================
 let ai: GoogleGenAI | null = null;
+
+function extractGeminiText(response: any): string {
+  const direct = typeof response?.text === 'function' ? response.text() : response?.text;
+  if (typeof direct === 'string' && direct.trim()) return direct.trim();
+  return (response?.candidates || [])
+    .flatMap((candidate: any) => candidate?.content?.parts || [])
+    .map((part: any) => typeof part?.text === 'string' ? part.text : '')
+    .filter(Boolean)
+    .join('')
+    .trim();
+}
+
+function geminiResponseDiagnostics(response: any): string {
+  const finishReason = response?.candidates?.[0]?.finishReason;
+  const blockReason = response?.promptFeedback?.blockReason;
+  return [finishReason && `finishReason=${finishReason}`, blockReason && `blockReason=${blockReason}`].filter(Boolean).join(', ');
+}
+
 app.post("/api/bot/chat", requireAuth, async (req: any, res: any) => {
   try {
     if (!ai) {
@@ -514,7 +532,12 @@ Serviços:
       },
     });
 
-    res.json({ reply: response.text });
+    const replyText = extractGeminiText(response);
+    if (!replyText) {
+      const diagnostics = geminiResponseDiagnostics(response);
+      throw new Error(`Gemini retornou uma resposta sem texto${diagnostics ? ` (${diagnostics})` : ''}.`);
+    }
+    res.json({ reply: replyText });
   } catch (e: any) {
     console.error("Erro no chat:", e);
     const userMessage = (e.status === 401 || e.status === 403 || (e.message && e.message.includes('403')))
@@ -550,8 +573,10 @@ app.get("/api/admin/validate-keys", requireAuth, requireAdmin, async (req: any, 
       const testRes = await tempAi.models.generateContent({
         model: "gemini-3.6-flash",
         contents: "Atenda com 'OK'",
+        config: { temperature: 0, maxOutputTokens: 32, thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL } },
       });
-      if (testRes && testRes.text) {
+      const testText = extractGeminiText(testRes);
+      if (testText) {
         results.push({
           key: 'GEMINI_API_KEY',
           name: 'Google Gemini AI Key',

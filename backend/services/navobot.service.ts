@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { and, desc, eq, ne, sql } from 'drizzle-orm';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { checkSlotAvailability, fetchDaySlotContext, invalidateAvailabilityCache } from './availability.service.js';
 import { getCurrentTimeBRT, getDayOfWeekKey, getTodayStringBRT, minutesToTime, timeToMinutes } from '../utils/datetime.js';
 import { generateBookingCode, matchPhoneNumbers, sanitizePhone } from '../utils/index.js';
@@ -156,6 +156,22 @@ function numericSelection(text: string): number | null {
   return Number.isInteger(value) && value > 0 ? value - 1 : null;
 }
 
+function extractGeminiText(response: any): string {
+  const direct = typeof response?.text === 'function' ? response.text() : response?.text;
+  if (typeof direct === 'string' && direct.trim()) return direct.trim();
+  const parts = (response?.candidates || [])
+    .flatMap((candidate: any) => candidate?.content?.parts || [])
+    .map((part: any) => typeof part?.text === 'string' ? part.text : '')
+    .filter(Boolean);
+  return parts.join('').trim();
+}
+
+function geminiResponseDiagnostics(response: any): string {
+  const finishReason = response?.candidates?.[0]?.finishReason;
+  const blockReason = response?.promptFeedback?.blockReason;
+  return [finishReason && `finishReason=${finishReason}`, blockReason && `blockReason=${blockReason}`].filter(Boolean).join(', ');
+}
+
 async function classifyWithAi(text: string, state: string, context: BotContext = {}): Promise<NavoBotIntent> {
   if (!ai) {
     console.warn('[NavoBot][Gemini] Fallback não utilizado: GEMINI_API_KEY ausente.');
@@ -172,6 +188,8 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
       contents: [{ role: 'user', parts: [{ text: `Estado atual: ${state}\nContexto já coletado: ${JSON.stringify({ pendingAction: context.pendingAction, appointmentId: context.appointmentId, serviceIds: context.serviceIds, date: context.date, timeSlot: context.timeSlot, professionalId: context.professionalId })}\nMensagem do cliente: ${text}` }] }],
       config: {
         temperature: 0.1,
+        maxOutputTokens: 128,
+        thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
         responseMimeType: 'application/json',
         responseSchema: {
           type: 'OBJECT',
@@ -187,7 +205,12 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
         systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Entenda frases naturais e variações informais em português. Se o cliente pedir para marcar, reservar ou ver quais serviços a barbearia oferece, use book. A palavra “disponíveis” em “serviços disponíveis” significa catálogo, não agenda. Se perguntar quais horários estão disponíveis, se há vagas ou os horários de hoje/amanhã, use availability. Se pedir para consultar uma reserva existente, use appointments. Se quiser mudar dia ou horário, use reschedule. Se quiser desmarcar, use cancel. Se pedir uma pessoa, use human. Se estiver apenas cumprimentando, use menu. Considere o estado e o contexto já coletado. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
       },
     });
-    const parsed = JSON.parse(response.text || '{}');
+    const responseText = extractGeminiText(response);
+    if (!responseText) {
+      console.warn(`[NavoBot][Gemini] Resposta sem texto${geminiResponseDiagnostics(response) ? ` (${geminiResponseDiagnostics(response)})` : ''}.`);
+      return 'unknown';
+    }
+    const parsed = JSON.parse(responseText);
     const confidence = Number(parsed.confidence || 0);
     const intent = confidence >= 0.65 ? normalizeIntentName(parsed.intent) : 'unknown';
     console.info(`[NavoBot][Gemini] Resultado: ${intent} (confiança ${confidence.toFixed(2)}).`);
@@ -979,16 +1002,18 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       const response = await ai.models.generateContent({
         model: 'gemini-3.6-flash',
         contents: [{ role: 'user', parts: [{ text: 'Responda somente com a palavra OK.' }] }],
-        config: { temperature: 0, maxOutputTokens: 8 },
+        config: { temperature: 0, maxOutputTokens: 32, thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL } },
       });
+      const responseText = extractGeminiText(response);
+      const diagnostics = geminiResponseDiagnostics(response);
       return {
-        ok: !!response.text,
+        ok: !!responseText,
         configured: true,
         usedGemini: true,
         model: 'gemini-3.6-flash',
         latencyMs: Date.now() - startedAt,
-        response: String(response.text || '').trim().slice(0, 40),
-        message: response.text ? 'Gemini respondeu com sucesso.' : 'Gemini respondeu sem texto.',
+        response: responseText.slice(0, 40),
+        message: responseText ? 'Gemini respondeu com sucesso.' : `Gemini foi chamado, mas não retornou texto${diagnostics ? ` (${diagnostics})` : ''}.`,
       };
     } catch (error: any) {
       return {
