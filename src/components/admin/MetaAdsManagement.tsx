@@ -71,10 +71,12 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({ onOpenSett
   const [form, setForm] = useState<MetaCampaignForm>(initialForm);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [statusTarget, setStatusTarget] = useState<{ campaign: MetaCampaign; status: 'ACTIVE' | 'PAUSED' } | null>(null);
 
   const load = async (showLoading = true) => {
     if (showLoading) setLoading(true);
+    setLoadError(null);
     try {
       const [statusResponse, campaignResponse] = await Promise.all([getMetaAdsStatus(), getMetaCampaigns()]);
       setConfigured(statusResponse.configured);
@@ -82,7 +84,9 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({ onOpenSett
       setCampaigns(campaignResponse.campaigns);
       setTotals(campaignResponse.totals);
     } catch (error: any) {
-      setMessage({ type: 'error', text: error?.message || 'Não foi possível carregar o módulo Campanhas.' });
+      const text = error?.message || 'Não foi possível carregar o módulo Campanhas.';
+      setLoadError(text);
+      setMessage({ type: 'error', text });
     } finally {
       setLoading(false);
     }
@@ -105,6 +109,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({ onOpenSett
       }), { spendCents: 0, leads: 0, clicks: 0, reach: 0, impressions: 0 });
       setTotals(nextTotals);
       setConnection((previous) => previous ? { ...previous, lastSyncedAt: response.syncedAt, status: 'connected', lastError: null } : previous);
+      setLoadError(null);
       setMessage({ type: 'success', text: 'Campanhas e métricas atualizadas a partir da Meta.' });
     } catch (error: any) {
       setMessage({ type: 'error', text: error?.message || 'Não foi possível sincronizar com a Meta.' });
@@ -164,6 +169,8 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({ onOpenSett
       </AdminPageHeader>
 
       {message && <div className={`flex items-start gap-2 rounded-lg border px-3 py-2.5 text-sm ${message.type === 'success' ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-red-500/30 bg-red-500/10 text-red-300'}`} role="status"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /><span>{message.text}</span></div>}
+
+      {loadError && <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div className="min-w-0"><h2 className="text-sm font-bold text-content-base">Não foi possível carregar as campanhas</h2><p className="mt-1 break-words text-sm leading-relaxed text-content-muted">{loadError}</p></div><button type="button" onClick={() => void load()} disabled={loading} className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"><RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Tentar novamente</button></div></section>}
 
       {!configured && <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-sm font-bold text-content-base">Conecte o Meta Ads para começar</h2><p className="mt-1 text-sm text-content-muted">A conexão e os ajustes ficam em Configurações. O módulo só cria campanhas depois que a conta e a Página forem escolhidas.</p></div><button type="button" onClick={onOpenSettings} className="min-h-9 rounded-md bg-gold-base px-3 text-xs font-bold text-content-on-accent hover:bg-gold-hover">Abrir configurações</button></div></section>}
       {configured && !canCreate && <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-sm font-bold text-content-base">Finalize a seleção de ativos</h2><p className="mt-1 text-sm text-content-muted">Selecione uma conta de anúncios e uma Página em Configurações antes de criar ou sincronizar campanhas.</p></div><button type="button" onClick={onOpenSettings} className="min-h-9 rounded-md border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10">Revisar configuração</button></div></section>}

@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import { and, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { db } from '../index.js';
+import { db, dbReadyPromise, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { JWT_SECRET } from '../config/env.js';
 import { requireAuth, requireAdmin } from '../middleware/index.js';
@@ -109,10 +109,37 @@ const getOwnedCampaign = async (ownerId: string, id: string) => db.query.metaAds
 
 const accountPath = (adAccountId: string) => `/act_${encodeURIComponent(adAccountId.replace(/^act_/, ''))}`;
 
+const META_ADS_MIGRATION_MESSAGE = 'A estrutura do Meta Ads ainda não foi criada no banco. Aplique a migração drizzle/0031_meta_ads.sql no Supabase e tente novamente.';
+
+const metaAdsDatabaseError = (error: any) => {
+  const message = String(error?.message || '');
+  const missingMetaTable = error?.code === '42P01' || /meta_ads_(connections|campaigns|leads)/i.test(message) && /does not exist|não existe/i.test(message);
+  const normalized = new Error(missingMetaTable ? META_ADS_MIGRATION_MESSAGE : 'O banco de dados do Navo está indisponível no momento.') as any;
+  normalized.status = missingMetaTable ? 503 : 503;
+  normalized.cause = error;
+  return normalized;
+};
+
+const ensureMetaAdsDatabase = async () => {
+  if (!isDbConnected && dbReadyPromise) await Promise.race([
+    dbReadyPromise.catch(() => undefined),
+    new Promise((resolve) => setTimeout(resolve, 5_000)),
+  ]);
+  if (!isDbConnected || !db) {
+    throw Object.assign(new Error('O banco de dados do Navo está indisponível no momento.'), { status: 503 });
+  }
+};
+
 metaAdsRouter.get('/status', requireAuth, requireAdmin, async (req, res) => {
-  const config = getMetaAdsConfig();
-  const connection = await getConnection(getCurrentUserId(req));
-  return res.json({ configured: config.configured, graphApiVersion: config.graphApiVersion, connection: publicConnection(connection) });
+  try {
+    await ensureMetaAdsDatabase();
+    const config = getMetaAdsConfig();
+    const connection = await getConnection(getCurrentUserId(req));
+    return res.json({ configured: config.configured, graphApiVersion: config.graphApiVersion, connection: publicConnection(connection) });
+  } catch (error: any) {
+    const normalized = metaAdsDatabaseError(error);
+    return res.status(normalized.status || 503).json({ error: normalized.message, code: error?.code || 'META_ADS_DATABASE_UNAVAILABLE' });
+  }
 });
 
 metaAdsRouter.get('/oauth/start', requireAuth, requireAdmin, async (req, res) => {
@@ -271,17 +298,23 @@ metaAdsRouter.get('/locations', requireAuth, requireAdmin, async (req, res) => {
 });
 
 metaAdsRouter.get('/campaigns', requireAuth, requireAdmin, async (req, res) => {
-  const ownerId = getCurrentUserId(req);
-  const campaigns = await db.query.metaAdsCampaigns.findMany({ where: eq(schema.metaAdsCampaigns.ownerId, ownerId), orderBy: [desc(schema.metaAdsCampaigns.updatedAt)] });
-  const totals = campaigns.reduce((acc, campaign) => {
-    acc.spendCents += Number(campaign.spendCents || 0);
-    acc.leads += Number(campaign.leads || 0);
-    acc.clicks += Number(campaign.clicks || 0);
-    acc.reach += Number(campaign.reach || 0);
-    acc.impressions += Number(campaign.impressions || 0);
-    return acc;
-  }, { spendCents: 0, leads: 0, clicks: 0, reach: 0, impressions: 0 });
-  return res.json({ campaigns: campaigns.map(publicCampaign), totals });
+  try {
+    await ensureMetaAdsDatabase();
+    const ownerId = getCurrentUserId(req);
+    const campaigns = await db.query.metaAdsCampaigns.findMany({ where: eq(schema.metaAdsCampaigns.ownerId, ownerId), orderBy: [desc(schema.metaAdsCampaigns.updatedAt)] });
+    const totals = campaigns.reduce((acc, campaign) => {
+      acc.spendCents += Number(campaign.spendCents || 0);
+      acc.leads += Number(campaign.leads || 0);
+      acc.clicks += Number(campaign.clicks || 0);
+      acc.reach += Number(campaign.reach || 0);
+      acc.impressions += Number(campaign.impressions || 0);
+      return acc;
+    }, { spendCents: 0, leads: 0, clicks: 0, reach: 0, impressions: 0 });
+    return res.json({ campaigns: campaigns.map(publicCampaign), totals });
+  } catch (error: any) {
+    const normalized = metaAdsDatabaseError(error);
+    return res.status(normalized.status || 503).json({ error: normalized.message, code: error?.code || 'META_ADS_DATABASE_UNAVAILABLE' });
+  }
 });
 
 metaAdsRouter.post('/campaigns/sync', requireAuth, requireAdmin, async (req, res) => {

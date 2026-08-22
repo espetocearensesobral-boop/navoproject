@@ -27,10 +27,12 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
   const [accountId, setAccountId] = useState('');
   const [pageId, setPageId] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [disconnectOpen, setDisconnectOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
+    setLoadError(null);
     setMessage(null);
     try {
       const nextStatus = await getMetaAdsStatus();
@@ -46,7 +48,9 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
         setPages([]);
       }
     } catch (error: any) {
-      setMessage({ type: 'error', text: error?.message || 'Não foi possível carregar a integração Meta Ads.' });
+      const text = error?.message || 'Não foi possível carregar a integração Meta Ads.';
+      setLoadError(text);
+      setMessage({ type: 'error', text });
     } finally {
       setLoading(false);
     }
@@ -100,6 +104,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
     try {
       const response = await saveMetaAdsAssets(accountId, pageId);
       setStatus((previous) => previous ? { ...previous, connection: response.connection } : previous);
+      setLoadError(null);
       setMessage({ type: 'success', text: 'Ativos Meta salvos. O módulo Campanhas já pode usar essa conta.' });
     } catch (error: any) {
       setMessage({ type: 'error', text: error?.message || 'Não foi possível salvar os ativos.' });
@@ -146,6 +151,8 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
           <span>{message.text}</span>
         </div>
       )}
+
+      {loadError && <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div className="min-w-0"><h2 className="text-sm font-bold text-content-base">Configuração ainda não carregada</h2><p className="mt-1 break-words text-sm leading-relaxed text-content-muted">{loadError}</p></div><button type="button" onClick={() => void load()} disabled={loading} className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"><RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Tentar novamente</button></div></section>}
 
       {!status?.configured && (
         <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5">
