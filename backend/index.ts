@@ -506,7 +506,7 @@ Serviços:
     });
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.6-flash",
       contents,
       config: {
         systemInstruction: contextText,
@@ -548,7 +548,7 @@ app.get("/api/admin/validate-keys", requireAuth, requireAdmin, async (req: any, 
         httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
       });
       const testRes = await tempAi.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.6-flash",
         contents: "Atenda com 'OK'",
       });
       if (testRes && testRes.text) {
@@ -557,9 +557,9 @@ app.get("/api/admin/validate-keys", requireAuth, requireAdmin, async (req: any, 
           name: 'Google Gemini AI Key',
           status: 'valid',
           configured: true,
-          modelTested: 'gemini-2.5-flash',
+          modelTested: 'gemini-3.6-flash',
           maskedKey: `${geminiKey.substring(0, 6)}...${geminiKey.substring(geminiKey.length - 4)}`,
-          message: 'Chave ativa, autenticada e respondendo com sucesso no modelo gemini-2.5-flash.',
+          message: 'Chave ativa, autenticada e respondendo com sucesso no modelo gemini-3.6-flash.',
         });
       } else {
         results.push({

@@ -168,7 +168,7 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
   try {
     console.info(`[NavoBot][Gemini] Classificando mensagem no estado ${state}.`);
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.6-flash',
       contents: [{ role: 'user', parts: [{ text: `Estado atual: ${state}\nContexto já coletado: ${JSON.stringify({ pendingAction: context.pendingAction, appointmentId: context.appointmentId, serviceIds: context.serviceIds, date: context.date, timeSlot: context.timeSlot, professionalId: context.professionalId })}\nMensagem do cliente: ${text}` }] }],
       config: {
         temperature: 0.1,
@@ -972,12 +972,12 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
 
   async function testAiConnection() {
     if (!ai) {
-      return { ok: false, configured: false, usedGemini: false, model: 'gemini-2.5-flash', latencyMs: 0, message: 'GEMINI_API_KEY não está configurada no ambiente.' };
+      return { ok: false, configured: false, usedGemini: false, model: 'gemini-3.6-flash', latencyMs: 0, message: 'GEMINI_API_KEY não está configurada no ambiente.' };
     }
     const startedAt = Date.now();
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.6-flash',
         contents: [{ role: 'user', parts: [{ text: 'Responda somente com a palavra OK.' }] }],
         config: { temperature: 0, maxOutputTokens: 8 },
       });
@@ -985,7 +985,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         ok: !!response.text,
         configured: true,
         usedGemini: true,
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.6-flash',
         latencyMs: Date.now() - startedAt,
         response: String(response.text || '').trim().slice(0, 40),
         message: response.text ? 'Gemini respondeu com sucesso.' : 'Gemini respondeu sem texto.',
@@ -995,7 +995,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         ok: false,
         configured: true,
         usedGemini: false,
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.6-flash',
         latencyMs: Date.now() - startedAt,
         message: `Falha ao chamar o Gemini: ${String(error?.message || 'erro desconhecido').slice(0, 240)}`,
       };

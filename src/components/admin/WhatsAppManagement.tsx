@@ -135,7 +135,7 @@ export const WhatsAppManagement: React.FC = () => {
         ok: false,
         configured: false,
         usedGemini: false,
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.6-flash',
         latencyMs: 0,
         message: error?.message || 'Não foi possível testar o Gemini do NavoBot.',
       });
@@ -253,7 +253,7 @@ export const WhatsAppManagement: React.FC = () => {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="text-sm font-bold text-content-base flex items-center gap-2"><Sparkles className="w-4 h-4 text-gold-base" /> Diagnóstico do Gemini</h2>
-            <p className="text-xs text-content-muted mt-1">Executa uma chamada real ao <code>gemini-2.5-flash</code> usado pelo NavoBot. Use para confirmar a chave e a comunicação com a API.</p>
+            <p className="text-xs text-content-muted mt-1">Executa uma chamada real ao <code>gemini-3.6-flash</code> usado pelo NavoBot. Use para confirmar a chave e a comunicação com a API.</p>
           </div>
           <button type="button" onClick={() => void handleAiTest()} disabled={testingAi} className="h-9 px-3 rounded-xl border border-border-subtle bg-surface-base text-content-base font-bold text-xs flex items-center gap-2 shrink-0 disabled:opacity-50"><Loader2 className={`w-3.5 h-3.5 ${testingAi ? 'animate-spin' : ''}`} />{testingAi ? 'Testando...' : 'Testar Gemini'}</button>
         </div>
