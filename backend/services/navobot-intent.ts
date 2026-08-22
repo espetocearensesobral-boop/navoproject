@@ -82,7 +82,7 @@ export function classifyDeterministicIntent(text: string): NavoBotIntent | null 
   if (/^5(?:\s*[-.)]|\s|$)/.test(normalized)) return 'human';
   if (/^(oi|ola|olá|menu|inicio|início|ajuda|bom dia|boa tarde|boa noite)\b/.test(normalized)) return 'menu';
   if (/\b(atendente|humano|pessoa|equipe|falar com alguem|falar com alguém)\b/.test(normalized)) return 'human';
-  if (/\b(reclamar|reclamacao|insatisfeito|insatisfacao|decepcionado|decepcao|indignado|absurdo|horrivel|pessimo|nao gostei|servico ruim|atendimento ruim|problema no atendimento|cobranca indevida|cobranca errada|cobraram errado|cobrou errado|atraso no atendimento|atendimento atrasado|demorou no atendimento|esperei demais|desrespeito|desrespeitaram|maltratado|grosseiro|erro no atendimento|falha no atendimento|quero denunciar)\b/.test(normalized)) return 'complaint';
+  if (/\b(reclamar|reclamacao|insatisfeito|insatisfacao|decepcionado|decepcao|indignado|absurdo|horrivel|pessimo|nao gostei|servico ruim|atendimento ruim|problema no atendimento|cobranca indevida|cobranca errada|cobraram errado|cobrou errado|atraso no atendimento|atendimento atrasado|demorou no atendimento|esperei demais|ainda estou esperando|estou esperando|ninguem me atendeu|sem retorno|nao tive retorno|desrespeito|desrespeitaram|maltratado|grosseiro|erro no atendimento|falha no atendimento|quero denunciar)\b/.test(normalized)) return 'complaint';
   if (/\b(cancelar|cancela|cancele|cancelamento|desmarcar|desmarque)\b/.test(normalized) && /\b(todos?|todas?|tudo|agendamentos?|reservas?|horarios?)\b/.test(normalized)) return 'cancel_all';
   if (/\b(cancelar|cancela|cancele|cancelamento|desmarcar|desmarque|nao vou conseguir ir|nao posso ir)\b/.test(normalized)) return 'cancel';
   if (/\b(reagendar|remarcar|mudar (o )?horario|trocar (o )?horario|alterar (o )?agendamento|mudar minha reserva|outro dia|outro horario|adiar)\b/.test(normalized)) return 'reschedule';
@@ -96,6 +96,13 @@ export function classifyDeterministicIntent(text: string): NavoBotIntent | null 
   if (/\b(agendar|agenda[r]?|marcar|novo agendamento|fazer um agendamento|gostaria de agendar|quero reservar|quero cortar|quero fazer|tem (um )?horario|tem vaga|disponibilidade|marcar um horario|quero (um )?horario)\b/.test(normalized)) return 'book';
   if (/\b(confirmar|confirmo|confirma|confirmacao|confirmado|esta confirmado)\b/.test(normalized)) return 'confirm';
   return null;
+}
+
+export function humanHandoffMessage(followUpCount: number): string {
+  if (followUpCount <= 0) {
+    return 'Sua mensagem adicional foi registrada. O caso já está encaminhado para a equipe responsável e o atendimento automático permanece pausado para evitar respostas desencontradas. Aguarde a análise da equipe. Para voltar ao menu automático, envie *MENU*.';
+  }
+  return 'Recebi sua nova mensagem. O caso continua encaminhado para a equipe responsável e o atendimento automático permanece pausado para evitar respostas desencontradas. Aguarde a análise da equipe. Para voltar ao menu automático, envie *MENU*.';
 }
 
 export function isPositiveConfirmation(text: string): boolean {

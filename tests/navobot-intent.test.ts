@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   classifyDeterministicIntent,
+  humanHandoffMessage,
   extractBookingCode,
   extractEvolutionMessage,
   findServiceMatches,
@@ -37,8 +38,19 @@ test('classifies core NavoBot intents deterministically', () => {
   assert.equal(classifyDeterministicIntent('quero reclamar da cobrança'), 'complaint');
   assert.equal(classifyDeterministicIntent('isso é um absurdo'), 'complaint');
   assert.equal(classifyDeterministicIntent('cobraram errado no meu atendimento'), 'complaint');
+  assert.equal(classifyDeterministicIntent('ninguém me atendeu'), 'complaint');
+  assert.equal(classifyDeterministicIntent('ainda estou esperando'), 'complaint');
   assert.equal(classifyDeterministicIntent('quero falar com atendente'), 'human');
   assert.equal(classifyDeterministicIntent('meu agendamento'), 'appointments');
+});
+
+test('contextualiza mensagens repetidas após o handoff humano', () => {
+  const firstFollowUp = humanHandoffMessage(0);
+  const laterFollowUp = humanHandoffMessage(1);
+  assert.match(firstFollowUp, /caso já está encaminhado/);
+  assert.match(firstFollowUp, /Aguarde a análise da equipe/);
+  assert.match(laterFollowUp, /Recebi sua nova mensagem/);
+  assert.notEqual(firstFollowUp, laterFollowUp);
 });
 
 test('does not confuse greetings with service names and supports partial service names', () => {

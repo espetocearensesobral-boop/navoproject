@@ -7,6 +7,7 @@ import { getCurrentTimeBRT, getDayOfWeekKey, getTodayStringBRT, minutesToTime, t
 import { generateBookingCode, matchPhoneNumbers, sanitizePhone } from '../utils/index.js';
 import {
   classifyDeterministicIntent,
+  humanHandoffMessage,
   extractBookingCode,
   extractEvolutionMessage,
   isNegativeConfirmation,
@@ -50,6 +51,7 @@ type BotContext = {
   availabilityDate?: string;
   availabilityOptions?: string[];
   inactivityReminderSentAt?: string;
+  humanFollowUpCount?: number;
 };
 
 type Conversation = {
@@ -303,6 +305,48 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const sent = await sendText(conversation.phone, text);
     await recordOutbound(conversation, text);
     return sent;
+  }
+
+  async function handleHumanState(conversation: Conversation, context: BotContext, text: string, contextualIntent: NavoBotIntent | null) {
+    const stateIntent = contextualIntent || classifyDeterministicIntent(text);
+    if (stateIntent === 'menu') {
+      await updateConversation(conversation, 'idle', {});
+      return reply(conversation, menuText());
+    }
+
+    const nextContext = contextForNewIntent(context);
+    if (stateIntent === 'appointments') {
+      await updateConversation(conversation, 'idle', nextContext);
+      return listAppointments(conversation);
+    }
+    if (stateIntent === 'availability') {
+      await updateConversation(conversation, 'idle', nextContext);
+      return handleAvailabilityRequest(conversation, nextContext, text);
+    }
+    if (stateIntent === 'book') {
+      const bookingContext = { ...nextContext, pendingAction: 'book' as const };
+      await updateConversation(conversation, 'idle', bookingContext);
+      return startBooking(conversation, bookingContext, text);
+    }
+    if (stateIntent === 'cancel') {
+      const cancelContext = { ...nextContext, pendingAction: 'cancel' as const };
+      await updateConversation(conversation, 'idle', cancelContext);
+      return beginAppointmentAction(conversation, cancelContext, 'cancel');
+    }
+    if (stateIntent === 'cancel_all') {
+      const cancelAllContext = { ...nextContext, pendingAction: 'cancel_all' as const };
+      await updateConversation(conversation, 'idle', cancelAllContext);
+      return beginBulkCancellation(conversation, cancelAllContext);
+    }
+    if (stateIntent === 'reschedule') {
+      const rescheduleContext = { ...nextContext, pendingAction: 'reschedule' as const };
+      await updateConversation(conversation, 'idle', rescheduleContext);
+      return beginAppointmentAction(conversation, rescheduleContext, 'reschedule');
+    }
+
+    const followUpCount = Number(context.humanFollowUpCount || 0);
+    await updateConversation(conversation, 'human', { ...context, humanFollowUpCount: followUpCount + 1 }, true);
+    return reply(conversation, humanHandoffMessage(followUpCount));
   }
 
   async function interactiveMessagesEnabled() {
@@ -811,11 +855,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
 
   async function handleState(conversation: Conversation, context: BotContext, text: string, contextualIntent: NavoBotIntent | null = null) {
     if (conversation.state === 'human') {
-      if (classifyDeterministicIntent(text) === 'menu') {
-        await updateConversation(conversation, 'idle', {});
-        return reply(conversation, menuText());
-      }
-      return reply(conversation, 'Sua solicitação foi encaminhada para a equipe. Para voltar ao menu automático, responda *MENU*.');
+      return handleHumanState(conversation, context, text, contextualIntent);
     }
     const stateIntent = contextualIntent || classifyDeterministicIntent(text);
     if (stateIntent === 'menu') {
@@ -871,7 +911,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       return beginAppointmentAction(conversation, nextContext, 'reschedule');
     }
     if (canInterruptFlow && stateIntent === 'complaint') {
-      const nextContext = contextForNewIntent(context);
+      const nextContext = contextForNewIntent(context, { humanFollowUpCount: 0 });
       await updateConversation(conversation, 'human', nextContext, true);
       return reply(conversation, 'Sinto muito pela experiência. Sua mensagem foi encaminhada para a equipe responsável. Se desejar, descreva o que aconteceu para facilitar a análise. Não é necessário repetir seus dados pessoais.');
     }
@@ -1015,7 +1055,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       context.clientName = pushName;
       await syncClientIdentity(message.phone, pushName);
     }
-    const aiIntent = !deterministic && conversation.state !== 'idle' && conversation.state !== 'human'
+    const aiIntent = !deterministic && conversation.state !== 'idle'
       ? await classifyWithAi(message.text, conversation.state, context)
       : null;
     const interruptIntents = new Set<NavoBotIntent>(['menu', 'appointments', 'availability', 'book', 'cancel', 'cancel_all', 'complaint', 'reschedule', 'human']);
@@ -1036,8 +1076,8 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       return { handled: true, intent };
     }
     if (intent === 'human') {
-      await updateConversation(conversation, 'human', context, true);
-      await reply(conversation, 'Vou encaminhar sua conversa para a equipe. Em breve alguém continuará o atendimento por aqui.');
+      await updateConversation(conversation, 'human', { ...context, humanFollowUpCount: 0 }, true);
+      await reply(conversation, 'Sua solicitação foi encaminhada para a equipe responsável. O atendimento automático permanece pausado para evitar respostas desencontradas. Aguarde a análise da equipe.');
       return { handled: true, intent };
     }
     if (intent === 'appointments') {
