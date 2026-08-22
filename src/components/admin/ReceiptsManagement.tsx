@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Banknote,
   CheckCircle2,
   CircleDollarSign,
   Clock3,
@@ -69,16 +68,10 @@ export const ReceiptsManagement: React.FC = () => {
   const summary = useMemo(() => {
     const pending = receipts.filter((item) => item.status === 'pending');
     const received = receipts.filter((item) => item.status === 'received');
-    const cancelled = receipts.filter((item) => item.status === 'cancelled');
-    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Fortaleza' }).format(new Date());
-    const receivedToday = received.filter((item) => getReceiptDate(item).slice(0, 10) === today);
     return {
       pending,
       received,
-      cancelled,
       pendingAmount: pending.reduce((total, item) => total + item.totalAmount, 0),
-      pendingCashAmount: pending.filter((item) => item.paymentMethod === 'cash').reduce((total, item) => total + item.totalAmount, 0),
-      receivedTodayAmount: receivedToday.reduce((total, item) => total + item.totalAmount, 0),
     };
   }, [receipts]);
 
@@ -165,7 +158,6 @@ export const ReceiptsManagement: React.FC = () => {
         title="Recebimentos"
         stats={[
           { label: 'Pendente', value: money(summary.pendingAmount), tone: summary.pendingAmount > 0 ? 'warning' : 'neutral' },
-          { label: 'Recebido hoje', value: money(summary.receivedTodayAmount), tone: 'finance-positive' },
         ]}
         action={{ label: 'Atualizar', onClick: loadReceipts, icon: RefreshCw, disabled: loading }}
       />
@@ -194,12 +186,6 @@ export const ReceiptsManagement: React.FC = () => {
           <button type="button" onClick={loadReceipts} className="shrink-0 min-h-9 px-2.5 rounded-lg border border-status-error/30 text-xs font-bold hover:bg-status-error/10">Tentar novamente</button>
         </div>
       )}
-
-      <div className="admin-card-grid admin-card-grid--3">
-        <SummaryCard label="Ação agora" value={String(summary.pending.length)} detail={`${money(summary.pendingAmount)} pendente`} icon={Clock3} tone="warning" />
-        <SummaryCard label="Recebido hoje" value={money(summary.receivedTodayAmount)} detail={`${summary.received.length} concluído${summary.received.length === 1 ? '' : 's'} no total`} icon={CheckCircle2} tone="success" />
-        <SummaryCard label="Em dinheiro" value={money(summary.pendingCashAmount)} detail="Pendências em espécie" icon={Banknote} tone="neutral" />
-      </div>
 
       <div className="bg-surface-card border border-border-subtle rounded-xl overflow-hidden">
         <div className="p-3.5 sm:p-4 border-b border-border-subtle space-y-3">
@@ -276,11 +262,6 @@ export const ReceiptsManagement: React.FC = () => {
       )}
     </div>
   );
-};
-
-const SummaryCard: React.FC<{ label: string; value: string; detail: string; icon: React.ElementType; tone: 'warning' | 'success' | 'neutral' }> = ({ label, value, detail, icon: Icon, tone }) => {
-  const toneClass = tone === 'warning' ? 'text-amber-500 bg-amber-500/10' : tone === 'success' ? 'text-status-success bg-status-success/10' : 'text-gold-base bg-gold-base/10';
-  return <div className="min-w-0 bg-surface-card border border-border-subtle rounded-xl p-3"><div className="flex items-start justify-between gap-2"><span className="text-[11px] font-bold uppercase tracking-wider text-content-muted admin-safe-wrap">{label}</span><span className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center ${toneClass}`}><Icon className="w-3.5 h-3.5" /></span></div><p className="mt-2 text-base sm:text-lg font-mono font-bold text-content-base truncate">{value}</p><p className="mt-0.5 text-[11px] text-content-muted admin-safe-wrap">{detail}</p></div>;
 };
 
 const ReceiptGroup: React.FC<{ title: string; description: string; count: number; tone: 'warning' | 'success'; children: React.ReactNode }> = ({ title, description, count, tone, children }) => (
