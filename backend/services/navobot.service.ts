@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { and, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { checkSlotAvailability, fetchDaySlotContext, invalidateAvailabilityCache } from './availability.service.js';
+import { NAVOBOT_PROMPT_VERSION, NAVOBOT_SYSTEM_PROMPT } from './navobot-prompt.js';
 import { getCurrentTimeBRT, getDayOfWeekKey, getTodayStringBRT, minutesToTime, timeToMinutes } from '../utils/datetime.js';
 import { generateBookingCode, matchPhoneNumbers, sanitizePhone } from '../utils/index.js';
 import {
@@ -203,7 +204,7 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
           },
           required: ['intent', 'confidence'],
         } as any,
-        systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Entenda frases naturais e variações informais em português. Se o cliente pedir para marcar, reservar ou ver quais serviços a barbearia oferece, use book. A palavra “disponíveis” em “serviços disponíveis” significa catálogo, não agenda. Se perguntar quais horários estão disponíveis, se há vagas ou os horários de hoje/amanhã, use availability. Se pedir para consultar uma reserva existente, use appointments. Se quiser mudar dia ou horário, use reschedule. Se quiser desmarcar um único agendamento, use cancel. Se pedir para cancelar todos, todas as reservas ou tudo, use cancel_all. Se pedir uma pessoa, use human. Se estiver apenas cumprimentando, use menu. Considere o estado e o contexto já coletado. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
+        systemInstruction: `${NAVOBOT_SYSTEM_PROMPT}\n\nVersão da política: ${NAVOBOT_PROMPT_VERSION}`,
       },
     });
     const responseText = extractGeminiText(response);
