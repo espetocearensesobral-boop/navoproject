@@ -49,11 +49,11 @@ const groupForTab = (tab: RelationshipTab): RelationshipGroupId => groups.find((
 
 export const RelationshipWorkspace: React.FC<{ initialTab?: RelationshipTab }> = ({ initialTab = 'overview' }) => {
   const [activeTab, setActiveTab] = useState<RelationshipTab>(initialTab);
-  const [openGroup, setOpenGroup] = useState<RelationshipGroupId | null>(() => groupForTab(initialTab as RelationshipTab));
+  const [openGroup, setOpenGroup] = useState<RelationshipGroupId | null>(() => initialTab === 'overview' ? null : groupForTab(initialTab as RelationshipTab));
 
   useEffect(() => {
     setActiveTab(initialTab);
-    setOpenGroup(groupForTab(initialTab as RelationshipTab));
+    setOpenGroup(initialTab === 'overview' ? null : groupForTab(initialTab as RelationshipTab));
   }, [initialTab]);
 
   const activeOption = useMemo(() => groups.flatMap((group) => group.options).find((option) => option.id === activeTab), [activeTab]);

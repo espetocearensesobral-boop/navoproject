@@ -58,11 +58,11 @@ const groupForTab = (tab: SystemTab): SystemGroupId => groups.find((group) => gr
 
 export const SystemWorkspace: React.FC<{ initialTab?: SystemTab; onOpenCampaigns?: (provider?: 'meta' | 'google') => void }> = ({ initialTab = 'unit', onOpenCampaigns }) => {
   const [activeTab, setActiveTab] = useState<SystemTab>(initialTab);
-  const [openGroup, setOpenGroup] = useState<SystemGroupId | null>(() => groupForTab(initialTab as SystemTab));
+  const [openGroup, setOpenGroup] = useState<SystemGroupId | null>(() => initialTab === 'unit' ? null : groupForTab(initialTab as SystemTab));
 
   useEffect(() => {
     setActiveTab(initialTab);
-    setOpenGroup(groupForTab(initialTab as SystemTab));
+    setOpenGroup(initialTab === 'unit' ? null : groupForTab(initialTab as SystemTab));
   }, [initialTab]);
 
   const activeOption = useMemo(() => groups.flatMap((group) => group.options).find((option) => option.id === activeTab), [activeTab]);
