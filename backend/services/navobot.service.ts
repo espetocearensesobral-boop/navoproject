@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { and, desc, eq, ne, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { checkSlotAvailability, fetchDaySlotContext, invalidateAvailabilityCache } from './availability.service.js';
 import { getCurrentTimeBRT, getDayOfWeekKey, getTodayStringBRT, minutesToTime, timeToMinutes } from '../utils/datetime.js';
@@ -33,9 +33,10 @@ export type NavoBotDeps = {
 };
 
 type BotContext = {
-  pendingAction?: 'book' | 'reschedule' | 'cancel';
+  pendingAction?: 'book' | 'reschedule' | 'cancel' | 'cancel_all';
   appointmentId?: string;
   candidateAppointmentIds?: string[];
+  bulkAppointmentIds?: string[];
   serviceId?: string;
   serviceIds?: string[];
   serviceOptions?: string[];
@@ -196,13 +197,13 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
           properties: {
             intent: {
               type: 'STRING',
-              enum: ['menu', 'appointments', 'availability', 'book', 'confirm', 'reschedule', 'cancel', 'human', 'unknown'],
+              enum: ['menu', 'appointments', 'availability', 'book', 'confirm', 'reschedule', 'cancel', 'cancel_all', 'human', 'unknown'],
             },
             confidence: { type: 'NUMBER' },
           },
           required: ['intent', 'confidence'],
         } as any,
-        systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Entenda frases naturais e variações informais em português. Se o cliente pedir para marcar, reservar ou ver quais serviços a barbearia oferece, use book. A palavra “disponíveis” em “serviços disponíveis” significa catálogo, não agenda. Se perguntar quais horários estão disponíveis, se há vagas ou os horários de hoje/amanhã, use availability. Se pedir para consultar uma reserva existente, use appointments. Se quiser mudar dia ou horário, use reschedule. Se quiser desmarcar, use cancel. Se pedir uma pessoa, use human. Se estiver apenas cumprimentando, use menu. Considere o estado e o contexto já coletado. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
+        systemInstruction: 'Classifique a intenção do cliente para um assistente de agendamentos. Entenda frases naturais e variações informais em português. Se o cliente pedir para marcar, reservar ou ver quais serviços a barbearia oferece, use book. A palavra “disponíveis” em “serviços disponíveis” significa catálogo, não agenda. Se perguntar quais horários estão disponíveis, se há vagas ou os horários de hoje/amanhã, use availability. Se pedir para consultar uma reserva existente, use appointments. Se quiser mudar dia ou horário, use reschedule. Se quiser desmarcar um único agendamento, use cancel. Se pedir para cancelar todos, todas as reservas ou tudo, use cancel_all. Se pedir uma pessoa, use human. Se estiver apenas cumprimentando, use menu. Considere o estado e o contexto já coletado. Retorne apenas JSON. Se houver dúvida, use unknown. Não execute nenhuma ação.',
       },
     });
     const responseText = extractGeminiText(response);
@@ -710,6 +711,53 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     return reply(conversation, `Agendamento cancelado com sucesso.\n\n${appointmentLabel(appointment)}\n\nQuando quiser, responda *AGENDAR* para marcar outro horário.`);
   }
 
+  async function beginBulkCancellation(conversation: Conversation, context: BotContext) {
+    const appointments = await findAppointments(conversation.phone);
+    if (!appointments.length) {
+      await updateConversation(conversation, 'idle', context.clientName ? { clientName: context.clientName } : {});
+      return reply(conversation, 'Não encontrei agendamentos ativos para cancelar.');
+    }
+    const nextContext = contextForNewIntent(context, {
+      pendingAction: 'cancel_all',
+      bulkAppointmentIds: appointments.map((appointment: any) => appointment.id),
+      appointmentId: undefined,
+      candidateAppointmentIds: undefined,
+    });
+    await updateConversation(conversation, 'awaiting_confirmation', nextContext);
+    const list = appointments.map((appointment: any) => `• ${appointmentLabel(appointment)}`).join('\n');
+    const fallback = `Encontrei ${appointments.length} agendamento${appointments.length === 1 ? '' : 's'} ativo${appointments.length === 1 ? '' : 's'} para este número:\n\n${list}\n\nConfirma o cancelamento de TODOS eles? Responda *SIM* para confirmar ou *NÃO* para manter os agendamentos.`;
+    return replyButtons(conversation, fallback, {
+      title: 'Cancelar todos os agendamentos',
+      description: `Serão cancelados ${appointments.length} agendamento${appointments.length === 1 ? '' : 's'}.`,
+      footerText: 'NavoBot',
+      buttons: [
+        { type: 'reply', id: 'confirm:yes', displayText: 'Sim, cancelar todos' },
+        { type: 'reply', id: 'confirm:no', displayText: 'Não, manter' },
+      ],
+    });
+  }
+
+  async function executeBulkCancellation(conversation: Conversation, context: BotContext) {
+    const targetIds = [...new Set(context.bulkAppointmentIds || [])];
+    if (!targetIds.length) {
+      await updateConversation(conversation, 'idle', {});
+      return reply(conversation, 'Não consegui identificar os agendamentos para cancelar. Nenhuma alteração foi feita.');
+    }
+    const appointments = (await findAppointments(conversation.phone)).filter((appointment: any) => targetIds.includes(appointment.id));
+    if (!appointments.length) {
+      await updateConversation(conversation, 'idle', {});
+      return reply(conversation, 'Os agendamentos já não estão ativos. Nenhuma alteração foi feita.');
+    }
+    const db = getDb();
+    await db.transaction(async (tx: any) => {
+      await tx.update(schema.appointments).set({ status: 'cancelled', cancellationReason: 'Cancelado pelo cliente via WhatsApp', updatedAt: new Date() }).where(inArray(schema.appointments.id, appointments.map((appointment: any) => appointment.id)));
+      await tx.update(schema.waitingQueue).set({ status: 'cancelled', updatedAt: new Date() }).where(inArray(schema.waitingQueue.appointmentId, appointments.map((appointment: any) => appointment.id)));
+    });
+    invalidateAvailabilityCache();
+    await updateConversation(conversation, 'idle', {});
+    return reply(conversation, `Todos os ${appointments.length} agendamentos foram cancelados com sucesso.\n\n${appointments.map((appointment: any) => `• ${appointmentLabel(appointment)}`).join('\n')}\n\nQuando quiser, responda *AGENDAR* para marcar outro horário.`);
+  }
+
   async function executeReschedule(conversation: Conversation, appointment: any, context: BotContext) {
     const db = getDb();
     if (!context.date || !context.timeSlot) return reply(conversation, 'Informe o novo dia e horário para continuar.');
@@ -796,6 +844,11 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       const nextContext = contextForNewIntent(context, { pendingAction: 'cancel' });
       await updateConversation(conversation, 'idle', nextContext);
       return beginAppointmentAction(conversation, nextContext, 'cancel');
+    }
+    if (canInterruptFlow && stateIntent === 'cancel_all') {
+      const nextContext = contextForNewIntent(context, { pendingAction: 'cancel_all' });
+      await updateConversation(conversation, 'idle', nextContext);
+      return beginBulkCancellation(conversation, nextContext);
     }
     if (canInterruptFlow && stateIntent === 'reschedule') {
       const nextContext = contextForNewIntent(context, { pendingAction: 'reschedule' });
@@ -924,6 +977,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       }
       if (!isPositiveConfirmation(text)) return reply(conversation, 'Responda *SIM* para confirmar ou *NÃO* para voltar.');
       if (context.pendingAction === 'cancel' && appointment) return executeCancellation(conversation, appointment);
+      if (context.pendingAction === 'cancel_all') return executeBulkCancellation(conversation, context);
       if (context.pendingAction === 'reschedule' && appointment) return executeReschedule(conversation, appointment, context);
       if (context.pendingAction === 'book') return executeBooking(conversation, context);
     }
@@ -944,7 +998,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const aiIntent = !deterministic && conversation.state !== 'idle' && conversation.state !== 'human'
       ? await classifyWithAi(message.text, conversation.state, context)
       : null;
-    const interruptIntents = new Set<NavoBotIntent>(['menu', 'appointments', 'availability', 'book', 'cancel', 'reschedule', 'human']);
+    const interruptIntents = new Set<NavoBotIntent>(['menu', 'appointments', 'availability', 'book', 'cancel', 'cancel_all', 'reschedule', 'human']);
     const contextualIntent = deterministic || (aiIntent && interruptIntents.has(aiIntent) ? aiIntent : null);
     const stateReply = await handleState(conversation, context, message.text, contextualIntent);
     if (stateReply !== null) return { handled: true, intent: contextualIntent || aiIntent || 'state' };
@@ -975,6 +1029,10 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     }
     if (intent === 'cancel') {
       await beginAppointmentAction(conversation, context, 'cancel');
+      return { handled: true, intent };
+    }
+    if (intent === 'cancel_all') {
+      await beginBulkCancellation(conversation, context);
       return { handled: true, intent };
     }
     if (intent === 'reschedule') {
