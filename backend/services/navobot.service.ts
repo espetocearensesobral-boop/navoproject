@@ -826,7 +826,26 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       await updateConversation(conversation, 'idle', preservedContext);
       return reply(conversation, menuText());
     }
-    if (stateIntent === 'availability') return handleAvailabilityRequest(conversation, context, text);
+    if (stateIntent === 'availability') {
+      const nextContext = contextForNewIntent(context, {
+        pendingAction: undefined,
+        appointmentId: undefined,
+        candidateAppointmentIds: undefined,
+        bulkAppointmentIds: undefined,
+        serviceId: undefined,
+        serviceIds: undefined,
+        serviceOptions: undefined,
+        servicePage: undefined,
+        professionalOptions: undefined,
+        date: undefined,
+        timeSlot: undefined,
+        professionalId: undefined,
+        availabilityDate: undefined,
+        availabilityOptions: undefined,
+      });
+      await updateConversation(conversation, 'idle', nextContext);
+      return handleAvailabilityRequest(conversation, nextContext, text);
+    }
     const isBareNumber = /^\s*\d+\s*$/.test(text);
     const canInterruptFlow = !isBareNumber && conversation.state !== 'idle' && conversation.state !== 'human' && stateIntent !== 'confirm';
     if (canInterruptFlow && stateIntent === 'appointments') {
