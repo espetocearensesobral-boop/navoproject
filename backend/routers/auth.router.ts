@@ -128,7 +128,7 @@ authRouter.post("/login", authLimiter, async (req, res) => {
 // ADMIN AUTH ENDPOINTS
 // =====================================
 
-const handleAdminLogin = async (req: express.Request, res: express.Response) => {
+const handleAdminLogin = async (req: any, res: any) => {
   try {
     if (!isDbConnected || !db) {
       return res.status(503).json({ error: userErrors.dbDisconnected });

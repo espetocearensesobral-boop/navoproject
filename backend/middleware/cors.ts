@@ -1,5 +1,3 @@
-import type { Request, Response, NextFunction } from 'express';
-
 const configuredOrigins = [
   process.env.PUBLIC_APP_ORIGIN,
   process.env.APP_URL,
@@ -41,7 +39,7 @@ function isAllowedOrigin(origin: string | undefined, host: string): boolean {
   }
 }
 
-export const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const corsMiddleware = (req: any, res: any, next: any) => {
   const origin = req.headers.origin;
   const host = req.headers.host || '';
   const allowed = isAllowedOrigin(origin, host);
