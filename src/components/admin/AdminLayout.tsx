@@ -14,7 +14,7 @@ import { ReportsWorkspace } from './ReportsWorkspace';
 import { RelationshipWorkspace } from './RelationshipWorkspace';
 import { SystemWorkspace } from './SystemWorkspace';
 import { AdminNotificationCenter } from './AdminNotificationCenter';
-import { MetaAdsManagement } from './MetaAdsManagement';
+import { CampaignsWorkspace } from './CampaignsWorkspace';
 import { authFetch } from '../../lib/api';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAdminOperationNotifications } from '../../hooks/useAdminOperationNotifications';
@@ -110,7 +110,8 @@ export const AdminLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [adminName, setAdminName] = useState('Admin');
-  const [systemInitialTab, setSystemInitialTab] = useState<'unit' | 'preferences' | 'availability' | 'notifications' | 'qrcode' | 'print' | 'audit' | 'meta_ads'>('unit');
+  const [systemInitialTab, setSystemInitialTab] = useState<'unit' | 'preferences' | 'availability' | 'notifications' | 'qrcode' | 'print' | 'audit' | 'meta_ads' | 'google_ads'>('unit');
+  const [campaignInitialProvider, setCampaignInitialProvider] = useState<'meta' | 'google'>('meta');
 
   React.useEffect(() => {
     try {
@@ -369,7 +370,11 @@ export const AdminLayout: React.FC = () => {
       case 'relatorios':
         return <ReportsWorkspace />;
       case 'campanhas':
-        return <MetaAdsManagement onOpenSettings={() => { setSystemInitialTab('meta_ads'); setActiveTab('sistema'); }} />;
+        return <CampaignsWorkspace
+          initialProvider={campaignInitialProvider}
+          onOpenMetaSettings={() => { setSystemInitialTab('meta_ads'); setActiveTab('sistema'); }}
+          onOpenGoogleSettings={() => { setSystemInitialTab('google_ads'); setActiveTab('sistema'); }}
+        />;
       case 'financeiro_recebimentos':
         return <ReceiptsManagement />;
       case 'financeiro_extrato':
@@ -383,7 +388,7 @@ export const AdminLayout: React.FC = () => {
       case 'relacionamento':
         return <RelationshipWorkspace />;
       case 'sistema':
-        return <SystemWorkspace initialTab={systemInitialTab} onOpenCampaigns={() => setActiveTab('campanhas')} />;
+        return <SystemWorkspace initialTab={systemInitialTab} onOpenCampaigns={(provider = 'meta') => { setCampaignInitialProvider(provider); setActiveTab('campanhas'); }} />;
       default:
         return null;
     }

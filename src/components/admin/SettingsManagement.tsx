@@ -8,14 +8,15 @@ import { QrCodeManagement } from './QrCodeManagement';
 import { AuditLogsManagement } from './AuditLogsManagement';
 import { AgendaAvailabilitySettings } from './AgendaAvailabilitySettings';
 import { MetaAdsSettings } from './MetaAdsSettings';
+import { GoogleAdsSettings } from './GoogleAdsSettings';
 import { defaultPrintSettings, fetchPrintSettings, savePrintSettings, type PrintSettings, type PrintFormat } from '../../services/printSettingsService';
 
-export type SettingsTab = 'email' | 'whatsapp' | 'qrcode' | 'audit' | 'availability' | 'print' | 'meta_ads';
+export type SettingsTab = 'email' | 'whatsapp' | 'qrcode' | 'audit' | 'availability' | 'print' | 'meta_ads' | 'google_ads';
 
 interface SettingsManagementProps {
   initialTab?: SettingsTab;
   hideTabs?: boolean;
-  onOpenCampaigns?: () => void;
+  onOpenCampaigns?: (provider?: 'meta' | 'google') => void;
 }
 
 export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialTab = 'email', hideTabs = false, onOpenCampaigns }) => {
@@ -43,6 +44,8 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
         return <PrintSettingsTab />;
       case 'meta_ads':
         return <MetaAdsSettings onOpenCampaigns={onOpenCampaigns} />;
+      case 'google_ads':
+        return <GoogleAdsSettings onOpenCampaigns={onOpenCampaigns} />;
       default:
         return null;
     }
@@ -63,6 +66,7 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
           { id: 'availability', label: 'Agenda', icon: CalendarDays },
           { id: 'print', label: 'Impressões', icon: Printer },
           { id: 'meta_ads', label: 'Meta Ads', icon: Target },
+          { id: 'google_ads', label: 'Google Ads', icon: Target },
         ]}
         activeId={activeTab}
         onChange={(id) => setActiveTab(id as SettingsTab)}

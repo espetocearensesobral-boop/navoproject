@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { CalendarDays, Mail, Megaphone, Printer, QrCode, Settings, ShieldCheck, Store } from 'lucide-react';
+import { CalendarDays, Globe2, Mail, Megaphone, Printer, QrCode, Settings, ShieldCheck, Store } from 'lucide-react';
 import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { SettingsManagement, type SettingsTab } from './SettingsManagement';
 import { AdminWorkspace } from './shared/AdminWorkspace';
 
-type SystemTab = 'unit' | 'preferences' | 'availability' | 'notifications' | 'qrcode' | 'print' | 'audit' | 'meta_ads';
+type SystemTab = 'unit' | 'preferences' | 'availability' | 'notifications' | 'qrcode' | 'print' | 'audit' | 'meta_ads' | 'google_ads';
 
-export const SystemWorkspace: React.FC<{ initialTab?: SystemTab; onOpenCampaigns?: () => void }> = ({ initialTab = 'unit', onOpenCampaigns }) => {
+export const SystemWorkspace: React.FC<{ initialTab?: SystemTab; onOpenCampaigns?: (provider?: 'meta' | 'google') => void }> = ({ initialTab = 'unit', onOpenCampaigns }) => {
   const [activeTab, setActiveTab] = useState<SystemTab>(initialTab);
 
   const renderContent = () => {
@@ -17,7 +17,9 @@ export const SystemWorkspace: React.FC<{ initialTab?: SystemTab; onOpenCampaigns
         ? 'whatsapp'
         : activeTab === 'meta_ads'
           ? 'meta_ads'
-          : activeTab;
+          : activeTab === 'google_ads'
+            ? 'google_ads'
+            : activeTab;
     return <SettingsManagement initialTab={settingsTab} hideTabs onOpenCampaigns={onOpenCampaigns} />;
   };
 
@@ -30,6 +32,7 @@ export const SystemWorkspace: React.FC<{ initialTab?: SystemTab; onOpenCampaigns
         { id: 'availability', label: 'Agenda', icon: CalendarDays },
         { id: 'notifications', label: 'Notificações', icon: Mail },
         { id: 'meta_ads', label: 'Meta Ads', icon: Megaphone },
+        { id: 'google_ads', label: 'Google Ads', icon: Globe2 },
         { id: 'qrcode', label: 'QR Code', icon: QrCode },
         { id: 'print', label: 'Impressões', icon: Printer },
         { id: 'audit', label: 'Auditoria', icon: ShieldCheck },

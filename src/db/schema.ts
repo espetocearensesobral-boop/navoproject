@@ -718,3 +718,77 @@ export const metaAdsLeads = pgTable('meta_ads_leads', {
   ownerIdx: index('meta_ads_leads_owner_idx').on(table.ownerId),
   campaignIdx: index('meta_ads_leads_campaign_idx').on(table.campaignId),
 }));
+
+// Integração Google Ads: credenciais ficam somente no backend e os dados são isolados pelo proprietário.
+export const googleAdsConnections = pgTable('google_ads_connections', {
+  id: text('id').primaryKey(),
+  ownerId: text('owner_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  googleUserId: text('google_user_id'),
+  googleUserName: text('google_user_name'),
+  refreshToken: text('refresh_token').notNull().default(''),
+  tokenExpiresAt: timestamp('token_expires_at'),
+  customerId: text('customer_id'),
+  customerName: text('customer_name'),
+  managerCustomerId: text('manager_customer_id'),
+  currency: text('currency').default('BRL'),
+  status: text('status').notNull().default('connected'),
+  lastSyncedAt: timestamp('last_synced_at'),
+  lastError: text('last_error'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  ownerUniqueIdx: uniqueIndex('google_ads_connections_owner_unique_idx').on(table.ownerId),
+}));
+
+export const googleAdsCampaigns = pgTable('google_ads_campaigns', {
+  id: text('id').primaryKey(),
+  ownerId: text('owner_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  connectionId: text('connection_id').notNull().references(() => googleAdsConnections.id, { onDelete: 'cascade' }),
+  customerId: text('customer_id').notNull(),
+  googleCampaignId: text('google_campaign_id').notNull(),
+  googleAdGroupId: text('google_ad_group_id'),
+  googleAdId: text('google_ad_id'),
+  name: text('name').notNull(),
+  objective: text('objective').notNull().default('WEBSITE_TRAFFIC'),
+  status: text('status').notNull().default('PAUSED'),
+  dailyBudgetCents: integer('daily_budget_cents').notNull().default(0),
+  startDate: text('start_date'),
+  endDate: text('end_date'),
+  locationLabel: text('location_label'),
+  locationResourceName: text('location_resource_name'),
+  destinationUrl: text('destination_url'),
+  adText: text('ad_text'),
+  headline: text('headline'),
+  keywords: jsonb('keywords').notNull().default([]),
+  impressions: integer('impressions').notNull().default(0),
+  reach: integer('reach').notNull().default(0),
+  clicks: integer('clicks').notNull().default(0),
+  leads: integer('leads').notNull().default(0),
+  spendCents: integer('spend_cents').notNull().default(0),
+  conversions: numeric('conversions').notNull().default('0'),
+  lastInsightAt: timestamp('last_insight_at'),
+  errorMessage: text('error_message'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  ownerIdx: index('google_ads_campaigns_owner_idx').on(table.ownerId),
+  connectionIdx: index('google_ads_campaigns_connection_idx').on(table.connectionId),
+  remoteUniqueIdx: uniqueIndex('google_ads_campaigns_remote_unique_idx').on(table.customerId, table.googleCampaignId),
+}));
+
+export const googleAdsLeads = pgTable('google_ads_leads', {
+  id: text('id').primaryKey(),
+  ownerId: text('owner_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  connectionId: text('connection_id').notNull().references(() => googleAdsConnections.id, { onDelete: 'cascade' }),
+  campaignId: text('campaign_id').references(() => googleAdsCampaigns.id, { onDelete: 'set null' }),
+  googleLeadId: text('google_lead_id').notNull().unique(),
+  fullName: text('full_name'),
+  phone: text('phone'),
+  email: text('email'),
+  payload: jsonb('payload').notNull().default({}),
+  receivedAt: timestamp('received_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  ownerIdx: index('google_ads_leads_owner_idx').on(table.ownerId),
+  campaignIdx: index('google_ads_leads_campaign_idx').on(table.campaignId),
+}));

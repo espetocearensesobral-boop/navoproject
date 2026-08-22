@@ -15,7 +15,7 @@ import {
 } from '../../services/metaAdsService';
 
 interface MetaAdsSettingsProps {
-  onOpenCampaigns?: () => void;
+  onOpenCampaigns?: (provider?: 'meta' | 'google') => void;
 }
 
 export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaigns }) => {
@@ -142,7 +142,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
         icon={Target}
         title="Meta Ads"
         stats={[{ label: 'conexão', value: connected ? 'Ativa' : 'Não conectada', tone: connected ? 'success' : 'muted' }]}
-        action={connected ? { label: 'Abrir campanhas', icon: Target, onClick: () => onOpenCampaigns?.() } : undefined}
+        action={connected ? { label: 'Abrir campanhas', icon: Target, onClick: () => onOpenCampaigns?.('meta') } : undefined}
       />
 
       {message && (
