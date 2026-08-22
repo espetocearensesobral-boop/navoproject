@@ -198,7 +198,7 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
           properties: {
             intent: {
               type: 'STRING',
-              enum: ['menu', 'appointments', 'availability', 'book', 'confirm', 'reschedule', 'cancel', 'cancel_all', 'human', 'unknown'],
+              enum: ['menu', 'appointments', 'availability', 'book', 'confirm', 'reschedule', 'cancel', 'cancel_all', 'complaint', 'human', 'unknown'],
             },
             confidence: { type: 'NUMBER' },
           },
@@ -418,7 +418,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     context.servicePage = 0;
     context.serviceOptions = activeServices.map((service: any) => service.id);
     await updateConversation(conversation, 'awaiting_service', context);
-    const fallback = `Escolha um serviço (responda com o número ou nome):\n\n` + activeServices.map((service: any, index: number) => `${index + 1}. *${compactServiceTitle(service.title)}* · ${money(service.price)}`).join('\n') + `\n\nSe preferir, acesse o catálogo completo e faça o agendamento diretamente pela plataforma Navo:\n${NAVO_CATALOG_URL}\n\nApós concluir pelo site, a confirmação será enviada automaticamente para este WhatsApp.`;
+    const fallback = `Escolha um serviço (responda com o número ou nome):\n\n` + activeServices.map((service: any, index: number) => `${index + 1}. *${compactServiceTitle(service.title)}* · ${money(service.price)}`).join('\n') + `\n\nO agendamento também pode ser feito diretamente pela plataforma Navo. Catálogo completo:\n${NAVO_CATALOG_URL}\n\nApós concluir pelo site, a confirmação será enviada automaticamente para este WhatsApp.`;
     const rows = activeServices.map((service: any, index: number) => ({
       title: `${index + 1}. ${compactServiceTitle(service.title, 24)}`,
       rowId: `service:${service.id}`,
@@ -465,10 +465,10 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const professionals = (await db.query.professionals.findMany()).filter((professional: any) => professional.isActive !== false);
     context.professionalOptions = ['prof_any', ...professionals.map((professional: any) => professional.id)];
     await updateConversation(conversation, 'awaiting_professional', context);
-    const fallback = 'Você prefere algum profissional?\n\n0. Qualquer profissional\n' + professionals.map((professional: any, index: number) => `${index + 1}. ${professional.name}`).join('\n') + '\n\nResponda com o número.';
+    const fallback = 'Selecione um profissional:\n\n0. Qualquer profissional\n' + professionals.map((professional: any, index: number) => `${index + 1}. ${professional.name}`).join('\n') + '\n\nResponda com o número.';
     const payload = {
       title: 'Escolha o profissional',
-      description: 'Você pode escolher alguém ou deixar a Navo encontrar o primeiro horário disponível.',
+      description: 'Selecione um profissional específico ou a opção qualquer profissional.',
       buttonText: 'Ver profissionais',
       footerText: 'NavoBot',
       sections: [{
@@ -489,11 +489,11 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
   async function continueAfterProfessional(conversation: Conversation, context: BotContext) {
     if (!context.date) {
       await updateConversation(conversation, 'awaiting_date', context);
-      return reply(conversation, 'Qual dia você prefere? Pode responder *amanhã*, *sábado*, *dia 22* ou *25/08*.');
+      return reply(conversation, 'Informe o dia. Exemplos de formato: *amanhã*, *sábado*, *dia 22* ou *25/08*.');
     }
     if (!context.timeSlot) {
       await updateConversation(conversation, 'awaiting_time', context);
-      return reply(conversation, `Perfeito. Para *${dateLabel(context.date)}*, qual horário você prefere?`);
+      return reply(conversation, `Para *${dateLabel(context.date)}*, informe o horário desejado.`);
     }
     return prepareBookingConfirmation(conversation, context);
   }
@@ -530,7 +530,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         serviceId: undefined,
       });
       await updateConversation(conversation, 'awaiting_availability_service', nextContext);
-      return reply(conversation, 'Posso consultar a disponibilidade. Qual serviço você deseja verificar?\n\n' + matchedServices.map((service: any, index: number) => `${index + 1}. *${service.title}*`).join('\n'));
+      return reply(conversation, 'Informe qual serviço deseja consultar.\n\n' + matchedServices.map((service: any, index: number) => `${index + 1}. *${service.title}*`).join('\n'));
     }
     if (matchedServices.length === 0) {
       const nextContext = contextForNewIntent(context, {
@@ -549,7 +549,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const nextContext = contextForNewIntent(context, { availabilityDate: date, availabilityOptions: [], serviceIds: [service.id], serviceId: service.id });
     await updateConversation(conversation, 'idle', nextContext);
     if (!slots.length) {
-      return reply(conversation, `Não encontrei horários livres para *${dateLabel(date)}* para o serviço *${service.title}*. Posso consultar outro dia se você quiser.`);
+      return reply(conversation, `Não encontrei horários livres para *${dateLabel(date)}* para o serviço *${service.title}*. Informe outra data para uma nova consulta.`);
     }
     return reply(conversation, `Horários disponíveis para *${service.title}* em *${dateLabel(date)}*:\n\n${slots.map((slot) => `• *${slot}*`).join('\n')}\n\nPara iniciar o agendamento, responda *AGENDAR* ou acesse:\nhttps://navoproject.vercel.app/?catalog=1`);
   }
@@ -594,10 +594,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       currTimeBRT: getCurrentTimeBRT(),
     });
     if (!check.available) {
-      const suggestions = await suggestSlots(context.date, totalDuration, context.professionalId || '');
-      return reply(conversation, suggestions.length
-        ? `Esse horário não está disponível. Para *${dateLabel(context.date)}*, posso oferecer: ${suggestions.join(', ')}. Responda com um deles ou escolha outro dia.`
-        : `Não encontrei horários livres para *${dateLabel(context.date)}*. Responda com outro dia para eu consultar.`);
+      return reply(conversation, `Esse horário não está disponível para *${dateLabel(context.date)}*. Informe outro horário ou outro dia para eu consultar.`);
     }
     context.professionalId = check.chosenProf?.id || context.professionalId || 'prof_any';
     await updateConversation(conversation, 'awaiting_confirmation', context);
@@ -818,7 +815,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         await updateConversation(conversation, 'idle', {});
         return reply(conversation, menuText());
       }
-      return reply(conversation, 'Sua solicitação foi encaminhada para a equipe. Se quiser voltar ao menu automático, responda *MENU*.');
+      return reply(conversation, 'Sua solicitação foi encaminhada para a equipe. Para voltar ao menu automático, responda *MENU*.');
     }
     const stateIntent = contextualIntent || classifyDeterministicIntent(text);
     if (stateIntent === 'menu') {
@@ -872,6 +869,11 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       const nextContext = contextForNewIntent(context, { pendingAction: 'reschedule' });
       await updateConversation(conversation, 'idle', nextContext);
       return beginAppointmentAction(conversation, nextContext, 'reschedule');
+    }
+    if (canInterruptFlow && stateIntent === 'complaint') {
+      const nextContext = contextForNewIntent(context);
+      await updateConversation(conversation, 'human', nextContext, true);
+      return reply(conversation, 'Sinto muito pela experiência. Sua mensagem foi encaminhada para a equipe responsável. Se desejar, descreva o que aconteceu para facilitar a análise. Não é necessário repetir seus dados pessoais.');
     }
     if (canInterruptFlow && stateIntent === 'human') {
       const nextContext = contextForNewIntent(context);
@@ -1016,7 +1018,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const aiIntent = !deterministic && conversation.state !== 'idle' && conversation.state !== 'human'
       ? await classifyWithAi(message.text, conversation.state, context)
       : null;
-    const interruptIntents = new Set<NavoBotIntent>(['menu', 'appointments', 'availability', 'book', 'cancel', 'cancel_all', 'reschedule', 'human']);
+    const interruptIntents = new Set<NavoBotIntent>(['menu', 'appointments', 'availability', 'book', 'cancel', 'cancel_all', 'complaint', 'reschedule', 'human']);
     const contextualIntent = deterministic || (aiIntent && interruptIntents.has(aiIntent) ? aiIntent : null);
     const stateReply = await handleState(conversation, context, message.text, contextualIntent);
     if (stateReply !== null) return { handled: true, intent: contextualIntent || aiIntent || 'state' };
@@ -1025,6 +1027,12 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (intent === 'menu' || intent === 'unknown') {
       await updateConversation(conversation, 'idle', context);
       await reply(conversation, menuText(message.pushName));
+      return { handled: true, intent };
+    }
+    if (intent === 'complaint') {
+      const nextContext = contextForNewIntent(context);
+      await updateConversation(conversation, 'human', nextContext, true);
+      await reply(conversation, 'Sinto muito pela experiência. Sua mensagem foi encaminhada para a equipe responsável. Se desejar, descreva o que aconteceu para facilitar a análise. Não é necessário repetir seus dados pessoais.');
       return { handled: true, intent };
     }
     if (intent === 'human') {
@@ -1116,7 +1124,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (state === 'awaiting_more_services') return `Ainda está comigo${greeting}? Deseja adicionar outro serviço ou continuar? Responda *ADICIONAR* ou *CONTINUAR*.`;
     if (state === 'awaiting_professional') return `Ainda está comigo${greeting}? Falta escolher o profissional. Responda com o número ou *QUALQUER PROFISSIONAL*.`;
     if (state === 'awaiting_date') return `Ainda está comigo${greeting}? Qual dia você prefere para o atendimento?`;
-    if (state === 'awaiting_time') return `Ainda está comigo${greeting}? Qual horário você prefere?`;
+    if (state === 'awaiting_time') return `Ainda está comigo${greeting}? Informe o horário desejado para continuar.`;
     if (state === 'awaiting_appointment') return `Ainda está comigo${greeting}? Envie o voucher do agendamento para continuar.`;
     if (state === 'awaiting_confirmation') return `Ainda está comigo${greeting}? Responda *SIM* para confirmar ou *NÃO* para voltar.`;
     return `Ainda está comigo${greeting}? Responda à última pergunta para continuar ou envie *MENU* para reiniciar.`;

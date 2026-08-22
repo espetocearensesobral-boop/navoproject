@@ -33,6 +33,10 @@ test('classifies core NavoBot intents deterministically', () => {
   assert.equal(classifyDeterministicIntent('preciso que cancele todos os agendamentos'), 'cancel_all');
   assert.equal(classifyDeterministicIntent('pode cancelar tudo'), 'cancel_all');
   assert.equal(classifyDeterministicIntent('cancele todos'), 'cancel_all');
+  assert.equal(classifyDeterministicIntent('o atendimento foi péssimo'), 'complaint');
+  assert.equal(classifyDeterministicIntent('quero reclamar da cobrança'), 'complaint');
+  assert.equal(classifyDeterministicIntent('isso é um absurdo'), 'complaint');
+  assert.equal(classifyDeterministicIntent('cobraram errado no meu atendimento'), 'complaint');
   assert.equal(classifyDeterministicIntent('quero falar com atendente'), 'human');
   assert.equal(classifyDeterministicIntent('meu agendamento'), 'appointments');
 });

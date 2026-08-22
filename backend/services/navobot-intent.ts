@@ -9,6 +9,7 @@ export type NavoBotIntent =
   | 'reschedule'
   | 'cancel'
   | 'cancel_all'
+  | 'complaint'
   | 'human'
   | 'unknown';
 
@@ -81,6 +82,7 @@ export function classifyDeterministicIntent(text: string): NavoBotIntent | null 
   if (/^5(?:\s*[-.)]|\s|$)/.test(normalized)) return 'human';
   if (/^(oi|ola|olá|menu|inicio|início|ajuda|bom dia|boa tarde|boa noite)\b/.test(normalized)) return 'menu';
   if (/\b(atendente|humano|pessoa|equipe|falar com alguem|falar com alguém)\b/.test(normalized)) return 'human';
+  if (/\b(reclamar|reclamacao|insatisfeito|insatisfacao|decepcionado|decepcao|indignado|absurdo|horrivel|pessimo|nao gostei|servico ruim|atendimento ruim|problema no atendimento|cobranca indevida|cobranca errada|cobraram errado|cobrou errado|atraso no atendimento|atendimento atrasado|demorou no atendimento|esperei demais|desrespeito|desrespeitaram|maltratado|grosseiro|erro no atendimento|falha no atendimento|quero denunciar)\b/.test(normalized)) return 'complaint';
   if (/\b(cancelar|cancela|cancele|cancelamento|desmarcar|desmarque)\b/.test(normalized) && /\b(todos?|todas?|tudo|agendamentos?|reservas?|horarios?)\b/.test(normalized)) return 'cancel_all';
   if (/\b(cancelar|cancela|cancele|cancelamento|desmarcar|desmarque|nao vou conseguir ir|nao posso ir)\b/.test(normalized)) return 'cancel';
   if (/\b(reagendar|remarcar|mudar (o )?horario|trocar (o )?horario|alterar (o )?agendamento|mudar minha reserva|outro dia|outro horario|adiar)\b/.test(normalized)) return 'reschedule';
@@ -225,6 +227,7 @@ export function normalizeIntentName(value: unknown): NavoBotIntent {
   if (['reschedule', 'reagendar', 'remarcar'].includes(normalized)) return 'reschedule';
   if (['cancel', 'cancelar'].includes(normalized)) return 'cancel';
   if (['cancel_all', 'cancelar todos', 'cancelar tudo', 'desmarcar todos'].includes(normalized)) return 'cancel_all';
+  if (['complaint', 'reclamacao', 'reclamar', 'queixa'].includes(normalized)) return 'complaint';
   if (['human', 'humano', 'atendente'].includes(normalized)) return 'human';
   return 'unknown';
 }
