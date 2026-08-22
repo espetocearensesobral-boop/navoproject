@@ -111,7 +111,7 @@ export const AdminLayout: React.FC = () => {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [adminName, setAdminName] = useState('Admin');
   const [systemInitialTab, setSystemInitialTab] = useState<'unit' | 'preferences' | 'availability' | 'notifications' | 'qrcode' | 'print' | 'audit' | 'meta_ads' | 'google_ads'>('unit');
-  const [campaignInitialProvider, setCampaignInitialProvider] = useState<'meta' | 'google'>('meta');
+  const [campaignInitialProvider, setCampaignInitialProvider] = useState<'meta' | 'google' | null>(null);
 
   React.useEffect(() => {
     try {
@@ -162,6 +162,7 @@ export const AdminLayout: React.FC = () => {
 
 
   const handleSidebarTabChange = (tab: AdminTab, mobile = false) => {
+    if (tab === 'campanhas') setCampaignInitialProvider(null);
     setActiveTab(tab);
     if (mobile) {
       hapticLight();
@@ -371,7 +372,7 @@ export const AdminLayout: React.FC = () => {
         return <ReportsWorkspace />;
       case 'campanhas':
         return <CampaignsWorkspace
-          initialProvider={campaignInitialProvider}
+          initialProvider={campaignInitialProvider || undefined}
           onOpenMetaSettings={() => { setSystemInitialTab('meta_ads'); setActiveTab('sistema'); }}
           onOpenGoogleSettings={() => { setSystemInitialTab('google_ads'); setActiveTab('sistema'); }}
         />;
