@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BarChart3, Globe2, Target } from 'lucide-react';
 import { MetaAdsManagement } from './MetaAdsManagement';
 import { GoogleAdsManagement } from './GoogleAdsManagement';
+import { CAMPAIGNS_DEMO_MODE } from '../../services/campaignDemoData';
 
 interface CampaignsWorkspaceProps {
   onOpenMetaSettings?: () => void;
@@ -24,6 +25,7 @@ export const CampaignsWorkspace: React.FC<CampaignsWorkspaceProps> = ({ onOpenMe
           <button type="button" onClick={() => setProvider('google')} className={`inline-flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-md px-3 text-xs font-bold transition-colors sm:flex-none ${provider === 'google' ? 'bg-blue-500 text-white' : 'text-content-muted hover:bg-surface-base hover:text-content-base'}`} aria-pressed={provider === 'google'}><Globe2 className="h-3.5 w-3.5" /> Google Ads</button>
         </div>
       </div>
+      {CAMPAIGNS_DEMO_MODE && <div className="rounded-lg border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-xs text-blue-100" role="status"><strong>Apresentação:</strong> os dados exibidos são demonstrativos e não alteram contas, campanhas ou orçamentos reais.</div>}
       {provider === 'meta' ? <MetaAdsManagement onOpenSettings={onOpenMetaSettings} /> : <GoogleAdsManagement onOpenSettings={onOpenGoogleSettings} />}
     </div>
   );

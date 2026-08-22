@@ -13,6 +13,12 @@ import {
   type MetaAdsConnection,
   type MetaPage,
 } from '../../services/metaAdsService';
+import {
+  CAMPAIGNS_DEMO_MODE,
+  demoMetaAccounts,
+  demoMetaConnection,
+  demoMetaPages,
+} from '../../services/campaignDemoData';
 
 interface MetaAdsSettingsProps {
   onOpenCampaigns?: (provider?: 'meta' | 'google') => void;
@@ -34,6 +40,15 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
     setLoading(true);
     setLoadError(null);
     setMessage(null);
+    if (CAMPAIGNS_DEMO_MODE) {
+      setStatus({ configured: true, graphApiVersion: 'v26.0', connection: { ...demoMetaConnection } });
+      setAccountId(demoMetaConnection.adAccountId || '');
+      setPageId(demoMetaConnection.pageId || '');
+      setAccounts([...demoMetaAccounts]);
+      setPages([...demoMetaPages]);
+      setLoading(false);
+      return;
+    }
     try {
       const nextStatus = await getMetaAdsStatus();
       setStatus(nextStatus);
@@ -69,6 +84,11 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
   const connect = async () => {
     setBusy(true);
     setMessage(null);
+    if (CAMPAIGNS_DEMO_MODE) {
+      setMessage({ type: 'success', text: 'A conexão Meta é apenas demonstrativa. Nenhuma autorização foi iniciada.' });
+      setBusy(false);
+      return;
+    }
     try {
       const response = await startMetaAdsOAuth();
       window.location.assign(response.url);
@@ -81,6 +101,14 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
   const refreshAssets = async () => {
     setBusy(true);
     setMessage(null);
+    if (CAMPAIGNS_DEMO_MODE) {
+      setAccounts([...demoMetaAccounts]);
+      setPages([...demoMetaPages]);
+      setStatus((previous) => previous ? { ...previous, connection: { ...demoMetaConnection, lastSyncedAt: new Date().toISOString() } } : previous);
+      setMessage({ type: 'success', text: 'Ativos demonstrativos atualizados. Nenhuma conta externa foi consultada.' });
+      setBusy(false);
+      return;
+    }
     try {
       const response = await getMetaAdsAssets();
       setAccounts(response.accounts);
@@ -101,6 +129,14 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
     }
     setBusy(true);
     setMessage(null);
+    if (CAMPAIGNS_DEMO_MODE) {
+      const account = demoMetaAccounts.find((item) => item.id === accountId);
+      const page = demoMetaPages.find((item) => item.id === pageId);
+      setStatus((previous) => previous ? { ...previous, connection: { ...demoMetaConnection, adAccountId: account?.id || accountId, adAccountName: account?.name || demoMetaConnection.adAccountName, pageId: page?.id || pageId, pageName: page?.name || demoMetaConnection.pageName } } : previous);
+      setMessage({ type: 'success', text: 'Seleção atualizada apenas na demonstração. Nenhum ativo Meta foi alterado.' });
+      setBusy(false);
+      return;
+    }
     try {
       const response = await saveMetaAdsAssets(accountId, pageId);
       setStatus((previous) => previous ? { ...previous, connection: response.connection } : previous);
@@ -116,6 +152,15 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
   const disconnect = async () => {
     setBusy(true);
     try {
+      if (CAMPAIGNS_DEMO_MODE) {
+        setStatus((previous) => previous ? { ...previous, connection: { ...demoMetaConnection, status: 'disconnected', adAccountId: null, pageId: null } } : previous);
+        setAccounts([]);
+        setPages([]);
+        setAccountId('');
+        setPageId('');
+        setMessage({ type: 'success', text: 'Conexão demonstrativa removida apenas desta tela. Nenhum token ou ativo real foi alterado.' });
+        return;
+      }
       await disconnectMetaAds();
       setStatus((previous) => previous ? { ...previous, connection: null } : previous);
       setAccounts([]);
@@ -141,9 +186,11 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
       <AdminPageHeader
         icon={Target}
         title="Meta Ads"
-        stats={[{ label: 'conexão', value: connected ? 'Ativa' : 'Não conectada', tone: connected ? 'success' : 'muted' }]}
+        stats={[{ label: 'conexão', value: connected ? (CAMPAIGNS_DEMO_MODE ? 'Demo' : 'Ativa') : 'Não conectada', tone: connected ? 'success' : 'muted' }]}
         action={connected ? { label: 'Abrir campanhas', icon: Target, onClick: () => onOpenCampaigns?.('meta') } : undefined}
       />
+
+      {CAMPAIGNS_DEMO_MODE && <div className="rounded-lg border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-xs text-blue-100" role="status"><strong>Configuração demonstrativa:</strong> conexão, ativos e ações abaixo são ilustrativos. OAuth, banco e contas reais ficam reservados para ativação futura.</div>}
 
       {message && (
         <div className={`flex items-start gap-2 rounded-lg border px-3 py-2.5 text-sm ${message.type === 'success' ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-red-500/30 bg-red-500/10 text-red-300'}`} role="status">
@@ -172,9 +219,10 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold-base/10 text-gold-base"><Link2 className="h-4 w-4" /></div>
-              <div className="min-w-0"><h2 className="text-sm font-bold text-content-base">Conta conectada</h2><p className="mt-1 text-xs text-content-muted">Autorização usada somente pelo backend do Navo.</p></div>
+              <div className="min-w-0"><h2 className="text-sm font-bold text-content-base">{CAMPAIGNS_DEMO_MODE ? 'Conexão ilustrativa' : 'Conta conectada'}</h2><p className="mt-1 text-xs text-content-muted">{CAMPAIGNS_DEMO_MODE ? 'Nenhuma autorização Meta foi realizada.' : 'Autorização usada somente pelo backend do Navo.'}</p>
+</div>
             </div>
-            {connected && <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-status-success/10 px-2 py-1 text-[11px] font-bold text-status-success"><CheckCircle2 className="h-3 w-3" /> Ativa</span>}
+            {connected && <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-status-success/10 px-2 py-1 text-[11px] font-bold text-status-success"><CheckCircle2 className="h-3 w-3" /> {CAMPAIGNS_DEMO_MODE ? 'Demo' : 'Ativa'}</span>}
           </div>
           {connected ? (
             <div className="mt-4 space-y-2 text-sm">
@@ -189,7 +237,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
             </div>
           ) : (
             <div className="mt-4 rounded-lg border border-dashed border-border-subtle bg-surface-base p-4 text-sm text-content-muted">
-              <p>Conecte a conta Meta para escolher a conta de anúncios e a Página que serão usadas nas campanhas.</p>
+              <p>{CAMPAIGNS_DEMO_MODE ? 'A demonstração foi desconectada apenas localmente. A integração real poderá ser configurada depois.' : 'Conecte a conta Meta para escolher a conta de anúncios e a Página que serão usadas nas campanhas.'}</p>
               <button type="button" onClick={connect} disabled={!status?.configured || busy} className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-md bg-gold-base px-4 text-sm font-bold text-content-on-accent transition-colors hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"><Link2 className="h-4 w-4" /> Conectar Meta Ads</button>
             </div>
           )}
@@ -200,7 +248,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
           <div className="mt-4 space-y-2.5 text-xs text-content-muted">
             <p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> Novas campanhas são criadas pausadas.</p>
             <p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> Ativação exige confirmação no módulo Campanhas.</p>
-            <p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> Tokens ficam somente no backend.</p>
+            <p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> {CAMPAIGNS_DEMO_MODE ? 'Nenhum token é usado na demonstração.' : 'Tokens ficam somente no backend.'}</p>
             <p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> O Navo mostra erros retornados pela Meta sem ocultá-los.</p>
           </div>
           <a href="https://www.facebook.com/business/tools/ads-manager" target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-gold-base hover:text-gold-hover">Abrir documentação da Meta <ExternalLink className="h-3 w-3" /></a>
@@ -209,7 +257,8 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({ onOpenCampaign
 
       {connected && (
         <section className="rounded-xl border border-border-subtle bg-surface-card p-4 sm:p-5">
-          <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-sm font-bold text-content-base">Ativos usados pelo Navo</h2><p className="mt-1 text-xs text-content-muted">Escolha explicitamente a conta de anúncios e a Página. O Navo não seleciona ativos por conta própria.</p></div><button type="button" onClick={saveAssets} disabled={busy || !accountId || !pageId} className="min-h-9 rounded-md bg-gold-base px-3 text-xs font-bold text-content-on-accent hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50">Salvar seleção</button></div>
+          <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-sm font-bold text-content-base">Ativos usados pelo Navo</h2><p className="mt-1 text-xs text-content-muted">{CAMPAIGNS_DEMO_MODE ? 'Ativos fictícios para visualizar o fluxo. Nenhuma conta real será alterada.' : 'Escolha explicitamente a conta de anúncios e a Página. O Navo não seleciona ativos por conta própria.'}</p>
+</div><button type="button" onClick={saveAssets} disabled={busy || !accountId || !pageId} className="min-h-9 rounded-md bg-gold-base px-3 text-xs font-bold text-content-on-accent hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50">Salvar seleção</button></div>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             <label className="block text-xs font-semibold text-content-muted">Conta de anúncios<select value={accountId} onChange={(event) => setAccountId(event.target.value)} className="mt-1.5 h-10 w-full rounded-md border border-border-subtle bg-surface-base px-3 text-sm text-content-base outline-none focus:border-gold-base"><option value="">Selecione</option>{accounts.map((account) => <option key={account.id} value={account.id}>{account.name} · {account.currency || 'BRL'}</option>)}</select></label>
             <label className="block text-xs font-semibold text-content-muted">Página do anúncio<select value={pageId} onChange={(event) => setPageId(event.target.value)} className="mt-1.5 h-10 w-full rounded-md border border-border-subtle bg-surface-base px-3 text-sm text-content-base outline-none focus:border-gold-base"><option value="">Selecione</option>{pages.map((page) => <option key={page.id} value={page.id}>{page.name}</option>)}</select></label>

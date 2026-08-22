@@ -12,6 +12,11 @@ import {
   type GoogleAdsConnection,
   type GoogleAdsCustomer,
 } from '../../services/googleAdsService';
+import {
+  CAMPAIGNS_DEMO_MODE,
+  demoGoogleConnection,
+  demoGoogleCustomers,
+} from '../../services/campaignDemoData';
 
 interface GoogleAdsSettingsProps {
   onOpenCampaigns?: (provider?: 'meta' | 'google') => void;
@@ -31,6 +36,13 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({ onOpenCamp
     setLoading(true);
     setLoadError(null);
     setMessage(null);
+    if (CAMPAIGNS_DEMO_MODE) {
+      setStatus({ configured: true, apiVersion: 'v25', connection: { ...demoGoogleConnection } });
+      setCustomerId(demoGoogleConnection.customerId || '');
+      setCustomers([...demoGoogleCustomers]);
+      setLoading(false);
+      return;
+    }
     try {
       const nextStatus = await getGoogleAdsStatus();
       setStatus(nextStatus);
@@ -64,6 +76,11 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({ onOpenCamp
   const connect = async () => {
     setBusy(true);
     setMessage(null);
+    if (CAMPAIGNS_DEMO_MODE) {
+      setMessage({ type: 'success', text: 'A conexão Google é apenas demonstrativa. Nenhuma autorização foi iniciada.' });
+      setBusy(false);
+      return;
+    }
     try {
       const response = await startGoogleAdsOAuth();
       window.location.assign(response.url);
@@ -76,6 +93,13 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({ onOpenCamp
   const refreshAssets = async () => {
     setBusy(true);
     setMessage(null);
+    if (CAMPAIGNS_DEMO_MODE) {
+      setCustomers([...demoGoogleCustomers]);
+      setStatus((previous) => previous ? { ...previous, connection: { ...demoGoogleConnection, lastSyncedAt: new Date().toISOString() } } : previous);
+      setMessage({ type: 'success', text: 'Contas demonstrativas atualizadas. Nenhuma conta externa foi consultada.' });
+      setBusy(false);
+      return;
+    }
     try {
       const response = await getGoogleAdsAssets();
       setCustomers(response.customers);
@@ -95,6 +119,13 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({ onOpenCamp
     }
     setBusy(true);
     setMessage(null);
+    if (CAMPAIGNS_DEMO_MODE) {
+      const customer = demoGoogleCustomers.find((item) => item.customerId === customerId);
+      setStatus((previous) => previous ? { ...previous, connection: { ...demoGoogleConnection, customerId: customer?.customerId || customerId, customerName: customer?.name || demoGoogleConnection.customerName } } : previous);
+      setMessage({ type: 'success', text: 'Conta atualizada apenas na demonstração. Nenhuma conta Google foi alterada.' });
+      setBusy(false);
+      return;
+    }
     try {
       const response = await saveGoogleAdsCustomer(customerId);
       setStatus((previous) => previous ? { ...previous, connection: response.connection } : previous);
@@ -110,6 +141,13 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({ onOpenCamp
   const disconnect = async () => {
     setBusy(true);
     try {
+      if (CAMPAIGNS_DEMO_MODE) {
+        setStatus((previous) => previous ? { ...previous, connection: { ...demoGoogleConnection, status: 'disconnected', customerId: null } } : previous);
+        setCustomers([]);
+        setCustomerId('');
+        setMessage({ type: 'success', text: 'Conexão demonstrativa removida apenas desta tela. Nenhum token ou ativo real foi alterado.' });
+        return;
+      }
       await disconnectGoogleAds();
       setStatus((previous) => previous ? { ...previous, connection: null } : previous);
       setCustomers([]);
@@ -133,9 +171,11 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({ onOpenCamp
       <AdminPageHeader
         icon={Target}
         title="Google Ads"
-        stats={[{ label: 'conexão', value: connected ? 'Ativa' : 'Não conectada', tone: connected ? 'success' : 'muted' }]}
+        stats={[{ label: 'conexão', value: connected ? (CAMPAIGNS_DEMO_MODE ? 'Demo' : 'Ativa') : 'Não conectada', tone: connected ? 'success' : 'muted' }]}
         action={connected ? { label: 'Abrir campanhas', icon: Target, onClick: () => onOpenCampaigns?.('google') } : undefined}
       />
+
+      {CAMPAIGNS_DEMO_MODE && <div className="rounded-lg border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-xs text-blue-100" role="status"><strong>Configuração demonstrativa:</strong> conexão, conta e ações abaixo são ilustrativas. OAuth, banco e contas reais ficam reservados para ativação futura.</div>}
 
       {message && <div className={`flex items-start gap-2 rounded-lg border px-3 py-2.5 text-sm ${message.type === 'success' ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-red-500/30 bg-red-500/10 text-red-300'}`} role="status"><span>{message.type === 'success' ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> : <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />}</span><span>{message.text}</span></div>}
 
@@ -143,9 +183,9 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({ onOpenCamp
 
       {!status?.configured && <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5"><div className="flex items-start gap-3"><KeyRound className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" /><div className="min-w-0"><h2 className="text-sm font-bold text-content-base">Integração ainda não configurada no servidor</h2><p className="mt-1 text-sm leading-relaxed text-content-muted">Defina `GOOGLE_ADS_CLIENT_ID`, `GOOGLE_ADS_CLIENT_SECRET`, `GOOGLE_ADS_DEVELOPER_TOKEN` e `GOOGLE_ADS_REDIRECT_URI` no backend. Segredos nunca devem ser colocados no frontend ou no repositório.</p><p className="mt-2 text-xs text-content-muted">Callback esperado: <code className="break-all text-amber-200">/api/google-ads/oauth/callback</code> · API: {status?.apiVersion || 'v25'}</p></div></div></section>}
 
-      <section className="grid gap-4 lg:grid-cols-[1.15fr_.85fr]"><div className="rounded-xl border border-border-subtle bg-surface-card p-4 sm:p-5"><div className="flex items-start justify-between gap-3"><div className="flex items-start gap-3 min-w-0"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300"><Link2 className="h-4 w-4" /></div><div className="min-w-0"><h2 className="text-sm font-bold text-content-base">Conta conectada</h2><p className="mt-1 text-xs text-content-muted">Autorização usada somente pelo backend do Navo.</p></div></div>{connected && <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-status-success/10 px-2 py-1 text-[11px] font-bold text-status-success"><CheckCircle2 className="h-3 w-3" /> Ativa</span>}</div>{connected ? <div className="mt-4 space-y-2 text-sm"><div className="flex justify-between gap-3 border-b border-border-subtle pb-2"><span className="text-content-muted">Usuário Google</span><strong className="truncate text-content-base">{connection?.googleUserName || 'Autorizado'}</strong></div><div className="flex justify-between gap-3 border-b border-border-subtle pb-2"><span className="text-content-muted">Conta selecionada</span><strong className="truncate text-content-base">{connection?.customerName || 'Selecione abaixo'}</strong></div><div className="flex justify-between gap-3"><span className="text-content-muted">Última sincronização</span><strong className="text-content-base">{connection?.lastSyncedAt ? new Date(connection.lastSyncedAt).toLocaleString('pt-BR') : 'Ainda não sincronizada'}</strong></div>{connection?.lastError && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300">{connection.lastError}</p>}<div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={refreshAssets} disabled={busy} className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border-subtle px-3 text-xs font-bold text-content-base transition-colors hover:bg-surface-base disabled:opacity-50"><RefreshCw className={`h-3.5 w-3.5 ${busy ? 'animate-spin' : ''}`} /> Atualizar contas</button><button type="button" onClick={() => setDisconnectOpen(true)} disabled={busy} className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-red-500/30 px-3 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/10 disabled:opacity-50"><LogOut className="h-3.5 w-3.5" /> Desconectar</button></div></div> : <div className="mt-4 rounded-lg border border-dashed border-border-subtle bg-surface-base p-4 text-sm text-content-muted"><p>Conecte o Google Ads para escolher a conta que será usada nas campanhas.</p><button type="button" onClick={connect} disabled={!status?.configured || busy} className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-md bg-gold-base px-4 text-sm font-bold text-content-on-accent transition-colors hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"><Link2 className="h-4 w-4" /> Conectar Google Ads</button></div>}</div><div className="rounded-xl border border-border-subtle bg-surface-card p-4 sm:p-5"><div className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300"><ShieldCheck className="h-4 w-4" /></div><div><h2 className="text-sm font-bold text-content-base">Política de operação</h2><p className="mt-1 text-xs leading-relaxed text-content-muted">Controles para criar campanhas simples sem ativação acidental.</p></div></div><div className="mt-4 space-y-2.5 text-xs text-content-muted"><p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> Novas campanhas são criadas pausadas.</p><p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> A ativação exige confirmação no módulo Campanhas.</p><p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> Tokens ficam somente no backend.</p><p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> O Navo não calcula impostos nem decide o orçamento por conta própria.</p></div><a href="https://developers.google.com/google-ads/api" target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-gold-base hover:text-gold-hover">Documentação Google Ads API <ExternalLink className="h-3 w-3" /></a></div></section>
+      <section className="grid gap-4 lg:grid-cols-[1.15fr_.85fr]"><div className="rounded-xl border border-border-subtle bg-surface-card p-4 sm:p-5"><div className="flex items-start justify-between gap-3"><div className="flex items-start gap-3 min-w-0"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300"><Link2 className="h-4 w-4" /></div><div className="min-w-0"><h2 className="text-sm font-bold text-content-base">{CAMPAIGNS_DEMO_MODE ? 'Conta ilustrativa' : 'Conta conectada'}</h2><p className="mt-1 text-xs text-content-muted">{CAMPAIGNS_DEMO_MODE ? 'Nenhuma autorização Google foi realizada.' : 'Autorização usada somente pelo backend do Navo.'}</p></div></div>{connected && <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-status-success/10 px-2 py-1 text-[11px] font-bold text-status-success"><CheckCircle2 className="h-3 w-3" /> {CAMPAIGNS_DEMO_MODE ? 'Demo' : 'Ativa'}</span>}</div>{connected ? <div className="mt-4 space-y-2 text-sm"><div className="flex justify-between gap-3 border-b border-border-subtle pb-2"><span className="text-content-muted">Usuário Google</span><strong className="truncate text-content-base">{connection?.googleUserName || 'Autorizado'}</strong></div><div className="flex justify-between gap-3 border-b border-border-subtle pb-2"><span className="text-content-muted">Conta selecionada</span><strong className="truncate text-content-base">{connection?.customerName || 'Selecione abaixo'}</strong></div><div className="flex justify-between gap-3"><span className="text-content-muted">Última sincronização</span><strong className="text-content-base">{connection?.lastSyncedAt ? new Date(connection.lastSyncedAt).toLocaleString('pt-BR') : 'Ainda não sincronizada'}</strong></div>{connection?.lastError && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300">{connection.lastError}</p>}<div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={refreshAssets} disabled={busy} className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border-subtle px-3 text-xs font-bold text-content-base transition-colors hover:bg-surface-base disabled:opacity-50"><RefreshCw className={`h-3.5 w-3.5 ${busy ? 'animate-spin' : ''}`} /> Atualizar contas</button><button type="button" onClick={() => setDisconnectOpen(true)} disabled={busy} className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-red-500/30 px-3 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/10 disabled:opacity-50"><LogOut className="h-3.5 w-3.5" /> Desconectar</button></div></div> : <div className="mt-4 rounded-lg border border-dashed border-border-subtle bg-surface-base p-4 text-sm text-content-muted"><p>{CAMPAIGNS_DEMO_MODE ? 'A demonstração foi desconectada apenas localmente. A integração real poderá ser configurada depois.' : 'Conecte o Google Ads para escolher a conta que será usada nas campanhas.'}</p><button type="button" onClick={connect} disabled={!status?.configured || busy} className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-md bg-gold-base px-4 text-sm font-bold text-content-on-accent transition-colors hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"><Link2 className="h-4 w-4" /> Conectar Google Ads</button></div>}</div><div className="rounded-xl border border-border-subtle bg-surface-card p-4 sm:p-5"><div className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300"><ShieldCheck className="h-4 w-4" /></div><div><h2 className="text-sm font-bold text-content-base">Política de operação</h2><p className="mt-1 text-xs leading-relaxed text-content-muted">Controles para criar campanhas simples sem ativação acidental.</p></div></div><div className="mt-4 space-y-2.5 text-xs text-content-muted"><p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> Novas campanhas são criadas pausadas.</p><p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> A ativação exige confirmação no módulo Campanhas.</p><p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> {CAMPAIGNS_DEMO_MODE ? 'Nenhum token é usado na demonstração.' : 'Tokens ficam somente no backend.'}</p><p className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-status-success" /> O Navo não calcula impostos nem decide o orçamento por conta própria.</p></div><a href="https://developers.google.com/google-ads/api" target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-gold-base hover:text-gold-hover">Documentação Google Ads API <ExternalLink className="h-3 w-3" /></a></div></section>
 
-      {connected && <section className="rounded-xl border border-border-subtle bg-surface-card p-4 sm:p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-sm font-bold text-content-base">Conta usada pelo Navo</h2><p className="mt-1 text-xs text-content-muted">Escolha explicitamente a conta cliente Google Ads. O Navo não escolhe contas por conta própria.</p></div><button type="button" onClick={saveCustomer} disabled={busy || !customerId} className="min-h-9 rounded-md bg-gold-base px-3 text-xs font-bold text-content-on-accent hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50">Salvar seleção</button></div><div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-end"><label className="block text-xs font-semibold text-content-muted">Conta cliente Google Ads<select value={customerId} onChange={(event) => setCustomerId(event.target.value)} className="mt-1.5 h-10 w-full rounded-md border border-border-subtle bg-surface-base px-3 text-sm text-content-base outline-none focus:border-gold-base"><option value="">Selecione</option>{customers.filter((customer) => !customer.manager).map((customer) => <option key={customer.customerId} value={customer.customerId}>{customer.name} · {customer.customerId} · {customer.currency || 'BRL'}</option>)}</select></label><button type="button" onClick={refreshAssets} disabled={busy} className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-md border border-border-subtle px-3 text-xs font-bold text-content-base hover:bg-surface-base disabled:opacity-50"><RefreshCw className={`h-3.5 w-3.5 ${busy ? 'animate-spin' : ''}`} /> Atualizar</button></div>{customers.length === 0 && <p className="mt-3 text-xs text-amber-300">O Google não retornou contas acessíveis. Verifique o Customer ID, as permissões do usuário e o vínculo com a conta de administrador.</p>}</section>}
+      {connected && <section className="rounded-xl border border-border-subtle bg-surface-card p-4 sm:p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-sm font-bold text-content-base">Conta usada pelo Navo</h2><p className="mt-1 text-xs text-content-muted">{CAMPAIGNS_DEMO_MODE ? 'Conta fictícia para visualizar o fluxo. Nenhuma conta real será alterada.' : 'Escolha explicitamente a conta cliente Google Ads. O Navo não escolhe contas por conta própria.'}</p></div><button type="button" onClick={saveCustomer} disabled={busy || !customerId} className="min-h-9 rounded-md bg-gold-base px-3 text-xs font-bold text-content-on-accent hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50">Salvar seleção</button></div><div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-end"><label className="block text-xs font-semibold text-content-muted">Conta cliente Google Ads<select value={customerId} onChange={(event) => setCustomerId(event.target.value)} className="mt-1.5 h-10 w-full rounded-md border border-border-subtle bg-surface-base px-3 text-sm text-content-base outline-none focus:border-gold-base"><option value="">Selecione</option>{customers.filter((customer) => !customer.manager).map((customer) => <option key={customer.customerId} value={customer.customerId}>{customer.name} · {customer.customerId} · {customer.currency || 'BRL'}</option>)}</select></label><button type="button" onClick={refreshAssets} disabled={busy} className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-md border border-border-subtle px-3 text-xs font-bold text-content-base hover:bg-surface-base disabled:opacity-50"><RefreshCw className={`h-3.5 w-3.5 ${busy ? 'animate-spin' : ''}`} /> Atualizar</button></div>{customers.length === 0 && <p className="mt-3 text-xs text-amber-300">O Google não retornou contas acessíveis. Verifique o Customer ID, as permissões do usuário e o vínculo com a conta de administrador.</p>}</section>}
 
       <ConfirmDialog isOpen={disconnectOpen} onClose={() => setDisconnectOpen(false)} onConfirm={disconnect} isLoading={busy} title="Desconectar Google Ads?" description="O Navo removerá o refresh token armazenado e preservará o histórico local. Campanhas já existentes continuarão sendo administradas no Google Ads até que você as pause por lá." confirmText="Desconectar" variant="danger" />
     </div>
