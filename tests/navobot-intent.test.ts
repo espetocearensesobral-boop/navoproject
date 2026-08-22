@@ -44,6 +44,13 @@ test('does not confuse greetings with service names and supports partial service
   ];
   assert.deepEqual(findServiceMatches(services, 'oi'), []);
   assert.deepEqual(findServiceMatches(services, 'Modelagem de barba').map((service) => service.id), ['svc-barba']);
+
+  const ambiguousServices = [
+    { id: 'svc-pigmentacao', title: 'Pigmentação de Cabelo e Barba' },
+    { id: 'svc-corte-moderno', title: 'Corte Moderno / Fade / Mid Fade' },
+  ];
+  assert.deepEqual(findServiceMatches(ambiguousServices, 'cortar o cabelo'), []);
+  assert.deepEqual(findServiceMatches(ambiguousServices, 'corte moderno').map((service) => service.id), ['svc-corte-moderno']);
 });
 
 test('parses relative dates and WhatsApp time formats', () => {

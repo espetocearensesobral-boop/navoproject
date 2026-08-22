@@ -230,6 +230,13 @@ export function normalizeIntentName(value: unknown): NavoBotIntent {
 }
 
 const SERVICE_STOP_WORDS = new Set(['a', 'as', 'o', 'os', 'um', 'uma', 'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'para', 'por']);
+const GENERIC_SERVICE_QUERY_WORDS = new Set([
+  'algum', 'alguma', 'alguns', 'algumas', 'amanha', 'agendar', 'agendamento',
+  'cabelo', 'cortar', 'corte', 'disponibilidade', 'disponivel', 'disponiveis', 'fazer',
+  'horario', 'horarios', 'hora', 'horas', 'hoje', 'livre', 'livres', 'marcar',
+  'reservar', 'servico', 'servicos', 'tem', 'vaga', 'vagas', 'queria', 'quero',
+  'gostaria',
+]);
 
 function serviceTokens(value: string): string[] {
   return value
@@ -243,15 +250,17 @@ function serviceTokens(value: string): string[] {
 export function findServiceMatches(services: Array<{ id: string; title: string }>, text: string): Array<{ id: string; title: string }> {
   const queryTokens = serviceTokens(text);
   if (!queryTokens.length) return [];
+  const semanticQueryTokens = queryTokens.filter((token) => !GENERIC_SERVICE_QUERY_WORDS.has(token));
+  if (!semanticQueryTokens.length) return [];
   const exact = services.filter((service) => {
     const titleTokens = serviceTokens(String(service.title));
-    return queryTokens.every((queryToken) => titleTokens.some((titleToken) => titleToken === queryToken || titleToken.startsWith(queryToken)));
+    return semanticQueryTokens.every((queryToken) => titleTokens.some((titleToken) => titleToken === queryToken || titleToken.startsWith(queryToken)));
   });
   if (exact.length) return exact;
   const scored = services.map((service) => {
     const titleTokens = serviceTokens(String(service.title));
-    const matched = queryTokens.filter((queryToken) => titleTokens.some((titleToken) => titleToken === queryToken || titleToken.startsWith(queryToken))).length;
-    return { service, matched, coverage: matched / queryTokens.length };
+    const matched = semanticQueryTokens.filter((queryToken) => titleTokens.some((titleToken) => titleToken === queryToken || titleToken.startsWith(queryToken))).length;
+    return { service, matched, coverage: matched / semanticQueryTokens.length };
   }).filter((item) => item.matched > 0 && item.coverage >= 0.5);
   if (!scored.length) return [];
   const bestCoverage = Math.max(...scored.map((item) => item.coverage));

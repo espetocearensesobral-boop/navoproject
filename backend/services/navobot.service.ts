@@ -521,9 +521,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       ? services.filter((service: any) => context.serviceIds?.includes(service.id))
       : [];
     const deterministicMatches = findServiceMatches(services, text);
-    const normalizedText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const phraseMatches = services.filter((service: any) => String(service.title).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).some((token) => token.length >= 3 && normalizedText.includes(token)));
-    const matchedServices = contextServices.length ? contextServices : deterministicMatches.length ? deterministicMatches : phraseMatches;
+    const matchedServices = contextServices.length ? contextServices : deterministicMatches;
     if (matchedServices.length > 1) {
       const nextContext = contextForNewIntent(context, {
         availabilityDate: parseDateFromText(text) || context.availabilityDate || getTodayStringBRT(),
