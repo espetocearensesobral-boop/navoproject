@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, CheckCircle2, Settings, Mail, Send, AlertCircle, Eye, EyeOff, MessageSquare, QrCode, ShieldCheck, CalendarDays, Printer, RotateCcw } from 'lucide-react';
+import { Save, CheckCircle2, Settings, Mail, Send, AlertCircle, Eye, EyeOff, MessageSquare, QrCode, ShieldCheck, CalendarDays, Printer, RotateCcw, Target } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
 import { fetchEmailSettings, saveEmailSettings, sendTestEmail, defaultEmailSettings, type EmailSettings } from '../../services/emailSettingsService';
@@ -7,16 +7,18 @@ import { WhatsAppManagement } from './WhatsAppManagement';
 import { QrCodeManagement } from './QrCodeManagement';
 import { AuditLogsManagement } from './AuditLogsManagement';
 import { AgendaAvailabilitySettings } from './AgendaAvailabilitySettings';
+import { MetaAdsSettings } from './MetaAdsSettings';
 import { defaultPrintSettings, fetchPrintSettings, savePrintSettings, type PrintSettings, type PrintFormat } from '../../services/printSettingsService';
 
-export type SettingsTab = 'email' | 'whatsapp' | 'qrcode' | 'audit' | 'availability' | 'print';
+export type SettingsTab = 'email' | 'whatsapp' | 'qrcode' | 'audit' | 'availability' | 'print' | 'meta_ads';
 
 interface SettingsManagementProps {
   initialTab?: SettingsTab;
   hideTabs?: boolean;
+  onOpenCampaigns?: () => void;
 }
 
-export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialTab = 'email', hideTabs = false }) => {
+export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialTab = 'email', hideTabs = false, onOpenCampaigns }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
 
   useEffect(() => {
@@ -39,6 +41,8 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
         return <AgendaAvailabilitySettings />;
       case 'print':
         return <PrintSettingsTab />;
+      case 'meta_ads':
+        return <MetaAdsSettings onOpenCampaigns={onOpenCampaigns} />;
       default:
         return null;
     }
@@ -58,6 +62,7 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ initialT
           { id: 'audit', label: 'Auditoria', icon: ShieldCheck },
           { id: 'availability', label: 'Agenda', icon: CalendarDays },
           { id: 'print', label: 'Impressões', icon: Printer },
+          { id: 'meta_ads', label: 'Meta Ads', icon: Target },
         ]}
         activeId={activeTab}
         onChange={(id) => setActiveTab(id as SettingsTab)}

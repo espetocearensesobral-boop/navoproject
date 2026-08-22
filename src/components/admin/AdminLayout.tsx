@@ -14,6 +14,7 @@ import { ReportsWorkspace } from './ReportsWorkspace';
 import { RelationshipWorkspace } from './RelationshipWorkspace';
 import { SystemWorkspace } from './SystemWorkspace';
 import { AdminNotificationCenter } from './AdminNotificationCenter';
+import { MetaAdsManagement } from './MetaAdsManagement';
 import { authFetch } from '../../lib/api';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAdminOperationNotifications } from '../../hooks/useAdminOperationNotifications';
@@ -39,6 +40,7 @@ import {
   MoreHorizontal,
   Store,
   Settings,
+  Megaphone,
   Sun,
   Moon,
 } from 'lucide-react';
@@ -48,6 +50,7 @@ export type AdminTab =
   | 'agenda'
   | 'queue'
   | 'relatorios'
+  | 'campanhas'
   | 'financeiro_recebimentos'
   | 'financeiro_extrato'
   | 'financeiro_saidas'
@@ -59,7 +62,7 @@ export type AdminTab =
 
 const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
 const ADMIN_TAB_VALUES: AdminTab[] = [
-  'dashboard', 'agenda', 'queue', 'relatorios', 'financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas',
+  'dashboard', 'agenda', 'queue', 'relatorios', 'campanhas', 'financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas',
   'clientes', 'catalogo', 'relacionamento', 'sistema'
 ];
 
@@ -107,6 +110,7 @@ export const AdminLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [adminName, setAdminName] = useState('Admin');
+  const [systemInitialTab, setSystemInitialTab] = useState<'unit' | 'preferences' | 'availability' | 'notifications' | 'qrcode' | 'print' | 'audit' | 'meta_ads'>('unit');
 
   React.useEffect(() => {
     try {
@@ -256,6 +260,12 @@ export const AdminLayout: React.FC = () => {
       description: 'Operação e financeiro',
     },
     {
+      id: 'campanhas' as AdminTab,
+      label: 'Campanhas',
+      icon: Megaphone,
+      description: 'Crie campanhas e acompanhe resultados',
+    },
+    {
       id: 'financeiro_recebimentos' as AdminTab,
       label: 'Recebimentos',
       icon: Wallet,
@@ -358,6 +368,8 @@ export const AdminLayout: React.FC = () => {
         return <WaitingQueue />;
       case 'relatorios':
         return <ReportsWorkspace />;
+      case 'campanhas':
+        return <MetaAdsManagement onOpenSettings={() => { setSystemInitialTab('meta_ads'); setActiveTab('sistema'); }} />;
       case 'financeiro_recebimentos':
         return <ReceiptsManagement />;
       case 'financeiro_extrato':
@@ -371,7 +383,7 @@ export const AdminLayout: React.FC = () => {
       case 'relacionamento':
         return <RelationshipWorkspace />;
       case 'sistema':
-        return <SystemWorkspace />;
+        return <SystemWorkspace initialTab={systemInitialTab} onOpenCampaigns={() => setActiveTab('campanhas')} />;
       default:
         return null;
     }

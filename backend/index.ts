@@ -205,6 +205,7 @@ import { loyaltyRouter } from './routers/loyalty.router.js';
 import { referralsRouter } from './routers/referrals.router.js';
 import { rewardsRouter } from './routers/rewards.router.js';
 import { reviewsRouter } from './routers/reviews.router.js';
+import { metaAdsRouter } from './routers/meta-ads.router.js';
 
 app.use('/api/system', systemRouter);
 app.use('/api/seed', seedRouter);
@@ -230,6 +231,7 @@ app.use('/api/loyalty', loyaltyRouter);
 app.use('/api/referrals', referralsRouter);
 app.use('/api/rewards', rewardsRouter);
 app.use('/api/reviews', reviewsRouter);
+app.use('/api/meta-ads', metaAdsRouter);
 
 // Migrate moved to setup.js execution or manual script if needed, or keeping it but it's rarely used from API directly. Wait, the user request says to modularize. Let's create a migrate router just to be safe. Actually, I can just mount seedRouter and remove the local seed route.
 

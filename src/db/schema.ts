@@ -645,3 +645,76 @@ export const navoBotMessagesRelations = relations(navoBotMessages, ({ one }) => 
     references: [navoBotConversations.id],
   }),
 }));
+
+// Integração Meta Ads: tokens ficam somente no backend e as campanhas são isoladas pelo proprietário.
+export const metaAdsConnections = pgTable('meta_ads_connections', {
+  id: text('id').primaryKey(),
+  ownerId: text('owner_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  metaUserId: text('meta_user_id'),
+  metaUserName: text('meta_user_name'),
+  accessToken: text('access_token').notNull().default(''),
+  tokenExpiresAt: timestamp('token_expires_at'),
+  adAccountId: text('ad_account_id'),
+  adAccountName: text('ad_account_name'),
+  currency: text('currency').default('BRL'),
+  pageId: text('page_id'),
+  pageName: text('page_name'),
+  status: text('status').notNull().default('connected'),
+  lastSyncedAt: timestamp('last_synced_at'),
+  lastError: text('last_error'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  ownerUniqueIdx: uniqueIndex('meta_ads_connections_owner_unique_idx').on(table.ownerId),
+}));
+
+export const metaAdsCampaigns = pgTable('meta_ads_campaigns', {
+  id: text('id').primaryKey(),
+  ownerId: text('owner_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  connectionId: text('connection_id').notNull().references(() => metaAdsConnections.id, { onDelete: 'cascade' }),
+  metaCampaignId: text('meta_campaign_id').notNull().unique(),
+  metaAdSetId: text('meta_ad_set_id'),
+  metaCreativeId: text('meta_creative_id'),
+  metaAdId: text('meta_ad_id'),
+  name: text('name').notNull(),
+  objective: text('objective').notNull(),
+  status: text('status').notNull().default('PAUSED'),
+  dailyBudgetCents: integer('daily_budget_cents').notNull().default(0),
+  startDate: text('start_date'),
+  endDate: text('end_date'),
+  locationLabel: text('location_label'),
+  locationKey: text('location_key'),
+  destinationUrl: text('destination_url'),
+  adText: text('ad_text'),
+  headline: text('headline'),
+  imageUrl: text('image_url'),
+  impressions: integer('impressions').notNull().default(0),
+  reach: integer('reach').notNull().default(0),
+  clicks: integer('clicks').notNull().default(0),
+  leads: integer('leads').notNull().default(0),
+  spendCents: integer('spend_cents').notNull().default(0),
+  lastInsightAt: timestamp('last_insight_at'),
+  errorMessage: text('error_message'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  ownerIdx: index('meta_ads_campaigns_owner_idx').on(table.ownerId),
+  connectionIdx: index('meta_ads_campaigns_connection_idx').on(table.connectionId),
+}));
+
+export const metaAdsLeads = pgTable('meta_ads_leads', {
+  id: text('id').primaryKey(),
+  ownerId: text('owner_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  connectionId: text('connection_id').notNull().references(() => metaAdsConnections.id, { onDelete: 'cascade' }),
+  campaignId: text('campaign_id').references(() => metaAdsCampaigns.id, { onDelete: 'set null' }),
+  metaLeadId: text('meta_lead_id').notNull().unique(),
+  fullName: text('full_name'),
+  phone: text('phone'),
+  email: text('email'),
+  payload: jsonb('payload').notNull().default({}),
+  receivedAt: timestamp('received_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  ownerIdx: index('meta_ads_leads_owner_idx').on(table.ownerId),
+  campaignIdx: index('meta_ads_leads_campaign_idx').on(table.campaignId),
+}));

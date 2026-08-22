@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { CalendarDays, Mail, Printer, QrCode, Settings, ShieldCheck, Store } from 'lucide-react';
+import { CalendarDays, Mail, Megaphone, Printer, QrCode, Settings, ShieldCheck, Store } from 'lucide-react';
 import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { SettingsManagement, type SettingsTab } from './SettingsManagement';
 import { AdminWorkspace } from './shared/AdminWorkspace';
 
-type SystemTab = 'unit' | 'preferences' | 'availability' | 'notifications' | 'qrcode' | 'print' | 'audit';
+type SystemTab = 'unit' | 'preferences' | 'availability' | 'notifications' | 'qrcode' | 'print' | 'audit' | 'meta_ads';
 
-export const SystemWorkspace: React.FC<{ initialTab?: SystemTab }> = ({ initialTab = 'unit' }) => {
+export const SystemWorkspace: React.FC<{ initialTab?: SystemTab; onOpenCampaigns?: () => void }> = ({ initialTab = 'unit', onOpenCampaigns }) => {
   const [activeTab, setActiveTab] = useState<SystemTab>(initialTab);
 
   const renderContent = () => {
@@ -15,8 +15,10 @@ export const SystemWorkspace: React.FC<{ initialTab?: SystemTab }> = ({ initialT
       ? 'email'
       : activeTab === 'notifications'
         ? 'whatsapp'
-        : activeTab;
-    return <SettingsManagement initialTab={settingsTab} hideTabs />;
+        : activeTab === 'meta_ads'
+          ? 'meta_ads'
+          : activeTab;
+    return <SettingsManagement initialTab={settingsTab} hideTabs onOpenCampaigns={onOpenCampaigns} />;
   };
 
   return (
@@ -27,6 +29,7 @@ export const SystemWorkspace: React.FC<{ initialTab?: SystemTab }> = ({ initialT
         { id: 'preferences', label: 'Preferências', icon: Settings },
         { id: 'availability', label: 'Agenda', icon: CalendarDays },
         { id: 'notifications', label: 'Notificações', icon: Mail },
+        { id: 'meta_ads', label: 'Meta Ads', icon: Megaphone },
         { id: 'qrcode', label: 'QR Code', icon: QrCode },
         { id: 'print', label: 'Impressões', icon: Printer },
         { id: 'audit', label: 'Auditoria', icon: ShieldCheck },
