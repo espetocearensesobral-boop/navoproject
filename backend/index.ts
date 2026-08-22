@@ -249,17 +249,20 @@ app.use('/api/email', emailRouter);
 
 import { createEvolutionApiModule } from './evolution-api.js';
 import { createNavoBotService } from './services/navobot.service.js';
+import { createEvolutionMessagingProvider, type WhatsAppMessagingProvider } from './services/whatsapp-provider.js';
 
-let evolutionSendText: (phone: string, text: string) => Promise<boolean> = async () => false;
-let evolutionSendButtons: (phone: string, payload: any) => Promise<boolean> = async () => false;
-let evolutionSendList: (phone: string, payload: any) => Promise<boolean> = async () => false;
+let whatsappProvider: WhatsAppMessagingProvider = createEvolutionMessagingProvider({
+  sendText: async () => false,
+  sendButtons: async () => false,
+  sendList: async () => false,
+});
 let evolutionGetSettings: () => Promise<any> = async () => null;
 const navoBotService = createNavoBotService({
   getDb: () => db,
   schema,
-  sendText: (phone, text) => evolutionSendText(phone, text),
-  sendButtons: (phone, payload) => evolutionSendButtons(phone, payload),
-  sendList: (phone, payload) => evolutionSendList(phone, payload),
+  sendText: (phone, text) => whatsappProvider.sendText(phone, text),
+  sendButtons: (phone, payload) => whatsappProvider.sendButtons(phone, payload),
+  sendList: (phone, payload) => whatsappProvider.sendList(phone, payload),
   useInteractiveMessages: async () => (await evolutionGetSettings())?.useInteractiveMessages === true,
 });
 const { router: evolutionApiRouter, sendText: configuredEvolutionSendText, sendButtons: configuredEvolutionSendButtons, sendList: configuredEvolutionSendList, getSettings: configuredEvolutionGetSettings } = createEvolutionApiModule({
@@ -269,9 +272,11 @@ const { router: evolutionApiRouter, sendText: configuredEvolutionSendText, sendB
   onWebhook: (payload) => navoBotService.handleWebhook(payload),
   onInactivitySweep: () => navoBotService.processInactivitySweep(),
 });
-evolutionSendText = configuredEvolutionSendText;
-evolutionSendButtons = configuredEvolutionSendButtons;
-evolutionSendList = configuredEvolutionSendList;
+whatsappProvider = createEvolutionMessagingProvider({
+  sendText: configuredEvolutionSendText,
+  sendButtons: configuredEvolutionSendButtons,
+  sendList: configuredEvolutionSendList,
+});
 evolutionGetSettings = configuredEvolutionGetSettings;
 app.use('/api/evolution', evolutionApiRouter);
 

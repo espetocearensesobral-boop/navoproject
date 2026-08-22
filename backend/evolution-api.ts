@@ -2,6 +2,7 @@ import express from 'express';
 import { z } from 'zod';
 import { requireAdmin, requireAuth } from './middleware/index.js';
 import { handleError } from './utils/index.js';
+import type { WhatsAppButtonsPayload, WhatsAppListPayload } from './services/whatsapp-provider.js';
 
 const DEFAULT_SETTINGS = {
   id: 'default',
@@ -354,7 +355,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
     }
   }
 
-  async function sendButtons(phone: string, payload: { title?: string; description?: string; text?: string; footerText?: string; buttons: Array<{ type?: 'reply'; displayText?: string; id?: string; buttonId?: string; buttonText?: { displayText?: string } }> }): Promise<boolean> {
+  async function sendButtons(phone: string, payload: WhatsAppButtonsPayload): Promise<boolean> {
     const normalizedPayload = {
       title: payload.title || 'NavoBot',
       description: payload.description || payload.text || 'Escolha uma opção',
@@ -368,7 +369,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
     return sendEvolutionPayload('/message/sendButtons', phone, normalizedPayload);
   }
 
-  async function sendList(phone: string, payload: { title: string; description: string; buttonText: string; footerText?: string; sections: Array<Record<string, unknown>> }): Promise<boolean> {
+  async function sendList(phone: string, payload: WhatsAppListPayload): Promise<boolean> {
     return sendEvolutionPayload('/message/sendList', phone, {
       ...payload,
       footerText: payload.footerText || 'NavoBot',
