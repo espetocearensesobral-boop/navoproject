@@ -191,8 +191,11 @@ export const GoogleAdsManagement: React.FC<GoogleAdsManagementProps> = ({ onOpen
     <div className="space-y-4 min-w-0">
       <AdminPageHeader icon={Megaphone} title="Google Ads" stats={[{ label: 'campanhas', value: campaigns.length }, { label: 'gasto', value: formatCents(totals.spendCents, connection?.currency || 'BRL'), tone: 'finance-negative' }]} action={{ label: 'Nova campanha', icon: Plus, onClick: () => setFormOpen(true), disabled: !canCreate }}>
         <button type="button" onClick={sync} disabled={syncing || !canCreate} className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border-subtle px-3 text-xs font-bold text-content-base hover:bg-surface-base disabled:pointer-events-none disabled:opacity-50"><RefreshCw className={`h-3.5 w-3.5 ${syncing ? 'animate-spin' : ''}`} /> Atualizar</button>
-      </AdminPageHeader>
+            </AdminPageHeader>
 
+      <div className="md:hidden">
+        <button type="button" onClick={() => setFormOpen(true)} disabled={!canCreate} className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-gold-base px-4 text-sm font-bold text-content-on-accent transition-colors hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"><Plus className="h-4 w-4" /> Nova campanha</button>
+      </div>
 
       {message && <div className={`flex items-start gap-2 rounded-lg border px-3 py-2.5 text-sm ${message.type === 'success' ? 'border-status-success/30 bg-status-success/10 text-status-success' : 'border-red-500/30 bg-red-500/10 text-red-300'}`} role="status"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /><span>{message.text}</span></div>}
       {loadError && <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div className="min-w-0"><h2 className="text-sm font-bold text-content-base">Não foi possível carregar as campanhas</h2><p className="mt-1 break-words text-sm leading-relaxed text-content-muted">{loadError}</p></div><button type="button" onClick={() => void load()} disabled={loading} className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"><RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Tentar novamente</button></div></section>}
