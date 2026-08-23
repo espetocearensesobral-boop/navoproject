@@ -545,36 +545,39 @@ export const ScheduleGrid: React.FC = () => {
         {/* Schedule Grid Table */}
         <div className="w-full overflow-x-auto rounded-2xl border border-border-subtle bg-surface-card shadow-xl">
           <div className="w-full min-w-[750px]">
-            {/* Table Header: Barbers Columns */}
-            <div className="grid grid-cols-12 bg-surface-base border-b border-border-subtle text-xs font-extrabold text-gold-hover">
-              <div className="col-span-2 p-3 border-r border-border-subtle text-center flex items-center justify-center space-x-1">
+            {/* Table Header: Barbers Columns. Colunas geradas dinamicamente pelo nº de barbeiros
+                ativos (evita desalinhamento quando há mais de 3, que quebrava linha com grid-cols-3 fixo). */}
+            <div className="sticky top-0 z-10 grid bg-surface-base border-b border-border-subtle text-xs font-extrabold text-gold-hover" style={{ gridTemplateColumns: `7rem repeat(${Math.max(activeBarbers.length, 1)}, minmax(9rem, 1fr))` }}>
+              <div className="p-3 border-r border-border-subtle text-center flex items-center justify-center space-x-1">
                 <Clock className="w-3.5 h-3.5" />
                 <span>Horário</span>
               </div>
-
-              <div className="col-span-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-x divide-border-subtle">
-                {activeBarbers.map(barber => (
-                  <div key={barber.id} className="p-3 flex items-center justify-center space-x-2">
-                    <img src={barber.photo_url} alt={barber.name} className="w-6 h-6 rounded-full object-cover border border-gold-base" />
-                    <span className="text-content-base font-bold">{barber.name}</span>
-                  </div>
-                ))}
-              </div>
+              {activeBarbers.map(barber => (
+                <div key={barber.id} className="p-3 flex items-center justify-center space-x-2 border-r border-border-subtle last:border-r-0">
+                  <img src={barber.photo_url} alt={barber.name} className="w-6 h-6 rounded-full object-cover border border-gold-base" />
+                  <span className="text-content-base font-bold truncate">{barber.name}</span>
+                </div>
+              ))}
             </div>
 
             {/* Time Slots Rows */}
             <div className="divide-y divide-border-subtle">
               {timeSlots.map(slot => {
+                const isNowRow = selectedDate === getTodayStringBRT() && currentBrtMinutes >= timeToMinutes(slot) && currentBrtMinutes < timeToMinutes(slot) + (operationSettings.slotIntervalMinutes || 30);
                 return (
-                  <div key={slot} className="grid grid-cols-12 hover:bg-surface-card transition-colors">
+                  <div
+                    key={slot}
+                    className={`grid transition-colors ${isNowRow ? 'bg-gold-base/[0.06]' : 'hover:bg-surface-card'}`}
+                    style={{ gridTemplateColumns: `7rem repeat(${Math.max(activeBarbers.length, 1)}, minmax(9rem, 1fr))` }}
+                  >
                     {/* Time Label */}
-                    <div className="col-span-2 p-3 border-r border-border-subtle text-center text-xs font-bold text-gold-hover flex items-center justify-center">
+                    <div className={`p-3 border-r border-border-subtle text-center text-xs font-bold flex items-center justify-center gap-1 ${isNowRow ? 'text-gold-base' : 'text-gold-hover'}`}>
+                      {isNowRow && <span className="w-1.5 h-1.5 rounded-full bg-gold-base shrink-0" aria-hidden="true" />}
                       {slot}
                     </div>
 
                     {/* Barbers Cells */}
-                    <div className="col-span-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-x divide-border-subtle">
-                      {activeBarbers.map(barber => {
+                    {activeBarbers.map(barber => {
                         const apt = appointments.find(
                           a => a.professional_id === barber.id &&
                                a.date === selectedDate &&
@@ -582,8 +585,9 @@ export const ScheduleGrid: React.FC = () => {
                                a.status !== 'cancelled' &&
                                a.status !== 'completed'
                         );
+                        const isPending = apt?.status === 'pending_approval';
                         const operationalState = apt ? getAppointmentOperationalState(apt) : null;
-                        const professionalAccent = selectedBarberId === 'all' && !operationalState?.isLate
+                        const professionalAccent = selectedBarberId === 'all' && !operationalState?.isLate && !isPending
                           ? getProfessionalAccent(barber.id)
                           : undefined;
 
@@ -592,16 +596,24 @@ export const ScheduleGrid: React.FC = () => {
                         );
 
                         return (
-                          <div key={barber.id} className="p-2 min-h-[52px] flex items-center">
+                          <div key={barber.id} className="p-2 min-h-[52px] flex items-center border-r border-border-subtle last:border-r-0">
                             {apt ? (
                               <div
                                 style={professionalAccent ? { borderLeftColor: professionalAccent } : undefined}
                                 className={`w-full border border-l-4 p-2 rounded-r-xl space-y-1 ${
-                                  operationalState?.isLate
+                                  isPending
+                                    ? 'bg-amber-500/10 border-amber-500/50'
+                                    : operationalState?.isLate
                                     ? 'bg-amber-500/5 border-amber-500/60'
                                     : 'bg-surface-base border-border-subtle'
                                 }`}
                               >
+                                {isPending && (
+                                  <div className="flex items-center gap-1 text-xs font-bold text-amber-300 uppercase tracking-wide">
+                                    <ShieldAlert className="w-3 h-3 text-amber-400 shrink-0" />
+                                    <span>Fora do expediente</span>
+                                  </div>
+                                )}
                                 <div className="flex items-center justify-between text-xs font-bold text-content-base gap-2">
                                   <span className="truncate">{apt.client_name}</span>
                                   <span className="text-xs finance-positive shrink-0">R$ {apt.final_amount.toFixed(2)}</span>
@@ -614,13 +626,15 @@ export const ScheduleGrid: React.FC = () => {
                                         <Timer className="w-3 h-3" /> {operationalState.remainingMinutes} min
                                       </span>
                                     ) : null}
-                                    <span className={`px-1.5 py-0.5 rounded-xl text-xs font-bold ${
-                                      operationalState?.isInService
-                                        ? 'bg-status-info/10 text-status-info border border-status-info/20'
-                                        : 'bg-status-success/20 text-status-success'
-                                    }`}>
-                                      {getAppointmentStatusLabel(apt.status)}
-                                    </span>
+                                    {!isPending && (
+                                      <span className={`px-1.5 py-0.5 rounded-xl text-xs font-bold ${
+                                        operationalState?.isInService
+                                          ? 'bg-status-info/10 text-status-info border border-status-info/20'
+                                          : 'bg-status-success/20 text-status-success'
+                                      }`}>
+                                        {getAppointmentStatusLabel(apt.status)}
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
                                 {operationalState?.isLate && (
@@ -628,6 +642,16 @@ export const ScheduleGrid: React.FC = () => {
                                     <AlertTriangle className="w-3 h-3 schedule-late-text" />
                                     Atrasado {operationalState.lateMinutes} min
                                   </div>
+                                )}
+                                {isPending && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAcceptPendingAppointment(apt.id)}
+                                    className="w-full mt-1 px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1 transition-colors active:scale-[0.97]"
+                                  >
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    <span>Aceitar</span>
+                                  </button>
                                 )}
                               </div>
                             ) : block ? (
@@ -650,7 +674,6 @@ export const ScheduleGrid: React.FC = () => {
                           </div>
                         );
                       })}
-                    </div>
                   </div>
                 );
               })}

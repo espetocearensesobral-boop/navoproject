@@ -457,7 +457,7 @@ export const WaitingQueue: React.FC = () => {
 
       {/* MAIN LAYOUT */}
       {activeTab === 'kanban' ? (
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(19rem,0.95fr)_minmax(0,2.05fr)] gap-4 items-stretch">
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.85fr)] gap-4 items-stretch">
           {/* EM ATENDIMENTO: ações em curso */}
           <section className="order-2 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-xl p-3 sm:p-4">
             <div className="flex items-center justify-between gap-3 shrink-0">
