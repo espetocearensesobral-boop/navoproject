@@ -209,7 +209,6 @@
   width: var(--admin-sidebar-width);
   background-color: var(--admin-surface);
   border-right: 1px solid var(--admin-border);
-  display: flex;
   flex-direction: column;
 }
 
