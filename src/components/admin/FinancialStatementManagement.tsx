@@ -335,36 +335,33 @@ export const FinancialStatementManagement: React.FC = () => {
         {loading ? (
           <AdminListSkeleton rows={6} className="p-4 sm:p-5" />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs min-w-[760px]">
-              <thead className="bg-[var(--admin-bg)] border-b border-[var(--admin-border)] text-[var(--admin-text-muted)] uppercase font-bold text-xs">
-                <tr className="whitespace-nowrap">
-                  <th className="p-3">Data / Hora</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Tipo</th>
-                  <th className="p-3">Categoria</th>
-                  <th className="p-3 min-w-[200px]">Descrição</th>
-                  <th className="p-3">Forma Pagto</th>
-                  <th className="p-3 text-right">Valor R$</th>
+          <div className="admin-table-container">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Data / Hora</th>
+                  <th>Status</th>
+                  <th>Tipo</th>
+                  <th>Categoria</th>
+                  <th>Descrição</th>
+                  <th>Forma Pagto</th>
+                  <th className="text-right">Valor R$</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--admin-border)] text-[var(--admin-text-main)]">
+              <tbody>
                 {filtered.map((t) => (
-                  <tr
-                    key={t.id}
-                    className="hover:bg-[var(--admin-bg)]/50 transition-colors"
-                  >
-                    <td className="p-3 font-mono text-xs text-[var(--admin-text-muted)] whitespace-nowrap">
+                  <tr key={t.id}>
+                    <td className="font-mono text-[var(--admin-text-muted)] whitespace-nowrap">
                       {formatTransactionDate(t.date)}
                     </td>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="whitespace-nowrap">
                       <span
                         className={`font-bold text-xs px-2 py-0.5 rounded-xl uppercase ${t.status === "pending" ? "bg-amber-500/15 text-amber-500" : "bg-status-success/15 text-status-success"}`}
                       >
                         {t.status === "pending" ? "Pendente" : "Confirmado"}
                       </span>
                     </td>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="whitespace-nowrap">
                       {t.type === "income" ? (
                         <span className="bg-status-success/15 text-status-success font-bold text-xs px-2 py-0.5 rounded-xl uppercase inline-flex items-center gap-1">
                           <ArrowUpRight className="w-3 h-3" />
@@ -377,17 +374,17 @@ export const FinancialStatementManagement: React.FC = () => {
                         </span>
                       )}
                     </td>
-                    <td className="p-3 font-semibold text-[var(--admin-text-muted)] admin-safe-wrap">
+                    <td className="font-semibold text-[var(--admin-text-muted)] admin-safe-wrap">
                       {t.category}
                     </td>
-                    <td className="p-3 font-bold text-[var(--admin-text-main)] admin-safe-wrap">
+                    <td className="font-bold text-[var(--admin-text-main)] admin-safe-wrap">
                       {t.description}
                     </td>
-                    <td className="p-3 font-mono text-[var(--admin-text-muted)]">
+                    <td className="font-mono text-[var(--admin-text-muted)]">
                       {t.paymentMethod}
                     </td>
                     <td
-                      className={`p-3 text-right font-bold tabular-nums whitespace-nowrap ${
+                      className={`text-right font-bold tabular-nums whitespace-nowrap ${
                         t.type === "income"
                           ? "finance-positive"
                           : "finance-negative"

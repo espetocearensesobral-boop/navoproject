@@ -196,31 +196,27 @@ export const AuditLogsManagement: React.FC = () => {
       </div>
 
       {/* Logs Table / List */}
-      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs min-w-[840px]">
-            <thead className="bg-[var(--admin-bg)] border-b border-[var(--admin-border)] text-[var(--admin-text-muted)] uppercase font-bold text-xs">
-              <tr className="whitespace-nowrap">
-                <th className="p-3">Data / Hora</th>
-                <th className="p-3">Operador</th>
-                <th className="p-3">Categoria</th>
-                <th className="p-3">Ação</th>
-                <th className="p-3 min-w-[220px]">Detalhes</th>
-                <th className="p-3">IP Origem</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--admin-border)]/60 text-[var(--admin-text-main)]">
-              {filteredLogs.map((item) => {
-                const Icon = getCategoryIcon(item.category);
-                return (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-[var(--admin-bg)]/50 transition-colors"
-                  >
-                    <td className="p-3 whitespace-nowrap font-mono text-xs text-[var(--admin-text-muted)]">
+      <div className="admin-table-container">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Data / Hora</th>
+              <th>Operador</th>
+              <th>Categoria</th>
+              <th>Ação</th>
+              <th>Detalhes</th>
+              <th>IP Origem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredLogs.map((item) => {
+              const Icon = getCategoryIcon(item.category);
+              return (
+                <tr key={item.id}>
+                    <td className="whitespace-nowrap font-mono text-[var(--admin-text-muted)]">
                       {new Date(item.timestamp).toLocaleString("pt-BR")}
                     </td>
-                    <td className="p-3 font-semibold">
+                    <td className="font-semibold">
                       <div className="flex items-start gap-1.5 min-w-0">
                         <User className="w-3.5 h-3.5 text-[var(--admin-accent)] shrink-0" />
                         <span className="admin-safe-wrap">
@@ -228,19 +224,19 @@ export const AuditLogsManagement: React.FC = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="p-3 whitespace-nowrap">
+                    <td className="whitespace-nowrap">
                       <span className="bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] font-bold text-xs px-2 py-0.5 rounded-xl capitalize inline-flex items-center gap-1">
                         <Icon className="w-3 h-3 text-[var(--admin-accent)]" />
                         {item.category}
                       </span>
                     </td>
-                    <td className="p-3 font-bold text-[var(--admin-text-main)] admin-safe-wrap">
+                    <td className="font-bold text-[var(--admin-text-main)] admin-safe-wrap">
                       {item.action}
                     </td>
-                    <td className="p-3 text-[var(--admin-text-muted)] max-w-md admin-safe-wrap">
+                    <td className="text-[var(--admin-text-muted)] max-w-md admin-safe-wrap">
                       {item.details}
                     </td>
-                    <td className="p-3 font-mono text-xs text-[var(--admin-text-muted)] whitespace-nowrap">
+                    <td className="font-mono text-[var(--admin-text-muted)] whitespace-nowrap">
                       {item.ipAddress}
                     </td>
                   </tr>
@@ -249,7 +245,6 @@ export const AuditLogsManagement: React.FC = () => {
             </tbody>
           </table>
         </div>
-      </div>
     </div>
   );
 };

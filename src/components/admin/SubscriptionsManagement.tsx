@@ -291,42 +291,39 @@ export const SubscriptionsManagement: React.FC = () => {
 
       {/* TAB 1: MEMBERS */}
       {activeTab === "members" && (
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl overflow-hidden shadow-xs">
-          <div className="hidden md:block overflow-x-auto admin-table-wrap">
-            <table className="w-full text-left text-xs min-w-[680px]">
-              <thead className="bg-[var(--admin-bg)] border-b border-[var(--admin-border)] text-[var(--admin-text-muted)] uppercase font-bold text-xs">
-                <tr className="whitespace-nowrap">
-                  <th className="p-3">Assinante</th>
-                  <th className="p-3">Plano Contratado</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Próxima Cobrança</th>
-                  <th className="p-3 text-center">Usos no Mês</th>
+        <div className="admin-table-container">
+          <div className="hidden md:block">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Assinante</th>
+                  <th>Plano Contratado</th>
+                  <th>Status</th>
+                  <th>Próxima Cobrança</th>
+                  <th className="text-center">Usos no Mês</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--admin-border)]/60 text-[var(--admin-text-main)]">
+              <tbody>
                 {members.map((m) => (
-                  <tr
-                    key={m.id}
-                    className="hover:bg-[var(--admin-bg)]/50 transition-colors"
-                  >
-                    <td className="p-3 font-semibold">
+                  <tr key={m.id}>
+                    <td>
                       {m.clientName}
                       <span className="text-xs text-[var(--admin-text-muted)] font-mono block">
                         {m.clientPhone}
                       </span>
                     </td>
-                    <td className="p-3 font-bold text-[var(--admin-accent)]">
+                    <td className="font-bold text-[var(--admin-accent)]">
                       {m.planName}
                     </td>
-                    <td className="p-3">
+                    <td>
                       <span className="bg-status-success/15 text-status-success font-bold text-xs px-2 py-0.5 rounded-xl uppercase">
                         {m.status === "active" ? "Ativo" : "Pendente"}
                       </span>
                     </td>
-                    <td className="p-3 text-[var(--admin-text-muted)] font-mono">
+                    <td className="text-[var(--admin-text-muted)] font-mono">
                       {new Date(m.nextBillingDate).toLocaleDateString("pt-BR")}
                     </td>
-                    <td className="p-3 text-center font-bold">
+                    <td className="text-center font-bold">
                       <span className="bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] px-2 py-0.5 rounded-xl">
                         {m.cutsUsedThisMonth} cortes
                       </span>

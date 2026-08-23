@@ -957,11 +957,13 @@ export const WaitingQueue: React.FC = () => {
         </div>
       ) : activeTab === "history" ? (
         /* HISTORY TAB */
-        <div className="admin-card overflow-hidden p-3 space-y-3 rounded-2xl">
-          <h2 className="text-xs font-bold text-[var(--admin-text-main)] flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4 text-status-success" />
-            <span>Histórico operacional ({historyList.length})</span>
-          </h2>
+        <div className="admin-card overflow-hidden p-0 rounded-2xl">
+          <div className="p-4 border-b border-[var(--admin-border)]">
+            <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-status-success" />
+              <span>Histórico operacional ({historyList.length})</span>
+            </h2>
+          </div>
 
           {historyList.length === 0 ? (
             <div className="py-8 text-center text-xs text-[var(--admin-text-muted)]">
@@ -969,56 +971,43 @@ export const WaitingQueue: React.FC = () => {
             </div>
           ) : (
             <>
-              <div className="hidden md:block overflow-x-auto custom-scrollbar admin-table-wrap">
-                <table className="w-full text-left text-xs whitespace-nowrap">
-                  <thead className="bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border-b border-[var(--admin-border)]">
+              <div className="hidden md:block admin-table-container border-0 rounded-none border-t-0">
+                <table className="admin-table">
+                  <thead>
                     <tr>
-                      <th className="p-3 font-bold uppercase text-xs">
-                        Cliente
-                      </th>
-                      <th className="p-3 font-bold uppercase text-xs">
-                        Serviço
-                      </th>
-                      <th className="p-3 font-bold uppercase text-xs">
-                        Barbeiro
-                      </th>
-                      <th className="p-3 font-bold uppercase text-xs">
-                        Encerramento
-                      </th>
-                      <th className="p-3 font-bold uppercase text-xs text-right">
-                        Status
-                      </th>
+                      <th>Cliente</th>
+                      <th>Serviço</th>
+                      <th>Barbeiro</th>
+                      <th>Encerramento</th>
+                      <th className="text-right">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[var(--admin-border)]">
+                  <tbody>
                     {historyList.map((item) => {
                       const isCancelled = item.status === "cancelled";
                       return (
-                        <tr
-                          key={item.id}
-                          className="hover:bg-[var(--admin-surface)] transition-colors"
-                        >
-                          <td className="p-3 font-bold text-[var(--admin-text-main)]">
+                        <tr key={item.id}>
+                          <td className="font-bold text-[var(--admin-text-main)]">
                             {item.client_name}
                           </td>
-                          <td className="p-3 text-[var(--admin-accent)]">
+                          <td className="text-[var(--admin-accent)] font-medium">
                             {item.service_title}
                           </td>
-                          <td className="p-3 text-[var(--admin-text-main)]">
+                          <td className="text-[var(--admin-text-main)]">
                             {item.professional_name}
                           </td>
                           <td
-                            className={`p-3 font-bold ${isCancelled ? "text-status-error" : "text-status-success"}`}
+                            className={`font-mono text-sm font-bold ${isCancelled ? "text-status-error" : "text-[var(--admin-text-main)]"}`}
                           >
                             {isCancelled
                               ? "Cancelado"
                               : item.completed_at || "Concluído"}
                           </td>
-                          <td className="p-3 text-right">
+                          <td className="text-right">
                             <span
-                              className={`px-2 py-0.5 rounded-xl text-xs font-bold ${isCancelled ? "bg-status-error/15 text-status-error" : "bg-status-success/15 text-status-success"}`}
+                              className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isCancelled ? "bg-status-error/15 text-status-error" : "bg-status-success/15 text-status-success"}`}
                             >
-                              {isCancelled ? "× Cancelado" : "✓ Concluído"}
+                              {isCancelled ? "Cancelado" : "Concluído"}
                             </span>
                           </td>
                         </tr>
@@ -1082,10 +1071,10 @@ export const WaitingQueue: React.FC = () => {
         </div>
       ) : (
         /* ABANDONED ITEMS TAB */
-        <div className="admin-card overflow-hidden p-3 space-y-3 rounded-2xl">
-          <div className="flex items-center justify-between gap-3">
+        <div className="admin-card overflow-hidden p-0 rounded-2xl">
+          <div className="p-4 border-b border-[var(--admin-border)] flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-xs font-bold text-[var(--admin-text-main)] flex items-center gap-1.5">
+              <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
                 <RotateCcw className="w-4 h-4 text-[var(--admin-accent)]" />
                 <span>Removidos da fila ({abandonedList.length})</span>
               </h2>
@@ -1100,69 +1089,140 @@ export const WaitingQueue: React.FC = () => {
               Nenhum removido recentemente.
             </div>
           ) : (
-            <div className="space-y-2">
-              {abandonedList.map((item) => (
-                <article
-                  key={item.id}
-                  className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-[var(--admin-text-main)] text-xs admin-clamp-2">
-                        {item.client_name}
-                      </h3>
-                      <span className="px-1.5 py-0.5 rounded-full bg-status-warning/10 text-status-warning text-xs font-bold border border-status-warning/20">
-                        Removido
-                      </span>
+            <>
+              {/* DESKTOP TABLE VIEW */}
+              <div className="hidden md:block admin-table-container border-0 rounded-none border-t-0">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Serviço</th>
+                      <th>Agendamento</th>
+                      <th className="text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {abandonedList.map((item) => (
+                      <tr key={item.id}>
+                        <td>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-[var(--admin-text-main)]">{item.client_name}</span>
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-status-warning/10 text-status-warning border border-status-warning/20">
+                              Removido
+                            </span>
+                          </div>
+                        </td>
+                        <td className="text-[var(--admin-accent)] font-medium">
+                          {item.service_title}
+                        </td>
+                        <td className="text-[var(--admin-text-muted)]">
+                          {item.professional_name || "A definir"} · {item.scheduled_time || "—"}
+                        </td>
+                        <td>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              disabled={actionLoadingId === item.id}
+                              onClick={() => handleReturnToQueue(item.id, item.client_name)}
+                              className="admin-btn-icon-sm rounded hover:bg-[var(--admin-accent)] hover:text-[var(--admin-accent-text)] text-[var(--admin-text-muted)] border border-transparent hover:border-[var(--admin-accent)]/20 disabled:opacity-50 flex items-center justify-center transition-colors"
+                              title="Retornar à fila"
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                            </button>
+                            {item.appointment_id ? (
+                              <button
+                                type="button"
+                                disabled={actionLoadingId === item.id}
+                                onClick={() => handleCancelQueuedAppointment(item)}
+                                className="admin-btn-icon-sm rounded hover:bg-status-error/10 hover:text-status-error text-[var(--admin-text-muted)] border border-transparent hover:border-status-error/20 disabled:opacity-50 flex items-center justify-center transition-colors"
+                                title="Cancelar atendimento"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled={actionLoadingId === item.id}
+                                onClick={() => handleDeleteAbandonedWalkIn(item)}
+                                className="admin-btn-icon-sm rounded hover:bg-status-error/10 hover:text-status-error text-[var(--admin-text-muted)] border border-transparent hover:border-status-error/20 disabled:opacity-50 flex items-center justify-center transition-colors"
+                                title="Excluir registro"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* MOBILE LIST VIEW */}
+              <div className="md:hidden divide-y divide-[var(--admin-border)]">
+                {abandonedList.map((item) => (
+                  <article
+                    key={item.id}
+                    className="p-3.5 space-y-3"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-[var(--admin-text-main)] text-sm admin-clamp-2">
+                          {item.client_name}
+                        </h3>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-status-warning/10 text-status-warning font-bold uppercase tracking-wider border border-status-warning/20">
+                          Removido
+                        </span>
+                      </div>
+                      <p className="mt-0.5 text-xs text-[var(--admin-accent)] font-semibold admin-clamp-2">
+                        {item.service_title}
+                      </p>
+                      <p className="mt-1 text-xs text-[var(--admin-text-muted)] admin-safe-wrap">
+                        {item.professional_name || "Profissional a definir"} ·{" "}
+                        {item.scheduled_time || "Horário não informado"}
+                        {item.appointment_id
+                          ? " · Agendamento preservado"
+                          : " · Cliente avulso"}
+                      </p>
                     </div>
-                    <p className="text-xs text-[var(--admin-accent)] font-semibold admin-clamp-2">
-                      {item.service_title}
-                    </p>
-                    <p className="text-xs text-[var(--admin-text-muted)] admin-safe-wrap">
-                      {item.professional_name || "Profissional a definir"} ·{" "}
-                      {item.scheduled_time || "Horário não informado"}
-                      {item.appointment_id
-                        ? " · Agendamento preservado"
-                        : " · Cliente avulso"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      disabled={actionLoadingId === item.id}
-                      onClick={() =>
-                        handleReturnToQueue(item.id, item.client_name)
-                      }
-                      className="px-3 py-2 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-extrabold text-xs flex items-center gap-1.5 hover:bg-[var(--admin-accent)]/80 disabled:opacity-60 transition-colors"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      Retornar à fila
-                    </button>
-                    {item.appointment_id ? (
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
                         disabled={actionLoadingId === item.id}
-                        onClick={() => handleCancelQueuedAppointment(item)}
-                        className="px-3 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60 transition-colors"
+                        onClick={() =>
+                          handleReturnToQueue(item.id, item.client_name)
+                        }
+                        className="flex-1 py-2 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-[var(--admin-accent)]/80 disabled:opacity-60 transition-colors"
                       >
-                        <X className="w-3.5 h-3.5" />
-                        Cancelar atendimento
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        Retornar
                       </button>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled={actionLoadingId === item.id}
-                        onClick={() => handleDeleteAbandonedWalkIn(item)}
-                        className="px-3 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        Excluir registro
-                      </button>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
+                      {item.appointment_id ? (
+                        <button
+                          type="button"
+                          disabled={actionLoadingId === item.id}
+                          onClick={() => handleCancelQueuedAppointment(item)}
+                          className="flex-1 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          Cancelar
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={actionLoadingId === item.id}
+                          onClick={() => handleDeleteAbandonedWalkIn(item)}
+                          className="flex-1 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Excluir
+                        </button>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}

@@ -131,72 +131,119 @@ export const ReceiptsManagement: React.FC = () => {
       timeStyle: "short",
     });
     return (
-      <article
-        key={item.id}
-        className="p-3.5 sm:p-4 bg-[var(--admin-surface)] transition-colors hover:bg-[var(--admin-bg)]/60"
-      >
-        <div className="flex items-start gap-3">
-          <button
-            type="button"
-            onClick={() => setSelectedReceipt(item)}
-            className="min-w-0 flex-1 text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]/70"
-            aria-label={`Abrir recebimento de ${item.clientName}`}
-          >
-            <div className="flex items-start gap-3">
-              <div
-                className={`w-9 h-9 rounded-lg shrink-0 flex items-center justify-center ${pending ? "bg-amber-500/10 text-amber-500" : "bg-status-success/10 text-status-success"}`}
-              >
-                {pending ? (
-                  <Clock3 className="w-4 h-4" />
-                ) : (
-                  <CheckCircle2 className="w-4 h-4" />
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span className="text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
-                    {item.clientName}
-                  </span>
-                  <StatusBadge status={item.status} />
-                </div>
-                <p className="mt-0.5 text-xs text-[var(--admin-text-muted)] admin-clamp-2">
-                  {item.serviceTitle}
-                </p>
-                <p className="mt-1 text-[11px] text-[var(--admin-text-muted)] admin-safe-wrap">
-                  {item.professionalName || "Profissional não informado"} ·{" "}
-                  {receiptDate}
-                </p>
+      <React.Fragment key={item.id}>
+        {/* DESKTOP TR */}
+        <tr className="hidden md:table-row">
+          <td>
+            <div className="font-bold text-[var(--admin-text-main)] mb-1">
+              {item.clientName}
+            </div>
+            <div className="text-[11px] text-[var(--admin-text-muted)]">
+              {receiptDate}
+            </div>
+          </td>
+          <td className="text-[var(--admin-accent)] font-medium">
+            {item.serviceTitle}
+          </td>
+          <td className="text-[var(--admin-text-main)]">
+            {item.professionalName || "Profissional não informado"}
+          </td>
+          <td>
+            <div className="flex flex-col gap-1.5">
+              <span className={`font-mono font-bold ${pending ? "text-[var(--admin-text-main)]" : "finance-positive"}`}>
+                {money(item.totalAmount)}
+              </span>
+              <div className="flex">
+                <StatusBadge status={item.status} />
               </div>
             </div>
-          </button>
-
-          <div className="shrink-0 min-w-[5.25rem] flex flex-col items-end gap-2">
-            <p
-              className={`text-sm font-mono font-bold ${pending ? "text-[var(--admin-text-main)]" : "finance-positive"}`}
-            >
-              {money(item.totalAmount)}
-            </p>
+          </td>
+          <td className="text-right">
             {pending ? (
               <button
                 type="button"
                 onClick={() => openCheckout(item)}
-                className="min-h-9 px-2.5 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold inline-flex items-center justify-center gap-1.5 hover:bg-[var(--admin-accent-hover)] active:scale-[0.98] transition-colors"
+                className="admin-btn-sm admin-btn-primary whitespace-nowrap"
               >
-                <CreditCard className="w-3.5 h-3.5" />
+                <CreditCard className="w-3.5 h-3.5 mr-1" />
                 Registrar
               </button>
             ) : (
               <button
                 type="button"
                 onClick={() => setSelectedReceipt(item)}
-                className="min-h-8 px-2 text-xs text-[var(--admin-accent)] font-bold rounded-lg hover:bg-[var(--admin-accent)]/10"
+                className="text-xs font-bold text-[var(--admin-accent)] hover:underline whitespace-nowrap px-2 py-1"
               >
-                Abrir
+                Detalhes
               </button>
             )}
+          </td>
+        </tr>
+        {/* MOBILE ARTICLE */}
+        <article className="md:hidden p-3.5 sm:p-4 bg-[var(--admin-surface)] transition-colors hover:bg-[var(--admin-bg)]/60">
+          <div className="flex items-start gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedReceipt(item)}
+              className="min-w-0 flex-1 text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]/70"
+              aria-label={`Abrir recebimento de ${item.clientName}`}
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className={`w-9 h-9 rounded-lg shrink-0 flex items-center justify-center ${pending ? "bg-amber-500/10 text-amber-500" : "bg-status-success/10 text-status-success"}`}
+                >
+                  {pending ? (
+                    <Clock3 className="w-4 h-4" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
+                      {item.clientName}
+                    </span>
+                    <StatusBadge status={item.status} />
+                  </div>
+                  <p className="mt-0.5 text-xs text-[var(--admin-text-muted)] admin-clamp-2">
+                    {item.serviceTitle}
+                  </p>
+                  <p className="mt-1 text-[11px] text-[var(--admin-text-muted)] admin-safe-wrap">
+                    {item.professionalName || "Profissional não informado"} ·{" "}
+                    {receiptDate}
+                  </p>
+                </div>
+              </div>
+            </button>
+
+            <div className="shrink-0 min-w-[5.25rem] flex flex-col items-end gap-2">
+              <p
+                className={`text-sm font-mono font-bold ${pending ? "text-[var(--admin-text-main)]" : "finance-positive"}`}
+              >
+                {money(item.totalAmount)}
+              </p>
+              {pending ? (
+                <button
+                  type="button"
+                  onClick={() => openCheckout(item)}
+                  className="min-h-9 px-2.5 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold inline-flex items-center justify-center gap-1.5 hover:bg-[var(--admin-accent-hover)] active:scale-[0.98] transition-colors"
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  Registrar
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setSelectedReceipt(item)}
+                  className="min-h-8 px-2 text-xs text-[var(--admin-accent)] font-bold rounded-lg hover:bg-[var(--admin-accent)]/10"
+                >
+                  Abrir
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
+      </React.Fragment>
     );
   };
 
@@ -372,25 +419,42 @@ const ReceiptGroup: React.FC<{
   tone: "warning" | "success";
   children: React.ReactNode;
 }> = ({ title, description, count, tone, children }) => (
-  <section className="overflow-hidden rounded-xl border border-[var(--admin-border)]">
-    <header className="flex items-center justify-between gap-3 px-3.5 py-3 bg-[var(--admin-bg)]/65">
-      <div className="min-w-0">
-        <h3 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
-          <span
-            className={`h-2 w-2 rounded-full ${tone === "warning" ? "bg-amber-500" : "bg-status-success"}`}
-            aria-hidden="true"
-          />
+  <section className="mb-6 last:mb-0">
+    <header className="flex items-center justify-between gap-3 mb-3 px-1">
+      <div className="min-w-0 flex items-center gap-2">
+        <span
+          className={`h-2.5 w-2.5 rounded-full ${tone === "warning" ? "bg-amber-500" : "bg-status-success"}`}
+          aria-hidden="true"
+        />
+        <h3 className="text-sm font-bold text-[var(--admin-text-main)]">
           {title}
         </h3>
-        <p className="mt-0.5 text-[11px] text-[var(--admin-text-muted)] admin-safe-wrap">
-          {description}
-        </p>
+        <span className="shrink-0 bg-[var(--admin-surface)] rounded-full border border-[var(--admin-border)] px-2 py-0.5 text-[10px] font-bold text-[var(--admin-text-muted)]">
+          {count}
+        </span>
       </div>
-      <span className="shrink-0 rounded-full border border-[var(--admin-border)] px-2 py-0.5 text-[11px] font-bold text-[var(--admin-text-muted)]">
-        {count}
-      </span>
     </header>
-    <div className="divide-y divide-[var(--admin-border)]">{children}</div>
+    <div className="admin-table-container">
+      {/* DESKTOP TABLE VIEW */}
+      <div className="hidden md:block">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Serviço</th>
+              <th>Profissional</th>
+              <th>Valor / Status</th>
+              <th className="text-right">Ação</th>
+            </tr>
+          </thead>
+          <tbody>{children}</tbody>
+        </table>
+      </div>
+      {/* MOBILE LIST VIEW */}
+      <div className="md:hidden divide-y divide-[var(--admin-border)]">
+        {children}
+      </div>
+    </div>
   </section>
 );
 

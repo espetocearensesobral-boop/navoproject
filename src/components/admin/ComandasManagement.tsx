@@ -637,39 +637,35 @@ export const ComandasManagement: React.FC = () => {
               Nenhuma comanda fechada encontrada no histórico.
             </div>
           ) : (
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl overflow-hidden shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs min-w-[760px]">
-                  <thead className="bg-[var(--admin-bg)] border-b border-[var(--admin-border)] text-[var(--admin-text-muted)] uppercase font-bold text-xs">
-                    <tr className="whitespace-nowrap">
-                      <th className="p-3">Código</th>
-                      <th className="p-3">Cliente</th>
-                      <th className="p-3">Profissional</th>
-                      <th className="p-3">Itens</th>
-                      <th className="p-3">Pagamento</th>
-                      <th className="p-3 text-right">Valor Pago</th>
-                      <th className="p-3 text-center">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[var(--admin-border)]/60 text-[var(--admin-text-main)]">
-                    {closedComandas.map((cmd) => (
-                      <tr
-                        key={cmd.id}
-                        className="hover:bg-[var(--admin-bg)]/50 transition-colors"
-                      >
-                        <td className="p-3 font-mono font-bold text-[var(--admin-accent)]">
+            <div className="admin-table-container">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Cliente</th>
+                    <th>Profissional</th>
+                    <th>Itens</th>
+                    <th>Pagamento</th>
+                    <th className="text-right">Valor Pago</th>
+                    <th className="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {closedComandas.map((cmd) => (
+                    <tr key={cmd.id}>
+                      <td className="font-mono font-bold text-[var(--admin-accent)]">
                           {cmd.code}
                         </td>
-                        <td className="p-3 font-semibold">{cmd.clientName}</td>
-                        <td className="p-3 text-[var(--admin-text-muted)]">
+                        <td className="font-semibold">{cmd.clientName}</td>
+                        <td className="text-[var(--admin-text-muted)]">
                           {cmd.professionalName || "Geral"}
                         </td>
-                        <td className="p-3 text-[var(--admin-text-muted)] max-w-xs truncate">
+                        <td className="text-[var(--admin-text-muted)] max-w-xs truncate">
                           {cmd.items
                             .map((i) => `${i.quantity}x ${i.title}`)
                             .join(", ")}
                         </td>
-                        <td className="p-3 uppercase font-bold text-xs text-[var(--admin-text-muted)]">
+                        <td className="uppercase font-bold text-xs text-[var(--admin-text-muted)]">
                           {cmd.paymentMethod === "pix"
                             ? "PIX"
                             : cmd.paymentMethod === "credit_card"
@@ -678,10 +674,10 @@ export const ComandasManagement: React.FC = () => {
                                 ? "Dinheiro"
                                 : "Débito"}
                         </td>
-                        <td className="p-3 text-right font-bold finance-positive tabular-nums">
+                        <td className="text-right font-bold finance-positive tabular-nums">
                           R$ {cmd.total.toFixed(2)}
                         </td>
-                        <td className="p-3 text-center">
+                        <td className="text-center">
                           <button
                             onClick={() => setReceiptModalComanda(cmd)}
                             className="p-1.5 rounded-lg border border-[var(--admin-border)] hover:bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] transition-colors"

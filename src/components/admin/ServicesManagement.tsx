@@ -411,306 +411,370 @@ export const ServicesManagement: React.FC = () => {
         </div>
       )}
 
-      {/* ========================================================= */}
-      {/* MOBILE SERVICES VIEW (COMPACT, MINIMALIST, SMART) - md:hidden */}
-      {/* ========================================================= */}
-      <div className="md:hidden space-y-3">
-        {/* Compact Top Action Bar */}
-        <div className="bg-[var(--admin-surface)] p-3 rounded-2xl border border-[var(--admin-border)] flex items-center justify-between gap-2">
-          {/* Search Bar */}
-          <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 text-[var(--admin-text-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar serviço..."
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-8 pr-2.5 py-1.5 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] outline-none focus:border-[var(--admin-accent)]"
-            />
-          </div>
+      {/* Search and Filters */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        {/* Search Input */}
+        <div className="relative w-full lg:w-96">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B8B8B]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar por nome ou descrição..."
+            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl pl-9 pr-3 py-2 text-xs text-[var(--admin-text-main)] placeholder-[#8B8B8B] outline-none focus:border-[var(--admin-accent)] transition-colors"
+          />
         </div>
 
-        {/* Repositioned Category & Quick Filter Pills */}
-        <div className="admin-category-scroll flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar -mx-1 px-1">
-          <button
-            onClick={() => {
-              setSelectedCategory("all");
-              setFilterType("all");
-            }}
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
-              selectedCategory === "all" && filterType === "all"
-                ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] border-[var(--admin-accent)]"
-                : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"
-            }`}
-          >
-            Todos ({services.length})
-          </button>
+        {/* Filters Group */}
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+          {/* Category Dropdown */}
+          <div className="flex items-center space-x-2">
+            <Filter className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-[var(--admin-surface)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-main)] rounded-xl px-3 py-2 outline-none focus:border-[var(--admin-accent)]"
+            >
+              <option value="all">Todas</option>
+              {DEFAULT_CATEGORIES.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <button
-            onClick={() =>
-              setFilterType(filterType === "combos" ? "all" : "combos")
-            }
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
-              filterType === "combos"
-                ? "bg-status-success text-white border-status-success"
-                : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"
-            }`}
-          >
-            Combos VIP
-          </button>
-
-          <button
-            onClick={() =>
-              setFilterType(filterType === "popular" ? "all" : "popular")
-            }
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
-              filterType === "popular"
-                ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] border-[var(--admin-accent)]"
-                : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"
-            }`}
-          >
-            Destaques
-          </button>
-
-          {DEFAULT_CATEGORIES.map((cat) => (
+          {/* Type Filter Buttons */}
+          <div className="flex items-center bg-[var(--admin-surface)] p-1 rounded-xl border border-[var(--admin-border)]">
             <button
-              key={cat.id}
-              onClick={() => {
-                setSelectedCategory(cat.id);
-                setFilterType("all");
-              }}
-              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
-                selectedCategory === cat.id && filterType === "all"
-                  ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] border-[var(--admin-accent)]"
-                  : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"
+              onClick={() => setFilterType("all")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                filterType === "all"
+                  ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow"
+                  : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
               }`}
             >
-              {cat.name}
+              Todos
             </button>
-          ))}
+            <button
+              onClick={() => setFilterType("combos")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                filterType === "combos"
+                  ? "bg-status-success text-white shadow"
+                  : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+              }`}
+            >
+              Combos VIP
+            </button>
+            <button
+              onClick={() => setFilterType("popular")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                filterType === "popular"
+                  ? "bg-[var(--admin-accent)]/30 text-[var(--admin-accent)] shadow"
+                  : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+              }`}
+            >
+              Mais Pedidos
+            </button>
+            <button
+              onClick={() => setFilterType("gallery")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                filterType === "gallery"
+                  ? "bg-blue-500/30 text-blue-300 shadow"
+                  : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+              }`}
+            >
+              Com Galeria
+            </button>
+          </div>
+
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-[var(--admin-surface)] p-1 rounded-xl border border-[var(--admin-border)]">
+            <button
+              onClick={() => setViewMode("table")}
+              className={`min-h-10 px-2 rounded-lg text-xs transition-all ${
+                viewMode === "table"
+                  ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
+                  : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+              }`}
+              title="Visualização em Tabela"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("list")}
+              className={`min-h-10 px-2 rounded-lg text-xs transition-all ${
+                viewMode === "list"
+                  ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
+                  : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+              }`}
+              title="Visualização em Lista"
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="admin-table-container">
+        {/* DESKTOP TABLE VIEW */}
+        <div className="hidden md:block">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th className="w-12">Foto</th>
+                <th>Serviço / Descrição</th>
+                <th>Categoria</th>
+                <th>Duração</th>
+                <th>Preço</th>
+                <th className="text-center">Tags</th>
+                <th className="text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-[var(--admin-text-muted)]">
+                    <div className="flex items-center justify-center space-x-2">
+                      <Scissors className="w-5 h-5 text-[var(--admin-accent)] animate-spin" />
+                      <span>Carregando serviços...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredServices.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-[var(--admin-text-muted)]">
+                    Nenhum serviço encontrado com os filtros atuais.
+                  </td>
+                </tr>
+              ) : (
+                filteredServices.map((service) => {
+                  const categoryName = getCategoryName(service.category_id);
+                  const servicePhotos =
+                    Array.isArray(service.gallery_urls) && service.gallery_urls.length > 0
+                      ? service.gallery_urls
+                      : service.image_url
+                        ? [service.image_url]
+                        : [];
+
+                  return (
+                    <tr key={service.id}>
+                      <td>
+                        <div className="w-10 h-10 rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-center justify-center overflow-hidden relative">
+                          {service.image_url || servicePhotos[0] ? (
+                            <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <Scissors className="w-5 h-5 text-[var(--admin-text-muted)]" />
+                          )}
+                          {servicePhotos.length > 0 && (
+                            <span className="absolute bottom-0 right-0 px-1 py-0.5 text-[9px] font-bold bg-[var(--admin-bg)]/80 rounded-tl-sm text-[var(--admin-text-main)]">
+                              {servicePhotos.length}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="font-bold text-[var(--admin-text-main)] admin-clamp-1">{service.title}</div>
+                        <div className="text-xs text-[var(--admin-text-muted)] admin-clamp-1" title={service.description}>
+                          {service.description || "Sem descrição"}
+                        </div>
+                      </td>
+                      <td className="text-[var(--admin-text-muted)]">
+                        <span className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                          {categoryName}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="flex items-center space-x-1.5 text-[var(--admin-text-main)] font-semibold">
+                          <Clock className="w-3.5 h-3.5 text-[var(--admin-text-muted)]" />
+                          <span>{service.duration_minutes} min</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="font-mono font-bold text-[var(--admin-text-main)]">R$ {service.price.toFixed(2)}</div>
+                        {service.original_price && service.original_price > service.price && (
+                          <div className="font-mono text-xs text-[var(--admin-text-muted)] line-through">
+                            R$ {service.original_price.toFixed(2)}
+                          </div>
+                        )}
+                      </td>
+                      <td className="text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                           <button
+                             type="button"
+                             onClick={() => handleToggleCombo(service)}
+                             className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
+                               service.is_combo
+                                 ? "bg-status-success/10 text-status-success border border-status-success/20"
+                                 : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface)]"
+                             }`}
+                             title="Alternar Combo VIP"
+                           >
+                             Combo
+                           </button>
+                           <button
+                             type="button"
+                             onClick={() => handleTogglePopular(service)}
+                             className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
+                               service.popular
+                                 ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border border-[var(--admin-accent)]/20"
+                                 : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface)]"
+                             }`}
+                             title="Alternar Destaque"
+                           >
+                             Destaq.
+                           </button>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEdit(service)}
+                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)]"
+                            title="Editar"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(service.id)}
+                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
+                            title="Excluir"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
 
-        {/* Mobile Services List */}
-        <div className="space-y-2">
+        {/* MOBILE LIST VIEW */}
+        <div className="md:hidden divide-y divide-[var(--admin-border)]">
           {loading ? (
-            <div className="p-8 text-center bg-[var(--admin-surface)] rounded-2xl border border-[var(--admin-border)] text-sm text-[var(--admin-text-muted)]">
-              <Scissors className="w-5 h-5 text-[var(--admin-accent)] animate-spin mx-auto mb-2" />
-              Carregando serviços...
-            </div>
+             <div className="p-8 text-center bg-[var(--admin-surface)] text-sm text-[var(--admin-text-muted)]">
+               <Scissors className="w-5 h-5 text-[var(--admin-accent)] animate-spin mx-auto mb-2" />
+               Carregando serviços...
+             </div>
           ) : filteredServices.length === 0 ? (
             <AdminEmptyState
               icon={Scissors}
               title={
-                searchQuery ||
-                selectedCategory !== "all" ||
-                filterType !== "all"
+                searchQuery || selectedCategory !== "all" || filterType !== "all"
                   ? "Nenhum serviço encontrado"
                   : "Nenhum serviço cadastrado"
               }
-              description={
-                searchQuery ||
-                selectedCategory !== "all" ||
-                filterType !== "all"
-                  ? "Ajuste a busca ou os filtros para tentar novamente."
-                  : "Cadastre o primeiro serviço para começar a montar sua agenda."
-              }
-              actionLabel={
-                !searchQuery &&
-                selectedCategory === "all" &&
-                filterType === "all"
-                  ? "Novo serviço"
-                  : undefined
-              }
-              onAction={
-                !searchQuery &&
-                selectedCategory === "all" &&
-                filterType === "all"
-                  ? handleOpenCreate
-                  : undefined
-              }
+              description="Ajuste a busca ou cadastre o primeiro serviço."
+              actionLabel="Novo serviço"
+              onAction={handleOpenCreate}
             />
           ) : (
             filteredServices.map((service) => {
               const categoryName = getCategoryName(service.category_id);
-              const servicePhotos =
-                Array.isArray(service.gallery_urls) &&
-                service.gallery_urls.length > 0
-                  ? service.gallery_urls
-                  : service.image_url
-                    ? [service.image_url]
-                    : [];
+              const servicePhotos = Array.isArray(service.gallery_urls) && service.gallery_urls.length > 0
+                ? service.gallery_urls
+                : service.image_url
+                  ? [service.image_url]
+                  : [];
               const isExpanded = expandedServiceId === service.id;
 
               return (
-                <article
-                  key={service.id}
-                  className={`overflow-hidden rounded-2xl border bg-[var(--admin-surface)] transition-colors ${isExpanded ? "border-[var(--admin-accent)]/50" : "border-[var(--admin-border)]"}`}
-                >
+                <article key={service.id} className="bg-[var(--admin-surface)] overflow-hidden transition-colors">
                   <button
                     type="button"
-                    onClick={() =>
-                      setExpandedServiceId(isExpanded ? null : service.id)
-                    }
+                    onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     aria-expanded={isExpanded}
-                    className="w-full min-h-[78px] p-3 text-left flex items-center gap-3 hover:bg-[var(--admin-bg)]/40"
+                    className="w-full min-h-[76px] p-3.5 text-left flex items-center gap-3 hover:bg-[var(--admin-bg)]/40"
                   >
-                    <div className="relative w-12 h-12 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0 relative">
                       {service.image_url || servicePhotos[0] ? (
-                        <img
-                          src={service.image_url || servicePhotos[0]}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <Scissors className="w-5 h-5 text-[var(--admin-accent)]" />
+                        <Scissors className="w-5 h-5 text-[var(--admin-accent)]/70" />
                       )}
                       {servicePhotos.length > 0 && (
-                        <span className="absolute -bottom-0.5 -right-0.5 px-1 py-0.5 rounded-md bg-[var(--admin-bg)]/90 text-[var(--admin-text-main)] text-xs font-bold border border-[var(--admin-accent)]/40">
+                        <span className="absolute bottom-0 right-0 px-1 text-[9px] font-bold bg-[var(--admin-bg)]/90 text-[var(--admin-text-main)] rounded-tl-md">
                           {servicePhotos.length}
                         </span>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="text-xs text-[var(--admin-accent)] font-bold uppercase admin-clamp-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--admin-accent)] admin-clamp-2">
                           {categoryName}
-                        </span>
+                        </p>
                         {service.is_combo && (
-                          <span className="shrink-0 text-xs bg-status-success/15 text-status-success font-bold px-1.5 py-0.5 rounded-md">
+                          <span className="shrink-0 rounded px-1.5 py-0.5 bg-status-success/10 text-status-success border border-status-success/20 text-[10px] font-bold uppercase tracking-wider">
                             Combo
                           </span>
                         )}
-                        {service.popular && (
-                          <span className="shrink-0 text-xs bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] font-bold px-1.5 py-0.5 rounded-md">
-                            Destaque
-                          </span>
-                        )}
                       </div>
-                      <h3 className="mt-0.5 font-bold text-[var(--admin-text-main)] text-sm admin-clamp-2">
+                      <h2 className="mt-0.5 text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
                         {service.title}
-                      </h3>
-                      <p className="text-xs text-[var(--admin-text-muted)] admin-clamp-2">
-                        {service.description || "Sem descrição cadastrada"}
-                      </p>
+                      </h2>
                     </div>
-                    <div className="text-right shrink-0 min-w-[62px]">
-                      <p className="text-xs font-bold finance-positive">
-                        R$ {service.price.toFixed(2)}
-                      </p>
-                      <p className="text-xs text-[var(--admin-text-muted)]">
-                        {service.duration_minutes} min
-                      </p>
+                    <div className="text-right shrink-0 min-w-[58px]">
+                       <p className="text-xs font-bold finance-positive font-mono">
+                         R$ {service.price.toFixed(2)}
+                       </p>
+                       <p className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)] mt-0.5">
+                         {service.duration_minutes} min
+                       </p>
                     </div>
                     {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-[var(--admin-accent)] shrink-0" />
+                      <ChevronUp className="w-4 h-4 text-[var(--admin-accent)] shrink-0 ml-1" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-[var(--admin-text-muted)] shrink-0" />
+                      <ChevronDown className="w-4 h-4 text-[var(--admin-text-muted)] shrink-0 ml-1" />
                     )}
                   </button>
-
                   {isExpanded && (
-                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3 space-y-3">
-                      <div className="admin-card-grid gap-3 text-xs">
-                        <div className="rounded-xl bg-[var(--admin-bg)] p-2.5">
-                          <p className="text-xs text-[var(--admin-text-muted)]">
-                            Categoria
-                          </p>
-                          <p className="font-semibold text-[var(--admin-text-main)]">
-                            {categoryName}
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-[var(--admin-bg)] p-2.5">
-                          <p className="text-xs text-[var(--admin-text-muted)]">
-                            Duração
-                          </p>
-                          <p className="font-semibold text-[var(--admin-text-main)]">
-                            {service.duration_minutes} min
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-[var(--admin-bg)] p-2.5">
-                          <p className="text-xs text-[var(--admin-text-muted)]">
-                            Preço original
-                          </p>
-                          <p className="font-semibold finance-positive">
-                            {service.original_price
-                              ? `R$ ${service.original_price.toFixed(2)}`
-                              : "—"}
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-[var(--admin-bg)] p-2.5">
-                          <p className="text-xs text-[var(--admin-text-muted)]">
-                            Galeria
-                          </p>
-                          <p className="font-semibold text-[var(--admin-text-main)]">
-                            {servicePhotos.length} foto(s)
-                          </p>
-                        </div>
-                      </div>
+                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3.5 space-y-3">
                       {service.description && (
-                        <p className="text-sm text-[var(--admin-text-muted)] leading-relaxed">
-                          {service.description}
-                        </p>
+                        <p className="text-xs text-[var(--admin-text-muted)] mb-3">{service.description}</p>
                       )}
-                      <div className="admin-action-group">
+                      <div className="flex gap-2 border-t border-[var(--admin-border)] pt-2">
                         <button
                           type="button"
                           onClick={() => handleToggleCombo(service)}
-                          title={
+                          className={`flex-1 min-h-10 rounded-lg border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
                             service.is_combo
-                              ? "Desativar Combo VIP"
-                              : "Ativar Combo VIP"
-                          }
-                          aria-label={
-                            service.is_combo
-                              ? "Desativar Combo VIP"
-                              : "Ativar Combo VIP"
-                          }
-                          className={`admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-1.5 ${service.is_combo ? "border-status-success/30 text-status-success" : "border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
+                              ? "bg-status-success/10 text-status-success border-status-success/20"
+                              : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:bg-[var(--admin-bg)]"
+                          }`}
                         >
-                          <Flame className="w-4 h-4" />
-                          <span className="hidden sm:inline">
-                            {service.is_combo ? "Combo ativo" : "Combo VIP"}
-                          </span>
+                           <Flame className="w-3.5 h-3.5" /> Combo
                         </button>
                         <button
                           type="button"
                           onClick={() => handleTogglePopular(service)}
-                          title={
+                          className={`flex-1 min-h-10 rounded-lg border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
                             service.popular
-                              ? "Remover destaque"
-                              : "Marcar como destaque"
-                          }
-                          aria-label={
-                            service.popular
-                              ? "Remover destaque"
-                              : "Marcar como destaque"
-                          }
-                          className={`admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-1.5 ${service.popular ? "border-[var(--admin-accent)]/40 text-[var(--admin-accent)]" : "border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
+                              ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border-[var(--admin-accent)]/20"
+                              : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:bg-[var(--admin-bg)]"
+                          }`}
                         >
-                          <Star className="w-4 h-4" />
-                          <span className="hidden sm:inline">
-                            {service.popular ? "Destaque ativo" : "Destaque"}
-                          </span>{" "}
+                           <Star className="w-3.5 h-3.5" /> Destaque
                         </button>
+                      </div>
+                      <div className="flex gap-2">
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(service)}
-                          title="Editar serviço"
-                          aria-label="Editar serviço"
-                          className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-sm font-bold flex items-center justify-center gap-1.5"
+                          className="flex-1 min-h-10 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5"
                         >
-                          <Edit2 className="w-4 h-4" />
-                          <span className="hidden sm:inline">Editar</span>
+                          <Edit3 className="w-4 h-4" /> Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(service.id)}
-                          title="Excluir serviço"
-                          aria-label="Excluir serviço"
-                          className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-3 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5"
+                          className="w-10 h-10 shrink-0 rounded-lg border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center"
                         >
                           <Trash2 className="w-4 h-4" />
-                          <span className="hidden sm:inline">Excluir</span>
                         </button>
                       </div>
                     </div>
@@ -720,519 +784,6 @@ export const ServicesManagement: React.FC = () => {
             })
           )}
         </div>
-      </div>
-      {/* ========================================================= */}
-      {/* DESKTOP SERVICES VIEW (FULL RICH MANAGEMENT) - hidden md:block */}
-      {/* ========================================================= */}
-      <div className="hidden md:block space-y-6">
-        {/* Success Notification Banner */}
-        {successMsg && (
-          <div className="p-3.5 bg-status-success/20 border border-[#00A86B]/40 text-status-success rounded-xl text-xs font-bold flex items-center justify-between shadow-lg animate-fade-in">
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              <span>{successMsg}</span>
-            </div>
-            <button
-              onClick={() => setSuccessMsg(null)}
-              className="text-status-success hover:opacity-80"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        {/* Search, Category & Type Filters */}
-        <div className="bg-[var(--admin-surface)] p-4 rounded-2xl border border-[var(--admin-border)] flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
-          {/* Search */}
-          <div className="relative w-full lg:w-72">
-            <Search className="w-4 h-4 text-[var(--admin-text-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar por nome ou descrição..."
-              className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl pl-9 pr-3 py-2 text-xs text-[var(--admin-text-main)] placeholder-[#8B8B8B] outline-none focus:border-[var(--admin-accent)] transition-colors"
-            />
-          </div>
-
-          {/* Filters Group */}
-          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
-            {/* Category Dropdown */}
-            <div className="flex items-center space-x-2">
-              <Filter className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-[var(--admin-surface)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-main)] rounded-xl px-3 py-2 outline-none focus:border-[var(--admin-accent)]"
-              >
-                <option value="all">Todas</option>
-                {DEFAULT_CATEGORIES.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Type Filter Buttons */}
-            <div className="flex items-center bg-[var(--admin-surface)] p-1 rounded-xl border border-[var(--admin-border)]">
-              <button
-                onClick={() => setFilterType("all")}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  filterType === "all"
-                    ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
-                }`}
-              >
-                Todos
-              </button>
-              <button
-                onClick={() => setFilterType("combos")}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  filterType === "combos"
-                    ? "bg-status-success text-white shadow"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
-                }`}
-              >
-                Combos VIP
-              </button>
-              <button
-                onClick={() => setFilterType("popular")}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  filterType === "popular"
-                    ? "bg-[var(--admin-accent)]/30 text-[var(--admin-accent)] shadow"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
-                }`}
-              >
-                Mais Pedidos
-              </button>
-              <button
-                onClick={() => setFilterType("gallery")}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  filterType === "gallery"
-                    ? "bg-blue-500/30 text-blue-300 shadow"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
-                }`}
-              >
-                Com Galeria
-              </button>
-            </div>
-
-            {/* View Mode Toggle */}
-            <div className="flex items-center bg-[var(--admin-surface)] p-1 rounded-xl border border-[var(--admin-border)]">
-              <button
-                onClick={() => setViewMode("table")}
-                className={`min-h-10 px-2 rounded-lg text-xs transition-all ${
-                  viewMode === "table"
-                    ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
-                }`}
-                title="Visualização em Tabela"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`min-h-10 px-2 rounded-lg text-xs transition-all ${
-                  viewMode === "list"
-                    ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
-                }`}
-                title="Visualização em Lista"
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Area: Table Mode */}
-        {viewMode === "table" ? (
-          <div className="w-full overflow-x-auto rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-xl">
-            <table className="w-full text-left border-collapse min-w-[950px]">
-              <thead>
-                <tr className="bg-[var(--admin-surface)] border-b border-[var(--admin-border)] text-xs font-extrabold text-[var(--admin-accent)] uppercase tracking-wider whitespace-nowrap">
-                  <th className="py-3.5 px-4">Foto & Galeria</th>
-                  <th className="py-3.5 px-4">Serviço / Descrição</th>
-                  <th className="py-3.5 px-4">Categoria</th>
-                  <th className="py-3.5 px-4">Duração</th>
-                  <th className="py-3.5 px-4">Preço (R$)</th>
-                  <th className="py-3.5 px-4 text-center">Badges & Destaque</th>
-                  <th className="py-3.5 px-4 text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--admin-border)] text-xs">
-                {loading ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="py-12 text-center text-[var(--admin-text-muted)]"
-                    >
-                      <div className="flex items-center justify-center space-x-2">
-                        <Scissors className="w-5 h-5 text-[var(--admin-accent)] animate-spin" />
-                        <span>Carregando cardápio de serviços...</span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : filteredServices.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="py-12 text-center text-[var(--admin-text-muted)]"
-                    >
-                      Nenhum serviço encontrado com os filtros atuais.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredServices.map((service) => {
-                    const categoryName = getCategoryName(service.category_id);
-                    const servicePhotos =
-                      Array.isArray(service.gallery_urls) &&
-                      service.gallery_urls.length > 0
-                        ? service.gallery_urls
-                        : service.image_url
-                          ? [service.image_url]
-                          : [];
-
-                    return (
-                      <tr
-                        key={service.id}
-                        className="hover:bg-[var(--admin-surface)] transition-colors group"
-                      >
-                        {/* Photo Thumbnail & Lightbox Click */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          <div className="relative group/img inline-block">
-                            <div className="w-12 h-12 rounded-xl bg-[var(--admin-surface)] border-2 border-content-base/60 overflow-hidden shadow-md relative flex items-center justify-center">
-                              {service.image_url || servicePhotos[0] ? (
-                                <img
-                                  src={service.image_url || servicePhotos[0]}
-                                  alt={service.title}
-                                  className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-300"
-                                />
-                              ) : (
-                                <Scissors className="w-5 h-5 text-[var(--admin-accent)]" />
-                              )}
-                              <div className="absolute inset-0 bg-[var(--admin-bg)]/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                                <Eye className="w-4 h-4 text-[var(--admin-text-main)]" />
-                              </div>
-                            </div>
-
-                            {/* Photos count pill */}
-                            {servicePhotos.length > 0 && (
-                              <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-xl bg-[var(--admin-bg)]/90 text-[var(--admin-text-main)] text-xs font-extrabold border border-[var(--admin-accent)]/40 shadow-sm flex items-center gap-0.5">
-                                <ImageIcon className="w-2.5 h-2.5" />
-                                <span>{servicePhotos.length}</span>
-                              </span>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* Title & Description */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          <div className="max-w-xs">
-                            <span className="font-serif text-[var(--admin-text-main)] font-semibold text-sm block group-hover:text-[var(--admin-accent)] transition-colors truncate">
-                              {service.title}
-                            </span>
-                            <span
-                              className="text-xs text-[var(--admin-text-muted)] block truncate"
-                              title={service.description}
-                            >
-                              {service.description ||
-                                "Sem descrição cadastrada"}
-                            </span>
-                          </div>
-                        </td>
-
-                        {/* Category */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          <span className="px-2.5 py-1 rounded-lg bg-[var(--admin-surface)] text-[var(--admin-accent)] text-xs font-bold border border-[var(--admin-border)]">
-                            {categoryName}
-                          </span>
-                        </td>
-
-                        {/* Duration */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-1.5 text-[var(--admin-accent)] font-semibold">
-                            <Clock className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
-                            <span>{service.duration_minutes} min</span>
-                          </div>
-                        </td>
-
-                        {/* Price & Discounts */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <div className="flex items-center space-x-2">
-                              <span className="font-mono num-tabular finance-positive font-semibold text-sm">
-                                R$ {service.price.toFixed(2)}
-                              </span>
-                              {service.original_price &&
-                                service.original_price > service.price && (
-                                  <span className="text-xs finance-positive line-through">
-                                    R$ {service.original_price.toFixed(2)}
-                                  </span>
-                                )}
-                            </div>
-                            {service.discount_percentage &&
-                              service.discount_percentage > 0 && (
-                                <span className="text-xs text-status-success font-extrabold">
-                                  {service.discount_percentage}% OFF
-                                </span>
-                              )}
-                          </div>
-                        </td>
-
-                        {/* Badges / Quick Toggle Switches */}
-                        <td className="py-3 px-4 text-center whitespace-nowrap">
-                          <div className="flex items-center justify-center space-x-1.5">
-                            {/* Toggle Combo */}
-                            <button
-                              onClick={() => handleToggleCombo(service)}
-                              title="Clique para alterar Combo VIP"
-                              className={`px-2 py-1 rounded-lg text-xs font-black uppercase transition-all border ${
-                                service.is_combo
-                                  ? "bg-status-success text-white border-[#00A86B] shadow-sm"
-                                  : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"
-                              }`}
-                            >
-                              {service.is_combo ? "Combo VIP" : "+ Combo"}
-                            </button>
-
-                            {/* Toggle Popular */}
-                            <button
-                              onClick={() => handleTogglePopular(service)}
-                              title="Clique para alterar Destaque/Mais Pedido"
-                              className={`px-2 py-1 rounded-lg text-xs font-bold uppercase transition-all border ${
-                                service.popular
-                                  ? "bg-[var(--admin-accent)]/20 text-[var(--admin-accent)] border-[var(--admin-accent)]/40 shadow-sm"
-                                  : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"
-                              }`}
-                            >
-                              {service.popular ? "Destaque" : "+ Destaque"}
-                            </button>
-                          </div>
-                        </td>
-
-                        {/* Actions */}
-                        <td className="py-3 px-4 text-right whitespace-nowrap">
-                          <div className="flex items-center justify-end space-x-1.5">
-                            {/* Edit */}
-                            <button
-                              onClick={() => handleOpenEdit(service)}
-                              className="px-2.5 py-1.5 rounded-lg bg-[var(--admin-surface)] hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] text-xs font-bold flex items-center space-x-1 border border-[var(--admin-border)]"
-                              title="Editar Serviço"
-                            >
-                              <Edit2 className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
-                              <span>Editar</span>
-                            </button>
-
-                            {/* Delete */}
-                            <button
-                              onClick={() => handleDelete(service.id)}
-                              className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20"
-                              title="Excluir Serviço"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          /* Grid Mode (Compact Blocks) */
-          <div className="space-y-2">
-            {loading ? (
-              <div className="py-10 text-center text-sm text-[var(--admin-text-muted)] bg-[var(--admin-surface)] rounded-2xl border border-[var(--admin-border)]">
-                <Scissors className="w-5 h-5 text-[var(--admin-accent)] animate-spin mx-auto mb-2" />
-                Carregando cardápio de serviços...
-              </div>
-            ) : filteredServices.length === 0 ? (
-              <AdminEmptyState
-                icon={Scissors}
-                title="Nenhum serviço encontrado"
-                description="Ajuste a busca ou os filtros para tentar novamente."
-              />
-            ) : (
-              filteredServices.map((service) => {
-                const categoryName = getCategoryName(service.category_id);
-                const servicePhotos =
-                  Array.isArray(service.gallery_urls) &&
-                  service.gallery_urls.length > 0
-                    ? service.gallery_urls
-                    : service.image_url
-                      ? [service.image_url]
-                      : [];
-                const isExpanded = expandedServiceId === service.id;
-
-                return (
-                  <article
-                    key={service.id}
-                    className={`overflow-hidden rounded-2xl border bg-[var(--admin-surface)] transition-colors ${isExpanded ? "border-[var(--admin-accent)]/50" : "border-[var(--admin-border)]"}`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setExpandedServiceId(isExpanded ? null : service.id)
-                      }
-                      aria-expanded={isExpanded}
-                      className="w-full min-h-[82px] p-3.5 sm:p-4 text-left flex items-center gap-3 sm:gap-4 hover:bg-[var(--admin-bg)]/40"
-                    >
-                      <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0">
-                        {service.image_url || servicePhotos[0] ? (
-                          <img
-                            src={service.image_url || servicePhotos[0]}
-                            alt=""
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <Scissors className="w-6 h-6 text-[var(--admin-accent)]/60" />
-                        )}
-                        {servicePhotos.length > 0 && (
-                          <span className="absolute -bottom-0.5 -right-0.5 px-1.5 py-0.5 rounded-md bg-[var(--admin-bg)]/90 text-[var(--admin-text-main)] text-xs font-bold border border-[var(--admin-accent)]/40 flex items-center gap-1">
-                            <ImageIcon className="w-3 h-3" />
-                            {servicePhotos.length}
-                          </span>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="shrink-0 px-2 py-1 rounded-md bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold border border-[var(--admin-accent)]/20 admin-clamp-2 max-w-[42%]">
-                            {categoryName}
-                          </span>
-                          {service.is_combo && (
-                            <span className="shrink-0 px-2 py-1 rounded-md bg-status-success/15 text-status-success text-xs font-bold">
-                              Combo
-                            </span>
-                          )}
-                          {service.popular && (
-                            <span className="shrink-0 px-2 py-1 rounded-md bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] text-xs font-bold">
-                              Destaque
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="mt-1 text-sm sm:text-base font-bold text-[var(--admin-text-main)] admin-clamp-2">
-                          {service.title}
-                        </h3>
-                        <p className="text-xs text-[var(--admin-text-muted)] admin-clamp-2">
-                          {service.description || "Sem descrição cadastrada"}
-                        </p>
-                      </div>
-                      <div className="hidden sm:block text-right shrink-0 min-w-[80px]">
-                        <p className="text-xs text-[var(--admin-text-muted)]">
-                          Duração
-                        </p>
-                        <p className="text-sm font-semibold text-[var(--admin-text-main)]">
-                          {service.duration_minutes} min
-                        </p>
-                      </div>
-                      <div className="text-right shrink-0 min-w-[72px]">
-                        <p className="text-xs text-[var(--admin-text-muted)]">
-                          Preço
-                        </p>
-                        <p className="text-sm sm:text-base font-bold finance-positive">
-                          R$ {service.price.toFixed(2)}
-                        </p>
-                      </div>
-                      {isExpanded ? (
-                        <ChevronUp className="w-5 h-5 text-[var(--admin-accent)] shrink-0" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-[var(--admin-text-muted)] shrink-0" />
-                      )}
-                    </button>
-
-                    {isExpanded && (
-                      <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3.5 sm:p-4 space-y-3">
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                          <div className="rounded-xl bg-[var(--admin-bg)] p-3">
-                            <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
-                              Categoria
-                            </p>
-                            <p className="mt-1 font-semibold text-[var(--admin-text-main)]">
-                              {categoryName}
-                            </p>
-                          </div>
-                          <div className="rounded-xl bg-[var(--admin-bg)] p-3">
-                            <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
-                              Duração
-                            </p>
-                            <p className="mt-1 font-semibold text-[var(--admin-text-main)]">
-                              {service.duration_minutes} minutos
-                            </p>
-                          </div>
-                          <div className="rounded-xl bg-[var(--admin-bg)] p-3">
-                            <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
-                              Preço original
-                            </p>
-                            <p className="mt-1 font-semibold finance-positive">
-                              {service.original_price
-                                ? `R$ ${service.original_price.toFixed(2)}`
-                                : "—"}
-                            </p>
-                          </div>
-                          <div className="rounded-xl bg-[var(--admin-bg)] p-3">
-                            <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
-                              Desconto
-                            </p>
-                            <p className="mt-1 font-semibold text-status-success">
-                              {service.discount_percentage
-                                ? `${service.discount_percentage}% OFF`
-                                : "Sem desconto"}
-                            </p>
-                          </div>
-                        </div>
-                        {service.description && (
-                          <p className="text-sm text-[var(--admin-text-muted)] leading-relaxed">
-                            {service.description}
-                          </p>
-                        )}
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleCombo(service)}
-                            className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.is_combo ? "border-status-success/30 text-status-success" : "border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
-                          >
-                            {service.is_combo
-                              ? "Combo VIP ativo"
-                              : "+ Ativar Combo VIP"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleTogglePopular(service)}
-                            className={`min-h-10 px-4 rounded-xl border text-sm font-semibold ${service.popular ? "border-[var(--admin-accent)]/40 text-[var(--admin-accent)]" : "border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
-                          >
-                            {service.popular
-                              ? "Destaque ativo"
-                              : "+ Marcar destaque"}
-                          </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEdit(service)}
-                            className="min-h-10 px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-sm font-bold flex items-center gap-1.5"
-                          >
-                            <Edit2 className="w-4 h-4" /> Editar
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(service.id)}
-                            className="min-h-10 px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center gap-1.5"
-                          >
-                            <Trash2 className="w-4 h-4" /> Excluir
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </article>
-                );
-              })
-            )}
-          </div>
-        )}
       </div>
 
       {/* Advanced Compact & Modular Create / Edit Service Modal */}

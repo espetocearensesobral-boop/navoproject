@@ -89,7 +89,26 @@ export async function initializeDb(): Promise<void> {
     }
   } catch (err: any) {
     console.warn('[AI Studio] Database not connected — using mock');
-    const noOp = { 
+    
+    const createChainableProxy = (returnValue: any = []): any => {
+      const handler: ProxyHandler<any> = {
+        get: (target, prop) => {
+          if (prop === 'then') {
+            return (resolve: any) => resolve(returnValue);
+          }
+          if (prop === 'catch' || prop === 'finally') {
+            return () => createChainableProxy(returnValue);
+          }
+          return createChainableProxy(returnValue);
+        },
+        apply: () => {
+          return createChainableProxy(returnValue);
+        }
+      };
+      return new Proxy(() => {}, handler);
+    };
+
+    const noOpTable = { 
       findMany: async () => [], 
       findFirst: async () => null,
       findUnique: async () => null, 
@@ -97,16 +116,22 @@ export async function initializeDb(): Promise<void> {
       update: async (d: any) => d?.data ?? {}, 
       delete: async () => ({}) 
     };
+
     db = new Proxy({}, {
       get: (_, prop) => {
-        if (prop === 'query') return new Proxy({}, { get: () => noOp });
-        if (prop === 'insert') return () => ({ values: async (v: any) => ({ onConflictDoNothing: () => ({ returning: async () => [v] }), onConflictDoUpdate: () => ({ returning: async () => [v] }) }) });
-        if (prop === 'update') return () => ({ set: async () => ({ where: async () => ({}) }) });
-        if (prop === 'delete') return () => ({ where: async () => ({}) });
-        if (prop === 'select') return () => ({ from: () => ({ where: async () => [] }) });
-        return async () => [];
+        if (prop === 'query') {
+          return new Proxy({}, { get: () => noOpTable });
+        }
+        if (prop === 'insert' || prop === 'update' || prop === 'delete' || prop === 'select' || prop === 'execute') {
+          return createChainableProxy([]);
+        }
+        if (prop === 'transaction') {
+          return async (cb: any) => cb(db);
+        }
+        return createChainableProxy([]);
       },
     });
+    
     isDbConnected = true; // Pretend it's connected to allow the app to boot
   }
 }

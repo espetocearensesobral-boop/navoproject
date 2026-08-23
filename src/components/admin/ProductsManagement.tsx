@@ -306,134 +306,181 @@ export const ProductsManagement: React.FC = () => {
           Nenhum produto encontrado.
         </div>
       ) : (
-        <div className="space-y-2">
-          {filteredProducts.map((product) => {
-            const isLowStock =
-              product.stock_quantity <= product.min_stock_alert;
-            const isExpanded = expandedProductId === product.id;
-            return (
-              <article
-                key={product.id}
-                className={`rounded-2xl border bg-[var(--admin-surface)] overflow-hidden transition-colors ${isExpanded ? "border-[var(--admin-accent)]/50" : "border-[var(--admin-border)]"}`}
-              >
-                <button
-                  type="button"
-                  onClick={() =>
-                    setExpandedProductId(isExpanded ? null : product.id)
-                  }
-                  aria-expanded={isExpanded}
-                  className="w-full min-h-[76px] p-3.5 sm:p-4 text-left flex items-center gap-3 sm:gap-4 hover:bg-[var(--admin-bg)]/40"
-                >
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0">
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Package className="w-5 h-5 text-[var(--admin-accent)]/70" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <p className="text-xs font-bold uppercase tracking-wider text-[var(--admin-accent)] admin-clamp-2">
-                        {product.category}
-                      </p>
-                      {isLowStock && (
-                        <span className="shrink-0 rounded-md bg-amber-500/15 px-2 py-1 text-xs font-bold text-amber-300">
-                          Baixo
-                        </span>
+        <div className="admin-table-container">
+          {/* DESKTOP TABLE VIEW */}
+          <div className="hidden md:block">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th className="w-12">Img</th>
+                  <th>Produto</th>
+                  <th>Categoria / Marca</th>
+                  <th>Preço / Custo</th>
+                  <th>Estoque / Alerta</th>
+                  <th>Comissão</th>
+                  <th className="text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProducts.map((product) => {
+                  const isLowStock = product.stock_quantity <= product.min_stock_alert;
+                  return (
+                    <tr key={product.id}>
+                      <td>
+                        <div className="w-10 h-10 rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-center justify-center overflow-hidden">
+                          {product.image_url ? (
+                            <img src={product.image_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <Package className="w-5 h-5 text-[var(--admin-text-muted)]" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="font-bold text-[var(--admin-text-main)]">
+                        {product.name}
+                        {isLowStock && (
+                          <span className="ml-2 inline-block px-1.5 py-0.5 rounded text-[10px] bg-status-warning/10 text-status-warning border border-status-warning/20 uppercase tracking-wider font-bold">
+                            Baixo
+                          </span>
+                        )}
+                      </td>
+                      <td className="text-[var(--admin-text-muted)]">
+                        <div className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">{product.category}</div>
+                        <div className="text-xs mt-0.5">{product.brand}</div>
+                      </td>
+                      <td>
+                        <div className="font-mono font-bold text-[var(--admin-text-main)]">{money(product.price)}</div>
+                        <div className="font-mono text-xs text-status-error">Custo: {money(product.cost_price)}</div>
+                      </td>
+                      <td>
+                        <div className={`font-bold ${isLowStock ? "text-status-warning" : "text-[var(--admin-text-main)]"}`}>
+                          {product.stock_quantity} un.
+                        </div>
+                        <div className="text-xs text-[var(--admin-text-muted)]">Mín: {product.min_stock_alert}</div>
+                      </td>
+                      <td className="text-[var(--admin-text-main)] font-mono">
+                        {product.commission_percentage}%
+                      </td>
+                      <td>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openEdit(product)}
+                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)]"
+                            title="Editar"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(product)}
+                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
+                            title="Excluir"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* MOBILE LIST VIEW */}
+          <div className="md:hidden divide-y divide-[var(--admin-border)]">
+            {filteredProducts.map((product) => {
+              const isLowStock = product.stock_quantity <= product.min_stock_alert;
+              const isExpanded = expandedProductId === product.id;
+              return (
+                <article key={product.id} className="bg-[var(--admin-surface)] overflow-hidden transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedProductId(isExpanded ? null : product.id)}
+                    aria-expanded={isExpanded}
+                    className="w-full min-h-[76px] p-3.5 text-left flex items-center gap-3 hover:bg-[var(--admin-bg)]/40"
+                  >
+                    <div className="w-11 h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0">
+                      {product.image_url ? (
+                        <img src={product.image_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <Package className="w-5 h-5 text-[var(--admin-accent)]/70" />
                       )}
                     </div>
-                    <h2 className="mt-0.5 text-sm sm:text-base font-bold text-[var(--admin-text-main)] admin-clamp-2">
-                      {product.name}
-                    </h2>
-                    <p className="text-xs text-[var(--admin-text-muted)] admin-safe-wrap">
-                      {product.brand}
-                    </p>
-                  </div>
-                  <div className="hidden sm:block text-right shrink-0">
-                    <p className="text-xs text-[var(--admin-text-muted)]">
-                      Preço
-                    </p>
-                    <p className="text-sm font-bold finance-positive">
-                      {money(product.price)}
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0 min-w-[58px]">
-                    <p className="text-xs text-[var(--admin-text-muted)]">
-                      Estoque
-                    </p>
-                    <p
-                      className={`text-sm font-bold ${isLowStock ? "text-amber-300" : "text-status-success"}`}
-                    >
-                      {product.stock_quantity} un.
-                    </p>
-                  </div>
-                  {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-[var(--admin-accent)] shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-[var(--admin-text-muted)] shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--admin-accent)] admin-clamp-2">
+                          {product.category}
+                        </p>
+                        {isLowStock && (
+                          <span className="shrink-0 rounded px-1.5 py-0.5 bg-status-warning/10 text-status-warning border border-status-warning/20 text-[10px] font-bold uppercase tracking-wider">
+                            Baixo
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="mt-0.5 text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
+                        {product.name}
+                      </h2>
+                      <p className="text-xs text-[var(--admin-text-muted)] admin-safe-wrap">
+                        {product.brand}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0 min-w-[58px]">
+                      <p className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)]">
+                        Estoque
+                      </p>
+                      <p className={`text-sm font-bold mt-0.5 ${isLowStock ? "text-status-warning" : "text-status-success"}`}>
+                        {product.stock_quantity}
+                      </p>
+                    </div>
+                    {isExpanded ? (
+                      <ChevronUp className="w-4 h-4 text-[var(--admin-accent)] shrink-0 ml-1" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-[var(--admin-text-muted)] shrink-0 ml-1" />
+                    )}
+                  </button>
+                  {isExpanded && (
+                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3.5 space-y-3">
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)]">Preço</p>
+                          <p className="font-bold font-mono text-[var(--admin-text-main)] mt-0.5">{money(product.price)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)]">Custo</p>
+                          <p className="font-bold font-mono text-status-error mt-0.5">{money(product.cost_price)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)]">Alerta min.</p>
+                          <p className="font-bold text-[var(--admin-text-main)] mt-0.5">{product.min_stock_alert} un.</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)]">Comissão</p>
+                          <p className="font-bold text-[var(--admin-text-main)] mt-0.5">{product.commission_percentage}%</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-2 border-t border-[var(--admin-border)]">
+                        <button
+                          type="button"
+                          onClick={() => openEdit(product)}
+                          className="flex-1 min-h-10 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5"
+                        >
+                          <Edit3 className="w-4 h-4" /> Editar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(product)}
+                          className="w-10 h-10 shrink-0 rounded-lg border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
                   )}
-                </button>
-                {isExpanded && (
-                  <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3.5 sm:p-4 space-y-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-xs">
-                      <div className="rounded-xl bg-[var(--admin-bg)] p-2.5">
-                        <p className="text-xs text-[var(--admin-text-muted)]">
-                          Preço
-                        </p>
-                        <p className="font-bold finance-positive">
-                          {money(product.price)}
-                        </p>
-                      </div>
-                      <div className="rounded-xl bg-[var(--admin-bg)] p-2.5">
-                        <p className="text-xs text-[var(--admin-text-muted)]">
-                          Custo
-                        </p>
-                        <p className="font-bold finance-negative">
-                          {money(product.cost_price)}
-                        </p>
-                      </div>
-                      <div className="rounded-xl bg-[var(--admin-bg)] p-2.5">
-                        <p className="text-xs text-[var(--admin-text-muted)]">
-                          Alerta mínimo
-                        </p>
-                        <p className="font-bold text-[var(--admin-text-main)]">
-                          {product.min_stock_alert} un.
-                        </p>
-                      </div>
-                      <div className="rounded-xl bg-[var(--admin-bg)] p-2.5">
-                        <p className="text-xs text-[var(--admin-text-muted)]">
-                          Comissão
-                        </p>
-                        <p className="font-bold text-[var(--admin-text-main)]">
-                          {product.commission_percentage}%
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => openEdit(product)}
-                        className="min-h-10 px-4 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] text-sm font-semibold flex items-center justify-center gap-1.5"
-                      >
-                        <Edit3 className="w-4 h-4" /> Editar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(product)}
-                        className="min-h-10 px-4 rounded-xl border border-status-error/25 text-status-error flex items-center justify-center gap-1.5 text-sm font-semibold"
-                      >
-                        <Trash2 className="w-4 h-4" /> Excluir
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </article>
-            );
-          })}
+                </article>
+              );
+            })}
+          </div>
         </div>
       )}
 

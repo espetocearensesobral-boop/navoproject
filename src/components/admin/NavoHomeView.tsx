@@ -158,124 +158,113 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
         </div>
       )}
 
-      {/* KPI Cards: os três números que respondem "como está o caixa hoje". */}
-      <div
-        className="grid grid-cols-2 sm:grid-cols-3 gap-2.5"
-        aria-busy={loading}
-      >
-        {loading ? (
-          <>
-            <AdminSkeleton className="h-[6.75rem] rounded-xl" />
-            <AdminSkeleton className="h-[6.75rem] rounded-xl" />
-            <AdminSkeleton className="h-[6.75rem] rounded-xl col-span-2 sm:col-span-1" />
-          </>
-        ) : (
-          <>
-            <div className="admin-card flex flex-col justify-between p-4 gap-2">
-              <div className="flex items-center justify-between text-[var(--admin-accent)] mb-1">
-                <span className="admin-label text-[var(--admin-accent)] truncate">
-                  Faturamento
-                </span>
-                <div className="w-8 h-8 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)]/10 flex items-center justify-center shrink-0">
-                  <Receipt className="w-4 h-4" />
+      {/* KPI Cards & Operational State - Structural Redesign */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6" aria-busy={loading}>
+        {/* Principal KPIs */}
+        <div className="lg:col-span-8 flex flex-col gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[var(--admin-border)] bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl overflow-hidden shadow-sm">
+            {loading ? (
+              <>
+                <AdminSkeleton className="h-28" />
+                <AdminSkeleton className="h-28" />
+                <AdminSkeleton className="h-28" />
+              </>
+            ) : (
+              <>
+                <div className="p-5 flex flex-col justify-between relative group hover:bg-[var(--admin-bg)]/50 transition-colors">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-3">
+                    <Receipt className="w-4 h-4" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider">Faturamento</span>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-serif font-bold text-status-success tabular-nums">
+                      R$ {totalRevenueToday.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-xs font-semibold text-[var(--admin-text-main)]">
+                        {summary?.completedAppointments || 0} concluídos
+                      </p>
+                      <Trend current={totalRevenueToday} previous={comparison?.totalIncome} />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <p className="admin-title-h1 text-status-success tabular-nums truncate">
-                R${" "}
-                {totalRevenueToday.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                })}
-              </p>
-              <div className="flex items-center gap-1.5 mt-auto min-w-0">
-                <p className="admin-text-small truncate">
-                  {summary?.completedAppointments || 0} concluídos
-                </p>
-                <Trend
-                  current={totalRevenueToday}
-                  previous={comparison?.totalIncome}
-                />
-              </div>
-            </div>
 
-            <div className="admin-card flex flex-col justify-between p-4 gap-2">
-              <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
-                <span className="admin-label truncate">A Receber</span>
-                <div className="w-8 h-8 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-accent)] flex items-center justify-center shrink-0">
-                  <Wallet className="w-4 h-4" />
+                <div className="p-5 flex flex-col justify-between relative group hover:bg-[var(--admin-bg)]/50 transition-colors">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-3">
+                    <Wallet className="w-4 h-4" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider">A Receber</span>
+                  </div>
+                  <div>
+                    <p className={`text-2xl font-serif font-bold tabular-nums ${pendingAmount > 0 ? "text-amber-400" : "text-[var(--admin-text-main)]"}`}>
+                      R$ {pendingAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </p>
+                    <p className="text-xs text-[var(--admin-text-muted)] mt-1">
+                      {pendingReceiptsCount === 0 ? "Caixa em dia" : `${pendingReceiptsCount} pendências financeiras`}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <p
-                className={`admin-title-h1 tabular-nums truncate ${pendingAmount > 0 ? "text-amber-400" : "text-[var(--admin-text-main)]"}`}
-              >
-                R${" "}
-                {pendingAmount.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                })}
-              </p>
-              <p className="admin-text-small mt-auto truncate">
-                {pendingReceiptsCount === 0
-                  ? "Nada pendente"
-                  : `${pendingReceiptsCount} pendência${pendingReceiptsCount > 1 ? "s" : ""}`}
-              </p>
-            </div>
 
-            <div className="admin-card flex flex-col justify-between p-4 gap-2 col-span-2 sm:col-span-1">
-              <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
-                <span className="admin-label truncate">Ticket Médio</span>
-                <div className="w-8 h-8 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-accent)] flex items-center justify-center shrink-0">
-                  <CalendarCheck2 className="w-4 h-4" />
+                <div className="p-5 flex flex-col justify-between relative group hover:bg-[var(--admin-bg)]/50 transition-colors">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-3">
+                    <CalendarCheck2 className="w-4 h-4" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider">Ticket Médio</span>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-serif font-bold text-[var(--admin-text-main)] tabular-nums">
+                      R$ {ticketMedio.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-xs text-[var(--admin-text-muted)]">
+                        por atendimento
+                      </p>
+                      <Trend current={ticketMedio} previous={comparison?.averageTicket} />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <p className="admin-title-h1 text-status-success tabular-nums truncate">
-                R${" "}
-                {ticketMedio.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                })}
-              </p>
-              <div className="flex items-center gap-1.5 mt-auto min-w-0">
-                <p className="admin-text-small truncate">por atendimento</p>
-                <Trend
-                  current={ticketMedio}
-                  previous={comparison?.averageTicket}
-                />
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Estado "agora": contadores operacionais, deliberadamente mais discretos que os KPIs financeiros acima. */}
-      {!loading && (
-        <div className="flex items-stretch rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-surface)] divide-x divide-[var(--admin-border)] overflow-hidden">
-          <div className="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
-            <UserCheck className="w-5 h-5 text-status-success shrink-0" />
-            <div className="min-w-0">
-              <p className="admin-title-h3 tabular-nums leading-tight">
-                {inServiceToday}
-              </p>
-              <p className="admin-label truncate">Em atendimento</p>
-            </div>
-          </div>
-          <div className="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
-            <Users className="w-5 h-5 text-[var(--admin-accent)] shrink-0" />
-            <div className="min-w-0">
-              <p className="admin-title-h3 tabular-nums leading-tight">
-                {waitingToday}
-              </p>
-              <p className="admin-label truncate">Aguardando</p>
-            </div>
-          </div>
-          <div className="flex-1 flex items-center gap-3 px-4 py-3 min-w-0">
-            <AlertTriangle className="w-5 h-5 text-[var(--admin-text-muted)] shrink-0" />
-            <div className="min-w-0">
-              <p className="admin-title-h3 tabular-nums leading-tight">
-                {closedOutToday}
-              </p>
-              <p className="admin-label truncate">Cancel./Não veio</p>
-            </div>
+              </>
+            )}
           </div>
         </div>
-      )}
+
+        {/* Operational Status (Agora) */}
+        <div className="lg:col-span-4">
+          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-5 h-full flex flex-col justify-center shadow-sm">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-text-muted)] mb-4">
+              Status Operacional
+            </h3>
+            {loading ? (
+               <div className="space-y-4">
+                 <AdminSkeleton className="h-6 w-full" />
+                 <AdminSkeleton className="h-6 w-3/4" />
+               </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-main)]">
+                    <UserCheck className="w-4 h-4 text-status-success" />
+                    <span className="text-sm font-semibold">Em atendimento</span>
+                  </div>
+                  <span className="text-base font-bold tabular-nums bg-status-success/10 text-status-success px-2 py-0.5 rounded-lg">{inServiceToday}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-main)]">
+                    <Users className="w-4 h-4 text-[var(--admin-accent)]" />
+                    <span className="text-sm font-semibold">Aguardando</span>
+                  </div>
+                  <span className="text-base font-bold tabular-nums bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] px-2 py-0.5 rounded-lg">{waitingToday}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)]">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="text-sm">Faltas / Cancel.</span>
+                  </div>
+                  <span className="text-sm font-bold tabular-nums text-[var(--admin-text-muted)]">{closedOutToday}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Atendimentos em andamento: o que precisa de atenção agora vem primeiro e visível por padrão. */}
       <div className="admin-card p-0 overflow-hidden min-w-0">

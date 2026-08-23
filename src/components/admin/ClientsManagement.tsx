@@ -380,8 +380,114 @@ export const ClientsManagement: React.FC = () => {
               onAction={() => loadClients(debouncedSearch)}
             />
           )}
-          {/* RESPONSIVE CLIENT LIST */}
-          <div className="space-y-2">
+
+          {/* DESKTOP TABLE VIEW (Hidden on Mobile) */}
+          <div className="hidden md:block admin-table-container">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Contato</th>
+                  <th>Fidelidade</th>
+                  <th className="text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredClients.map((client) => {
+                  const tier = client.loyaltyTier || "Bronze";
+                  const isAdmin = (client.role || "").toLowerCase() === "admin";
+                  
+                  return (
+                    <tr key={client.id}>
+                      <td>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-sm shrink-0 overflow-hidden shadow-inner">
+                            {client.avatarUrl ? (
+                              <img src={client.avatarUrl} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              (client.name || "?").charAt(0).toUpperCase()
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-[var(--admin-text-main)] truncate text-[13px]">{client.name || "Sem nome"}</p>
+                            {isAdmin && (
+                              <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-500/15 text-purple-400 uppercase tracking-wider border border-purple-500/30">
+                                Admin
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <p className="text-[var(--admin-text-main)] truncate max-w-[200px] text-[13px]" title={client.email}>
+                          {client.email || "—"}
+                        </p>
+                        <p className="text-[11px] text-[var(--admin-text-muted)] font-mono mt-0.5">
+                          {client.phone || "—"}
+                        </p>
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-block px-2 py-0.5 rounded bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold border border-[var(--admin-accent)]/20 uppercase tracking-wider">
+                            {tier}
+                          </span>
+                          <span className="font-bold text-[var(--admin-text-main)] text-[13px]">
+                            {client.loyaltyPoints || 0} <span className="text-[11px] text-[var(--admin-text-muted)]">pts</span>
+                          </span>
+                        </div>
+                      </td>
+                      <td className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {client.phone && (
+                            <a
+                              href={`https://wa.me/55${client.phone.replace(/\D/g, "")}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Abrir WhatsApp"
+                              className="admin-btn-icon-sm hover:text-status-success hover:bg-status-success/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded"
+                            >
+                              <Phone className="w-4 h-4" />
+                            </a>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleOpenModal(client)}
+                            title="Editar"
+                            className="admin-btn-icon-sm hover:text-[var(--admin-accent)] hover:bg-[var(--admin-accent)]/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(client.id)}
+                            disabled={isDeleting}
+                            title="Excluir"
+                            className="admin-btn-icon-sm hover:text-status-error hover:bg-status-error/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded disabled:opacity-50"
+                          >
+                            {isDeleting && deleteTargetId === client.id ? (
+                              <span className="h-3 w-3 animate-spin rounded-full border border-status-error border-t-transparent" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filteredClients.length === 0 && !loadError && (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-[var(--admin-text-muted)]">
+                      Nenhum cliente encontrado.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* MOBILE ACCORDION VIEW (Hidden on Desktop) */}
+          <div className="md:hidden space-y-2">
             {filteredClients.map((client, index) => {
               const isExpanded = expandedClientId === client.id;
               const tier = client.loyaltyTier || "Bronze";
@@ -399,9 +505,9 @@ export const ClientsManagement: React.FC = () => {
                       setExpandedClientId(isExpanded ? null : client.id)
                     }
                     aria-expanded={isExpanded}
-                    className="w-full min-h-[82px] p-3.5 sm:p-4 text-left flex items-center gap-3 sm:gap-4 hover:bg-[var(--admin-bg)]/40 active:scale-[0.995] transition-[transform,background-color] duration-150"
+                    className="w-full min-h-[82px] p-3.5 text-left flex items-center gap-3 hover:bg-[var(--admin-bg)]/40 active:scale-[0.995] transition-[transform,background-color] duration-150"
                   >
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-sm shrink-0 overflow-hidden">
+                    <div className="w-11 h-11 rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-sm shrink-0 overflow-hidden">
                       {client.avatarUrl ? (
                         <img
                           src={client.avatarUrl}
@@ -414,36 +520,15 @@ export const ClientsManagement: React.FC = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <h3 className="text-sm sm:text-base font-bold text-[var(--admin-text-main)] admin-clamp-2">
+                        <h3 className="text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
                           {client.name || "Cliente sem nome"}
                         </h3>
-                        <span className="shrink-0 px-2 py-1 rounded-md bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold">
+                        <span className="shrink-0 px-2 py-1 rounded-md bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-[10px] font-bold">
                           {tier}
                         </span>
                       </div>
-                      <p className="text-xs text-[var(--admin-text-muted)] admin-safe-wrap">
+                      <p className="text-xs text-[var(--admin-text-muted)] admin-safe-wrap mt-0.5">
                         {client.email || "E-mail não informado"}
-                      </p>
-                      <p className="text-xs text-[var(--admin-text-muted)] admin-safe-wrap">
-                        {client.birthday
-                          ? `Aniversário em ${new Date(`${client.birthday}T12:00:00`).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}`
-                          : "Aniversário não informado"}
-                      </p>
-                    </div>
-                    <div className="hidden sm:block text-right shrink-0 min-w-[78px]">
-                      <p className="text-xs text-[var(--admin-text-muted)]">
-                        Fidelidade
-                      </p>
-                      <p className="text-sm font-bold text-[var(--admin-accent)]">
-                        {client.loyaltyPoints || 0} pts
-                      </p>
-                    </div>
-                    <div className="hidden md:block text-right shrink-0 min-w-[70px]">
-                      <p className="text-xs text-[var(--admin-text-muted)]">
-                        Papel
-                      </p>
-                      <p className="text-xs font-semibold text-[var(--admin-text-main)] capitalize">
-                        {client.role || "client"}
                       </p>
                     </div>
                     {isExpanded ? (
@@ -454,110 +539,76 @@ export const ClientsManagement: React.FC = () => {
                   </button>
 
                   {isExpanded && (
-                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3.5 sm:p-4 space-y-3">
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3.5 space-y-3">
+                      <div className="grid grid-cols-1 gap-2 text-xs">
                         <div className="rounded-xl bg-[var(--admin-bg)] p-3">
-                          <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
-                            Contato
+                          <p className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider font-bold mb-1.5">
+                            Contato e Info
                           </p>
-                          <p className="mt-1 text-[var(--admin-text-main)] font-semibold break-words">
-                            {client.email || "E-mail não informado"}
+                          <p className="text-[var(--admin-text-main)] font-semibold break-words">
+                            {client.email || "—"}
                           </p>
-                          <p className="text-[var(--admin-text-muted)]">
-                            {client.phone || "Telefone não informado"}
+                          <p className="text-[var(--admin-text-muted)] mt-1">
+                            {client.phone || "Sem telefone"}
                           </p>
-                          <p className="text-[var(--admin-text-muted)]">
-                            {client.birthday
-                              ? `Aniversário: ${new Date(`${client.birthday}T12:00:00`).toLocaleDateString("pt-BR")}`
-                              : "Aniversário não informado"}
-                          </p>
+                          {client.birthday && (
+                            <p className="text-[var(--admin-text-muted)] mt-1 flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5" />
+                              {new Date(`${client.birthday}T12:00:00`).toLocaleDateString("pt-BR")}
+                            </p>
+                          )}
                         </div>
-                        <div className="rounded-xl bg-[var(--admin-bg)] p-3">
-                          <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
-                            Fidelidade
-                          </p>
-                          <p className="mt-1 text-[var(--admin-text-main)] font-semibold">
-                            {tier}
-                          </p>
-                          <p className="text-[var(--admin-accent)] font-bold">
-                            {client.loyaltyPoints || 0} pontos
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-[var(--admin-bg)] p-3">
-                          <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
-                            Papel e cadastro
-                          </p>
-                          <p className="mt-1 text-[var(--admin-text-main)] font-semibold capitalize">
-                            {client.role || "client"}
-                          </p>
-                          <p className="text-[var(--admin-text-muted)]">
-                            Atualizado em{" "}
-                            {client.updatedAt
-                              ? new Date(client.updatedAt).toLocaleDateString(
-                                  "pt-BR",
-                                )
-                              : "—"}
-                          </p>
+                        <div className="rounded-xl bg-[var(--admin-bg)] p-3 flex justify-between items-center">
+                           <div>
+                             <p className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider font-bold mb-1">
+                               Pontos
+                             </p>
+                             <p className="text-[var(--admin-accent)] font-bold text-base">
+                               {client.loyaltyPoints || 0} pts
+                             </p>
+                           </div>
+                           <div className="text-right">
+                              <p className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider font-bold mb-1">
+                                Nível
+                              </p>
+                              <p className="text-[var(--admin-text-main)] font-semibold">
+                                {tier}
+                              </p>
+                           </div>
                         </div>
                       </div>
-                      <div className="admin-action-group">
+                      <div className="flex flex-wrap gap-2 pt-1">
                         {client.phone && (
                           <a
                             href={`https://wa.me/55${client.phone.replace(/\D/g, "")}`}
                             target="_blank"
                             rel="noreferrer"
-                            title="Abrir WhatsApp"
-                            aria-label="Abrir WhatsApp"
-                            className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-success/30 text-status-success text-sm font-semibold flex items-center justify-center gap-1.5"
+                            className="flex-1 min-h-10 px-3 rounded-xl border border-status-success/30 bg-status-success/5 text-status-success text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
                           >
                             <Phone className="w-4 h-4" />
-                            <span className="hidden sm:inline">WhatsApp</span>
+                            WhatsApp
                           </a>
                         )}
                         <button
                           type="button"
                           onClick={() => handleOpenModal(client)}
-                          title="Editar cliente"
-                          aria-label="Editar cliente"
-                          className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-sm font-bold flex items-center justify-center gap-1.5"
+                          className="flex-1 min-h-10 px-3 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
                         >
                           <Edit2 className="w-4 h-4" />
-                          <span className="hidden sm:inline">Editar</span>
+                          Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(client.id)}
                           disabled={isDeleting}
-                          title="Excluir cliente"
-                          aria-label="Excluir cliente"
-                          className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5 hover:bg-status-error/10 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                          className="flex-none min-h-10 min-w-10 px-3 rounded-xl border border-status-error/25 bg-status-error/5 text-status-error flex items-center justify-center hover:bg-status-error/10 active:scale-95 transition-all disabled:opacity-50"
                         >
                           {isDeleting && deleteTargetId === client.id ? (
-                            <span
-                              className="h-4 w-4 animate-spin rounded-full border-2 border-status-error/30 border-t-status-error"
-                              aria-hidden="true"
-                            />
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-status-error/30 border-t-status-error" />
                           ) : (
                             <Trash2 className="w-4 h-4" />
                           )}
-                          <span className="hidden sm:inline">
-                            {isDeleting && deleteTargetId === client.id
-                              ? "Excluindo…"
-                              : "Excluir"}
-                          </span>
                         </button>
-                        {isAdmin && (
-                          <span
-                            title="Administrador"
-                            aria-label="Administrador"
-                            className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-purple-500/15 text-purple-300 text-sm font-semibold flex items-center justify-center gap-1.5"
-                          >
-                            <ShieldCheck className="w-4 h-4" />
-                            <span className="hidden sm:inline">
-                              Administrador
-                            </span>
-                          </span>
-                        )}
                       </div>
                     </div>
                   )}
@@ -590,7 +641,7 @@ export const ClientsManagement: React.FC = () => {
                 }
               />
             )}
-          </div>{" "}
+          </div>
         </>
       )}
 

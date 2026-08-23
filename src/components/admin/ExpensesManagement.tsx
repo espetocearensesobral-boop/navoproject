@@ -288,62 +288,138 @@ export const ExpensesManagement: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-[var(--admin-border)]">
-            {visibleExpenses.map((expense) => (
-              <article
-                key={expense.id}
-                className="p-4 sm:px-5 flex items-start gap-3"
-              >
-                <span className="w-10 h-10 shrink-0 rounded-xl bg-status-error/10 text-status-error flex items-center justify-center">
-                  <ArrowDownRight className="w-5 h-5" />
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <h3 className="text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
-                      {expense.description}
-                    </h3>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] admin-safe-wrap">
-                      {expense.category}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-[var(--admin-text-muted)]">
-                    {expense.date.split("-").reverse().join("/")} ·{" "}
-                    {paymentMethods.find(
-                      (method) => method.id === expense.paymentMethod,
-                    )?.label || expense.paymentMethod}
-                  </p>
-                  {expense.notes && (
-                    <p className="mt-1 text-xs text-[var(--admin-text-muted)] admin-clamp-2">
-                      {expense.notes}
+          <>
+            {/* DESKTOP TABLE VIEW */}
+            <div className="hidden md:block admin-table-container border-0 rounded-none border-t border-[var(--admin-border)]">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Método</th>
+                    <th className="text-right">Valor</th>
+                    <th className="text-right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleExpenses.map((expense) => (
+                    <tr key={expense.id}>
+                      <td className="whitespace-nowrap text-[var(--admin-text-muted)]">
+                        {expense.date.split("-").reverse().join("/")}
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-3">
+                           <span className="w-8 h-8 shrink-0 rounded-lg bg-status-error/10 text-status-error flex items-center justify-center">
+                             <ArrowDownRight className="w-4 h-4" />
+                           </span>
+                           <div>
+                             <p className="font-bold text-[var(--admin-text-main)] truncate max-w-[200px]" title={expense.description}>
+                               {expense.description}
+                             </p>
+                             {expense.notes && (
+                               <p className="text-[10px] text-[var(--admin-text-muted)] truncate max-w-[200px]" title={expense.notes}>
+                                 {expense.notes}
+                               </p>
+                             )}
+                           </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="px-2 py-0.5 rounded text-xs font-bold bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)]">
+                          {expense.category}
+                        </span>
+                      </td>
+                      <td className="text-[var(--admin-text-muted)]">
+                        {paymentMethods.find(m => m.id === expense.paymentMethod)?.label || expense.paymentMethod}
+                      </td>
+                      <td className="text-right font-mono font-bold finance-negative whitespace-nowrap">
+                        - {money(Number(expense.amount))}
+                      </td>
+                      <td>
+                        <div className="flex justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => openEdit(expense)}
+                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:bg-[var(--admin-accent)]/10"
+                            aria-label={`Editar ${expense.description}`}
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(expense)}
+                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
+                            aria-label={`Excluir ${expense.description}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* MOBILE LIST VIEW */}
+            <div className="md:hidden divide-y divide-[var(--admin-border)]">
+              {visibleExpenses.map((expense) => (
+                <article
+                  key={expense.id}
+                  className="p-4 sm:px-5 flex items-start gap-3"
+                >
+                  <span className="w-10 h-10 shrink-0 rounded-xl bg-status-error/10 text-status-error flex items-center justify-center">
+                    <ArrowDownRight className="w-5 h-5" />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <h3 className="text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
+                        {expense.description}
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] admin-safe-wrap">
+                        {expense.category}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-[var(--admin-text-muted)]">
+                      {expense.date.split("-").reverse().join("/")} ·{" "}
+                      {paymentMethods.find(
+                        (method) => method.id === expense.paymentMethod,
+                      )?.label || expense.paymentMethod}
                     </p>
-                  )}
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-sm font-mono font-bold finance-negative">
-                    - {money(Number(expense.amount))}
-                  </p>
-                  <div className="mt-2 flex justify-end gap-1">
-                    <button
-                      type="button"
-                      onClick={() => openEdit(expense)}
-                      className="w-8 h-8 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center"
-                      aria-label={`Editar ${expense.description}`}
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(expense)}
-                      className="w-8 h-8 rounded-lg border border-status-error/25 text-status-error flex items-center justify-center"
-                      aria-label={`Excluir ${expense.description}`}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {expense.notes && (
+                      <p className="mt-1 text-xs text-[var(--admin-text-muted)] admin-clamp-2">
+                        {expense.notes}
+                      </p>
+                    )}
                   </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-mono font-bold finance-negative">
+                      - {money(Number(expense.amount))}
+                    </p>
+                    <div className="mt-2 flex justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => openEdit(expense)}
+                        className="w-8 h-8 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center"
+                        aria-label={`Editar ${expense.description}`}
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(expense)}
+                        className="w-8 h-8 rounded-lg border border-status-error/25 text-status-error flex items-center justify-center"
+                        aria-label={`Excluir ${expense.description}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
