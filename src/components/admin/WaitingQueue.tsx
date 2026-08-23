@@ -5,6 +5,7 @@ import { AdminTabs } from './shared/AdminTabs';
 import { AdminListSkeleton } from './shared/AdminSkeleton';
 import { AdminEmptyState } from './shared/AdminEmptyState';
 import { ReceiptCheckoutModal } from './ReceiptCheckoutModal';
+import { AdminModalV2 } from './shared/AdminModalV2';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import {
   getQueueFromSupabase,
@@ -832,158 +833,127 @@ export const WaitingQueue: React.FC = () => {
 
       {/* MODAL: ADD WALK-IN */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
-          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/30 rounded-2xl w-full max-w-xl max-h-[90dvh] overflow-hidden shadow-2xl flex flex-col animate-fade-in">
-            <div className="p-5 sm:p-6 bg-surface-base border-b border-border-subtle flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gold-base/10 text-gold-hover flex items-center justify-center">
-                  <Plus className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-content-base">Novo encaixe</h2>
-                  <p className="text-xs text-content-muted mt-0.5">Adicione um cliente à recepção em poucos passos.</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => { setIsServicePickerOpen(false); setIsAddModalOpen(false); }}
-                className="w-10 h-10 rounded-xl bg-surface-card border border-border-subtle text-content-muted hover:text-content-base flex items-center justify-center"
-                aria-label="Fechar modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
+        <AdminModalV2
+          icon={Plus}
+          eyebrow="Recepção"
+          title="Novo encaixe"
+          subtitle="Adicione um cliente à recepção em poucos passos"
+          onClose={() => { setIsServicePickerOpen(false); setIsAddModalOpen(false); }}
+          size="md"
+          footer={
+            <div className="receipt-v2-actions">
+              <button type="button" onClick={() => { setIsServicePickerOpen(false); setIsAddModalOpen(false); }} className="receipt-v2-secondary">Cancelar</button>
+              <button type="submit" form="walk-in-form" disabled={isSavingWalkIn} className="receipt-v2-primary">{isSavingWalkIn ? 'Inserindo…' : 'Inserir na fila'}</button>
+            </div>
+          }
+        >
+          <form id="walk-in-form" onKeyDown={handleEnterAsTab} onSubmit={handleAddWalkInSubmit} className="admin-modal-v2-form-grid">
+            <div className="admin-modal-v2-field">
+              <label className="admin-modal-v2-field-label" htmlFor="walk-in-client-name">Nome do cliente *</label>
+              <input
+                id="walk-in-client-name"
+                ref={clientNameInputRef}
+                type="text"
+                value={newClientName}
+                onChange={(e) => setNewClientName(e.target.value)}
+                placeholder="Ex: Gabriel Santos"
+                className="admin-modal-v2-input"
+                required
+              />
             </div>
 
-            <form onKeyDown={handleEnterAsTab} onSubmit={handleAddWalkInSubmit} className="p-5 sm:p-6 space-y-4 text-sm overflow-y-auto">
-              <div>
-                <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">
-                  Nome do cliente *
-                </label>
-                <input
-                  ref={clientNameInputRef}
-                  type="text"
-                  value={newClientName}
-                  onChange={(e) => setNewClientName(e.target.value)}
-                  placeholder="Ex: Gabriel Santos"
-                  className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base"
-                  required
-                />
-              </div>
+            <div className="admin-modal-v2-field">
+              <label className="admin-modal-v2-field-label" htmlFor="walk-in-client-phone">Telefone / WhatsApp</label>
+              <input
+                id="walk-in-client-phone"
+                type="text"
+                value={newClientPhone}
+                onChange={(e) => setNewClientPhone(e.target.value)}
+                placeholder="(11) 99887-1122"
+                className="admin-modal-v2-input"
+              />
+            </div>
 
-              <div>
-                <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">
-                  Telefone / WhatsApp
-                </label>
-                <input
-                  type="text"
-                  value={newClientPhone}
-                  onChange={(e) => setNewClientPhone(e.target.value)}
-                  placeholder="(11) 99887-1122"
-                  className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base"
-                />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">Serviço *</label>
-                  <button
-                    type="button"
-                    data-enter-action="true"
-                    onClick={() => setIsServicePickerOpen(true)}
-                    className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3 text-left hover:border-gold-base/60 focus:outline-none focus:border-gold-base"
-                    aria-haspopup="dialog"
-                    aria-expanded={isServicePickerOpen}
-                  >
-                    <span className={`text-sm font-semibold admin-clamp-2 ${newServiceTitle ? 'text-content-base' : 'text-content-muted'}`}>{newServiceTitle || 'Selecionar serviço'}</span>
-                    <span className="text-sm font-black finance-positive shrink-0">R$ {newServicePrice.toFixed(2)}</span>
-                  </button>
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">Barbeiro *</label>
-                  <select
-                    id="walk-in-professional"
-                    value={newProfessionalId}
-                    onChange={(e) => {
-                      const id = e.target.value;
-                      setNewProfessionalId(id);
-                      const found = professionals.find((p) => p.id === id);
-                      if (found) setNewProfessionalName(found.name);
-                    }}
-                    className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base cursor-pointer"
-                  >
-                    {professionals.map((p) => <option key={p.id} value={p.id} className="bg-surface-card">{p.name}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-content-muted uppercase tracking-wide block mb-1.5">Observações</label>
-                <input
-                  type="text"
-                  value={newNotes}
-                  onChange={(e) => setNewNotes(e.target.value)}
-                  placeholder="Ex: Aceitou aguardar 15 min"
-                  className="w-full min-h-11 bg-surface-base border border-border-subtle rounded-xl px-3.5 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-border-subtle">
+            <div className="admin-modal-v2-form-grid admin-modal-v2-form-grid--2">
+              <div className="admin-modal-v2-field">
+                <label className="admin-modal-v2-field-label">Serviço *</label>
                 <button
                   type="button"
-                  onClick={() => { setIsServicePickerOpen(false); setIsAddModalOpen(false); }}
-                  className="min-h-11 px-4 rounded-xl bg-surface-base border border-border-subtle text-content-muted hover:text-content-base font-bold text-sm"
+                  data-enter-action="true"
+                  onClick={() => setIsServicePickerOpen(true)}
+                  className="admin-modal-v2-picker"
+                  aria-haspopup="dialog"
+                  aria-expanded={isServicePickerOpen}
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSavingWalkIn}
-                  className="min-h-11 px-5 rounded-xl bg-gold-base text-content-on-accent font-black text-sm shadow disabled:opacity-60 disabled:cursor-wait"
-                >
-                  {isSavingWalkIn ? 'Inserindo…' : 'Inserir na fila'}
+                  <span className={`admin-clamp-2 ${!newServiceTitle ? 'admin-modal-v2-picker-placeholder' : ''}`}>{newServiceTitle || 'Selecionar serviço'}</span>
+                  <span className="admin-modal-v2-picker-price">R$ {newServicePrice.toFixed(2)}</span>
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
+
+              <div className="admin-modal-v2-field">
+                <label className="admin-modal-v2-field-label" htmlFor="walk-in-professional">Barbeiro *</label>
+                <select
+                  id="walk-in-professional"
+                  value={newProfessionalId}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setNewProfessionalId(id);
+                    const found = professionals.find((p) => p.id === id);
+                    if (found) setNewProfessionalName(found.name);
+                  }}
+                  className="admin-modal-v2-select"
+                >
+                  {professionals.map((p) => <option key={p.id} value={p.id} className="bg-surface-card">{p.name}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="admin-modal-v2-field">
+              <label className="admin-modal-v2-field-label" htmlFor="walk-in-notes">Observações</label>
+              <input
+                id="walk-in-notes"
+                type="text"
+                value={newNotes}
+                onChange={(e) => setNewNotes(e.target.value)}
+                placeholder="Ex: Aceitou aguardar 15 min"
+                className="admin-modal-v2-input"
+              />
+            </div>
+          </form>
+        </AdminModalV2>
       )}
 
       {/* MODAL: SERVICE PICKER */}
       {isAddModalOpen && isServicePickerOpen && (
-        <div className="fixed inset-0 z-[60] bg-surface-base/85 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-6">
-          <div role="dialog" aria-modal="true" aria-label="Selecionar serviço" className="w-full max-w-2xl max-h-[82dvh] overflow-hidden rounded-t-2xl sm:rounded-2xl bg-surface-card border border-gold-base/30 shadow-2xl animate-fade-in flex flex-col">
-            <div className="p-5 border-b border-border-subtle flex items-center justify-between gap-3">
-              <div>
-                <h3 className="text-base font-bold text-content-base">Selecionar serviço</h3>
-                <p className="text-xs text-content-muted mt-0.5">Escolha o serviço para este encaixe.</p>
-              </div>
-              <button type="button" onClick={() => setIsServicePickerOpen(false)} className="w-10 h-10 rounded-xl bg-surface-base border border-border-subtle text-content-muted hover:text-content-base flex items-center justify-center" aria-label="Fechar seleção de serviços"><X className="w-5 h-5" /></button>
+        <AdminModalV2
+          icon={Scissors}
+          eyebrow="Novo encaixe"
+          title="Selecionar serviço"
+          onClose={() => setIsServicePickerOpen(false)}
+          size="lg"
+          labelledBy="service-picker-title"
+        >
+          {services.length === 0 ? (
+            <p className="py-10 text-center text-sm text-content-muted">Nenhum serviço disponível.</p>
+          ) : (
+            <div className="admin-card-grid gap-2.5">
+              {services.map((service) => {
+                const isSelected = service.title === newServiceTitle;
+                return (
+                  <button
+                    key={service.id}
+                    type="button"
+                    onClick={() => handleSelectWalkInService(service)}
+                    className={`min-h-16 p-3.5 rounded-xl border text-left flex items-center justify-between gap-3 transition-colors ${isSelected ? 'bg-gold-base/10 border-gold-base text-content-base' : 'bg-surface-base border-border-subtle text-content-base hover:border-gold-base/50'}`}
+                  >
+                    <span className="text-sm font-bold leading-snug">{service.title}</span>
+                    <span className="text-sm font-black finance-positive shrink-0">R$ {service.price.toFixed(2)}</span>
+                  </button>
+                );
+              })}
             </div>
-            <div className="p-4 sm:p-5 overflow-y-auto">
-              {services.length === 0 ? (
-                <p className="py-10 text-center text-sm text-content-muted">Nenhum serviço disponível.</p>
-              ) : (
-                <div className="admin-card-grid gap-2.5">
-                  {services.map((service) => {
-                    const isSelected = service.title === newServiceTitle;
-                    return (
-                      <button
-                        key={service.id}
-                        type="button"
-                        onClick={() => handleSelectWalkInService(service)}
-                        className={`min-h-16 p-3.5 rounded-xl border text-left flex items-center justify-between gap-3 transition-colors ${isSelected ? 'bg-gold-base/10 border-gold-base text-content-base' : 'bg-surface-base border-border-subtle text-content-base hover:border-gold-base/50'}`}
-                      >
-                        <span className="text-sm font-bold leading-snug">{service.title}</span>
-                        <span className="text-sm font-black finance-positive shrink-0">R$ {service.price.toFixed(2)}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+          )}
+        </AdminModalV2>
       )}
 
       {/* MODAL: WHATSAPP ALERT */}
@@ -1006,59 +976,42 @@ export const WaitingQueue: React.FC = () => {
       )}
 
       {isWhatsAppModalOpen && selectedQueueItemForWa && (
-        <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface-card border border-whatsapp/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
-            <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-whatsapp/10 text-whatsapp flex items-center justify-center">
-                  <MessageCircle className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="text-xs font-bold text-content-base">Aviso WhatsApp</h2>
-                  <p className="text-xs text-content-muted">{selectedQueueItemForWa.client_name}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsWhatsAppModalOpen(false)}
-                className="w-7 h-7 rounded-lg bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center"
-              >
-                <X className="w-3.5 h-3.5" />
+        <AdminModalV2
+          icon={MessageCircle}
+          eyebrow="WhatsApp"
+          title="Avisar cliente"
+          subtitle={selectedQueueItemForWa.client_name}
+          onClose={() => setIsWhatsAppModalOpen(false)}
+          accent="whatsapp"
+          size="sm"
+          footer={
+            <div className="receipt-v2-actions">
+              <button type="button" onClick={handleCopyWaMessage} className="receipt-v2-secondary">
+                {copiedNotice ? <Check className="receipt-v2-button-icon text-status-success" /> : <Copy className="receipt-v2-button-icon" />}
+                <span>{copiedNotice ? 'Copiado!' : 'Copiar texto'}</span>
+              </button>
+              <button type="button" onClick={handleSendWhatsAppDirect} className="receipt-v2-primary" style={{ background: 'var(--color-whatsapp)', color: 'var(--color-whatsapp-on)' }}>
+                <Send className="receipt-v2-button-icon" />
+                <span>Enviar no WhatsApp</span>
               </button>
             </div>
-
-            <div className="p-4 space-y-3 text-xs">
-              <div className="p-2.5 rounded-xl bg-whatsapp/10 border border-whatsapp/20 text-xs text-whatsapp flex items-center gap-2">
-                <Zap className="w-4 h-4 shrink-0" />
-                <span>Integração de Notificação WhatsApp via API Web/wa.me ativa. O cliente receberá a mensagem diretamente.</span>
-              </div>
-
-              <textarea
-                rows={4}
-                value={customWaMessage}
-                onChange={(e) => setCustomWaMessage(e.target.value)}
-                className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-whatsapp resize-none"
-              />
-
-              <div className="flex items-center justify-between pt-1">
-                <button
-                  onClick={handleCopyWaMessage}
-                  className="px-3 py-1.5 bg-surface-card text-content-base rounded-xl text-xs font-bold flex items-center gap-1"
-                >
-                  {copiedNotice ? <Check className="w-3.5 h-3.5 text-status-success" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedNotice ? 'Copiado!' : 'Copiar Texto'}</span>
-                </button>
-
-                <button
-                  onClick={handleSendWhatsAppDirect}
-                  className="px-4 py-1.5 bg-whatsapp text-whatsapp-on rounded-xl text-xs font-black flex items-center gap-1 shadow"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Enviar no WhatsApp</span>
-                </button>
-              </div>
-            </div>
+          }
+        >
+          <div className="receipt-v2-notice" style={{ borderColor: 'color-mix(in srgb, var(--color-whatsapp) 18%, transparent)', background: 'color-mix(in srgb, var(--color-whatsapp) 7%, transparent)' }}>
+            <Zap aria-hidden="true" style={{ color: 'var(--color-whatsapp)' }} />
+            <span>Integração via API Web/wa.me ativa. O cliente recebe a mensagem diretamente.</span>
           </div>
-        </div>
+
+          <label className="admin-modal-v2-field">
+            <span className="admin-modal-v2-field-label">Mensagem</span>
+            <textarea
+              rows={4}
+              value={customWaMessage}
+              onChange={(e) => setCustomWaMessage(e.target.value)}
+              className="w-full bg-surface-base border border-border-subtle rounded-xl p-3 text-sm text-content-base focus:outline-none focus:border-whatsapp resize-none mt-1.5"
+            />
+          </label>
+        </AdminModalV2>
       )}
     </div>
   );

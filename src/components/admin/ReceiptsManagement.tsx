@@ -6,12 +6,12 @@ import {
   CreditCard,
   RefreshCw,
   Search,
-  X,
 } from 'lucide-react';
 import { AdminPageHeader } from './shared/AdminPageHeader';
 import { AdminTabs } from './shared/AdminTabs';
 import { AdminListSkeleton } from './shared/AdminSkeleton';
 import { ReceiptCheckoutModal } from './ReceiptCheckoutModal';
+import { AdminModalV2 } from './shared/AdminModalV2';
 import {
   fetchReceiptsFromSupabase,
   type ReceiptItem,
@@ -287,18 +287,53 @@ const ReceiptDetailsModal: React.FC<{ receipt: ReceiptItem; onClose: () => void;
   const received = receipt.status === 'received';
   const pending = receipt.status === 'pending';
   return (
-    <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-5" role="dialog" aria-modal="true" aria-label="Detalhes do recebimento">
-      <div className="admin-modal w-full max-w-xl max-h-[92dvh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-surface-card border border-border-subtle shadow-2xl">
-        <div className="sticky top-0 p-4 sm:p-5 bg-surface-card border-b border-border-subtle flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-[11px] font-bold uppercase tracking-[0.15em] text-gold-base">Detalhes</p><h2 className="mt-1 text-lg font-serif font-bold text-content-base admin-clamp-2">{receipt.clientName}</h2></div><button type="button" onClick={onClose} aria-label="Fechar detalhes" className="w-10 h-10 rounded-xl flex items-center justify-center text-content-muted hover:text-content-base hover:bg-surface-base"><X className="w-5 h-5" /></button></div>
-        <div className="p-4 sm:p-5 space-y-4">
-          <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-sm text-content-muted admin-clamp-2">{receipt.serviceTitle}</p><p className="mt-1 text-xs text-content-muted admin-safe-wrap">{receipt.professionalName || 'Profissional não informado'}</p></div><StatusBadge status={receipt.status} /></div>
-          <div className="p-3.5 rounded-xl bg-surface-base border border-border-subtle space-y-2.5 text-sm"><AmountRow label="Valor original" value={money(receipt.originalAmount)} /><AmountRow label="Valor revisado" value={money(receipt.enteredAmount)} />{receipt.discountAmount > 0 && <AmountRow label={`Desconto${receipt.discountPercent ? ` (${receipt.discountPercent.toFixed(2)}%)` : ''}`} value={`- ${money(receipt.discountAmount)}`} tone="negative" />}{receipt.surchargeAmount > 0 && <AmountRow label={`Acréscimo${receipt.surchargePercent ? ` (${receipt.surchargePercent.toFixed(2)}%)` : ''}`} value={`+ ${money(receipt.surchargeAmount)}`} tone="positive" />}<div className="pt-2.5 border-t border-border-subtle"><AmountRow label="Valor total" value={money(receipt.totalAmount)} strong tone={received ? 'positive' : undefined} /></div></div>
-          {received && <div className="p-3.5 rounded-xl bg-status-success/5 border border-status-success/20 space-y-2 text-sm"><AmountRow label="Pagamento" value={paymentLabel[receipt.paymentMethod || 'other']} /><AmountRow label="Recebido" value={money(receipt.amountReceived)} />{receipt.paymentMethod === 'cash' && <AmountRow label="Troco" value={money(receipt.changeAmount)} tone="positive" />}<AmountRow label="Confirmado em" value={receipt.receivedAt ? new Date(receipt.receivedAt).toLocaleString('pt-BR') : '—'} /></div>}
-          {receipt.observations && <div className="p-3.5 rounded-xl bg-surface-base border border-border-subtle"><p className="text-[11px] font-bold uppercase tracking-wider text-content-muted">Observações</p><p className="mt-1 text-sm text-content-base whitespace-pre-wrap admin-safe-wrap">{receipt.observations}</p></div>}
-          <div className="pt-3 border-t border-border-subtle flex flex-col-reverse sm:flex-row sm:justify-end gap-2"><button type="button" onClick={onClose} className="h-11 px-5 rounded-xl border border-border-subtle text-content-muted hover:text-content-base text-sm font-bold">Fechar</button>{pending && <button type="button" onClick={onRegister} className="h-11 px-5 rounded-xl bg-gold-base text-content-on-accent text-sm font-bold flex items-center justify-center gap-2"><CreditCard className="w-4 h-4" />Registrar pagamento</button>}</div>
+    <AdminModalV2
+      icon={CreditCard}
+      eyebrow="Detalhes"
+      title={receipt.clientName}
+      subtitle={receipt.serviceTitle}
+      onClose={onClose}
+      size="md"
+      footer={
+        <div className="receipt-v2-actions">
+          <button type="button" onClick={onClose} className="receipt-v2-secondary">Fechar</button>
+          {pending && (
+            <button type="button" onClick={onRegister} className="receipt-v2-primary">
+              <CreditCard className="receipt-v2-button-icon" />Registrar pagamento
+            </button>
+          )}
         </div>
+      }
+    >
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <p className="text-xs text-content-muted admin-safe-wrap">{receipt.professionalName || 'Profissional não informado'}</p>
+        <StatusBadge status={receipt.status} />
       </div>
-    </div>
+
+      <div className="receipt-v2-review">
+        <AmountRow label="Valor original" value={money(receipt.originalAmount)} />
+        <AmountRow label="Valor revisado" value={money(receipt.enteredAmount)} />
+        {receipt.discountAmount > 0 && <AmountRow label={`Desconto${receipt.discountPercent ? ` (${receipt.discountPercent.toFixed(2)}%)` : ''}`} value={`− ${money(receipt.discountAmount)}`} tone="negative" />}
+        {receipt.surchargeAmount > 0 && <AmountRow label={`Acréscimo${receipt.surchargePercent ? ` (${receipt.surchargePercent.toFixed(2)}%)` : ''}`} value={`+ ${money(receipt.surchargeAmount)}`} tone="positive" />}
+        <div className="receipt-v2-review-total"><AmountRow label="Valor total" value={money(receipt.totalAmount)} strong tone={received ? 'positive' : undefined} /></div>
+      </div>
+
+      {received && (
+        <div className="receipt-v2-review">
+          <AmountRow label="Pagamento" value={paymentLabel[receipt.paymentMethod || 'other']} />
+          <AmountRow label="Recebido" value={money(receipt.amountReceived)} />
+          {receipt.paymentMethod === 'cash' && <AmountRow label="Troco" value={money(receipt.changeAmount)} tone="positive" />}
+          <AmountRow label="Confirmado em" value={receipt.receivedAt ? new Date(receipt.receivedAt).toLocaleString('pt-BR') : '—'} />
+        </div>
+      )}
+
+      {receipt.observations && (
+        <div className="receipt-v2-observations">
+          <span>Observações</span>
+          <p>{receipt.observations}</p>
+        </div>
+      )}
+    </AdminModalV2>
   );
 };
 

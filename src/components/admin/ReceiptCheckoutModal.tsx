@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { handleEnterAsTab } from '../../utils/formUtils';
 import { useDialogFocus } from '../../hooks/useDialogFocus';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import {
   createReceiptInSupabase,
   receiveReceiptInSupabase,
@@ -101,42 +102,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
   const dialogRef = useRef<HTMLDivElement>(null);
   useDialogFocus(true, dialogRef);
 
-  useEffect(() => {
-    const body = document.body;
-    const html = document.documentElement;
-    const adminMain = document.querySelector<HTMLElement>('.admin-shell main');
-    const previous = {
-      bodyOverflow: body.style.overflow,
-      bodyOverscroll: body.style.overscrollBehavior,
-      htmlOverflow: html.style.overflow,
-      htmlOverscroll: html.style.overscrollBehavior,
-      mainOverflow: adminMain?.style.overflow || '',
-      mainOverscroll: adminMain?.style.overscrollBehavior || '',
-      mainTouchAction: adminMain?.style.touchAction || '',
-    };
-
-    body.style.overflow = 'hidden';
-    body.style.overscrollBehavior = 'none';
-    html.style.overflow = 'hidden';
-    html.style.overscrollBehavior = 'none';
-    if (adminMain) {
-      adminMain.style.overflow = 'hidden';
-      adminMain.style.overscrollBehavior = 'none';
-      adminMain.style.touchAction = 'none';
-    }
-
-    return () => {
-      body.style.overflow = previous.bodyOverflow;
-      body.style.overscrollBehavior = previous.bodyOverscroll;
-      html.style.overflow = previous.htmlOverflow;
-      html.style.overscrollBehavior = previous.htmlOverscroll;
-      if (adminMain) {
-        adminMain.style.overflow = previous.mainOverflow;
-        adminMain.style.overscrollBehavior = previous.mainOverscroll;
-        adminMain.style.touchAction = previous.mainTouchAction;
-      }
-    };
-  }, []);
+  useModalScrollLock(true);
 
   const calculation = useMemo(() => {
     const entered = Math.max(0, Number(initialReceipt?.enteredAmount ?? originalAmount));

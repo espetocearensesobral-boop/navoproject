@@ -2788,6 +2788,271 @@ button, a, input, select, textarea {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Admin modal v2: generic dialog shell shared by every admin modal   */
+/* (WhatsApp, novo encaixe, seleção de serviço, detalhes de recebimento). */
+/* Same visual language as receipt-v2, generalized so it isn't tied to    */
+/* the checkout flow. Content-level classes (buttons, notice, review rows) */
+/* are reused as-is via .receipt-v2-* inside children — only the dialog   */
+/* shell itself is duplicated here since widths/sizes differ per modal.   */
+/* ------------------------------------------------------------------ */
+.admin-modal-v2-overlay,
+.admin-modal-v2-overlay * {
+  box-sizing: border-box;
+}
+
+.admin-modal-v2-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.admin-modal-v2-dialog {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-height: 90dvh;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 16px;
+  background: var(--color-surface-card);
+  color: var(--color-content-base);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  isolation: isolate;
+}
+
+.admin-modal-v2-dialog--sm { max-width: 420px; }
+.admin-modal-v2-dialog--md { max-width: 560px; }
+.admin-modal-v2-dialog--lg { max-width: 720px; }
+
+.admin-modal-v2-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 24px 20px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.admin-modal-v2-title-group {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-modal-v2-header-icon {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-surface-base);
+  color: var(--color-content-muted);
+}
+
+.admin-modal-v2-header-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.admin-modal-v2-header-icon--gold {
+  background: color-mix(in srgb, var(--color-gold-base) 12%, transparent);
+  color: var(--color-gold-hover);
+}
+
+.admin-modal-v2-header-icon--whatsapp {
+  background: color-mix(in srgb, var(--color-whatsapp) 12%, transparent);
+  color: var(--color-whatsapp);
+}
+
+.admin-modal-v2-title-copy {
+  min-width: 0;
+}
+
+.admin-modal-v2-label {
+  display: block;
+  color: var(--color-content-muted);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.admin-modal-v2-title {
+  margin: 2px 0 0;
+  overflow: hidden;
+  color: var(--color-content-base);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-modal-v2-subtitle {
+  margin: 2px 0 0;
+  overflow: hidden;
+  color: var(--color-content-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-modal-v2-close {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-content-muted);
+}
+
+.admin-modal-v2-close:hover {
+  background: var(--color-surface-base);
+  color: var(--color-content-base);
+}
+
+.admin-modal-v2-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.admin-modal-v2-scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 20px 24px;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.admin-modal-v2-footer {
+  flex: 0 0 auto;
+  padding: 16px 24px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+@media (max-width: 639px) {
+  .admin-modal-v2-overlay {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .admin-modal-v2-dialog {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - 8px);
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .admin-modal-v2-header {
+    padding: 20px 20px 16px;
+  }
+
+  .admin-modal-v2-scroll {
+    padding: 16px 20px;
+    max-height: calc(100dvh - 150px);
+  }
+
+  .admin-modal-v2-footer {
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+  }
+}
+
+.admin-modal-v2-form-grid {
+  display: grid;
+  gap: 18px;
+}
+
+@media (min-width: 640px) {
+  .admin-modal-v2-form-grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.admin-modal-v2-field {
+  display: block;
+  min-width: 0;
+}
+
+.admin-modal-v2-field-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-content-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.admin-modal-v2-input,
+.admin-modal-v2-select,
+.admin-modal-v2-picker {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: var(--color-content-base);
+  font-family: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-modal-v2-input {
+  cursor: text;
+}
+
+.admin-modal-v2-input:focus,
+.admin-modal-v2-select:focus,
+.admin-modal-v2-picker:focus {
+  border-bottom-color: var(--color-content-base);
+}
+
+.admin-modal-v2-input::placeholder {
+  color: var(--color-content-muted);
+}
+
+.admin-modal-v2-picker-placeholder {
+  color: var(--color-content-muted);
+}
+
+.admin-modal-v2-picker-price {
+  flex: 0 0 auto;
+  color: var(--color-status-success);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 
 /* Lock background scrolling while Receipt Checkout v2 is open. */
 .receipt-v2-overlay {
