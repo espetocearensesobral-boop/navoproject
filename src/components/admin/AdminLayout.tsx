@@ -319,32 +319,48 @@ export const AdminLayout: React.FC = () => {
     { id: 'queue' as AdminTab, label: 'Espera', icon: Clock },
   ];
 
+  // Agrupamento puramente visual da navegação: reduz uma lista plana de 12 itens
+  // a 4 blocos com propósito claro. Não altera AdminTab, rotas ou persistência de aba.
+  const navGroups: { label: string; tabs: AdminTab[] }[] = [
+    { label: 'Operação', tabs: ['dashboard', 'agenda', 'queue'] },
+    { label: 'Financeiro', tabs: ['financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas'] },
+    { label: 'Gestão', tabs: ['relatorios', 'campanhas', 'clientes', 'catalogo', 'relacionamento'] },
+    { label: 'Configuração', tabs: ['sistema'] },
+  ];
+
   const renderSidebarNavigation = (mobile = false) => (
     <nav
       data-admin-sidebar-navigation={mobile ? 'mobile' : 'desktop'}
       className={mobile ? 'flex-1 px-3 py-4 overflow-y-auto custom-scrollbar' : 'flex-1 px-2 py-4 overflow-y-auto no-scrollbar'}
     >
-      <div className="admin-sidebar-items space-y-0.5">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => handleSidebarTabChange(item.id, mobile)}
-              data-admin-sidebar-item={item.id}
-              title={item.description}
-              className={`admin-sidebar-item w-full ${mobile ? 'min-h-11 px-3 rounded-lg text-sm gap-3' : 'min-h-9 px-2 rounded-md text-xs gap-2'} font-medium flex items-center transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active' : ''}`}
-              aria-current={isActive ? 'page' : undefined}
-            >
-              <Icon className={`${mobile ? 'w-[18px] h-[18px]' : 'w-4 h-4'} shrink-0`} />
-              <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
-              {isActive && <ChevronRight className="admin-sidebar-item-chevron w-3 h-3 shrink-0" />}
-            </button>
-          );
-        })}
-      </div>
+      {navGroups.map((group, groupIndex) => (
+        <div key={group.label} className={groupIndex > 0 ? 'mt-4' : ''}>
+          <p className={`px-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-content-muted/70 ${mobile ? 'px-3' : ''}`}>
+            {group.label}
+          </p>
+          <div className="admin-sidebar-items space-y-0.5">
+            {navItems.filter((item) => group.tabs.includes(item.id)).map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleSidebarTabChange(item.id, mobile)}
+                  data-admin-sidebar-item={item.id}
+                  title={item.description}
+                  className={`admin-sidebar-item w-full ${mobile ? 'min-h-11 px-3 rounded-lg text-sm gap-3' : 'min-h-9 px-2 rounded-md text-xs gap-2'} font-medium flex items-center transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active' : ''}`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  <Icon className={`${mobile ? 'w-[18px] h-[18px]' : 'w-4 h-4'} shrink-0`} />
+                  <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
+                  {isActive && <ChevronRight className="admin-sidebar-item-chevron w-3 h-3 shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </nav>
   );
 

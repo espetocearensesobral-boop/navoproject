@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Clock } from 'lucide-react';
+import { ArrowRight, Clock, LucideIcon } from 'lucide-react';
 import { Appointment } from '../../../types';
 import { AdminSkeleton } from './AdminSkeleton';
 import { AdminEmptyState } from './AdminEmptyState';
@@ -8,6 +8,13 @@ interface AdminAppointmentFeedProps {
   appointments: Appointment[];
   onNavigateToAgenda: () => void;
   loading?: boolean;
+  /** Permite reaproveitar o feed em contextos diferentes (ex: histórico) sem repetir o texto padrão. */
+  emptyIcon?: LucideIcon;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  emptyActionLabel?: string;
+  /** Quando false, oculta o CTA do estado vazio (ex: dentro de uma seção de histórico já colapsável). */
+  showEmptyAction?: boolean;
 }
 
 const statusLabel: Record<string, string> = {
@@ -32,7 +39,16 @@ const statusClass: Record<string, string> = {
   no_show: 'text-status-error',
 };
 
-export const AdminAppointmentFeed: React.FC<AdminAppointmentFeedProps> = ({ appointments, onNavigateToAgenda, loading = false }) => (
+export const AdminAppointmentFeed: React.FC<AdminAppointmentFeedProps> = ({
+  appointments,
+  onNavigateToAgenda,
+  loading = false,
+  emptyIcon: EmptyIcon = Clock,
+  emptyTitle = 'Nenhum agendamento hoje',
+  emptyDescription = 'A agenda está livre por enquanto.',
+  emptyActionLabel = 'Abrir agenda',
+  showEmptyAction = true,
+}) => (
   <div className="divide-y divide-border-subtle">
     {loading ? (
       <div className="space-y-3 px-4 py-5" aria-label="Carregando atendimentos" aria-busy="true">
@@ -49,11 +65,11 @@ export const AdminAppointmentFeed: React.FC<AdminAppointmentFeedProps> = ({ appo
       </div>
     ) : appointments.length === 0 ? (
       <AdminEmptyState
-        icon={Clock}
-        title="Nenhum agendamento hoje"
-        description="A agenda está livre por enquanto."
-        actionLabel="Abrir agenda"
-        onAction={onNavigateToAgenda}
+        icon={EmptyIcon}
+        title={emptyTitle}
+        description={emptyDescription}
+        actionLabel={showEmptyAction ? emptyActionLabel : undefined}
+        onAction={showEmptyAction ? onNavigateToAgenda : undefined}
       />
     ) : appointments.map((appointment) => {
       const serviceName = Array.isArray(appointment.services) && appointment.services.length > 0
