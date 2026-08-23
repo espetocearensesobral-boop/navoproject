@@ -1,5 +1,5 @@
-import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import React from "react";
+import { LucideIcon } from "lucide-react";
 
 /**
  * Padrão único de abas (navegação secundária) para todas as telas do /admin.
@@ -33,9 +33,16 @@ interface AdminTabsProps {
   className?: string;
 }
 
-export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, className = '' }) => {
+export const AdminTabs: React.FC<AdminTabsProps> = ({
+  tabs,
+  activeId,
+  onChange,
+  className = "",
+}) => {
   return (
-    <div className={`admin-tabs flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 ${className}`}>
+    <div
+      className={`admin-tabs flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 ${className}`}
+    >
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeId === tab.id;
@@ -46,22 +53,24 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({ tabs, activeId, onChange, 
             onClick={() => !tab.disabled && onChange(tab.id)}
             disabled={tab.disabled}
             aria-disabled={tab.disabled || undefined}
-            aria-current={isActive ? 'page' : undefined}
+            aria-current={isActive ? "page" : undefined}
             title={tab.label}
             className={`shrink-0 min-h-10 sm:min-h-9 min-w-0 px-3 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-[0.98] ${
               tab.disabled
-                ? 'bg-surface-base/60 text-content-muted/50 border border-border-subtle/60 cursor-not-allowed'
+                ? "bg-[var(--admin-bg)]/60 text-[var(--admin-text-muted)]/50 border border-[var(--admin-border)]/60 cursor-not-allowed"
                 : isActive
-                  ? 'bg-gold-base text-content-on-accent'
-                  : 'bg-surface-card text-content-muted border border-border-subtle hover:text-content-base'
+                  ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                  : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"
             }`}
           >
             {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
             <span className="admin-button-label">{tab.label}</span>
-            {typeof tab.count === 'number' && (
+            {typeof tab.count === "number" && (
               <span
                 className={`min-w-5 h-5 px-1 rounded-full text-[10px] flex items-center justify-center font-extrabold shrink-0 ${
-                  isActive ? 'bg-surface-base/25 text-surface-base' : 'bg-gold-base/10 text-gold-base'
+                  isActive
+                    ? "bg-[var(--admin-bg)]/25 text-surface-base"
+                    : "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]"
                 }`}
               >
                 {tab.count}

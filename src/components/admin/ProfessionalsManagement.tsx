@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Professional } from '../../types';
-import { fetchProfessionalsFromSupabase, saveProfessionalInSupabase, deleteProfessionalInSupabase } from '../../services/supabaseDataService';
-import { AdminPageHeader } from './shared/AdminPageHeader';
-import { Button } from '../ui/Button';
-import { AdminLabel } from '../ui/AdminLabel';
-import { handleEnterAsTab } from '../../utils/formUtils';
+import React, { useState, useEffect } from "react";
+import { Professional } from "../../types";
+import {
+  fetchProfessionalsFromSupabase,
+  saveProfessionalInSupabase,
+  deleteProfessionalInSupabase,
+} from "../../services/supabaseDataService";
+import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { Button } from "../ui/Button";
+import { AdminLabel } from "../ui/AdminLabel";
+import { handleEnterAsTab } from "../../utils/formUtils";
 import {
   Users,
   Plus,
@@ -30,90 +34,97 @@ import {
   Scissors,
   Check,
   UserCheck,
-  MessageCircle
-} from 'lucide-react';
+  MessageCircle,
+} from "lucide-react";
 
 // Preset avatar photos for quick professional selection
 const PRESET_BARBER_AVATARS = [
   {
-    name: 'Carlos - Master Fade',
-    role: 'Master Barber',
-    url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=75&w=300'
+    name: "Carlos - Master Fade",
+    role: "Master Barber",
+    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=75&w=300",
   },
   {
-    name: 'Matheus - Groomer Visagista',
-    role: 'Visagista',
-    url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=75&w=300'
+    name: "Matheus - Groomer Visagista",
+    role: "Visagista",
+    url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=75&w=300",
   },
   {
-    name: 'Lucas - Freestyle & Arte',
-    role: 'Especialista Freestyle',
-    url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=75&w=300'
+    name: "Lucas - Freestyle & Arte",
+    role: "Especialista Freestyle",
+    url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=75&w=300",
   },
   {
-    name: 'Rafael - Barba & Toalha Quente',
-    role: 'Barbeiro Sênior',
-    url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=75&w=300'
+    name: "Rafael - Barba & Toalha Quente",
+    role: "Barbeiro Sênior",
+    url: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=75&w=300",
   },
   {
-    name: 'Gabriel - Química & Platino',
-    role: 'Colorista Masculino',
-    url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=75&w=300'
+    name: "Gabriel - Química & Platino",
+    role: "Colorista Masculino",
+    url: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=75&w=300",
   },
   {
-    name: 'Bruno - Corte Clássico',
-    role: 'Barbeiro Tradicional',
-    url: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&q=75&w=300'
-  }
+    name: "Bruno - Corte Clássico",
+    role: "Barbeiro Tradicional",
+    url: "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&q=75&w=300",
+  },
 ];
 
 const SUGGESTED_SPECIALTIES = [
-  'Degradê / Fade',
-  'Skin Fade Navalhado',
-  'Barboterapia Imperial',
-  'Freestyle Hair Art',
-  'Visagismo Masculino',
-  'Nevou / Platino Global',
-  'Pigmentação de Barba',
-  'Corte Infantil Estilizado',
-  'Tratamento Anti-Queda',
-  'Alinhamento com Toalha Quente'
+  "Degradê / Fade",
+  "Skin Fade Navalhado",
+  "Barboterapia Imperial",
+  "Freestyle Hair Art",
+  "Visagismo Masculino",
+  "Nevou / Platino Global",
+  "Pigmentação de Barba",
+  "Corte Infantil Estilizado",
+  "Tratamento Anti-Queda",
+  "Alinhamento com Toalha Quente",
 ];
 
 export const ProfessionalsManagement: React.FC = () => {
   const [barbers, setBarbers] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [viewMode, setViewMode] = useState<'list' | 'table'>('list');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "inactive"
+  >("all");
+  const [viewMode, setViewMode] = useState<"list" | "table">("list");
   const [expandedBarberId, setExpandedBarberId] = useState<string | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeFormTab, setActiveFormTab] = useState<'profile' | 'specialties' | 'commission' | 'schedule'>('profile');
+  const [activeFormTab, setActiveFormTab] = useState<
+    "profile" | "specialties" | "commission" | "schedule"
+  >("profile");
   const [editingBarber, setEditingBarber] = useState<Professional | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState<Partial<Professional>>({
-    name: '',
-    nickname: '',
-    role: 'Master Barber',
+    name: "",
+    nickname: "",
+    role: "Master Barber",
     commission_rate: 0.45,
-    photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=75&w=250',
-    specialties: ['Degradê / Fade', 'Barboterapia Imperial'],
+    photo_url:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=75&w=250",
+    specialties: ["Degradê / Fade", "Barboterapia Imperial"],
     working_hours: {
-      days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-      start: '08:00',
-      end: '19:00',
-      lunch_break: { start: '12:00', end: '13:00' }
+      days: ["mon", "tue", "wed", "thu", "fri", "sat"],
+      start: "08:00",
+      end: "19:00",
+      lunch_break: { start: "12:00", end: "13:00" },
     },
     is_active: true,
-    bio: '',
-    phone: '',
-    pix_key: ''
+    bio: "",
+    phone: "",
+    pix_key: "",
   });
 
-  const [specialtiesText, setSpecialtiesText] = useState('Degradê / Fade, Barboterapia Imperial');
+  const [specialtiesText, setSpecialtiesText] = useState(
+    "Degradê / Fade, Barboterapia Imperial",
+  );
 
   useEffect(() => {
     loadBarbers();
@@ -123,7 +134,7 @@ export const ProfessionalsManagement: React.FC = () => {
     setLoading(true);
     const data = await fetchProfessionalsFromSupabase();
     // Exclude prof_any for staff management view
-    setBarbers(data.filter((b) => b.id !== 'prof_any'));
+    setBarbers(data.filter((b) => b.id !== "prof_any"));
     setLoading(false);
   };
 
@@ -135,42 +146,44 @@ export const ProfessionalsManagement: React.FC = () => {
   const handleOpenCreate = () => {
     setEditingBarber(null);
     setFormData({
-      name: '',
-      nickname: '',
-      role: 'Master Barber',
+      name: "",
+      nickname: "",
+      role: "Master Barber",
       commission_rate: 0.45,
-      photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=75&w=250',
-      specialties: ['Degradê / Fade', 'Barboterapia Imperial'],
+      photo_url:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=75&w=250",
+      specialties: ["Degradê / Fade", "Barboterapia Imperial"],
       working_hours: {
-        days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-        start: '08:00',
-        end: '19:00',
-        lunch_break: { start: '12:00', end: '13:00' }
+        days: ["mon", "tue", "wed", "thu", "fri", "sat"],
+        start: "08:00",
+        end: "19:00",
+        lunch_break: { start: "12:00", end: "13:00" },
       },
       is_active: true,
-      bio: 'Especialista em cortes modernos e alinhamento de barba de alta precisão.',
-      phone: '(11) 99887-6655',
-      pix_key: 'carlos.silva@pix.com'
+      bio: "Especialista em cortes modernos e alinhamento de barba de alta precisão.",
+      phone: "(11) 99887-6655",
+      pix_key: "carlos.silva@pix.com",
     });
-    setSpecialtiesText('Degradê / Fade, Barboterapia Imperial');
-    setActiveFormTab('profile');
+    setSpecialtiesText("Degradê / Fade, Barboterapia Imperial");
+    setActiveFormTab("profile");
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (barber: Professional) => {
     setEditingBarber(barber);
     setFormData({ ...barber });
-    setSpecialtiesText(barber.specialties ? barber.specialties.join(', ') : '');
-    setActiveFormTab('profile');
+    setSpecialtiesText(barber.specialties ? barber.specialties.join(", ") : "");
+    setActiveFormTab("profile");
     setIsModalOpen(true);
   };
 
-
   const handleDelete = async (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir este barbeiro da equipe?')) {
+    if (
+      window.confirm("Tem certeza que deseja excluir este barbeiro da equipe?")
+    ) {
       const updated = await deleteProfessionalInSupabase(id);
-      setBarbers(updated.filter((b) => b.id !== 'prof_any'));
-      showToast('Profissional removido com sucesso!');
+      setBarbers(updated.filter((b) => b.id !== "prof_any"));
+      showToast("Profissional removido com sucesso!");
     }
   };
 
@@ -178,56 +191,76 @@ export const ProfessionalsManagement: React.FC = () => {
     const updatedStatus = !(barber.is_active ?? true);
     const updatedBarber: Professional = {
       ...barber,
-      is_active: updatedStatus
+      is_active: updatedStatus,
     };
 
     const updatedList = await saveProfessionalInSupabase(updatedBarber, true);
-    setBarbers(updatedList.filter((b) => b.id !== 'prof_any'));
-    showToast(updatedStatus ? `${barber.name} ativado na agenda!` : `${barber.name} pausado temporariamente.`);
+    setBarbers(updatedList.filter((b) => b.id !== "prof_any"));
+    showToast(
+      updatedStatus
+        ? `${barber.name} ativado na agenda!`
+        : `${barber.name} pausado temporariamente.`,
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name) {
-      alert('Por favor, informe o nome do profissional.');
+      alert("Por favor, informe o nome do profissional.");
       return;
     }
 
-    const specs = specialtiesText.split(',').map((s) => s.trim()).filter(Boolean);
+    const specs = specialtiesText
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
 
     const itemToSave: Professional = {
       id: editingBarber?.id || `prof_${Date.now()}`,
-      name: formData.name || '',
-      nickname: formData.nickname || formData.name || '',
-      role: formData.role || 'Barbeiro Sênior',
+      name: formData.name || "",
+      nickname: formData.nickname || formData.name || "",
+      role: formData.role || "Barbeiro Sênior",
       rating: editingBarber?.rating || 5.0,
       reviews_count: editingBarber?.reviews_count || 12,
-      photo_url: formData.photo_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=75&w=250',
-      specialties: specs.length > 0 ? specs : ['Degradê / Fade', 'Barba Imperial'],
+      photo_url:
+        formData.photo_url ||
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=75&w=250",
+      specialties:
+        specs.length > 0 ? specs : ["Degradê / Fade", "Barba Imperial"],
       commission_rate: Number(formData.commission_rate || 0.45),
       working_hours: formData.working_hours || {
-        days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-        start: '08:00',
-        end: '19:00',
-        lunch_break: { start: '12:00', end: '13:00' }
+        days: ["mon", "tue", "wed", "thu", "fri", "sat"],
+        start: "08:00",
+        end: "19:00",
+        lunch_break: { start: "12:00", end: "13:00" },
       },
       is_active: formData.is_active ?? true,
-      bio: formData.bio || '',
-      phone: formData.phone || '',
-      pix_key: formData.pix_key || ''
+      bio: formData.bio || "",
+      phone: formData.phone || "",
+      pix_key: formData.pix_key || "",
     };
 
-    const updatedList = await saveProfessionalInSupabase(itemToSave, Boolean(editingBarber));
-    setBarbers(updatedList.filter((b) => b.id !== 'prof_any'));
+    const updatedList = await saveProfessionalInSupabase(
+      itemToSave,
+      Boolean(editingBarber),
+    );
+    setBarbers(updatedList.filter((b) => b.id !== "prof_any"));
     setIsModalOpen(false);
-    showToast(editingBarber ? 'Cadastro do profissional atualizado!' : 'Novo profissional cadastrado!');
+    showToast(
+      editingBarber
+        ? "Cadastro do profissional atualizado!"
+        : "Novo profissional cadastrado!",
+    );
   };
 
   const handleAddSpecialtyTag = (tag: string) => {
-    const currentSpecs = specialtiesText.split(',').map((s) => s.trim()).filter(Boolean);
+    const currentSpecs = specialtiesText
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     if (!currentSpecs.includes(tag)) {
       currentSpecs.push(tag);
-      setSpecialtiesText(currentSpecs.join(', '));
+      setSpecialtiesText(currentSpecs.join(", "));
     }
   };
 
@@ -240,42 +273,59 @@ export const ProfessionalsManagement: React.FC = () => {
     setFormData({
       ...formData,
       working_hours: {
-        ...(formData.working_hours || { start: '08:00', end: '19:00' }),
-        days: newDays
-      }
+        ...(formData.working_hours || { start: "08:00", end: "19:00" }),
+        days: newDays,
+      },
     });
   };
 
   const dayLabels: { [key: string]: string } = {
-    mon: 'Seg',
-    tue: 'Ter',
-    wed: 'Qua',
-    thu: 'Qui',
-    fri: 'Sex',
-    sat: 'Sáb',
-    sun: 'Dom'
+    mon: "Seg",
+    tue: "Ter",
+    wed: "Qua",
+    thu: "Qui",
+    fri: "Sex",
+    sat: "Sáb",
+    sun: "Dom",
   };
 
   // Filtered list
   const filteredBarbers = barbers.filter((b) => {
     const matchesSearch =
       b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (b.nickname && b.nickname.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (b.nickname &&
+        b.nickname.toLowerCase().includes(searchQuery.toLowerCase())) ||
       b.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (b.specialties && b.specialties.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase())));
+      (b.specialties &&
+        b.specialties.some((s) =>
+          s.toLowerCase().includes(searchQuery.toLowerCase()),
+        ));
 
     let matchesStatus = true;
-    if (statusFilter === 'active') matchesStatus = b.is_active ?? true;
-    if (statusFilter === 'inactive') matchesStatus = (b.is_active ?? true) === false;
+    if (statusFilter === "active") matchesStatus = b.is_active ?? true;
+    if (statusFilter === "inactive")
+      matchesStatus = (b.is_active ?? true) === false;
 
     return matchesSearch && matchesStatus;
   });
 
   // Stats calculation
   const totalBarbers = barbers.length;
-  const activeBarbers = barbers.filter((b) => (b.is_active ?? true)).length;
-  const avgRating = totalBarbers > 0 ? (barbers.reduce((acc, b) => acc + (b.rating || 5.0), 0) / totalBarbers).toFixed(1) : '5.0';
-  const avgCommission = totalBarbers > 0 ? Math.round((barbers.reduce((acc, b) => acc + (b.commission_rate || 0.45), 0) / totalBarbers) * 100) : 45;
+  const activeBarbers = barbers.filter((b) => b.is_active ?? true).length;
+  const avgRating =
+    totalBarbers > 0
+      ? (
+          barbers.reduce((acc, b) => acc + (b.rating || 5.0), 0) / totalBarbers
+        ).toFixed(1)
+      : "5.0";
+  const avgCommission =
+    totalBarbers > 0
+      ? Math.round(
+          (barbers.reduce((acc, b) => acc + (b.commission_rate || 0.45), 0) /
+            totalBarbers) *
+            100,
+        )
+      : 45;
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
@@ -283,8 +333,12 @@ export const ProfessionalsManagement: React.FC = () => {
       <AdminPageHeader
         icon={Users}
         title="Equipe"
-        stats={[{ label: 'ativos', value: activeBarbers, tone: 'gold' }]}
-        action={{ label: 'Novo barbeiro', onClick: handleOpenCreate, icon: Plus }}
+        stats={[{ label: "ativos", value: activeBarbers, tone: "gold" }]}
+        action={{
+          label: "Novo barbeiro",
+          onClick: handleOpenCreate,
+          icon: Plus,
+        }}
       />
 
       {/* TOAST MESSAGE */}
@@ -297,48 +351,72 @@ export const ProfessionalsManagement: React.FC = () => {
 
       {/* COMPACT KPI CARDS */}
       <div className="hidden md:grid grid-cols-2 md:grid-cols-4 gap-2.5">
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider">Total Equipe</span>
-            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Total Equipe
+            </span>
+            <div className="w-6 h-6 rounded-lg bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center">
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-mono num-tabular text-content-base font-semibold">{totalBarbers}</p>
-          <p className="text-xs text-content-muted mt-1 font-medium truncate">Profissionais cadastrados</p>
+          <p className="text-lg font-mono num-tabular text-[var(--admin-text-main)] font-semibold">
+            {totalBarbers}
+          </p>
+          <p className="text-xs text-[var(--admin-text-muted)] mt-1 font-medium truncate">
+            Profissionais cadastrados
+          </p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider">Ativos na Agenda</span>
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Ativos na Agenda
+            </span>
             <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center">
               <UserCheck className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-mono num-tabular font-bold text-status-success">{activeBarbers}</p>
-          <p className="text-xs text-content-muted mt-1 font-medium truncate">Cadeiras disponíveis</p>
+          <p className="text-lg font-mono num-tabular font-bold text-status-success">
+            {activeBarbers}
+          </p>
+          <p className="text-xs text-[var(--admin-text-muted)] mt-1 font-medium truncate">
+            Cadeiras disponíveis
+          </p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider">Média Avaliação</span>
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Média Avaliação
+            </span>
             <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
               <Star className="w-3.5 h-3.5 fill-amber-400" />
             </div>
           </div>
-          <p className="text-lg font-mono num-tabular font-bold text-amber-400">{avgRating} / 5</p>
-          <p className="text-xs text-content-muted mt-1 font-medium truncate">Sua equipe em destaque</p>
+          <p className="text-lg font-mono num-tabular font-bold text-amber-400">
+            {avgRating} / 5
+          </p>
+          <p className="text-xs text-[var(--admin-text-muted)] mt-1 font-medium truncate">
+            Sua equipe em destaque
+          </p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-content-muted mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider">Comissão Média</span>
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+          <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Comissão Média
+            </span>
             <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-lg font-mono num-tabular text-content-base font-semibold">{avgCommission}%</p>
-          <p className="text-xs text-content-muted mt-1 font-medium truncate">Por serviço prestado</p>
+          <p className="text-lg font-mono num-tabular text-[var(--admin-text-main)] font-semibold">
+            {avgCommission}%
+          </p>
+          <p className="text-xs text-[var(--admin-text-muted)] mt-1 font-medium truncate">
+            Por serviço prestado
+          </p>
         </div>
       </div>
 
@@ -349,91 +427,119 @@ export const ProfessionalsManagement: React.FC = () => {
           onClick={handleOpenCreate}
           title="Novo profissional"
           aria-label="Novo profissional"
-          className="w-full h-10 rounded-xl bg-gold-base text-content-on-accent font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
+          className="w-full h-10 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
         >
           <Plus className="w-4 h-4" />
           <span>Novo barbeiro</span>
         </button>
-        <div className="bg-surface-card p-3 rounded-2xl border border-border-subtle">
+        <div className="bg-[var(--admin-surface)] p-3 rounded-2xl border border-[var(--admin-border)]">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar profissional..."
-              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-10 pr-3 py-2.5 text-sm text-content-base focus:outline-none focus:border-gold-base"
+              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-3 py-2.5 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
             />
           </div>
         </div>
-        <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          <button type="button" onClick={() => setStatusFilter('all')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'all' ? 'bg-gold-base text-content-on-accent' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Todos ({totalBarbers})</button>
-          <button type="button" onClick={() => setStatusFilter('active')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'active' ? 'bg-status-success text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Ativos ({activeBarbers})</button>
-          <button type="button" onClick={() => setStatusFilter('inactive')} className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === 'inactive' ? 'bg-red-500 text-white' : 'bg-surface-card text-content-muted border border-border-subtle'}`}>Pausados ({totalBarbers - activeBarbers})</button>
+        <div
+          data-gesture-scroll="horizontal"
+          className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+        >
+          <button
+            type="button"
+            onClick={() => setStatusFilter("all")}
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === "all" ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+          >
+            Todos ({totalBarbers})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("active")}
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === "active" ? "bg-status-success text-white" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+          >
+            Ativos ({activeBarbers})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter("inactive")}
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === "inactive" ? "bg-red-500 text-white" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+          >
+            Pausados ({totalBarbers - activeBarbers})
+          </button>
         </div>
       </div>
 
       {/* DESKTOP SEARCH AND FILTERS */}
-      <div className="hidden md:flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
+      <div className="hidden md:flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-[var(--admin-surface)] p-2.5 rounded-xl border border-[var(--admin-border)]">
         <div className="relative flex-1">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nome, apelido, cargo ou especialidade..."
-            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
           />
         </div>
 
-          <div className="flex items-center gap-2 justify-between sm:justify-end min-w-0">
-            <div data-gesture-scroll="horizontal" className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar min-w-0">
+        <div className="flex items-center gap-2 justify-between sm:justify-end min-w-0">
+          <div
+            data-gesture-scroll="horizontal"
+            className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar min-w-0"
+          >
             <button
-              onClick={() => setStatusFilter('all')}
+              onClick={() => setStatusFilter("all")}
               className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
-                statusFilter === 'all'
-                  ? 'bg-gold-base text-content-on-accent'
-                  : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
+                statusFilter === "all"
+                  ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                  : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
               }`}
             >
               Todos ({totalBarbers})
             </button>
             <button
-              onClick={() => setStatusFilter('active')}
+              onClick={() => setStatusFilter("active")}
               className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
-                statusFilter === 'active'
-                  ? 'bg-gold-base text-content-on-accent'
-                  : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
+                statusFilter === "active"
+                  ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                  : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
               }`}
             >
               Ativos ({activeBarbers})
             </button>
             <button
-              onClick={() => setStatusFilter('inactive')}
+              onClick={() => setStatusFilter("inactive")}
               className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
-                statusFilter === 'inactive'
-                  ? 'bg-gold-base text-content-on-accent'
-                  : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
+                statusFilter === "inactive"
+                  ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                  : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
               }`}
             >
               Pausados ({totalBarbers - activeBarbers})
             </button>
           </div>
 
-          <div className="flex items-center bg-surface-card p-0.5 rounded-lg border border-border-subtle shrink-0">
+          <div className="flex items-center bg-[var(--admin-surface)] p-0.5 rounded-lg border border-[var(--admin-border)] shrink-0">
             <button
-              onClick={() => setViewMode('list')}
+              onClick={() => setViewMode("list")}
               className={`min-h-9 px-2 rounded-lg text-xs transition-colors ${
-                viewMode === 'list' ? 'bg-gold-base/15 text-gold-hover' : 'text-content-muted'
+                viewMode === "list"
+                  ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
+                  : "text-[var(--admin-text-muted)]"
               }`}
               title="Lista"
             >
               <List className="w-4 h-4" />
             </button>
             <button
-              onClick={() => setViewMode('table')}
+              onClick={() => setViewMode("table")}
               className={`min-h-9 px-2 rounded-lg text-xs transition-colors ${
-                viewMode === 'table' ? 'bg-gold-base/15 text-gold-hover' : 'text-content-muted'
+                viewMode === "table"
+                  ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
+                  : "text-[var(--admin-text-muted)]"
               }`}
               title="Tabela"
             >
@@ -444,94 +550,189 @@ export const ProfessionalsManagement: React.FC = () => {
       </div>
 
       {/* CARDS VIEW */}
-      {viewMode === 'list' ? (
+      {viewMode === "list" ? (
         <div className="space-y-2">
           {loading ? (
-            <div className="py-8 text-center text-sm text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
+            <div className="py-8 text-center text-sm text-[var(--admin-text-muted)] bg-[var(--admin-surface)] rounded-2xl border border-[var(--admin-border)]">
               Carregando barbeiros...
             </div>
           ) : filteredBarbers.length === 0 ? (
-            <div className="py-8 text-center text-sm text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
+            <div className="py-8 text-center text-sm text-[var(--admin-text-muted)] bg-[var(--admin-surface)] rounded-2xl border border-[var(--admin-border)]">
               Nenhum profissional encontrado.
             </div>
           ) : (
             filteredBarbers.map((barber) => {
               const isActive = barber.is_active ?? true;
               const isExpanded = expandedBarberId === barber.id;
-              const commissionPercent = Math.round((barber.commission_rate || 0.45) * 100);
+              const commissionPercent = Math.round(
+                (barber.commission_rate || 0.45) * 100,
+              );
 
               return (
                 <article
                   key={barber.id}
-                  className={`overflow-hidden rounded-2xl border bg-surface-card transition-colors ${
-                    isExpanded ? 'border-gold-base/50' : isActive ? 'border-border-subtle' : 'border-red-500/25 opacity-75'
+                  className={`overflow-hidden rounded-2xl border bg-[var(--admin-surface)] transition-colors ${
+                    isExpanded
+                      ? "border-[var(--admin-accent)]/50"
+                      : isActive
+                        ? "border-[var(--admin-border)]"
+                        : "border-red-500/25 opacity-75"
                   }`}
                 >
                   <button
                     type="button"
-                    onClick={() => setExpandedBarberId(isExpanded ? null : barber.id)}
+                    onClick={() =>
+                      setExpandedBarberId(isExpanded ? null : barber.id)
+                    }
                     aria-expanded={isExpanded}
-                    className="w-full min-h-[82px] p-3.5 sm:p-4 text-left flex items-center gap-3 sm:gap-4 hover:bg-surface-base/40"
+                    className="w-full min-h-[82px] p-3.5 sm:p-4 text-left flex items-center gap-3 sm:gap-4 hover:bg-[var(--admin-bg)]/40"
                   >
                     <div className="relative shrink-0">
                       <img
                         src={barber.photo_url}
                         alt={barber.name}
-                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-gold-base/40"
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-[var(--admin-accent)]/40"
                       />
-                      <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-surface-card ${isActive ? 'bg-status-success' : 'bg-red-500'}`} />
+                      <span
+                        className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-surface-card ${isActive ? "bg-status-success" : "bg-red-500"}`}
+                      />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <h3 className="font-bold text-content-base text-sm sm:text-base admin-clamp-2">{barber.name}</h3>
-                        <span className={`shrink-0 px-2 py-1 rounded-md text-xs font-bold ${isActive ? 'bg-status-success/15 text-status-success' : 'bg-red-500/15 text-red-300'}`}>
-                          {isActive ? 'Ativo' : 'Pausado'}
+                        <h3 className="font-bold text-[var(--admin-text-main)] text-sm sm:text-base admin-clamp-2">
+                          {barber.name}
+                        </h3>
+                        <span
+                          className={`shrink-0 px-2 py-1 rounded-md text-xs font-bold ${isActive ? "bg-status-success/15 text-status-success" : "bg-red-500/15 text-red-300"}`}
+                        >
+                          {isActive ? "Ativo" : "Pausado"}
                         </span>
                       </div>
-                      <p className="text-xs text-gold-hover font-semibold admin-safe-wrap">{barber.role}</p>
+                      <p className="text-xs text-[var(--admin-accent)] font-semibold admin-safe-wrap">
+                        {barber.role}
+                      </p>
                       <div className="flex items-center gap-1 text-xs text-amber-400 font-bold mt-1">
                         <Star className="w-3.5 h-3.5 fill-amber-400" />
                         <span>{(barber.rating || 5.0).toFixed(1)}</span>
-                        <span className="text-content-muted font-normal">({barber.reviews_count || 10})</span>
+                        <span className="text-[var(--admin-text-muted)] font-normal">
+                          ({barber.reviews_count || 10})
+                        </span>
                       </div>
                     </div>
                     <div className="hidden md:block text-right shrink-0">
-                      <p className="text-xs text-content-muted">Comissão</p>
-                      <p className="text-sm font-bold text-content-base">{commissionPercent}%</p>
+                      <p className="text-xs text-[var(--admin-text-muted)]">
+                        Comissão
+                      </p>
+                      <p className="text-sm font-bold text-[var(--admin-text-main)]">
+                        {commissionPercent}%
+                      </p>
                     </div>
                     <div className="hidden sm:block text-right shrink-0 min-w-[104px]">
-                      <p className="text-xs text-content-muted">Turno</p>
-                      <p className="text-xs font-semibold text-content-base">{barber.working_hours?.start || '08:00'}–{barber.working_hours?.end || '19:00'}</p>
+                      <p className="text-xs text-[var(--admin-text-muted)]">
+                        Turno
+                      </p>
+                      <p className="text-xs font-semibold text-[var(--admin-text-main)]">
+                        {barber.working_hours?.start || "08:00"}–
+                        {barber.working_hours?.end || "19:00"}
+                      </p>
                     </div>
-                    {isExpanded ? <ChevronUp className="w-5 h-5 text-gold-base shrink-0" /> : <ChevronDown className="w-5 h-5 text-content-muted shrink-0" />}
+                    {isExpanded ? (
+                      <ChevronUp className="w-5 h-5 text-[var(--admin-accent)] shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-[var(--admin-text-muted)] shrink-0" />
+                    )}
                   </button>
 
                   {isExpanded && (
-                    <div className="border-t border-border-subtle bg-surface-base/35 p-3.5 sm:p-4 space-y-3">
+                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3.5 sm:p-4 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                        <div className="rounded-xl bg-surface-base p-3">
-                          <p className="text-xs text-content-muted uppercase tracking-wider">Especialidades</p>
-                          <p className="mt-1 text-content-base font-semibold leading-relaxed">{barber.specialties?.join(', ') || 'Geral'}</p>
+                        <div className="rounded-xl bg-[var(--admin-bg)] p-3">
+                          <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
+                            Especialidades
+                          </p>
+                          <p className="mt-1 text-[var(--admin-text-main)] font-semibold leading-relaxed">
+                            {barber.specialties?.join(", ") || "Geral"}
+                          </p>
                         </div>
-                        <div className="rounded-xl bg-surface-base p-3">
-                          <p className="text-xs text-content-muted uppercase tracking-wider">Horários semanais</p>
-                          <p className="mt-1 text-content-base font-semibold">{barber.working_hours?.days?.map((day) => dayLabels[day] || day).join(', ') || 'Seg-Sáb'}</p>
-                          <p className="text-content-muted">{barber.working_hours?.start || '08:00'}–{barber.working_hours?.end || '19:00'}</p>
+                        <div className="rounded-xl bg-[var(--admin-bg)] p-3">
+                          <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
+                            Horários semanais
+                          </p>
+                          <p className="mt-1 text-[var(--admin-text-main)] font-semibold">
+                            {barber.working_hours?.days
+                              ?.map((day) => dayLabels[day] || day)
+                              .join(", ") || "Seg-Sáb"}
+                          </p>
+                          <p className="text-[var(--admin-text-muted)]">
+                            {barber.working_hours?.start || "08:00"}–
+                            {barber.working_hours?.end || "19:00"}
+                          </p>
                         </div>
-                        <div className="rounded-xl bg-surface-base p-3">
-                          <p className="text-xs text-content-muted uppercase tracking-wider">Contato</p>
-                          <p className="mt-1 text-content-base font-semibold admin-safe-wrap">{barber.phone || 'Não informado'}</p>
-                          <p className="text-content-muted admin-safe-wrap">{barber.pix_key || 'PIX não informado'}</p>
+                        <div className="rounded-xl bg-[var(--admin-bg)] p-3">
+                          <p className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider">
+                            Contato
+                          </p>
+                          <p className="mt-1 text-[var(--admin-text-main)] font-semibold admin-safe-wrap">
+                            {barber.phone || "Não informado"}
+                          </p>
+                          <p className="text-[var(--admin-text-muted)] admin-safe-wrap">
+                            {barber.pix_key || "PIX não informado"}
+                          </p>
                         </div>
                       </div>
-                      {barber.bio && <p className="text-sm text-content-muted leading-relaxed">{barber.bio}</p>}
+                      {barber.bio && (
+                        <p className="text-sm text-[var(--admin-text-muted)] leading-relaxed">
+                          {barber.bio}
+                        </p>
+                      )}
                       <div className="admin-action-group pt-1">
-                        <button type="button" onClick={() => handleToggleStatus(barber)} title={isActive ? 'Pausar agenda' : 'Ativar agenda'} aria-label={isActive ? 'Pausar agenda' : 'Ativar agenda'} className={`admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border text-sm font-semibold flex items-center justify-center gap-1.5 ${isActive ? 'border-status-success/30 text-status-success' : 'border-red-500/30 text-red-300'}`}>
-                          <Power className="w-4 h-4" /><span className="hidden sm:inline">{isActive ? 'Pausar agenda' : 'Ativar agenda'}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStatus(barber)}
+                          title={isActive ? "Pausar agenda" : "Ativar agenda"}
+                          aria-label={
+                            isActive ? "Pausar agenda" : "Ativar agenda"
+                          }
+                          className={`admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border text-sm font-semibold flex items-center justify-center gap-1.5 ${isActive ? "border-status-success/30 text-status-success" : "border-red-500/30 text-red-300"}`}
+                        >
+                          <Power className="w-4 h-4" />
+                          <span className="hidden sm:inline">
+                            {isActive ? "Pausar agenda" : "Ativar agenda"}
+                          </span>
                         </button>
-                        {barber.phone && <a href={`https://wa.me/55${barber.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" title="Abrir WhatsApp" aria-label="Abrir WhatsApp" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-success/30 text-status-success text-sm font-semibold flex items-center justify-center gap-1.5"><MessageCircle className="w-4 h-4" /><span className="hidden sm:inline">WhatsApp</span></a>}
-                        <button type="button" onClick={() => handleOpenEdit(barber)} title="Editar profissional" aria-label="Editar profissional" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-gold-base text-content-on-accent text-sm font-bold flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" /><span className="hidden sm:inline">Editar</span></button>
-                        <button type="button" onClick={() => handleDelete(barber.id)} title="Excluir profissional" aria-label="Excluir profissional" className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5"><Trash2 className="w-4 h-4" /><span className="hidden sm:inline">Excluir</span></button>
+                        {barber.phone && (
+                          <a
+                            href={`https://wa.me/55${barber.phone.replace(/\D/g, "")}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            title="Abrir WhatsApp"
+                            aria-label="Abrir WhatsApp"
+                            className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-success/30 text-status-success text-sm font-semibold flex items-center justify-center gap-1.5"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            <span className="hidden sm:inline">WhatsApp</span>
+                          </a>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(barber)}
+                          title="Editar profissional"
+                          aria-label="Editar profissional"
+                          className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-sm font-bold flex items-center justify-center gap-1.5"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                          <span className="hidden sm:inline">Editar</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(barber.id)}
+                          title="Excluir profissional"
+                          aria-label="Excluir profissional"
+                          className="admin-action-icon min-h-10 min-w-10 px-2 sm:px-4 rounded-xl border border-status-error/25 text-status-error text-sm font-semibold flex items-center justify-center gap-1.5"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span className="hidden sm:inline">Excluir</span>
+                        </button>
                       </div>
                     </div>
                   )}
@@ -542,36 +743,57 @@ export const ProfessionalsManagement: React.FC = () => {
         </div>
       ) : (
         /* TABLE VIEW */
-        <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xl">
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl overflow-hidden shadow-xl">
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left text-xs whitespace-nowrap">
-              <thead className="bg-surface-base text-content-muted border-b border-border-subtle">
+              <thead className="bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border-b border-[var(--admin-border)]">
                 <tr>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Profissional</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Avaliação</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Comissão</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Especialidades</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">Turno & Dias</th>
-                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs text-right">Ações</th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">
+                    Profissional
+                  </th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">
+                    Avaliação
+                  </th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">
+                    Comissão
+                  </th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">
+                    Especialidades
+                  </th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs">
+                    Turno & Dias
+                  </th>
+                  <th className="p-3.5 font-bold uppercase tracking-wider text-xs text-right">
+                    Ações
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border-subtle">
+              <tbody className="divide-y divide-[var(--admin-border)]">
                 {filteredBarbers.map((barber) => {
                   const isActive = barber.is_active ?? true;
-                  const commissionPercent = Math.round((barber.commission_rate || 0.45) * 100);
+                  const commissionPercent = Math.round(
+                    (barber.commission_rate || 0.45) * 100,
+                  );
 
                   return (
-                    <tr key={barber.id} className="hover:bg-surface-card transition-colors">
+                    <tr
+                      key={barber.id}
+                      className="hover:bg-[var(--admin-surface)] transition-colors"
+                    >
                       <td className="p-3.5">
                         <div className="flex items-center gap-2.5">
                           <img
                             src={barber.photo_url}
                             alt={barber.name}
-                            className="w-8 h-8 rounded-lg object-cover border border-gold-base/40"
+                            className="w-8 h-8 rounded-lg object-cover border border-[var(--admin-accent)]/40"
                           />
                           <div>
-                            <p className="font-bold text-content-base text-xs">{barber.name}</p>
-                            <p className="text-xs text-gold-hover">{barber.role}</p>
+                            <p className="font-bold text-[var(--admin-text-main)] text-xs">
+                              {barber.name}
+                            </p>
+                            <p className="text-xs text-[var(--admin-accent)]">
+                              {barber.role}
+                            </p>
                           </div>
                         </div>
                       </td>
@@ -581,33 +803,35 @@ export const ProfessionalsManagement: React.FC = () => {
                       </td>
 
                       <td className="p-3.5">
-                        <span className="px-2 py-0.5 rounded-xl bg-surface-card border border-border-subtle text-gold-hover font-bold text-xs">
+                        <span className="px-2 py-0.5 rounded-xl bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-accent)] font-bold text-xs">
                           {commissionPercent}%
                         </span>
                       </td>
 
                       <td className="p-3.5">
-                        <span className="text-xs text-content-muted">
-                          {barber.specialties?.slice(0, 2).join(', ') || 'Geral'}
+                        <span className="text-xs text-[var(--admin-text-muted)]">
+                          {barber.specialties?.slice(0, 2).join(", ") ||
+                            "Geral"}
                         </span>
                       </td>
 
-                      <td className="p-3.5 text-content-muted">
-                        {barber.working_hours?.start || '08:00'} - {barber.working_hours?.end || '19:00'}
+                      <td className="p-3.5 text-[var(--admin-text-muted)]">
+                        {barber.working_hours?.start || "08:00"} -{" "}
+                        {barber.working_hours?.end || "19:00"}
                       </td>
 
                       <td className="p-3.5 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => handleToggleStatus(barber)}
-                            className={`p-1.5 rounded-xl ${isActive ? 'text-status-success' : 'text-red-400'}`}
+                            className={`p-1.5 rounded-xl ${isActive ? "text-status-success" : "text-red-400"}`}
                             title="Toggle Status"
                           >
                             <Power className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleOpenEdit(barber)}
-                            className="px-2 py-1 bg-gold-base text-content-on-accent font-bold rounded-xl text-xs"
+                            className="px-2 py-1 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold rounded-xl text-xs"
                           >
                             Editar
                           </button>
@@ -630,39 +854,43 @@ export const ProfessionalsManagement: React.FC = () => {
 
       {/* CREATE/EDIT MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
+        <div className="fixed inset-0 z-50 bg-[var(--admin-bg)]/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] sm:border-[var(--admin-accent)]/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
             {/* Header */}
-            <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center gap-2 shrink-0">
+            <div className="p-3.5 bg-[var(--admin-bg)] border-b border-[var(--admin-border)] flex justify-between items-center gap-2 shrink-0">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-hover shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-[var(--admin-accent)]/10 border border-[var(--admin-accent)]/30 flex items-center justify-center text-[var(--admin-accent)] shrink-0">
                   <Users className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-sm font-bold text-content-base truncate">
-                    {editingBarber ? `Editar: ${editingBarber.name}` : 'Novo Barbeiro'}
+                  <h2 className="text-sm font-bold text-[var(--admin-text-main)] truncate">
+                    {editingBarber
+                      ? `Editar: ${editingBarber.name}`
+                      : "Novo Barbeiro"}
                   </h2>
-                  <p className="text-xs text-content-muted truncate">Configuração de perfil, comissões e horários</p>
+                  <p className="text-xs text-[var(--admin-text-muted)] truncate">
+                    Configuração de perfil, comissões e horários
+                  </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-7 h-7 rounded-xl bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors shrink-0"
+                className="w-7 h-7 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center transition-colors shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs Header */}
-            <div className="flex border-b border-border-subtle bg-surface-base px-2 pt-1.5 gap-1 shrink-0 overflow-x-auto no-scrollbar">
+            <div className="flex border-b border-[var(--admin-border)] bg-[var(--admin-bg)] px-2 pt-1.5 gap-1 shrink-0 overflow-x-auto no-scrollbar">
               <button
                 type="button"
-                onClick={() => setActiveFormTab('profile')}
+                onClick={() => setActiveFormTab("profile")}
                 className={`px-3 py-1.5 text-xs font-bold rounded-t-xl transition-all whitespace-nowrap ${
-                  activeFormTab === 'profile'
-                    ? 'bg-surface-card text-gold-hover border-t-2 border-x border-border-subtle border-t-[#FFFFFF]'
-                    : 'text-content-muted hover:text-content-base'
+                  activeFormTab === "profile"
+                    ? "bg-[var(--admin-surface)] text-[var(--admin-accent)] border-t-2 border-x border-[var(--admin-border)] border-t-[#FFFFFF]"
+                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
                 1. Perfil
@@ -670,11 +898,11 @@ export const ProfessionalsManagement: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setActiveFormTab('specialties')}
+                onClick={() => setActiveFormTab("specialties")}
                 className={`px-3 py-1.5 text-xs font-bold rounded-t-xl transition-all whitespace-nowrap ${
-                  activeFormTab === 'specialties'
-                    ? 'bg-surface-card text-gold-hover border-t-2 border-x border-border-subtle border-t-[#FFFFFF]'
-                    : 'text-content-muted hover:text-content-base'
+                  activeFormTab === "specialties"
+                    ? "bg-[var(--admin-surface)] text-[var(--admin-accent)] border-t-2 border-x border-[var(--admin-border)] border-t-[#FFFFFF]"
+                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
                 2. Especialidades
@@ -682,11 +910,11 @@ export const ProfessionalsManagement: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setActiveFormTab('commission')}
+                onClick={() => setActiveFormTab("commission")}
                 className={`px-3 py-1.5 text-xs font-bold rounded-t-xl transition-all whitespace-nowrap ${
-                  activeFormTab === 'commission'
-                    ? 'bg-surface-card text-gold-hover border-t-2 border-x border-border-subtle border-t-[#FFFFFF]'
-                    : 'text-content-muted hover:text-content-base'
+                  activeFormTab === "commission"
+                    ? "bg-[var(--admin-surface)] text-[var(--admin-accent)] border-t-2 border-x border-[var(--admin-border)] border-t-[#FFFFFF]"
+                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
                 3. Comissão & PIX
@@ -694,11 +922,11 @@ export const ProfessionalsManagement: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setActiveFormTab('schedule')}
+                onClick={() => setActiveFormTab("schedule")}
                 className={`px-3 py-1.5 text-xs font-bold rounded-t-xl transition-all whitespace-nowrap ${
-                  activeFormTab === 'schedule'
-                    ? 'bg-surface-card text-gold-hover border-t-2 border-x border-border-subtle border-t-[#FFFFFF]'
-                    : 'text-content-muted hover:text-content-base'
+                  activeFormTab === "schedule"
+                    ? "bg-[var(--admin-surface)] text-[var(--admin-accent)] border-t-2 border-x border-[var(--admin-border)] border-t-[#FFFFFF]"
+                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
                 4. Horários
@@ -706,82 +934,86 @@ export const ProfessionalsManagement: React.FC = () => {
             </div>
 
             {/* Modal Form */}
-            <form onKeyDown={handleEnterAsTab} onSubmit={handleSubmit} className="p-4 overflow-y-auto space-y-3 custom-scrollbar flex-1">
+            <form
+              onKeyDown={handleEnterAsTab}
+              onSubmit={handleSubmit}
+              className="p-4 overflow-y-auto space-y-3 custom-scrollbar flex-1"
+            >
               {/* TAB 1: PROFILE */}
-              {activeFormTab === 'profile' && (
+              {activeFormTab === "profile" && (
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
-                      <AdminLabel tone="accent">
-                        Nome Completo *
-                      </AdminLabel>
+                      <AdminLabel tone="accent">Nome Completo *</AdminLabel>
                       <input
                         type="text"
                         required
                         value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
                         placeholder="Ex: Carlos Eduardo Silva"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                       />
                     </div>
 
                     <div>
-                      <AdminLabel tone="accent">
-                        Apelido / Cadeira
-                      </AdminLabel>
+                      <AdminLabel tone="accent">Apelido / Cadeira</AdminLabel>
                       <input
                         type="text"
                         value={formData.nickname}
-                        onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, nickname: e.target.value })
+                        }
                         placeholder="Ex: Carlão Fade"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
-                      <AdminLabel tone="accent">
-                        Cargo / Título
-                      </AdminLabel>
+                      <AdminLabel tone="accent">Cargo / Título</AdminLabel>
                       <input
                         type="text"
                         value={formData.role}
-                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, role: e.target.value })
+                        }
                         placeholder="Master Barber"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                       />
                     </div>
 
                     <div>
-                      <AdminLabel tone="accent">
-                        WhatsApp / Contato
-                      </AdminLabel>
+                      <AdminLabel tone="accent">WhatsApp / Contato</AdminLabel>
                       <input
                         type="text"
-                        value={formData.phone || ''}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        value={formData.phone || ""}
+                        onChange={(e) =>
+                          setFormData({ ...formData, phone: e.target.value })
+                        }
                         placeholder="(11) 99887-6655"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <AdminLabel tone="accent">
-                      Biografia / Descrição
-                    </AdminLabel>
+                    <AdminLabel tone="accent">Biografia / Descrição</AdminLabel>
                     <textarea
                       rows={2}
-                      value={formData.bio || ''}
-                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                      value={formData.bio || ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, bio: e.target.value })
+                      }
                       placeholder="Experiência profissional..."
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base resize-none"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] resize-none"
                     />
                   </div>
 
                   {/* Photo selection */}
-                  <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
+                  <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
                     <AdminLabel tone="accent" uppercase>
                       Foto de Perfil
                     </AdminLabel>
@@ -790,14 +1022,19 @@ export const ProfessionalsManagement: React.FC = () => {
                       <img
                         src={formData.photo_url}
                         alt="Preview"
-                        className="w-10 h-10 rounded-xl object-cover border border-gold-base"
+                        className="w-10 h-10 rounded-xl object-cover border border-[var(--admin-accent)]"
                       />
                       <input
                         type="url"
-                        value={formData.photo_url || ''}
-                        onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
+                        value={formData.photo_url || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            photo_url: e.target.value,
+                          })
+                        }
                         placeholder="URL da imagem..."
-                        className="flex-1 bg-surface-card border border-border-subtle rounded-xl px-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                        className="flex-1 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                       />
                     </div>
 
@@ -806,12 +1043,20 @@ export const ProfessionalsManagement: React.FC = () => {
                         <button
                           key={idx}
                           type="button"
-                          onClick={() => setFormData({ ...formData, photo_url: preset.url })}
+                          onClick={() =>
+                            setFormData({ ...formData, photo_url: preset.url })
+                          }
                           className={`rounded-lg overflow-hidden border transition-all ${
-                            formData.photo_url === preset.url ? 'border-gold-base ring-1 ring-gold-base' : 'border-border-subtle opacity-70'
+                            formData.photo_url === preset.url
+                              ? "border-[var(--admin-accent)] ring-1 ring-[var(--admin-accent)]"
+                              : "border-[var(--admin-border)] opacity-70"
                           }`}
                         >
-                          <img src={preset.url} alt={preset.name} className="w-full h-8 object-cover" />
+                          <img
+                            src={preset.url}
+                            alt={preset.name}
+                            className="w-full h-8 object-cover"
+                          />
                         </button>
                       ))}
                     </div>
@@ -820,7 +1065,7 @@ export const ProfessionalsManagement: React.FC = () => {
               )}
 
               {/* TAB 2: SPECIALTIES */}
-              {activeFormTab === 'specialties' && (
+              {activeFormTab === "specialties" && (
                 <div className="space-y-3">
                   <div>
                     <AdminLabel tone="accent">
@@ -831,12 +1076,12 @@ export const ProfessionalsManagement: React.FC = () => {
                       value={specialtiesText}
                       onChange={(e) => setSpecialtiesText(e.target.value)}
                       placeholder="Degradê / Fade, Barboterapia Imperial"
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                     />
                   </div>
 
-                  <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                    <p className="text-xs font-bold text-gold-hover flex items-center gap-1 uppercase">
+                  <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
+                    <p className="text-xs font-bold text-[var(--admin-accent)] flex items-center gap-1 uppercase">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Especialidades populares:</span>
                     </p>
@@ -846,7 +1091,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           key={tag}
                           type="button"
                           onClick={() => handleAddSpecialtyTag(tag)}
-                          className="px-2 py-1 rounded-lg bg-surface-card text-content-muted hover:text-content-base border border-border-subtle text-xs font-bold"
+                          className="px-2 py-1 rounded-lg bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] text-xs font-bold"
                         >
                           + {tag}
                         </button>
@@ -857,7 +1102,7 @@ export const ProfessionalsManagement: React.FC = () => {
               )}
 
               {/* TAB 3: COMMISSION & PIX */}
-              {activeFormTab === 'commission' && (
+              {activeFormTab === "commission" && (
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
@@ -871,47 +1116,64 @@ export const ProfessionalsManagement: React.FC = () => {
                         max="1"
                         required
                         value={formData.commission_rate}
-                        onChange={(e) => setFormData({ ...formData, commission_rate: Number(e.target.value) })}
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs font-bold text-content-base focus:outline-none focus:border-gold-base"
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            commission_rate: Number(e.target.value),
+                          })
+                        }
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs font-bold text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                       />
                     </div>
 
                     <div>
-                      <AdminLabel tone="accent">
-                        Chave PIX Repasse
-                      </AdminLabel>
+                      <AdminLabel tone="accent">Chave PIX Repasse</AdminLabel>
                       <input
                         type="text"
-                        value={formData.pix_key || ''}
-                        onChange={(e) => setFormData({ ...formData, pix_key: e.target.value })}
+                        value={formData.pix_key || ""}
+                        onChange={(e) =>
+                          setFormData({ ...formData, pix_key: e.target.value })
+                        }
                         placeholder="CPF, e-mail ou telefone"
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                       />
                     </div>
                   </div>
 
-                  <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1 text-xs">
-                    <p className="text-xs text-content-muted font-bold uppercase">Simulador de Divisão</p>
+                  <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-1 text-xs">
+                    <p className="text-xs text-[var(--admin-text-muted)] font-bold uppercase">
+                      Simulador de Divisão
+                    </p>
                     <p className="font-extrabold text-status-success">
-                      Em R$ 100,00 → Barbeiro recebe R$ {((formData.commission_rate || 0.45) * 100).toFixed(2)}
+                      Em R$ 100,00 → Barbeiro recebe R${" "}
+                      {((formData.commission_rate || 0.45) * 100).toFixed(2)}
                     </p>
                   </div>
                 </div>
               )}
 
               {/* TAB 4: SCHEDULE */}
-              {activeFormTab === 'schedule' && (
+              {activeFormTab === "schedule" && (
                 <div className="space-y-3">
-                  <div className="p-3 bg-surface-base border border-border-subtle rounded-xl flex items-center justify-between">
-                    <span className="text-xs font-bold text-content-base">Disponível na Agenda</span>
+                  <div className="p-3 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl flex items-center justify-between">
+                    <span className="text-xs font-bold text-[var(--admin-text-main)]">
+                      Disponível na Agenda
+                    </span>
                     <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, is_active: !(formData.is_active ?? true) })}
+                      onClick={() =>
+                        setFormData({
+                          ...formData,
+                          is_active: !(formData.is_active ?? true),
+                        })
+                      }
                       className={`px-3 py-1 rounded-xl text-xs font-bold ${
-                        (formData.is_active ?? true) ? 'bg-status-success text-white' : 'bg-red-500/20 text-red-400'
+                        (formData.is_active ?? true)
+                          ? "bg-status-success text-white"
+                          : "bg-red-500/20 text-red-400"
                       }`}
                     >
-                      {(formData.is_active ?? true) ? 'Ativo' : 'Pausado'}
+                      {(formData.is_active ?? true) ? "Ativo" : "Pausado"}
                     </button>
                   </div>
 
@@ -920,17 +1182,27 @@ export const ProfessionalsManagement: React.FC = () => {
                       <AdminLabel tone="muted">Início Expediente</AdminLabel>
                       <input
                         type="time"
-                        value={formData.working_hours?.start || '08:00'}
+                        value={formData.working_hours?.start || "08:00"}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
                             working_hours: {
-                              ...(formData.working_hours || { days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'], end: '19:00' }),
-                              start: e.target.value
-                            }
+                              ...(formData.working_hours || {
+                                days: [
+                                  "mon",
+                                  "tue",
+                                  "wed",
+                                  "thu",
+                                  "fri",
+                                  "sat",
+                                ],
+                                end: "19:00",
+                              }),
+                              start: e.target.value,
+                            },
                           })
                         }
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs text-content-base"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2 text-xs text-[var(--admin-text-main)]"
                       />
                     </div>
 
@@ -938,17 +1210,27 @@ export const ProfessionalsManagement: React.FC = () => {
                       <AdminLabel tone="muted">Fim Expediente</AdminLabel>
                       <input
                         type="time"
-                        value={formData.working_hours?.end || '19:00'}
+                        value={formData.working_hours?.end || "19:00"}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
                             working_hours: {
-                              ...(formData.working_hours || { days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'], start: '08:00' }),
-                              end: e.target.value
-                            }
+                              ...(formData.working_hours || {
+                                days: [
+                                  "mon",
+                                  "tue",
+                                  "wed",
+                                  "thu",
+                                  "fri",
+                                  "sat",
+                                ],
+                                start: "08:00",
+                              }),
+                              end: e.target.value,
+                            },
                           })
                         }
-                        className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs text-content-base"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2 text-xs text-[var(--admin-text-main)]"
                       />
                     </div>
                   </div>
@@ -957,14 +1239,17 @@ export const ProfessionalsManagement: React.FC = () => {
                     <AdminLabel tone="muted">Dias da Semana</AdminLabel>
                     <div className="flex flex-wrap gap-1">
                       {Object.keys(dayLabels).map((day) => {
-                        const isActive = formData.working_hours?.days.includes(day);
+                        const isActive =
+                          formData.working_hours?.days.includes(day);
                         return (
                           <button
                             key={day}
                             type="button"
                             onClick={() => toggleDay(day)}
                             className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
-                              isActive ? 'bg-gold-base text-content-on-accent' : 'bg-surface-base text-content-muted border border-border-subtle'
+                              isActive
+                                ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                                : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"
                             }`}
                           >
                             {dayLabels[day]}
@@ -977,7 +1262,7 @@ export const ProfessionalsManagement: React.FC = () => {
               )}
 
               {/* Modal Footer */}
-              <div className="pt-3 border-t border-border-subtle flex items-center justify-between shrink-0">
+              <div className="pt-3 border-t border-[var(--admin-border)] flex items-center justify-between shrink-0">
                 <Button
                   type="button"
                   variant="ghost"
@@ -987,11 +1272,7 @@ export const ProfessionalsManagement: React.FC = () => {
                   Cancelar
                 </Button>
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="sm"
-                >
+                <Button type="submit" variant="primary" size="sm">
                   <Save className="w-3.5 h-3.5" />
                   <span>Salvar</span>
                 </Button>
@@ -1003,4 +1284,3 @@ export const ProfessionalsManagement: React.FC = () => {
     </div>
   );
 };
-

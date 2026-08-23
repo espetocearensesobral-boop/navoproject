@@ -14,9 +14,9 @@ export const AdminLabel: React.FC<AdminLabelProps> = ({
   ...props
 }) => {
   const toneClass = {
-    default: 'text-content-base',
-    muted: 'text-content-muted',
-    accent: 'text-gold-hover',
+    default: 'text-[var(--admin-text-main)]',
+    muted: 'text-[var(--admin-text-muted)]',
+    accent: 'text-[var(--admin-accent)]',
   }[tone];
 
   return (

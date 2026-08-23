@@ -1,25 +1,25 @@
-import React, { useState, useRef } from 'react';
-import { usePullToRefresh } from '../../hooks/usePullToRefresh';
-import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
-import { NavoHomeView } from './NavoHomeView';
-import { ScheduleGrid } from './ScheduleGrid';
-import { ReceiptsManagement } from './ReceiptsManagement';
-import { FinancialStatementManagement } from './FinancialStatementManagement';
-import { ExpensesManagement } from './ExpensesManagement';
-import { ClientsManagement } from './ClientsManagement';
-import { WaitingQueue } from './WaitingQueue';
-import { AdminAuthView } from './AdminAuthView';
-import { CatalogWorkspace } from './CatalogWorkspace';
-import { ReportsWorkspace } from './ReportsWorkspace';
-import { RelationshipWorkspace } from './RelationshipWorkspace';
-import { SystemWorkspace } from './SystemWorkspace';
-import { AdminNotificationCenter } from './AdminNotificationCenter';
-import { CampaignsWorkspace } from './CampaignsWorkspace';
-import { authFetch } from '../../lib/api';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useAdminOperationNotifications } from '../../hooks/useAdminOperationNotifications';
-import { useDialogFocus } from '../../hooks/useDialogFocus';
-import { hapticLight } from '../../lib/haptics';
+import React, { useState, useRef } from "react";
+import { usePullToRefresh } from "../../hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "../shared/PullToRefreshIndicator";
+import { NavoHomeView } from "./NavoHomeView";
+import { ScheduleGrid } from "./ScheduleGrid";
+import { ReceiptsManagement } from "./ReceiptsManagement";
+import { FinancialStatementManagement } from "./FinancialStatementManagement";
+import { ExpensesManagement } from "./ExpensesManagement";
+import { ClientsManagement } from "./ClientsManagement";
+import { WaitingQueue } from "./WaitingQueue";
+import { AdminAuthView } from "./AdminAuthView";
+import { CatalogWorkspace } from "./CatalogWorkspace";
+import { ReportsWorkspace } from "./ReportsWorkspace";
+import { RelationshipWorkspace } from "./RelationshipWorkspace";
+import { SystemWorkspace } from "./SystemWorkspace";
+import { AdminNotificationCenter } from "./AdminNotificationCenter";
+import { CampaignsWorkspace } from "./CampaignsWorkspace";
+import { authFetch } from "../../lib/api";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useAdminOperationNotifications } from "../../hooks/useAdminOperationNotifications";
+import { useDialogFocus } from "../../hooks/useDialogFocus";
+import { hapticLight } from "../../lib/haptics";
 import {
   Calendar,
   Clock,
@@ -43,75 +43,103 @@ import {
   Megaphone,
   Sun,
   Moon,
-} from 'lucide-react';
+} from "lucide-react";
 
 export type AdminTab =
-  | 'dashboard'
-  | 'agenda'
-  | 'queue'
-  | 'relatorios'
-  | 'campanhas'
-  | 'financeiro_recebimentos'
-  | 'financeiro_extrato'
-  | 'financeiro_saidas'
-  | 'clientes'
-  | 'catalogo'
-  | 'relacionamento'
-  | 'sistema';
+  | "dashboard"
+  | "agenda"
+  | "queue"
+  | "relatorios"
+  | "campanhas"
+  | "financeiro_recebimentos"
+  | "financeiro_extrato"
+  | "financeiro_saidas"
+  | "clientes"
+  | "catalogo"
+  | "relacionamento"
+  | "sistema";
 
-
-const ADMIN_ACTIVE_TAB_KEY = 'navo-admin-active-tab';
+const ADMIN_ACTIVE_TAB_KEY = "navo-admin-active-tab";
 const ADMIN_TAB_VALUES: AdminTab[] = [
-  'dashboard', 'agenda', 'queue', 'relatorios', 'campanhas', 'financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas',
-  'clientes', 'catalogo', 'relacionamento', 'sistema'
+  "dashboard",
+  "agenda",
+  "queue",
+  "relatorios",
+  "campanhas",
+  "financeiro_recebimentos",
+  "financeiro_extrato",
+  "financeiro_saidas",
+  "clientes",
+  "catalogo",
+  "relacionamento",
+  "sistema",
 ];
 
 const getStoredAdminTab = (): AdminTab => {
-  if (typeof window === 'undefined') return 'dashboard';
+  if (typeof window === "undefined") return "dashboard";
   try {
     const storedTab = window.sessionStorage.getItem(ADMIN_ACTIVE_TAB_KEY);
     const legacyTabMap: Record<string, AdminTab> = {
-      financeiro: 'financeiro_recebimentos',
-      financeiro_relatorios: 'relatorios',
-      rewards: 'relacionamento',
-      servicos: 'catalogo',
-      profissionais: 'catalogo',
-      produtos: 'catalogo',
-      relacionamento_dashboard: 'relacionamento',
-      relacionamento_loyalty: 'relacionamento',
-      relacionamento_rewards: 'relacionamento',
-      relacionamento_referrals: 'relacionamento',
-      relacionamento_reviews: 'relacionamento',
-      followup: 'relacionamento',
-      aniversariantes: 'relacionamento',
-      barbearia: 'sistema',
-      settings: 'sistema',
-      settings_agenda: 'sistema',
-      settings_print: 'sistema',
-      audit: 'sistema',
-      whatsapp: 'sistema',
-      qrcode: 'sistema',
+      financeiro: "financeiro_recebimentos",
+      financeiro_relatorios: "relatorios",
+      rewards: "relacionamento",
+      servicos: "catalogo",
+      profissionais: "catalogo",
+      produtos: "catalogo",
+      relacionamento_dashboard: "relacionamento",
+      relacionamento_loyalty: "relacionamento",
+      relacionamento_rewards: "relacionamento",
+      relacionamento_referrals: "relacionamento",
+      relacionamento_reviews: "relacionamento",
+      followup: "relacionamento",
+      aniversariantes: "relacionamento",
+      barbearia: "sistema",
+      settings: "sistema",
+      settings_agenda: "sistema",
+      settings_print: "sistema",
+      audit: "sistema",
+      whatsapp: "sistema",
+      qrcode: "sistema",
     };
     const normalizedTab = (storedTab && legacyTabMap[storedTab]) || storedTab;
     return normalizedTab && ADMIN_TAB_VALUES.includes(normalizedTab as AdminTab)
-      ? normalizedTab as AdminTab
-      : 'dashboard';
+      ? (normalizedTab as AdminTab)
+      : "dashboard";
   } catch {
-    return 'dashboard';
+    return "dashboard";
   }
 };
-
 
 export const AdminLayout: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const { isSupported: notificationsSupported, permission: notificationPermission, toggleNotifications, backgroundPushEnabled, notificationsBusy } = useAdminOperationNotifications(isAuthorized);
-  const [activeTab, setActiveTab] = useState<AdminTab>(() => getStoredAdminTab());
+  const {
+    isSupported: notificationsSupported,
+    permission: notificationPermission,
+    toggleNotifications,
+    backgroundPushEnabled,
+    notificationsBusy,
+  } = useAdminOperationNotifications(isAuthorized);
+  const [activeTab, setActiveTab] = useState<AdminTab>(() =>
+    getStoredAdminTab(),
+  );
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [adminName, setAdminName] = useState('Admin');
-  const [systemInitialTab, setSystemInitialTab] = useState<'unit' | 'preferences' | 'availability' | 'notifications' | 'qrcode' | 'print' | 'audit' | 'meta_ads' | 'google_ads'>('unit');
-  const [campaignInitialProvider, setCampaignInitialProvider] = useState<'meta' | 'google' | null>(null);
+  const [adminName, setAdminName] = useState("Admin");
+  const [systemInitialTab, setSystemInitialTab] = useState<
+    | "unit"
+    | "preferences"
+    | "availability"
+    | "notifications"
+    | "qrcode"
+    | "print"
+    | "audit"
+    | "meta_ads"
+    | "google_ads"
+  >("unit");
+  const [campaignInitialProvider, setCampaignInitialProvider] = useState<
+    "meta" | "google" | null
+  >(null);
 
   React.useEffect(() => {
     try {
@@ -124,10 +152,13 @@ export const AdminLayout: React.FC = () => {
   const mainRef = useRef<HTMLElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   useDialogFocus(sidebarOpen, sidebarRef);
-  const notificationsActive = notificationsSupported && notificationPermission === 'granted' && backgroundPushEnabled;
+  const notificationsActive =
+    notificationsSupported &&
+    notificationPermission === "granted" &&
+    backgroundPushEnabled;
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    setTheme(theme === "dark" ? "light" : "dark");
     hapticLight();
   };
 
@@ -144,25 +175,31 @@ export const AdminLayout: React.FC = () => {
   const scrollSidebarNavigationToItem = (tab: AdminTab, mobile = false) => {
     window.requestAnimationFrame(() => {
       const navigation = document.querySelector<HTMLElement>(
-        mobile ? '[data-admin-sidebar-navigation="mobile"]' : '[data-admin-sidebar-navigation="desktop"]'
+        mobile
+          ? '[data-admin-sidebar-navigation="mobile"]'
+          : '[data-admin-sidebar-navigation="desktop"]',
       );
-      const target = navigation?.querySelector<HTMLElement>(`[data-admin-sidebar-item="${tab}"]`);
+      const target = navigation?.querySelector<HTMLElement>(
+        `[data-admin-sidebar-item="${tab}"]`,
+      );
       if (!navigation || !target) return;
 
       const navigationRect = navigation.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
-      const targetTop = navigation.scrollTop + (targetRect.top - navigationRect.top) - ((navigation.clientHeight - targetRect.height) / 2);
+      const targetTop =
+        navigation.scrollTop +
+        (targetRect.top - navigationRect.top) -
+        (navigation.clientHeight - targetRect.height) / 2;
 
       navigation.scrollTo({
         top: Math.max(0, targetTop),
-        behavior: 'smooth',
+        behavior: "smooth",
       });
     });
   };
 
-
   const handleSidebarTabChange = (tab: AdminTab, mobile = false) => {
-    if (tab === 'campanhas') setCampaignInitialProvider(null);
+    if (tab === "campanhas") setCampaignInitialProvider(null);
     setActiveTab(tab);
     if (mobile) {
       hapticLight();
@@ -172,26 +209,33 @@ export const AdminLayout: React.FC = () => {
     scrollSidebarNavigationToItem(tab);
   };
 
-  const { pullDistance, isRefreshing, handlers: pullToRefreshHandlers } = usePullToRefresh(
-    mainRef,
-    {
-      onRefresh: async () => {
-        window.dispatchEvent(new CustomEvent('adminRefresh'));
-        await new Promise(resolve => setTimeout(resolve, 800)); // wait a bit for data to load
-      }
-    }
-  );
+  const {
+    pullDistance,
+    isRefreshing,
+    handlers: pullToRefreshHandlers,
+  } = usePullToRefresh(mainRef, {
+    onRefresh: async () => {
+      window.dispatchEvent(new CustomEvent("adminRefresh"));
+      await new Promise((resolve) => setTimeout(resolve, 800)); // wait a bit for data to load
+    },
+  });
 
   // Padroniza o foco inicial de todos os modais do Admin sem exigir refs em cada tela.
   React.useEffect(() => {
     const focusFirstModalField = () => {
-      const modal = document.querySelector<HTMLElement>('.admin-shell .fixed.inset-0 form, .admin-shell .fixed.inset-0 [role="dialog"], .admin-shell .fixed.inset-0 .admin-modal');
+      const modal = document.querySelector<HTMLElement>(
+        '.admin-shell .fixed.inset-0 form, .admin-shell .fixed.inset-0 [role="dialog"], .admin-shell .fixed.inset-0 .admin-modal',
+      );
       if (!modal || modal.contains(document.activeElement)) return;
-      const firstField = modal.querySelector<HTMLElement>('[data-autofocus], input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), button[type="submit"]:not([disabled])');
+      const firstField = modal.querySelector<HTMLElement>(
+        '[data-autofocus], input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), button[type="submit"]:not([disabled])',
+      );
       firstField?.focus();
     };
 
-    const observer = new MutationObserver(() => window.requestAnimationFrame(focusFirstModalField));
+    const observer = new MutationObserver(() =>
+      window.requestAnimationFrame(focusFirstModalField),
+    );
     observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, []);
@@ -199,18 +243,18 @@ export const AdminLayout: React.FC = () => {
   // A autorização vem exclusivamente da sessão HTTP e do perfil no banco.
   React.useEffect(() => {
     setIsLoadingAuth(true);
-    authFetch('/api/auth/me')
+    authFetch("/api/auth/me")
       .then(async (res) => {
-        if (!res.ok) throw new Error('Sessão inválida');
+        if (!res.ok) throw new Error("Sessão inválida");
         return res.json();
       })
       .then((user) => {
-        if (user?.role !== 'admin') throw new Error('Acesso restrito');
+        if (user?.role !== "admin") throw new Error("Acesso restrito");
         setIsAuthorized(true);
-        setAdminName(user.name || 'Admin');
+        setAdminName(user.name || "Admin");
       })
-      .catch(() => { 
-        setIsAuthorized(false); 
+      .catch(() => {
+        setIsAuthorized(false);
       })
       .finally(() => {
         setIsLoadingAuth(false);
@@ -219,145 +263,172 @@ export const AdminLayout: React.FC = () => {
 
   if (isLoadingAuth) {
     return (
-      <div className="flex h-[100dvh] items-center justify-center bg-surface-base">
-        <div className="w-8 h-8 border-4 border-gold-base/20 border-t-gold-base rounded-full animate-spin" />
+      <div className="flex h-[100dvh] items-center justify-center bg-[var(--admin-bg)]">
+        <div className="w-8 h-8 border-4 border-[var(--admin-accent)]/20 border-t-gold-base rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!isAuthorized) {
     return (
-      <AdminAuthView 
+      <AdminAuthView
         onLoginSuccess={(user) => {
           setIsAuthorized(true);
-          setAdminName(user.name || 'Admin');
-        }} 
+          setAdminName(user.name || "Admin");
+        }}
       />
     );
   }
 
   const navItems = [
     {
-      id: 'dashboard' as AdminTab,
-      label: 'Hoje',
+      id: "dashboard" as AdminTab,
+      label: "Hoje",
       icon: TrendingUp,
-      description: 'Resumo e alertas do dia',
+      description: "Resumo e alertas do dia",
     },
     {
-      id: 'agenda' as AdminTab,
-      label: 'Agenda',
+      id: "agenda" as AdminTab,
+      label: "Agenda",
       icon: Calendar,
-      description: 'Horários, encaixes e bloqueios',
+      description: "Horários, encaixes e bloqueios",
     },
     {
-      id: 'queue' as AdminTab,
-      label: 'Fila',
+      id: "queue" as AdminTab,
+      label: "Fila",
       icon: Clock,
-      description: 'Atendimentos em andamento',
+      description: "Atendimentos em andamento",
     },
     {
-      id: 'relatorios' as AdminTab,
-      label: 'Relatórios',
+      id: "relatorios" as AdminTab,
+      label: "Relatórios",
       icon: FileText,
-      description: 'Operação e financeiro',
+      description: "Operação e financeiro",
     },
     {
-      id: 'campanhas' as AdminTab,
-      label: 'Campanhas',
+      id: "campanhas" as AdminTab,
+      label: "Campanhas",
       icon: Megaphone,
-      description: 'Crie campanhas e acompanhe resultados',
+      description: "Crie campanhas e acompanhe resultados",
     },
     {
-      id: 'financeiro_recebimentos' as AdminTab,
-      label: 'Recebimentos',
+      id: "financeiro_recebimentos" as AdminTab,
+      label: "Recebimentos",
       icon: Wallet,
-      description: 'Pendências e recebimentos confirmados',
+      description: "Pendências e recebimentos confirmados",
     },
     {
-      id: 'financeiro_extrato' as AdminTab,
-      label: 'Extrato',
+      id: "financeiro_extrato" as AdminTab,
+      label: "Extrato",
       icon: DollarSign,
-      description: 'Livro-caixa persistido',
+      description: "Livro-caixa persistido",
     },
     {
-      id: 'financeiro_saidas' as AdminTab,
-      label: 'Saídas',
+      id: "financeiro_saidas" as AdminTab,
+      label: "Saídas",
       icon: ArrowDownRight,
-      description: 'Despesas e pagamentos',
+      description: "Despesas e pagamentos",
     },
     {
-      id: 'clientes' as AdminTab,
-      label: 'Clientes',
+      id: "clientes" as AdminTab,
+      label: "Clientes",
       icon: UserCheck,
-      description: 'Base de clientes',
+      description: "Base de clientes",
     },
     {
-      id: 'catalogo' as AdminTab,
-      label: 'Catálogo',
+      id: "catalogo" as AdminTab,
+      label: "Catálogo",
       icon: Package,
-      description: 'Serviços, equipe e estoque',
+      description: "Serviços, equipe e estoque",
     },
     {
-      id: 'relacionamento' as AdminTab,
-      label: 'Relacionamento',
+      id: "relacionamento" as AdminTab,
+      label: "Relacionamento",
       icon: Award,
-      description: 'Fidelidade, avaliações e retorno',
+      description: "Fidelidade, avaliações e retorno",
     },
     {
-      id: 'sistema' as AdminTab,
-      label: 'Sistema',
+      id: "sistema" as AdminTab,
+      label: "Sistema",
       icon: Settings,
-      description: 'Unidade, integrações e segurança',
+      description: "Unidade, integrações e segurança",
     },
   ];
 
-
   // Quick bottom bar items matching mobile model
   const bottomBarItems = [
-    { id: 'dashboard' as AdminTab, label: 'Hoje', icon: TrendingUp },
-    { id: 'agenda' as AdminTab, label: 'Agenda', icon: Calendar },
-    { id: 'queue' as AdminTab, label: 'Espera', icon: Clock },
+    { id: "dashboard" as AdminTab, label: "Hoje", icon: TrendingUp },
+    { id: "agenda" as AdminTab, label: "Agenda", icon: Calendar },
+    { id: "queue" as AdminTab, label: "Espera", icon: Clock },
   ];
 
   // Agrupamento puramente visual da navegação: reduz uma lista plana de 12 itens
   // a 4 blocos com propósito claro. Não altera AdminTab, rotas ou persistência de aba.
   const navGroups: { label: string; tabs: AdminTab[] }[] = [
-    { label: 'Operação', tabs: ['dashboard', 'agenda', 'queue'] },
-    { label: 'Financeiro', tabs: ['financeiro_recebimentos', 'financeiro_extrato', 'financeiro_saidas'] },
-    { label: 'Gestão', tabs: ['relatorios', 'campanhas', 'clientes', 'catalogo', 'relacionamento'] },
-    { label: 'Configuração', tabs: ['sistema'] },
+    { label: "Operação", tabs: ["dashboard", "agenda", "queue"] },
+    {
+      label: "Financeiro",
+      tabs: [
+        "financeiro_recebimentos",
+        "financeiro_extrato",
+        "financeiro_saidas",
+      ],
+    },
+    {
+      label: "Gestão",
+      tabs: [
+        "relatorios",
+        "campanhas",
+        "clientes",
+        "catalogo",
+        "relacionamento",
+      ],
+    },
+    { label: "Configuração", tabs: ["sistema"] },
   ];
 
   const renderSidebarNavigation = (mobile = false) => (
     <nav
-      data-admin-sidebar-navigation={mobile ? 'mobile' : 'desktop'}
-      className={mobile ? 'flex-1 px-3 py-4 overflow-y-auto custom-scrollbar' : 'flex-1 px-2 py-4 overflow-y-auto no-scrollbar'}
+      data-admin-sidebar-navigation={mobile ? "mobile" : "desktop"}
+      className={
+        mobile
+          ? "flex-1 px-3 py-4 overflow-y-auto custom-scrollbar"
+          : "flex-1 px-2 py-4 overflow-y-auto no-scrollbar"
+      }
     >
       {navGroups.map((group, groupIndex) => (
-        <div key={group.label} className={groupIndex > 0 ? 'mt-4' : ''}>
-          <p className={`px-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-content-muted/70 ${mobile ? 'px-3' : ''}`}>
+        <div key={group.label} className={groupIndex > 0 ? "mt-4" : ""}>
+          <p
+            className={`px-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)]/70 ${mobile ? "px-3" : ""}`}
+          >
             {group.label}
           </p>
           <div className="admin-sidebar-items space-y-0.5">
-            {navItems.filter((item) => group.tabs.includes(item.id)).map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => handleSidebarTabChange(item.id, mobile)}
-                  data-admin-sidebar-item={item.id}
-                  title={item.description}
-                  className={`admin-sidebar-item w-full ${mobile ? 'min-h-11 px-3 rounded-lg text-sm gap-3' : 'min-h-9 px-2 rounded-md text-xs gap-2'} font-medium flex items-center transition-colors group min-w-0 ${isActive ? 'admin-sidebar-item-active' : ''}`}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  <Icon className={`${mobile ? 'w-[18px] h-[18px]' : 'w-4 h-4'} shrink-0`} />
-                  <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
-                  {isActive && <ChevronRight className="admin-sidebar-item-chevron w-3 h-3 shrink-0" />}
-                </button>
-              );
-            })}
+            {navItems
+              .filter((item) => group.tabs.includes(item.id))
+              .map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleSidebarTabChange(item.id, mobile)}
+                    data-admin-sidebar-item={item.id}
+                    title={item.description}
+                    className={`admin-nav-item w-full ${mobile ? "min-h-[44px]" : "min-h-[36px]"} ${isActive ? "active" : ""}`}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <Icon
+                      className={`${mobile ? "w-[18px] h-[18px]" : "w-4 h-4"} shrink-0`}
+                    />
+                    <span className="flex-1 text-left truncate min-w-0">
+                      {item.label}
+                    </span>
+                    {isActive && <ChevronRight className="w-3 h-3 shrink-0" />}
+                  </button>
+                );
+              })}
           </div>
         </div>
       ))}
@@ -366,7 +437,7 @@ export const AdminLayout: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await authFetch('/api/auth/logout', { method: 'POST' });
+      await authFetch("/api/auth/logout", { method: "POST" });
     } catch (e) {}
     try {
       window.sessionStorage.removeItem(ADMIN_ACTIVE_TAB_KEY);
@@ -374,56 +445,72 @@ export const AdminLayout: React.FC = () => {
     setIsAuthorized(false);
   };
 
-  
-
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard':
-        return <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />;
-      case 'agenda':
+      case "dashboard":
+        return (
+          <NavoHomeView onNavigateToAgenda={() => setActiveTab("agenda")} />
+        );
+      case "agenda":
         return <ScheduleGrid />;
-      case 'queue':
+      case "queue":
         return <WaitingQueue />;
-      case 'relatorios':
+      case "relatorios":
         return <ReportsWorkspace />;
-      case 'campanhas':
-        return <CampaignsWorkspace
-          initialProvider={campaignInitialProvider || undefined}
-          onOpenMetaSettings={() => { setSystemInitialTab('meta_ads'); setActiveTab('sistema'); }}
-          onOpenGoogleSettings={() => { setSystemInitialTab('google_ads'); setActiveTab('sistema'); }}
-        />;
-      case 'financeiro_recebimentos':
+      case "campanhas":
+        return (
+          <CampaignsWorkspace
+            initialProvider={campaignInitialProvider || undefined}
+            onOpenMetaSettings={() => {
+              setSystemInitialTab("meta_ads");
+              setActiveTab("sistema");
+            }}
+            onOpenGoogleSettings={() => {
+              setSystemInitialTab("google_ads");
+              setActiveTab("sistema");
+            }}
+          />
+        );
+      case "financeiro_recebimentos":
         return <ReceiptsManagement />;
-      case 'financeiro_extrato':
+      case "financeiro_extrato":
         return <FinancialStatementManagement />;
-      case 'financeiro_saidas':
+      case "financeiro_saidas":
         return <ExpensesManagement />;
-      case 'clientes':
+      case "clientes":
         return <ClientsManagement />;
-      case 'catalogo':
+      case "catalogo":
         return <CatalogWorkspace />;
-      case 'relacionamento':
+      case "relacionamento":
         return <RelationshipWorkspace />;
-      case 'sistema':
-        return <SystemWorkspace initialTab={systemInitialTab} onOpenCampaigns={(provider = 'meta') => { setCampaignInitialProvider(provider); setActiveTab('campanhas'); }} />;
+      case "sistema":
+        return (
+          <SystemWorkspace
+            initialTab={systemInitialTab}
+            onOpenCampaigns={(provider = "meta") => {
+              setCampaignInitialProvider(provider);
+              setActiveTab("campanhas");
+            }}
+          />
+        );
       default:
         return null;
     }
   };
 
-  const isMoreActive = !bottomBarItems.some(item => item.id === activeTab);
+  const isMoreActive = !bottomBarItems.some((item) => item.id === activeTab);
 
   return (
-    <div className="admin-shell h-[100dvh] bg-surface-base flex text-content-base font-sans antialiased overflow-hidden">
+    <div className="admin-shell h-[100dvh] bg-[var(--admin-bg)] flex text-[var(--admin-text-main)] font-sans antialiased overflow-hidden">
       {/* Desktop Sidebar (Fixed layout for screens >= 1024px) */}
-      <aside className="hidden lg:flex lg:w-56 lg:flex-col shrink-0 lg:bg-surface-card lg:border-r lg:border-border-subtle lg:fixed lg:inset-y-0 lg:left-0 text-content-base z-30">
-        {/* Logo Header (Fixed 56px height) */}
-        <div className="flex items-center h-12 px-3 border-b border-border-subtle shrink-0 bg-surface-card">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-6 h-6 bg-gold-base text-content-on-accent rounded-md flex items-center justify-center shrink-0 font-bold">
-              <Scissors className="w-3.5 h-3.5" />
+      <aside className="hidden lg:flex admin-layout-sidebar lg:fixed lg:inset-y-0 lg:left-0 z-30">
+        {/* Logo Header */}
+        <div className="flex items-center h-[var(--admin-header-height)] px-4 border-b border-[var(--admin-border)] shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-lg flex items-center justify-center shrink-0 font-bold">
+              <Scissors className="w-4 h-4" />
             </div>
-            <h1 className="text-xs font-semibold text-content-base tracking-tight truncate">Navo Premium</h1>
+            <h1 className="admin-title-h3 truncate">Navo Premium</h1>
           </div>
         </div>
 
@@ -431,54 +518,65 @@ export const AdminLayout: React.FC = () => {
         {renderSidebarNavigation()}
 
         {/* User Profile Footer */}
-        <div className="p-2 border-t border-border-subtle shrink-0 bg-surface-card">
-          <div className="flex items-center gap-2 px-2 h-10 rounded-md bg-surface-base border border-border-subtle">
-            <div className="w-6 h-6 rounded-md bg-gold-base flex items-center justify-center text-content-on-accent font-bold text-[10px] uppercase shrink-0">
+        <div className="p-4 border-t border-[var(--admin-border)] shrink-0 flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)] flex items-center justify-center text-[var(--admin-accent-text)] font-bold text-sm uppercase shrink-0">
               {adminName.substring(0, 2)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold text-content-base truncate">{adminName}</p>
-              <p className="text-[9px] font-medium text-content-muted uppercase tracking-wider">Admin</p>
+              <p className="admin-text-body font-semibold truncate text-[var(--admin-text-main)]">
+                {adminName}
+              </p>
+              <p className="admin-label mt-0.5">Administrador</p>
             </div>
+          </div>
+
+          <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
-              className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-surface-base text-content-muted hover:text-gold-base active:bg-surface-elevated transition-colors shrink-0"
-              title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+              className="admin-btn-secondary flex-1 h-9 px-0"
+              title={theme === "dark" ? "Modo claro" : "Modo escuro"}
               aria-label="Alternar tema"
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4 text-content-muted" />}
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4 text-[var(--admin-accent)]" />
+              ) : (
+                <Moon className="w-4 h-4 text-[var(--admin-text-muted)]" />
+              )}
             </button>
-            <AdminNotificationCenter
-              notificationsSupported={notificationsSupported}
-              notificationPermission={notificationPermission}
-              notificationsActive={notificationsActive}
-              notificationsBusy={notificationsBusy}
-              onToggleNotifications={toggleNotifications}
-            />
-            <button 
+            <div className="flex-1 flex justify-center">
+              <AdminNotificationCenter
+                notificationsSupported={notificationsSupported}
+                notificationPermission={notificationPermission}
+                notificationsActive={notificationsActive}
+                notificationsBusy={notificationsBusy}
+                onToggleNotifications={toggleNotifications}
+              />
+            </div>
+            <button
               onClick={handleLogout}
-              className="w-8 h-8 flex items-center justify-center rounded-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800 transition-colors shrink-0"
+              className="admin-btn-secondary text-status-error hover:bg-status-error/10 hover:border-status-error/30 flex-1 h-9 px-0"
               title="Sair"
               aria-label="Sair"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 mx-auto" />
             </button>
           </div>
         </div>
       </aside>
 
       {/* Mobile Topbar */}
-      <header className="admin-mobile-topbar lg:hidden fixed top-0 left-0 right-0 bg-surface-card border-b border-border-subtle z-40 px-3 flex items-center justify-between">
-        <div className="flex items-center gap-2 min-w-0 px-2">
-          <div className="w-7 h-7 bg-gold-base text-content-on-accent rounded-md flex items-center justify-center shrink-0">
+      <header className="admin-mobile-topbar lg:hidden fixed top-0 left-0 right-0 bg-[var(--admin-surface)] border-b border-[var(--admin-border)] z-40 px-3 flex items-center justify-between h-[var(--admin-header-height)]">
+        <div className="flex items-center gap-3 min-w-0 px-1">
+          <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-sm)] flex items-center justify-center shrink-0">
             <Scissors className="w-4 h-4" />
           </div>
-          <h1 className="text-sm font-serif font-bold text-content-base truncate">
-            {navItems.find(i => i.id === activeTab)?.label || 'Navo Premium'}
+          <h1 className="admin-title-h3 truncate">
+            {navItems.find((i) => i.id === activeTab)?.label || "Navo Premium"}
           </h1>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <AdminNotificationCenter
             notificationsSupported={notificationsSupported}
             notificationPermission={notificationPermission}
@@ -489,16 +587,22 @@ export const AdminLayout: React.FC = () => {
           <button
             type="button"
             onClick={toggleTheme}
-            className="w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-content-muted hover:text-gold-base active:text-gold-base active:scale-[0.97] transition-[transform,color,background-color] duration-150"
-            title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-            aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            className="admin-btn-icon admin-btn-ghost rounded-full"
+            title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+            aria-label={
+              theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"
+            }
           >
-            {theme === 'dark' ? <Sun className="w-5 h-5 text-gold-base" /> : <Moon className="w-5 h-5" />}
+            {theme === "dark" ? (
+              <Sun className="w-5 h-5 text-[var(--admin-accent)]" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
           </button>
           <button
             type="button"
             onClick={openMobileNavigation}
-            className="w-10 h-10 flex items-center justify-center rounded-full border border-border-subtle bg-surface-card text-content-muted active:text-gold-base active:scale-[0.97] transition-[transform,color,background-color] duration-150"
+            className="admin-btn-icon admin-btn-ghost rounded-full"
             aria-label="Abrir Menu de Navegação"
           >
             <Menu className="w-5 h-5" />
@@ -507,8 +611,8 @@ export const AdminLayout: React.FC = () => {
       </header>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className="admin-mobile-bottom-bar lg:hidden fixed bottom-0 left-0 right-0 bg-surface-card border-t border-border-subtle z-40 flex items-center justify-around px-2">
-        {bottomBarItems.map(item => {
+      <nav className="admin-mobile-bottom-bar lg:hidden fixed bottom-0 left-0 right-0 bg-[var(--admin-surface)] border-t border-[var(--admin-border)] z-40 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+        {bottomBarItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (
@@ -516,40 +620,46 @@ export const AdminLayout: React.FC = () => {
               key={item.id}
               type="button"
               onClick={() => handleSidebarTabChange(item.id, true)}
-              aria-current={isActive ? 'page' : undefined}
-              className={`admin-bottom-nav-item flex-1 min-h-14 flex flex-col items-center justify-center gap-0.5 rounded-md transition-[transform,color,background-color] duration-150 active:scale-[0.97] ${
-                isActive 
-                  ? 'text-gold-base font-bold bg-gold-base/10' 
-                  : 'text-content-muted hover:text-content-base'
+              aria-current={isActive ? "page" : undefined}
+              className={`flex-1 min-h-[64px] flex flex-col items-center justify-center gap-1 rounded-[var(--admin-radius-md)] my-1 mx-0.5 transition-colors active:scale-[0.97] ${
+                isActive
+                  ? "text-[var(--admin-accent)] font-semibold bg-[var(--admin-accent)]/10"
+                  : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)]"
               }`}
             >
               <Icon className="w-5 h-5 shrink-0" />
-              <span className="admin-button-label text-[11px] font-semibold tracking-tight max-w-[76px]">{item.label}</span>
+              <span className="text-[10px] font-medium tracking-tight max-w-[76px] truncate">
+                {item.label}
+              </span>
             </button>
           );
         })}
 
         {/* 4th Item: Menu / Mais */}
         <button
-                      type="button"
+          type="button"
           onClick={openMobileNavigation}
-          className={`admin-bottom-nav-item flex-1 min-h-14 flex flex-col items-center justify-center gap-0.5 rounded-md transition-[transform,color,background-color] duration-150 active:scale-[0.97] ${
-            isMoreActive ? 'text-gold-base font-bold' : 'text-content-muted hover:text-content-base'
+          className={`flex-1 min-h-[64px] flex flex-col items-center justify-center gap-1 rounded-[var(--admin-radius-md)] my-1 mx-0.5 transition-colors active:scale-[0.97] ${
+            isMoreActive
+              ? "text-[var(--admin-accent)] font-semibold bg-[var(--admin-accent)]/10"
+              : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)]"
           }`}
         >
           <MoreHorizontal className="w-5 h-5 shrink-0" />
-          <span className="admin-button-label text-[11px] font-semibold tracking-tight max-w-[76px]">Mais</span>
+          <span className="text-[10px] font-medium tracking-tight max-w-[76px] truncate">
+            Mais
+          </span>
         </button>
       </nav>
 
       {/* Mobile Drawer (Side sheet) */}
       <div
-        className={`admin-mobile-drawer lg:hidden fixed inset-0 z-50 flex justify-start ${sidebarOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        className={`admin-mobile-drawer lg:hidden fixed inset-0 z-50 flex justify-start ${sidebarOpen ? "pointer-events-auto" : "pointer-events-none"}`}
         aria-hidden={!sidebarOpen}
         inert={!sidebarOpen}
       >
         <div
-          className={`fixed inset-0 bg-black/55 transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
+          className={`fixed inset-0 bg-black/55 transition-opacity duration-200 ${sidebarOpen ? "opacity-100" : "opacity-0"}`}
           onClick={closeMobileNavigation}
           aria-hidden="true"
         />
@@ -557,20 +667,20 @@ export const AdminLayout: React.FC = () => {
         <aside
           ref={sidebarRef}
           tabIndex={-1}
-          className={`relative w-[min(280px,84vw)] bg-surface-card text-content-base flex flex-col border-r border-border-subtle h-[100dvh] outline-none transform transition-transform duration-200 ease-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+          className={`relative w-[min(280px,84vw)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] flex flex-col border-r border-[var(--admin-border)] h-[100dvh] outline-none transform transition-transform duration-200 ease-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between min-h-14 px-4 pt-[env(safe-area-inset-top)] border-b border-border-subtle shrink-0">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-6 h-6 bg-gold-base text-content-on-accent rounded-md flex items-center justify-center shrink-0 font-bold">
-                <Scissors className="w-3.5 h-3.5" />
+          <div className="flex items-center justify-between min-h-[var(--admin-header-height)] px-4 pt-[env(safe-area-inset-top)] border-b border-[var(--admin-border)] shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-sm)] flex items-center justify-center shrink-0 font-bold">
+                <Scissors className="w-4 h-4" />
               </div>
-              <h1 className="text-sm font-serif font-bold text-content-base truncate">Navo Premium</h1>
+              <h1 className="admin-title-h3 truncate">Navo Premium</h1>
             </div>
             <button
               type="button"
               onClick={closeMobileNavigation}
-              className="w-10 h-10 flex items-center justify-center rounded-xl text-content-muted hover:text-content-base active:bg-surface-base active:scale-[0.97] transition-[transform,color,background-color] duration-150"
+              className="admin-btn-icon-sm admin-btn-ghost rounded-[var(--admin-radius-sm)]"
               aria-label="Fechar menu"
             >
               <X className="w-5 h-5" />
@@ -581,7 +691,7 @@ export const AdminLayout: React.FC = () => {
           {renderSidebarNavigation(true)}
 
           {/* Mobile Footer */}
-          <div className="p-3 border-t border-border-subtle shrink-0 space-y-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+          <div className="p-4 border-t border-[var(--admin-border)] shrink-0 space-y-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <AdminNotificationCenter
               notificationsSupported={notificationsSupported}
               notificationPermission={notificationPermission}
@@ -594,16 +704,22 @@ export const AdminLayout: React.FC = () => {
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="h-11 w-11 flex items-center justify-center rounded-xl border border-border-subtle bg-surface-base text-content-muted hover:text-gold-base active:scale-[0.97] transition-[transform,color,background-color] duration-150 shrink-0"
-                title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-                aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+                className="admin-btn-secondary flex-1 h-10 px-0"
+                title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+                aria-label={
+                  theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"
+                }
               >
-                {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-base" /> : <Moon className="w-4 h-4" />}
+                {theme === "dark" ? (
+                  <Sun className="w-4 h-4 text-[var(--admin-accent)]" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
               </button>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex-1 h-11 flex items-center justify-center gap-2 px-3 rounded-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800 active:scale-[0.99] font-semibold text-xs transition-[transform,background-color] duration-150 min-w-0"
+                className="admin-btn-secondary flex-[2] h-10 text-status-error hover:bg-status-error/10 hover:border-status-error/30"
               >
                 <LogOut className="w-4 h-4 shrink-0" />
                 <span className="admin-button-label">Sair</span>
@@ -614,11 +730,24 @@ export const AdminLayout: React.FC = () => {
       </div>
 
       {/* Main Content Area */}
-      <main ref={mainRef} className="flex-1 lg:ml-56 pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full" tabIndex={-1} onTouchStart={pullToRefreshHandlers.onTouchStart} onTouchMove={pullToRefreshHandlers.onTouchMove} onTouchEnd={pullToRefreshHandlers.onTouchEnd}>
-        <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
-        <div className="max-w-[1320px] mx-auto px-3 sm:px-5 lg:px-6 py-5 lg:pt-6 lg:pb-10 pb-[calc(6rem+env(safe-area-inset-bottom))] w-full min-w-0">
+      <main
+        ref={mainRef}
+        className="admin-layout-main lg:ml-[var(--admin-sidebar-width)] pt-[calc(var(--admin-header-height)+env(safe-area-inset-top))] lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full"
+        tabIndex={-1}
+        onTouchStart={pullToRefreshHandlers.onTouchStart}
+        onTouchMove={pullToRefreshHandlers.onTouchMove}
+        onTouchEnd={pullToRefreshHandlers.onTouchEnd}
+      >
+        <PullToRefreshIndicator
+          pullDistance={pullDistance}
+          isRefreshing={isRefreshing}
+        />
+        <div className="admin-content-wrapper">
           {/* Tab Content */}
-          <div key={activeTab} className="admin-content-transition w-full min-w-0">
+          <div
+            key={activeTab}
+            className="admin-content-transition w-full min-w-0"
+          >
             {renderContent()}
           </div>
         </div>
@@ -626,5 +755,3 @@ export const AdminLayout: React.FC = () => {
     </div>
   );
 };
-
-

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 type AdminSkeletonProps = {
   className?: string;
@@ -6,13 +6,13 @@ type AdminSkeletonProps = {
 };
 
 export const AdminSkeleton: React.FC<AdminSkeletonProps> = ({
-  className = '',
-  label = 'Carregando conteúdo',
+  className = "",
+  label = "Carregando conteúdo",
 }) => (
   <div
     aria-label={label}
     aria-busy="true"
-    className={`admin-skeleton rounded-lg bg-surface-base ${className}`}
+    className={`admin-skeleton rounded-lg bg-[var(--admin-bg)] ${className}`}
   />
 );
 
@@ -23,11 +23,18 @@ type AdminListSkeletonProps = {
 
 export const AdminListSkeleton: React.FC<AdminListSkeletonProps> = ({
   rows = 4,
-  className = '',
+  className = "",
 }) => (
-  <div className={`space-y-3 ${className}`} aria-label="Carregando lista" aria-busy="true">
+  <div
+    className={`space-y-3 ${className}`}
+    aria-label="Carregando lista"
+    aria-busy="true"
+  >
     {Array.from({ length: rows }, (_, index) => (
-      <div key={index} className="flex items-center gap-3 rounded-xl border border-border-subtle bg-surface-card px-3 py-3">
+      <div
+        key={index}
+        className="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-3"
+      >
         <AdminSkeleton className="h-10 w-10 shrink-0 rounded-full" />
         <div className="min-w-0 flex-1 space-y-2">
           <AdminSkeleton className="h-3 w-2/5" />

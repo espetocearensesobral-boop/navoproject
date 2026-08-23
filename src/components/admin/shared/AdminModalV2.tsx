@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
-import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
-import { useDialogFocus } from '../../../hooks/useDialogFocus';
-import { useModalScrollLock } from '../../../hooks/useModalScrollLock';
+import React, { useRef } from "react";
+import { createPortal } from "react-dom";
+import { X } from "lucide-react";
+import { useDialogFocus } from "../../../hooks/useDialogFocus";
+import { useModalScrollLock } from "../../../hooks/useModalScrollLock";
 
 export interface AdminModalV2Props {
   /** Small icon shown inside the circular header badge. */
@@ -15,9 +15,9 @@ export interface AdminModalV2Props {
   subtitle?: string;
   onClose: () => void;
   /** 'sm' matches the receipt checkout width (420px). 'md' fits forms/pickers (560px). 'lg' fits grids (720px). */
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   /** Tint applied to the header icon badge — defaults to gold. */
-  accent?: 'gold' | 'whatsapp' | 'neutral';
+  accent?: "gold" | "whatsapp" | "neutral";
   children: React.ReactNode;
   /** Sticky footer, typically the action buttons. Rendered outside the scroll area. */
   footer?: React.ReactNode;
@@ -36,18 +36,23 @@ export const AdminModalV2: React.FC<AdminModalV2Props> = ({
   title,
   subtitle,
   onClose,
-  size = 'sm',
-  accent = 'gold',
+  size = "sm",
+  accent = "gold",
   children,
   footer,
-  labelledBy = 'admin-modal-v2-title',
+  labelledBy = "admin-modal-v2-title",
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   useDialogFocus(true, dialogRef);
   useModalScrollLock(true);
 
   return createPortal(
-    <div className="admin-modal-v2-overlay" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
+    <div
+      className="admin-modal-v2-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={labelledBy}
+    >
       <div
         ref={dialogRef}
         tabIndex={-1}
@@ -55,16 +60,27 @@ export const AdminModalV2: React.FC<AdminModalV2Props> = ({
       >
         <header className="admin-modal-v2-header">
           <div className="admin-modal-v2-title-group">
-            <span className={`admin-modal-v2-header-icon admin-modal-v2-header-icon--${accent}`}>
+            <span
+              className={`admin-modal-v2-header-icon admin-modal-v2-header-icon--${accent}`}
+            >
               <Icon aria-hidden="true" />
             </span>
             <div className="admin-modal-v2-title-copy">
               <p className="admin-modal-v2-label">{eyebrow}</p>
-              <h2 id={labelledBy} className="admin-modal-v2-title">{title}</h2>
-              {subtitle && <p className="admin-modal-v2-subtitle">{subtitle}</p>}
+              <h2 id={labelledBy} className="admin-modal-v2-title">
+                {title}
+              </h2>
+              {subtitle && (
+                <p className="admin-modal-v2-subtitle">{subtitle}</p>
+              )}
             </div>
           </div>
-          <button type="button" onClick={onClose} className="admin-modal-v2-close" aria-label="Fechar">
+          <button
+            type="button"
+            onClick={onClose}
+            className="admin-modal-v2-close"
+            aria-label="Fechar"
+          >
             <X aria-hidden="true" />
           </button>
         </header>

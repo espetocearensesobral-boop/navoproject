@@ -1,5 +1,5 @@
-import React from 'react';
-import { LucideIcon, Plus } from 'lucide-react';
+import React from "react";
+import { LucideIcon, Plus } from "lucide-react";
 
 /**
  * Padrão único de cabeçalho para todas as telas do /admin.
@@ -18,7 +18,14 @@ export interface AdminStat {
   label: string;
   value: string | number;
   /** Cor de destaque do valor. Default = dourado. */
-  tone?: 'gold' | 'success' | 'info' | 'warning' | 'muted' | 'finance-positive' | 'finance-negative';
+  tone?:
+    | "gold"
+    | "success"
+    | "info"
+    | "warning"
+    | "muted"
+    | "finance-positive"
+    | "finance-negative";
 }
 
 export interface AdminPageHeaderAction {
@@ -37,14 +44,14 @@ interface AdminPageHeaderProps {
   children?: React.ReactNode;
 }
 
-const TONE_CLASSES: Record<NonNullable<AdminStat['tone']>, string> = {
-  gold: 'text-gold-base',
-  success: 'text-status-success',
-  info: 'text-blue-400',
-  warning: 'text-amber-400',
-  muted: 'text-content-muted',
-  'finance-positive': 'finance-positive',
-  'finance-negative': 'finance-negative',
+const TONE_CLASSES: Record<NonNullable<AdminStat["tone"]>, string> = {
+  gold: "text-[var(--admin-accent)]",
+  success: "text-status-success",
+  info: "text-blue-400",
+  warning: "text-amber-400",
+  muted: "text-[var(--admin-text-muted)]",
+  "finance-positive": "finance-positive",
+  "finance-negative": "finance-negative",
 };
 
 export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
@@ -57,26 +64,32 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
   const ActionIcon = action?.icon ?? Plus;
 
   return (
-    <div className="hidden md:flex min-h-12 items-center justify-between gap-4 border-b border-border-subtle pb-3 overflow-hidden">
-      <div className="flex items-center gap-2.5 min-w-0 flex-1">
-        <div className="w-7 h-7 rounded-md bg-surface-card text-gold-base flex items-center justify-center border border-border-subtle shrink-0">
+    <div className="hidden md:flex min-h-[48px] items-center justify-between gap-4 border-b border-[var(--admin-border)] pb-4 overflow-hidden">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="w-8 h-8 rounded-[var(--admin-radius-sm)] bg-[var(--admin-surface)] text-[var(--admin-accent)] flex items-center justify-center border border-[var(--admin-border)] shrink-0">
           <Icon className="w-4 h-4" />
         </div>
 
-        <h1 className="admin-copy-title text-sm font-semibold text-content-base tracking-tight truncate min-w-0 shrink">
+        <h1 className="admin-title-h2 text-[var(--admin-text-main)] truncate min-w-0 shrink">
           {title}
         </h1>
 
         {stats.length > 0 && (
-          <div className="flex items-center gap-1.5 text-xs text-content-muted whitespace-nowrap pl-3 border-l border-border-subtle ml-2 shrink-0 overflow-x-auto no-scrollbar max-w-[45vw]">
+          <div className="flex items-center gap-2 text-[var(--text-body-sm)] text-[var(--admin-text-muted)] whitespace-nowrap pl-4 border-l border-[var(--admin-border)] ml-2 shrink-0 overflow-x-auto no-scrollbar max-w-[45vw]">
             {stats.map((stat, idx) => (
               <React.Fragment key={stat.label}>
-                {idx > 0 && <span className="text-border-subtle">·</span>}
-                <span className="admin-copy-label">
-                  <span className={`font-semibold ${TONE_CLASSES[stat.tone ?? 'gold']}`}>
+                {idx > 0 && (
+                  <span className="text-[var(--admin-border)]">·</span>
+                )}
+                <span className="admin-label">
+                  <span
+                    className={`font-semibold ${TONE_CLASSES[stat.tone ?? "gold"]}`}
+                  >
                     {stat.value}
-                  </span>{' '}
-                  {stat.label}
+                  </span>{" "}
+                  <span className="text-[var(--admin-text-muted)] font-medium normal-case tracking-normal">
+                    {stat.label}
+                  </span>
                 </span>
               </React.Fragment>
             ))}
@@ -90,9 +103,9 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
           <button
             onClick={action.onClick}
             disabled={action.disabled}
-            className="min-h-9 min-w-0 px-3 py-1.5 rounded-md bg-gold-base text-content-on-accent font-bold text-xs flex items-center gap-1.5 hover:bg-gold-hover active:scale-95 transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap shrink-0"
+            className="admin-btn-sm admin-btn-primary shrink-0"
           >
-            <ActionIcon className="w-4 h-4 stroke-[3] shrink-0" />
+            <ActionIcon className="w-4 h-4 shrink-0" />
             <span className="admin-button-label">{action.label}</span>
           </button>
         )}
