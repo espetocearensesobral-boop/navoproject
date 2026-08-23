@@ -3061,6 +3061,15 @@ button, a, input, select, textarea {
   overflow-y: visible !important;
 }
 
+/* Dedicated sticky/fixed footer outside scrollable area */
+.receipt-v2-footer {
+  flex-shrink: 0 !important;
+  padding: 14px 20px !important;
+  background: var(--admin-surface, var(--color-surface-card, #1e2023)) !important;
+  border-top: 1px solid var(--admin-border, var(--color-border-subtle, rgba(255, 255, 255, 0.08))) !important;
+  z-index: 10 !important;
+}
+
 
 /* Mobile hardening: scoped to the admin shell, preserving desktop and checkout geometry. */
 @media (max-width: 1023px) {

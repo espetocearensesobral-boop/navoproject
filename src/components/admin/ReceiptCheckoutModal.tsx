@@ -5,9 +5,7 @@ import {
   ArrowRight,
   Banknote,
   CheckCircle2,
-  ChevronDown,
   ClipboardCheck,
-  Clock3,
   CreditCard,
   FileText,
   Info,
@@ -15,6 +13,8 @@ import {
   Printer,
   QrCode,
   ReceiptText,
+  Share2,
+  Tag,
   UserRound,
   WalletCards,
   X,
@@ -53,7 +53,7 @@ interface ReceiptCheckoutModalProps {
   onReceived: (receipt: ReceiptItem) => void;
 }
 
-type CheckoutStep = "decision" | 1 | 2 | 3;
+type CheckoutStep = "decision" | 1 | 2;
 type AdjustmentMode = "percent" | "amount";
 
 const money = (value: number) =>
@@ -81,8 +81,8 @@ const paymentOptions: {
 
 const paymentLabel: Record<ReceiptPaymentMethod, string> = {
   pix: "PIX",
-  credit_card: "Cartão de crédito",
-  debit_card: "Cartão de débito",
+  credit_card: "Cartão de Crédito",
+  debit_card: "Cartão de Débito",
   cash: "Dinheiro",
   other: "Outro meio",
 };
@@ -121,7 +121,6 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   useDialogFocus(true, dialogRef);
-
   useModalScrollLock(true);
 
   const calculation = useMemo(() => {
@@ -164,6 +163,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
       total,
       amountReceived,
       change: Math.max(0, amountReceived - total),
+      isCashShort: paymentMethod === "cash" && amountReceived < total,
     };
   }, [
     cashReceived,
@@ -205,7 +205,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
       const message =
         requestError instanceof Error
           ? requestError.message
-          : "Não foi possível criar a pendência.";
+          : "Não foi possível criar a pendência de recebimento.";
       setError(message);
       return null;
     } finally {
@@ -274,36 +274,52 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
             `<div class="print-row"><span>${escapePrintHtml(label)}</span><strong>${escapePrintHtml(value)}</strong></div>`,
         )
         .join("");
-      const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' : ""}<h2 class="print-center">Comprovante</h2><hr class="print-divider">${contextRows}<hr class="print-divider">${valueRows}${settings.showObservations && receipt.observations ? `<hr class="print-divider"><p><strong>Observações:</strong> ${escapePrintHtml(receipt.observations)}</p>` : ""}`;
+      const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' : ""}<h2 class="print-center">Comprovante de Pagamento</h2><hr class="print-divider">${contextRows}<hr class="print-divider">${valueRows}${settings.showObservations && receipt.observations ? `<hr class="print-divider"><p><strong>Observações:</strong> ${escapePrintHtml(receipt.observations)}</p>` : ""}`;
       if (
         !openPrintWindow({
-          title: "Comprovante",
+          title: "Comprovante de Pagamento",
           settings,
           format: settings.receiptFormat,
           bodyHtml,
         })
       ) {
         setError(
-          "A impressão foi bloqueada. Permita pop-ups e tente novamente.",
+          "A impressão foi bloqueada pelo navegador. Permita pop-ups e tente novamente.",
         );
       }
     } catch (requestError) {
       setError(
         requestError instanceof Error
           ? requestError.message
-          : "Não foi possível preparar a impressão.",
+          : "Não foi possível preparar o comprovante de impressão.",
       );
     }
   };
 
+  const handleShareWhatsApp = () => {
+    if (!receipt) return;
+    const clientName = receipt.clientName || source.clientName;
+    const phone = (source.clientPhone || "").replace(/\D/g, "");
+    const totalFormatted = money(receipt.totalAmount);
+    const dateFormatted = new Date(
+      receipt.receivedAt || Date.now(),
+    ).toLocaleString("pt-BR");
+    const methodStr = paymentLabel[receipt.paymentMethod || "other"];
+
+    const msg = `*Navo Barber & Club - Comprovante de Pagamento*\n\nOlá, ${clientName}!\nConfirmamos o pagamento referente ao serviço *${receipt.serviceTitle}*.\n\n*Detalhes:*\n• Profissional: ${receipt.professionalName || "Profissional"}\n• Forma: ${methodStr}\n• Valor: *${totalFormatted}*\n• Data: ${dateFormatted}\n\nAgradecemos a preferência e até a próxima!`;
+
+    const targetUrl = phone
+      ? `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`
+      : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+    window.open(targetUrl, "_blank");
+  };
+
   const handleConfirmReceipt = async () => {
     if (!receipt) return;
-    if (
-      paymentMethod === "cash" &&
-      calculation.amountReceived < calculation.total
-    ) {
+    if (calculation.isCashShort) {
       setError(
-        "O valor recebido deve ser igual ou superior ao total para pagamento em dinheiro.",
+        "O valor recebido em dinheiro é menor que o total da comanda/serviço.",
       );
       return;
     }
@@ -329,29 +345,26 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
       setError(
         requestError instanceof Error
           ? requestError.message
-          : "Não foi possível confirmar.",
+          : "Não foi possível confirmar o recebimento.",
       );
     } finally {
       setIsConfirming(false);
     }
   };
 
-  const stepLabel =
-    step === "decision" ? "Recebimento" : `Recebimento · Etapa ${step} de 3`;
   const isConfirmed = receipt?.status === "received";
-  const adjustmentSummary =
-    calculation.discountAmount > 0 || calculation.surchargeAmount > 0
-      ? [
-          calculation.discountAmount > 0
-            ? `− ${money(calculation.discountAmount)}`
-            : "",
-          calculation.surchargeAmount > 0
-            ? `+ ${money(calculation.surchargeAmount)}`
-            : "",
-        ]
-          .filter(Boolean)
-          .join(" · ")
-      : "Sem ajustes";
+
+  const getHeaderTitle = () => {
+    if (isConfirmed) return "Recebimento confirmado";
+    if (step === "decision") return "Conclusão de atendimento";
+    if (step === 1) return "Finalizar recebimento";
+    return "Revisão e confirmação";
+  };
+
+  const getHeaderSubtitle = () => {
+    if (isConfirmed) return `Código #${receipt?.id.slice(-8).toUpperCase()}`;
+    return `${source.clientName} · ${source.serviceTitle}`;
+  };
 
   return createPortal(
     <div
@@ -361,18 +374,32 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
       aria-labelledby="receipt-dialog-title"
     >
       <div ref={dialogRef} tabIndex={-1} className="receipt-v2-dialog">
+        {/* HEADER FIXO */}
         <header className="receipt-v2-header">
           <div className="receipt-v2-title-group">
             <span className="receipt-v2-header-icon">
-              <Clock3 aria-hidden="true" />
+              {isConfirmed ? (
+                <CheckCircle2 className="text-status-success" aria-hidden="true" />
+              ) : step === 2 ? (
+                <ClipboardCheck aria-hidden="true" />
+              ) : (
+                <CreditCard aria-hidden="true" />
+              )}
             </span>
             <div className="receipt-v2-title-copy">
-              <p className="receipt-v2-label">{stepLabel}</p>
-              <h2 id="receipt-dialog-title" className="receipt-v2-title">
+              <p className="receipt-v2-label">
                 {isConfirmed
-                  ? "Recebimento confirmado"
-                  : "Finalizar recebimento"}
+                  ? "Comprovante emitido"
+                  : step === "decision"
+                    ? "Etapa inicial"
+                    : `Etapa ${step} de 2`}
+              </p>
+              <h2 id="receipt-dialog-title" className="receipt-v2-title">
+                {getHeaderTitle()}
               </h2>
+              <p className="text-xs text-[var(--admin-text-muted)] truncate max-w-[260px] sm:max-w-xs mt-0.5">
+                {getHeaderSubtitle()}
+              </p>
             </div>
           </div>
           <button
@@ -385,523 +412,566 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           </button>
         </header>
 
-        {!isConfirmed && <CheckoutProgress step={step} />}
+        {/* PROGRESS BAR FIXO */}
+        {!isConfirmed && step !== "decision" && (
+          <div className="receipt-v2-progress px-5 sm:px-6 mb-3">
+            <div className="flex items-center gap-2">
+              <div
+                className={`flex-1 h-1.5 rounded-full transition-all ${
+                  step >= 1 ? "bg-[var(--admin-accent)]" : "bg-[var(--admin-border)]"
+                }`}
+              />
+              <div
+                className={`flex-1 h-1.5 rounded-full transition-all ${
+                  step >= 2 ? "bg-[var(--admin-accent)]" : "bg-[var(--admin-border)]"
+                }`}
+              />
+            </div>
+          </div>
+        )}
 
+        {/* CORPO COM ROLAGEM SUAVE */}
         <div className="receipt-v2-scroll">
           {error && (
-            <div className="receipt-v2-error" role="alert">
-              {error}
+            <div
+              className="mb-4 rounded-xl border border-status-error/30 bg-status-error/10 p-3 text-xs font-semibold text-status-error flex items-start gap-2"
+              role="alert"
+            >
+              <Info className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{error}</span>
             </div>
           )}
 
-          {step === "decision" && (
-            <div className="receipt-v2-content receipt-v2-decision">
-              <div className="receipt-v2-decision-card">
-                <span className="receipt-v2-decision-icon">
-                  <CheckCircle2 aria-hidden="true" />
-                </span>
-                <div>
-                  <strong>Atendimento concluído.</strong>
-                  <p>
-                    {source.serviceTitle} · {money(originalAmount)}
-                  </p>
+          {/* PASSO: DECISÃO INICIAL (FILA) */}
+          {step === "decision" && !isConfirmed && (
+            <div className="space-y-4">
+              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 sm:p-5 text-center space-y-2 shadow-xs">
+                <div className="w-12 h-12 rounded-full bg-status-success/15 text-status-success mx-auto flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-bold text-[var(--admin-text-main)]">
+                  Atendimento finalizado com sucesso!
+                </h3>
+                <p className="text-xs text-[var(--admin-text-muted)] max-w-sm mx-auto">
+                  O atendimento de <strong>{source.clientName}</strong> ({source.serviceTitle}) está concluído.
+                </p>
+                <div className="pt-2 text-2xl font-serif font-bold text-[var(--admin-accent)]">
+                  {money(originalAmount)}
                 </div>
               </div>
-              <div className="receipt-v2-decision-copy">
-                <h3>Registrar agora?</h3>
+
+              <div className="bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-3.5 text-xs text-[var(--admin-text-muted)] space-y-1">
+                <p className="font-bold text-[var(--admin-text-main)]">
+                  O que deseja fazer agora?
+                </p>
                 <p>
-                  Depois, ficará pendente em{" "}
-                  <strong>Financeiro › Recebimentos</strong>.
+                  • <strong>Registrar agora:</strong> Define forma de pagamento, descontos e confirma o recebimento imediatamente no extrato.
+                </p>
+                <p>
+                  • <strong>Registrar depois:</strong> Mantém como pendência na aba <em>Financeiro › Recebimentos</em> para acerto posterior.
                 </p>
               </div>
-              <div className="receipt-v2-decision-actions">
-                <button
-                  type="button"
-                  onClick={handleRegisterLater}
-                  disabled={isCreating}
-                  className="receipt-v2-secondary"
-                >
-                  {isCreating ? "Criando…" : "Registrar depois"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRegisterNow}
-                  disabled={isCreating}
-                  className="receipt-v2-primary"
-                >
-                  {isCreating ? (
-                    <Loader2 className="receipt-v2-button-icon receipt-v2-spin" />
-                  ) : (
-                    <ReceiptText className="receipt-v2-button-icon" />
-                  )}
-                  Registrar agora
-                </button>
-              </div>
             </div>
           )}
 
+          {/* PASSO 1: VALORES, DESCONTOS & PAGAMENTO */}
           {step === 1 && !isConfirmed && (
             <form
-              className="receipt-v2-content"
+              id="checkout-step-1-form"
               onKeyDown={handleEnterAsTab}
-              onSubmit={(event) => {
-                event.preventDefault();
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (calculation.isCashShort) {
+                  setError("O valor recebido em dinheiro deve ser maior ou igual ao total.");
+                  return;
+                }
+                setError(null);
                 setStep(2);
               }}
+              className="space-y-4"
             >
-              <CheckoutHero
-                label="Valor do serviço"
-                value={money(originalAmount)}
-                meta={
-                  source.clientPhone
-                    ? `${source.clientName} · ${source.clientPhone}`
-                    : source.clientName
-                }
-              />
-              <ServiceSummary
-                title={source.serviceTitle}
-                value={money(originalAmount)}
-              />
-              <label className="receipt-v2-notes-field">
-                <span className="receipt-v2-field-label">Observações</span>
-                <input
-                  value={observations}
-                  onChange={(event) => setObservations(event.target.value)}
-                  placeholder="Ex.: pagar no próximo atendimento"
-                  className="receipt-v2-minimal-input"
-                />
-              </label>
-              <InlineNotice>
-                Ao confirmar, o recebimento será marcado como recebido e entrará
-                no extrato financeiro. Esta ação não poderá ser repetida.
-              </InlineNotice>
-              <CheckoutNav
-                onBack={onClose}
-                primaryLabel="Revisar valores"
-                primaryIcon={<ArrowRight aria-hidden="true" />}
-              />
-            </form>
-          )}
-
-          {step === 2 && !isConfirmed && (
-            <form
-              className="receipt-v2-content"
-              onKeyDown={handleEnterAsTab}
-              onSubmit={(event) => {
-                event.preventDefault();
-                setStep(3);
-              }}
-            >
-              <CheckoutHero
-                label="Valor do serviço"
-                value={money(originalAmount)}
-                meta={source.clientName}
-              />
-              <details className="receipt-v2-accordion">
-                <summary className="receipt-v2-accordion-summary">
-                  <span>Ajustes do valor</span>
-                  <span className="receipt-v2-summary-right">
-                    <span>{adjustmentSummary}</span>
-                    <ChevronDown aria-hidden="true" />
-                  </span>
-                </summary>
-                <div className="receipt-v2-accordion-body">
-                  <div className="receipt-v2-adjust-grid">
-                    <AdjustmentControl
-                      label="Desconto"
-                      mode={discountMode}
-                      value={discountValue}
-                      onModeChange={setDiscountMode}
-                      onValueChange={setDiscountValue}
-                      calculated={calculation.discountAmount}
-                      tone="negative"
-                    />
-                    <AdjustmentControl
-                      label="Acréscimo"
-                      mode={surchargeMode}
-                      value={surchargeValue}
-                      onModeChange={setSurchargeMode}
-                      onValueChange={setSurchargeValue}
-                      calculated={calculation.surchargeAmount}
-                      tone="positive"
-                    />
+              {/* CARD HERO DE ATENDIMENTO */}
+              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-2">
+                <div className="flex items-center justify-between text-xs text-[var(--admin-text-muted)]">
+                  <span>Valor base do serviço</span>
+                  <span className="font-semibold text-[var(--admin-text-main)]">{source.serviceTitle}</span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <div className="text-2xl font-serif font-bold text-[var(--admin-text-main)]">
+                    {money(originalAmount)}
+                  </div>
+                  <div className="text-xs text-[var(--admin-text-muted)] flex items-center gap-1">
+                    <UserRound className="w-3.5 h-3.5" />
+                    <span>{source.professionalName || "Profissional padrão"}</span>
                   </div>
                 </div>
-              </details>
-              <div className="receipt-v2-total">
-                <span>Valor total</span>
-                <strong>{money(calculation.total)}</strong>
               </div>
-              <div className="receipt-v2-payment">
-                <span className="receipt-v2-field-label">
-                  Forma de pagamento
-                </span>
-                <div
-                  className="receipt-v2-payment-scroll"
-                  role="radiogroup"
-                  aria-label="Forma de pagamento"
-                >
-                  {paymentOptions.map((option) => {
-                    const Icon = option.icon;
-                    const selected = paymentMethod === option.id;
-                    return (
-                      <button
-                        key={option.id}
-                        type="button"
-                        role="radio"
-                        aria-checked={selected}
-                        onClick={() => setPaymentMethod(option.id)}
-                        className={`receipt-v2-payment-chip ${selected ? "is-selected" : ""}`}
-                      >
-                        <Icon aria-hidden="true" />
-                        <span>{option.label}</span>
-                      </button>
-                    );
-                  })}
+
+              {/* AJUSTES: DESCONTO E ACRÉSCIMO */}
+              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-3">
+                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
+                  <Tag className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
+                  <span>Ajustes de Valor</span>
                 </div>
-              </div>
-              {paymentMethod === "cash" && (
-                <div className="receipt-v2-cash">
-                  <p>
-                    <Banknote aria-hidden="true" />
-                    Dinheiro e troco
-                  </p>
-                  <div className="receipt-v2-cash-grid">
-                    <label>
-                      <span>Valor recebido</span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* DESCONTO */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-medium text-[var(--admin-text-muted)]">Desconto</span>
+                      <span className="font-bold text-status-error text-[11px]">
+                        {calculation.discountAmount > 0 ? `− ${money(calculation.discountAmount)}` : "R$ 0,00"}
+                      </span>
+                    </div>
+                    <div className="flex rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] overflow-hidden focus-within:border-[var(--admin-accent)]">
+                      <div className="flex border-r border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                        <button
+                          type="button"
+                          onClick={() => setDiscountMode("percent")}
+                          className={`px-2.5 py-1.5 text-xs font-bold transition-colors ${
+                            discountMode === "percent"
+                              ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                              : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                          }`}
+                        >
+                          %
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDiscountMode("amount")}
+                          className={`px-2.5 py-1.5 text-xs font-bold transition-colors ${
+                            discountMode === "amount"
+                              ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                              : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                          }`}
+                        >
+                          R$
+                        </button>
+                      </div>
+                      <input
+                        type="number"
+                        min="0"
+                        max={discountMode === "percent" ? 100 : undefined}
+                        step="0.01"
+                        value={discountValue}
+                        onChange={(e) => setDiscountValue(e.target.value)}
+                        placeholder="0,00"
+                        className="w-full bg-transparent px-3 py-2 text-xs font-bold text-[var(--admin-text-main)] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* ACRÉSCIMO */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-medium text-[var(--admin-text-muted)]">Acréscimo / Taxa</span>
+                      <span className="font-bold text-status-success text-[11px]">
+                        {calculation.surchargeAmount > 0 ? `+ ${money(calculation.surchargeAmount)}` : "R$ 0,00"}
+                      </span>
+                    </div>
+                    <div className="flex rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] overflow-hidden focus-within:border-[var(--admin-accent)]">
+                      <div className="flex border-r border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                        <button
+                          type="button"
+                          onClick={() => setSurchargeMode("percent")}
+                          className={`px-2.5 py-1.5 text-xs font-bold transition-colors ${
+                            surchargeMode === "percent"
+                              ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                              : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                          }`}
+                        >
+                          %
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSurchargeMode("amount")}
+                          className={`px-2.5 py-1.5 text-xs font-bold transition-colors ${
+                            surchargeMode === "amount"
+                              ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                              : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                          }`}
+                        >
+                          R$
+                        </button>
+                      </div>
                       <input
                         type="number"
                         min="0"
                         step="0.01"
-                        value={cashReceived}
-                        onChange={(event) =>
-                          setCashReceived(event.target.value)
-                        }
+                        value={surchargeValue}
+                        onChange={(e) => setSurchargeValue(e.target.value)}
+                        placeholder="0,00"
+                        className="w-full bg-transparent px-3 py-2 text-xs font-bold text-[var(--admin-text-main)] focus:outline-none"
                       />
-                    </label>
-                    <div>
-                      <span>Troco</span>
-                      <strong>{money(calculation.change)}</strong>
                     </div>
                   </div>
                 </div>
-              )}
-              <InlineNotice>
-                Ao confirmar, o recebimento entra no Extrato Financeiro e não
-                poderá ser confirmado novamente.
-              </InlineNotice>
-              <CheckoutNav
-                onBack={() => setStep(1)}
-                primaryLabel="Revisar pagamento"
-                primaryIcon={<ArrowRight aria-hidden="true" />}
-              />
-            </form>
-          )}
-
-          {step === 3 && !isConfirmed && (
-            <div className="receipt-v2-content">
-              <CheckoutHero
-                label="Valor a receber"
-                value={money(calculation.total)}
-                meta={`${source.clientName} · ${paymentLabel[paymentMethod]}`}
-              />
-              <div className="receipt-v2-review">
-                <ReviewRow label="Cliente" value={source.clientName} />
-                <ReviewRow label="Serviço" value={source.serviceTitle} />
-                <ReviewRow
-                  label="Forma de pagamento"
-                  value={paymentLabel[paymentMethod]}
-                />
-                <ReviewRow
-                  label="Valor base"
-                  value={money(calculation.entered)}
-                />
-                {calculation.discountAmount > 0 && (
-                  <ReviewRow
-                    label="Desconto"
-                    value={`− ${money(calculation.discountAmount)}`}
-                    tone="negative"
-                  />
-                )}
-                {calculation.surchargeAmount > 0 && (
-                  <ReviewRow
-                    label="Acréscimo"
-                    value={`+ ${money(calculation.surchargeAmount)}`}
-                    tone="positive"
-                  />
-                )}
-                {paymentMethod === "cash" && (
-                  <ReviewRow
-                    label="Troco"
-                    value={money(calculation.change)}
-                    tone="positive"
-                  />
-                )}
-                <div className="receipt-v2-review-total">
-                  <ReviewRow
-                    label="Valor total"
-                    value={money(calculation.total)}
-                    tone="positive"
-                    strong
-                  />
-                </div>
               </div>
-              <InlineNotice>
-                Ao confirmar, o recebimento será marcado como recebido. Esta
-                ação não poderá ser repetida para este atendimento.
-              </InlineNotice>
-              <CheckoutNav
-                onBack={() => setStep(2)}
-                primaryLabel={
-                  isConfirming ? "Confirmando…" : "Confirmar pagamento"
-                }
-                primaryIcon={
-                  isConfirming ? (
-                    <Loader2 className="receipt-v2-spin" aria-hidden="true" />
-                  ) : (
-                    <ClipboardCheck aria-hidden="true" />
-                  )
-                }
-                onPrimary={handleConfirmReceipt}
-                disabled={isConfirming}
-              />
-            </div>
-          )}
 
-          {isConfirmed && receipt && (
-            <div className="receipt-v2-content">
-              <div className="receipt-v2-success">
-                <CheckCircle2 aria-hidden="true" />
-                <strong>Recebimento confirmado</strong>
-              </div>
-              <CheckoutHero
-                label="Valor recebido"
-                value={money(receipt.totalAmount)}
-                meta={`${receipt.clientName} · ${paymentLabel[receipt.paymentMethod || "other"]}`}
-              />
-              <div className="receipt-v2-review">
-                <div className="receipt-v2-receipt-heading">
-                  <span>
-                    <FileText aria-hidden="true" />
-                    Comprovante
+              {/* FORMA DE PAGAMENTO */}
+              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
+                    Forma de Pagamento
                   </span>
-                  <strong>{receipt.id.slice(-8).toUpperCase()}</strong>
+                  <span className="text-xs font-bold text-[var(--admin-accent)]">
+                    {paymentLabel[paymentMethod]}
+                  </span>
                 </div>
-                <ReviewRow label="Cliente" value={receipt.clientName} />
-                <ReviewRow label="Serviço" value={receipt.serviceTitle} />
-                <ReviewRow
-                  label="Profissional"
-                  value={receipt.professionalName || "Não informado"}
-                />
-                <ReviewRow
-                  label="Pagamento"
-                  value={paymentLabel[receipt.paymentMethod || "other"]}
-                />
-                <ReviewRow
-                  label="Total recebido"
-                  value={money(receipt.totalAmount)}
-                  tone="positive"
-                  strong
-                />
-                <ReviewRow
-                  label="Confirmado em"
-                  value={new Date(
-                    receipt.receivedAt || Date.now(),
-                  ).toLocaleString("pt-BR")}
-                />
-                {receipt.observations && (
-                  <div className="receipt-v2-observations">
-                    <span>Observações</span>
-                    <p>{receipt.observations}</p>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {paymentOptions.map((opt) => {
+                    const Icon = opt.icon;
+                    const isSelected = paymentMethod === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setPaymentMethod(opt.id)}
+                        className={`p-2.5 rounded-xl border flex items-center gap-2 transition-all text-left ${
+                          isSelected
+                            ? "border-[var(--admin-accent)] bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] shadow-xs"
+                            : "border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:border-[var(--admin-border-strong)]"
+                        }`}
+                      >
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="text-xs font-bold truncate">{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* CASO DINHEIRO: VALOR RECEBIDO E TROCO */}
+                {paymentMethod === "cash" && (
+                  <div className="mt-3 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 space-y-2">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
+                      <Banknote className="w-4 h-4" />
+                      <span>Cálculo de Troco em Dinheiro</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                      <div>
+                        <label className="block text-[11px] font-medium text-[var(--admin-text-muted)] mb-1">
+                          Valor entregue pelo cliente (R$)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={cashReceived}
+                          onChange={(e) => setCashReceived(e.target.value)}
+                          className="w-full h-9 rounded-lg bg-[var(--admin-surface)] border border-[var(--admin-border)] px-3 text-sm font-bold text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                        />
+                      </div>
+                      <div className="flex flex-col justify-center bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg p-2.5">
+                        <span className="text-[10px] uppercase font-bold text-[var(--admin-text-muted)]">
+                          Troco a devolver
+                        </span>
+                        <strong
+                          className={`text-base font-bold tabular-nums ${
+                            calculation.isCashShort
+                              ? "text-status-error text-xs font-normal"
+                              : "text-status-success"
+                          }`}
+                        >
+                          {calculation.isCashShort
+                            ? "Valor insuficiente"
+                            : money(calculation.change)}
+                        </strong>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
-              <div className="receipt-v2-actions">
-                <button
-                  type="button"
-                  onClick={handlePrintReceipt}
-                  className="receipt-v2-secondary"
-                >
-                  <Printer aria-hidden="true" />
-                  Imprimir
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="receipt-v2-primary"
-                >
-                  Fechar
-                </button>
+
+              {/* OBSERVAÇÕES */}
+              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
+                  Observações adicionais (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={observations}
+                  onChange={(e) => setObservations(e.target.value)}
+                  placeholder="Ex: pago no PIX da empresa / desconto acordado"
+                  className="w-full h-9 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)]"
+                />
+              </div>
+
+              {/* TOTAL EM DESTAQUE */}
+              <div className="bg-gradient-to-r from-[var(--admin-surface)] to-[var(--admin-bg)] border border-[var(--admin-accent)]/30 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <span className="text-xs uppercase font-bold text-[var(--admin-text-muted)] block">
+                    Total Final a Receber
+                  </span>
+                  <span className="text-[11px] text-[var(--admin-text-muted)]">
+                    {calculation.discountAmount > 0 || calculation.surchargeAmount > 0
+                      ? "Com ajustes aplicados"
+                      : "Sem ajustes adicionais"}
+                  </span>
+                </div>
+                <div className="text-2xl font-serif font-bold text-[var(--admin-accent)]">
+                  {money(calculation.total)}
+                </div>
+              </div>
+            </form>
+          )}
+
+          {/* PASSO 2: REVISÃO & CONFIRMAÇÃO */}
+          {step === 2 && !isConfirmed && (
+            <div className="space-y-4">
+              {/* HERO REVISÃO */}
+              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 text-center space-y-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
+                  Confirmar recebimento de
+                </span>
+                <div className="text-3xl font-serif font-bold text-[var(--admin-accent)]">
+                  {money(calculation.total)}
+                </div>
+                <div className="text-xs text-[var(--admin-text-muted)]">
+                  Via <strong>{paymentLabel[paymentMethod]}</strong>
+                </div>
+              </div>
+
+              {/* DETALHES CONSOLIDADOS */}
+              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-2.5 text-xs">
+                <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
+                  <span className="text-[var(--admin-text-muted)]">Cliente</span>
+                  <strong className="text-[var(--admin-text-main)]">{source.clientName}</strong>
+                </div>
+                <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
+                  <span className="text-[var(--admin-text-muted)]">Serviço</span>
+                  <span className="text-[var(--admin-text-main)] font-semibold">{source.serviceTitle}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
+                  <span className="text-[var(--admin-text-muted)]">Profissional</span>
+                  <span className="text-[var(--admin-text-main)]">{source.professionalName || "Não informado"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
+                  <span className="text-[var(--admin-text-muted)]">Valor original</span>
+                  <span className="text-[var(--admin-text-main)]">{money(originalAmount)}</span>
+                </div>
+                {calculation.discountAmount > 0 && (
+                  <div className="flex justify-between py-1 border-b border-[var(--admin-border)] text-status-error font-medium">
+                    <span>Desconto</span>
+                    <span>− {money(calculation.discountAmount)}</span>
+                  </div>
+                )}
+                {calculation.surchargeAmount > 0 && (
+                  <div className="flex justify-between py-1 border-b border-[var(--admin-border)] text-status-success font-medium">
+                    <span>Acréscimo</span>
+                    <span>+ {money(calculation.surchargeAmount)}</span>
+                  </div>
+                )}
+                {paymentMethod === "cash" && (
+                  <>
+                    <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
+                      <span className="text-[var(--admin-text-muted)]">Valor entregue</span>
+                      <span className="text-[var(--admin-text-main)]">{money(calculation.amountReceived)}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-[var(--admin-border)] text-status-success font-bold">
+                      <span>Troco</span>
+                      <span>{money(calculation.change)}</span>
+                    </div>
+                  </>
+                )}
+                {observations.trim() && (
+                  <div className="pt-1">
+                    <span className="text-[var(--admin-text-muted)] block mb-0.5">Observações:</span>
+                    <p className="italic text-[var(--admin-text-main)] bg-[var(--admin-bg)] p-2 rounded-lg">
+                      {observations}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-3 flex items-start gap-2 text-xs text-[var(--admin-text-muted)]">
+                <Info className="w-4 h-4 text-[var(--admin-accent)] shrink-0 mt-0.5" />
+                <span>
+                  Ao confirmar, o status passará para <strong>Recebido</strong> e o lançamento entrará automaticamente no fluxo de caixa.
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* PASSO FINAL: RECEBIMENTO CONFIRMADO (COMPROVANTE) */}
+          {isConfirmed && receipt && (
+            <div className="space-y-4">
+              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-5 text-center space-y-2 shadow-xs">
+                <div className="w-12 h-12 rounded-full bg-status-success/20 text-status-success mx-auto flex items-center justify-center">
+                  <CheckCircle2 className="w-7 h-7" />
+                </div>
+                <h3 className="text-base font-bold text-[var(--admin-text-main)]">
+                  Recebimento Confirmado!
+                </h3>
+                <p className="text-xs text-[var(--admin-text-muted)]">
+                  Lançamento efetuado com sucesso no Extrato Financeiro.
+                </p>
+                <div className="pt-2 text-3xl font-serif font-bold text-status-success">
+                  {money(receipt.totalAmount)}
+                </div>
+              </div>
+
+              {/* CARD DE COMPROVANTE */}
+              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-2 text-xs">
+                <div className="flex items-center justify-between pb-2 border-b border-[var(--admin-border)]">
+                  <span className="font-bold flex items-center gap-1.5 text-[var(--admin-text-main)]">
+                    <FileText className="w-4 h-4 text-[var(--admin-accent)]" />
+                    Comprovante
+                  </span>
+                  <span className="font-mono font-bold text-[var(--admin-accent)]">
+                    #{receipt.id.slice(-8).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-[var(--admin-text-muted)]">Cliente:</span>
+                  <strong className="text-[var(--admin-text-main)]">{receipt.clientName}</strong>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-[var(--admin-text-muted)]">Serviço:</span>
+                  <span className="text-[var(--admin-text-main)]">{receipt.serviceTitle}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-[var(--admin-text-muted)]">Profissional:</span>
+                  <span className="text-[var(--admin-text-main)]">{receipt.professionalName || "Não informado"}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-[var(--admin-text-muted)]">Forma:</span>
+                  <span className="text-[var(--admin-text-main)] font-semibold">
+                    {paymentLabel[receipt.paymentMethod || "other"]}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-[var(--admin-text-muted)]">Data/Hora:</span>
+                  <span className="text-[var(--admin-text-main)]">
+                    {new Date(receipt.receivedAt || Date.now()).toLocaleString("pt-BR")}
+                  </span>
+                </div>
               </div>
             </div>
           )}
         </div>
+
+        {/* RODAPÉ FIXO INABALÁVEL (SEMPRE VISÍVEL FORA DA ROLAGEM) */}
+        <footer className="receipt-v2-footer">
+          {/* AÇÕES PARA: DECISÃO INICIAL */}
+          {step === "decision" && !isConfirmed && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleRegisterLater}
+                disabled={isCreating}
+                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)] transition-colors"
+              >
+                {isCreating ? "Salvando…" : "Registrar depois"}
+              </button>
+              <button
+                type="button"
+                onClick={handleRegisterNow}
+                disabled={isCreating}
+                className="flex-[1.5] min-h-[44px] px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--admin-accent-hover)] transition-all shadow-xs"
+              >
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <CreditCard className="w-4 h-4" />
+                )}
+                <span>Registrar agora</span>
+              </button>
+            </div>
+          )}
+
+          {/* AÇÕES PARA: ETAPA 1 (VALORES & FORMA DE PAGAMENTO) */}
+          {step === 1 && !isConfirmed && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)] transition-colors flex items-center justify-center gap-1"
+              >
+                <X className="w-4 h-4" />
+                <span>Cancelar</span>
+              </button>
+              <button
+                type="submit"
+                form="checkout-step-1-form"
+                disabled={calculation.isCashShort}
+                className="flex-[1.8] min-h-[44px] px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--admin-accent-hover)] disabled:opacity-50 transition-all shadow-xs"
+              >
+                <span>Revisar ({money(calculation.total)})</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {/* AÇÕES PARA: ETAPA 2 (REVISÃO & CONFIRMAÇÃO) */}
+          {step === 2 && !isConfirmed && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                disabled={isConfirming}
+                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)] transition-colors flex items-center justify-center gap-1"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Voltar</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmReceipt}
+                disabled={isConfirming}
+                className="flex-[2] min-h-[44px] px-4 rounded-xl bg-status-success hover:opacity-95 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs"
+              >
+                {isConfirming ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Confirmando…</span>
+                  </>
+                ) : (
+                  <>
+                    <ClipboardCheck className="w-4 h-4" />
+                    <span>Confirmar recebimento</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* AÇÕES PARA: RECEBIMENTO CONFIRMADO */}
+          {isConfirmed && receipt && (
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={handleShareWhatsApp}
+                className="min-h-[44px] px-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[11px] font-bold text-status-success hover:bg-[var(--admin-bg)] transition-colors flex items-center justify-center gap-1"
+                title="Compartilhar no WhatsApp"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">WhatsApp</span>
+                <span className="sm:hidden">Whats</span>
+              </button>
+              <button
+                type="button"
+                onClick={handlePrintReceipt}
+                className="min-h-[44px] px-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[11px] font-bold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] transition-colors flex items-center justify-center gap-1"
+                title="Imprimir Comprovante"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Imprimir</span>
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="min-h-[44px] px-3 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1 hover:bg-[var(--admin-accent-hover)] transition-all shadow-xs"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Concluir</span>
+              </button>
+            </div>
+          )}
+        </footer>
       </div>
     </div>,
     document.body,
   );
 };
 
-const CheckoutNav: React.FC<{
-  onBack: () => void;
-  primaryLabel: string;
-  primaryIcon?: React.ReactNode;
-  onPrimary?: () => void;
-  disabled?: boolean;
-}> = ({ onBack, primaryLabel, primaryIcon, onPrimary, disabled = false }) => (
-  <div className="receipt-v2-actions">
-    <button
-      type="button"
-      onClick={onBack}
-      disabled={disabled}
-      className="receipt-v2-secondary"
-    >
-      <ArrowLeft aria-hidden="true" />
-      Voltar
-    </button>
-    <button
-      type={onPrimary ? "button" : "submit"}
-      onClick={onPrimary}
-      disabled={disabled}
-      className="receipt-v2-primary"
-    >
-      {primaryLabel}
-      {primaryIcon}
-    </button>
-  </div>
-);
-
-const ReviewRow: React.FC<{
-  label: string;
-  value: string;
-  tone?: "positive" | "negative";
-  strong?: boolean;
-}> = ({ label, value, tone, strong }) => (
-  <div className="receipt-v2-review-row">
-    <span className={strong ? "is-strong" : ""}>{label}</span>
-    <strong
-      className={`${strong ? "is-strong" : ""} ${tone === "positive" ? "is-positive" : tone === "negative" ? "is-negative" : ""}`}
-    >
-      {value}
-    </strong>
-  </div>
-);
-
-const CheckoutHero: React.FC<{
-  label: string;
-  value: string;
-  meta: string;
-}> = ({ label, value, meta }) => (
-  <div className="receipt-v2-hero">
-    <span className="receipt-v2-hero-label">{label}</span>
-    <strong className="receipt-v2-hero-value">{value}</strong>
-    <span className="receipt-v2-hero-meta">
-      <UserRound aria-hidden="true" />
-      {meta}
-    </span>
-  </div>
-);
-
-const ServiceSummary: React.FC<{ title: string; value: string }> = ({
-  title,
-  value,
-}) => (
-  <div className="receipt-v2-service">
-    <span className="receipt-v2-service-icon">
-      <ReceiptText aria-hidden="true" />
-    </span>
-    <div>
-      <strong>{title}</strong>
-      <span>
-        Serviço · <b>{value}</b>
-      </span>
-    </div>
-  </div>
-);
-
-const InlineNotice: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => (
-  <div className="receipt-v2-notice" role="note">
-    <Info aria-hidden="true" />
-    <span>{children}</span>
-  </div>
-);
-
-const CheckoutProgress: React.FC<{ step: CheckoutStep }> = ({ step }) => {
-  if (typeof step !== "number") return null;
-  return (
-    <div className="receipt-v2-progress" aria-label={`Etapa ${step} de 3`}>
-      {[1, 2, 3].map((item, index) => (
-        <React.Fragment key={item}>
-          <span
-            className={`receipt-v2-progress-dot ${step >= item ? "is-done" : ""} ${step === item ? "is-active" : ""}`}
-            aria-label={["Dados", "Valores", "Confirmar"][index]}
-          />
-          {index < 2 && (
-            <span
-              className={`receipt-v2-progress-line ${step > item ? "is-done" : ""}`}
-              aria-hidden="true"
-            />
-          )}
-        </React.Fragment>
-      ))}
-    </div>
-  );
-};
-
-interface AdjustmentControlProps {
-  label: string;
-  mode: AdjustmentMode;
-  value: string;
-  calculated: number;
-  tone: "positive" | "negative";
-  onModeChange: (mode: AdjustmentMode) => void;
-  onValueChange: (value: string) => void;
-}
-
-const AdjustmentControl: React.FC<AdjustmentControlProps> = ({
-  label,
-  mode,
-  value,
-  calculated,
-  tone,
-  onModeChange,
-  onValueChange,
-}) => (
-  <div className="receipt-v2-adjustment">
-    <div className="receipt-v2-adjustment-label">
-      <span>{label}</span>
-      <b className={tone === "negative" ? "is-negative" : "is-positive"}>
-        {tone === "negative" ? "−" : "+"} {money(calculated)}
-      </b>
-    </div>
-    <div className="receipt-v2-adjustment-input">
-      <div className="receipt-v2-mode-toggle">
-        <button
-          type="button"
-          onClick={() => onModeChange("percent")}
-          aria-pressed={mode === "percent"}
-        >
-          %
-        </button>
-        <button
-          type="button"
-          onClick={() => onModeChange("amount")}
-          aria-pressed={mode === "amount"}
-        >
-          R$
-        </button>
-      </div>
-      <input
-        aria-label={`${label} em ${mode === "percent" ? "percentual" : "valor"}`}
-        type="number"
-        min="0"
-        max={mode === "percent" ? 100 : undefined}
-        step="0.01"
-        value={value}
-        onChange={(event) => onValueChange(event.target.value)}
-      />
-    </div>
-  </div>
-);
