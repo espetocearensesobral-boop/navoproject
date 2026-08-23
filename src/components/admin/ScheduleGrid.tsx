@@ -46,6 +46,7 @@ import {
 } from "../../utils/dateUtils";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminListSkeleton } from "./shared/AdminSkeleton";
+import { AdminModalV2 } from "./shared/AdminModalV2";
 
 const PROFESSIONAL_ACCENT_COUNT = 6;
 
@@ -897,39 +898,227 @@ export const ScheduleGrid: React.FC = () => {
 
       {/* Modal: Bloquear Horário */}
       {isBlockModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="admin-modal bg-[var(--admin-surface)] border border-red-500/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
-            <div className="p-4 border-b border-[var(--admin-border)] flex justify-between items-center">
-              <h2 className="text-sm font-serif text-[var(--admin-text-main)] font-semibold flex items-center space-x-2">
-                <Lock className="w-4 h-4 text-red-400" />
-                <span>Bloquear horário</span>
-              </h2>
+        <AdminModalV2
+          icon={Lock}
+          eyebrow="Operação de Grade"
+          title="Bloquear Horário"
+          subtitle="Impedir agendamentos no período selecionado"
+          accent="neutral"
+          size="sm"
+          onClose={() => setIsBlockModalOpen(false)}
+          footer={
+            <div className="flex items-center justify-end gap-2 w-full">
               <button
+                type="button"
                 onClick={() => setIsBlockModalOpen(false)}
-                className="text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] transition-colors"
+                className="admin-btn admin-btn-sm admin-btn-secondary"
               >
-                <X className="w-5 h-5" />
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                form="block-time-form"
+                disabled={savingBlock}
+                className="admin-btn admin-btn-sm admin-btn-destructive"
+              >
+                {savingBlock ? "Salvando..." : "Confirmar Bloqueio"}
               </button>
             </div>
+          }
+        >
+          <form
+            id="block-time-form"
+            onKeyDown={handleEnterAsTab}
+            onSubmit={handleAddBlock}
+            className="space-y-3.5"
+          >
+            <div>
+              <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
+                Barbeiro *
+              </label>
+              <select
+                value={blockForm.professional_id}
+                onChange={(e) =>
+                  setBlockForm({
+                    ...blockForm,
+                    professional_id: e.target.value,
+                  })
+                }
+                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
+              >
+                {barbers.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <form
-              onKeyDown={handleEnterAsTab}
-              onSubmit={handleAddBlock}
-              className="p-5 space-y-4"
-            >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-bold text-[var(--admin-accent)] block mb-1">
-                  Barbeiro *
+                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
+                  Início *
                 </label>
                 <select
-                  value={blockForm.professional_id}
+                  value={blockForm.start_time}
                   onChange={(e) =>
                     setBlockForm({
                       ...blockForm,
+                      start_time: e.target.value,
+                      end_time:
+                        timeToMinutes(e.target.value) >=
+                        timeToMinutes(blockForm.end_time)
+                          ? timeSlots.find(
+                              (ts) =>
+                                timeToMinutes(ts) >
+                                timeToMinutes(e.target.value),
+                            ) || blockForm.end_time
+                          : blockForm.end_time,
+                    })
+                  }
+                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
+                >
+                  {timeSlots.map((ts) => (
+                    <option key={ts} value={ts}>
+                      {ts}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
+                  Fim *
+                </label>
+                <select
+                  value={blockForm.end_time}
+                  onChange={(e) =>
+                    setBlockForm({ ...blockForm, end_time: e.target.value })
+                  }
+                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
+                >
+                  {timeSlots
+                    .filter(
+                      (ts) =>
+                        timeToMinutes(ts) >
+                        timeToMinutes(blockForm.start_time),
+                    )
+                    .map((ts) => (
+                      <option key={ts} value={ts}>
+                        {ts}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
+                Motivo do Bloqueio *
+              </label>
+              <input
+                type="text"
+                value={blockForm.reason}
+                onChange={(e) =>
+                  setBlockForm({ ...blockForm, reason: e.target.value })
+                }
+                placeholder="Ex: Almoço, Intervalo, Consulta Médica"
+                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
+                required
+              />
+            </div>
+          </form>
+        </AdminModalV2>
+      )}
+
+      {/* Modal: Encaixe Manual Presencial */}
+      {isManualBookingOpen && (
+        <AdminModalV2
+          icon={Scissors}
+          eyebrow="Agenda Manual"
+          title="Encaixe Presencial"
+          subtitle="Registrar agendamento direto na grade"
+          accent="gold"
+          size="sm"
+          onClose={() => setIsManualBookingOpen(false)}
+          footer={
+            <div className="flex items-center justify-end gap-2 w-full">
+              <button
+                type="button"
+                onClick={() => setIsManualBookingOpen(false)}
+                className="admin-btn admin-btn-sm admin-btn-secondary"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                form="manual-booking-form"
+                disabled={savingManualBooking}
+                className="admin-btn admin-btn-sm admin-btn-primary disabled:opacity-60 disabled:cursor-wait"
+              >
+                {savingManualBooking
+                  ? "Salvando..."
+                  : "Confirmar Agendamento"}
+              </button>
+            </div>
+          }
+        >
+          <form
+            id="manual-booking-form"
+            onKeyDown={handleEnterAsTab}
+            onSubmit={handleManualBookingSubmit}
+            className="space-y-3.5"
+          >
+            <div>
+              <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
+                Nome do Cliente *
+              </label>
+              <input
+                type="text"
+                value={manualBookingForm.client_name}
+                onChange={(e) =>
+                  setManualBookingForm({
+                    ...manualBookingForm,
+                    client_name: e.target.value,
+                  })
+                }
+                placeholder="Ex: Gabriel Santos"
+                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
+                  Telefone WhatsApp
+                </label>
+                <input
+                  type="text"
+                  value={manualBookingForm.client_phone}
+                  onChange={(e) =>
+                    setManualBookingForm({
+                      ...manualBookingForm,
+                      client_phone: e.target.value,
+                    })
+                  }
+                  placeholder="(11) 98765-4321"
+                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
+                  Barbeiro *
+                </label>
+                <select
+                  value={manualBookingForm.professional_id}
+                  onChange={(e) =>
+                    setManualBookingForm({
+                      ...manualBookingForm,
                       professional_id: e.target.value,
                     })
                   }
-                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-red-400 transition-colors"
+                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                 >
                   {barbers.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -938,271 +1127,75 @@ export const ScheduleGrid: React.FC = () => {
                   ))}
                 </select>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-bold text-[var(--admin-accent)] block mb-1">
-                    Início *
-                  </label>
-                  <select
-                    value={blockForm.start_time}
-                    onChange={(e) =>
-                      setBlockForm({
-                        ...blockForm,
-                        start_time: e.target.value,
-                        end_time:
-                          timeToMinutes(e.target.value) >=
-                          timeToMinutes(blockForm.end_time)
-                            ? timeSlots.find(
-                                (ts) =>
-                                  timeToMinutes(ts) >
-                                  timeToMinutes(e.target.value),
-                              ) || blockForm.end_time
-                            : blockForm.end_time,
-                      })
-                    }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-red-400 transition-colors"
-                  >
-                    {timeSlots.map((ts) => (
-                      <option key={ts} value={ts}>
-                        {ts}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-[var(--admin-accent)] block mb-1">
-                    Fim *
-                  </label>
-                  <select
-                    value={blockForm.end_time}
-                    onChange={(e) =>
-                      setBlockForm({ ...blockForm, end_time: e.target.value })
-                    }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-red-400 transition-colors"
-                  >
-                    {timeSlots
-                      .filter(
-                        (ts) =>
-                          timeToMinutes(ts) >
-                          timeToMinutes(blockForm.start_time),
-                      )
-                      .map((ts) => (
-                        <option key={ts} value={ts}>
-                          {ts}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-[var(--admin-accent)] block mb-1">
-                  Motivo do Bloqueio *
-                </label>
-                <input
-                  type="text"
-                  value={blockForm.reason}
-                  onChange={(e) =>
-                    setBlockForm({ ...blockForm, reason: e.target.value })
-                  }
-                  placeholder="Ex: Almoço, Intervalo, Consulta Médica"
-                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-red-400 transition-colors"
-                  required
-                />
-              </div>
-
-              <div className="pt-3 border-t border-[var(--admin-border)] flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setIsBlockModalOpen(false)}
-                  className="admin-btn-sm bg-transparent border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)]"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingBlock}
-                  className="admin-btn-sm admin-btn-destructive"
-                >
-                  {savingBlock ? "Salvando..." : "Confirmar Bloqueio"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal: Encaixe Manual Presencial */}
-      {isManualBookingOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="admin-modal bg-[var(--admin-surface)] border border-[var(--admin-accent)]/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
-            <div className="p-4 border-b border-[var(--admin-border)] flex justify-between items-center">
-              <h2 className="text-sm font-serif text-[var(--admin-text-main)] font-semibold flex items-center space-x-2">
-                <Scissors className="w-4 h-4 text-[var(--admin-accent)]" />
-                <span>Encaixe presencial</span>
-              </h2>
-              <button
-                onClick={() => setIsManualBookingOpen(false)}
-                className="text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </div>
 
-            <form
-              onKeyDown={handleEnterAsTab}
-              onSubmit={handleManualBookingSubmit}
-              className="p-5 space-y-4"
-            >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-bold text-[var(--admin-accent)] block mb-1">
-                  Nome do Cliente *
+                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
+                  Serviço real *
                 </label>
-                <input
-                  type="text"
-                  value={manualBookingForm.client_name}
+                <select
+                  value={manualBookingForm.service_id}
                   onChange={(e) =>
                     setManualBookingForm({
                       ...manualBookingForm,
-                      client_name: e.target.value,
+                      service_id: e.target.value,
                     })
                   }
-                  placeholder="Ex: Gabriel Santos"
                   className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                   required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-bold text-[var(--admin-accent)] block mb-1">
-                    Telefone WhatsApp
-                  </label>
-                  <input
-                    type="text"
-                    value={manualBookingForm.client_phone}
-                    onChange={(e) =>
-                      setManualBookingForm({
-                        ...manualBookingForm,
-                        client_phone: e.target.value,
-                      })
-                    }
-                    placeholder="(11) 98765-4321"
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-[var(--admin-accent)] block mb-1">
-                    Barbeiro *
-                  </label>
-                  <select
-                    value={manualBookingForm.professional_id}
-                    onChange={(e) =>
-                      setManualBookingForm({
-                        ...manualBookingForm,
-                        professional_id: e.target.value,
-                      })
-                    }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                  >
-                    {barbers.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-bold text-[var(--admin-accent)] block mb-1">
-                    Serviço real *
-                  </label>
-                  <select
-                    value={manualBookingForm.service_id}
-                    onChange={(e) =>
-                      setManualBookingForm({
-                        ...manualBookingForm,
-                        service_id: e.target.value,
-                      })
-                    }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                    required
-                  >
-                    <option value="">Selecione</option>
-                    {services.map((service) => (
-                      <option key={service.id} value={service.id}>
-                        {service.title} — R${" "}
-                        {Number(service.price || 0).toFixed(2)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-[var(--admin-accent)] block mb-1">
-                    Horário *
-                  </label>
-                  <select
-                    value={manualBookingForm.time_slot}
-                    onChange={(e) =>
-                      setManualBookingForm({
-                        ...manualBookingForm,
-                        time_slot: e.target.value,
-                      })
-                    }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                    required
-                  >
-                    {timeSlots.map((ts) => (
-                      <option key={ts} value={ts}>
-                        {ts}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {manualBookingForm.service_id &&
-                (() => {
-                  const selectedService = services.find(
-                    (service) => service.id === manualBookingForm.service_id,
-                  );
-                  return selectedService ? (
-                    <p className="text-xs text-[var(--admin-text-muted)]">
-                      Duração real:{" "}
-                      <strong className="text-[var(--admin-accent)]">
-                        {selectedService.duration_minutes} min
-                      </strong>
-                      . O valor será recalculado pelo servidor.
-                    </p>
-                  ) : null;
-                })()}
-
-              <div className="pt-3 border-t border-[var(--admin-border)] flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setIsManualBookingOpen(false)}
-                  className="admin-btn-sm bg-transparent border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)]"
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingManualBooking}
-                  className="admin-btn-sm admin-btn-primary disabled:opacity-60 disabled:cursor-wait"
-                >
-                  {savingManualBooking
-                    ? "Salvando..."
-                    : "Confirmar Agendamento"}
-                </button>
+                  <option value="">Selecione</option>
+                  {services.map((service) => (
+                    <option key={service.id} value={service.id}>
+                      {service.title} — R${" "}
+                      {Number(service.price || 0).toFixed(2)}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </form>
-          </div>
-        </div>
+
+              <div>
+                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
+                  Horário *
+                </label>
+                <select
+                  value={manualBookingForm.time_slot}
+                  onChange={(e) =>
+                    setManualBookingForm({
+                      ...manualBookingForm,
+                      time_slot: e.target.value,
+                    })
+                  }
+                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                  required
+                >
+                  {timeSlots.map((ts) => (
+                    <option key={ts} value={ts}>
+                      {ts}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {manualBookingForm.service_id &&
+              (() => {
+                const selectedService = services.find(
+                  (service) => service.id === manualBookingForm.service_id,
+                );
+                return selectedService ? (
+                  <p className="text-xs text-[var(--admin-text-muted)]">
+                    Duração real:{" "}
+                    <strong className="text-[var(--admin-accent)]">
+                      {selectedService.duration_minutes} min
+                    </strong>
+                    . O valor será recalculado pelo servidor.
+                  </p>
+                ) : null;
+              })()}
+          </form>
+        </AdminModalV2>
       )}
     </div>
   );

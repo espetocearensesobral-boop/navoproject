@@ -139,71 +139,71 @@ export const AdminNotificationCenter: React.FC<
         <>
           <button
             type="button"
-            className="fixed inset-0 z-[55] cursor-default bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-[55] cursor-default bg-black/40 backdrop-blur-[2px]"
             aria-label="Fechar central de notificações"
             onClick={() => setOpen(false)}
           />
           <section
             role="dialog"
             aria-label="Central de notificações"
-            className={`z-[60] flex flex-col overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] ${placement === "drawer" ? "fixed left-3 right-3 bottom-20 max-h-[min(78vh,40rem)]" : "fixed left-1/2 top-1/2 w-[min(42rem,calc(100vw-2rem))] max-h-[min(86vh,42rem)] -translate-x-1/2 -translate-y-1/2"}`}
+            className={`z-[60] flex flex-col overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] shadow-xl animate-fade-in ${
+              placement === "drawer"
+                ? "fixed left-3 right-3 bottom-20 max-h-[min(70vh,28rem)] max-w-sm mx-auto"
+                : "fixed left-3 right-3 top-16 max-h-[min(75vh,28rem)] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[22rem] sm:max-h-[min(75vh,30rem)]"
+            }`}
           >
-            <header className="flex items-start justify-between gap-3 p-4 border-b border-[var(--admin-border)]">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base font-semibold tracking-tight truncate">
-                    Notificações
-                  </h2>
-                  {unreadCount > 0 && (
-                    <span className="rounded-full bg-status-error/10 text-status-error px-2 py-0.5 text-[10px] font-bold">
-                      {unreadCount} novas
-                    </span>
-                  )}
-                </div>
-                <p className="mt-1 text-xs text-[var(--admin-text-muted)]">
-                  Agenda, fila e recebimentos
-                </p>
+            <header className="flex items-center justify-between gap-2 px-3 py-2.5 border-b border-[var(--admin-border)] bg-[var(--admin-bg)]/40">
+              <div className="flex items-center gap-2 min-w-0">
+                <Bell className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
+                <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--admin-text-main)] truncate">
+                  Notificações
+                </h2>
+                {unreadCount > 0 && (
+                  <span className="rounded-full bg-status-error/15 text-status-error px-1.5 py-0.2 text-[10px] font-black">
+                    {unreadCount}
+                  </span>
+                )}
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="w-8 h-8 rounded-md text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)] flex items-center justify-center shrink-0"
+                className="w-6 h-6 rounded-md text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)] flex items-center justify-center shrink-0 transition-colors"
                 aria-label="Fechar notificações"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </header>
 
-            <div className="flex items-center gap-4 px-4 py-3 border-b border-[var(--admin-border)] bg-[var(--admin-bg)]/30">
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--admin-border)] bg-[var(--admin-bg)]/20 text-[11px]">
               <button
                 type="button"
                 onClick={markAllAsRead}
                 disabled={unreadCount === 0}
-                className="inline-flex items-center gap-1.5 rounded-md px-0 py-1 text-xs font-semibold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1 font-semibold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                <CheckCheck className="w-4 h-4" />
+                <CheckCheck className="w-3.5 h-3.5" />
                 Marcar lidas
               </button>
               <button
                 type="button"
                 onClick={clearHistory}
                 disabled={history.length === 0}
-                className="inline-flex items-center gap-1.5 rounded-md px-0 py-1 text-xs font-semibold text-status-error hover:text-status-error/80 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1 font-semibold text-status-error/80 hover:text-status-error disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
                 Limpar
               </button>
             </div>
 
-            <div className="flex-1 min-h-0 max-h-[min(42vh,22rem)] overflow-y-auto overscroll-contain">
+            <div className="flex-1 min-h-0 max-h-[min(40vh,18rem)] overflow-y-auto overscroll-contain divide-y divide-[var(--admin-border)]/50">
               {history.length === 0 ? (
-                <div className="px-4 py-12 text-center">
-                  <Bell className="w-8 h-8 mx-auto text-[var(--admin-text-muted)]/40" />
-                  <p className="mt-4 text-sm font-semibold text-[var(--admin-text-main)]">
+                <div className="px-4 py-8 text-center">
+                  <Bell className="w-6 h-6 mx-auto text-[var(--admin-text-muted)]/30" />
+                  <p className="mt-2 text-xs font-semibold text-[var(--admin-text-main)]">
                     Nenhuma notificação registrada
                   </p>
-                  <p className="mt-1 text-xs text-[var(--admin-text-muted)]">
-                    Novos eventos operacionais aparecerão aqui.
+                  <p className="mt-0.5 text-[11px] text-[var(--admin-text-muted)]">
+                    Novos alertas operacionais aparecerão aqui.
                   </p>
                 </div>
               ) : (
@@ -212,61 +212,75 @@ export const AdminNotificationCenter: React.FC<
                     key={item.id}
                     type="button"
                     onClick={() => markAsRead(item.id)}
-                    className={`w-full text-left px-4 py-3 border-b border-[var(--admin-border)] last:border-b-0 hover:bg-[var(--admin-bg)] transition-colors ${item.read ? "" : "bg-[var(--admin-accent)]/5"}`}
+                    className={`w-full text-left px-3 py-2.5 hover:bg-[var(--admin-bg)] transition-colors ${
+                      item.read ? "opacity-75" : "bg-[var(--admin-accent)]/[0.04]"
+                    }`}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2.5">
                       <span
-                        className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${item.read ? "bg-content-muted/30" : "bg-[var(--admin-accent)]"}`}
+                        className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${
+                          item.read ? "bg-content-muted/30" : "bg-[var(--admin-accent)] ring-2 ring-[var(--admin-accent)]/20"
+                        }`}
                       />
-                      <span className="min-w-0 flex-1">
-                        <span className="flex items-start justify-between gap-2">
-                          <span className="text-xs font-black text-[var(--admin-text-main)]">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-1.5">
+                          <span className="text-xs font-bold text-[var(--admin-text-main)] truncate">
                             {item.title}
                           </span>
-                          <span className="text-xs text-[var(--admin-text-muted)] whitespace-nowrap">
+                          <span className="text-[10px] text-[var(--admin-text-muted)] shrink-0 font-medium">
                             {formatNotificationTime(item.createdAt)}
                           </span>
-                        </span>
-                        <span className="block mt-1 text-xs leading-relaxed text-[var(--admin-text-muted)]">
+                        </div>
+                        <p className="mt-0.5 text-[11px] leading-snug text-[var(--admin-text-muted)] line-clamp-2">
                           {item.body}
-                        </span>
-                      </span>
+                        </p>
+                      </div>
                     </div>
                   </button>
                 ))
               )}
             </div>
 
-            <footer className="p-3 border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/30">
+            <footer className="p-2 border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/40">
               <button
                 type="button"
                 onClick={() => void onToggleNotifications()}
                 disabled={isBlocked || notificationsBusy}
-                className={`w-full min-h-12 rounded-md px-3 py-2 flex items-center justify-between gap-4 text-left border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${notificationsActive ? "border-status-success/40 bg-[var(--admin-surface)]" : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:border-[var(--admin-accent)]/40"}`}
+                className={`w-full rounded-lg px-2.5 py-1.5 flex items-center justify-between gap-2 text-left border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  notificationsActive
+                    ? "border-status-success/30 bg-status-success/[0.04]"
+                    : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:border-[var(--admin-accent)]/40"
+                }`}
               >
-                <span className="flex items-center gap-2.5 min-w-0">
-                  <span className="w-8 h-8 rounded-md bg-[var(--admin-bg)] flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-6 h-6 rounded-md bg-[var(--admin-bg)] flex items-center justify-center shrink-0">
                     {notificationsActive ? (
-                      <BellRing className="w-4 h-4 text-status-success" />
+                      <BellRing className="w-3.5 h-3.5 text-status-success" />
                     ) : (
-                      <Bell className="w-4 h-4 text-[var(--admin-text-muted)]" />
+                      <Bell className="w-3.5 h-3.5 text-[var(--admin-text-muted)]" />
                     )}
-                  </span>
-                  <span className="min-w-0">
+                  </div>
+                  <div className="min-w-0">
                     <span
-                      className={`block text-xs font-bold ${notificationsActive ? "text-status-success" : "text-[var(--admin-text-main)]"}`}
+                      className={`block text-[11px] font-bold leading-tight ${
+                        notificationsActive ? "text-status-success" : "text-[var(--admin-text-main)]"
+                      }`}
                     >
                       {notificationsActive ? "Push ativo" : "Push inativo"}
                     </span>
                     <span
-                      className={`block mt-0.5 text-[11px] truncate ${notificationsActive ? "text-status-success/80" : "text-[var(--admin-text-muted)]"}`}
+                      className={`block text-[10px] truncate leading-tight ${
+                        notificationsActive ? "text-status-success/80" : "text-[var(--admin-text-muted)]"
+                      }`}
                     >
                       {pushLabel}
                     </span>
-                  </span>
-                </span>
+                  </div>
+                </div>
                 <span
-                  className={`text-xs font-bold whitespace-nowrap ${notificationsActive ? "text-status-success" : "text-[var(--admin-accent)]"}`}
+                  className={`text-[11px] font-bold shrink-0 ${
+                    notificationsActive ? "text-status-success" : "text-[var(--admin-accent)]"
+                  }`}
                 >
                   {notificationsActive ? "Desativar" : "Ativar"}
                 </span>

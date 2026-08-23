@@ -254,11 +254,11 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
                   <span className="text-base font-bold tabular-nums bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] px-2 py-0.5 rounded-lg">{waitingToday}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)]">
-                    <AlertTriangle className="w-4 h-4" />
-                    <span className="text-sm">Faltas / Cancel.</span>
+                  <div className="flex items-center gap-2 text-[var(--admin-text-main)]">
+                    <AlertTriangle className="w-4 h-4 text-status-error" />
+                    <span className="text-sm font-semibold">Faltas / Cancelados</span>
                   </div>
-                  <span className="text-sm font-bold tabular-nums text-[var(--admin-text-muted)]">{closedOutToday}</span>
+                  <span className="text-base font-bold tabular-nums bg-status-error/10 text-status-error px-2 py-0.5 rounded-lg">{closedOutToday}</span>
                 </div>
               </div>
             )}

@@ -576,20 +576,8 @@ export const WaitingQueue: React.FC = () => {
           />
         </div>
 
-        <div className="admin-card p-2.5 space-y-2 rounded-xl">
-          <AdminTabs
-            tabs={[
-              { id: "kanban", label: "Painel" },
-              { id: "history", label: "Histórico" },
-              { id: "abandoned", label: "Removidos" },
-            ]}
-            activeId={activeTab}
-            onChange={(id) =>
-              setActiveTab(id as "kanban" | "history" | "abandoned")
-            }
-            className="pb-0"
-          />
-          <div className="flex items-center gap-2 min-w-0">
+        <div className="admin-card p-2.5 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+          <div className="flex items-center gap-2 w-full sm:w-56 md:w-64 shrink-0">
             <Filter
               className="w-3.5 h-3.5 text-[var(--admin-text-muted)] shrink-0"
               aria-hidden="true"
@@ -597,7 +585,7 @@ export const WaitingQueue: React.FC = () => {
             <select
               value={selectedBarberFilter}
               onChange={(e) => setSelectedBarberFilter(e.target.value)}
-              className="min-h-10 flex-1 min-w-0 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-lg px-3 text-xs text-[var(--admin-text-main)] font-semibold outline-none cursor-pointer transition-colors focus:border-[var(--admin-accent)]"
+              className="min-h-9 flex-1 min-w-0 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-lg px-2.5 text-xs text-[var(--admin-text-main)] font-semibold outline-none cursor-pointer transition-colors focus:border-[var(--admin-accent)]"
               aria-label="Filtrar por barbeiro"
             >
               <option value="all">Todos os barbeiros</option>
@@ -607,6 +595,21 @@ export const WaitingQueue: React.FC = () => {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="flex items-center justify-start sm:justify-end min-w-0">
+            <AdminTabs
+              tabs={[
+                { id: "kanban", label: "Painel" },
+                { id: "history", label: "Histórico" },
+                { id: "abandoned", label: "Removidos" },
+              ]}
+              activeId={activeTab}
+              onChange={(id) =>
+                setActiveTab(id as "kanban" | "history" | "abandoned")
+              }
+              className="pb-0"
+            />
           </div>
         </div>
       </div>
