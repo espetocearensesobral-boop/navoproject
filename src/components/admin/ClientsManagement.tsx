@@ -281,16 +281,16 @@ export const ClientsManagement: React.FC = () => {
 
       {/* MOBILE CTA + TOP BAR: mesmo padrão de Produtos & Estoque */}
       <div className="md:hidden space-y-2">
-        <Button
+        <button
           type="button"
           onClick={() => handleOpenModal()}
           title="Novo cliente"
           aria-label="Novo cliente"
-          className="w-full h-10 shadow-md active:scale-95"
+          className="admin-btn admin-btn-primary w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Novo cliente</span>
-        </Button>
+        </button>
       </div>
       <div className="md:hidden flex items-center gap-2">
         <div className="relative flex-1">

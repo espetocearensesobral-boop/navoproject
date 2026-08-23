@@ -101,12 +101,13 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
         {children}
         {action && (
           <button
+            type="button"
             onClick={action.onClick}
             disabled={action.disabled}
-            className="admin-btn-sm admin-btn-primary shrink-0"
+            className="admin-btn admin-btn-sm admin-btn-primary shrink-0 flex items-center justify-center gap-1.5 font-bold cursor-pointer"
           >
             <ActionIcon className="w-4 h-4 shrink-0" />
-            <span className="admin-button-label">{action.label}</span>
+            <span className="admin-button-label whitespace-nowrap">{action.label}</span>
           </button>
         )}
       </div>

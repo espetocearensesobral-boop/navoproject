@@ -1026,7 +1026,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                       },
                     ])
                   }
-                  className="h-9 px-3 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-main)] font-bold text-xs flex items-center gap-1.5"
+                  className="admin-btn admin-btn-sm admin-btn-secondary font-bold text-xs flex items-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Novo nível
                 </button>
@@ -1034,7 +1034,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   type="button"
                   onClick={handleSaveTiers}
                   disabled={savingTiers || tiers.length === 0}
-                  className="h-9 px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs disabled:opacity-50"
+                  className="admin-btn admin-btn-sm admin-btn-primary font-bold text-xs disabled:opacity-50 cursor-pointer"
                 >
                   {savingTiers ? "Salvando..." : "Salvar níveis"}
                 </button>
@@ -1162,7 +1162,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 <button
                   type="button"
                   onClick={() => openBenefitEditor()}
-                  className="h-9 px-3 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-1.5 shrink-0"
+                  className="admin-btn admin-btn-sm admin-btn-primary font-bold text-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Novo benefício
                 </button>
@@ -1252,7 +1252,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 <button
                   type="button"
                   onClick={() => openPlanEditor()}
-                  className="h-9 px-3 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-1.5 shrink-0"
+                  className="admin-btn admin-btn-sm admin-btn-primary font-bold text-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Novo plano
                 </button>

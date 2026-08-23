@@ -275,8 +275,9 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
             </h3>
           </div>
           <button
+            type="button"
             onClick={onNavigateToAgenda}
-            className="admin-btn-sm admin-btn-primary"
+            className="admin-btn admin-btn-sm admin-btn-primary cursor-pointer"
             aria-label="Ver na Agenda"
           >
             <CalendarCheck2 className="w-4 h-4 shrink-0" />

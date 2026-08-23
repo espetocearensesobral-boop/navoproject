@@ -211,8 +211,11 @@ export const SubscriptionsManagement: React.FC = () => {
 
       {/* Ação (mobile) */}
       <button
+        type="button"
         onClick={() => setIsPlanModalOpen(true)}
-        className="md:hidden w-full bg-[var(--admin-accent)] hover:bg-gold-hover text-[var(--admin-accent-text)] px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
+        title="Novo plano"
+        aria-label="Novo plano"
+        className="admin-btn admin-btn-primary md:hidden w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer shrink-0"
       >
         <Plus className="w-4 h-4 stroke-[2.5]" />
         <span>Novo plano</span>

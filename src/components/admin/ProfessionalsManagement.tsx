@@ -418,7 +418,7 @@ export const ProfessionalsManagement: React.FC = () => {
           onClick={handleOpenCreate}
           title="Novo profissional"
           aria-label="Novo profissional"
-          className="w-full h-10 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
+          className="admin-btn admin-btn-primary w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Novo barbeiro</span>

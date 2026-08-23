@@ -386,10 +386,11 @@ export const ServicesManagement: React.FC = () => {
 
       {/* Ação mobile: mesmo padrão de Produtos & Estoque */}
       <button
+        type="button"
         onClick={handleOpenCreate}
         title="Novo serviço"
         aria-label="Novo serviço"
-        className="md:hidden w-full h-10 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md"
+        className="admin-btn admin-btn-primary md:hidden w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
       >
         <Plus className="w-4 h-4" />
         <span>Novo serviço</span>

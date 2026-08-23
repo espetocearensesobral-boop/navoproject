@@ -535,11 +535,14 @@ export const WaitingQueue: React.FC = () => {
       {/* Ação (mobile) */}
       {operationSettings.allowWalkIn && (
         <button
+          type="button"
           onClick={() => {
             setIsServicePickerOpen(false);
             setIsAddModalOpen(true);
           }}
-          className="md:hidden w-full min-h-11 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] px-4 py-2.5 rounded-xl text-sm font-extrabold flex items-center justify-center gap-2 transition-[transform,background-color] duration-150 shadow-md active:scale-[0.97] shrink-0"
+          title="Novo encaixe"
+          aria-label="Novo encaixe"
+          className="admin-btn admin-btn-primary md:hidden w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span>Novo encaixe</span>

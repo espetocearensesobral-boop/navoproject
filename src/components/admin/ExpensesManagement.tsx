@@ -232,9 +232,12 @@ export const ExpensesManagement: React.FC = () => {
         <button
           type="button"
           onClick={openCreate}
-          className="w-full h-11 rounded-xl bg-status-error text-white text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.98]"
+          title="Nova saída"
+          aria-label="Nova saída"
+          className="admin-btn admin-btn-destructive w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-status-error/30 bg-status-error/10 hover:bg-status-error/20 text-status-error shadow-md cursor-pointer"
         >
-          <Plus className="w-4 h-4" /> Nova saída
+          <Plus className="w-4 h-4" />
+          <span>Nova saída</span>
         </button>
       </div>
 

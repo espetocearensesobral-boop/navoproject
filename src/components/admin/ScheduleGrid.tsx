@@ -398,16 +398,19 @@ export const ScheduleGrid: React.FC = () => {
           {/* Action Buttons */}
           <div className="flex items-center gap-2 shrink-0">
             <button
+              type="button"
               onClick={() => setIsManualBookingOpen(true)}
-              className="admin-btn-sm admin-btn-primary rounded-xl"
+              className="admin-btn admin-btn-sm admin-btn-primary rounded-xl flex items-center gap-1.5 font-bold cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5 shrink-0" />
               <span>Encaixe</span>
             </button>
             <button
+              type="button"
               onClick={() => setIsBlockModalOpen(true)}
-              className="admin-btn-icon-sm admin-btn-destructive border rounded-xl"
+              className="admin-btn-icon-sm admin-btn-destructive border border-status-error/30 rounded-xl cursor-pointer"
               title="Bloquear horário"
+              aria-label="Bloquear horário"
             >
               <Lock className="w-4 h-4" />
             </button>
@@ -683,8 +686,9 @@ export const ScheduleGrid: React.FC = () => {
             </select>
 
             <button
+              type="button"
               onClick={() => setIsBlockModalOpen(true)}
-              className="admin-btn-icon-sm admin-btn-destructive border rounded-xl"
+              className="admin-btn admin-btn-sm admin-btn-destructive border border-status-error/30 rounded-xl flex items-center gap-1.5 cursor-pointer"
             >
               <Lock className="w-3.5 h-3.5" />
               <span>Bloquear Horário</span>

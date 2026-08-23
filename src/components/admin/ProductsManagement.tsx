@@ -203,9 +203,12 @@ export const ProductsManagement: React.FC = () => {
         <button
           type="button"
           onClick={openCreate}
-          className="w-full h-10 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center justify-center gap-2 active:scale-95"
+          title="Novo produto"
+          aria-label="Novo produto"
+          className="admin-btn admin-btn-primary w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
         >
-          <Plus className="w-4 h-4" /> Novo produto
+          <Plus className="w-4 h-4" />
+          <span>Novo produto</span>
         </button>
       </div>
 

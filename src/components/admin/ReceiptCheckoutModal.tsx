@@ -368,7 +368,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
 
   return createPortal(
     <div
-      className="receipt-v2-overlay"
+      className="admin-shell receipt-v2-overlay"
       role="dialog"
       aria-modal="true"
       aria-labelledby="receipt-dialog-title"
@@ -377,17 +377,17 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
         {/* HEADER FIXO */}
         <header className="receipt-v2-header">
           <div className="receipt-v2-title-group">
-            <span className="receipt-v2-header-icon">
+            <span className={`receipt-v2-header-icon ${isConfirmed ? "receipt-v2-header-icon--success" : "receipt-v2-header-icon--gold"}`}>
               {isConfirmed ? (
                 <CheckCircle2 className="text-status-success" aria-hidden="true" />
               ) : step === 2 ? (
-                <ClipboardCheck aria-hidden="true" />
+                <ClipboardCheck className="text-[var(--color-gold-base)]" aria-hidden="true" />
               ) : (
-                <CreditCard aria-hidden="true" />
+                <CreditCard className="text-[var(--color-gold-base)]" aria-hidden="true" />
               )}
             </span>
             <div className="receipt-v2-title-copy">
-              <p className="receipt-v2-label">
+              <p className="receipt-v2-label text-[var(--color-gold-base)]">
                 {isConfirmed
                   ? "Comprovante emitido"
                   : step === "decision"
@@ -397,7 +397,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               <h2 id="receipt-dialog-title" className="receipt-v2-title">
                 {getHeaderTitle()}
               </h2>
-              <p className="text-xs text-[var(--admin-text-muted)] truncate max-w-[260px] sm:max-w-xs mt-0.5">
+              <p className="text-xs text-[var(--color-content-muted)] truncate max-w-[260px] sm:max-w-xs mt-0.5">
                 {getHeaderSubtitle()}
               </p>
             </div>
@@ -418,12 +418,12 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
             <div className="flex items-center gap-2">
               <div
                 className={`flex-1 h-1.5 rounded-full transition-all ${
-                  step >= 1 ? "bg-[var(--admin-accent)]" : "bg-[var(--admin-border)]"
+                  step >= 1 ? "bg-[var(--color-gold-base)]" : "bg-[var(--color-border-subtle)]"
                 }`}
               />
               <div
                 className={`flex-1 h-1.5 rounded-full transition-all ${
-                  step >= 2 ? "bg-[var(--admin-accent)]" : "bg-[var(--admin-border)]"
+                  step >= 2 ? "bg-[var(--color-gold-base)]" : "bg-[var(--color-border-subtle)]"
                 }`}
               />
             </div>
@@ -445,30 +445,31 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           {/* PASSO: DECISÃO INICIAL (FILA) */}
           {step === "decision" && !isConfirmed && (
             <div className="space-y-4">
-              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 sm:p-5 text-center space-y-2 shadow-xs">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 sm:p-5 text-center space-y-2 shadow-xs">
                 <div className="w-12 h-12 rounded-full bg-status-success/15 text-status-success mx-auto flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-bold text-[var(--admin-text-main)]">
+                <h3 className="text-base font-bold text-[var(--color-content-base)]">
                   Atendimento finalizado com sucesso!
                 </h3>
-                <p className="text-xs text-[var(--admin-text-muted)] max-w-sm mx-auto">
-                  O atendimento de <strong>{source.clientName}</strong> ({source.serviceTitle}) está concluído.
+                <p className="text-xs text-[var(--color-content-muted)] max-w-sm mx-auto">
+                  O atendimento de <strong className="text-[var(--color-content-base)]">{source.clientName}</strong> ({source.serviceTitle}) está concluído.
                 </p>
-                <div className="pt-2 text-2xl font-serif font-bold text-[var(--admin-accent)]">
+                <div className="pt-2 text-2xl font-serif font-bold text-[var(--color-gold-base)]">
                   {money(originalAmount)}
                 </div>
               </div>
 
-              <div className="bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-3.5 text-xs text-[var(--admin-text-muted)] space-y-1">
-                <p className="font-bold text-[var(--admin-text-main)]">
-                  O que deseja fazer agora?
+              <div className="bg-[var(--color-surface-base)]/50 border border-[var(--color-border-subtle)] rounded-xl p-3.5 text-xs text-[var(--color-content-muted)] space-y-1.5">
+                <p className="font-bold text-[var(--color-content-base)] flex items-center gap-1.5">
+                  <Info className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
+                  <span>O que deseja fazer agora?</span>
                 </p>
                 <p>
-                  • <strong>Registrar agora:</strong> Define forma de pagamento, descontos e confirma o recebimento imediatamente no extrato.
+                  • <strong className="text-[var(--color-content-base)]">Registrar agora:</strong> Define forma de pagamento, descontos e confirma o recebimento imediatamente no extrato.
                 </p>
                 <p>
-                  • <strong>Registrar depois:</strong> Mantém como pendência na aba <em>Financeiro › Recebimentos</em> para acerto posterior.
+                  • <strong className="text-[var(--color-content-base)]">Registrar depois:</strong> Mantém como pendência na aba <em>Financeiro › Recebimentos</em> para acerto posterior.
                 </p>
               </div>
             </div>
@@ -490,27 +491,28 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               }}
               className="space-y-4"
             >
-              {/* CARD HERO DE ATENDIMENTO */}
-              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-2">
-                <div className="flex items-center justify-between text-xs text-[var(--admin-text-muted)]">
+              {/* CARD HERO DE ATENDIMENTO COM PALETA DO SISTEMA */}
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-2 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--color-gold-base)]/5 rounded-full blur-xl pointer-events-none" />
+                <div className="flex items-center justify-between text-xs text-[var(--color-content-muted)]">
                   <span>Valor base do serviço</span>
-                  <span className="font-semibold text-[var(--admin-text-main)]">{source.serviceTitle}</span>
+                  <span className="font-semibold text-[var(--color-content-base)]">{source.serviceTitle}</span>
                 </div>
                 <div className="flex items-baseline justify-between">
-                  <div className="text-2xl font-serif font-bold text-[var(--admin-text-main)]">
+                  <div className="text-2xl font-serif font-bold text-[var(--color-content-base)]">
                     {money(originalAmount)}
                   </div>
-                  <div className="text-xs text-[var(--admin-text-muted)] flex items-center gap-1">
-                    <UserRound className="w-3.5 h-3.5" />
-                    <span>{source.professionalName || "Profissional padrão"}</span>
+                  <div className="text-xs text-[var(--color-content-muted)] flex items-center gap-1 bg-[var(--color-surface-card)] px-2.5 py-1 rounded-full border border-[var(--color-border-subtle)]">
+                    <UserRound className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
+                    <span className="text-[var(--color-content-base)]">{source.professionalName || "Profissional"}</span>
                   </div>
                 </div>
               </div>
 
               {/* AJUSTES: DESCONTO E ACRÉSCIMO */}
-              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-3">
-                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
-                  <Tag className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-3">
+                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--color-gold-base)]">
+                  <Tag className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
                   <span>Ajustes de Valor</span>
                 </div>
 
@@ -518,20 +520,20 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                   {/* DESCONTO */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-medium text-[var(--admin-text-muted)]">Desconto</span>
+                      <span className="font-medium text-[var(--color-content-muted)]">Desconto</span>
                       <span className="font-bold text-status-error text-[11px]">
                         {calculation.discountAmount > 0 ? `− ${money(calculation.discountAmount)}` : "R$ 0,00"}
                       </span>
                     </div>
-                    <div className="flex rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] overflow-hidden focus-within:border-[var(--admin-accent)]">
-                      <div className="flex border-r border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                    <div className="flex rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] overflow-hidden focus-within:border-[var(--color-gold-base)] focus-within:ring-1 focus-within:ring-[var(--color-gold-base)] transition-all">
+                      <div className="flex border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-base)]">
                         <button
                           type="button"
                           onClick={() => setDiscountMode("percent")}
                           className={`px-2.5 py-1.5 text-xs font-bold transition-colors ${
                             discountMode === "percent"
-                              ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
-                              : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                              ? "bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)]"
+                              : "text-[var(--color-content-muted)] hover:text-[var(--color-content-base)]"
                           }`}
                         >
                           %
@@ -541,8 +543,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                           onClick={() => setDiscountMode("amount")}
                           className={`px-2.5 py-1.5 text-xs font-bold transition-colors ${
                             discountMode === "amount"
-                              ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
-                              : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                              ? "bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)]"
+                              : "text-[var(--color-content-muted)] hover:text-[var(--color-content-base)]"
                           }`}
                         >
                           R$
@@ -556,7 +558,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                         value={discountValue}
                         onChange={(e) => setDiscountValue(e.target.value)}
                         placeholder="0,00"
-                        className="w-full bg-transparent px-3 py-2 text-xs font-bold text-[var(--admin-text-main)] focus:outline-none"
+                        className="w-full bg-transparent px-3 py-2 text-xs font-bold text-[var(--color-content-base)] focus:outline-none"
                       />
                     </div>
                   </div>
@@ -564,20 +566,20 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                   {/* ACRÉSCIMO */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-medium text-[var(--admin-text-muted)]">Acréscimo / Taxa</span>
+                      <span className="font-medium text-[var(--color-content-muted)]">Acréscimo / Taxa</span>
                       <span className="font-bold text-status-success text-[11px]">
                         {calculation.surchargeAmount > 0 ? `+ ${money(calculation.surchargeAmount)}` : "R$ 0,00"}
                       </span>
                     </div>
-                    <div className="flex rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] overflow-hidden focus-within:border-[var(--admin-accent)]">
-                      <div className="flex border-r border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                    <div className="flex rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] overflow-hidden focus-within:border-[var(--color-gold-base)] focus-within:ring-1 focus-within:ring-[var(--color-gold-base)] transition-all">
+                      <div className="flex border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-base)]">
                         <button
                           type="button"
                           onClick={() => setSurchargeMode("percent")}
                           className={`px-2.5 py-1.5 text-xs font-bold transition-colors ${
                             surchargeMode === "percent"
-                              ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
-                              : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                              ? "bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)]"
+                              : "text-[var(--color-content-muted)] hover:text-[var(--color-content-base)]"
                           }`}
                         >
                           %
@@ -587,8 +589,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                           onClick={() => setSurchargeMode("amount")}
                           className={`px-2.5 py-1.5 text-xs font-bold transition-colors ${
                             surchargeMode === "amount"
-                              ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
-                              : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                              ? "bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)]"
+                              : "text-[var(--color-content-muted)] hover:text-[var(--color-content-base)]"
                           }`}
                         >
                           R$
@@ -601,7 +603,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                         value={surchargeValue}
                         onChange={(e) => setSurchargeValue(e.target.value)}
                         placeholder="0,00"
-                        className="w-full bg-transparent px-3 py-2 text-xs font-bold text-[var(--admin-text-main)] focus:outline-none"
+                        className="w-full bg-transparent px-3 py-2 text-xs font-bold text-[var(--color-content-base)] focus:outline-none"
                       />
                     </div>
                   </div>
@@ -609,12 +611,12 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
 
               {/* FORMA DE PAGAMENTO */}
-              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-3">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-content-muted)]">
                     Forma de Pagamento
                   </span>
-                  <span className="text-xs font-bold text-[var(--admin-accent)]">
+                  <span className="text-xs font-bold text-[var(--color-gold-hover)] bg-[var(--color-gold-base)]/10 px-2 py-0.5 rounded-full border border-[var(--color-gold-base)]/20">
                     {paymentLabel[paymentMethod]}
                   </span>
                 </div>
@@ -630,11 +632,11 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                         onClick={() => setPaymentMethod(opt.id)}
                         className={`p-2.5 rounded-xl border flex items-center gap-2 transition-all text-left ${
                           isSelected
-                            ? "border-[var(--admin-accent)] bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] shadow-xs"
-                            : "border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:border-[var(--admin-border-strong)]"
+                            ? "border-[var(--color-gold-base)] bg-[var(--color-gold-base)]/15 text-[var(--color-gold-hover)] shadow-xs"
+                            : "border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-[var(--color-content-muted)] hover:text-[var(--color-content-base)] hover:border-[var(--color-border-subtle)]"
                         }`}
                       >
-                        <Icon className="w-4 h-4 shrink-0" />
+                        <Icon className={`w-4 h-4 shrink-0 ${isSelected ? "text-[var(--color-gold-base)]" : ""}`} />
                         <span className="text-xs font-bold truncate">{opt.label}</span>
                       </button>
                     );
@@ -644,13 +646,13 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 {/* CASO DINHEIRO: VALOR RECEBIDO E TROCO */}
                 {paymentMethod === "cash" && (
                   <div className="mt-3 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 space-y-2">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-500">
                       <Banknote className="w-4 h-4" />
                       <span>Cálculo de Troco em Dinheiro</span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                       <div>
-                        <label className="block text-[11px] font-medium text-[var(--admin-text-muted)] mb-1">
+                        <label className="block text-[11px] font-medium text-[var(--color-content-muted)] mb-1">
                           Valor entregue pelo cliente (R$)
                         </label>
                         <input
@@ -659,11 +661,11 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                           step="0.01"
                           value={cashReceived}
                           onChange={(e) => setCashReceived(e.target.value)}
-                          className="w-full h-9 rounded-lg bg-[var(--admin-surface)] border border-[var(--admin-border)] px-3 text-sm font-bold text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                          className="w-full h-9 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] px-3 text-sm font-bold text-[var(--color-content-base)] focus:outline-none focus:border-[var(--color-gold-base)]"
                         />
                       </div>
-                      <div className="flex flex-col justify-center bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg p-2.5">
-                        <span className="text-[10px] uppercase font-bold text-[var(--admin-text-muted)]">
+                      <div className="flex flex-col justify-center bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-lg p-2.5">
+                        <span className="text-[10px] uppercase font-bold text-[var(--color-content-muted)]">
                           Troco a devolver
                         </span>
                         <strong
@@ -684,8 +686,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
 
               {/* OBSERVAÇÕES */}
-              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--color-content-muted)]">
                   Observações adicionais (opcional)
                 </label>
                 <input
@@ -693,23 +695,23 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                   value={observations}
                   onChange={(e) => setObservations(e.target.value)}
                   placeholder="Ex: pago no PIX da empresa / desconto acordado"
-                  className="w-full h-9 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)]"
+                  className="w-full h-9 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] px-3 text-xs text-[var(--color-content-base)] placeholder:text-[var(--color-content-muted)] focus:outline-none focus:border-[var(--color-gold-base)] transition-colors"
                 />
               </div>
 
-              {/* TOTAL EM DESTAQUE */}
-              <div className="bg-gradient-to-r from-[var(--admin-surface)] to-[var(--admin-bg)] border border-[var(--admin-accent)]/30 rounded-2xl p-4 flex items-center justify-between">
+              {/* TOTAL EM DESTAQUE COM GRADIENTE DOURADO/HERITAGE */}
+              <div className="bg-gradient-to-r from-[var(--color-surface-card)] via-[var(--color-surface-base)] to-[var(--color-surface-card)] border border-[var(--color-gold-base)]/30 rounded-2xl p-4 flex items-center justify-between shadow-xs">
                 <div>
-                  <span className="text-xs uppercase font-bold text-[var(--admin-text-muted)] block">
+                  <span className="text-xs uppercase font-bold text-[var(--color-gold-base)] block">
                     Total Final a Receber
                   </span>
-                  <span className="text-[11px] text-[var(--admin-text-muted)]">
+                  <span className="text-[11px] text-[var(--color-content-muted)]">
                     {calculation.discountAmount > 0 || calculation.surchargeAmount > 0
                       ? "Com ajustes aplicados"
                       : "Sem ajustes adicionais"}
                   </span>
                 </div>
-                <div className="text-2xl font-serif font-bold text-[var(--admin-accent)]">
+                <div className="text-2xl font-serif font-bold text-[var(--color-gold-base)]">
                   {money(calculation.total)}
                 </div>
               </div>
@@ -720,55 +722,55 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           {step === 2 && !isConfirmed && (
             <div className="space-y-4">
               {/* HERO REVISÃO */}
-              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 text-center space-y-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
+              <div className="bg-gradient-to-b from-[var(--color-surface-card)] to-[var(--color-surface-base)] border border-[var(--color-gold-base)]/25 rounded-2xl p-5 text-center space-y-1 shadow-xs">
+                <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-gold-base)]">
                   Confirmar recebimento de
                 </span>
-                <div className="text-3xl font-serif font-bold text-[var(--admin-accent)]">
+                <div className="text-3xl font-serif font-bold text-[var(--color-gold-base)]">
                   {money(calculation.total)}
                 </div>
-                <div className="text-xs text-[var(--admin-text-muted)]">
-                  Via <strong>{paymentLabel[paymentMethod]}</strong>
+                <div className="text-xs text-[var(--color-content-muted)]">
+                  Via <strong className="text-[var(--color-content-base)]">{paymentLabel[paymentMethod]}</strong>
                 </div>
               </div>
 
               {/* DETALHES CONSOLIDADOS */}
-              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-2.5 text-xs">
-                <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
-                  <span className="text-[var(--admin-text-muted)]">Cliente</span>
-                  <strong className="text-[var(--admin-text-main)]">{source.clientName}</strong>
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-2.5 text-xs">
+                <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)]">
+                  <span className="text-[var(--color-content-muted)]">Cliente</span>
+                  <strong className="text-[var(--color-content-base)]">{source.clientName}</strong>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
-                  <span className="text-[var(--admin-text-muted)]">Serviço</span>
-                  <span className="text-[var(--admin-text-main)] font-semibold">{source.serviceTitle}</span>
+                <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)]">
+                  <span className="text-[var(--color-content-muted)]">Serviço</span>
+                  <span className="text-[var(--color-content-base)] font-semibold">{source.serviceTitle}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
-                  <span className="text-[var(--admin-text-muted)]">Profissional</span>
-                  <span className="text-[var(--admin-text-main)]">{source.professionalName || "Não informado"}</span>
+                <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)]">
+                  <span className="text-[var(--color-content-muted)]">Profissional</span>
+                  <span className="text-[var(--color-content-base)]">{source.professionalName || "Não informado"}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
-                  <span className="text-[var(--admin-text-muted)]">Valor original</span>
-                  <span className="text-[var(--admin-text-main)]">{money(originalAmount)}</span>
+                <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)]">
+                  <span className="text-[var(--color-content-muted)]">Valor original</span>
+                  <span className="text-[var(--color-content-base)]">{money(originalAmount)}</span>
                 </div>
                 {calculation.discountAmount > 0 && (
-                  <div className="flex justify-between py-1 border-b border-[var(--admin-border)] text-status-error font-medium">
+                  <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)] text-status-error font-medium">
                     <span>Desconto</span>
                     <span>− {money(calculation.discountAmount)}</span>
                   </div>
                 )}
                 {calculation.surchargeAmount > 0 && (
-                  <div className="flex justify-between py-1 border-b border-[var(--admin-border)] text-status-success font-medium">
+                  <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)] text-status-success font-medium">
                     <span>Acréscimo</span>
                     <span>+ {money(calculation.surchargeAmount)}</span>
                   </div>
                 )}
                 {paymentMethod === "cash" && (
                   <>
-                    <div className="flex justify-between py-1 border-b border-[var(--admin-border)]">
-                      <span className="text-[var(--admin-text-muted)]">Valor entregue</span>
-                      <span className="text-[var(--admin-text-main)]">{money(calculation.amountReceived)}</span>
+                    <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)]">
+                      <span className="text-[var(--color-content-muted)]">Valor entregue</span>
+                      <span className="text-[var(--color-content-base)]">{money(calculation.amountReceived)}</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[var(--admin-border)] text-status-success font-bold">
+                    <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)] text-status-success font-bold">
                       <span>Troco</span>
                       <span>{money(calculation.change)}</span>
                     </div>
@@ -776,18 +778,18 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 )}
                 {observations.trim() && (
                   <div className="pt-1">
-                    <span className="text-[var(--admin-text-muted)] block mb-0.5">Observações:</span>
-                    <p className="italic text-[var(--admin-text-main)] bg-[var(--admin-bg)] p-2 rounded-lg">
+                    <span className="text-[var(--color-content-muted)] block mb-0.5">Observações:</span>
+                    <p className="italic text-[var(--color-content-base)] bg-[var(--color-surface-card)] p-2 rounded-lg border border-[var(--color-border-subtle)]">
                       {observations}
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-3 flex items-start gap-2 text-xs text-[var(--admin-text-muted)]">
-                <Info className="w-4 h-4 text-[var(--admin-accent)] shrink-0 mt-0.5" />
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-xl p-3 flex items-start gap-2 text-xs text-[var(--color-content-muted)]">
+                <Info className="w-4 h-4 text-[var(--color-gold-base)] shrink-0 mt-0.5" />
                 <span>
-                  Ao confirmar, o status passará para <strong>Recebido</strong> e o lançamento entrará automaticamente no fluxo de caixa.
+                  Ao confirmar, o status passará para <strong className="text-[var(--color-content-base)]">Recebido</strong> e o lançamento entrará automaticamente no fluxo de caixa.
                 </span>
               </div>
             </div>
@@ -796,14 +798,14 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           {/* PASSO FINAL: RECEBIMENTO CONFIRMADO (COMPROVANTE) */}
           {isConfirmed && receipt && (
             <div className="space-y-4">
-              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-5 text-center space-y-2 shadow-xs">
+              <div className="bg-[var(--color-surface-base)] border border-status-success/30 rounded-2xl p-5 text-center space-y-2 shadow-xs">
                 <div className="w-12 h-12 rounded-full bg-status-success/20 text-status-success mx-auto flex items-center justify-center">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
-                <h3 className="text-base font-bold text-[var(--admin-text-main)]">
+                <h3 className="text-base font-bold text-[var(--color-content-base)]">
                   Recebimento Confirmado!
                 </h3>
-                <p className="text-xs text-[var(--admin-text-muted)]">
+                <p className="text-xs text-[var(--color-content-muted)]">
                   Lançamento efetuado com sucesso no Extrato Financeiro.
                 </p>
                 <div className="pt-2 text-3xl font-serif font-bold text-status-success">
@@ -812,37 +814,37 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
 
               {/* CARD DE COMPROVANTE */}
-              <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-4 space-y-2 text-xs">
-                <div className="flex items-center justify-between pb-2 border-b border-[var(--admin-border)]">
-                  <span className="font-bold flex items-center gap-1.5 text-[var(--admin-text-main)]">
-                    <FileText className="w-4 h-4 text-[var(--admin-accent)]" />
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-2 text-xs">
+                <div className="flex items-center justify-between pb-2 border-b border-[var(--color-border-subtle)]">
+                  <span className="font-bold flex items-center gap-1.5 text-[var(--color-content-base)]">
+                    <FileText className="w-4 h-4 text-[var(--color-gold-base)]" />
                     Comprovante
                   </span>
-                  <span className="font-mono font-bold text-[var(--admin-accent)]">
+                  <span className="font-mono font-bold text-[var(--color-gold-base)]">
                     #{receipt.id.slice(-8).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-[var(--admin-text-muted)]">Cliente:</span>
-                  <strong className="text-[var(--admin-text-main)]">{receipt.clientName}</strong>
+                  <span className="text-[var(--color-content-muted)]">Cliente:</span>
+                  <strong className="text-[var(--color-content-base)]">{receipt.clientName}</strong>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-[var(--admin-text-muted)]">Serviço:</span>
-                  <span className="text-[var(--admin-text-main)]">{receipt.serviceTitle}</span>
+                  <span className="text-[var(--color-content-muted)]">Serviço:</span>
+                  <span className="text-[var(--color-content-base)]">{receipt.serviceTitle}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-[var(--admin-text-muted)]">Profissional:</span>
-                  <span className="text-[var(--admin-text-main)]">{receipt.professionalName || "Não informado"}</span>
+                  <span className="text-[var(--color-content-muted)]">Profissional:</span>
+                  <span className="text-[var(--color-content-base)]">{receipt.professionalName || "Não informado"}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-[var(--admin-text-muted)]">Forma:</span>
-                  <span className="text-[var(--admin-text-main)] font-semibold">
+                  <span className="text-[var(--color-content-muted)]">Forma:</span>
+                  <span className="text-[var(--color-content-base)] font-semibold">
                     {paymentLabel[receipt.paymentMethod || "other"]}
                   </span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-[var(--admin-text-muted)]">Data/Hora:</span>
-                  <span className="text-[var(--admin-text-main)]">
+                  <span className="text-[var(--color-content-muted)]">Data/Hora:</span>
+                  <span className="text-[var(--color-content-base)]">
                     {new Date(receipt.receivedAt || Date.now()).toLocaleString("pt-BR")}
                   </span>
                 </div>
@@ -860,7 +862,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="button"
                 onClick={handleRegisterLater}
                 disabled={isCreating}
-                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)] transition-colors"
+                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-muted)] hover:bg-[var(--color-surface-card)] hover:text-[var(--color-content-base)] transition-colors"
               >
                 {isCreating ? "Salvando…" : "Registrar depois"}
               </button>
@@ -868,7 +870,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="button"
                 onClick={handleRegisterNow}
                 disabled={isCreating}
-                className="flex-[1.5] min-h-[44px] px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--admin-accent-hover)] transition-all shadow-xs"
+                className="flex-[1.5] min-h-[44px] px-4 rounded-xl bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--color-gold-hover)] transition-all shadow-xs"
               >
                 {isCreating ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -886,7 +888,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)] transition-colors flex items-center justify-center gap-1"
+                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-muted)] hover:bg-[var(--color-surface-card)] hover:text-[var(--color-content-base)] transition-colors flex items-center justify-center gap-1"
               >
                 <X className="w-4 h-4" />
                 <span>Cancelar</span>
@@ -895,7 +897,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="submit"
                 form="checkout-step-1-form"
                 disabled={calculation.isCashShort}
-                className="flex-[1.8] min-h-[44px] px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--admin-accent-hover)] disabled:opacity-50 transition-all shadow-xs"
+                className="flex-[1.8] min-h-[44px] px-4 rounded-xl bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--color-gold-hover)] disabled:opacity-50 transition-all shadow-xs"
               >
                 <span>Revisar ({money(calculation.total)})</span>
                 <ArrowRight className="w-4 h-4" />
@@ -910,7 +912,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="button"
                 onClick={() => setStep(1)}
                 disabled={isConfirming}
-                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)] transition-colors flex items-center justify-center gap-1"
+                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-muted)] hover:bg-[var(--color-surface-card)] hover:text-[var(--color-content-base)] transition-colors flex items-center justify-center gap-1"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Voltar</span>
@@ -919,7 +921,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="button"
                 onClick={handleConfirmReceipt}
                 disabled={isConfirming}
-                className="flex-[2] min-h-[44px] px-4 rounded-xl bg-status-success hover:opacity-95 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs"
+                className="flex-[2] min-h-[44px] px-4 rounded-xl bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] hover:bg-[var(--color-gold-hover)] text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs"
               >
                 {isConfirming ? (
                   <>
@@ -942,17 +944,17 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               <button
                 type="button"
                 onClick={handleShareWhatsApp}
-                className="min-h-[44px] px-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[11px] font-bold text-status-success hover:bg-[var(--admin-bg)] transition-colors flex items-center justify-center gap-1"
+                className="min-h-[44px] px-2 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-[11px] font-bold text-status-success hover:bg-[var(--color-surface-card)] transition-colors flex items-center justify-center gap-1"
                 title="Compartilhar no WhatsApp"
               >
-                <Share2 className="w-3.5 h-3.5" />
+                <Share2 className="w-3.5 h-3.5 text-status-success" />
                 <span className="hidden sm:inline">WhatsApp</span>
                 <span className="sm:hidden">Whats</span>
               </button>
               <button
                 type="button"
                 onClick={handlePrintReceipt}
-                className="min-h-[44px] px-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[11px] font-bold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] transition-colors flex items-center justify-center gap-1"
+                className="min-h-[44px] px-2 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-[11px] font-bold text-[var(--color-content-muted)] hover:text-[var(--color-content-base)] hover:bg-[var(--color-surface-card)] transition-colors flex items-center justify-center gap-1"
                 title="Imprimir Comprovante"
               >
                 <Printer className="w-3.5 h-3.5" />
@@ -961,7 +963,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="min-h-[44px] px-3 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1 hover:bg-[var(--admin-accent-hover)] transition-all shadow-xs"
+                className="min-h-[44px] px-3 rounded-xl bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] text-xs font-bold flex items-center justify-center gap-1 hover:bg-[var(--color-gold-hover)] transition-all shadow-xs"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Concluir</span>
