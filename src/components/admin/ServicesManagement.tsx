@@ -634,7 +634,7 @@ export const ServicesManagement: React.FC = () => {
                             className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)]"
                             title="Editar"
                           >
-                            <Edit3 className="w-4 h-4" />
+                            <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             type="button"
@@ -767,7 +767,7 @@ export const ServicesManagement: React.FC = () => {
                           onClick={() => handleOpenEdit(service)}
                           className="flex-1 min-h-10 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5"
                         >
-                          <Edit3 className="w-4 h-4" /> Editar
+                          <Edit2 className="w-4 h-4" /> Editar
                         </button>
                         <button
                           type="button"

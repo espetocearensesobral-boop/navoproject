@@ -17,6 +17,7 @@ import {
   Edit2,
   Trash2,
   Star,
+  Sparkles,
   CheckCircle2,
   X,
   Save,

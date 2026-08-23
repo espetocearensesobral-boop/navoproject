@@ -691,7 +691,6 @@ export const ComandasManagement: React.FC = () => {
                   </tbody>
                 </table>
               </div>
-            </div>
           )}
         </div>
       )}
