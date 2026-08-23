@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BarChart3, ChevronDown, Globe2, Target } from "lucide-react";
 import { MetaAdsManagement } from "./MetaAdsManagement";
 import { GoogleAdsManagement } from "./GoogleAdsManagement";
@@ -39,20 +39,29 @@ export const CampaignsWorkspace: React.FC<CampaignsWorkspaceProps> = ({
   onOpenGoogleSettings,
   initialProvider,
 }) => {
-  const [openProviders, setOpenProviders] = useState<CampaignProvider[]>(() =>
-    initialProvider ? [initialProvider] : [],
+  const [openProvider, setOpenProvider] = useState<CampaignProvider | null>(
+    () => initialProvider || null,
   );
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
-    setOpenProviders(initialProvider ? [initialProvider] : []);
+    if (initialProvider) {
+      setOpenProvider(initialProvider);
+    }
   }, [initialProvider]);
 
+  useEffect(() => {
+    if (openProvider && sectionRefs.current[openProvider]) {
+      const el = sectionRefs.current[openProvider];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.focus({ preventScroll: true });
+      }
+    }
+  }, [openProvider]);
+
   const toggleProvider = (provider: CampaignProvider) => {
-    setOpenProviders((current) =>
-      current.includes(provider)
-        ? current.filter((item) => item !== provider)
-        : [...current, provider],
-    );
+    setOpenProvider((current) => (current === provider ? null : provider));
   };
 
   const renderProviderContent = (provider: CampaignProvider) => {
@@ -76,17 +85,21 @@ export const CampaignsWorkspace: React.FC<CampaignsWorkspaceProps> = ({
       <div className="space-y-3" aria-label="Canais de campanha">
         {groups.map((group) => {
           const GroupIcon = group.icon;
-          const isOpen = openProviders.includes(group.id);
+          const isOpen = openProvider === group.id;
           return (
             <section
               key={group.id}
-              className={`overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors ${isOpen ? "border-[var(--admin-accent)]/40" : "border-[var(--admin-border)]"}`}
+              ref={(el) => {
+                sectionRefs.current[group.id] = el;
+              }}
+              tabIndex={-1}
+              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors focus:outline-none ${isOpen ? "border-[var(--admin-accent)]/40 shadow-xs ring-1 ring-[var(--admin-accent)]/20" : "border-[var(--admin-border)]"}`}
             >
               <button
                 type="button"
                 onClick={() => toggleProvider(group.id)}
                 aria-expanded={isOpen}
-                className="flex min-h-[74px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-bg)] sm:px-5"
+                className="flex min-h-[74px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-bg)] sm:px-5 cursor-pointer"
               >
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isOpen ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]" : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"}`}

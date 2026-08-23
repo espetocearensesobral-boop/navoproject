@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown, Package, Scissors, Users } from "lucide-react";
 import { ServicesManagement } from "./ServicesManagement";
 import { ProfessionalsManagement } from "./ProfessionalsManagement";
@@ -39,53 +39,55 @@ const sections: CatalogSection[] = [
   },
 ];
 
-export const CatalogWorkspace: React.FC<{ initialTab?: CatalogSectionId }> = ({
-  initialTab = "services",
-}) => {
-  const [openSections, setOpenSections] = useState<Record<CatalogSectionId, boolean>>({
-    services: initialTab === "services",
-    professionals: initialTab === "professionals",
-    products: initialTab === "products",
-  });
+export const CatalogWorkspace: React.FC<{ initialTab?: CatalogSectionId }> = () => {
+  const [openSection, setOpenSection] = useState<CatalogSectionId | null>(null);
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
-    if (initialTab) {
-      setOpenSections((prev) => ({
-        ...prev,
-        [initialTab]: true,
-      }));
+    if (openSection && sectionRefs.current[openSection]) {
+      const el = sectionRefs.current[openSection];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.focus({ preventScroll: true });
+      }
     }
-  }, [initialTab]);
+  }, [openSection]);
 
   const toggleSection = (id: CatalogSectionId) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setOpenSection((current) => (current === id ? null : id));
   };
 
-  const openCount = Object.values(openSections).filter(Boolean).length;
+  const activeSection = sections.find((s) => s.id === openSection);
 
   return (
     <div className="admin-catalog-workspace min-w-0 space-y-4">
       <AdminPageHeader
         icon={Package}
         title="Catálogo"
-        stats={[{ label: "seções", value: `${openCount} de 3 ativas` }]}
+        stats={[
+          {
+            label: "seção",
+            value: activeSection ? activeSection.label : "Nenhuma aberta",
+          },
+        ]}
       />
 
       <div className="space-y-3" aria-label="Seções do catálogo">
         {sections.map((section) => {
           const SectionIcon = section.icon;
           const Component = section.component;
-          const isOpen = Boolean(openSections[section.id]);
+          const isOpen = openSection === section.id;
 
           return (
             <section
               key={section.id}
-              className={`overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors ${
+              ref={(el) => {
+                sectionRefs.current[section.id] = el;
+              }}
+              tabIndex={-1}
+              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors focus:outline-none ${
                 isOpen
-                  ? "border-[var(--admin-accent)]/40 shadow-xs"
+                  ? "border-[var(--admin-accent)]/40 shadow-xs ring-1 ring-[var(--admin-accent)]/20"
                   : "border-[var(--admin-border)]"
               }`}
             >
@@ -95,7 +97,7 @@ export const CatalogWorkspace: React.FC<{ initialTab?: CatalogSectionId }> = ({
                 aria-controls={`catalog-section-content-${section.id}`}
                 aria-expanded={isOpen}
                 onClick={() => toggleSection(section.id)}
-                className="flex min-h-[74px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-bg)] sm:px-5"
+                className="flex min-h-[74px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-bg)] sm:px-5 cursor-pointer"
               >
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${

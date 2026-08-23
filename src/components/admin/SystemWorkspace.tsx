@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
   ChevronDown,
@@ -144,6 +144,7 @@ export const SystemWorkspace: React.FC<{
   const [openGroup, setOpenGroup] = useState<SystemGroupId | null>(() =>
     initialTab === "unit" ? null : groupForTab(initialTab as SystemTab),
   );
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -151,6 +152,16 @@ export const SystemWorkspace: React.FC<{
       initialTab === "unit" ? null : groupForTab(initialTab as SystemTab),
     );
   }, [initialTab]);
+
+  useEffect(() => {
+    if (openGroup && sectionRefs.current[openGroup]) {
+      const el = sectionRefs.current[openGroup];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.focus({ preventScroll: true });
+      }
+    }
+  }, [openGroup]);
 
   const activeOption = useMemo(
     () =>
@@ -197,7 +208,11 @@ export const SystemWorkspace: React.FC<{
           return (
             <section
               key={group.id}
-              className={`overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors ${isOpen ? "border-[var(--admin-accent)]/40" : "border-[var(--admin-border)]"}`}
+              ref={(el) => {
+                sectionRefs.current[group.id] = el;
+              }}
+              tabIndex={-1}
+              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors focus:outline-none ${isOpen ? "border-[var(--admin-accent)]/40 shadow-xs ring-1 ring-[var(--admin-accent)]/20" : "border-[var(--admin-border)]"}`}
             >
               <button
                 type="button"
@@ -207,7 +222,7 @@ export const SystemWorkspace: React.FC<{
                   )
                 }
                 aria-expanded={isOpen}
-                className="flex min-h-[74px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-bg)] sm:px-5"
+                className="flex min-h-[74px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-bg)] sm:px-5 cursor-pointer"
               >
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isOpen ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]" : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"}`}

@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Activity,
   ChevronDown,
   FileText,
   TrendingUp,
-  Maximize2,
-  Minimize2,
 } from "lucide-react";
 import { OperationalReportsManagement } from "./OperationalReportsManagement";
 import { ReportsManagement } from "./ReportsManagement";
@@ -38,92 +36,55 @@ const sections: ReportsSection[] = [
   },
 ];
 
-export const ReportsWorkspace: React.FC<{ initialTab?: ReportsSectionId }> = ({
-  initialTab = "operational",
-}) => {
-  const [openSections, setOpenSections] = useState<Record<ReportsSectionId, boolean>>({
-    operational: initialTab === "operational",
-    financial: initialTab === "financial",
-  });
+export const ReportsWorkspace: React.FC<{ initialTab?: ReportsSectionId }> = () => {
+  const [openSection, setOpenSection] = useState<ReportsSectionId | null>(null);
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
-    if (initialTab) {
-      setOpenSections((prev) => ({
-        ...prev,
-        [initialTab]: true,
-      }));
+    if (openSection && sectionRefs.current[openSection]) {
+      const el = sectionRefs.current[openSection];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.focus({ preventScroll: true });
+      }
     }
-  }, [initialTab]);
+  }, [openSection]);
 
   const toggleSection = (id: ReportsSectionId) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setOpenSection((current) => (current === id ? null : id));
   };
 
-  const expandAll = () => {
-    setOpenSections({
-      operational: true,
-      financial: true,
-    });
-  };
-
-  const collapseAll = () => {
-    setOpenSections({
-      operational: false,
-      financial: false,
-    });
-  };
-
-  const openCount = Object.values(openSections).filter(Boolean).length;
+  const activeSection = sections.find((s) => s.id === openSection);
 
   return (
     <div className="admin-reports-workspace min-w-0 space-y-4">
       <AdminPageHeader
         icon={FileText}
         title="Relatórios"
-        stats={[{ label: "módulos", value: `${openCount} de 2 abertos` }]}
-      >
-        <div className="flex items-center gap-2">
-          {openCount < 2 ? (
-            <button
-              type="button"
-              onClick={expandAll}
-              className="admin-btn admin-btn-sm admin-btn-secondary text-xs flex items-center gap-1.5 cursor-pointer"
-              title="Expandir todos os relatórios"
-              aria-label="Expandir todos os relatórios"
-            >
-              <Maximize2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Expandir todos</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={collapseAll}
-              className="admin-btn admin-btn-sm admin-btn-secondary text-xs flex items-center gap-1.5 cursor-pointer"
-              title="Recolher todos os relatórios"
-              aria-label="Recolher todos os relatórios"
-            >
-              <Minimize2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Recolher todos</span>
-            </button>
-          )}
-        </div>
-      </AdminPageHeader>
+        stats={[
+          {
+            label: "módulo",
+            value: activeSection ? activeSection.label : "Nenhum aberto",
+          },
+        ]}
+      />
 
       <div className="space-y-3" aria-label="Seções de relatórios">
         {sections.map((section) => {
           const SectionIcon = section.icon;
           const Component = section.component;
-          const isOpen = Boolean(openSections[section.id]);
+          const isOpen = openSection === section.id;
 
           return (
             <section
               key={section.id}
-              className={`overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors ${
+              ref={(el) => {
+                sectionRefs.current[section.id] = el;
+              }}
+              tabIndex={-1}
+              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors focus:outline-none ${
                 isOpen
-                  ? "border-[var(--admin-accent)]/40 shadow-xs"
+                  ? "border-[var(--admin-accent)]/40 shadow-xs ring-1 ring-[var(--admin-accent)]/20"
                   : "border-[var(--admin-border)]"
               }`}
             >
