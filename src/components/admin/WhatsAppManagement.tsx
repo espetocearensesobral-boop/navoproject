@@ -512,7 +512,7 @@ export const WhatsAppManagement: React.FC = () => {
             type="button"
             onClick={() => void handleTest()}
             disabled={testing || saving}
-            className="h-10 px-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+            className="admin-btn admin-btn-secondary h-10 px-4 text-xs font-bold flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${testing ? "animate-spin" : ""}`} />
             {testing ? "Testando..." : "Testar conexão"}
@@ -521,7 +521,7 @@ export const WhatsAppManagement: React.FC = () => {
             type="button"
             onClick={() => void handleSave()}
             disabled={saving}
-            className="h-10 px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+            className="admin-btn admin-btn-primary h-10 px-4 text-xs font-bold flex items-center justify-center gap-2"
           >
             <Save className="w-4 h-4" />
             {saving ? "Salvando..." : "Salvar configuração"}

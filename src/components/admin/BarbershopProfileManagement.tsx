@@ -193,7 +193,7 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* TAB CONTENT: IDENTIDADE */}
       {activeTab === "info" && (
         <form
-          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-lg space-y-5"
+          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-xl space-y-5"
           onKeyDown={handleEnterAsTab}
         >
           <div className="flex items-center gap-2 pb-3 border-b border-[var(--admin-border)]">
@@ -377,7 +377,7 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* TAB CONTENT: HORÁRIOS */}
       {activeTab === "hours" && (
         <form
-          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-lg space-y-5"
+          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-xl space-y-5"
           onKeyDown={handleEnterAsTab}
           onSubmit={(e) => e.preventDefault()}
         >
@@ -610,7 +610,7 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* TAB CONTENT: CANAIS DE CONTATO */}
       {activeTab === "contacts" && (
         <form
-          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-lg space-y-5"
+          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-xl space-y-5"
           onKeyDown={handleEnterAsTab}
           onSubmit={(e) => e.preventDefault()}
         >
@@ -714,7 +714,7 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* TAB CONTENT: LINKS & REDES SOCIAIS */}
       {activeTab === "links" && (
         <form
-          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-lg space-y-5"
+          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-xl space-y-5"
           onKeyDown={handleEnterAsTab}
           onSubmit={(e) => e.preventDefault()}
         >
@@ -789,7 +789,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           type="button"
           onClick={handleCancel}
           disabled={isSaving}
-          className="h-11 px-6 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] text-xs font-bold transition-colors disabled:opacity-50 w-full sm:w-auto"
+          className="admin-btn admin-btn-secondary h-11 px-6 text-xs font-bold w-full sm:w-auto"
         >
           Cancelar
         </button>
@@ -797,7 +797,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="h-11 px-6 bg-[var(--admin-accent)] hover:bg-gold-hover text-[var(--admin-accent-text)] rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 w-full sm:w-auto"
+          className="admin-btn admin-btn-primary h-11 px-6 text-xs font-bold flex items-center justify-center gap-2 w-full sm:w-auto shadow-md"
         >
           <Save className="w-4 h-4" />
           <span>{isSaving ? "Salvando..." : "Salvar Alterações"}</span>

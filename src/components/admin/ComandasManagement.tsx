@@ -683,7 +683,7 @@ export const ComandasManagement: React.FC = () => {
                         <td className="text-center">
                           <button
                             onClick={() => setReceiptModalComanda(cmd)}
-                            className="p-1.5 rounded-lg border border-[var(--admin-border)] hover:bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] transition-colors"
+                            className="p-1.5 rounded-xl border border-[var(--admin-border)] hover:bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] transition-colors"
                             title="Ver Comprovante"
                           >
                             <FileText className="w-4 h-4" />
@@ -923,7 +923,7 @@ export const ComandasManagement: React.FC = () => {
                     step="1"
                     value={discountInput}
                     onChange={(e) => setDiscountInput(Number(e.target.value))}
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none"
+                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none"
                   />
                 </div>
                 <div>
@@ -936,7 +936,7 @@ export const ComandasManagement: React.FC = () => {
                     step="1"
                     value={tipInput}
                     onChange={(e) => setTipInput(Number(e.target.value))}
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none"
+                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none"
                   />
                 </div>
               </div>

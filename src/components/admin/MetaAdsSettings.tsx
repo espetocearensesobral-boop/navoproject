@@ -361,7 +361,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
               type="button"
               onClick={() => void load()}
               disabled={loading}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"
+              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"
             >
               <RefreshCw
                 className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
@@ -401,7 +401,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
         <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]">
                 <Link2 className="h-4 w-4" />
               </div>
               <div className="min-w-0">
@@ -453,7 +453,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
                 </strong>
               </div>
               {connection?.lastError && (
-                <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                <p className="rounded-xl bg-red-500/10 px-3 py-2 text-xs text-red-300">
                   {connection.lastError}
                 </p>
               )}
@@ -462,7 +462,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
                   type="button"
                   onClick={refreshAssets}
                   disabled={busy}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[var(--admin-border)] px-3 text-xs font-bold text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-bg)] disabled:opacity-50"
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--admin-border)] px-3 text-xs font-bold text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-bg)] disabled:opacity-50"
                 >
                   <RefreshCw
                     className={`h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`}
@@ -473,14 +473,14 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
                   type="button"
                   onClick={() => setDisconnectOpen(true)}
                   disabled={busy}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-red-500/30 px-3 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/10 disabled:opacity-50"
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-red-500/30 px-3 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/10 disabled:opacity-50"
                 >
                   <LogOut className="h-3.5 w-3.5" /> Desconectar
                 </button>
               </div>
             </div>
           ) : (
-            <div className="mt-4 rounded-lg border border-dashed border-[var(--admin-border)] bg-[var(--admin-bg)] p-4 text-sm text-[var(--admin-text-muted)]">
+            <div className="mt-4 rounded-xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-bg)] p-4 text-sm text-[var(--admin-text-muted)]">
               <p>
                 {CAMPAIGNS_DEMO_MODE
                   ? "A demonstração foi desconectada apenas localmente. A integração real poderá ser configurada depois."
@@ -490,7 +490,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
                 type="button"
                 onClick={connect}
                 disabled={!status?.configured || busy}
-                className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-md bg-[var(--admin-accent)] px-4 text-sm font-bold text-[var(--admin-accent-text)] transition-colors hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"
+                className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--admin-accent)] px-4 text-sm font-bold text-[var(--admin-accent-text)] transition-colors hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"
               >
                 <Link2 className="h-4 w-4" /> Conectar Meta Ads
               </button>
@@ -500,7 +500,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
 
         <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-300">
               <ShieldCheck className="h-4 w-4" />
             </div>
             <div>
@@ -561,7 +561,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
               type="button"
               onClick={saveAssets}
               disabled={busy || !accountId || !pageId}
-              className="min-h-9 rounded-md bg-[var(--admin-accent)] px-3 text-xs font-bold text-[var(--admin-accent-text)] hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"
+              className="min-h-9 rounded-xl bg-[var(--admin-accent)] px-3 text-xs font-bold text-[var(--admin-accent-text)] hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"
             >
               Salvar seleção
             </button>
@@ -572,7 +572,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
               <select
                 value={accountId}
                 onChange={(event) => setAccountId(event.target.value)}
-                className="mt-1.5 h-10 w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
+                className="mt-1.5 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
               >
                 <option value="">Selecione</option>
                 {accounts.map((account) => (
@@ -587,7 +587,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
               <select
                 value={pageId}
                 onChange={(event) => setPageId(event.target.value)}
-                className="mt-1.5 h-10 w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
+                className="mt-1.5 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
               >
                 <option value="">Selecione</option>
                 {pages.map((page) => (

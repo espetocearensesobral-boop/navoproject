@@ -561,14 +561,14 @@ export const ServicesManagement: React.FC = () => {
                   return (
                     <tr key={service.id}>
                       <td>
-                        <div className="w-10 h-10 rounded border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-center justify-center overflow-hidden relative">
+                        <div className="w-10 h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-center justify-center overflow-hidden relative">
                           {service.image_url || servicePhotos[0] ? (
                             <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <Scissors className="w-5 h-5 text-[var(--admin-text-muted)]" />
                           )}
                           {servicePhotos.length > 0 && (
-                            <span className="absolute bottom-0 right-0 px-1 py-0.5 text-[9px] font-bold bg-[var(--admin-bg)]/80 rounded-tl-sm text-[var(--admin-text-main)]">
+                            <span className="absolute bottom-0 right-0 px-1 py-0.5 text-[9px] font-bold bg-[var(--admin-bg)]/80 rounded-tl-md text-[var(--admin-text-main)]">
                               {servicePhotos.length}
                             </span>
                           )}
@@ -604,7 +604,7 @@ export const ServicesManagement: React.FC = () => {
                            <button
                              type="button"
                              onClick={() => handleToggleCombo(service)}
-                             className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
+                             className={`px-2 py-0.5 rounded-lg text-[10px] uppercase font-bold tracking-wider transition-colors ${
                                service.is_combo
                                  ? "bg-status-success/10 text-status-success border border-status-success/20"
                                  : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface)]"
@@ -616,7 +616,7 @@ export const ServicesManagement: React.FC = () => {
                            <button
                              type="button"
                              onClick={() => handleTogglePopular(service)}
-                             className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
+                             className={`px-2 py-0.5 rounded-lg text-[10px] uppercase font-bold tracking-wider transition-colors ${
                                service.popular
                                  ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border border-[var(--admin-accent)]/20"
                                  : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface)]"
@@ -632,7 +632,7 @@ export const ServicesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(service)}
-                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)]"
+                            className="admin-btn-icon-sm rounded-xl text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)]"
                             title="Editar"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -640,7 +640,7 @@ export const ServicesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleDelete(service.id)}
-                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
+                            className="admin-btn-icon-sm rounded-xl text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
                             title="Excluir"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -742,7 +742,7 @@ export const ServicesManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleToggleCombo(service)}
-                          className={`flex-1 min-h-10 rounded-lg border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                          className={`flex-1 min-h-10 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
                             service.is_combo
                               ? "bg-status-success/10 text-status-success border-status-success/20"
                               : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:bg-[var(--admin-bg)]"
@@ -753,7 +753,7 @@ export const ServicesManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleTogglePopular(service)}
-                          className={`flex-1 min-h-10 rounded-lg border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                          className={`flex-1 min-h-10 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
                             service.popular
                               ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border-[var(--admin-accent)]/20"
                               : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:bg-[var(--admin-bg)]"
@@ -766,14 +766,14 @@ export const ServicesManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(service)}
-                          className="flex-1 min-h-10 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5"
+                          className="flex-1 min-h-10 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" /> Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(service.id)}
-                          className="w-10 h-10 shrink-0 rounded-lg border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center"
+                          className="w-10 h-10 shrink-0 rounded-xl border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -1162,7 +1162,7 @@ export const ServicesManagement: React.FC = () => {
                                   onClick={() =>
                                     handleAddPresetImage(preset.url)
                                   }
-                                  className="relative rounded-lg overflow-hidden h-12 border border-[var(--admin-border)] hover:border-[var(--admin-accent)] text-left"
+                                  className="relative rounded-xl overflow-hidden h-12 border border-[var(--admin-border)] hover:border-[var(--admin-accent)] text-left"
                                 >
                                   <img
                                     src={preset.url}
