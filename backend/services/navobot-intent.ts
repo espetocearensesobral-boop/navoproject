@@ -242,9 +242,9 @@ export function normalizeIntentName(value: unknown): NavoBotIntent {
 const SERVICE_STOP_WORDS = new Set(['a', 'as', 'o', 'os', 'um', 'uma', 'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'para', 'por']);
 const GENERIC_SERVICE_QUERY_WORDS = new Set([
   'algum', 'alguma', 'alguns', 'algumas', 'amanha', 'agendar', 'agendamento',
-  'cabelo', 'cortar', 'disponibilidade', 'disponivel', 'disponiveis', 'fazer',
+  'disponibilidade', 'disponivel', 'disponiveis', 'fazer',
   'horario', 'horarios', 'hora', 'horas', 'hoje', 'livre', 'livres', 'marcar',
-  'reservar', 'servico', 'servicos', 'tem', 'vaga', 'vagas', 'queria', 'quero',
+  'reservar', 'tem', 'vaga', 'vagas', 'queria', 'quero',
   'gostaria',
 ]);
 

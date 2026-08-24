@@ -188,7 +188,7 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
   try {
     console.info(`[NavoBot][Gemini] Classificando mensagem no estado ${state}.`);
     const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+      model: 'gemini-2.5-flash',
       contents: [{ role: 'user', parts: [{ text: `Estado atual: ${state}\nContexto já coletado: ${JSON.stringify({ pendingAction: context.pendingAction, appointmentId: context.appointmentId, serviceIds: context.serviceIds, date: context.date, timeSlot: context.timeSlot, professionalId: context.professionalId })}\nMensagem do cliente: ${text}` }] }],
       config: {
         temperature: 0.1,
@@ -566,16 +566,6 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       : [];
     const deterministicMatches = findServiceMatches(services, text);
     const matchedServices = contextServices.length ? contextServices : deterministicMatches;
-    if (matchedServices.length > 1) {
-      const nextContext = contextForNewIntent(context, {
-        availabilityDate: parseDateFromText(text) || context.availabilityDate || getTodayStringBRT(),
-        availabilityOptions: matchedServices.map((service: any) => service.id),
-        serviceIds: [],
-        serviceId: undefined,
-      });
-      await updateConversation(conversation, 'awaiting_availability_service', nextContext);
-      return reply(conversation, 'Informe qual serviço deseja consultar.\n\n' + matchedServices.map((service: any, index: number) => `${index + 1}. *${service.title}*`).join('\n'));
-    }
     if (matchedServices.length === 0) {
       const nextContext = contextForNewIntent(context, {
         availabilityDate: parseDateFromText(text) || context.availabilityDate || getTodayStringBRT(),
@@ -587,15 +577,18 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       return reply(conversation, 'Consigo consultar os horários disponíveis. Para calcular corretamente, preciso saber qual serviço você deseja fazer, pois cada serviço tem uma duração diferente.\n\nResponda com o nome do serviço ou acesse o catálogo completo: https://navoproject.vercel.app/?catalog=1');
     }
 
-    const service: any = matchedServices[0];
+    const totalDuration = matchedServices.reduce((sum: number, s: any) => sum + Number(s.durationMinutes || 30), 0);
+    const serviceTitles = matchedServices.map((s: any) => s.title).join(' e ');
+    const serviceIds = matchedServices.map((s: any) => s.id);
     const date = parseDateFromText(text) || context.availabilityDate || getTodayStringBRT();
-    const slots = await suggestSlots(date, Number(service.durationMinutes || 30), context.professionalId || '');
-    const nextContext = contextForNewIntent(context, { availabilityDate: date, availabilityOptions: [], serviceIds: [service.id], serviceId: service.id });
+    const slots = await suggestSlots(date, totalDuration, context.professionalId || '');
+    const nextContext = contextForNewIntent(context, { availabilityDate: date, availabilityOptions: [], serviceIds, serviceId: serviceIds[0] });
     await updateConversation(conversation, 'idle', nextContext);
+    
     if (!slots.length) {
-      return reply(conversation, `Não encontrei horários livres para *${dateLabel(date)}* para o serviço *${service.title}*. Informe outra data para uma nova consulta.`);
+      return reply(conversation, `Não encontrei horários livres para *${dateLabel(date)}* para *${serviceTitles}*. Informe outra data para uma nova consulta.`);
     }
-    return reply(conversation, `Horários disponíveis para *${service.title}* em *${dateLabel(date)}*:\n\n${slots.map((slot) => `• *${slot}*`).join('\n')}\n\nPara iniciar o agendamento, responda *AGENDAR* ou acesse:\nhttps://navoproject.vercel.app/?catalog=1`);
+    return reply(conversation, `Horários disponíveis para *${serviceTitles}* em *${dateLabel(date)}*:\n\n${slots.map((slot) => `• *${slot}*`).join('\n')}\n\nPara iniciar o agendamento, responda *AGENDAR* seguido do horário escolhido ou acesse o link:\nhttps://navoproject.vercel.app/?catalog=1`);
   }
 
   async function suggestSlots(date: string, duration: number, professionalId = '', excludeAppointmentId = '') {
@@ -931,7 +924,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         ? services.filter((service: any) => service.id === selectedId)
         : findServiceMatches(services, text);
       if (!matches.length) return reply(conversation, 'Não identifiquei esse serviço. Responda com o nome ou número do serviço para consultar os horários.');
-      context.serviceIds = [matches[0].id];
+      context.serviceIds = matches.map((m: any) => m.id);
       context.serviceId = matches[0].id;
       return handleAvailabilityRequest(conversation, context, text);
     }
@@ -1119,12 +1112,12 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
 
   async function testAiConnection() {
     if (!ai) {
-      return { ok: false, configured: false, usedGemini: false, model: 'gemini-3.6-flash', latencyMs: 0, message: 'GEMINI_API_KEY não está configurada no ambiente.' };
+      return { ok: false, configured: false, usedGemini: false, model: 'gemini-2.5-flash', latencyMs: 0, message: 'GEMINI_API_KEY não está configurada no ambiente.' };
     }
     const startedAt = Date.now();
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
+        model: 'gemini-2.5-flash',
         contents: [{ role: 'user', parts: [{ text: 'Responda somente com a palavra OK.' }] }],
         config: { temperature: 0, maxOutputTokens: 32, thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL } },
       });
@@ -1134,7 +1127,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         ok: !!responseText,
         configured: true,
         usedGemini: true,
-        model: 'gemini-3.6-flash',
+        model: 'gemini-2.5-flash',
         latencyMs: Date.now() - startedAt,
         response: responseText.slice(0, 40),
         message: responseText ? 'Gemini respondeu com sucesso.' : `Gemini foi chamado, mas não retornou texto${diagnostics ? ` (${diagnostics})` : ''}.`,
@@ -1144,7 +1137,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         ok: false,
         configured: true,
         usedGemini: false,
-        model: 'gemini-3.6-flash',
+        model: 'gemini-2.5-flash',
         latencyMs: Date.now() - startedAt,
         message: `Falha ao chamar o Gemini: ${String(error?.message || 'erro desconhecido').slice(0, 240)}`,
       };
