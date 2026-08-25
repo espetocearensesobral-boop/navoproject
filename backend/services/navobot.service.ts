@@ -102,14 +102,14 @@ function conversationId(phone: string, instanceName: string): string {
 
 function menuText(name?: string): string {
   const greeting = name ? `Olá, *${name}*!` : 'Olá!';
-  return `${greeting} Eu sou o *NavoBot*, assistente da Navo Barber & Club.\n\n` +
-    'Posso ajudar com:\n' +
-    '1. Novo agendamento\n' +
-    '2. Consultar meu agendamento\n' +
-    '3. Reagendar\n' +
-    '4. Cancelar\n' +
-    '5. Falar com a equipe\n\n' +
-    'Você também pode escrever o que precisa, por exemplo: “quero reagendar meu corte para amanhã às 15h”.';
+  return `${greeting} Sou o *NavoBot* 🤖\n\n` +
+    'Como posso te ajudar?\n\n' +
+    '*1*. ✂️ Novo agendamento\n' +
+    '*2*. 📅 Meus agendamentos\n' +
+    '*3*. 🔄 Reagendar\n' +
+    '*4*. ❌ Cancelar\n' +
+    '*5*. 👤 Falar com a equipe\n\n' +
+    '💡 _Dica: Pode digitar livremente, ex: "reagendar para amanhã às 15h"_';
 }
 
 function serviceLabel(service: any): string {
@@ -119,21 +119,21 @@ function serviceLabel(service: any): string {
 function appointmentLabel(appointment: any): string {
   const service = Array.isArray(appointment.services) && appointment.services[0]
     ? typeof appointment.services[0] === 'string' ? appointment.services[0] : appointment.services[0].title
-    : 'Serviço agendado';
-  return `*${service || 'Serviço agendado'}* em *${dateLabel(appointment.date)}* às *${appointment.timeSlot}* com *${appointment.professionalName || 'profissional Navo'}*`;
+    : 'Agendamento';
+  return `▪️ ${service}\n📅 ${dateLabel(appointment.date)} às ${appointment.timeSlot}`;
 }
 
 function confirmationText(action: 'book' | 'reschedule' | 'cancel', appointment: any, context: BotContext, services: any[] = []): string {
   if (action === 'cancel') {
-    return `Confirma o cancelamento do agendamento ${appointmentLabel(appointment)}?\n\nResponda *SIM* para confirmar ou *NÃO* para voltar.`;
+    return `⚠️ Confirma o cancelamento?\n\n${appointmentLabel(appointment)}\n\nResponda *SIM* ou *NÃO*.`;
   }
   if (action === 'reschedule') {
-    return `Confirma o reagendamento para *${dateLabel(context.date || appointment.date)}* às *${context.timeSlot || appointment.timeSlot}*?\n\nResponda *SIM* para confirmar ou *NÃO* para voltar.`;
+    return `🔄 Confirma o novo horário?\n\n📅 *${dateLabel(context.date || appointment.date)}*\n⏰ *${context.timeSlot || appointment.timeSlot}*\n\nResponda *SIM* ou *NÃO*.`;
   }
   const serviceLines = services.length
-    ? services.map((service) => `• ${service.title} · ${service.durationMinutes} min · ${money(service.price)}`).join('\n')
-    : '• Serviço a definir';
-  return `Vou registrar este agendamento:\n\n${serviceLines}\n\n⏱️ Duração total: *${services.reduce((total, service) => total + Number(service.durationMinutes || 0), 0)} min*\n📅 *${dateLabel(context.date || '')}* às *${context.timeSlot || ''}*\n✂️ *${appointment?.professionalName || 'profissional a definir'}*\n💳 Pagamento no local\n\nConfirma? Responda *SIM* ou *NÃO*.`;
+    ? services.map((service) => `▪️ ${service.title}\n  └ ${service.durationMinutes}min • ${money(service.price)}`).join('\n')
+    : '▪️ Serviço a definir';
+  return `✅ *Confira seu agendamento:*\n\n${serviceLines}\n\n📅 Data: *${dateLabel(context.date || '')}*\n⏰ Hora: *${context.timeSlot || ''}*\n👤 Prof: *${appointment?.professionalName || 'Qualquer'}*\n\nTudo certo? Responda *SIM* ou *NÃO*.`;
 }
 
 function confirmationPayload(action: 'book' | 'reschedule' | 'cancel', appointment: any, context: BotContext, services: any[] = []) {
@@ -141,14 +141,14 @@ function confirmationPayload(action: 'book' | 'reschedule' | 'cancel', appointme
   const buttons = action === 'cancel'
     ? [
         { type: 'reply' as const, id: 'confirm:yes', displayText: 'Sim, cancelar' },
-        { type: 'reply' as const, id: 'confirm:no', displayText: 'Não, manter' },
+        { type: 'reply' as const, id: 'confirm:no', displayText: 'Não' },
       ]
     : [
-        { type: 'reply' as const, id: 'confirm:yes', displayText: 'Sim, confirmar' },
-        { type: 'reply' as const, id: 'confirm:no', displayText: 'Não, voltar' },
+        { type: 'reply' as const, id: 'confirm:yes', displayText: '👍 Confirmar' },
+        { type: 'reply' as const, id: 'confirm:no', displayText: '❌ Cancelar' },
       ];
   return {
-    title: action === 'cancel' ? 'Confirmar cancelamento' : action === 'reschedule' ? 'Confirmar reagendamento' : 'Confirmar agendamento',
+    title: action === 'cancel' ? 'Cancelar?' : action === 'reschedule' ? 'Confirmar Novo Horário' : 'Confirmar Agendamento',
     description: text,
     footerText: 'NavoBot',
     buttons,
@@ -462,18 +462,18 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     context.servicePage = 0;
     context.serviceOptions = activeServices.map((service: any) => service.id);
     await updateConversation(conversation, 'awaiting_service', context);
-    const fallback = `Escolha um serviço (responda com o número ou nome):\n\n` + activeServices.map((service: any, index: number) => `${index + 1}. *${compactServiceTitle(service.title)}* · ${money(service.price)}`).join('\n') + `\n\nO agendamento também pode ser feito diretamente pela plataforma Navo. Catálogo completo:\n${NAVO_CATALOG_URL}\n\nApós concluir pelo site, a confirmação será enviada automaticamente para este WhatsApp.`;
+    const fallback = `✂️ *Escolha o serviço* (número ou nome):\n\n` + activeServices.map((service: any, index: number) => `*${index + 1}*. ${compactServiceTitle(service.title, 35)}\n  └ ${service.durationMinutes}min • ${money(service.price)}`).join('\n') + `\n\n🌐 Catálogo completo online:\n${NAVO_CATALOG_URL}`;
     const rows = activeServices.map((service: any, index: number) => ({
-      title: `${index + 1}. ${compactServiceTitle(service.title, 24)}`,
+      title: `${index + 1}. ${compactServiceTitle(service.title, 20)}`,
       rowId: `service:${service.id}`,
-      description: money(service.price),
+      description: `${service.durationMinutes}min • ${money(service.price)}`.slice(0, 72),
     }));
     const payload = {
-      title: 'Serviços da Navo',
-      description: `Catálogo completo: ${NAVO_CATALOG_URL}`,
+      title: 'Catálogo de Serviços',
+      description: 'Escolha qual serviço deseja agendar.',
       buttonText: 'Ver serviços',
       footerText: 'NavoBot',
-      sections: [{ title: 'Serviços disponíveis', rows }],
+      sections: [{ title: 'Disponíveis', rows: rows.slice(0, 10) }],
     };
     // Listas interativas do WhatsApp têm limite de linhas; quando houver mais
     // serviços, o fallback textual mantém todos visíveis sem paginação.
@@ -490,16 +490,16 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
 
   async function askMoreServices(conversation: Conversation, context: BotContext) {
     const services = await getServices(context);
-    const selected = services.map((service: any) => `• ${service.title}`).join('\n') || 'Nenhum serviço selecionado';
-    const fallback = `Serviço selecionado:\n${selected}\n\nDeseja adicionar outro serviço? Responda *ADICIONAR* ou *CONTINUAR*.`;
+    const selected = services.map((service: any) => `▪️ ${service.title}`).join('\n') || 'Nenhum selecionado';
+    const fallback = `✅ *Serviço anotado:*\n${selected}\n\nDeseja incluir mais algum? Responda *ADICIONAR* ou *CONTINUAR*.`;
     await updateConversation(conversation, 'awaiting_more_services', context);
     return replyButtons(conversation, fallback, {
-      title: 'Serviço selecionado',
-      description: `Você selecionou:\n${selected}`,
+      title: 'Serviço anotado',
+      description: `✅ ${services.length} selecionado(s)\nDeseja incluir mais algum?`,
       footerText: 'NavoBot',
       buttons: [
-        { type: 'reply', id: 'service:add', displayText: 'Adicionar outro' },
-        { type: 'reply', id: 'service:done', displayText: 'Continuar' },
+        { type: 'reply', id: 'service:add', displayText: 'Adicionar +' },
+        { type: 'reply', id: 'service:done', displayText: 'Avançar ➡️' },
       ],
     });
   }
@@ -509,20 +509,20 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const professionals = (await db.query.professionals.findMany()).filter((professional: any) => professional.isActive !== false);
     context.professionalOptions = ['prof_any', ...professionals.map((professional: any) => professional.id)];
     await updateConversation(conversation, 'awaiting_professional', context);
-    const fallback = 'Selecione um profissional:\n\n0. Qualquer profissional\n' + professionals.map((professional: any, index: number) => `${index + 1}. ${professional.name}`).join('\n') + '\n\nResponda com o número.';
+    const fallback = '👤 *Selecione o profissional* (envie o número):\n\n*0*. 🎲 Qualquer profissional\n' + professionals.map((professional: any, index: number) => `*${index + 1}*. ${professional.name}`).join('\n');
     const payload = {
-      title: 'Escolha o profissional',
-      description: 'Selecione um profissional específico ou a opção qualquer profissional.',
+      title: 'Profissionais',
+      description: 'Escolha quem vai te atender.',
       buttonText: 'Ver profissionais',
       footerText: 'NavoBot',
       sections: [{
-        title: 'Profissionais ativos',
+        title: 'Disponíveis',
         rows: [
-          { title: 'Qualquer profissional', rowId: 'professional:prof_any', description: 'Mais opções de horário' },
-          ...professionals.map((professional: any) => ({
+          { title: 'Qualquer profissional', rowId: 'professional:prof_any', description: 'Encontrar mais horários livres' },
+          ...professionals.slice(0, 9).map((professional: any) => ({
             title: String(professional.name).slice(0, 24),
             rowId: `professional:${professional.id}`,
-            description: professional.roleTitle || 'Profissional Navo',
+            description: String(professional.roleTitle || 'Especialista').slice(0, 72),
           })),
         ],
       }],
@@ -574,7 +574,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         serviceId: undefined,
       });
       await updateConversation(conversation, 'awaiting_availability_service', nextContext);
-      return reply(conversation, 'Consigo consultar os horários disponíveis. Para calcular corretamente, preciso saber qual serviço você deseja fazer, pois cada serviço tem uma duração diferente.\n\nResponda com o nome do serviço ou acesse o catálogo completo: https://navoproject.vercel.app/?catalog=1');
+      return reply(conversation, 'Para consultar os horários livres, preciso saber qual *serviço* você deseja (a duração afeta a disponibilidade).\n\nResponda com o nome do serviço ou veja o catálogo:\nhttps://navoproject.vercel.app/?catalog=1');
     }
 
     const totalDuration = matchedServices.reduce((sum: number, s: any) => sum + Number(s.durationMinutes || 30), 0);
@@ -586,9 +586,9 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     await updateConversation(conversation, 'idle', nextContext);
     
     if (!slots.length) {
-      return reply(conversation, `Não encontrei horários livres para *${dateLabel(date)}* para *${serviceTitles}*. Informe outra data para uma nova consulta.`);
+      return reply(conversation, `❌ Sem horários livres em *${dateLabel(date)}* para *${serviceTitles}*.\n\nInforme outra data para consultar novamente.`);
     }
-    return reply(conversation, `Horários disponíveis para *${serviceTitles}* em *${dateLabel(date)}*:\n\n${slots.map((slot) => `• *${slot}*`).join('\n')}\n\nPara iniciar o agendamento, responda *AGENDAR* seguido do horário escolhido ou acesse o link:\nhttps://navoproject.vercel.app/?catalog=1`);
+    return reply(conversation, `✅ *Horários livres* em *${dateLabel(date)}*\nPara: ${serviceTitles}\n\n${slots.map((slot) => `▪️ *${slot}*`).join('   ')}\n\nPara agendar, responda *AGENDAR ${slots[0]}* (ou o horário que preferir).`);
   }
 
   async function suggestSlots(date: string, duration: number, professionalId = '', excludeAppointmentId = '') {
