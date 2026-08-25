@@ -309,7 +309,7 @@ export const ClientsManagement: React.FC = () => {
       {/* HORIZONTAL FILTER PILLS */}
       <div
         data-gesture-scroll="horizontal"
-        className="admin-category-scroll flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-1 px-1"
+        className="admin-category-scroll flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 -mx-1 px-1"
       >
         {[
           { id: "all", label: "Todos", count: safeClients.length },
@@ -322,20 +322,21 @@ export const ClientsManagement: React.FC = () => {
         ].map((pill) => (
           <button
             key={pill.id}
+            type="button"
             onClick={() => setSelectedTier(pill.id)}
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+            className={`shrink-0 min-h-9 px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer ${
               selectedTier === pill.id
-                ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] border-[var(--admin-accent)]"
-                : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text-main)] hover:border-[var(--admin-border)]"
+                ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] border-[var(--admin-accent)] shadow-xs"
+                : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)]"
             }`}
           >
             <span>{pill.label}</span>
             {pill.count !== undefined && (
               <span
-                className={`ml-1 px-1.5 py-0.2 rounded-full text-xs ${
+                className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                   selectedTier === pill.id
-                    ? "bg-[var(--admin-bg)]/15 text-surface-base"
-                    : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"
+                    ? "bg-[var(--admin-bg)]/20 text-surface-base"
+                    : "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]"
                 }`}
               >
                 {pill.count}
@@ -346,24 +347,24 @@ export const ClientsManagement: React.FC = () => {
       </div>
 
       {/* DESKTOP SEARCH BAR (MD AND UP) */}
-      <div className="hidden md:flex bg-[var(--admin-surface)] p-3 rounded-xl border border-[var(--admin-border)] justify-between items-center">
-        <div className="relative w-72">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
+      <div className="hidden md:flex bg-[var(--admin-surface)] px-4 py-3 rounded-xl border border-[var(--admin-border)] justify-between items-center shadow-xs">
+        <div className="relative w-80">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
           <input
             type="text"
             placeholder="Nome, e-mail ou telefone..."
             title="Busca local nos clientes carregados"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+            className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-lg pl-9 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
           />
         </div>
-        <p className="text-xs text-[var(--admin-text-muted)] font-bold">
+        <p className="text-xs text-[var(--admin-text-muted)] font-medium">
           Exibindo{" "}
-          <span className="text-[var(--admin-text-main)]">
+          <span className="text-[var(--admin-text-main)] font-bold">
             {filteredClients.length}
           </span>{" "}
-          resultados
+          {filteredClients.length === 1 ? "cliente" : "clientes"}
         </p>
       </div>
 
