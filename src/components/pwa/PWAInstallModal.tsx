@@ -64,7 +64,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-[150] bg-surface-base/80 backdrop-blur-sm flex items-center justify-center p-4"
         onClick={onClose}
       >
         <motion.div

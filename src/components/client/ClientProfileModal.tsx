@@ -130,7 +130,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-surface-base/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
         className="w-full sm:w-[420px] bg-surface-card rounded-3xl border border-border-subtle shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden flex flex-col max-h-[90vh]"
       >

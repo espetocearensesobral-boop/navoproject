@@ -446,6 +446,16 @@ export const ClientApp: React.FC = () => {
     );
   }
 
+  const isAnyModalOpen = Boolean(
+    isMoreDrawerOpen ||
+    isProfileModalOpen ||
+    isLoginModalOpen ||
+    showGuestSignupPrompt ||
+    isPwaModalOpen ||
+    isPublicReviewOpen ||
+    pendingTabChange !== null
+  );
+
   return (
     <div className="flex justify-center bg-surface-base w-full flex-1 overflow-hidden relative">
       {/* Skip Link for Keyboard Accessibility */}
@@ -591,6 +601,7 @@ export const ClientApp: React.FC = () => {
                   onOpenProfile={() => setIsProfileModalOpen(true)}
                   onOpenMenu={() => setIsMoreDrawerOpen(true)}
                   scrollContainerRef={landingScrollRef}
+                  isAnyModalOpen={isAnyModalOpen}
                 />
               )}
 

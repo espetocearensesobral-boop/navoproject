@@ -54,7 +54,7 @@ export const ClientMoreDrawer: React.FC<ClientMoreDrawerProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center gap-8 p-4"
+            className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center gap-8 p-4"
           >
             <button
               onClick={onClose}

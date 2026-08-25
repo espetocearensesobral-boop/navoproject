@@ -526,7 +526,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
         </div>
       )}
 
-      {selectedServices.length > 0 && (
+      {selectedServices.length > 0 && !modalService && (
         <BookingActionDock
           summaryLabel={`${selectedServices.length} ${selectedServices.length === 1 ? 'serviço selecionado' : 'serviços selecionados'}`}
           summaryValue={<span className="font-mono num-tabular">{totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>}
@@ -555,7 +555,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
       {/* Service Detail Bottom Sheet Modal */}
       {modalService && (
         <div
-          className="fixed inset-0 bg-surface-base/80 backdrop-blur-[2px] z-50 flex items-end sm:items-center justify-center animate-fade-in p-0 sm:p-4"
+          className="fixed inset-0 bg-surface-base/80 backdrop-blur-[2px] z-[150] flex items-end sm:items-center justify-center animate-fade-in p-0 sm:p-4"
           ref={serviceModalRef}
           tabIndex={-1}
           role="dialog"

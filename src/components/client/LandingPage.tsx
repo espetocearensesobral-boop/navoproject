@@ -68,9 +68,10 @@ interface LandingPageProps {
   onOpenMenu: () => void;
   /** Recebe a referência do container real de scroll (snap-scroll de seções), usado pelo pull-to-refresh do componente pai. */
   scrollContainerRef?: React.MutableRefObject<HTMLElement | null>;
+  isAnyModalOpen?: boolean;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments, isGuest = true, currentUser, onOpenLogin, onOpenProfile, onOpenMenu, scrollContainerRef }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments, isGuest = true, currentUser, onOpenLogin, onOpenProfile, onOpenMenu, scrollContainerRef, isAnyModalOpen = false }) => {
   const { theme, setTheme } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const postHeroRef = useRef<HTMLElement>(null);
@@ -361,10 +362,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     return getShopStatusInfo(shopProfile);
   }, [shopProfile]);
 
+  const isAnyLandingModalOpen = Boolean(
+    isAnyModalOpen ||
+    isHoursModalOpen ||
+    isCatalogOpen ||
+    selectedGalleryIndex !== null ||
+    termsPrivacyTab
+  );
+
   return (
     <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-auto bg-white text-neutral-900 font-sans antialiased relative selection:bg-gold-base/20 selection:text-neutral-900 no-scrollbar">
       <AnimatePresence>
-        {hasReachedPostHero && !isFinalCtaVisible && (
+        {hasReachedPostHero && !isFinalCtaVisible && !isAnyLandingModalOpen && (
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -395,7 +404,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center p-4"
+            className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center p-4"
           >
             <button 
               onClick={toggleHoursModal} 
@@ -1181,7 +1190,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             role="dialog"
             aria-modal="true"
             aria-labelledby="services-catalog-title"
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm p-4 sm:p-6 flex items-center justify-center"
+            className="fixed inset-0 z-[150] bg-black/70 backdrop-blur-sm p-4 sm:p-6 flex items-center justify-center"
             onMouseDown={() => setIsCatalogOpen(false)}
           >
             <motion.div
@@ -1273,7 +1282,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-50 bg-surface-base/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-4 md:p-6 pb-4 select-none overflow-hidden"
+            className="fixed inset-0 z-[150] bg-surface-base/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-4 md:p-6 pb-4 select-none overflow-hidden"
           >
             {/* Photo Carousel Area - Fills space to the top */}
             <div className="relative flex-1 flex items-center justify-center mb-3 w-full max-w-4xl mx-auto min-h-0">
