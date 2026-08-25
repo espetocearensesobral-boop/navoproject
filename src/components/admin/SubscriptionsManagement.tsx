@@ -480,30 +480,30 @@ export const SubscriptionsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* CREATE PLAN MODAL */}
+      {/* CREATE PLAN MODAL FULLSCREEN */}
       {isPlanModalOpen && (
         <AdminModalV2
           icon={Award}
-          eyebrow="Clube de Assinaturas"
-          title="Novo plano"
-          subtitle="Configure mensalidade, repasse e serviços inclusos."
+          eyebrow="Clube de Assinaturas & Recorrência"
+          title="Novo Plano de Assinatura"
+          subtitle="Configure mensalidade, repasse aos barbeiros, serviços inclusos e benefícios do clube."
           onClose={() => setIsPlanModalOpen(false)}
-          size="md"
+          size="fullscreen"
           footer={
-            <div className="flex items-center justify-end gap-2.5">
+            <div className="flex items-center justify-between w-full">
               <button
                 type="button"
                 onClick={() => setIsPlanModalOpen(false)}
-                className="admin-btn admin-btn-secondary h-10 px-4 text-xs font-bold"
+                className="admin-btn admin-btn-secondary h-11 px-5 text-sm font-bold"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 form="create-plan-form"
-                className="admin-btn admin-btn-primary h-10 px-5 text-xs font-bold"
+                className="admin-btn admin-btn-primary h-11 px-6 text-sm font-bold"
               >
-                Criar Plano
+                Criar Plano de Assinatura
               </button>
             </div>
           }
@@ -512,67 +512,179 @@ export const SubscriptionsManagement: React.FC = () => {
             id="create-plan-form"
             onKeyDown={handleEnterAsTab}
             onSubmit={handleCreatePlan}
-            className="space-y-4"
+            className="space-y-6"
           >
-            <label className="block">
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
-                Nome do Plano *
-              </span>
-              <input
-                type="text"
-                required
-                autoFocus
-                placeholder="Ex: Clube Cabelo Ilimitado"
-                value={newPlanName}
-                onChange={(e) => setNewPlanName(e.target.value)}
-                className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-              />
-            </label>
+            {/* Section 1: Basic Plan Information */}
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--admin-accent)] flex items-center gap-2">
+                <Award className="w-4 h-4" />
+                <span>1. Dados Principais do Plano</span>
+              </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <label className="block">
-                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
-                  Mensalidade (R$) *
-                </span>
-                <input
-                  type="number"
-                  required
-                  min="10"
-                  step="5"
-                  value={newPlanPrice}
-                  onChange={(e) => setNewPlanPrice(Number(e.target.value))}
-                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs font-mono font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                />
-              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block">
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                      Nome Comercial do Plano *
+                    </span>
+                    <input
+                      type="text"
+                      required
+                      autoFocus
+                      placeholder="Ex: Clube Cabelo & Barba VIP"
+                      value={newPlanName}
+                      onChange={(e) => setNewPlanName(e.target.value)}
+                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                    />
+                  </label>
+                </div>
 
-              <label className="block">
-                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
-                  Repasse por Corte (R$) *
-                </span>
-                <input
-                  type="number"
-                  required
-                  min="5"
-                  step="1"
-                  value={newPlanBarberFee}
-                  onChange={(e) => setNewPlanBarberFee(Number(e.target.value))}
-                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs font-mono font-bold text-status-error outline-none focus:border-[var(--admin-accent)] transition-colors"
-                />
-              </label>
+                <div>
+                  <label className="block">
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                      Ciclo de Cobrança
+                    </span>
+                    <select
+                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                    >
+                      <option value="monthly">Mensal (Cobrado a cada 30 dias)</option>
+                      <option value="quarterly">Trimestral (Cobrado a cada 90 dias)</option>
+                      <option value="annual">Anual (Cobrado anualmente)</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
             </div>
 
-            <label className="block">
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
-                Serviços inclusos (separados por vírgula)
-              </span>
-              <input
-                type="text"
-                placeholder="Ex: Corte Ilimitado, Barba, Bebida Cortesia"
-                value={newPlanServices}
-                onChange={(e) => setNewPlanServices(e.target.value)}
-                className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-              />
-            </label>
+            {/* Section 2: Pricing and Barber Commission */}
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--admin-accent)] flex items-center gap-2">
+                <DollarSign className="w-4 h-4" />
+                <span>2. Valores e Repasse por Atendimento</span>
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div>
+                  <label className="block">
+                    <span className="block text-xs font-bold uppercase tracking-wider finance-positive mb-2">
+                      Valor da Mensalidade (R$) *
+                    </span>
+                    <input
+                      type="number"
+                      required
+                      min="10"
+                      step="5"
+                      value={newPlanPrice}
+                      onChange={(e) => setNewPlanPrice(Number(e.target.value))}
+                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-base font-mono font-bold finance-positive outline-none focus:border-[var(--admin-accent)] transition-colors"
+                    />
+                  </label>
+                </div>
+
+                <div>
+                  <label className="block">
+                    <span className="block text-xs font-bold uppercase tracking-wider finance-negative mb-2">
+                      Repasse ao Barbeiro por Corte (R$) *
+                    </span>
+                    <input
+                      type="number"
+                      required
+                      min="5"
+                      step="1"
+                      value={newPlanBarberFee}
+                      onChange={(e) => setNewPlanBarberFee(Number(e.target.value))}
+                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-base font-mono font-bold finance-negative outline-none focus:border-[var(--admin-accent)] transition-colors"
+                    />
+                  </label>
+                </div>
+
+                <div>
+                  <label className="block">
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                      Desconto em Cosméticos (%)
+                    </span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      defaultValue={15}
+                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-base font-mono font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className="p-4 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-xs text-[var(--admin-text-muted)]">
+                  <p className="font-bold text-[var(--admin-text-main)]">Projeção por Membro Ativo:</p>
+                  <p className="mt-0.5">Se o cliente fizer 2 visitas/mês, a barbearia retém R$ {(newPlanPrice - newPlanBarberFee * 2).toFixed(2)} de margem líquida.</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs uppercase tracking-wider font-bold text-[var(--admin-accent)] block">Receita Líquida Estimada:</span>
+                  <span className="text-base font-black text-status-success">
+                    {Math.max(0, Math.round(((newPlanPrice - newPlanBarberFee * 2) / (newPlanPrice || 1)) * 100))}% de Margem
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Services Included */}
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--admin-accent)] flex items-center gap-2">
+                <Scissors className="w-4 h-4" />
+                <span>3. Serviços e Benefícios Inclusos</span>
+              </h2>
+
+              <div>
+                <label className="block">
+                  <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                    Lista de Serviços Inclusos (separados por vírgula) *
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Corte Ilimitado, Barboterapia Imperial, Bebida Cortesia, Lavagem Especial"
+                    value={newPlanServices}
+                    onChange={(e) => setNewPlanServices(e.target.value)}
+                    className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                  />
+                </label>
+              </div>
+
+              <div className="p-4 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
+                <p className="text-xs font-bold text-[var(--admin-accent)] flex items-center gap-1.5 uppercase">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Benefícios rápidos para adicionar:</span>
+                </p>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {[
+                    "Cortes Ilimitados",
+                    "Barba Ilimitada",
+                    "Bebida Cortesia",
+                    "Acabamento Semanal",
+                    "Sobrancelha Grátis",
+                    "Atendimento Preferencial",
+                  ].map((benefit) => (
+                    <button
+                      key={benefit}
+                      type="button"
+                      onClick={() => {
+                        if (!newPlanServices.includes(benefit)) {
+                          setNewPlanServices(
+                            newPlanServices
+                              ? `${newPlanServices}, ${benefit}`
+                              : benefit,
+                          );
+                        }
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:border-[var(--admin-accent)] border border-[var(--admin-border)] text-xs font-bold transition-colors"
+                    >
+                      + {benefit}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </form>
         </AdminModalV2>
       )}

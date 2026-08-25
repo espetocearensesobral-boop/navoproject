@@ -29,6 +29,7 @@ import {
   Scissors,
   UserCheck,
   MessageCircle,
+  Calendar,
 } from "lucide-react";
 
 // Preset avatar photos for quick professional selection
@@ -756,87 +757,94 @@ export const ProfessionalsManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* CREATE/EDIT MODAL */}
+      {/* CREATE/EDIT MODAL FULLSCREEN */}
       {isModalOpen && (
         <AdminModalV2
           icon={Users}
-          eyebrow="Equipe & Barbeiros"
-          title={editingBarber ? `Editar: ${editingBarber.name}` : "Novo Barbeiro"}
-          subtitle="Configuração de perfil, comissões, especialidades e horários."
+          eyebrow="Equipe & Profissionais"
+          title={editingBarber ? `Editar Barbeiro: ${editingBarber.name}` : "Novo Barbeiro"}
+          subtitle="Configuração de perfil, comissões, especialidades e horários de atendimento."
           onClose={() => setIsModalOpen(false)}
-          size="md"
+          size="fullscreen"
           footer={
             <div className="flex items-center justify-between w-full">
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
+                size="md"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancelar
               </Button>
 
-              <Button
-                type="submit"
-                form="professionalForm"
-                variant="primary"
-                size="sm"
-              >
-                <Save className="w-3.5 h-3.5" />
-                <span>Salvar Barbeiro</span>
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="submit"
+                  form="professionalForm"
+                  variant="primary"
+                  size="md"
+                  className="px-6 font-bold"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Salvar Barbeiro</span>
+                </Button>
+              </div>
             </div>
           }
         >
-          <div className="space-y-3">
+          <div className="space-y-6">
             {/* Modal Tabs Header */}
-            <div className="flex border-b border-[var(--admin-border)] bg-[var(--admin-bg)] p-1 rounded-xl gap-1 shrink-0 overflow-x-auto no-scrollbar">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-2 flex flex-wrap sm:flex-nowrap gap-2 shadow-xs">
               <button
                 type="button"
                 onClick={() => setActiveFormTab("profile")}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "profile"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
-                1. Perfil
+                <UserCheck className="w-4 h-4 shrink-0" />
+                <span>1. Perfil & Dados</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveFormTab("specialties")}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "specialties"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
-                2. Especialidades
+                <Scissors className="w-4 h-4 shrink-0" />
+                <span>2. Especialidades</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveFormTab("commission")}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "commission"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
-                3. Comissão & PIX
+                <DollarSign className="w-4 h-4 shrink-0" />
+                <span>3. Comissão & PIX</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveFormTab("schedule")}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "schedule"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
-                4. Horários
+                <Calendar className="w-4 h-4 shrink-0" />
+                <span>4. Horários & Agenda</span>
               </button>
             </div>
 
@@ -845,92 +853,110 @@ export const ProfessionalsManagement: React.FC = () => {
               id="professionalForm"
               onKeyDown={handleEnterAsTab}
               onSubmit={handleSubmit}
-              className="space-y-3"
+              className="space-y-6"
             >
               {/* TAB 1: PROFILE */}
               {activeFormTab === "profile" && (
-                <div className="space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <AdminLabel tone="accent">Nome Completo *</AdminLabel>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                        placeholder="Ex: Carlos Eduardo Silva"
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                      />
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          Nome Completo *
+                        </span>
+                        <input
+                          type="text"
+                          required
+                          value={formData.name}
+                          onChange={(e) =>
+                            setFormData({ ...formData, name: e.target.value })
+                          }
+                          placeholder="Ex: Carlos Eduardo Silva"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                        />
+                      </label>
                     </div>
 
                     <div>
-                      <AdminLabel tone="accent">Apelido / Cadeira</AdminLabel>
-                      <input
-                        type="text"
-                        value={formData.nickname}
-                        onChange={(e) =>
-                          setFormData({ ...formData, nickname: e.target.value })
-                        }
-                        placeholder="Ex: Carlão Fade"
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <div>
-                      <AdminLabel tone="accent">Cargo / Título</AdminLabel>
-                      <input
-                        type="text"
-                        value={formData.role}
-                        onChange={(e) =>
-                          setFormData({ ...formData, role: e.target.value })
-                        }
-                        placeholder="Master Barber"
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                      />
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          Apelido / Identificação da Cadeira
+                        </span>
+                        <input
+                          type="text"
+                          value={formData.nickname}
+                          onChange={(e) =>
+                            setFormData({ ...formData, nickname: e.target.value })
+                          }
+                          placeholder="Ex: Carlão Fade (Cadeira 01)"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                        />
+                      </label>
                     </div>
 
                     <div>
-                      <AdminLabel tone="accent">WhatsApp / Contato</AdminLabel>
-                      <input
-                        type="text"
-                        value={formData.phone || ""}
-                        onChange={(e) =>
-                          setFormData({ ...formData, phone: e.target.value })
-                        }
-                        placeholder="(11) 99887-6655"
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                      />
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          Cargo / Título Profissional
+                        </span>
+                        <input
+                          type="text"
+                          value={formData.role}
+                          onChange={(e) =>
+                            setFormData({ ...formData, role: e.target.value })
+                          }
+                          placeholder="Ex: Master Barber & Visagista"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                        />
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          WhatsApp / Telefone de Contato
+                        </span>
+                        <input
+                          type="text"
+                          value={formData.phone || ""}
+                          onChange={(e) =>
+                            setFormData({ ...formData, phone: e.target.value })
+                          }
+                          placeholder="(11) 99887-6655"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                        />
+                      </label>
                     </div>
                   </div>
 
                   <div>
-                    <AdminLabel tone="accent">Biografia / Descrição</AdminLabel>
-                    <textarea
-                      rows={2}
-                      value={formData.bio || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, bio: e.target.value })
-                      }
-                      placeholder="Experiência profissional..."
-                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] resize-none"
-                    />
+                    <label className="block">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                        Biografia / Apresentação para Clientes
+                      </span>
+                      <textarea
+                        rows={3}
+                        value={formData.bio || ""}
+                        onChange={(e) =>
+                          setFormData({ ...formData, bio: e.target.value })
+                        }
+                        placeholder="Mais de 8 anos de experiência em cortes clássicos e modernos, barba terapia e visagismo masculino..."
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] resize-none transition-colors"
+                      />
+                    </label>
                   </div>
 
                   {/* Photo selection */}
-                  <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
-                    <AdminLabel tone="accent" uppercase>
-                      Foto de Perfil
-                    </AdminLabel>
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-4">
+                    <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                      Foto de Perfil do Profissional
+                    </p>
 
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
                       <img
                         src={formData.photo_url}
-                        alt="Preview"
-                        className="w-10 h-10 rounded-xl object-cover border border-[var(--admin-accent)]"
+                        alt="Preview do Barbeiro"
+                        className="w-16 h-16 rounded-2xl object-cover border-2 border-[var(--admin-accent)] shrink-0 shadow-xs"
                       />
                       <input
                         type="url"
@@ -941,32 +967,42 @@ export const ProfessionalsManagement: React.FC = () => {
                             photo_url: e.target.value,
                           })
                         }
-                        placeholder="URL da imagem..."
-                        className="flex-1 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                        placeholder="Cole a URL da imagem de perfil..."
+                        className="w-full h-11 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                       />
                     </div>
 
-                    <div className="grid grid-cols-6 gap-1.5 pt-1">
-                      {PRESET_BARBER_AVATARS.map((preset, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() =>
-                            setFormData({ ...formData, photo_url: preset.url })
-                          }
-                          className={`rounded-lg overflow-hidden border transition-all ${
-                            formData.photo_url === preset.url
-                              ? "border-[var(--admin-accent)] ring-1 ring-[var(--admin-accent)]"
-                              : "border-[var(--admin-border)] opacity-70"
-                          }`}
-                        >
-                          <img
-                            src={preset.url}
-                            alt={preset.name}
-                            className="w-full h-8 object-cover"
-                          />
-                        </button>
-                      ))}
+                    <div>
+                      <p className="text-xs text-[var(--admin-text-muted)] font-bold uppercase mb-2">
+                        Ou escolha um avatar predefinido:
+                      </p>
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                        {PRESET_BARBER_AVATARS.map((preset, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() =>
+                              setFormData({ ...formData, photo_url: preset.url })
+                            }
+                            className={`group relative rounded-xl overflow-hidden border-2 transition-all h-20 ${
+                              formData.photo_url === preset.url
+                                ? "border-[var(--admin-accent)] ring-2 ring-[var(--admin-accent)]"
+                                : "border-[var(--admin-border)] opacity-70 hover:opacity-100 hover:border-[var(--admin-accent)]/50"
+                            }`}
+                          >
+                            <img
+                              src={preset.url}
+                              alt={preset.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                            />
+                            <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 text-center">
+                              <span className="text-[10px] font-bold text-white block truncate">
+                                {preset.name}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -974,32 +1010,34 @@ export const ProfessionalsManagement: React.FC = () => {
 
               {/* TAB 2: SPECIALTIES */}
               {activeFormTab === "specialties" && (
-                <div className="space-y-3">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
                   <div>
-                    <AdminLabel tone="accent">
-                      Especialidades (separadas por vírgula)
-                    </AdminLabel>
-                    <input
-                      type="text"
-                      value={specialtiesText}
-                      onChange={(e) => setSpecialtiesText(e.target.value)}
-                      placeholder="Degradê / Fade, Barboterapia Imperial"
-                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                    />
+                    <label className="block">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                        Especialidades Principais (separadas por vírgula)
+                      </span>
+                      <input
+                        type="text"
+                        value={specialtiesText}
+                        onChange={(e) => setSpecialtiesText(e.target.value)}
+                        placeholder="Ex: Degradê Navalhado, Barboterapia Imperial, Cortes Clássicos, Visagismo"
+                        className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                      />
+                    </label>
                   </div>
 
-                  <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
-                    <p className="text-xs font-bold text-[var(--admin-accent)] flex items-center gap-1 uppercase">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Especialidades populares:</span>
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-3">
+                    <p className="text-xs font-bold text-[var(--admin-accent)] flex items-center gap-1.5 uppercase">
+                      <Sparkles className="w-4 h-4" />
+                      <span>Clique para adicionar especialidades sugeridas:</span>
                     </p>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2 pt-1">
                       {SUGGESTED_SPECIALTIES.map((tag) => (
                         <button
                           key={tag}
                           type="button"
                           onClick={() => handleAddSpecialtyTag(tag)}
-                          className="px-2 py-1 rounded-lg bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] text-xs font-bold"
+                          className="px-3.5 py-2 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:border-[var(--admin-accent)] border border-[var(--admin-border)] text-xs font-bold transition-colors"
                         >
                           + {tag}
                         </button>
@@ -1011,62 +1049,88 @@ export const ProfessionalsManagement: React.FC = () => {
 
               {/* TAB 3: COMMISSION & PIX */}
               {activeFormTab === "commission" && (
-                <div className="space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <AdminLabel tone="accent">
-                        Taxa de Comissão (Ex: 0.45 = 45%) *
-                      </AdminLabel>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max="1"
-                        required
-                        value={formData.commission_rate}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            commission_rate: Number(e.target.value),
-                          })
-                        }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs font-bold text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                      />
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider finance-positive mb-2">
+                          Taxa de Comissão do Profissional (Ex: 0.45 = 45%) *
+                        </span>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max="1"
+                            required
+                            value={formData.commission_rate}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                commission_rate: Number(e.target.value),
+                              })
+                            }
+                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-base font-bold finance-positive focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                          />
+                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold finance-positive">
+                            {Math.round((formData.commission_rate || 0) * 100)}%
+                          </span>
+                        </div>
+                      </label>
                     </div>
 
                     <div>
-                      <AdminLabel tone="accent">Chave PIX Repasse</AdminLabel>
-                      <input
-                        type="text"
-                        value={formData.pix_key || ""}
-                        onChange={(e) =>
-                          setFormData({ ...formData, pix_key: e.target.value })
-                        }
-                        placeholder="CPF, e-mail ou telefone"
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                      />
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          Chave PIX para Repasses Semanais / Mensais
+                        </span>
+                        <input
+                          type="text"
+                          value={formData.pix_key || ""}
+                          onChange={(e) =>
+                            setFormData({ ...formData, pix_key: e.target.value })
+                          }
+                          placeholder="CPF, e-mail, telefone ou chave aleatória"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors font-mono"
+                        />
+                      </label>
                     </div>
                   </div>
 
-                  <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-1 text-xs">
-                    <p className="text-xs text-[var(--admin-text-muted)] font-bold uppercase">
-                      Simulador de Divisão
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
+                    <p className="text-xs text-[var(--admin-accent)] font-bold uppercase tracking-wider">
+                      Simulador de Repasse Financeiro Automático
                     </p>
-                    <p className="font-extrabold text-status-success">
-                      Em R$ 100,00 → Barbeiro recebe R${" "}
-                      {((formData.commission_rate || 0.45) * 100).toFixed(2)}
-                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] gap-3">
+                      <div>
+                        <span className="text-xs text-[var(--admin-text-muted)] block">Para cada R$ 100,00 faturados na comanda:</span>
+                        <span className="text-base font-bold text-[var(--admin-text-main)]">
+                          Barbearia fica com R$ {(100 - (formData.commission_rate || 0.45) * 100).toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-[var(--admin-text-muted)] block">Repasse do Barbeiro:</span>
+                        <span className="text-lg font-black text-status-success">
+                          R$ {((formData.commission_rate || 0.45) * 100).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
 
               {/* TAB 4: SCHEDULE */}
               {activeFormTab === "schedule" && (
-                <div className="space-y-3">
-                  <div className="p-3 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl flex items-center justify-between">
-                    <span className="text-xs font-bold text-[var(--admin-text-main)]">
-                      Disponível na Agenda
-                    </span>
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                  <div className="p-4 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl flex items-center justify-between">
+                    <div>
+                      <span className="text-sm font-bold text-[var(--admin-text-main)] block">
+                        Disponibilidade de Agendamento Online
+                      </span>
+                      <span className="text-xs text-[var(--admin-text-muted)]">
+                        Habilita a exibição do profissional na lista de seleção dos clientes
+                      </span>
+                    </div>
                     <button
                       type="button"
                       onClick={() =>
@@ -1075,77 +1139,87 @@ export const ProfessionalsManagement: React.FC = () => {
                           is_active: !(formData.is_active ?? true),
                         })
                       }
-                      className={`px-3 py-1 rounded-xl text-xs font-bold ${
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
                         (formData.is_active ?? true)
-                          ? "bg-status-success text-white"
-                          : "bg-red-500/20 text-red-400"
+                          ? "bg-status-success text-white shadow-xs"
+                          : "bg-red-500/20 text-red-400 border border-red-500/30"
                       }`}
                     >
-                      {(formData.is_active ?? true) ? "Ativo" : "Pausado"}
+                      {(formData.is_active ?? true) ? "● Ativo na Agenda" : "○ Pausado"}
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
-                      <AdminLabel tone="muted">Início Expediente</AdminLabel>
-                      <input
-                        type="time"
-                        value={formData.working_hours?.start || "08:00"}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            working_hours: {
-                              ...(formData.working_hours || {
-                                days: [
-                                  "mon",
-                                  "tue",
-                                  "wed",
-                                  "thu",
-                                  "fri",
-                                  "sat",
-                                ],
-                                end: "19:00",
-                              }),
-                              start: e.target.value,
-                            },
-                          })
-                        }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2 text-xs text-[var(--admin-text-main)]"
-                      />
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          Horário de Início do Expediente
+                        </span>
+                        <input
+                          type="time"
+                          value={formData.working_hours?.start || "08:00"}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              working_hours: {
+                                ...(formData.working_hours || {
+                                  days: [
+                                    "mon",
+                                    "tue",
+                                    "wed",
+                                    "thu",
+                                    "fri",
+                                    "sat",
+                                  ],
+                                  end: "19:00",
+                                }),
+                                start: e.target.value,
+                              },
+                            })
+                          }
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                        />
+                      </label>
                     </div>
 
                     <div>
-                      <AdminLabel tone="muted">Fim Expediente</AdminLabel>
-                      <input
-                        type="time"
-                        value={formData.working_hours?.end || "19:00"}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            working_hours: {
-                              ...(formData.working_hours || {
-                                days: [
-                                  "mon",
-                                  "tue",
-                                  "wed",
-                                  "thu",
-                                  "fri",
-                                  "sat",
-                                ],
-                                start: "08:00",
-                              }),
-                              end: e.target.value,
-                            },
-                          })
-                        }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2 text-xs text-[var(--admin-text-main)]"
-                      />
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          Horário de Fim do Expediente
+                        </span>
+                        <input
+                          type="time"
+                          value={formData.working_hours?.end || "19:00"}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              working_hours: {
+                                ...(formData.working_hours || {
+                                  days: [
+                                    "mon",
+                                    "tue",
+                                    "wed",
+                                    "thu",
+                                    "fri",
+                                    "sat",
+                                  ],
+                                  start: "08:00",
+                                }),
+                                end: e.target.value,
+                              },
+                            })
+                          }
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                        />
+                      </label>
                     </div>
                   </div>
 
                   <div>
-                    <AdminLabel tone="muted">Dias da Semana</AdminLabel>
-                    <div className="flex flex-wrap gap-1">
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                      Dias da Semana Trabalhados
+                    </span>
+                    <div className="flex flex-wrap gap-2">
                       {Object.keys(dayLabels).map((day) => {
                         const isActive =
                           formData.working_hours?.days.includes(day);
@@ -1154,10 +1228,10 @@ export const ProfessionalsManagement: React.FC = () => {
                             key={day}
                             type="button"
                             onClick={() => toggleDay(day)}
-                            className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
+                            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                               isActive
-                                ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
-                                : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"
+                                ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
+                                : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"
                             }`}
                           >
                             {dayLabels[day]}

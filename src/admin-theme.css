@@ -1,7 +1,11 @@
 /* Admin UI Rebrand & UX Redesign Pro */
 /* CSS específico para a área administrativa, aplicando hierarquia, densidade e usabilidade com a skill frontend-design. */
 
-.admin-shell {
+:root,
+[data-theme],
+body,
+.admin-shell,
+.admin-modal-v2-overlay {
   /* Escala de Espaçamento Base */
   --space-1: 4px;
   --space-2: 8px;

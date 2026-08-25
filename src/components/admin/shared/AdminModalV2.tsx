@@ -14,8 +14,8 @@ export interface AdminModalV2Props {
   /** Optional short line under the title, shown inside the header (e.g. client name). */
   subtitle?: string;
   onClose: () => void;
-  /** 'sm' matches the receipt checkout width (420px). 'md' fits forms/pickers (560px). 'lg' fits grids (720px). */
-  size?: "sm" | "md" | "lg";
+  /** 'sm' matches receipt checkout (420px). 'md' fits dialogs (560px). 'lg' fits grids (720px). 'fullscreen' fills entire screen. */
+  size?: "sm" | "md" | "lg" | "fullscreen";
   /** Tint applied to the header icon badge — defaults to gold. */
   accent?: "gold" | "whatsapp" | "neutral";
   children: React.ReactNode;
@@ -46,9 +46,11 @@ export const AdminModalV2: React.FC<AdminModalV2Props> = ({
   useDialogFocus(true, dialogRef);
   useModalScrollLock(true);
 
+  const isFullscreen = size === "fullscreen";
+
   return createPortal(
     <div
-      className="admin-modal-v2-overlay"
+      className={`admin-modal-v2-overlay ${isFullscreen ? "admin-modal-v2-overlay--fullscreen" : ""} admin-shell`}
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelledBy}
@@ -59,35 +61,47 @@ export const AdminModalV2: React.FC<AdminModalV2Props> = ({
         className={`admin-modal-v2-dialog admin-modal-v2-dialog--${size}`}
       >
         <header className="admin-modal-v2-header">
-          <div className="admin-modal-v2-title-group">
-            <span
-              className={`admin-modal-v2-header-icon admin-modal-v2-header-icon--${accent}`}
-            >
-              <Icon aria-hidden="true" />
-            </span>
-            <div className="admin-modal-v2-title-copy">
-              <p className="admin-modal-v2-label">{eyebrow}</p>
-              <h2 id={labelledBy} className="admin-modal-v2-title">
-                {title}
-              </h2>
-              {subtitle && (
-                <p className="admin-modal-v2-subtitle">{subtitle}</p>
-              )}
+          <div className={`${isFullscreen ? "max-w-6xl mx-auto w-full flex items-center justify-between" : "flex items-center justify-between w-full"}`}>
+            <div className="admin-modal-v2-title-group">
+              <span
+                className={`admin-modal-v2-header-icon admin-modal-v2-header-icon--${accent}`}
+              >
+                <Icon aria-hidden="true" />
+              </span>
+              <div className="admin-modal-v2-title-copy">
+                <p className="admin-modal-v2-label">{eyebrow}</p>
+                <h2 id={labelledBy} className="admin-modal-v2-title">
+                  {title}
+                </h2>
+                {subtitle && (
+                  <p className="admin-modal-v2-subtitle">{subtitle}</p>
+                )}
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="admin-modal-v2-close"
+              aria-label="Fechar"
+            >
+              <X aria-hidden="true" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="admin-modal-v2-close"
-            aria-label="Fechar"
-          >
-            <X aria-hidden="true" />
-          </button>
         </header>
 
-        <div className="admin-modal-v2-scroll">{children}</div>
+        <div className="admin-modal-v2-scroll">
+          <div className={isFullscreen ? "max-w-6xl mx-auto w-full pb-8" : "w-full"}>
+            {children}
+          </div>
+        </div>
 
-        {footer && <div className="admin-modal-v2-footer">{footer}</div>}
+        {footer && (
+          <div className="admin-modal-v2-footer">
+            <div className={isFullscreen ? "max-w-6xl mx-auto w-full" : "w-full"}>
+              {footer}
+            </div>
+          </div>
+        )}
       </div>
     </div>,
     document.body,

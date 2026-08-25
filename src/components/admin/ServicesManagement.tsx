@@ -772,32 +772,32 @@ export const ServicesManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Advanced Compact & Modular Create / Edit Service Modal */}
+      {/* Advanced Fullscreen Create / Edit Service Modal */}
       {isModalOpen && (
         <AdminModalV2
           icon={Scissors}
           eyebrow="Catálogo de Serviços"
-          title={editingService ? `Editar: ${editingService.title}` : "Novo Serviço"}
-          subtitle="Preencha informações do serviço, precificação e galeria de fotos."
+          title={editingService ? `Editar Serviço: ${editingService.title}` : "Novo Serviço"}
+          subtitle="Preencha informações do serviço, precificação, destaques e galeria de fotos."
           onClose={() => setIsModalOpen(false)}
-          size="lg"
+          size="fullscreen"
           footer={
             <div className="flex items-center justify-between w-full">
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
+                size="md"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancelar
               </Button>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 {activeFormTab !== "gallery" && (
                   <Button
                     type="button"
                     variant="secondary"
-                    size="sm"
+                    size="md"
                     onClick={() => {
                       if (activeFormTab === "general")
                         setActiveFormTab("pricing");
@@ -805,8 +805,8 @@ export const ServicesManagement: React.FC = () => {
                         setActiveFormTab("gallery");
                     }}
                   >
-                    <span>Avançar</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <span>Avançar Etapa</span>
+                    <ArrowRight className="w-4 h-4" />
                   </Button>
                 )}
 
@@ -814,55 +814,56 @@ export const ServicesManagement: React.FC = () => {
                   type="submit"
                   form="serviceForm"
                   variant="primary"
-                  size="sm"
+                  size="md"
+                  className="px-6 font-bold"
                 >
-                  <Save className="w-3.5 h-3.5" />
+                  <Save className="w-4 h-4" />
                   <span>Salvar Serviço</span>
                 </Button>
               </div>
             </div>
           }
         >
-          <div className="flex flex-col sm:flex-row gap-3 min-h-[360px]">
-            {/* Sidebar Navigation (Desktop: Left Column, Mobile: Top Horizontal Bar) */}
-            <div className="sm:w-44 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-1.5 flex sm:flex-col gap-1 shrink-0 overflow-x-auto no-scrollbar">
+          <div className="space-y-6">
+            {/* Top Step Tabs */}
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-2 flex flex-wrap sm:flex-nowrap gap-2 shadow-xs">
               <button
                 type="button"
                 onClick={() => setActiveFormTab("general")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap text-left ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "general"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
-                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text-main)]"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
-                <Scissors className="w-3.5 h-3.5 shrink-0" />
-                <span>1. Dados Gerais</span>
+                <Scissors className="w-4 h-4 shrink-0" />
+                <span>1. Dados Gerais & Detalhes</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveFormTab("pricing")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap text-left ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "pricing"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
-                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text-main)]"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
-                <DollarSign className="w-3.5 h-3.5 shrink-0" />
-                <span>2. Preço & Valores</span>
+                <DollarSign className="w-4 h-4 shrink-0" />
+                <span>2. Preço, Desconto & Duração</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveFormTab("gallery")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap text-left ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "gallery"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
-                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text-main)]"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
-                <ImageIcon className="w-3.5 h-3.5 shrink-0" />
-                <span>3. Galeria ({formData.gallery_urls?.length || 0})</span>
+                <ImageIcon className="w-4 h-4 shrink-0" />
+                <span>3. Galeria de Fotos ({formData.gallery_urls?.length || 0})</span>
               </button>
             </div>
 
@@ -871,385 +872,408 @@ export const ServicesManagement: React.FC = () => {
               id="serviceForm"
               onKeyDown={handleEnterAsTab}
               onSubmit={handleSubmit}
-              className="flex-1 overflow-hidden"
+              className="space-y-6"
             >
-              <div className="space-y-3.5">
-                  {/* TAB 1: GENERAL INFO */}
-                  {activeFormTab === "general" && (
-                    <div className="space-y-3">
-                      <div>
-                        <AdminLabel tone="accent">
+              {/* TAB 1: GENERAL INFO */}
+              {activeFormTab === "general" && (
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="md:col-span-2">
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
                           Título do Serviço *
-                        </AdminLabel>
+                        </span>
                         <input
                           type="text"
                           value={formData.title}
                           onChange={(e) =>
                             setFormData({ ...formData, title: e.target.value })
                           }
-                          placeholder="Ex: Corte Degradê Navalhado + Barba"
-                          className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none"
+                          placeholder="Ex: Corte Degradê Navalhado + Barba Terapia"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors font-medium"
                           required
                         />
-                      </div>
+                      </label>
+                    </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <AdminLabel tone="accent">Categoria *</AdminLabel>
-                          <select
-                            value={formData.category_id}
+                    <div>
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          Categoria do Serviço *
+                        </span>
+                        <select
+                          value={formData.category_id}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              category_id: e.target.value,
+                            })
+                          }
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
+                        >
+                          {DEFAULT_CATEGORIES.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          Duração Estimada (Minutos) *
+                        </span>
+                        <div className="relative">
+                          <Clock className="w-4 h-4 text-[var(--admin-accent)] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="number"
+                            min="5"
+                            step="5"
+                            value={formData.duration_minutes}
                             onChange={(e) =>
                               setFormData({
                                 ...formData,
-                                category_id: e.target.value,
+                                duration_minutes: Number(e.target.value),
                               })
                             }
-                            className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none"
-                          >
-                            {DEFAULT_CATEGORIES.map((cat) => (
-                              <option key={cat.id} value={cat.id}>
-                                {cat.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <AdminLabel tone="accent">
-                            Duração Estimada (Minutos) *
-                          </AdminLabel>
-                          <div className="relative">
-                            <Clock className="w-3.5 h-3.5 text-[var(--admin-accent)] absolute left-3 top-1/2 -translate-y-1/2" />
-                            <input
-                              type="number"
-                              value={formData.duration_minutes}
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  duration_minutes: Number(e.target.value),
-                                })
-                              }
-                              placeholder="35"
-                              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-8 pr-3 py-2.5 text-xs finance-positive focus:border-[var(--admin-accent)] outline-none"
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <AdminLabel tone="accent">
-                          Descrição Detalhada do Serviço
-                        </AdminLabel>
-                        <textarea
-                          rows={2}
-                          value={formData.description}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              description: e.target.value,
-                            })
-                          }
-                          placeholder="Descreva as etapas, produtos e o resultado..."
-                          className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none resize-none"
-                        />
-                      </div>
-
-                      {/* Destaques */}
-                      <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
-                        <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
-                          Configuração de Destaque
-                        </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <label className="flex items-center gap-2 p-2 rounded-xl bg-[var(--admin-surface)] border border-[var(--admin-border)] cursor-pointer hover:border-status-success/40">
-                            <input
-                              type="checkbox"
-                              checked={formData.is_combo}
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  is_combo: e.target.checked,
-                                })
-                              }
-                              className="w-3.5 h-3.5 accent-[#4CAF50]"
-                            />
-                            <div>
-                              <span className="text-xs font-bold text-[var(--admin-text-main)] block">
-                                Combo VIP
-                              </span>
-                              <span className="text-xs text-[var(--admin-text-muted)]">
-                                Pacote promocional
-                              </span>
-                            </div>
-                          </label>
-
-                          <label className="flex items-center gap-2 p-2 rounded-xl bg-[var(--admin-surface)] border border-[var(--admin-border)] cursor-pointer hover:border-[var(--admin-accent)]/40">
-                            <input
-                              type="checkbox"
-                              checked={formData.popular}
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  popular: e.target.checked,
-                                })
-                              }
-                              className="w-3.5 h-3.5 accent-gold-base"
-                            />
-                            <div>
-                              <span className="text-xs font-bold text-[var(--admin-text-main)] block">
-                                Mais pedido
-                              </span>
-                              <span className="text-xs text-[var(--admin-text-muted)]">
-                                Selo no cardápio
-                              </span>
-                            </div>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* TAB 2: PRICING */}
-                  {activeFormTab === "pricing" && (
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <AdminLabel
-                            tone="default"
-                            className="finance-positive"
-                          >
-                            Preço de Venda (R$) *
-                          </AdminLabel>
-                          <div className="relative">
-                            <span className="text-xs finance-positive font-bold absolute left-3 top-1/2 -translate-y-1/2">
-                              R$
-                            </span>
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={formData.price}
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  price: Number(e.target.value),
-                                })
-                              }
-                              placeholder="60.00"
-                              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold finance-positive focus:border-[var(--admin-accent)] outline-none"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <AdminLabel
-                            tone="default"
-                            className="finance-positive"
-                          >
-                            Preço De / Sem Desconto (R$)
-                          </AdminLabel>
-                          <div className="relative">
-                            <span className="text-xs finance-positive font-bold absolute left-3 top-1/2 -translate-y-1/2">
-                              R$
-                            </span>
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={formData.original_price || ""}
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  original_price: e.target.value
-                                    ? Number(e.target.value)
-                                    : undefined,
-                                })
-                              }
-                              placeholder="75.00"
-                              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-8 pr-3 py-2.5 text-xs finance-positive focus:border-[var(--admin-accent)] outline-none"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {formData.original_price &&
-                        formData.original_price > (formData.price || 0) && (
-                          <div className="p-3 finance-negative-soft finance-negative-border rounded-xl flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Flame className="w-4 h-4 finance-negative" />
-                              <span className="text-xs font-bold finance-negative">
-                                Desconto de R${" "}
-                                {(
-                                  formData.original_price -
-                                  (formData.price || 0)
-                                ).toFixed(2)}
-                              </span>
-                            </div>
-                            <span className="px-2 py-0.5 rounded-xl finance-negative-soft finance-negative font-black text-xs uppercase">
-                              {Math.round(
-                                ((formData.original_price -
-                                  (formData.price || 0)) /
-                                  formData.original_price) *
-                                  100,
-                              )}
-                              % OFF
-                            </span>
-                          </div>
-                        )}
-
-                      <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] text-xs text-[var(--admin-text-muted)] space-y-1">
-                        <p className="font-bold text-[var(--admin-text-main)] flex items-center gap-1.5">
-                          <Info className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
-                          <span>Efeito de Preço Riscado</span>
-                        </p>
-                        <p className="text-xs">
-                          Preencher o valor original ativa o selo promocional e
-                          mostra o preço de/por no agendamento do cliente.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* TAB 3: GALLERY */}
-                  {activeFormTab === "gallery" && (
-                    <div className="space-y-3">
-                      <div>
-                        <AdminLabel tone="accent">
-                          URL Foto de Capa Principal
-                        </AdminLabel>
-                        <input
-                          type="url"
-                          value={formData.image_url || ""}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              image_url: e.target.value,
-                            })
-                          }
-                          placeholder="https://..."
-                          className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none"
-                        />
-                      </div>
-
-                      <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
-                        <AdminLabel tone="accent" uppercase>
-                          Adicionar Foto por URL
-                        </AdminLabel>
-                        <div className="flex gap-2">
-                          <input
-                            type="url"
-                            value={newGalleryUrlInput}
-                            onChange={(e) =>
-                              setNewGalleryUrlInput(e.target.value)
-                            }
-                            placeholder="Cole URL da foto..."
-                            className="flex-1 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
+                            placeholder="35"
+                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 text-sm font-bold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
+                            required
                           />
-                          <button
-                            type="button"
-                            onClick={handleAddGalleryUrl}
-                            className="px-3 py-1.5 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs shrink-0"
-                          >
-                            Adicionar
-                          </button>
                         </div>
+                      </label>
+                    </div>
+                  </div>
 
-                        <div className="pt-1">
-                          <p className="text-xs text-[var(--admin-text-muted)] font-bold uppercase mb-1.5">
-                            Fotos Sugeridas:
-                          </p>
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                            {BARBERSHOP_IMAGE_PRESETS.slice(0, 4).map(
-                              (preset, idx) => (
+                  <div>
+                    <label className="block">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                        Descrição Detalhada do Serviço
+                      </span>
+                      <textarea
+                        rows={3}
+                        value={formData.description}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            description: e.target.value,
+                          })
+                        }
+                        placeholder="Descreva as técnicas aplicadas, produtos utilizados e diferenciais do atendimento..."
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none resize-none transition-colors"
+                      />
+                    </label>
+                  </div>
+
+                  {/* Destaques & Selos */}
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-3">
+                    <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4" />
+                      <span>Configurações de Destaque no Catálogo</span>
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <label className="flex items-center gap-3 p-3.5 rounded-xl bg-[var(--admin-surface)] border border-[var(--admin-border)] cursor-pointer hover:border-status-success/60 transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={formData.is_combo}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              is_combo: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 accent-[#4CAF50] rounded"
+                        />
+                        <div>
+                          <span className="text-sm font-bold text-[var(--admin-text-main)] block">
+                            Combo VIP Promocional
+                          </span>
+                          <span className="text-xs text-[var(--admin-text-muted)]">
+                            Identificado como pacote combinado com desconto
+                          </span>
+                        </div>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3.5 rounded-xl bg-[var(--admin-surface)] border border-[var(--admin-border)] cursor-pointer hover:border-[var(--admin-accent)]/60 transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={formData.popular}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              popular: e.target.checked,
+                            })
+                          }
+                          className="w-4 h-4 accent-gold-base rounded"
+                        />
+                        <div>
+                          <span className="text-sm font-bold text-[var(--admin-text-main)] block">
+                            Mais Pedido / Destaque
+                          </span>
+                          <span className="text-xs text-[var(--admin-text-muted)]">
+                            Exibe selo de recomendação no cardápio de agendamento
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: PRICING */}
+              {activeFormTab === "pricing" && (
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider finance-positive mb-2">
+                          Preço de Venda Praticado (R$) *
+                        </span>
+                        <div className="relative">
+                          <span className="text-sm finance-positive font-bold absolute left-4 top-1/2 -translate-y-1/2">
+                            R$
+                          </span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={formData.price}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                price: Number(e.target.value),
+                              })
+                            }
+                            placeholder="60.00"
+                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-12 pr-4 text-base font-bold finance-positive focus:border-[var(--admin-accent)] outline-none transition-colors"
+                            required
+                          />
+                        </div>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                          Preço Original / Sem Desconto (R$)
+                        </span>
+                        <div className="relative">
+                          <span className="text-sm text-[var(--admin-text-muted)] font-bold absolute left-4 top-1/2 -translate-y-1/2">
+                            R$
+                          </span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={formData.original_price || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                original_price: e.target.value
+                                  ? Number(e.target.value)
+                                  : undefined,
+                              })
+                            }
+                            placeholder="75.00"
+                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-12 pr-4 text-base font-bold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
+                          />
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {formData.original_price &&
+                    formData.original_price > (formData.price || 0) && (
+                      <div className="p-4 finance-negative-soft finance-negative-border rounded-xl flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <Flame className="w-5 h-5 finance-negative" />
+                          <div>
+                            <span className="text-sm font-bold finance-negative block">
+                              Economia de R${" "}
+                              {(
+                                formData.original_price -
+                                (formData.price || 0)
+                              ).toFixed(2)}{" "}
+                              para o cliente
+                            </span>
+                            <span className="text-xs text-[var(--admin-text-muted)]">
+                              Preço original riscado de R$ {formData.original_price.toFixed(2)} por R$ {(formData.price || 0).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="px-3 py-1 rounded-xl finance-negative-soft finance-negative font-black text-sm uppercase">
+                          {Math.round(
+                            ((formData.original_price -
+                              (formData.price || 0)) /
+                              formData.original_price) *
+                              100,
+                          )}
+                          % OFF
+                        </span>
+                      </div>
+                    )}
+
+                  <div className="p-4 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] text-xs text-[var(--admin-text-muted)] space-y-1">
+                    <p className="font-bold text-[var(--admin-text-main)] flex items-center gap-2 text-sm">
+                      <Info className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
+                      <span>Transparência e Comissões</span>
+                    </p>
+                    <p className="leading-relaxed">
+                      O valor praticado será a base de cálculo para a comissão do profissional que realizar o atendimento na comanda.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: GALLERY */}
+              {activeFormTab === "gallery" && (
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                  <div>
+                    <label className="block">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
+                        URL da Foto de Capa Principal
+                      </span>
+                      <input
+                        type="url"
+                        value={formData.image_url || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            image_url: e.target.value,
+                          })
+                        }
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-3">
+                    <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                      Adicionar Nova Imagem à Galeria
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        value={newGalleryUrlInput}
+                        onChange={(e) =>
+                          setNewGalleryUrlInput(e.target.value)
+                        }
+                        placeholder="Cole a URL direta da foto (ex: https://...)"
+                        className="flex-1 h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddGalleryUrl}
+                        className="px-4 py-2 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs shrink-0 hover:opacity-90 transition-opacity"
+                      >
+                        + Adicionar
+                      </button>
+                    </div>
+
+                    <div className="pt-2">
+                      <p className="text-xs text-[var(--admin-text-muted)] font-bold uppercase mb-2">
+                        Sugestões de Fotos Profissionais:
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {BARBERSHOP_IMAGE_PRESETS.slice(0, 4).map(
+                          (preset, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() =>
+                                handleAddPresetImage(preset.url)
+                              }
+                              className="relative rounded-xl overflow-hidden h-16 border border-[var(--admin-border)] hover:border-[var(--admin-accent)] text-left group transition-all"
+                            >
+                              <img
+                                src={preset.url}
+                                alt={preset.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              />
+                              <div className="absolute inset-0 bg-black/50 p-1.5 flex items-end">
+                                <span className="text-[11px] font-bold text-white line-clamp-1">
+                                  {preset.title}
+                                </span>
+                              </div>
+                            </button>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Photo List */}
+                  <div>
+                    <p className="text-sm font-bold text-[var(--admin-text-main)] mb-3">
+                      Fotos Cadastradas na Galeria ({formData.gallery_urls?.length || 0}):
+                    </p>
+                    {formData.gallery_urls && formData.gallery_urls.length > 0 ? (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                        {formData.gallery_urls.map((imgUrl, index) => {
+                          const isCover = formData.image_url === imgUrl;
+                          return (
+                            <div
+                              key={index}
+                              className={`relative aspect-square rounded-xl overflow-hidden bg-[var(--admin-bg)] border ${
+                                isCover
+                                  ? "border-[var(--admin-accent)] ring-2 ring-[var(--admin-accent)]"
+                                  : "border-[var(--admin-border)]"
+                              }`}
+                            >
+                              <img
+                                src={imgUrl}
+                                alt="Galeria do serviço"
+                                className="w-full h-full object-cover"
+                              />
+                              {isCover && (
+                                <span className="absolute top-1.5 left-1.5 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-[10px] font-black px-1.5 py-0.5 rounded-md shadow-xs">
+                                  CAPA
+                                </span>
+                              )}
+                              <div className="absolute bottom-1.5 right-1.5 flex gap-1">
+                                {!isCover && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleSetCoverImage(imgUrl)
+                                    }
+                                    className="px-2 py-1 rounded-lg bg-[var(--admin-bg)]/90 text-[var(--admin-accent)] text-[10px] font-bold hover:bg-[var(--admin-surface)]"
+                                  >
+                                    Capa
+                                  </button>
+                                )}
                                 <button
-                                  key={idx}
                                   type="button"
                                   onClick={() =>
-                                    handleAddPresetImage(preset.url)
+                                    handleRemoveGalleryImage(index)
                                   }
-                                  className="relative rounded-xl overflow-hidden h-12 border border-[var(--admin-border)] hover:border-[var(--admin-accent)] text-left"
+                                  className="p-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700"
                                 >
-                                  <img
-                                    src={preset.url}
-                                    alt={preset.title}
-                                    className="w-full h-full object-cover"
-                                  />
-                                  <div className="absolute inset-0 bg-[var(--admin-bg)]/40 p-1 flex items-end">
-                                    <span className="text-xs font-bold text-[var(--admin-text-main)] admin-clamp-2">
-                                      {preset.title}
-                                    </span>
-                                  </div>
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
-                              ),
-                            )}
-                          </div>
-                        </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-
-                      {/* Photo List */}
-                      <div>
-                        <p className="text-xs font-bold text-[var(--admin-text-main)] mb-2">
-                          Fotos Cadastradas (
-                          {formData.gallery_urls?.length || 0}):
+                    ) : (
+                      <div className="p-8 text-center border border-dashed border-[var(--admin-border)] rounded-2xl">
+                        <ImageIcon className="w-8 h-8 text-[var(--admin-text-muted)] mx-auto mb-2 opacity-50" />
+                        <p className="text-xs text-[var(--admin-text-muted)]">
+                          Nenhuma foto cadastrada para este serviço ainda.
                         </p>
-                        {formData.gallery_urls &&
-                        formData.gallery_urls.length > 0 ? (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                            {formData.gallery_urls.map((imgUrl, index) => {
-                              const isCover = formData.image_url === imgUrl;
-                              return (
-                                <div
-                                  key={index}
-                                  className="relative aspect-square rounded-xl overflow-hidden bg-[var(--admin-bg)] border border-[var(--admin-border)]"
-                                >
-                                  <img
-                                    src={imgUrl}
-                                    alt="Galeria"
-                                    className="w-full h-full object-cover"
-                                  />
-                                  {isCover && (
-                                    <span className="absolute top-1 left-1 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-black px-1 rounded-xl">
-                                      Capa
-                                    </span>
-                                  )}
-                                  <div className="absolute bottom-1 right-1 flex gap-1">
-                                    {!isCover && (
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          handleSetCoverImage(imgUrl)
-                                        }
-                                        className="p-1 rounded-xl bg-[var(--admin-bg)]/80 text-[var(--admin-accent)] text-xs font-bold"
-                                      >
-                                        Capa
-                                      </button>
-                                    )}
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        handleRemoveGalleryImage(index)
-                                      }
-                                      className="p-1 rounded-xl bg-red-600 text-white"
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          <p className="text-xs text-[var(--admin-text-muted)] italic">
-                            Nenhuma foto adicionada.
-                          </p>
-                        )}
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </form>
-            </div>
-          </AdminModalV2>
-        )}
+              )}
+            </form>
+          </div>
+        </AdminModalV2>
+      )}
 
       <AdminFab
         onClick={handleOpenCreate}
