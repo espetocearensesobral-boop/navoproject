@@ -18,24 +18,24 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
   ...props
 }) => {
   const variants = {
-    primary: 'bg-accent-solid text-on-accent hover:bg-accent-strong shadow-md',
-    secondary: 'bg-content-base/5 text-content-base border border-border-subtle hover:bg-content-base/10',
-    danger: 'bg-status-error/10 text-status-error border border-status-error/30 hover:bg-status-error/20',
-    ghost: 'text-content-muted hover:text-content-base hover:bg-content-base/5',
+    primary: 'bg-[var(--admin-accent)] text-[var(--admin-accent-text)] hover:bg-[var(--admin-accent-hover)]',
+    secondary: 'bg-[var(--admin-surface)] text-[var(--admin-text-main)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface-hover)]',
+    danger: 'bg-status-error/10 text-status-error border border-status-error/25 hover:bg-status-error/20',
+    ghost: 'text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)]',
   };
 
   const sizes = {
-    sm: 'px-4 py-2 text-xs gap-1.5',
-    md: 'px-6 py-3 text-sm gap-2',
-    lg: 'px-8 py-4 text-base gap-2.5',
+    sm: 'h-8 px-3 text-xs gap-1.5',
+    md: 'h-9 px-4 text-xs sm:text-sm gap-2',
+    lg: 'h-10 px-5 text-sm gap-2.5',
   };
 
   return (
     <button
       disabled={disabled || isLoading}
       className={`
-        inline-flex items-center justify-center font-bold rounded-xl
-        transition-all duration-200 active:scale-95
+        inline-flex items-center justify-center font-semibold rounded-lg
+        transition-all duration-150 active:scale-[0.985]
         disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
         ${variants[variant]}
         ${sizes[size]}

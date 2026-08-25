@@ -398,30 +398,30 @@ export const ServicesManagement: React.FC = () => {
       )}
 
       {/* Search and Filters */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         {/* Search Input */}
-        <div className="relative w-full lg:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B8B8B]" />
+        <div className="relative w-full lg:w-80">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--admin-text-muted)]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nome ou descrição..."
-            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl pl-9 pr-3 py-2 text-xs text-[var(--admin-text-main)] placeholder-[#8B8B8B] outline-none focus:border-[var(--admin-accent)] transition-colors"
+            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg pl-9 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] placeholder-[var(--admin-text-muted)] outline-none focus:border-[var(--admin-accent)] transition-colors"
           />
         </div>
 
         {/* Filters Group */}
-        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+        <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-between lg:justify-end">
           {/* Category Dropdown */}
           <div className="flex items-center space-x-2">
             <Filter className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-[var(--admin-surface)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-main)] rounded-xl px-3 py-2 outline-none focus:border-[var(--admin-accent)]"
+              className="bg-[var(--admin-surface)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-main)] rounded-lg px-3 py-1.5 outline-none focus:border-[var(--admin-accent)]"
             >
-              <option value="all">Todas</option>
+              <option value="all">Todas categorias</option>
               {DEFAULT_CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -431,12 +431,12 @@ export const ServicesManagement: React.FC = () => {
           </div>
 
           {/* Type Filter Buttons */}
-          <div className="flex items-center bg-[var(--admin-surface)] p-1 rounded-xl border border-[var(--admin-border)]">
+          <div className="flex items-center bg-[var(--admin-surface)] p-0.5 rounded-lg border border-[var(--admin-border)]">
             <button
               onClick={() => setFilterType("all")}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                 filterType === "all"
-                  ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow"
+                  ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
               }`}
             >
@@ -444,59 +444,59 @@ export const ServicesManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setFilterType("combos")}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                 filterType === "combos"
-                  ? "bg-status-success text-white shadow"
+                  ? "bg-status-success text-white"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
               }`}
             >
-              Combos VIP
+              VIPs
             </button>
             <button
               onClick={() => setFilterType("popular")}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                 filterType === "popular"
-                  ? "bg-[var(--admin-accent)]/30 text-[var(--admin-accent)] shadow"
+                  ? "bg-[var(--admin-accent)]/20 text-[var(--admin-accent)]"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
               }`}
             >
-              Mais Pedidos
+              Destaques
             </button>
             <button
               onClick={() => setFilterType("gallery")}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                 filterType === "gallery"
-                  ? "bg-blue-500/30 text-blue-300 shadow"
+                  ? "bg-blue-500/20 text-blue-300"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
               }`}
             >
-              Com Galeria
+              Galeria
             </button>
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-[var(--admin-surface)] p-1 rounded-xl border border-[var(--admin-border)]">
+          <div className="flex items-center bg-[var(--admin-surface)] p-0.5 rounded-lg border border-[var(--admin-border)]">
             <button
               onClick={() => setViewMode("table")}
-              className={`min-h-10 px-2 rounded-lg text-xs transition-all ${
+              className={`h-7 px-2 rounded-md text-xs transition-all ${
                 viewMode === "table"
                   ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
               }`}
               title="Visualização em Tabela"
             >
-              <LayoutGrid className="w-4 h-4" />
+              <LayoutGrid className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`min-h-10 px-2 rounded-lg text-xs transition-all ${
+              className={`h-7 px-2 rounded-md text-xs transition-all ${
                 viewMode === "list"
                   ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
               }`}
               title="Visualização em Lista"
             >
-              <List className="w-4 h-4" />
+              <List className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -546,21 +546,21 @@ export const ServicesManagement: React.FC = () => {
                   return (
                     <tr key={service.id}>
                       <td>
-                        <div className="w-10 h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-center justify-center overflow-hidden relative">
+                        <div className="w-9 h-9 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-center justify-center overflow-hidden relative">
                           {service.image_url || servicePhotos[0] ? (
                             <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <Scissors className="w-5 h-5 text-[var(--admin-text-muted)]" />
+                            <Scissors className="w-4 h-4 text-[var(--admin-text-muted)]" />
                           )}
                           {servicePhotos.length > 0 && (
-                            <span className="absolute bottom-0 right-0 px-1 py-0.5 text-[9px] font-bold bg-[var(--admin-bg)]/80 rounded-tl-md text-[var(--admin-text-main)]">
+                            <span className="absolute bottom-0 right-0 px-1 py-0.2 text-[8px] font-bold bg-[var(--admin-bg)]/85 text-[var(--admin-text-main)]">
                               {servicePhotos.length}
                             </span>
                           )}
                         </div>
                       </td>
                       <td>
-                        <div className="font-bold text-[var(--admin-text-main)] admin-clamp-1">{service.title}</div>
+                        <div className="font-bold text-[var(--admin-text-main)] text-[13px] admin-clamp-1">{service.title}</div>
                         <div className="text-xs text-[var(--admin-text-muted)] admin-clamp-1" title={service.description}>
                           {service.description || "Sem descrição"}
                         </div>
@@ -571,15 +571,15 @@ export const ServicesManagement: React.FC = () => {
                         </span>
                       </td>
                       <td>
-                        <div className="flex items-center space-x-1.5 text-[var(--admin-text-main)] font-semibold">
+                        <div className="flex items-center space-x-1.5 text-[var(--admin-text-main)] font-semibold text-[13px]">
                           <Clock className="w-3.5 h-3.5 text-[var(--admin-text-muted)]" />
                           <span>{service.duration_minutes} min</span>
                         </div>
                       </td>
                       <td>
-                        <div className="font-mono font-bold text-[var(--admin-text-main)]">R$ {service.price.toFixed(2)}</div>
+                        <div className="font-mono font-bold text-[var(--admin-text-main)] text-[13px]">R$ {service.price.toFixed(2)}</div>
                         {service.original_price && service.original_price > service.price && (
-                          <div className="font-mono text-xs text-[var(--admin-text-muted)] line-through">
+                          <div className="font-mono text-[11px] text-[var(--admin-text-muted)] line-through">
                             R$ {service.original_price.toFixed(2)}
                           </div>
                         )}
@@ -589,7 +589,7 @@ export const ServicesManagement: React.FC = () => {
                            <button
                              type="button"
                              onClick={() => handleToggleCombo(service)}
-                             className={`px-2 py-0.5 rounded-lg text-[10px] uppercase font-bold tracking-wider transition-colors ${
+                             className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider transition-colors ${
                                service.is_combo
                                  ? "bg-status-success/10 text-status-success border border-status-success/20"
                                  : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface)]"
@@ -601,7 +601,7 @@ export const ServicesManagement: React.FC = () => {
                            <button
                              type="button"
                              onClick={() => handleTogglePopular(service)}
-                             className={`px-2 py-0.5 rounded-lg text-[10px] uppercase font-bold tracking-wider transition-colors ${
+                             className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider transition-colors ${
                                service.popular
                                  ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border border-[var(--admin-accent)]/20"
                                  : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface)]"
@@ -613,11 +613,11 @@ export const ServicesManagement: React.FC = () => {
                         </div>
                       </td>
                       <td>
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(service)}
-                            className="admin-btn-icon-sm rounded-xl text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)]"
+                            className="admin-btn-icon-sm rounded-md text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)]"
                             title="Editar"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -625,7 +625,7 @@ export const ServicesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleDelete(service.id)}
-                            className="admin-btn-icon-sm rounded-xl text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
+                            className="admin-btn-icon-sm rounded-md text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
                             title="Excluir"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -675,16 +675,16 @@ export const ServicesManagement: React.FC = () => {
                     type="button"
                     onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
                     aria-expanded={isExpanded}
-                    className="w-full min-h-[76px] p-3.5 text-left flex items-center gap-3 hover:bg-[var(--admin-bg)]/40"
+                    className="w-full min-h-[72px] p-3 text-left flex items-center gap-3 hover:bg-[var(--admin-surface-hover)]"
                   >
-                    <div className="w-11 h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0 relative">
+                    <div className="w-10 h-10 rounded-lg bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0 relative">
                       {service.image_url || servicePhotos[0] ? (
                         <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <Scissors className="w-5 h-5 text-[var(--admin-accent)]/70" />
+                        <Scissors className="w-4 h-4 text-[var(--admin-accent)]/70" />
                       )}
                       {servicePhotos.length > 0 && (
-                        <span className="absolute bottom-0 right-0 px-1 text-[9px] font-bold bg-[var(--admin-bg)]/90 text-[var(--admin-text-main)] rounded-tl-md">
+                        <span className="absolute bottom-0 right-0 px-1 text-[8px] font-bold bg-[var(--admin-bg)]/90 text-[var(--admin-text-main)]">
                           {servicePhotos.length}
                         </span>
                       )}
@@ -695,8 +695,8 @@ export const ServicesManagement: React.FC = () => {
                           {categoryName}
                         </p>
                         {service.is_combo && (
-                          <span className="shrink-0 rounded px-1.5 py-0.5 bg-status-success/10 text-status-success border border-status-success/20 text-[10px] font-bold uppercase tracking-wider">
-                            Combo
+                          <span className="shrink-0 rounded-full px-2 py-0.5 bg-status-success/10 text-status-success border border-status-success/20 text-[9px] font-bold uppercase tracking-wider">
+                            VIP
                           </span>
                         )}
                       </div>
@@ -719,29 +719,29 @@ export const ServicesManagement: React.FC = () => {
                     )}
                   </button>
                   {isExpanded && (
-                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3.5 space-y-3">
+                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-3 space-y-2.5">
                       {service.description && (
-                        <p className="text-xs text-[var(--admin-text-muted)] mb-3">{service.description}</p>
+                        <p className="text-xs text-[var(--admin-text-muted)] mb-2.5">{service.description}</p>
                       )}
                       <div className="flex gap-2 border-t border-[var(--admin-border)] pt-2">
                         <button
                           type="button"
                           onClick={() => handleToggleCombo(service)}
-                          className={`flex-1 min-h-10 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                          className={`flex-1 min-h-9 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
                             service.is_combo
                               ? "bg-status-success/10 text-status-success border-status-success/20"
-                              : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:bg-[var(--admin-bg)]"
+                              : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface-hover)]"
                           }`}
                         >
-                           <Flame className="w-3.5 h-3.5" /> Combo
+                           <Flame className="w-3.5 h-3.5" /> VIP
                         </button>
                         <button
                           type="button"
                           onClick={() => handleTogglePopular(service)}
-                          className={`flex-1 min-h-10 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                          className={`flex-1 min-h-9 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
                             service.popular
                               ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border-[var(--admin-accent)]/20"
-                              : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:bg-[var(--admin-bg)]"
+                              : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface-hover)]"
                           }`}
                         >
                            <Star className="w-3.5 h-3.5" /> Destaque
@@ -751,16 +751,16 @@ export const ServicesManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(service)}
-                          className="flex-1 min-h-10 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                          className="flex-1 min-h-9 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                         >
-                          <Edit2 className="w-4 h-4" /> Editar
+                          <Edit2 className="w-3.5 h-3.5" /> Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(service.id)}
-                          className="w-10 h-10 shrink-0 rounded-xl border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center transition-colors"
+                          className="w-9 h-9 shrink-0 rounded-lg border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center transition-colors"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>

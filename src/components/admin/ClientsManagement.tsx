@@ -336,7 +336,7 @@ export const ClientsManagement: React.FC = () => {
       </div>
 
       {/* DESKTOP SEARCH BAR (MD AND UP) */}
-      <div className="hidden md:flex bg-[var(--admin-surface)] px-4 py-3 rounded-xl border border-[var(--admin-border)] justify-between items-center shadow-xs">
+      <div className="hidden md:flex bg-[var(--admin-surface)] px-3.5 py-2.5 rounded-xl border border-[var(--admin-border)] justify-between items-center">
         <div className="relative w-80">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
           <input
@@ -391,7 +391,7 @@ export const ClientsManagement: React.FC = () => {
                     <tr key={client.id}>
                       <td>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-sm shrink-0 overflow-hidden shadow-inner">
+                          <div className="w-9 h-9 rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-xs shrink-0 overflow-hidden">
                             {client.avatarUrl ? (
                               <img src={client.avatarUrl} alt="" className="w-full h-full object-cover" />
                             ) : (
@@ -401,7 +401,7 @@ export const ClientsManagement: React.FC = () => {
                           <div className="min-w-0">
                             <p className="font-bold text-[var(--admin-text-main)] truncate text-[13px]">{client.name || "Sem nome"}</p>
                             {isAdmin && (
-                              <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-500/15 text-purple-400 uppercase tracking-wider border border-purple-500/30">
+                              <span className="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-400 uppercase tracking-wider border border-purple-500/30">
                                 Admin
                               </span>
                             )}
@@ -418,7 +418,7 @@ export const ClientsManagement: React.FC = () => {
                       </td>
                       <td>
                         <div className="flex items-center gap-2">
-                          <span className="inline-block px-2 py-0.5 rounded bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold border border-[var(--admin-accent)]/20 uppercase tracking-wider">
+                          <span className="inline-block px-2.5 py-0.5 rounded-full bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold border border-[var(--admin-accent)]/20 uppercase tracking-wider">
                             {tier}
                           </span>
                           <span className="font-bold text-[var(--admin-text-main)] text-[13px]">
@@ -427,14 +427,14 @@ export const ClientsManagement: React.FC = () => {
                         </div>
                       </td>
                       <td className="text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-1.5">
                           {client.phone && (
                             <a
                               href={`https://wa.me/55${client.phone.replace(/\D/g, "")}`}
                               target="_blank"
                               rel="noreferrer"
                               title="Abrir WhatsApp"
-                              className="admin-btn-icon-sm hover:text-status-success hover:bg-status-success/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded"
+                              className="admin-btn-icon-sm hover:text-status-success hover:bg-status-success/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded-md"
                             >
                               <Phone className="w-4 h-4" />
                             </a>
@@ -443,7 +443,7 @@ export const ClientsManagement: React.FC = () => {
                             type="button"
                             onClick={() => handleOpenModal(client)}
                             title="Editar"
-                            className="admin-btn-icon-sm hover:text-[var(--admin-accent)] hover:bg-[var(--admin-accent)]/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded"
+                            className="admin-btn-icon-sm hover:text-[var(--admin-accent)] hover:bg-[var(--admin-accent)]/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded-md"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -452,7 +452,7 @@ export const ClientsManagement: React.FC = () => {
                             onClick={() => handleDelete(client.id)}
                             disabled={isDeleting}
                             title="Excluir"
-                            className="admin-btn-icon-sm hover:text-status-error hover:bg-status-error/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded disabled:opacity-50"
+                            className="admin-btn-icon-sm hover:text-status-error hover:bg-status-error/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded-md disabled:opacity-50"
                           >
                             {isDeleting && deleteTargetId === client.id ? (
                               <span className="h-3 w-3 animate-spin rounded-full border border-status-error border-t-transparent" />
@@ -467,7 +467,7 @@ export const ClientsManagement: React.FC = () => {
                 })}
                 {filteredClients.length === 0 && !loadError && (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-[var(--admin-text-muted)]">
+                    <td colSpan={4} className="py-8 text-center text-[var(--admin-text-muted)]">
                       Nenhum cliente encontrado.
                     </td>
                   </tr>
@@ -487,7 +487,7 @@ export const ClientsManagement: React.FC = () => {
                 <article
                   key={client.id}
                   style={{ animationDelay: `${Math.min(index, 6) * 24}ms` }}
-                  className={`admin-list-item-enter overflow-hidden rounded-2xl border bg-[var(--admin-surface)] transition-colors ${isExpanded ? "border-[var(--admin-accent)]/50" : "border-[var(--admin-border)]"}`}
+                  className={`admin-list-item-enter overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors ${isExpanded ? "border-[var(--admin-accent)]/50" : "border-[var(--admin-border)]"}`}
                 >
                   <button
                     type="button"
@@ -495,9 +495,9 @@ export const ClientsManagement: React.FC = () => {
                       setExpandedClientId(isExpanded ? null : client.id)
                     }
                     aria-expanded={isExpanded}
-                    className="w-full min-h-[82px] p-3.5 text-left flex items-center gap-3 hover:bg-[var(--admin-bg)]/40 active:scale-[0.995] transition-[transform,background-color] duration-150"
+                    className="w-full min-h-[76px] p-3 text-left flex items-center gap-3 hover:bg-[var(--admin-surface-hover)] active:scale-[0.995] transition-all"
                   >
-                    <div className="w-11 h-11 rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-sm shrink-0 overflow-hidden">
+                    <div className="w-10 h-10 rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-xs shrink-0 overflow-hidden">
                       {client.avatarUrl ? (
                         <img
                           src={client.avatarUrl}
@@ -513,7 +513,7 @@ export const ClientsManagement: React.FC = () => {
                         <h3 className="text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
                           {client.name || "Cliente sem nome"}
                         </h3>
-                        <span className="shrink-0 px-2 py-1 rounded-md bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-[10px] font-bold">
+                        <span className="shrink-0 px-2 py-0.5 rounded-full bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-[10px] font-bold">
                           {tier}
                         </span>
                       </div>
@@ -522,17 +522,17 @@ export const ClientsManagement: React.FC = () => {
                       </p>
                     </div>
                     {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-[var(--admin-accent)] shrink-0" />
+                      <ChevronUp className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-[var(--admin-text-muted)] shrink-0" />
+                      <ChevronDown className="w-4 h-4 text-[var(--admin-text-muted)] shrink-0" />
                     )}
                   </button>
 
                   {isExpanded && (
-                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/35 p-3.5 space-y-3">
+                    <div className="border-t border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-3 space-y-2.5">
                       <div className="grid grid-cols-1 gap-2 text-xs">
-                        <div className="rounded-xl bg-[var(--admin-bg)] p-3">
-                          <p className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider font-bold mb-1.5">
+                        <div className="rounded-lg bg-[var(--admin-surface)] border border-[var(--admin-border)] p-2.5">
+                          <p className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider font-bold mb-1">
                             Contato e Info
                           </p>
                           <p className="text-[var(--admin-text-main)] font-semibold break-words">
@@ -548,12 +548,12 @@ export const ClientsManagement: React.FC = () => {
                             </p>
                           )}
                         </div>
-                        <div className="rounded-xl bg-[var(--admin-bg)] p-3 flex justify-between items-center">
+                        <div className="rounded-lg bg-[var(--admin-surface)] border border-[var(--admin-border)] p-2.5 flex justify-between items-center">
                            <div>
-                             <p className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider font-bold mb-1">
+                             <p className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider font-bold mb-0.5">
                                Pontos
                              </p>
-                             <p className="text-[var(--admin-accent)] font-bold text-base">
+                             <p className="text-[var(--admin-accent)] font-bold text-sm">
                                {client.loyaltyPoints || 0} pts
                              </p>
                            </div>
@@ -573,30 +573,30 @@ export const ClientsManagement: React.FC = () => {
                             href={`https://wa.me/55${client.phone.replace(/\D/g, "")}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex-1 min-h-10 px-3 rounded-xl border border-status-success/30 bg-status-success/5 text-status-success text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                            className="flex-1 min-h-9 px-3 rounded-lg border border-status-success/30 bg-status-success/5 text-status-success text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-98 transition-all"
                           >
-                            <Phone className="w-4 h-4" />
+                            <Phone className="w-3.5 h-3.5" />
                             WhatsApp
                           </a>
                         )}
                         <button
                           type="button"
                           onClick={() => handleOpenModal(client)}
-                          className="flex-1 min-h-10 px-3 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                          className="flex-1 min-h-9 px-3 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-98 transition-all"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-3.5 h-3.5" />
                           Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(client.id)}
                           disabled={isDeleting}
-                          className="flex-none min-h-10 min-w-10 px-3 rounded-xl border border-status-error/25 bg-status-error/5 text-status-error flex items-center justify-center hover:bg-status-error/10 active:scale-95 transition-all disabled:opacity-50"
+                          className="flex-none min-h-9 min-w-9 px-2.5 rounded-lg border border-status-error/25 bg-status-error/5 text-status-error flex items-center justify-center hover:bg-status-error/10 active:scale-98 transition-all disabled:opacity-50"
                         >
                           {isDeleting && deleteTargetId === client.id ? (
-                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-status-error/30 border-t-status-error" />
+                            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-status-error/30 border-t-status-error" />
                           ) : (
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           )}
                         </button>
                       </div>

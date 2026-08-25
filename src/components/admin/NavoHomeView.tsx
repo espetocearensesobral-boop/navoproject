@@ -158,11 +158,11 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
         </div>
       )}
 
-      {/* KPI Cards & Operational State - Structural Redesign */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6" aria-busy={loading}>
+      {/* KPI Cards & Operational State - Clean SaaS Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5" aria-busy={loading}>
         {/* Principal KPIs */}
-        <div className="lg:col-span-8 flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[var(--admin-border)] bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl overflow-hidden shadow-sm">
+        <div className="lg:col-span-8 flex flex-col gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[var(--admin-border)] bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl overflow-hidden">
             {loading ? (
               <>
                 <AdminSkeleton className="h-28" />
@@ -171,13 +171,13 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
               </>
             ) : (
               <>
-                <div className="p-5 flex flex-col justify-between relative group hover:bg-[var(--admin-bg)]/50 transition-colors">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-3">
-                    <Receipt className="w-4 h-4" />
+                <div className="p-4 sm:p-5 flex flex-col justify-between hover:bg-[var(--admin-surface-hover)] transition-colors">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-2.5">
+                    <Receipt className="w-4 h-4 text-[var(--admin-accent)]" />
                     <span className="text-[11px] font-bold uppercase tracking-wider">Faturamento</span>
                   </div>
                   <div>
-                    <p className="text-2xl font-serif font-bold text-status-success tabular-nums">
+                    <p className="text-xl sm:text-2xl font-bold text-status-success tabular-nums">
                       R$ {totalRevenueToday.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
@@ -189,13 +189,13 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
                   </div>
                 </div>
 
-                <div className="p-5 flex flex-col justify-between relative group hover:bg-[var(--admin-bg)]/50 transition-colors">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-3">
-                    <Wallet className="w-4 h-4" />
+                <div className="p-4 sm:p-5 flex flex-col justify-between hover:bg-[var(--admin-surface-hover)] transition-colors">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-2.5">
+                    <Wallet className="w-4 h-4 text-amber-400" />
                     <span className="text-[11px] font-bold uppercase tracking-wider">A Receber</span>
                   </div>
                   <div>
-                    <p className={`text-2xl font-serif font-bold tabular-nums ${pendingAmount > 0 ? "text-amber-400" : "text-[var(--admin-text-main)]"}`}>
+                    <p className={`text-xl sm:text-2xl font-bold tabular-nums ${pendingAmount > 0 ? "text-amber-400" : "text-[var(--admin-text-main)]"}`}>
                       R$ {pendingAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </p>
                     <p className="text-xs text-[var(--admin-text-muted)] mt-1">
@@ -204,13 +204,13 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
                   </div>
                 </div>
 
-                <div className="p-5 flex flex-col justify-between relative group hover:bg-[var(--admin-bg)]/50 transition-colors">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-3">
-                    <CalendarCheck2 className="w-4 h-4" />
+                <div className="p-4 sm:p-5 flex flex-col justify-between hover:bg-[var(--admin-surface-hover)] transition-colors">
+                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-2.5">
+                    <CalendarCheck2 className="w-4 h-4 text-[var(--admin-text-muted)]" />
                     <span className="text-[11px] font-bold uppercase tracking-wider">Ticket Médio</span>
                   </div>
                   <div>
-                    <p className="text-2xl font-serif font-bold text-[var(--admin-text-main)] tabular-nums">
+                    <p className="text-xl sm:text-2xl font-bold text-[var(--admin-text-main)] tabular-nums">
                       R$ {ticketMedio.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
@@ -228,37 +228,37 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
 
         {/* Operational Status (Agora) */}
         <div className="lg:col-span-4">
-          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-5 h-full flex flex-col justify-center shadow-sm">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-[var(--admin-text-muted)] mb-4">
+          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5 h-full flex flex-col justify-center">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-3.5">
               Status Operacional
             </h3>
             {loading ? (
-               <div className="space-y-4">
+               <div className="space-y-3">
                  <AdminSkeleton className="h-6 w-full" />
                  <AdminSkeleton className="h-6 w-3/4" />
                </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-[var(--admin-text-main)]">
                     <UserCheck className="w-4 h-4 text-status-success" />
-                    <span className="text-sm font-semibold">Em atendimento</span>
+                    <span className="text-xs sm:text-sm font-semibold">Em atendimento</span>
                   </div>
-                  <span className="text-base font-bold tabular-nums bg-status-success/10 text-status-success px-2 py-0.5 rounded-lg">{inServiceToday}</span>
+                  <span className="text-xs sm:text-sm font-bold tabular-nums bg-status-success/10 text-status-success px-2.5 py-0.5 rounded-full">{inServiceToday}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-[var(--admin-text-main)]">
                     <Users className="w-4 h-4 text-[var(--admin-accent)]" />
-                    <span className="text-sm font-semibold">Aguardando</span>
+                    <span className="text-xs sm:text-sm font-semibold">Aguardando</span>
                   </div>
-                  <span className="text-base font-bold tabular-nums bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] px-2 py-0.5 rounded-lg">{waitingToday}</span>
+                  <span className="text-xs sm:text-sm font-bold tabular-nums bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] px-2.5 py-0.5 rounded-full">{waitingToday}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-[var(--admin-text-main)]">
                     <AlertTriangle className="w-4 h-4 text-status-error" />
-                    <span className="text-sm font-semibold">Faltas / Cancelados</span>
+                    <span className="text-xs sm:text-sm font-semibold">Faltas / Cancelados</span>
                   </div>
-                  <span className="text-base font-bold tabular-nums bg-status-error/10 text-status-error px-2 py-0.5 rounded-lg">{closedOutToday}</span>
+                  <span className="text-xs sm:text-sm font-bold tabular-nums bg-status-error/10 text-status-error px-2.5 py-0.5 rounded-full">{closedOutToday}</span>
                 </div>
               </div>
             )}

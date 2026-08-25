@@ -181,8 +181,8 @@ export const RelationshipWorkspace: React.FC<{
               tabIndex={-1}
               className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-all duration-200 focus:outline-none ${
                 isOpen
-                  ? "border-[var(--admin-accent)]/40 shadow-xs ring-1 ring-[var(--admin-accent)]/20"
-                  : "border-[var(--admin-border)] hover:border-border-strong hover:bg-[var(--admin-surface)]/80"
+                  ? "border-[var(--admin-accent)]/40 ring-1 ring-[var(--admin-accent)]/20 shadow-xs"
+                  : "border-[var(--admin-border)] hover:border-[var(--admin-border-subtle)] hover:bg-[var(--admin-surface-hover)]"
               }`}
             >
               {/* Cabeçalho do Menu Recolhível Individual */}
@@ -190,24 +190,24 @@ export const RelationshipWorkspace: React.FC<{
                 type="button"
                 onClick={() => toggleSection(section.id)}
                 aria-expanded={isOpen}
-                className="flex min-h-[70px] w-full items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-[var(--admin-bg)] sm:px-5 cursor-pointer"
+                className="flex min-h-[64px] w-full items-center gap-3.5 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-surface-hover)] sm:px-5 cursor-pointer"
               >
                 <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
                     isOpen
                       ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
                       : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"
                   }`}
                 >
-                  <SectionIcon className="h-5 w-5" />
+                  <SectionIcon className="h-4 w-4" />
                 </span>
 
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2">
-                    <span className="truncate text-sm font-bold text-[var(--admin-text-main)] sm:text-[15px]">
+                    <span className="truncate text-sm font-semibold text-[var(--admin-text-main)]">
                       {section.label}
                     </span>
-                    <span className="inline-flex items-center rounded-md bg-[var(--admin-bg)] border border-[var(--admin-border)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--admin-text-muted)] uppercase tracking-wider">
+                    <span className="inline-flex items-center rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2 py-0.5 text-[9px] font-semibold text-[var(--admin-text-muted)] uppercase tracking-wider">
                       {section.category}
                     </span>
                   </span>
@@ -230,7 +230,7 @@ export const RelationshipWorkspace: React.FC<{
 
               {/* Conteúdo Renderizado quando o Menu está Expandido */}
               {isOpen && (
-                <div className="border-t border-[var(--admin-border)] px-3 pb-4 pt-3 sm:px-4 sm:pb-5 animate-in fade-in duration-200">
+                <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/40 p-4 sm:p-5 animate-in fade-in duration-200">
                   {renderSectionContent(section.id)}
                 </div>
               )}

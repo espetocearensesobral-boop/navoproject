@@ -268,12 +268,12 @@ export const ExpensesManagement: React.FC = () => {
       )}
 
       <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-[var(--admin-border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="p-3 sm:p-4 border-b border-[var(--admin-border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h2 className="text-base font-serif font-bold text-[var(--admin-text-main)]">
+            <h2 className="text-sm sm:text-base font-bold text-[var(--admin-text-main)]">
               Saídas
             </h2>
-            <p className="mt-0.5 text-sm text-[var(--admin-text-muted)]">
+            <p className="mt-0.5 text-xs text-[var(--admin-text-muted)]">
               Toda saída entra no Extrato e nos Relatórios.
             </p>
           </div>
@@ -282,8 +282,8 @@ export const ExpensesManagement: React.FC = () => {
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Descrição ou categoria"
-              className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-9 pr-3 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+              placeholder="Buscar descrição ou categoria..."
+              className="w-full h-9 rounded-lg bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-9 pr-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
             />
           </div>
         </div>
@@ -342,14 +342,14 @@ export const ExpensesManagement: React.FC = () => {
                         </div>
                       </td>
                       <td>
-                        <span className="px-2 py-0.5 rounded text-xs font-bold bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)]">
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)]">
                           {expense.category}
                         </span>
                       </td>
-                      <td className="text-[var(--admin-text-muted)]">
+                      <td className="text-[var(--admin-text-muted)] text-xs">
                         {paymentMethods.find(m => m.id === expense.paymentMethod)?.label || expense.paymentMethod}
                       </td>
-                      <td className="text-right font-mono font-bold finance-negative whitespace-nowrap">
+                      <td className="text-right font-mono font-bold finance-negative whitespace-nowrap text-xs sm:text-sm">
                         - {money(Number(expense.amount))}
                       </td>
                       <td>
@@ -357,7 +357,7 @@ export const ExpensesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => openEdit(expense)}
-                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:bg-[var(--admin-accent)]/10"
+                            className="admin-btn-icon-sm rounded-md text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:bg-[var(--admin-surface-hover)]"
                             aria-label={`Editar ${expense.description}`}
                           >
                             <Edit3 className="w-4 h-4" />
@@ -365,7 +365,7 @@ export const ExpensesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleDelete(expense)}
-                            className="admin-btn-icon-sm rounded text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
+                            className="admin-btn-icon-sm rounded-md text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
                             aria-label={`Excluir ${expense.description}`}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -393,7 +393,7 @@ export const ExpensesManagement: React.FC = () => {
                       <h3 className="text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
                         {expense.description}
                       </h3>
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] admin-safe-wrap">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] admin-safe-wrap">
                         {expense.category}
                       </span>
                     </div>
@@ -413,11 +413,11 @@ export const ExpensesManagement: React.FC = () => {
                     <p className="text-sm font-mono font-bold finance-negative">
                       - {money(Number(expense.amount))}
                     </p>
-                    <div className="mt-2 flex justify-end gap-1">
+                    <div className="mt-2 flex justify-end gap-1.5">
                       <button
                         type="button"
                         onClick={() => openEdit(expense)}
-                        className="w-8 h-8 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center"
+                        className="w-8 h-8 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)] flex items-center justify-center transition-colors"
                         aria-label={`Editar ${expense.description}`}
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -425,7 +425,7 @@ export const ExpensesManagement: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleDelete(expense)}
-                        className="w-8 h-8 rounded-lg border border-status-error/25 text-status-error flex items-center justify-center"
+                        className="w-8 h-8 rounded-lg border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center transition-colors"
                         aria-label={`Excluir ${expense.description}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />

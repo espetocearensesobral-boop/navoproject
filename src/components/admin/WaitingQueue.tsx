@@ -538,13 +538,13 @@ export const WaitingQueue: React.FC = () => {
       {/* BUSCA, FILTROS E ABAS */}
       <div className="space-y-3">
         <div className="relative">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar cliente, serviço ou barbeiro..."
-            className="w-full min-h-11 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl pl-10 pr-3.5 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+            className="w-full h-9 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg pl-9 pr-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
           />
         </div>
 

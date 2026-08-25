@@ -62,22 +62,22 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-description"
-        className="relative w-full max-w-md bg-surface-inverse border border-content-inverse/10 rounded-2xl shadow-2xl animate-success-pop overflow-hidden outline-none"
+        className="relative w-full max-w-md bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl shadow-2xl animate-success-pop overflow-hidden outline-none"
       >
         {/* Header */}
-        <div className="p-6 pb-4 flex items-start justify-between">
-          <div className="flex items-start gap-4">
+        <div className="p-5 pb-3 flex items-start justify-between">
+          <div className="flex items-start gap-3.5">
             <div className={`
-              w-12 h-12 rounded-xl flex items-center justify-center shrink-0
+              w-10 h-10 rounded-lg flex items-center justify-center shrink-0
               ${variant === 'danger' 
-                ? 'bg-red-500/10 text-red-400 border border-red-500/20' 
-                : 'bg-accent-solid/10 text-accent-solid border border-accent-solid/20'}
+                ? 'bg-status-error/10 text-status-error border border-status-error/25' 
+                : 'bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border border-[var(--admin-accent)]/25'}
             `}>
-              {icon || <AlertTriangle className="w-6 h-6" />}
+              {icon || <AlertTriangle className="w-5 h-5" />}
             </div>
             <div>
-              <h3 id="confirm-dialog-title" className="text-lg font-bold text-content-inverse">{title}</h3>
-              <p id="confirm-dialog-description" className="text-sm text-content-inverse/60 mt-1 leading-relaxed">{description}</p>
+              <h3 id="confirm-dialog-title" className="text-base font-bold text-[var(--admin-text-main)]">{title}</h3>
+              <p id="confirm-dialog-description" className="text-xs text-[var(--admin-text-muted)] mt-1 leading-relaxed">{description}</p>
             </div>
           </div>
           {!isLoading && (
@@ -85,15 +85,15 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               type="button"
               onClick={onClose}
               aria-label="Fechar confirmação"
-              className="p-1.5 rounded-lg text-content-inverse/60 hover:text-content-inverse hover:bg-content-inverse/10 transition-colors"
+              className="p-1 rounded-md text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)] transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
 
         {/* Actions */}
-        <div className="p-6 pt-2 flex gap-3">
+        <div className="p-5 pt-2 flex gap-2.5">
           <LoadingButton
             variant="secondary"
             className="flex-1"
