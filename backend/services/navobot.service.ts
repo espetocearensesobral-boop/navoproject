@@ -491,15 +491,15 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
   async function askMoreServices(conversation: Conversation, context: BotContext) {
     const services = await getServices(context);
     const selected = services.map((service: any) => `▪️ ${service.title}`).join('\n') || 'Nenhum selecionado';
-    const fallback = `✅ *Serviço anotado:*\n${selected}\n\nDeseja incluir mais algum? Responda *ADICIONAR* ou *CONTINUAR*.`;
+    const fallback = `✅ *Serviço anotado:*\n${selected}\n\nDeseja incluir mais algum? Responda *SIM* ou *NÃO*.`;
     await updateConversation(conversation, 'awaiting_more_services', context);
     return replyButtons(conversation, fallback, {
       title: 'Serviço anotado',
       description: `✅ ${services.length} selecionado(s)\nDeseja incluir mais algum?`,
       footerText: 'NavoBot',
       buttons: [
-        { type: 'reply', id: 'service:add', displayText: 'Adicionar +' },
-        { type: 'reply', id: 'service:done', displayText: 'Avançar ➡️' },
+        { type: 'reply', id: 'service:add', displayText: '👍 Sim' },
+        { type: 'reply', id: 'service:done', displayText: '❌ Não' },
       ],
     });
   }
@@ -969,7 +969,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       const wantsContinue = normalized === 'service:done' || normalized.includes('continuar') || normalized.includes('pronto') || isNegativeConfirmation(text);
       if (wantsAdd && !wantsContinue) return listServices(conversation, context);
       if (wantsContinue) return askProfessional(conversation, context);
-      return reply(conversation, 'Deseja adicionar outro serviço? Responda *ADICIONAR* ou *CONTINUAR*.');
+      return reply(conversation, 'Deseja adicionar outro serviço? Responda *SIM* ou *NÃO*.');
     }
     if (conversation.state === 'awaiting_professional') {
       const db = getDb();
@@ -1154,7 +1154,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const greeting = clientName ? ` ${clientName}` : '';
     if (state === 'awaiting_service') return `Ainda está comigo${greeting}? Posso continuar escolhendo o serviço. Responda com o número ou escreva o nome do serviço.`;
     if (state === 'awaiting_availability_service') return `Ainda está comigo${greeting}? Qual serviço você deseja usar para consultar os horários?`;
-    if (state === 'awaiting_more_services') return `Ainda está comigo${greeting}? Deseja adicionar outro serviço ou continuar? Responda *ADICIONAR* ou *CONTINUAR*.`;
+    if (state === 'awaiting_more_services') return `Ainda está comigo${greeting}? Deseja adicionar outro serviço? Responda *SIM* ou *NÃO*.`;
     if (state === 'awaiting_professional') return `Ainda está comigo${greeting}? Falta escolher o profissional. Responda com o número ou *QUALQUER PROFISSIONAL*.`;
     if (state === 'awaiting_date') return `Ainda está comigo${greeting}? Qual dia você prefere para o atendimento?`;
     if (state === 'awaiting_time') return `Ainda está comigo${greeting}? Informe o horário desejado para continuar.`;

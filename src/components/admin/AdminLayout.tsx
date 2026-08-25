@@ -692,14 +692,6 @@ export const AdminLayout: React.FC = () => {
 
           {/* Mobile Footer */}
           <div className="p-4 border-t border-[var(--admin-border)] shrink-0 space-y-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-            <AdminNotificationCenter
-              notificationsSupported={notificationsSupported}
-              notificationPermission={notificationPermission}
-              notificationsActive={notificationsActive}
-              notificationsBusy={notificationsBusy}
-              onToggleNotifications={toggleNotifications}
-              placement="drawer"
-            />
             <div className="flex items-center gap-2">
               <button
                 type="button"

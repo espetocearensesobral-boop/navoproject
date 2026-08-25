@@ -96,15 +96,13 @@ export const AdminNotificationCenter: React.FC<
       ? `Abrir notificações, ${unreadCount} não lidas`
       : "Abrir notificações";
   const triggerClass =
-    placement === "drawer"
-      ? "w-full h-11 flex items-center justify-center gap-2 px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-main)] hover:border-[var(--admin-accent)]/40 transition-colors"
-      : placement === "topbar"
-        ? "w-10 h-10 flex items-center justify-center rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] active:text-[var(--admin-accent)] active:scale-95 transition-transform"
-        : "w-8 h-8 flex items-center justify-center rounded-xl text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-accent)] active:bg-surface-elevated transition-colors shrink-0";
+    placement === "topbar"
+      ? "w-10 h-10 flex items-center justify-center rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] active:text-[var(--admin-accent)] active:scale-95 transition-transform"
+      : "w-8 h-8 flex items-center justify-center rounded-xl text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-accent)] active:bg-surface-elevated transition-colors shrink-0";
   const activeTriggerClass = notificationsActive ? "text-status-success" : "";
 
   return (
-    <div className={`relative ${placement === "drawer" ? "w-full" : ""}`}>
+    <div className="relative">
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
@@ -117,11 +115,11 @@ export const AdminNotificationCenter: React.FC<
         <span className="relative shrink-0">
           {notificationsActive ? (
             <BellRing
-              className={`${placement === "topbar" ? "w-5 h-5" : placement === "drawer" ? "w-4 h-4" : "w-4 h-4"} text-[var(--admin-accent-text)]`}
+              className={`${placement === "topbar" ? "w-5 h-5" : "w-4 h-4"} text-[var(--admin-accent-text)]`}
             />
           ) : (
             <Bell
-              className={`${placement === "topbar" ? "w-5 h-5" : placement === "drawer" ? "w-4 h-4" : "w-4 h-4"}`}
+              className={`${placement === "topbar" ? "w-5 h-5" : "w-4 h-4"}`}
             />
           )}
           {unreadCount > 0 && (
@@ -130,9 +128,6 @@ export const AdminNotificationCenter: React.FC<
             </span>
           )}
         </span>
-        {placement === "drawer" && (
-          <span className="truncate">Central de notificações</span>
-        )}
       </button>
 
       {open && (
@@ -146,11 +141,7 @@ export const AdminNotificationCenter: React.FC<
           <section
             role="dialog"
             aria-label="Central de notificações"
-            className={`z-[60] flex flex-col overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] shadow-xl animate-fade-in ${
-              placement === "drawer"
-                ? "fixed left-3 right-3 bottom-20 max-h-[min(70vh,28rem)] max-w-sm mx-auto"
-                : "fixed left-3 right-3 top-16 max-h-[min(75vh,28rem)] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[22rem] sm:max-h-[min(75vh,30rem)]"
-            }`}
+            className="z-[60] flex flex-col overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] shadow-xl animate-fade-in fixed left-3 right-3 top-16 max-h-[min(75vh,28rem)] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[22rem] sm:max-h-[min(75vh,30rem)]"
           >
             <header className="flex items-center justify-between gap-2 px-3 py-2.5 border-b border-[var(--admin-border)] bg-[var(--admin-bg)]/40">
               <div className="flex items-center gap-2 min-w-0">
@@ -241,50 +232,37 @@ export const AdminNotificationCenter: React.FC<
               )}
             </div>
 
-            <footer className="p-2 border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/40">
-              <button
-                type="button"
-                onClick={() => void onToggleNotifications()}
-                disabled={isBlocked || notificationsBusy}
-                className={`w-full rounded-lg px-2.5 py-1.5 flex items-center justify-between gap-2 text-left border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                  notificationsActive
-                    ? "border-status-success/30 bg-status-success/[0.04]"
-                    : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:border-[var(--admin-accent)]/40"
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-6 h-6 rounded-md bg-[var(--admin-bg)] flex items-center justify-center shrink-0">
-                    {notificationsActive ? (
-                      <BellRing className="w-3.5 h-3.5 text-status-success" />
-                    ) : (
-                      <Bell className="w-3.5 h-3.5 text-[var(--admin-text-muted)]" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <span
-                      className={`block text-[11px] font-bold leading-tight ${
-                        notificationsActive ? "text-status-success" : "text-[var(--admin-text-main)]"
-                      }`}
-                    >
-                      {notificationsActive ? "Push ativo" : "Push inativo"}
-                    </span>
-                    <span
-                      className={`block text-[10px] truncate leading-tight ${
-                        notificationsActive ? "text-status-success/80" : "text-[var(--admin-text-muted)]"
-                      }`}
-                    >
-                      {pushLabel}
+            <footer className="p-3 border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/40">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BellRing className={`w-4 h-4 ${notificationsActive ? "text-status-success" : "text-[var(--admin-text-muted)]"}`} />
+                    <span className="text-[11px] font-bold text-[var(--admin-text-main)]">
+                      Notificações Push
                     </span>
                   </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={notificationsActive}
+                    onClick={() => void onToggleNotifications()}
+                    disabled={isBlocked || notificationsBusy}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+                      notificationsActive ? "bg-status-success" : "bg-[var(--admin-border)]"
+                    }`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        notificationsActive ? "translate-x-4" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
                 </div>
-                <span
-                  className={`text-[11px] font-bold shrink-0 ${
-                    notificationsActive ? "text-status-success" : "text-[var(--admin-accent)]"
-                  }`}
-                >
-                  {notificationsActive ? "Desativar" : "Ativar"}
-                </span>
-              </button>
+                <p className="text-[10px] leading-tight text-[var(--admin-text-muted)]">
+                  {pushLabel}
+                </p>
+              </div>
             </footer>
           </section>
         </>

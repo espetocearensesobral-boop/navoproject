@@ -762,12 +762,12 @@ appointmentsRouter.post("/", optionalAuth, async (req: any, res) => {
     }
 
     if (newApt.status === 'cancelled') {
-      const msg = `❌ *NAVO BARBER & CLUB*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\nSeu agendamento para *${newApt.date}* às *${newApt.timeSlot}* foi *CANCELADO* com sucesso.\n\nFicamos à disposição para remarcar quando desejar! 💈`;
+      const msg = `❌ *Agendamento Cancelado*\n\nOlá ${newApt.clientName || 'Cliente'}, seu horário de *${newApt.date}* às *${newApt.timeSlot}* foi cancelado.\n\nPara remarcar, basta enviar uma mensagem! 💈`;
       await sendAppointmentWhatsApp(phone, msg);
       notifyClientByEmail(newApt.clientId, newApt, 'cancel');
       notifyShopByEmail(newApt, 'cancel');
     } else {
-      const msg = `💈 *NAVO BARBER & CLUB*\n\nOlá, *${newApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *confirmado* com sucesso:\n\n🔑 *Código:* ${newApt.bookingCode || newApt.id}\n📅 *Data:* ${newApt.date}\n⏰ *Horário:* ${newApt.timeSlot}\n✂️ *Barbeiro:* ${newApt.professionalName || 'Profissional Navo'}\n\n📍 *Local:* Navo Barber & Club - Rua Fortaleza, 1420 - Expectativa, Sobral - CE\n\nTe esperamos com o café pronto! ☕`;
+      const msg = `✅ *Agendamento Confirmado*\n\nOlá ${newApt.clientName || 'Cliente'}! Tudo certo para seu atendimento:\n\n📅 *${newApt.date}* às *${newApt.timeSlot}*\n👤 *${newApt.professionalName || 'Profissional Navo'}*\n📍 Rua Fortaleza, 1420 - Sobral/CE\n\nTe esperamos com o café pronto! ☕`;
       await sendAppointmentWhatsApp(phone, msg);
       notifyClientByEmail(newApt.clientId, newApt, 'booking');
       notifyShopByEmail(newApt, 'booking');
@@ -1224,7 +1224,6 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
           }
         });
 
-
         const scheduleChanged = newDate !== dbApt.date || newTimeSlot !== dbApt.timeSlot || newProfessionalId !== dbApt.professionalId || data.services !== undefined;
         if (scheduleChanged) {
           let phone = updatedApt.clientPhone || '';
@@ -1232,15 +1231,32 @@ appointmentsRouter.put("/:id", sensitiveOpsLimiter, optionalAuth, async (req: an
             const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, updatedApt.clientId) });
             if (profile && profile.phone) phone = profile.phone;
           }
-          const msg = `🔄 *NAVO BARBER & CLUB*\n\nOlá, *${updatedApt.clientName || 'Cliente'}*!\n\nSeu agendamento foi *REAGENDADO* com sucesso:\n\n📅 *Nova Data:* ${updatedApt.date}\n⏰ *Novo Horário:* ${updatedApt.timeSlot}\n✂️ *Barbeiro:* ${updatedApt.professionalName || 'Profissional Navo'}\n\n📍 *Local:* Navo Barber & Club - Rua Fortaleza, 1420 - Expectativa, Sobral - CE\n\nTe esperamos com o café pronto! ☕`;
-
+          const msg = `🔄 *Agendamento Reagendado*\n\nOlá ${updatedApt.clientName || 'Cliente'}! Seu novo horário foi confirmado:\n\n📅 *${updatedApt.date}* às *${updatedApt.timeSlot}*\n👤 *${updatedApt.professionalName || 'Profissional Navo'}*\n📍 Rua Fortaleza, 1420 - Sobral/CE\n\nTe esperamos com o café pronto! ☕`;
           await sendAppointmentWhatsApp(phone, msg);
           notifyClientByEmail(updatedApt.clientId, updatedApt, 'reschedule', dbApt);
           notifyShopByEmail(updatedApt, 'reschedule', dbApt);
         }
 
         invalidateAvailabilityCache();
+
         if (dbApt.status !== updatedApt.status) {
+          let phone = updatedApt.clientPhone || '';
+          if (!updatedApt.clientPhone && updatedApt.clientId) {
+            const profile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, updatedApt.clientId) });
+            if (profile && profile.phone) phone = profile.phone;
+          }
+
+          let clientMsg = '';
+          if (updatedApt.status === 'cancelled') {
+            clientMsg = `❌ *Agendamento Cancelado*\n\nOlá ${updatedApt.clientName || 'Cliente'}, seu horário de *${updatedApt.date}* às *${updatedApt.timeSlot}* foi cancelado pela barbearia.\n\nPara remarcar, basta enviar uma mensagem! 💈`;
+          } else if (updatedApt.status === 'completed') {
+            clientMsg = `💈 *Atendimento Finalizado*\n\n${updatedApt.clientName || 'Cliente'}, muito obrigado pela preferência! Esperamos que tenha gostado do resultado.\n\nAté a próxima!`;
+          }
+          
+          if (clientMsg && phone) {
+            await sendAppointmentWhatsApp(phone, clientMsg);
+          }
+
           const statusPush = updatedApt.status === 'cancelled'
             ? {
                 title: 'Agendamento cancelado',
