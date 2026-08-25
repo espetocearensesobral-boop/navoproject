@@ -36,7 +36,13 @@ import {
 } from "../../services/shopProfileService";
 import { timeToMinutes } from "../../utils/dateUtils";
 
-export const BarbershopProfileManagement: React.FC = () => {
+export interface BarbershopProfileManagementProps {
+  embedded?: boolean;
+}
+
+export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementProps> = ({
+  embedded = false,
+}) => {
   const [profile, setProfile] = useState<ShopProfile>(defaultShopProfile);
   const [savedProfile, setSavedProfile] =
     useState<ShopProfile>(defaultShopProfile);
@@ -193,12 +199,12 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* TAB CONTENT: IDENTIDADE */}
       {activeTab === "info" && (
         <form
-          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-xl space-y-5"
+          className="space-y-4"
           onKeyDown={handleEnterAsTab}
         >
-          <div className="flex items-center gap-2 pb-3 border-b border-[var(--admin-border)]">
+          <div className="flex items-center gap-2 pt-1 pb-1">
             <Store className="w-4 h-4 text-[var(--admin-accent)]" />
-            <h2 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
+            <h2 className="text-sm font-semibold text-[var(--admin-text-main)]">
               Informações da Marca e Unidade
             </h2>
           </div>
@@ -215,7 +221,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                   setProfile((p) => ({ ...p, name: e.target.value }))
                 }
                 placeholder="Ex: Navo Barber & Club"
-                className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
 
@@ -230,7 +236,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                   setProfile((p) => ({ ...p, unitName: e.target.value }))
                 }
                 placeholder="Ex: Unidade Expectativa"
-                className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
@@ -246,7 +252,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 setProfile((p) => ({ ...p, slogan: e.target.value }))
               }
               placeholder="Ex: Estilo, Tradição e Excelência na Medida Certa"
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             />
           </div>
 
@@ -261,12 +267,12 @@ export const BarbershopProfileManagement: React.FC = () => {
                 setProfile((p) => ({ ...p, description: e.target.value }))
               }
               placeholder="Apresente sua barbearia para os clientes no aplicativo..."
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] resize-none"
+              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] resize-none"
             />
           </div>
 
           {/* LOGO DA BARBEARIA / IDENTIDADE VISUAL */}
-          <div className="bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-2xl p-4 sm:p-5 space-y-4">
+          <div className="bg-[var(--admin-bg)]/70 rounded-xl p-4 sm:p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <label className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider block">
@@ -361,7 +367,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                       setProfile((p) => ({ ...p, logoUrl: e.target.value }))
                     }
                     placeholder="https://exemplo.com/sua-logomarca.png"
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
                   />
                   <span className="text-xs text-[var(--admin-text-muted)] mt-1 block">
                     Formatos suportados: PNG, JPG, WEBP ou SVG (Recomendado:
@@ -377,18 +383,18 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* TAB CONTENT: HORÁRIOS */}
       {activeTab === "hours" && (
         <form
-          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-xl space-y-5"
+          className="space-y-4"
           onKeyDown={handleEnterAsTab}
           onSubmit={(e) => e.preventDefault()}
         >
-          <div className="flex items-center justify-between pb-3 border-b border-[var(--admin-border)]">
+          <div className="flex items-center justify-between pt-1 pb-1">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-[var(--admin-accent)]" />
-              <h2 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
+              <h2 className="text-sm font-semibold text-[var(--admin-text-main)]">
                 Horários Semanal
               </h2>
             </div>
-            <div className="text-xs text-[var(--admin-text-muted)] bg-[var(--admin-bg)] px-2.5 py-1 rounded-xl border border-[var(--admin-border)]">
+            <div className="text-xs text-[var(--admin-text-muted)] bg-[var(--admin-bg)] px-2.5 py-1 rounded-xl">
               Slot de atendimento:{" "}
               <strong className="text-[var(--admin-accent)] font-mono">
                 30 minutos
@@ -396,7 +402,7 @@ export const BarbershopProfileManagement: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-[var(--admin-bg)]/80 p-3.5 rounded-xl border border-[var(--admin-border)] text-xs text-[var(--admin-text-muted)] flex items-start gap-2.5">
+          <div className="bg-[var(--admin-bg)]/70 p-3.5 rounded-xl text-xs text-[var(--admin-text-muted)] flex items-start gap-2.5">
             <Info className="w-4 h-4 text-[var(--admin-accent)] shrink-0 mt-0.5" />
             <p>
               Os horários definidos aqui controlam diretamente as opções de
@@ -406,7 +412,7 @@ export const BarbershopProfileManagement: React.FC = () => {
           </div>
 
           {/* GENERAL DEFAULT OPEN & CLOSE TIMES */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[var(--admin-bg)] p-4 rounded-xl border border-[var(--admin-border)]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[var(--admin-bg)]/70 p-4 rounded-xl">
             <div>
               <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider block mb-1">
                 Horário Padrão de Abertura
@@ -417,7 +423,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, openTime: e.target.value }))
                 }
-                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-surface)] rounded-xl p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
             <div>
@@ -430,17 +436,17 @@ export const BarbershopProfileManagement: React.FC = () => {
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, closeTime: e.target.value }))
                 }
-                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-surface)] rounded-xl p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
 
           {/* TOGGLE: HORÁRIO FORA DE EXPEDIENTE COM APROVAÇÃO */}
           <div
-            className={`p-4 rounded-xl border transition-all flex items-start justify-between gap-4 ${
+            className={`p-4 rounded-xl transition-all flex items-start justify-between gap-4 ${
               profile.allowOutsideHoursApproval
-                ? "bg-amber-500/10 border-amber-500/40"
-                : "bg-[var(--admin-bg)] border-[var(--admin-border)]"
+                ? "bg-amber-500/10"
+                : "bg-[var(--admin-bg)]/70"
             }`}
           >
             <div className="flex items-start gap-3">
@@ -492,10 +498,10 @@ export const BarbershopProfileManagement: React.FC = () => {
                 return (
                   <div
                     key={dayItem.key}
-                    className={`p-3 rounded-xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+                    className={`p-3 rounded-xl transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
                       sch.active
-                        ? "bg-[var(--admin-bg)] border-[var(--admin-border)]"
-                        : "bg-[var(--admin-bg)]/40 border-[var(--admin-border)]/50 opacity-60"
+                        ? "bg-[var(--admin-bg)]/80"
+                        : "bg-[var(--admin-bg)]/40 opacity-60"
                     }`}
                   >
                     <div className="flex items-center gap-3 shrink-0">
@@ -520,8 +526,8 @@ export const BarbershopProfileManagement: React.FC = () => {
                       <span
                         className={`text-xs font-bold uppercase px-2 py-0.5 rounded-xl ${
                           sch.active
-                            ? "bg-emerald-950/60 text-emerald-400 border border-emerald-500/30"
-                            : "bg-red-950/60 text-red-400 border border-red-500/30"
+                            ? "bg-emerald-950/60 text-emerald-400"
+                            : "bg-red-950/60 text-red-400"
                         }`}
                       >
                         {sch.active ? "Aberto" : "Fechado"}
@@ -544,7 +550,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                                 e.target.value,
                               )
                             }
-                            className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                            className="bg-[var(--admin-surface)] rounded-xl px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
                           />
                         </div>
 
@@ -566,7 +572,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                                 e.target.value,
                               )
                             }
-                            className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                            className="bg-[var(--admin-surface)] rounded-xl px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
                           />
                         </div>
                       </div>
@@ -582,17 +588,17 @@ export const BarbershopProfileManagement: React.FC = () => {
           </div>
 
           {/* SAMPLE SLOTS GENERATED */}
-          <div className="pt-3 border-t border-[var(--admin-border)]">
+          <div className="pt-2">
             <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider block mb-1">
               Amostra dos Horários Gerados Automaticamente ({sampleSlots.length}{" "}
               horários)
             </label>
-            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] custom-scrollbar">
+            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-[var(--admin-bg)]/70 rounded-xl custom-scrollbar">
               {sampleSlots.length > 0 ? (
                 sampleSlots.map((slot) => (
                   <span
                     key={slot}
-                    className="px-2 py-1 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl text-xs font-mono font-bold text-[var(--admin-accent)]"
+                    className="px-2 py-1 bg-[var(--admin-surface)] rounded-xl text-xs font-mono font-bold text-[var(--admin-accent)]"
                   >
                     {slot}
                   </span>
@@ -610,13 +616,13 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* TAB CONTENT: CANAIS DE CONTATO */}
       {activeTab === "contacts" && (
         <form
-          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-xl space-y-5"
+          className="space-y-4"
           onKeyDown={handleEnterAsTab}
           onSubmit={(e) => e.preventDefault()}
         >
-          <div className="flex items-center gap-2 pb-3 border-b border-[var(--admin-border)]">
+          <div className="flex items-center gap-2 pt-1 pb-1">
             <Phone className="w-4 h-4 text-[var(--admin-accent)]" />
-            <h2 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
+            <h2 className="text-sm font-semibold text-[var(--admin-text-main)]">
               Contatos & Endereço
             </h2>
           </div>
@@ -632,7 +638,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 setProfile((p) => ({ ...p, address: e.target.value }))
               }
               placeholder="Ex: Rua Fortaleza, 1420 - Expectativa, Sobral - CE"
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             />
           </div>
 
@@ -651,7 +657,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                   }))
                 }
                 placeholder="(11) 99999-8888"
-                className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
 
@@ -669,7 +675,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                   }))
                 }
                 placeholder="5511999998888"
-                className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
@@ -689,7 +695,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                   }))
                 }
                 placeholder="(11) 3211-0000"
-                className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
 
@@ -704,7 +710,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                   setProfile((p) => ({ ...p, email: e.target.value }))
                 }
                 placeholder="contato@barbearianavo.com.br"
-                className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
@@ -714,13 +720,13 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* TAB CONTENT: LINKS & REDES SOCIAIS */}
       {activeTab === "links" && (
         <form
-          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-xl space-y-5"
+          className="space-y-4"
           onKeyDown={handleEnterAsTab}
           onSubmit={(e) => e.preventDefault()}
         >
-          <div className="flex items-center gap-2 pb-3 border-b border-[var(--admin-border)]">
+          <div className="flex items-center gap-2 pt-1 pb-1">
             <LinkIcon className="w-4 h-4 text-[var(--admin-accent)]" />
-            <h2 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
+            <h2 className="text-sm font-semibold text-[var(--admin-text-main)]">
               Redes Sociais & Links Externos
             </h2>
           </div>
@@ -730,7 +736,7 @@ export const BarbershopProfileManagement: React.FC = () => {
               Perfil no Instagram (@usuario)
             </label>
             <div className="flex min-w-0">
-              <span className="bg-[var(--admin-bg)] border border-r-0 border-[var(--admin-border)] rounded-l-xl px-3 py-2.5 text-[var(--admin-text-muted)] font-bold text-xs shrink-0 flex items-center">
+              <span className="bg-[var(--admin-bg)] rounded-l-xl px-3 py-2.5 text-[var(--admin-text-muted)] font-bold text-xs shrink-0 flex items-center">
                 @
               </span>
               <input
@@ -743,7 +749,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                   }))
                 }
                 placeholder="barbearianavo"
-                className="flex-1 min-w-0 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-r-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                className="flex-1 min-w-0 bg-[var(--admin-bg)] rounded-r-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
@@ -759,7 +765,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 setProfile((p) => ({ ...p, facebookUrl: e.target.value }))
               }
               placeholder="https://facebook.com/barbearianavo"
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             />
           </div>
 
@@ -774,7 +780,7 @@ export const BarbershopProfileManagement: React.FC = () => {
                 setProfile((p) => ({ ...p, mapsUrl: e.target.value }))
               }
               placeholder="https://maps.google.com/?q=..."
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             />
           </div>
         </form>
@@ -783,8 +789,8 @@ export const BarbershopProfileManagement: React.FC = () => {
       {/* TAB CONTENT: APARÊNCIA E PALETA */}
       {activeTab === "appearance" && <AppearanceTabContent />}
 
-      {/* Ações finais: um único ponto de persistência para todas as abas do perfil. */}
-      <div className="pt-5 mt-2 border-t border-[var(--admin-border)] flex flex-col sm:flex-row sm:justify-end gap-2">
+      {/* Ações finais */}
+      <div className="pt-4 mt-2 flex flex-col sm:flex-row sm:justify-end gap-2">
         <button
           type="button"
           onClick={handleCancel}
@@ -811,11 +817,11 @@ const AppearanceTabContent: React.FC = () => {
   const { palette, setPalette } = useTheme();
 
   return (
-    <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-5 rounded-xl space-y-6 text-xs min-w-0">
+    <div className="space-y-4 text-xs min-w-0">
       <div>
-        <div className="flex items-center gap-2 pb-2 border-b border-[var(--admin-border)] mb-3">
+        <div className="flex items-center gap-2 mb-1">
           <Palette className="w-4 h-4 text-[var(--admin-accent)]" />
-          <h2 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
+          <h2 className="text-sm font-semibold text-[var(--admin-text-main)]">
             Paleta e Identidade Visual do Sistema
           </h2>
         </div>
@@ -835,12 +841,12 @@ const AppearanceTabContent: React.FC = () => {
               type="button"
               onClick={() => setPalette(item.id)}
               aria-pressed={selected}
-              className={`group text-left rounded-xl border p-3 transition-all active:scale-[0.98] ${selected ? "border-[var(--admin-accent)] bg-[var(--admin-accent)]/10 shadow-sm" : "border-[var(--admin-border)] bg-[var(--admin-bg)] hover:border-[var(--admin-accent)]/50 hover:bg-surface-elevated"}`}
+              className={`group text-left rounded-xl p-3 transition-all active:scale-[0.98] ${selected ? "bg-[var(--admin-accent)]/15 shadow-xs ring-1 ring-[var(--admin-accent)]/30" : "bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)]"}`}
             >
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2 min-w-0">
                   <span
-                    className="w-8 h-8 rounded-xl shrink-0 border border-white/10 shadow-inner"
+                    className="w-8 h-8 rounded-xl shrink-0 shadow-inner"
                     style={{
                       background: `linear-gradient(135deg, ${item.accentSoft}, ${item.deep})`,
                     }}
@@ -879,7 +885,7 @@ const AppearanceTabContent: React.FC = () => {
         })}
       </div>
 
-      <div className="pt-4 border-t border-[var(--admin-border)] flex items-start gap-2 text-xs text-[var(--admin-text-muted)]">
+      <div className="pt-2 flex items-start gap-2 text-xs text-[var(--admin-text-muted)]">
         <Palette className="w-4 h-4 text-[var(--admin-accent)] shrink-0 mt-0.5" />
         <p>
           O Dourado Heritage permanece como padrão original. As demais opções

@@ -389,18 +389,18 @@ body,
   background-color: var(--admin-bg);
 }
 
-/* Espaçamento horizontal sem desperdício de margem lateral */
+/* Espaçamento horizontal sem desperdício de margem lateral - aproveitamento total de tela */
 .admin-content-wrapper {
   max-width: 100%;
   width: 100%;
   margin: 0;
-  padding: 16px 24px 48px 24px;
+  padding: 14px 16px 36px 16px;
   box-sizing: border-box;
 }
 
 @media (max-width: 1024px) {
   .admin-content-wrapper {
-    padding: 12px 14px 84px 14px;
+    padding: 10px 12px 72px 12px;
   }
 }
 

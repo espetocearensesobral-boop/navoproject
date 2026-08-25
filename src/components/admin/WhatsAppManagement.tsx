@@ -253,7 +253,7 @@ export const WhatsAppManagement: React.FC = () => {
         </div>
       )}
 
-      <section className="p-4 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl space-y-4">
+      <section className="p-4 bg-[var(--admin-surface)] rounded-xl space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
@@ -277,7 +277,7 @@ export const WhatsAppManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+        <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl bg-[var(--admin-bg)]/70">
           <div className="min-w-0">
             <p className="text-xs font-bold text-[var(--admin-text-main)]">
               Ativar integração
@@ -299,7 +299,7 @@ export const WhatsAppManagement: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl border border-[var(--admin-accent)]/30 bg-[var(--admin-accent)]/5">
+        <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl bg-[var(--admin-accent)]/10">
           <div className="min-w-0">
             <p className="text-xs font-bold text-[var(--admin-text-main)]">
               Ativar NavoBot
@@ -322,7 +322,7 @@ export const WhatsAppManagement: React.FC = () => {
           </button>
         </div>
 
-        <label className="block p-3.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] space-y-2">
+        <label className="block p-3.5 rounded-xl bg-[var(--admin-bg)]/70 space-y-2">
           <span className="block text-xs font-bold text-[var(--admin-text-main)]">
             Tipo de conta conectada por QR Code
           </span>
@@ -335,7 +335,7 @@ export const WhatsAppManagement: React.FC = () => {
                   .value as EvolutionApiSettings["whatsappAccountType"],
               )
             }
-            className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+            className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
           >
             <option value="personal_qr">WhatsApp pessoal</option>
             <option value="business_qr">WhatsApp Business</option>
@@ -347,7 +347,7 @@ export const WhatsAppManagement: React.FC = () => {
           </span>
         </label>
 
-        <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+        <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl bg-[var(--admin-bg)]/70">
           <div className="min-w-0">
             <p className="text-xs font-bold text-[var(--admin-text-main)]">
               Mensagens interativas (botões e listas)
@@ -382,7 +382,7 @@ export const WhatsAppManagement: React.FC = () => {
               value={settings.baseUrl}
               onChange={(event) => update("baseUrl", event.target.value)}
               placeholder="http://129.159.50.100:8080"
-              className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-w-0"
+              className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
             />
             <span className="block text-xs text-[var(--admin-text-muted)]">
               Não inclua a rota final, como `/instance` ou `/message`.
@@ -396,7 +396,7 @@ export const WhatsAppManagement: React.FC = () => {
               value={settings.instanceName}
               onChange={(event) => update("instanceName", event.target.value)}
               placeholder="navo-bot"
-              className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-w-0"
+              className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
             />
           </label>
           <label className="space-y-1">
@@ -416,7 +416,7 @@ export const WhatsAppManagement: React.FC = () => {
                     ? "••••••••"
                     : "Cole a chave da Evolution API"
                 }
-                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 pr-10 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-w-0"
+                className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 pr-10 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
               />
               <button
                 type="button"
@@ -434,7 +434,7 @@ export const WhatsAppManagement: React.FC = () => {
           </label>
         </div>
 
-        <div className="p-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] space-y-3">
+        <div className="p-3.5 rounded-xl bg-[var(--admin-bg)]/70 space-y-3">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="text-xs font-bold text-[var(--admin-text-main)]">
@@ -466,7 +466,7 @@ export const WhatsAppManagement: React.FC = () => {
                   value={settings.webhookUrl}
                   onChange={(event) => update("webhookUrl", event.target.value)}
                   placeholder="https://seu-dominio.com/api/webhooks/evolution"
-                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-w-0"
+                  className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                 />
               </label>
               <label className="space-y-1 block">
@@ -485,7 +485,7 @@ export const WhatsAppManagement: React.FC = () => {
                   placeholder={
                     settings.hasWebhookSecret ? "••••••••" : "Defina um segredo"
                   }
-                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-w-0"
+                  className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                 />
               </label>
             </div>
@@ -499,7 +499,7 @@ export const WhatsAppManagement: React.FC = () => {
                 saving ||
                 (!settings.webhookEnabled && !settings.webhookUrl)
               }
-              className="h-9 w-full sm:w-auto px-4 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+              className="h-9 w-full sm:w-auto px-4 rounded-xl bg-[var(--admin-surface)] hover:bg-surface-elevated text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
             >
               <Wifi className="w-3.5 h-3.5" />
               {applyingWebhook ? "Aplicando..." : "Aplicar webhook"}
@@ -507,7 +507,7 @@ export const WhatsAppManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-2 border-t border-[var(--admin-border)]">
+        <div className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-2">
           <button
             type="button"
             onClick={() => void handleTest()}
@@ -529,7 +529,7 @@ export const WhatsAppManagement: React.FC = () => {
         </div>
       </section>
 
-      <section className="p-4 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl space-y-3">
+      <section className="p-4 bg-[var(--admin-surface)] rounded-xl space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
@@ -546,7 +546,7 @@ export const WhatsAppManagement: React.FC = () => {
             type="button"
             onClick={() => void handleAiTest()}
             disabled={testingAi}
-            className="h-9 px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-main)] font-bold text-xs flex items-center gap-2 shrink-0 disabled:opacity-50"
+            className="h-9 px-3 rounded-xl bg-[var(--admin-bg)]/80 text-[var(--admin-text-main)] font-bold text-xs flex items-center gap-2 shrink-0 disabled:opacity-50"
           >
             <Loader2
               className={`w-3.5 h-3.5 ${testingAi ? "animate-spin" : ""}`}
@@ -556,7 +556,7 @@ export const WhatsAppManagement: React.FC = () => {
         </div>
         {aiResult && (
           <div
-            className={`p-3 rounded-xl border text-xs ${aiResult.ok ? "border-status-success/30 bg-status-success/10 text-status-success" : "border-status-error/30 bg-status-error/10 text-status-error"}`}
+            className={`p-3 rounded-xl text-xs ${aiResult.ok ? "bg-status-success/10 text-status-success" : "bg-status-error/10 text-status-error"}`}
           >
             <p className="font-bold">{aiResult.message}</p>
             <p className="mt-1">
@@ -568,7 +568,7 @@ export const WhatsAppManagement: React.FC = () => {
         )}
       </section>
 
-      <section className="p-4 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl space-y-3">
+      <section className="p-4 bg-[var(--admin-surface)] rounded-xl space-y-3">
         <div>
           <h2 className="text-sm font-bold text-[var(--admin-text-main)]">
             Mensagem de teste
@@ -588,7 +588,7 @@ export const WhatsAppManagement: React.FC = () => {
               onChange={(event) => setTestNumber(event.target.value)}
               placeholder="5511999998888"
               inputMode="tel"
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-w-0"
+              className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
             />
           </label>
           <label className="space-y-1 sm:col-span-2">
@@ -598,7 +598,7 @@ export const WhatsAppManagement: React.FC = () => {
             <input
               value={testText}
               onChange={(event) => setTestText(event.target.value)}
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-w-0"
+              className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
             />
           </label>
         </div>
@@ -607,7 +607,7 @@ export const WhatsAppManagement: React.FC = () => {
             type="button"
             onClick={() => void handleSendTest()}
             disabled={sending || !testNumber.trim() || !testText.trim()}
-            className="h-10 w-full sm:w-auto px-4 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+            className="h-10 w-full sm:w-auto px-4 rounded-xl bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
           >
             <Send className="w-4 h-4" />
             {sending ? "Enviando..." : "Enviar mensagem de teste"}
@@ -615,7 +615,7 @@ export const WhatsAppManagement: React.FC = () => {
         </div>
       </section>
 
-      <div className="p-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-xs text-[var(--admin-text-muted)]">
+      <div className="p-3 rounded-xl bg-[var(--admin-bg)]/60 text-xs text-[var(--admin-text-muted)]">
         Para ativar o NavoBot, informe uma URL pública HTTPS no webhook, defina
         um segredo, salve a configuração, aplique o webhook e só então ative o
         agente. A Evolution API enviará eventos da instância para{" "}

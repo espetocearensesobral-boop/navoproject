@@ -111,7 +111,7 @@ export const QrCodeManagement: React.FC = () => {
       {/* Main Container */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Printable Card Totem */}
-        <div className="qr-print-sheet bg-[var(--admin-surface)] border border-[var(--admin-accent)]/40 rounded-2xl p-6 text-center space-y-4 shadow-md bg-[var(--admin-accent)]/5 font-serif relative overflow-hidden">
+        <div className="qr-print-sheet bg-[var(--admin-surface)] rounded-2xl p-6 text-center space-y-4 font-serif relative overflow-hidden">
           <div className="qr-print-brand space-y-1">
             <h2 className="text-2xl font-bold tracking-widest uppercase text-[var(--admin-text-main)]">
               NAVO PREMIUM
@@ -122,7 +122,7 @@ export const QrCodeManagement: React.FC = () => {
           </div>
 
           {/* QR Code Container */}
-          <div className="qr-print-code bg-[var(--admin-bg)] p-4 rounded-2xl border-2 border-[var(--admin-accent)]/60 inline-block shadow-inner mx-auto">
+          <div className="qr-print-code bg-[var(--admin-bg)]/80 p-4 rounded-2xl inline-block mx-auto">
             <QRCodeSVG
               value={bookingUrl}
               size={220}
@@ -130,7 +130,7 @@ export const QrCodeManagement: React.FC = () => {
               includeMargin
               fgColor="#111111"
               bgColor="#ffffff"
-              className="mx-auto"
+              className="mx-auto rounded-lg"
             />
           </div>
 
@@ -145,7 +145,7 @@ export const QrCodeManagement: React.FC = () => {
         </div>
 
         {/* Link & Digital Sharing Options */}
-        <div className="qr-print-exclude bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 space-y-5 shadow-xs flex flex-col justify-between">
+        <div className="qr-print-exclude bg-[var(--admin-surface)] rounded-2xl p-6 space-y-5 flex flex-col justify-between">
           <div className="space-y-3">
             <h3 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
               <Share2 className="w-4 h-4 text-[var(--admin-accent)]" />
@@ -155,7 +155,7 @@ export const QrCodeManagement: React.FC = () => {
               Cole na bio, no WhatsApp ou envie aos clientes.
             </p>
 
-            <div className="flex items-center gap-2 bg-[var(--admin-bg)] p-2.5 rounded-xl border border-[var(--admin-border)]">
+            <div className="flex items-center gap-2 bg-[var(--admin-bg)]/80 p-2.5 rounded-xl">
               <input
                 type="text"
                 readOnly
@@ -182,7 +182,7 @@ export const QrCodeManagement: React.FC = () => {
             )}
           </div>
 
-          <div className="pt-4 border-t border-[var(--admin-border)] space-y-2">
+          <div className="pt-4 space-y-2">
             <span className="text-xs font-bold uppercase text-[var(--admin-text-muted)] block">
               Ações rápidas
             </span>
@@ -190,7 +190,7 @@ export const QrCodeManagement: React.FC = () => {
               href={bookingUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] hover:border-[var(--admin-accent)]/50 text-[var(--admin-text-main)] p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
+              className="w-full bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
             >
               <ExternalLink className="w-4 h-4 text-[var(--admin-accent)]" />
               <span>Testar Link do Cliente</span>

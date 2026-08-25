@@ -205,17 +205,17 @@ export const SystemWorkspace: React.FC<{
                     key={opt.id}
                     type="button"
                     onClick={() => setActiveOperationTab(opt.id)}
-                    className={`flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                    className={`flex items-center gap-2.5 p-2.5 rounded-lg text-left transition-all cursor-pointer ${
                       isSelected
-                        ? "border-[var(--admin-accent)]/40 bg-[var(--admin-accent)]/10 text-[var(--admin-text-main)] ring-1 ring-[var(--admin-accent)]/20"
-                        : "border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:border-[var(--admin-border-subtle)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)]"
+                        ? "bg-[var(--admin-accent)]/15 text-[var(--admin-text-main)] font-semibold"
+                        : "bg-[var(--admin-bg)]/60 text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)]"
                     }`}
                   >
                     <span
                       className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${
                         isSelected
-                          ? "bg-[var(--admin-accent)]/20 text-[var(--admin-accent)]"
-                          : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"
+                          ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
+                          : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"
                       }`}
                     >
                       <OptIcon className="h-3.5 w-3.5" />
@@ -224,13 +224,13 @@ export const SystemWorkspace: React.FC<{
                       <span
                         className={`block truncate text-xs font-semibold ${
                           isSelected
-                            ? "text-[var(--admin-accent)]"
-                            : "text-[var(--admin-text-main)]"
+                            ? "text-[var(--admin-text-main)]"
+                            : "text-[var(--admin-text-muted)]"
                         }`}
                       >
                         {opt.label}
                       </span>
-                      <span className="block truncate text-[10px] text-[var(--admin-text-muted)]">
+                      <span className="block truncate text-[10px] text-[var(--admin-text-muted)] opacity-80">
                         {opt.description}
                       </span>
                     </div>
@@ -240,7 +240,7 @@ export const SystemWorkspace: React.FC<{
             </div>
 
             {/* Conteúdo Renderizado do Submódulo Selecionado */}
-            <div className="pt-2 border-t border-[var(--admin-border)]">
+            <div className="pt-2">
               {activeOperationTab === "unit" && <BarbershopProfileManagement />}
               {activeOperationTab === "preferences" && (
                 <SettingsManagement initialTab="email" hideTabs />
@@ -318,10 +318,10 @@ export const SystemWorkspace: React.FC<{
                 sectionRefs.current[section.id] = el;
               }}
               tabIndex={-1}
-              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-all duration-200 focus:outline-none ${
+              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl transition-all duration-200 focus:outline-none ${
                 isOpen
-                  ? "border-[var(--admin-accent)]/40 ring-1 ring-[var(--admin-accent)]/20 shadow-xs"
-                  : "border-[var(--admin-border)] hover:border-[var(--admin-border-subtle)] hover:bg-[var(--admin-surface-hover)]"
+                  ? "bg-[var(--admin-surface)] ring-1 ring-[var(--admin-accent)]/25 shadow-xs"
+                  : "bg-[var(--admin-surface)]/70 hover:bg-[var(--admin-surface)]"
               }`}
             >
               {/* Cabeçalho do Menu Individual */}
@@ -329,13 +329,13 @@ export const SystemWorkspace: React.FC<{
                 type="button"
                 onClick={() => toggleSection(section.id)}
                 aria-expanded={isOpen}
-                className="flex min-h-[64px] w-full items-center gap-3.5 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-surface-hover)] sm:px-5 cursor-pointer"
+                className="flex min-h-[60px] w-full items-center gap-3.5 px-4 py-3 text-left transition-colors sm:px-5 cursor-pointer"
               >
                 <span
                   className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
                     isOpen
                       ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
-                      : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"
+                      : "bg-[var(--admin-bg)]/80 text-[var(--admin-text-muted)]"
                   }`}
                 >
                   <SectionIcon className="h-4 w-4" />
@@ -346,7 +346,7 @@ export const SystemWorkspace: React.FC<{
                     <span className="truncate text-sm font-semibold text-[var(--admin-text-main)]">
                       {section.label}
                     </span>
-                    <span className="inline-flex items-center rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2 py-0.5 text-[9px] font-semibold text-[var(--admin-text-muted)] uppercase tracking-wider">
+                    <span className="inline-flex items-center rounded-full bg-[var(--admin-bg)] px-2 py-0.5 text-[9px] font-semibold text-[var(--admin-text-muted)] uppercase tracking-wider">
                       {section.category}
                     </span>
                   </span>
@@ -364,7 +364,7 @@ export const SystemWorkspace: React.FC<{
 
               {/* Conteúdo Renderizado quando o Menu está Expandido */}
               {isOpen && (
-                <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/40 p-4 sm:p-5 animate-in fade-in duration-200">
+                <div className="px-4 pb-5 pt-1 sm:px-5 animate-in fade-in duration-200">
                   {renderSectionContent(section.id)}
                 </div>
               )}

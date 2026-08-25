@@ -397,8 +397,9 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
         </section>
       )}
 
+      {/* Cards de Status e Políticas */}
       <section className="grid gap-4 lg:grid-cols-[1.15fr_.85fr]">
-        <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5">
+        <div className="rounded-xl bg-[var(--admin-surface)] p-4 sm:p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]">
@@ -426,7 +427,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
           </div>
           {connected ? (
             <div className="mt-4 space-y-2 text-sm">
-              <div className="flex justify-between gap-3 border-b border-[var(--admin-border)] pb-2">
+              <div className="flex justify-between gap-3 pb-2">
                 <span className="text-[var(--admin-text-muted)]">
                   Usuário Meta
                 </span>
@@ -434,7 +435,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
                   {connection?.metaUserName || "Autorizado"}
                 </strong>
               </div>
-              <div className="flex justify-between gap-3 border-b border-[var(--admin-border)] pb-2">
+              <div className="flex justify-between gap-3 pb-2">
                 <span className="text-[var(--admin-text-muted)]">
                   Conta de anúncios
                 </span>
@@ -462,7 +463,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
                   type="button"
                   onClick={refreshAssets}
                   disabled={busy}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--admin-border)] px-3 text-xs font-bold text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-bg)] disabled:opacity-50"
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-xl bg-[var(--admin-bg)]/70 px-3 text-xs font-bold text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-bg)] disabled:opacity-50"
                 >
                   <RefreshCw
                     className={`h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`}
@@ -473,14 +474,14 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
                   type="button"
                   onClick={() => setDisconnectOpen(true)}
                   disabled={busy}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-red-500/30 px-3 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/10 disabled:opacity-50"
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-xl bg-red-500/10 px-3 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
                 >
                   <LogOut className="h-3.5 w-3.5" /> Desconectar
                 </button>
               </div>
             </div>
           ) : (
-            <div className="mt-4 rounded-xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-bg)] p-4 text-sm text-[var(--admin-text-muted)]">
+            <div className="mt-4 rounded-xl bg-[var(--admin-bg)]/70 p-4 text-sm text-[var(--admin-text-muted)]">
               <p>
                 {CAMPAIGNS_DEMO_MODE
                   ? "A demonstração foi desconectada apenas localmente. A integração real poderá ser configurada depois."
@@ -498,7 +499,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
           )}
         </div>
 
-        <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5">
+        <div className="rounded-xl bg-[var(--admin-surface)] p-4 sm:p-5">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-300">
               <ShieldCheck className="h-4 w-4" />
@@ -545,7 +546,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
       </section>
 
       {connected && (
-        <section className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5">
+        <section className="rounded-xl bg-[var(--admin-surface)] p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="text-sm font-bold text-[var(--admin-text-main)]">
@@ -572,7 +573,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
               <select
                 value={accountId}
                 onChange={(event) => setAccountId(event.target.value)}
-                className="mt-1.5 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
+                className="mt-1.5 h-10 w-full rounded-xl bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               >
                 <option value="">Selecione</option>
                 {accounts.map((account) => (
@@ -587,7 +588,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
               <select
                 value={pageId}
                 onChange={(event) => setPageId(event.target.value)}
-                className="mt-1.5 h-10 w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
+                className="mt-1.5 h-10 w-full rounded-xl bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               >
                 <option value="">Selecione</option>
                 {pages.map((page) => (
