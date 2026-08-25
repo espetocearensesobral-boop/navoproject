@@ -24,7 +24,7 @@
   /* Estrutura */
   --admin-sidebar-width: 260px;
   --admin-header-height: 56px;
-  --admin-content-max-width: 1440px;
+  --admin-content-max-width: 100%;
   --admin-radius-sm: 6px;
   --admin-radius-md: 8px;
   --admin-radius-lg: 12px;
@@ -75,7 +75,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  height: 40px;
+  height: 48px;
   padding: 0 var(--space-4);
   font-size: var(--text-body);
   font-weight: 600;
@@ -152,7 +152,7 @@
 
 .admin-btn-icon {
   width: 40px;
-  height: 40px;
+  height: 48px;
   padding: 0;
   border-radius: var(--admin-radius-md);
   color: var(--admin-text-muted);
@@ -166,14 +166,14 @@
 
 /* Tamanhos Menores */
 .admin-btn-sm {
-  height: 32px;
-  padding: 0 var(--space-3);
+  height: 36px;
+  padding: 0 16px;
   font-size: var(--text-body-sm);
   gap: var(--space-1);
 }
 .admin-btn-icon-sm {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   gap: 0;
 }
@@ -185,7 +185,7 @@
   background-color: var(--admin-surface);
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-lg);
-  padding: var(--space-4);
+  padding: 24px;
 }
 .admin-card-header {
   margin-bottom: var(--space-4);
@@ -222,12 +222,12 @@
   font-weight: 600;
   text-transform: uppercase;
   color: var(--admin-text-muted);
-  padding: var(--space-3) var(--space-4);
+  padding: 20px 32px;
   border-bottom: 1px solid var(--admin-border);
   background-color: color-mix(in srgb, var(--admin-bg) 50%, var(--admin-surface));
 }
 .admin-table td {
-  padding: var(--space-3) var(--space-4);
+  padding: 20px 32px;
   font-size: var(--text-body);
   border-bottom: 1px solid var(--admin-border);
   vertical-align: middle;
@@ -288,12 +288,12 @@
   max-width: var(--admin-content-max-width);
   width: 100%;
   margin: 0 auto;
-  padding: var(--space-6);
+  padding: 32px 48px;
 }
 
 @media (max-width: 1024px) {
   .admin-content-wrapper {
-    padding: var(--space-4);
+    padding: 24px;
     padding-bottom: 80px; /* Espaço para nav inferior */
   }
 }
@@ -308,8 +308,8 @@
   margin-bottom: var(--space-4);
 }
 .admin-input {
-  height: 40px;
-  padding: 0 var(--space-3);
+  height: 48px;
+  padding: 0 16px;
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-md);
   background-color: var(--admin-bg);
