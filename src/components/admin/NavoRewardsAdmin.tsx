@@ -1796,7 +1796,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             <form
               onKeyDown={handleEnterAsTab}
               onSubmit={handleManualPointsSubmit}
-              className="space-y-3 max-w-xl text-xs"
+              className="space-y-3 w-full text-xs"
             >
               <div>
                 <label className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider mb-1">
@@ -1885,7 +1885,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           </div>
 
           {/* Validador de Voucher */}
-          <div className="bg-[var(--admin-surface)] p-4 rounded-xl border border-[var(--admin-border)] space-y-2.5 max-w-xl">
+          <div className="bg-[var(--admin-surface)] p-4 rounded-xl border border-[var(--admin-border)] space-y-2.5 w-full">
             <h4 className="text-xs font-bold uppercase text-[var(--admin-accent)] tracking-wider flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" /> Validar Código de Voucher
               do Cliente
@@ -2193,7 +2193,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               <span>Link de indicação</span>
             </h3>
 
-            <div className="space-y-3 max-w-2xl text-xs">
+            <div className="space-y-3 w-full text-xs">
               <div>
                 <label className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider mb-1">
                   Cliente remetente
@@ -2286,7 +2286,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               </button>
             </div>
 
-            <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2 max-w-2xl">
+            <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2 w-full">
               <span className="text-xs font-bold uppercase text-[var(--admin-text-muted)] block">
                 Link Público da Pesquisa NPS
               </span>

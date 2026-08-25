@@ -221,7 +221,7 @@ const EmailSettingsTab: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl text-xs min-w-0">
+    <div className="space-y-6 w-full text-xs min-w-0">
       <div>
         <h2 className="text-sm font-serif font-bold text-[var(--admin-text-main)] mb-0.5 truncate">
           Envio de E-mails (SMTP)
@@ -680,7 +680,7 @@ const PrintSettingsTab: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 max-w-4xl text-xs min-w-0">
+    <div className="space-y-6 w-full text-xs min-w-0">
       <div>
         <h2 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
           Impressões

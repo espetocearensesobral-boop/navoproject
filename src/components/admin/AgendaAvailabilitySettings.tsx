@@ -117,7 +117,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl min-w-0">
+    <div className="space-y-6 w-full min-w-0">
       <div>
         <div className="flex items-center gap-2 mb-1">
           <CalendarDays className="w-5 h-5 text-[var(--admin-accent)]" />

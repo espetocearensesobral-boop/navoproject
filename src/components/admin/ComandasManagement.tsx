@@ -703,7 +703,7 @@ export const ComandasManagement: React.FC = () => {
         <form
           onKeyDown={handleEnterAsTab}
           onSubmit={handleCreateComanda}
-          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-5 space-y-5 shadow-xs max-w-2xl mx-auto"
+          className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 space-y-5 shadow-xs w-full max-w-4xl mx-auto"
         >
           <div className="border-b border-[var(--admin-border)] pb-3">
             <h2 className="text-base font-bold text-[var(--admin-text-main)] flex items-center gap-2">
