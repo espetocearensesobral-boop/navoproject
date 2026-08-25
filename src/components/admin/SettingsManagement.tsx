@@ -91,29 +91,33 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({
     }
   };
 
+  if (hideTabs) {
+    return (
+      <div className="animate-in fade-in duration-200 min-w-0">
+        {renderContent()}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 animate-in fade-in duration-300 min-w-0">
       <AdminPageHeader icon={Settings} title="Configurações do Sistema" />
 
-      {!hideTabs && (
-        <>
-          {/* TAB BAR */}
-          <AdminTabs
-            tabs={[
-              { id: "email", label: "E-mail", icon: Mail },
-              { id: "whatsapp", label: "WhatsApp", icon: MessageSquare },
-              { id: "qrcode", label: "QR Code", icon: QrCode },
-              { id: "audit", label: "Auditoria", icon: ShieldCheck },
-              { id: "availability", label: "Agenda", icon: CalendarDays },
-              { id: "print", label: "Impressões", icon: Printer },
-              { id: "meta_ads", label: "Meta Ads", icon: Target },
-              { id: "google_ads", label: "Google Ads", icon: Target },
-            ]}
-            activeId={activeTab}
-            onChange={(id) => setActiveTab(id as SettingsTab)}
-          />
-        </>
-      )}
+      {/* TAB BAR */}
+      <AdminTabs
+        tabs={[
+          { id: "email", label: "E-mail", icon: Mail },
+          { id: "whatsapp", label: "WhatsApp", icon: MessageSquare },
+          { id: "qrcode", label: "QR Code", icon: QrCode },
+          { id: "audit", label: "Auditoria", icon: ShieldCheck },
+          { id: "availability", label: "Agenda", icon: CalendarDays },
+          { id: "print", label: "Impressões", icon: Printer },
+          { id: "meta_ads", label: "Meta Ads", icon: Target },
+          { id: "google_ads", label: "Google Ads", icon: Target },
+        ]}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as SettingsTab)}
+      />
 
       {/* MAIN CONTENT AREA */}
       <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-6 min-w-0">

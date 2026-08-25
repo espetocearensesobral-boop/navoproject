@@ -1,10 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
   ChevronDown,
   Globe2,
-  Mail,
-  Megaphone,
   MessageSquare,
   Printer,
   QrCode,
@@ -14,10 +12,10 @@ import {
   Target,
 } from "lucide-react";
 import { BarbershopProfileManagement } from "./BarbershopProfileManagement";
-import { SettingsManagement, type SettingsTab } from "./SettingsManagement";
+import { SettingsManagement } from "./SettingsManagement";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 
-type SystemTab =
+export type SystemTab =
   | "unit"
   | "preferences"
   | "availability"
@@ -27,257 +25,347 @@ type SystemTab =
   | "audit"
   | "meta_ads"
   | "google_ads";
-type SystemGroupId = "operation" | "communication" | "marketing" | "security";
 
-type SystemOption = {
-  id: SystemTab;
+export type SystemSectionId =
+  | "operation"
+  | "notifications"
+  | "qrcode"
+  | "meta_ads"
+  | "google_ads"
+  | "audit";
+
+type OperationSubTab = "unit" | "preferences" | "availability" | "print";
+
+type OperationOption = {
+  id: OperationSubTab;
   label: string;
   description: string;
   icon: React.ElementType;
 };
-type SystemGroup = {
-  id: SystemGroupId;
-  label: string;
-  summary: string;
-  icon: React.ElementType;
-  options: SystemOption[];
-};
 
-const groups: SystemGroup[] = [
+const operationOptions: OperationOption[] = [
   {
-    id: "operation",
-    label: "Operação da unidade",
-    summary: "Perfil, agenda, preferências e impressões",
+    id: "unit",
+    label: "Unidade",
+    description: "Nome, endereço, logotipo e identidade visual",
     icon: Store,
-    options: [
-      {
-        id: "unit",
-        label: "Unidade",
-        description: "Nome, endereço e identidade da operação",
-        icon: Store,
-      },
-      {
-        id: "preferences",
-        label: "Preferências",
-        description: "E-mail, avisos e preferências gerais",
-        icon: Settings,
-      },
-      {
-        id: "availability",
-        label: "Agenda",
-        description: "Disponibilidade e regras de atendimento",
-        icon: CalendarDays,
-      },
-      {
-        id: "print",
-        label: "Impressões",
-        description: "Comprovantes, relatórios e QR Code",
-        icon: Printer,
-      },
-    ],
   },
   {
-    id: "communication",
-    label: "Comunicação e canais",
-    summary: "WhatsApp, notificações, e-mail e QR Code",
-    icon: MessageSquare,
-    options: [
-      {
-        id: "notifications",
-        label: "Notificações",
-        description: "E-mail e mensagens de atendimento",
-        icon: Mail,
-      },
-      {
-        id: "qrcode",
-        label: "QR Code",
-        description: "Conexão e acesso rápido ao WhatsApp",
-        icon: QrCode,
-      },
-    ],
+    id: "preferences",
+    label: "Preferências",
+    description: "E-mail (SMTP), avisos e configurações gerais",
+    icon: Settings,
   },
   {
-    id: "marketing",
-    label: "Marketing e integrações",
-    summary: "Meta Ads e Google Ads",
-    icon: Megaphone,
-    options: [
-      {
-        id: "meta_ads",
-        label: "Meta Ads",
-        description: "Facebook, Instagram e campanhas Meta",
-        icon: Target,
-      },
-      {
-        id: "google_ads",
-        label: "Google Ads",
-        description: "Campanhas, métricas e conta Google",
-        icon: Globe2,
-      },
-    ],
+    id: "availability",
+    label: "Agenda",
+    description: "Horários de funcionamento e regras de atendimento",
+    icon: CalendarDays,
   },
   {
-    id: "security",
-    label: "Segurança e auditoria",
-    summary: "Registros e acompanhamento de alterações",
-    icon: ShieldCheck,
-    options: [
-      {
-        id: "audit",
-        label: "Auditoria",
-        description: "Histórico de ações administrativas",
-        icon: ShieldCheck,
-      },
-    ],
+    id: "print",
+    label: "Impressões",
+    description: "Comprovantes térmicos, relatórios e padrões de cupom",
+    icon: Printer,
   },
 ];
 
-const groupForTab = (tab: SystemTab): SystemGroupId =>
-  groups.find((group) => group.options.some((option) => option.id === tab))
-    ?.id || "operation";
+type SystemSectionItem = {
+  id: SystemSectionId;
+  label: string;
+  category: string;
+  description: string;
+  icon: React.ElementType;
+};
+
+const systemSections: SystemSectionItem[] = [
+  {
+    id: "operation",
+    label: "Operação da unidade",
+    category: "Operação",
+    description: "Perfil, agenda, preferências de e-mail e regras de impressão",
+    icon: Store,
+  },
+  {
+    id: "notifications",
+    label: "Notificações WhatsApp",
+    category: "Comunicação",
+    description: "Notificações automáticas, regras de mensagens e atendimento",
+    icon: MessageSquare,
+  },
+  {
+    id: "qrcode",
+    label: "QR Code de Conexão",
+    category: "Conexão",
+    description: "Pareamento e acesso rápido ao canal oficial WhatsApp",
+    icon: QrCode,
+  },
+  {
+    id: "meta_ads",
+    label: "Meta Ads",
+    category: "Marketing",
+    description: "Pixel, rastreamento de conversões e campanhas Meta (Facebook / Instagram)",
+    icon: Target,
+  },
+  {
+    id: "google_ads",
+    label: "Google Ads",
+    category: "Marketing",
+    description: "Tags globais de conversão e campanhas na rede de busca Google",
+    icon: Globe2,
+  },
+  {
+    id: "audit",
+    label: "Auditoria e Segurança",
+    category: "Segurança",
+    description: "Histórico completo de logs administrativos e alterações no sistema",
+    icon: ShieldCheck,
+  },
+];
+
+const getSectionFromTab = (tab?: string): SystemSectionId => {
+  if (
+    tab === "unit" ||
+    tab === "preferences" ||
+    tab === "availability" ||
+    tab === "print"
+  ) {
+    return "operation";
+  }
+  if (
+    tab === "notifications" ||
+    tab === "qrcode" ||
+    tab === "meta_ads" ||
+    tab === "google_ads" ||
+    tab === "audit"
+  ) {
+    return tab;
+  }
+  return "operation";
+};
+
+const getOperationSubTab = (tab?: string): OperationSubTab => {
+  if (
+    tab === "unit" ||
+    tab === "preferences" ||
+    tab === "availability" ||
+    tab === "print"
+  ) {
+    return tab;
+  }
+  return "unit";
+};
 
 export const SystemWorkspace: React.FC<{
-  initialTab?: SystemTab;
+  initialTab?: SystemTab | string;
   onOpenCampaigns?: (provider?: "meta" | "google") => void;
 }> = ({ initialTab = "unit", onOpenCampaigns }) => {
-  const [activeTab, setActiveTab] = useState<SystemTab>(initialTab);
-  const [openGroup, setOpenGroup] = useState<SystemGroupId | null>(() =>
-    initialTab === "unit" ? null : groupForTab(initialTab as SystemTab),
+  const [openSection, setOpenSection] = useState<SystemSectionId | null>(() =>
+    getSectionFromTab(initialTab),
+  );
+  const [activeOperationTab, setActiveOperationTab] = useState<OperationSubTab>(
+    () => getOperationSubTab(initialTab),
   );
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
-    setActiveTab(initialTab);
-    setOpenGroup(
-      initialTab === "unit" ? null : groupForTab(initialTab as SystemTab),
-    );
+    if (initialTab) {
+      setOpenSection(getSectionFromTab(initialTab));
+      setActiveOperationTab(getOperationSubTab(initialTab));
+    }
   }, [initialTab]);
 
-  useEffect(() => {
-    if (openGroup && sectionRefs.current[openGroup]) {
-      const el = sectionRefs.current[openGroup];
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-        el.focus({ preventScroll: true });
+  const toggleSection = (id: SystemSectionId) => {
+    setOpenSection((current) => {
+      const next = current === id ? null : id;
+      if (next && sectionRefs.current[next]) {
+        setTimeout(() => {
+          sectionRefs.current[next]?.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+          });
+        }, 100);
       }
+      return next;
+    });
+  };
+
+  const renderSectionContent = (id: SystemSectionId) => {
+    switch (id) {
+      case "operation":
+        return (
+          <div className="space-y-4">
+            {/* Seletor de Submódulos da Operação */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+              {operationOptions.map((opt) => {
+                const OptIcon = opt.icon;
+                const isSelected = activeOperationTab === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setActiveOperationTab(opt.id)}
+                    className={`flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-[var(--admin-accent)]/40 bg-[var(--admin-accent)]/10 text-[var(--admin-text-main)] ring-1 ring-[var(--admin-accent)]/20"
+                        : "border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:border-[var(--admin-border-subtle)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)]"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${
+                        isSelected
+                          ? "bg-[var(--admin-accent)]/20 text-[var(--admin-accent)]"
+                          : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"
+                      }`}
+                    >
+                      <OptIcon className="h-3.5 w-3.5" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <span
+                        className={`block truncate text-xs font-semibold ${
+                          isSelected
+                            ? "text-[var(--admin-accent)]"
+                            : "text-[var(--admin-text-main)]"
+                        }`}
+                      >
+                        {opt.label}
+                      </span>
+                      <span className="block truncate text-[10px] text-[var(--admin-text-muted)]">
+                        {opt.description}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Conteúdo Renderizado do Submódulo Selecionado */}
+            <div className="pt-2 border-t border-[var(--admin-border)]">
+              {activeOperationTab === "unit" && <BarbershopProfileManagement />}
+              {activeOperationTab === "preferences" && (
+                <SettingsManagement initialTab="email" hideTabs />
+              )}
+              {activeOperationTab === "availability" && (
+                <SettingsManagement initialTab="availability" hideTabs />
+              )}
+              {activeOperationTab === "print" && (
+                <SettingsManagement initialTab="print" hideTabs />
+              )}
+            </div>
+          </div>
+        );
+
+      case "notifications":
+        return <SettingsManagement initialTab="whatsapp" hideTabs />;
+
+      case "qrcode":
+        return <SettingsManagement initialTab="qrcode" hideTabs />;
+
+      case "meta_ads":
+        return (
+          <SettingsManagement
+            initialTab="meta_ads"
+            hideTabs
+            onOpenCampaigns={onOpenCampaigns}
+          />
+        );
+
+      case "google_ads":
+        return (
+          <SettingsManagement
+            initialTab="google_ads"
+            hideTabs
+            onOpenCampaigns={onOpenCampaigns}
+          />
+        );
+
+      case "audit":
+        return <SettingsManagement initialTab="audit" hideTabs />;
+
+      default:
+        return null;
     }
-  }, [openGroup]);
-
-  const activeOption = useMemo(
-    () =>
-      groups
-        .flatMap((group) => group.options)
-        .find((option) => option.id === activeTab),
-    [activeTab],
-  );
-
-  const selectOption = (groupId: SystemGroupId, tab: SystemTab) => {
-    setOpenGroup(groupId);
-    setActiveTab(tab);
   };
 
-  const renderContent = () => {
-    if (activeTab === "unit") return <BarbershopProfileManagement />;
-    const settingsTab: SettingsTab =
-      activeTab === "preferences"
-        ? "email"
-        : activeTab === "notifications"
-          ? "whatsapp"
-          : activeTab;
-    return (
-      <SettingsManagement
-        initialTab={settingsTab}
-        hideTabs
-        onOpenCampaigns={onOpenCampaigns}
-      />
-    );
-  };
+  const activeSectionInfo = systemSections.find((sec) => sec.id === openSection);
 
   return (
     <div className="admin-system-workspace min-w-0 space-y-4">
       <AdminPageHeader
         icon={Settings}
         title="Configurações do Sistema"
-        stats={[{ label: "seção", value: activeOption?.label || "Unidade" }]}
+        stats={[
+          {
+            label: "seção ativa",
+            value: activeSectionInfo ? activeSectionInfo.label : "Nenhuma",
+          },
+          {
+            label: "total de módulos",
+            value: systemSections.length,
+          },
+        ]}
       />
 
       <div className="space-y-3" aria-label="Seções de configurações">
-        {groups.map((group) => {
-          const GroupIcon = group.icon;
-          const isOpen = openGroup === group.id;
+        {systemSections.map((section) => {
+          const SectionIcon = section.icon;
+          const isOpen = openSection === section.id;
+
           return (
             <section
-              key={group.id}
+              key={section.id}
               ref={(el) => {
-                sectionRefs.current[group.id] = el;
+                sectionRefs.current[section.id] = el;
               }}
               tabIndex={-1}
-              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors focus:outline-none ${isOpen ? "border-[var(--admin-accent)]/40 shadow-xs ring-1 ring-[var(--admin-accent)]/20" : "border-[var(--admin-border)]"}`}
+              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-all duration-200 focus:outline-none ${
+                isOpen
+                  ? "border-[var(--admin-accent)]/40 ring-1 ring-[var(--admin-accent)]/20 shadow-xs"
+                  : "border-[var(--admin-border)] hover:border-[var(--admin-border-subtle)] hover:bg-[var(--admin-surface-hover)]"
+              }`}
             >
+              {/* Cabeçalho do Menu Individual */}
               <button
                 type="button"
-                onClick={() =>
-                  setOpenGroup((current) =>
-                    current === group.id ? null : group.id,
-                  )
-                }
+                onClick={() => toggleSection(section.id)}
                 aria-expanded={isOpen}
-                className="flex min-h-[74px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-bg)] sm:px-5 cursor-pointer"
+                className="flex min-h-[64px] w-full items-center gap-3.5 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-surface-hover)] sm:px-5 cursor-pointer"
               >
                 <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isOpen ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]" : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"}`}
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                    isOpen
+                      ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
+                      : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"
+                  }`}
                 >
-                  <GroupIcon className="h-5 w-5" />
+                  <SectionIcon className="h-4 w-4" />
                 </span>
+
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-bold text-[var(--admin-text-main)] sm:text-[15px]">
-                    {group.label}
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="truncate text-sm font-semibold text-[var(--admin-text-main)]">
+                      {section.label}
+                    </span>
+                    <span className="inline-flex items-center rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2 py-0.5 text-[9px] font-semibold text-[var(--admin-text-muted)] uppercase tracking-wider">
+                      {section.category}
+                    </span>
                   </span>
                   <span className="mt-0.5 block truncate text-xs text-[var(--admin-text-muted)]">
-                    {group.summary}
+                    {section.description}
                   </span>
                 </span>
+
                 <ChevronDown
-                  className={`h-4 w-4 shrink-0 text-[var(--admin-text-muted)] transition-transform duration-200 ${isOpen ? "rotate-180 text-[var(--admin-accent)]" : ""}`}
+                  className={`h-4 w-4 shrink-0 text-[var(--admin-text-muted)] transition-transform duration-200 ${
+                    isOpen ? "rotate-180 text-[var(--admin-accent)]" : ""
+                  }`}
                 />
               </button>
 
+              {/* Conteúdo Renderizado quando o Menu está Expandido */}
               {isOpen && (
-                <div className="border-t border-[var(--admin-border)] px-3 pb-4 pt-3 sm:px-4 sm:pb-5">
-                  <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-                    {group.options.map((option) => {
-                      const OptionIcon = option.icon;
-                      const isActive = activeTab === option.id;
-                      return (
-                        <button
-                          key={option.id}
-                          type="button"
-                          onClick={() => selectOption(group.id, option.id)}
-                          aria-current={isActive ? "page" : undefined}
-                          className={`flex min-h-[64px] items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors ${isActive ? "border-[var(--admin-accent)]/40 bg-[var(--admin-accent)]/10" : "border-[var(--admin-border)] bg-[var(--admin-bg)] hover:border-border-strong hover:bg-[var(--admin-surface)]"}`}
-                        >
-                          <span
-                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${isActive ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"}`}
-                          >
-                            <OptionIcon className="h-4 w-4" />
-                          </span>
-                          <span className="min-w-0">
-                            <span
-                              className={`block truncate text-xs font-bold ${isActive ? "text-[var(--admin-accent)]" : "text-[var(--admin-text-main)]"}`}
-                            >
-                              {option.label}
-                            </span>
-                            <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-[var(--admin-text-muted)]">
-                              {option.description}
-                            </span>
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="mt-4 border-t border-[var(--admin-border)] pt-4">
-                    {renderContent()}
-                  </div>
+                <div className="border-t border-[var(--admin-border)] bg-[var(--admin-bg)]/40 p-4 sm:p-5 animate-in fade-in duration-200">
+                  {renderSectionContent(section.id)}
                 </div>
               )}
             </section>
