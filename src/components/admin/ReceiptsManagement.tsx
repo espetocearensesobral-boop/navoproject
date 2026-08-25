@@ -1,22 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
-  ArrowDownRight,
-  ArrowUpRight,
   Calendar,
   CheckCircle2,
   CircleDollarSign,
   Clock3,
   CreditCard,
-  Filter,
-  Layers,
-  Percent,
-  Plus,
   RefreshCw,
   Search,
   Scissors,
   User,
-  Wallet,
   X,
 } from "lucide-react";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
