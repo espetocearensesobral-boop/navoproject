@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminFab } from "./shared/AdminFab";
+import { AdminModalV2 } from "./shared/AdminModalV2";
 import { handleEnterAsTab } from "../../utils/formUtils";
 import {
   deleteCashTransactionInSupabase,
@@ -439,190 +440,23 @@ export const ExpensesManagement: React.FC = () => {
       </div>
 
       {isModalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="expense-modal-title"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) closeModal();
-          }}
-          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
-        >
-          <div className="w-full sm:max-w-lg max-h-[92dvh] flex flex-col rounded-t-3xl sm:rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-2xl overflow-hidden pb-[calc(0.5rem+env(safe-area-inset-bottom))] animate-modal-enter">
-            {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-[var(--admin-border)] flex items-center justify-between gap-3 shrink-0 bg-[var(--admin-surface)]">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
-                  Livro-caixa / Despesas
-                </p>
-                <h2
-                  id="expense-modal-title"
-                  className="mt-0.5 text-base font-serif font-bold text-[var(--admin-text-main)] sm:text-lg"
-                >
-                  {editingExpense ? "Editar saída" : "Nova saída"}
-                </h2>
-              </div>
+        <AdminModalV2
+          icon={ArrowDownRight}
+          eyebrow="Financeiro / Despesas"
+          title={editingExpense ? "Editar saída" : "Nova saída"}
+          subtitle={
+            editingExpense
+              ? form.description || "Atualização de registro"
+              : "Registre despesas e saídas financeiras da barbearia."
+          }
+          onClose={closeModal}
+          size="md"
+          footer={
+            <div className="flex items-center justify-end gap-2.5">
               <button
                 type="button"
                 onClick={closeModal}
-                className="w-9 h-9 rounded-xl text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] flex items-center justify-center transition-colors cursor-pointer"
-                aria-label="Fechar formulário"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
-              {modalError && (
-                <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3 text-xs sm:text-sm font-semibold text-status-error flex items-start justify-between gap-2 animate-fade-in">
-                  <span>{modalError}</span>
-                  <button
-                    type="button"
-                    onClick={() => setModalError(null)}
-                    className="text-status-error/80 hover:text-status-error shrink-0"
-                    aria-label="Fechar mensagem de erro"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              <form
-                id="expense-form"
-                onSubmit={handleSave}
-                onKeyDown={handleEnterAsTab}
-                className="space-y-3.5"
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className="sm:col-span-2 block">
-                    <span className="text-xs font-semibold text-[var(--admin-text-muted)] block mb-1">
-                      Descrição *
-                    </span>
-                    <input
-                      required
-                      autoFocus
-                      value={form.description}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          description: event.target.value,
-                        }))
-                      }
-                      placeholder="Ex.: Produtos para revenda, Aluguel, Conta de luz"
-                      className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs sm:text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="text-xs font-semibold text-[var(--admin-text-muted)] block mb-1">
-                      Categoria *
-                    </span>
-                    <select
-                      value={form.category}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          category: event.target.value,
-                        }))
-                      }
-                      className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs sm:text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
-                    >
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="block">
-                    <span className="text-xs font-semibold text-[var(--admin-text-muted)] block mb-1">
-                      Data do lançamento *
-                    </span>
-                    <input
-                      required
-                      type="date"
-                      value={form.date}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          date: event.target.value,
-                        }))
-                      }
-                      className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs sm:text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="text-xs font-semibold text-[var(--admin-text-muted)] block mb-1">
-                      Valor (R$) *
-                    </span>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--admin-text-muted)]">
-                        R$
-                      </span>
-                      <input
-                        required
-                        type="text"
-                        inputMode="decimal"
-                        value={amountInput}
-                        onChange={(event) => setAmountInput(event.target.value)}
-                        placeholder="0,00"
-                        className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-9 pr-3 text-xs sm:text-sm font-mono font-bold text-status-error placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
-                      />
-                    </div>
-                  </label>
-
-                  <label className="block">
-                    <span className="text-xs font-semibold text-[var(--admin-text-muted)] block mb-1">
-                      Forma de pagamento
-                    </span>
-                    <select
-                      value={form.paymentMethod}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          paymentMethod: event.target.value,
-                        }))
-                      }
-                      className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs sm:text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
-                    >
-                      {paymentMethods.map((method) => (
-                        <option key={method.id} value={method.id}>
-                          {method.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="sm:col-span-2 block">
-                    <span className="text-xs font-semibold text-[var(--admin-text-muted)] block mb-1">
-                      Observações / Justificativa
-                    </span>
-                    <textarea
-                      rows={2}
-                      value={form.notes || ""}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          notes: event.target.value,
-                        }))
-                      }
-                      placeholder="Observações complementares (opcional)"
-                      className="w-full rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 py-2 text-xs sm:text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] resize-none focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
-                    />
-                  </label>
-                </div>
-              </form>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 sm:p-5 border-t border-[var(--admin-border)] flex flex-col-reverse sm:flex-row sm:justify-end gap-2 bg-[var(--admin-surface)] shrink-0">
-              <button
-                type="button"
-                onClick={closeModal}
-                className="admin-btn admin-btn-secondary w-full sm:w-auto h-10 px-4 text-xs font-bold cursor-pointer"
+                className="admin-btn admin-btn-secondary h-10 px-4 text-xs font-bold cursor-pointer"
               >
                 Cancelar
               </button>
@@ -630,13 +464,155 @@ export const ExpensesManagement: React.FC = () => {
                 type="submit"
                 form="expense-form"
                 disabled={saving}
-                className="admin-btn admin-btn-primary w-full sm:w-auto h-10 px-5 text-xs font-bold cursor-pointer disabled:opacity-50"
+                className="admin-btn admin-btn-primary h-10 px-5 text-xs font-bold cursor-pointer disabled:opacity-50"
               >
                 {saving ? "Salvando..." : "Salvar saída"}
               </button>
             </div>
-          </div>
-        </div>
+          }
+        >
+          {modalError && (
+            <div className="mb-4 rounded-xl border border-status-error/30 bg-status-error/10 p-3 text-xs font-semibold text-status-error flex items-start justify-between gap-2 animate-fade-in">
+              <span>{modalError}</span>
+              <button
+                type="button"
+                onClick={() => setModalError(null)}
+                className="text-status-error/80 hover:text-status-error shrink-0"
+                aria-label="Fechar mensagem de erro"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          <form
+            id="expense-form"
+            onSubmit={handleSave}
+            onKeyDown={handleEnterAsTab}
+            className="space-y-4"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <label className="sm:col-span-2 block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Descrição da despesa *
+                </span>
+                <input
+                  required
+                  autoFocus
+                  value={form.description}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      description: event.target.value,
+                    }))
+                  }
+                  placeholder="Ex.: Produtos para revenda, Aluguel, Conta de luz"
+                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Categoria *
+                </span>
+                <select
+                  value={form.category}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      category: event.target.value,
+                    }))
+                  }
+                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Data do lançamento *
+                </span>
+                <input
+                  required
+                  type="date"
+                  value={form.date}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      date: event.target.value,
+                    }))
+                  }
+                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Valor (R$) *
+                </span>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--admin-text-muted)]">
+                    R$
+                  </span>
+                  <input
+                    required
+                    type="text"
+                    inputMode="decimal"
+                    value={amountInput}
+                    onChange={(event) => setAmountInput(event.target.value)}
+                    placeholder="0,00"
+                    className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-9 pr-3 text-xs font-mono font-bold text-status-error placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                  />
+                </div>
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Forma de pagamento
+                </span>
+                <select
+                  value={form.paymentMethod}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      paymentMethod: event.target.value,
+                    }))
+                  }
+                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                >
+                  {paymentMethods.map((method) => (
+                    <option key={method.id} value={method.id}>
+                      {method.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="sm:col-span-2 block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Observações / Justificativa
+                </span>
+                <textarea
+                  rows={2}
+                  value={form.notes || ""}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      notes: event.target.value,
+                    }))
+                  }
+                  placeholder="Observações complementares (opcional)"
+                  className="w-full rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 py-2 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] resize-none focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </label>
+            </div>
+          </form>
+        </AdminModalV2>
       )}
 
       <AdminFab

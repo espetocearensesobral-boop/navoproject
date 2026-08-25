@@ -7,6 +7,7 @@ import {
 } from "../../services/supabaseDataService";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminFab } from "./shared/AdminFab";
+import { AdminModalV2 } from "./shared/AdminModalV2";
 import { Button } from "../ui/Button";
 import { AdminLabel } from "../ui/AdminLabel";
 import { handleEnterAsTab } from "../../utils/formUtils";
@@ -757,42 +758,45 @@ export const ProfessionalsManagement: React.FC = () => {
 
       {/* CREATE/EDIT MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[var(--admin-bg)]/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] sm:border-[var(--admin-accent)]/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
-            {/* Header */}
-            <div className="p-3.5 bg-[var(--admin-bg)] border-b border-[var(--admin-border)] flex justify-between items-center gap-2 shrink-0">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-[var(--admin-accent)]/10 border border-[var(--admin-accent)]/30 flex items-center justify-center text-[var(--admin-accent)] shrink-0">
-                  <Users className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-sm font-bold text-[var(--admin-text-main)] truncate">
-                    {editingBarber
-                      ? `Editar: ${editingBarber.name}`
-                      : "Novo Barbeiro"}
-                  </h2>
-                  <p className="text-xs text-[var(--admin-text-muted)] truncate">
-                    Configuração de perfil, comissões e horários
-                  </p>
-                </div>
-              </div>
-              <button
+        <AdminModalV2
+          icon={Users}
+          eyebrow="Equipe & Barbeiros"
+          title={editingBarber ? `Editar: ${editingBarber.name}` : "Novo Barbeiro"}
+          subtitle="Configuração de perfil, comissões, especialidades e horários."
+          onClose={() => setIsModalOpen(false)}
+          size="md"
+          footer={
+            <div className="flex items-center justify-between w-full">
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => setIsModalOpen(false)}
-                className="w-7 h-7 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center transition-colors shrink-0"
               >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+                Cancelar
+              </Button>
 
+              <Button
+                type="submit"
+                form="professionalForm"
+                variant="primary"
+                size="sm"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>Salvar Barbeiro</span>
+              </Button>
+            </div>
+          }
+        >
+          <div className="space-y-3">
             {/* Modal Tabs Header */}
-            <div className="flex border-b border-[var(--admin-border)] bg-[var(--admin-bg)] px-2 pt-1.5 gap-1 shrink-0 overflow-x-auto no-scrollbar">
+            <div className="flex border-b border-[var(--admin-border)] bg-[var(--admin-bg)] p-1 rounded-xl gap-1 shrink-0 overflow-x-auto no-scrollbar">
               <button
                 type="button"
                 onClick={() => setActiveFormTab("profile")}
-                className={`px-3 py-1.5 text-xs font-bold rounded-t-xl transition-all whitespace-nowrap ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
                   activeFormTab === "profile"
-                    ? "bg-[var(--admin-surface)] text-[var(--admin-accent)] border-t-2 border-x border-[var(--admin-border)] border-t-[#FFFFFF]"
+                    ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
@@ -802,9 +806,9 @@ export const ProfessionalsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveFormTab("specialties")}
-                className={`px-3 py-1.5 text-xs font-bold rounded-t-xl transition-all whitespace-nowrap ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
                   activeFormTab === "specialties"
-                    ? "bg-[var(--admin-surface)] text-[var(--admin-accent)] border-t-2 border-x border-[var(--admin-border)] border-t-[#FFFFFF]"
+                    ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
@@ -814,9 +818,9 @@ export const ProfessionalsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveFormTab("commission")}
-                className={`px-3 py-1.5 text-xs font-bold rounded-t-xl transition-all whitespace-nowrap ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
                   activeFormTab === "commission"
-                    ? "bg-[var(--admin-surface)] text-[var(--admin-accent)] border-t-2 border-x border-[var(--admin-border)] border-t-[#FFFFFF]"
+                    ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
@@ -826,9 +830,9 @@ export const ProfessionalsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveFormTab("schedule")}
-                className={`px-3 py-1.5 text-xs font-bold rounded-t-xl transition-all whitespace-nowrap ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
                   activeFormTab === "schedule"
-                    ? "bg-[var(--admin-surface)] text-[var(--admin-accent)] border-t-2 border-x border-[var(--admin-border)] border-t-[#FFFFFF]"
+                    ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
               >
@@ -838,9 +842,10 @@ export const ProfessionalsManagement: React.FC = () => {
 
             {/* Modal Form */}
             <form
+              id="professionalForm"
               onKeyDown={handleEnterAsTab}
               onSubmit={handleSubmit}
-              className="p-4 overflow-y-auto space-y-3 custom-scrollbar flex-1"
+              className="space-y-3"
             >
               {/* TAB 1: PROFILE */}
               {activeFormTab === "profile" && (
@@ -1163,26 +1168,9 @@ export const ProfessionalsManagement: React.FC = () => {
                   </div>
                 </div>
               )}
-
-              {/* Modal Footer */}
-              <div className="pt-3 border-t border-[var(--admin-border)] flex items-center justify-between shrink-0">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  Cancelar
-                </Button>
-
-                <Button type="submit" variant="primary" size="sm">
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Salvar</span>
-                </Button>
-              </div>
             </form>
           </div>
-        </div>
+        </AdminModalV2>
       )}
 
       <AdminFab

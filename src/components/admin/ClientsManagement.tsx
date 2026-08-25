@@ -24,6 +24,7 @@ import { handleEnterAsTab } from "../../utils/formUtils";
 import { useDialogFocus } from "../../hooks/useDialogFocus";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminFab } from "./shared/AdminFab";
+import { AdminModalV2 } from "./shared/AdminModalV2";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
 import { AdminListSkeleton } from "./shared/AdminSkeleton";
 import { AdminEmptyState } from "./shared/AdminEmptyState";
@@ -636,259 +637,15 @@ export const ClientsManagement: React.FC = () => {
 
       {/* COMPACT MODULAR CLIENT MODAL */}
       {isModalOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-[var(--admin-bg)]/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            ref={dialogRef}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="client-dialog-title"
-            onClick={(event) => event.stopPropagation()}
-            className="bg-[var(--admin-surface)] border border-[var(--admin-border)] sm:border-[var(--admin-accent)]/30 rounded-t-2xl sm:rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[94dvh] sm:max-h-[90vh] animate-fade-in"
-          >
-            {/* Header */}
-            <div className="p-3.5 bg-[var(--admin-bg)] border-b border-[var(--admin-border)] flex justify-between items-center gap-2 shrink-0">
-              <div
-                className="absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-[var(--admin-border)] sm:hidden"
-                aria-hidden="true"
-              />
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-[var(--admin-accent)]/10 border border-[var(--admin-accent)]/30 flex items-center justify-center text-[var(--admin-accent)] shrink-0">
-                  <Users className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <h2
-                    id="client-dialog-title"
-                    className="text-sm font-bold text-[var(--admin-text-main)] truncate"
-                  >
-                    {editingClient
-                      ? `Editar: ${editingClient.name}`
-                      : "Novo cliente"}
-                  </h2>
-                  <p className="text-xs text-[var(--admin-text-muted)] truncate">
-                    Ajuste informações de contato e pontuação
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                aria-label="Fechar cliente"
-                className="w-7 h-7 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center transition-colors shrink-0"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Scrollable Form Body */}
-            <div className="p-4 overflow-y-auto space-y-3 custom-scrollbar flex-1">
-              {errorMsg && (
-                <div className="p-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs font-bold">
-                  {errorMsg}
-                </div>
-              )}
-
-              <form
-                id="clientForm"
-                onSubmit={handleSave}
-                className="space-y-3"
-                onKeyDown={handleEnterAsTab}
-              >
-                <div>
-                  <AdminLabel tone="accent">Nome Completo *</AdminLabel>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => {
-                      setFormData({ ...formData, name: e.target.value });
-                      setFieldErrors((current) => ({
-                        ...current,
-                        name: undefined,
-                      }));
-                    }}
-                    aria-invalid={Boolean(fieldErrors.name)}
-                    aria-describedby={
-                      fieldErrors.name ? "client-name-error" : undefined
-                    }
-                    placeholder="Ex: Carlos Silva"
-                    className={`w-full bg-[var(--admin-bg)] border rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.name ? "border-status-error" : "border-[var(--admin-border)]"}`}
-                  />
-                  {fieldErrors.name && (
-                    <p
-                      id="client-name-error"
-                      className="mt-1 text-xs text-status-error"
-                    >
-                      {fieldErrors.name}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div>
-                    <AdminLabel tone="accent">E-mail *</AdminLabel>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => {
-                        setFormData({ ...formData, email: e.target.value });
-                        setFieldErrors((current) => ({
-                          ...current,
-                          email: undefined,
-                        }));
-                      }}
-                      aria-invalid={Boolean(fieldErrors.email)}
-                      aria-describedby={
-                        fieldErrors.email ? "client-email-error" : undefined
-                      }
-                      placeholder="carlos@email.com"
-                      className={`w-full bg-[var(--admin-bg)] border rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.email ? "border-status-error" : "border-[var(--admin-border)]"}`}
-                    />
-                    {fieldErrors.email && (
-                      <p
-                        id="client-email-error"
-                        className="mt-1 text-xs text-status-error"
-                      >
-                        {fieldErrors.email}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <AdminLabel tone="accent">Telefone</AdminLabel>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => {
-                        setFormData({
-                          ...formData,
-                          phone: formatPhone(e.target.value),
-                        });
-                        setFieldErrors((current) => ({
-                          ...current,
-                          phone: undefined,
-                        }));
-                      }}
-                      aria-invalid={Boolean(fieldErrors.phone)}
-                      aria-describedby={
-                        fieldErrors.phone ? "client-phone-error" : undefined
-                      }
-                      placeholder="(11) 99999-9999"
-                      className={`w-full bg-[var(--admin-bg)] border rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.phone ? "border-status-error" : "border-[var(--admin-border)]"}`}
-                    />
-                    {fieldErrors.phone && (
-                      <p
-                        id="client-phone-error"
-                        className="mt-1 text-xs text-status-error"
-                      >
-                        {fieldErrors.phone}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <AdminLabel tone="accent">
-                    Data de aniversário{" "}
-                    <span className="text-[var(--admin-text-muted)] font-normal">
-                      (opcional)
-                    </span>
-                  </AdminLabel>
-                  <input
-                    type="date"
-                    value={formData.birthday}
-                    onChange={(e) =>
-                      setFormData({ ...formData, birthday: e.target.value })
-                    }
-                    className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </div>
-
-                <div>
-                  <AdminLabel tone="accent">
-                    Senha{" "}
-                    {editingClient && (
-                      <span className="text-[var(--admin-text-muted)] font-normal">
-                        (Deixe em branco para manter)
-                      </span>
-                    )}
-                  </AdminLabel>
-                  <input
-                    type="password"
-                    required={!editingClient}
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    placeholder="••••••••"
-                    className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </div>
-
-                <div className="p-3 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl space-y-2.5">
-                  <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
-                    Fidelidade & Permissões
-                  </p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <AdminLabel tone="muted">Papel</AdminLabel>
-                      <select
-                        value={formData.role}
-                        onChange={(e) =>
-                          setFormData({ ...formData, role: e.target.value })
-                        }
-                        className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                      >
-                        <option value="client">Cliente</option>
-                        <option value="admin">Administrador</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <AdminLabel tone="muted">Nível Fidelidade</AdminLabel>
-                      <select
-                        value={formData.loyaltyTier}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            loyaltyTier: e.target.value,
-                          })
-                        }
-                        className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                      >
-                        <option value="Bronze">Bronze</option>
-                        <option value="Prata">Prata</option>
-                        <option value="Ouro">Ouro</option>
-                        <option value="Diamante">Diamante</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <AdminLabel tone="muted">Pontos de Fidelidade</AdminLabel>
-                    <input
-                      type="number"
-                      min="0"
-                      value={formData.loyaltyPoints}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          loyaltyPoints: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
-                    />
-                  </div>
-                </div>
-              </form>
-            </div>
-
-            {/* Footer */}
-            <div className="p-3 bg-[var(--admin-bg)] border-t border-[var(--admin-border)] flex justify-end gap-2 shrink-0">
+        <AdminModalV2
+          icon={Users}
+          eyebrow="Cadastro de Clientes"
+          title={editingClient ? `Editar: ${editingClient.name}` : "Novo cliente"}
+          subtitle="Ajuste informações de contato, senha e fidelidade."
+          onClose={() => setIsModalOpen(false)}
+          size="md"
+          footer={
+            <div className="flex items-center justify-end gap-2.5">
               <Button
                 type="button"
                 variant="ghost"
@@ -906,8 +663,212 @@ export const ClientsManagement: React.FC = () => {
                 Salvar
               </Button>
             </div>
+          }
+        >
+          <div className="space-y-3">
+            {errorMsg && (
+              <div className="p-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs font-bold">
+                {errorMsg}
+              </div>
+            )}
+
+            <form
+              id="clientForm"
+              onSubmit={handleSave}
+              className="space-y-3"
+              onKeyDown={handleEnterAsTab}
+            >
+              <div>
+                <AdminLabel tone="accent">Nome Completo *</AdminLabel>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={formData.name}
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                    setFieldErrors((current) => ({
+                      ...current,
+                      name: undefined,
+                    }));
+                  }}
+                  aria-invalid={Boolean(fieldErrors.name)}
+                  aria-describedby={
+                    fieldErrors.name ? "client-name-error" : undefined
+                  }
+                  placeholder="Ex: Carlos Silva"
+                  className={`w-full h-10 bg-[var(--admin-bg)] border rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.name ? "border-status-error" : "border-[var(--admin-border)]"}`}
+                />
+                {fieldErrors.name && (
+                  <p
+                    id="client-name-error"
+                    className="mt-1 text-xs text-status-error"
+                  >
+                    {fieldErrors.name}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <AdminLabel tone="accent">E-mail *</AdminLabel>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => {
+                      setFormData({ ...formData, email: e.target.value });
+                      setFieldErrors((current) => ({
+                        ...current,
+                        email: undefined,
+                      }));
+                    }}
+                    aria-invalid={Boolean(fieldErrors.email)}
+                    aria-describedby={
+                      fieldErrors.email ? "client-email-error" : undefined
+                    }
+                    placeholder="carlos@email.com"
+                    className={`w-full h-10 bg-[var(--admin-bg)] border rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.email ? "border-status-error" : "border-[var(--admin-border)]"}`}
+                  />
+                  {fieldErrors.email && (
+                    <p
+                      id="client-email-error"
+                      className="mt-1 text-xs text-status-error"
+                    >
+                      {fieldErrors.email}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <AdminLabel tone="accent">Telefone</AdminLabel>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        phone: formatPhone(e.target.value),
+                      });
+                      setFieldErrors((current) => ({
+                        ...current,
+                        phone: undefined,
+                      }));
+                    }}
+                    aria-invalid={Boolean(fieldErrors.phone)}
+                    aria-describedby={
+                      fieldErrors.phone ? "client-phone-error" : undefined
+                    }
+                    placeholder="(11) 99999-9999"
+                    className={`w-full h-10 bg-[var(--admin-bg)] border rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.phone ? "border-status-error" : "border-[var(--admin-border)]"}`}
+                  />
+                  {fieldErrors.phone && (
+                    <p
+                      id="client-phone-error"
+                      className="mt-1 text-xs text-status-error"
+                    >
+                      {fieldErrors.phone}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <AdminLabel tone="accent">
+                  Data de aniversário{" "}
+                  <span className="text-[var(--admin-text-muted)] font-normal">
+                    (opcional)
+                  </span>
+                </AdminLabel>
+                <input
+                  type="date"
+                  value={formData.birthday}
+                  onChange={(e) =>
+                    setFormData({ ...formData, birthday: e.target.value })
+                  }
+                  className="w-full h-10 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                />
+              </div>
+
+              <div>
+                <AdminLabel tone="accent">
+                  Senha{" "}
+                  {editingClient && (
+                    <span className="text-[var(--admin-text-muted)] font-normal">
+                      (Deixe em branco para manter)
+                    </span>
+                  )}
+                </AdminLabel>
+                <input
+                  type="password"
+                  required={!editingClient}
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder="••••••••"
+                  className="w-full h-10 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                />
+              </div>
+
+              <div className="p-3 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl space-y-2.5">
+                <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                  Fidelidade & Permissões
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <AdminLabel tone="muted">Papel</AdminLabel>
+                    <select
+                      value={formData.role}
+                      onChange={(e) =>
+                        setFormData({ ...formData, role: e.target.value })
+                      }
+                      className="w-full h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    >
+                      <option value="client">Cliente</option>
+                      <option value="admin">Administrador</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <AdminLabel tone="muted">Nível Fidelidade</AdminLabel>
+                    <select
+                      value={formData.loyaltyTier}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          loyaltyTier: e.target.value,
+                        })
+                      }
+                      className="w-full h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    >
+                      <option value="Bronze">Bronze</option>
+                      <option value="Prata">Prata</option>
+                      <option value="Ouro">Ouro</option>
+                      <option value="Diamante">Diamante</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <AdminLabel tone="muted">Pontos de Fidelidade</AdminLabel>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.loyaltyPoints}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        loyaltyPoints: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                  />
+                </div>
+              </div>
+            </form>
           </div>
-        </div>
+        </AdminModalV2>
       )}
 
       <ConfirmDialog

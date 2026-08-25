@@ -18,6 +18,7 @@ import {
 } from "../../services/supabaseDataService";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminFab } from "./shared/AdminFab";
+import { AdminModalV2 } from "./shared/AdminModalV2";
 import { handleEnterAsTab } from "../../utils/formUtils";
 
 const defaultProduct: ProductItem = {
@@ -475,177 +476,200 @@ export const ProductsManagement: React.FC = () => {
       )}
 
       {isModalOpen ? (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="w-full sm:max-w-lg max-h-[92dvh] overflow-y-auto rounded-t-3xl sm:rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <div>
-                <h2 className="text-base font-bold text-[var(--admin-text-main)]">
-                  {editingProduct ? "Editar produto" : "Novo produto"}
-                </h2>
-                <p className="text-xs text-[var(--admin-text-muted)] admin-safe-wrap">
-                  Dados do catálogo e estoque.
-                </p>
-              </div>
+        <AdminModalV2
+          icon={Package}
+          eyebrow="Estoque"
+          title={editingProduct ? "Editar produto" : "Novo produto"}
+          subtitle={
+            editingProduct
+              ? editingProduct.name
+              : "Cadastre itens para venda e controle de estoque."
+          }
+          onClose={() => {
+            setEditingProduct(null);
+            setIsModalOpen(false);
+          }}
+          size="md"
+          footer={
+            <div className="flex items-center justify-end gap-2.5">
               <button
                 type="button"
                 onClick={() => {
                   setEditingProduct(null);
                   setIsModalOpen(false);
                 }}
-                className="h-9 w-9 rounded-xl text-[var(--admin-text-muted)] flex items-center justify-center"
-                aria-label="Fechar formulário"
+                className="admin-btn admin-btn-secondary h-10 px-4 text-xs font-bold"
               >
-                <X className="w-5 h-5" />
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                form="product-form"
+                disabled={saving}
+                className="admin-btn admin-btn-primary h-10 px-5 text-xs font-bold disabled:opacity-50"
+              >
+                {saving ? "Salvando..." : "Salvar produto"}
               </button>
             </div>
-            <form
-              onKeyDown={handleEnterAsTab}
-              onSubmit={handleSave}
-              className="space-y-3"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label className="text-xs font-semibold text-[var(--admin-text-muted)]">
-                  Nome
-                  <input
-                    required
-                    value={form.name}
-                    onChange={(event) => updateForm("name", event.target.value)}
-                    className="mt-1 w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </label>
-                <label className="text-xs font-semibold text-[var(--admin-text-muted)]">
-                  Marca
-                  <input
-                    required
-                    value={form.brand}
-                    onChange={(event) =>
-                      updateForm("brand", event.target.value)
-                    }
-                    className="mt-1 w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </label>
-                <label className="text-xs font-semibold text-[var(--admin-text-muted)]">
-                  Categoria
-                  <select
-                    value={form.category}
-                    onChange={(event) =>
-                      updateForm("category", event.target.value)
-                    }
-                    className="mt-1 w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
-                  >
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="text-xs font-semibold text-[var(--admin-text-muted)]">
-                  Preço
-                  <input
-                    required
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={form.price}
-                    onChange={(event) =>
-                      updateForm("price", Number(event.target.value))
-                    }
-                    className="mt-1 w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </label>
-                <label className="text-xs font-semibold text-[var(--admin-text-muted)]">
-                  Custo
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={form.cost_price}
-                    onChange={(event) =>
-                      updateForm("cost_price", Number(event.target.value))
-                    }
-                    className="mt-1 w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </label>
-                <label className="text-xs font-semibold text-[var(--admin-text-muted)]">
-                  Estoque atual
-                  <input
-                    required
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={form.stock_quantity}
-                    onChange={(event) =>
-                      updateForm("stock_quantity", Number(event.target.value))
-                    }
-                    className="mt-1 w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </label>
-                <label className="text-xs font-semibold text-[var(--admin-text-muted)]">
-                  Alerta mínimo
-                  <input
-                    required
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={form.min_stock_alert}
-                    onChange={(event) =>
-                      updateForm("min_stock_alert", Number(event.target.value))
-                    }
-                    className="mt-1 w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </label>
-                <label className="text-xs font-semibold text-[var(--admin-text-muted)]">
-                  Comissão (%)
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="1"
-                    value={form.commission_percentage}
-                    onChange={(event) =>
-                      updateForm(
-                        "commission_percentage",
-                        Number(event.target.value),
-                      )
-                    }
-                    className="mt-1 w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </label>
-              </div>
-              <label className="text-xs font-semibold text-[var(--admin-text-muted)]">
-                Imagem (URL opcional)
+          }
+        >
+          <form
+            id="product-form"
+            onKeyDown={handleEnterAsTab}
+            onSubmit={handleSave}
+            className="space-y-4"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Nome do produto *
+                </span>
                 <input
-                  type="url"
-                  value={form.image_url || ""}
-                  onChange={(event) =>
-                    updateForm("image_url", event.target.value)
-                  }
-                  className="mt-1 w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
+                  required
+                  autoFocus
+                  value={form.name}
+                  onChange={(event) => updateForm("name", event.target.value)}
+                  placeholder="Ex: Pomada Modeladora Matte"
+                  className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                 />
               </label>
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingProduct(null);
-                    setIsModalOpen(false);
-                  }}
-                  className="flex-1 h-10 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-muted)] text-xs font-semibold"
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Marca *
+                </span>
+                <input
+                  required
+                  value={form.brand}
+                  onChange={(event) => updateForm("brand", event.target.value)}
+                  placeholder="Ex: BarberX Pro"
+                  className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Categoria *
+                </span>
+                <select
+                  value={form.category}
+                  onChange={(event) =>
+                    updateForm("category", event.target.value)
+                  }
+                  className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 h-10 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold disabled:opacity-50"
-                >
-                  {saving ? "Salvando..." : "Salvar produto"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Preço de venda (R$) *
+                </span>
+                <input
+                  required
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.price}
+                  onChange={(event) =>
+                    updateForm("price", Number(event.target.value))
+                  }
+                  className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs font-mono font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Preço de custo (R$)
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.cost_price}
+                  onChange={(event) =>
+                    updateForm("cost_price", Number(event.target.value))
+                  }
+                  className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs font-mono text-status-error outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Estoque atual (un.) *
+                </span>
+                <input
+                  required
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={form.stock_quantity}
+                  onChange={(event) =>
+                    updateForm("stock_quantity", Number(event.target.value))
+                  }
+                  className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Alerta de estoque mínimo *
+                </span>
+                <input
+                  required
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={form.min_stock_alert}
+                  onChange={(event) =>
+                    updateForm("min_stock_alert", Number(event.target.value))
+                  }
+                  className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Comissão do barbeiro (%)
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={form.commission_percentage}
+                  onChange={(event) =>
+                    updateForm(
+                      "commission_percentage",
+                      Number(event.target.value),
+                    )
+                  }
+                  className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs font-mono text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                />
+              </label>
+            </div>
+
+            <label className="block">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                URL da imagem (opcional)
+              </span>
+              <input
+                type="url"
+                value={form.image_url || ""}
+                onChange={(event) =>
+                  updateForm("image_url", event.target.value)
+                }
+                placeholder="https://exemplo.com/foto-produto.jpg"
+                className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+              />
+            </label>
+          </form>
+        </AdminModalV2>
       ) : null}
 
       <AdminFab

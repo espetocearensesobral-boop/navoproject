@@ -20,6 +20,7 @@ import {
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminFab } from "./shared/AdminFab";
 import { AdminTabs } from "./shared/AdminTabs";
+import { AdminModalV2 } from "./shared/AdminModalV2";
 
 export interface SubscriptionPlan {
   id: string;
@@ -481,53 +482,58 @@ export const SubscriptionsManagement: React.FC = () => {
 
       {/* CREATE PLAN MODAL */}
       {isPlanModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <AdminModalV2
+          icon={Award}
+          eyebrow="Clube de Assinaturas"
+          title="Novo plano"
+          subtitle="Configure mensalidade, repasse e serviços inclusos."
+          onClose={() => setIsPlanModalOpen(false)}
+          size="md"
+          footer={
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setIsPlanModalOpen(false)}
+                className="admin-btn admin-btn-secondary h-10 px-4 text-xs font-bold"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                form="create-plan-form"
+                className="admin-btn admin-btn-primary h-10 px-5 text-xs font-bold"
+              >
+                Criar Plano
+              </button>
+            </div>
+          }
+        >
           <form
+            id="create-plan-form"
             onKeyDown={handleEnterAsTab}
             onSubmit={handleCreatePlan}
-            className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl w-full max-w-md p-5 text-[var(--admin-text-main)] space-y-4 relative shadow-2xl animate-fade-in"
+            className="space-y-4"
           >
-            <button
-              type="button"
-              onClick={() => setIsPlanModalOpen(false)}
-              className="absolute top-4 right-4 text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] p-1"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-center gap-3 border-b border-[var(--admin-border)] pb-3">
-              <div className="w-10 h-10 rounded-xl bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
-                <Award className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-[var(--admin-text-main)]">
-                  Novo plano
-                </h3>
-                <p className="text-xs text-[var(--admin-text-muted)]">
-                  Nome, mensalidade e comissão.
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase block mb-1">
-                Nome do Plano
-              </label>
+            <label className="block">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                Nome do Plano *
+              </span>
               <input
                 type="text"
                 required
+                autoFocus
                 placeholder="Ex: Clube Cabelo Ilimitado"
                 value={newPlanName}
                 onChange={(e) => setNewPlanName(e.target.value)}
-                className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none"
+                className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
               />
-            </div>
+            </label>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase block mb-1">
-                  Mensalidade (R$)
-                </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Mensalidade (R$) *
+                </span>
                 <input
                   type="number"
                   required
@@ -535,14 +541,14 @@ export const SubscriptionsManagement: React.FC = () => {
                   step="5"
                   value={newPlanPrice}
                   onChange={(e) => setNewPlanPrice(Number(e.target.value))}
-                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none"
+                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs font-mono font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                 />
-              </div>
+              </label>
 
-              <div>
-                <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase block mb-1">
-                  Repasse Barbeiro (R$)
-                </label>
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                  Repasse por Corte (R$) *
+                </span>
                 <input
                   type="number"
                   required
@@ -550,40 +556,25 @@ export const SubscriptionsManagement: React.FC = () => {
                   step="1"
                   value={newPlanBarberFee}
                   onChange={(e) => setNewPlanBarberFee(Number(e.target.value))}
-                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none"
+                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs font-mono font-bold text-status-error outline-none focus:border-[var(--admin-accent)] transition-colors"
                 />
-              </div>
+              </label>
             </div>
 
-            <div>
-              <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase block mb-1">
-                Serviços inclusos
-              </label>
+            <label className="block">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1.5">
+                Serviços inclusos (separados por vírgula)
+              </span>
               <input
                 type="text"
+                placeholder="Ex: Corte Ilimitado, Barba, Bebida Cortesia"
                 value={newPlanServices}
                 onChange={(e) => setNewPlanServices(e.target.value)}
-                className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none"
+                className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
               />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsPlanModalOpen(false)}
-                className="px-4 py-2 text-xs font-bold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="bg-[var(--admin-accent)] hover:bg-gold-hover text-[var(--admin-accent-text)] px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95"
-              >
-                Criar Plano
-              </button>
-            </div>
+            </label>
           </form>
-        </div>
+        </AdminModalV2>
       )}
 
       <AdminFab

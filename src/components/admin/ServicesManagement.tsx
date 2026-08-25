@@ -9,6 +9,7 @@ import {
 import { DEFAULT_CATEGORIES, getCategoryName } from "../../data/categories";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminFab } from "./shared/AdminFab";
+import { AdminModalV2 } from "./shared/AdminModalV2";
 import { AdminEmptyState } from "./shared/AdminEmptyState";
 import { Button } from "../ui/Button";
 import { AdminLabel } from "../ui/AdminLabel";
@@ -773,87 +774,106 @@ export const ServicesManagement: React.FC = () => {
 
       {/* Advanced Compact & Modular Create / Edit Service Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[var(--admin-bg)]/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] sm:border-[var(--admin-accent)]/40 rounded-2xl w-full max-w-3xl h-[92vh] max-h-[680px] overflow-hidden shadow-2xl flex flex-col animate-fade-in">
-            {/* Modal Top Header */}
-            <div className="p-3.5 sm:p-4 bg-[var(--admin-bg)] border-b border-[var(--admin-border)] flex justify-between items-center shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[var(--admin-accent)]/10 border border-[var(--admin-accent)]/30 flex items-center justify-center text-[var(--admin-accent)]">
-                  <Scissors className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-bold text-[var(--admin-text-main)] truncate max-w-[220px] sm:max-w-md">
-                    {editingService
-                      ? `Editar: ${editingService.title}`
-                      : "Novo serviço"}
-                  </h2>
-                  <p className="text-xs text-[var(--admin-text-muted)] hidden sm:block">
-                    Preencha informações do serviço, precificação e galeria de
-                    fotos.
-                  </p>
-                </div>
+        <AdminModalV2
+          icon={Scissors}
+          eyebrow="Catálogo de Serviços"
+          title={editingService ? `Editar: ${editingService.title}` : "Novo Serviço"}
+          subtitle="Preencha informações do serviço, precificação e galeria de fotos."
+          onClose={() => setIsModalOpen(false)}
+          size="lg"
+          footer={
+            <div className="flex items-center justify-between w-full">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Cancelar
+              </Button>
+
+              <div className="flex items-center gap-2">
+                {activeFormTab !== "gallery" && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      if (activeFormTab === "general")
+                        setActiveFormTab("pricing");
+                      else if (activeFormTab === "pricing")
+                        setActiveFormTab("gallery");
+                    }}
+                  >
+                    <span>Avançar</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+
+                <Button
+                  type="submit"
+                  form="serviceForm"
+                  variant="primary"
+                  size="sm"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Salvar Serviço</span>
+                </Button>
               </div>
+            </div>
+          }
+        >
+          <div className="flex flex-col sm:flex-row gap-3 min-h-[360px]">
+            {/* Sidebar Navigation (Desktop: Left Column, Mobile: Top Horizontal Bar) */}
+            <div className="sm:w-44 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-1.5 flex sm:flex-col gap-1 shrink-0 overflow-x-auto no-scrollbar">
+              <button
+                type="button"
+                onClick={() => setActiveFormTab("general")}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap text-left ${
+                  activeFormTab === "general"
+                    ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text-main)]"
+                }`}
+              >
+                <Scissors className="w-3.5 h-3.5 shrink-0" />
+                <span>1. Dados Gerais</span>
+              </button>
 
               <button
                 type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="w-7 h-7 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center transition-colors"
+                onClick={() => setActiveFormTab("pricing")}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap text-left ${
+                  activeFormTab === "pricing"
+                    ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text-main)]"
+                }`}
               >
-                <X className="w-4 h-4" />
+                <DollarSign className="w-3.5 h-3.5 shrink-0" />
+                <span>2. Preço & Valores</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveFormTab("gallery")}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap text-left ${
+                  activeFormTab === "gallery"
+                    ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
+                    : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text-main)]"
+                }`}
+              >
+                <ImageIcon className="w-3.5 h-3.5 shrink-0" />
+                <span>3. Galeria ({formData.gallery_urls?.length || 0})</span>
               </button>
             </div>
 
-            {/* Modal Body: Sidebar Navigation + Form Area */}
-            <div className="flex flex-col sm:flex-row flex-1 overflow-hidden min-h-0">
-              {/* Sidebar Navigation (Desktop: Left Column, Mobile: Top Horizontal Bar) */}
-              <div className="sm:w-48 bg-[var(--admin-bg)] border-b sm:border-b-0 sm:border-r border-[var(--admin-border)] p-2 flex sm:flex-col gap-1 shrink-0 overflow-x-auto no-scrollbar">
-                <button
-                  type="button"
-                  onClick={() => setActiveFormTab("general")}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-left ${
-                    activeFormTab === "general"
-                      ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
-                      : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text-main)]"
-                  }`}
-                >
-                  <Scissors className="w-3.5 h-3.5 shrink-0" />
-                  <span>1. Dados Gerais</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveFormTab("pricing")}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-left ${
-                    activeFormTab === "pricing"
-                      ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
-                      : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text-main)]"
-                  }`}
-                >
-                  <DollarSign className="w-3.5 h-3.5 shrink-0" />
-                  <span>2. Preço & Valores</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveFormTab("gallery")}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-left ${
-                    activeFormTab === "gallery"
-                      ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
-                      : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text-main)]"
-                  }`}
-                >
-                  <ImageIcon className="w-3.5 h-3.5 shrink-0" />
-                  <span>3. Galeria ({formData.gallery_urls?.length || 0})</span>
-                </button>
-              </div>
-
-              {/* Form Content Area */}
-              <form
-                onKeyDown={handleEnterAsTab}
-                onSubmit={handleSubmit}
-                className="flex-1 flex flex-col justify-between overflow-hidden"
-              >
-                <div className="p-4 space-y-3.5 overflow-y-auto flex-1 custom-scrollbar">
+            {/* Form Content Area */}
+            <form
+              id="serviceForm"
+              onKeyDown={handleEnterAsTab}
+              onSubmit={handleSubmit}
+              className="flex-1 overflow-hidden"
+            >
+              <div className="space-y-3.5">
                   {/* TAB 1: GENERAL INFO */}
                   {activeFormTab === "general" && (
                     <div className="space-y-3">
@@ -1226,47 +1246,10 @@ export const ServicesManagement: React.FC = () => {
                     </div>
                   )}
                 </div>
-
-                {/* Form Fixed Footer */}
-                <div className="p-3 bg-[var(--admin-bg)] border-t border-[var(--admin-border)] flex items-center justify-between shrink-0">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsModalOpen(false)}
-                  >
-                    Cancelar
-                  </Button>
-
-                  <div className="flex items-center gap-2">
-                    {activeFormTab !== "gallery" && (
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => {
-                          if (activeFormTab === "general")
-                            setActiveFormTab("pricing");
-                          else if (activeFormTab === "pricing")
-                            setActiveFormTab("gallery");
-                        }}
-                      >
-                        <span>Avançar</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Button>
-                    )}
-
-                    <Button type="submit" variant="primary" size="sm">
-                      <Save className="w-3.5 h-3.5" />
-                      <span>Salvar</span>
-                    </Button>
-                  </div>
-                </div>
               </form>
             </div>
-          </div>
-        </div>
-      )}
+          </AdminModalV2>
+        )}
 
       <AdminFab
         onClick={handleOpenCreate}

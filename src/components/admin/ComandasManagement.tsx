@@ -20,6 +20,7 @@ import { escapePrintHtml, openPrintWindow } from "../../utils/printUtils";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminFab } from "./shared/AdminFab";
 import { AdminTabs } from "./shared/AdminTabs";
+import { AdminModalV2 } from "./shared/AdminModalV2";
 import {
   Receipt,
   Plus,
@@ -868,29 +869,34 @@ export const ComandasManagement: React.FC = () => {
 
       {/* CLOSING COMANDA MODAL */}
       {closingComanda && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl w-full max-w-md p-5 text-[var(--admin-text-main)] space-y-4 relative shadow-2xl animate-fade-in">
-            <button
-              onClick={() => setClosingComanda(null)}
-              className="absolute top-4 right-4 text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] p-1"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-center gap-3 border-b border-[var(--admin-border)] pb-3">
-              <div className="w-10 h-10 rounded-xl bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
-                <Receipt className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-[var(--admin-text-main)]">
-                  Fechar conta
-                </h3>
-                <p className="text-xs text-[var(--admin-text-muted)] font-mono">
-                  {closingComanda.code} • {closingComanda.clientName}
-                </p>
-              </div>
+        <AdminModalV2
+          icon={Receipt}
+          eyebrow="Fechamento de Conta"
+          title={`Fechar comanda ${closingComanda.code}`}
+          subtitle={`${closingComanda.clientName} • ${closingComanda.items.length} itens`}
+          onClose={() => setClosingComanda(null)}
+          size="md"
+          footer={
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setClosingComanda(null)}
+                className="admin-btn admin-btn-secondary h-10 px-4 text-xs font-bold"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmCloseComanda}
+                className="admin-btn admin-btn-primary h-10 px-5 text-xs font-bold flex items-center gap-1.5"
+              >
+                <Check className="w-4 h-4 stroke-[3]" />
+                <span>Confirmar pagamento</span>
+              </button>
             </div>
-
+          }
+        >
+          <div className="space-y-4">
             {/* Calculations */}
             <div className="space-y-3 bg-[var(--admin-bg)] p-3.5 rounded-xl border border-[var(--admin-border)] text-xs">
               <div className="flex justify-between items-center text-[var(--admin-text-muted)]">
@@ -900,38 +906,38 @@ export const ComandasManagement: React.FC = () => {
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[var(--admin-border)]/60">
-                <div>
-                  <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase block mb-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[var(--admin-border)]/60">
+                <label className="block">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1">
                     Desconto (R$)
-                  </label>
+                  </span>
                   <input
                     type="number"
                     min="0"
                     step="1"
                     value={discountInput}
                     onChange={(e) => setDiscountInput(Number(e.target.value))}
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none"
+                    className="w-full h-9 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                   />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase block mb-1">
+                </label>
+                <label className="block">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-1">
                     Gorjeta / Caixinha (R$)
-                  </label>
+                  </span>
                   <input
                     type="number"
                     min="0"
                     step="1"
                     value={tipInput}
                     onChange={(e) => setTipInput(Number(e.target.value))}
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none"
+                    className="w-full h-9 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                   />
-                </div>
+                </label>
               </div>
 
               <div className="flex justify-between items-center text-sm font-bold border-t border-[var(--admin-border)]/80 pt-2 finance-positive">
                 <span>Total a Pagar:</span>
-                <span className="text-base tabular-nums">
+                <span className="text-base tabular-nums font-mono font-bold">
                   R${" "}
                   {Math.max(
                     0,
@@ -943,10 +949,10 @@ export const ComandasManagement: React.FC = () => {
 
             {/* Payment Method */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider block">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
                 Forma de Pagamento
-              </label>
-              <div className="grid grid-cols-3 gap-2">
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {[
                   { id: "pix", label: "PIX", icon: QrCode },
                   { id: "credit_card", label: "Crédito", icon: CreditCard },
@@ -961,146 +967,46 @@ export const ComandasManagement: React.FC = () => {
                       key={pm.id}
                       type="button"
                       onClick={() => setPaymentMethod(pm.id as any)}
-                      className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1 transition-all ${
+                      className={`p-2.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                         isSel
                           ? "bg-[var(--admin-accent)]/15 border-[var(--admin-accent)] text-[var(--admin-accent)] shadow-xs"
-                          : "bg-[var(--admin-bg)] border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:border-[var(--admin-accent)]/30"
+                          : "bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:border-[var(--admin-accent)]/30 hover:text-[var(--admin-text-main)]"
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-4 h-4 shrink-0" />
                       <span>{pm.label}</span>
                     </button>
                   );
                 })}
               </div>
             </div>
-
-            {/* Actions */}
-            <div className="pt-2 flex items-center justify-end gap-2">
-              <button
-                onClick={() => setClosingComanda(null)}
-                className="px-4 py-2 text-xs font-bold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirmCloseComanda}
-                className="bg-[var(--admin-accent)] hover:bg-gold-hover text-[var(--admin-accent-text)] px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all active:scale-95 flex items-center gap-1.5"
-              >
-                <Check className="w-4 h-4 stroke-[3]" />
-                <span>Confirmar</span>
-              </button>
-            </div>
           </div>
-        </div>
+        </AdminModalV2>
       )}
 
       {/* RECEIPT MODAL */}
       {receiptModalComanda && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl w-full max-w-sm p-6 text-[var(--admin-text-main)] space-y-4 relative shadow-2xl font-serif">
-            <button
-              onClick={() => setReceiptModalComanda(null)}
-              className="absolute top-4 right-4 text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] p-1"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="text-center border-b border-[var(--admin-border)] pb-4 space-y-1">
-              {shopProfile.logoUrl ? (
-                <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 mx-auto mb-2 shadow-md overflow-hidden flex items-center justify-center">
-                  <img
-                    src={shopProfile.logoUrl}
-                    alt={shopProfile.name || "Logo"}
-                    className="w-full h-full object-cover rounded-full bg-neutral-900"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLElement).style.display = "none";
-                    }}
-                  />
-                </div>
-              ) : null}
-              <h2 className="text-lg font-bold text-[var(--admin-text-main)] tracking-widest uppercase">
-                {shopProfile.name || "NAVO PREMIUM"}
-              </h2>
-              <p className="text-xs text-[var(--admin-accent)] font-bold uppercase tracking-widest">
-                {shopProfile.slogan || "Heritage Barber & Club"}
-              </p>
-              <p className="text-xs text-[var(--admin-text-muted)] font-sans">
-                Comprovante de Atendimento #{receiptModalComanda.code}
-              </p>
-            </div>
-
-            <div className="text-xs font-sans space-y-1.5 border-b border-[var(--admin-border)] pb-3">
-              <p>
-                <strong>Cliente:</strong> {receiptModalComanda.clientName}
-              </p>
-              <p>
-                <strong>Profissional:</strong>{" "}
-                {receiptModalComanda.professionalName || "Geral"}
-              </p>
-              <p>
-                <strong>Data:</strong>{" "}
-                {new Date(
-                  receiptModalComanda.closedAt || receiptModalComanda.createdAt,
-                ).toLocaleString("pt-BR")}
-              </p>
-              <p className="uppercase">
-                <strong>Pagamento:</strong> {receiptModalComanda.paymentMethod}
-              </p>
-            </div>
-
-            <div className="font-sans space-y-2">
-              <span className="text-xs font-bold uppercase text-[var(--admin-text-muted)] block">
-                Itens Consumidos
-              </span>
-              {receiptModalComanda.items.map((item, i) => (
-                <div key={i} className="flex justify-between text-xs">
-                  <span>
-                    {item.quantity}x {item.title}
-                  </span>
-                  <span className="font-bold finance-positive tabular-nums">
-                    R$ {(item.price * item.quantity).toFixed(2)}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t border-[var(--admin-border)] pt-3 font-sans space-y-1 text-xs">
-              <div className="flex justify-between text-[var(--admin-text-muted)]">
-                <span>Subtotal:</span>
-                <span className="finance-positive">
-                  R$ {receiptModalComanda.subtotal.toFixed(2)}
-                </span>
-              </div>
-              {receiptModalComanda.discount > 0 && (
-                <div className="flex justify-between finance-negative">
-                  <span>Desconto:</span>
-                  <span>- R$ {receiptModalComanda.discount.toFixed(2)}</span>
-                </div>
-              )}
-              {receiptModalComanda.tip > 0 && (
-                <div className="flex justify-between finance-positive">
-                  <span>Caixinha / Gorjeta:</span>
-                  <span>+ R$ {receiptModalComanda.tip.toFixed(2)}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-sm font-bold text-[var(--admin-text-main)] border-t border-[var(--admin-border)]/80 pt-1">
-                <span>TOTAL PAGO:</span>
-                <span className="finance-positive tabular-nums">
-                  R$ {receiptModalComanda.total.toFixed(2)}
-                </span>
-              </div>
-            </div>
-
-            <div className="pt-2 flex items-center justify-center gap-2 font-sans">
+        <AdminModalV2
+          icon={Receipt}
+          eyebrow="Comprovante de Atendimento"
+          title={shopProfile.name || "NAVO PREMIUM"}
+          subtitle={`Comanda #${receiptModalComanda.code} • ${new Date(
+            receiptModalComanda.closedAt || receiptModalComanda.createdAt,
+          ).toLocaleString("pt-BR")}`}
+          onClose={() => setReceiptModalComanda(null)}
+          size="sm"
+          footer={
+            <div className="flex items-center justify-end gap-2.5 w-full">
               <button
+                type="button"
                 onClick={handlePrintComanda}
-                className="px-3 py-2 rounded-xl border border-[var(--admin-border)] hover:bg-[var(--admin-bg)] text-xs font-bold flex items-center gap-1.5"
+                className="admin-btn admin-btn-secondary h-10 px-3 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
               >
                 <Printer className="w-4 h-4" />
                 <span>Imprimir</span>
               </button>
               <button
+                type="button"
                 onClick={() => {
                   const msg = `Olá! Segue o comprovante da comanda ${receiptModalComanda.code} no Navo Premium no valor de R$ ${receiptModalComanda.total.toFixed(2)}. Obrigado pela preferência!`;
                   window.open(
@@ -1108,14 +1014,85 @@ export const ComandasManagement: React.FC = () => {
                     "_blank",
                   );
                 }}
-                className="bg-status-success text-white px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5"
+                className="admin-btn bg-status-success text-white hover:opacity-90 h-10 px-4 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
               >
                 <Share2 className="w-4 h-4" />
-                <span>Enviar Whats</span>
+                <span>Enviar WhatsApp</span>
               </button>
             </div>
+          }
+        >
+          <div className="space-y-4">
+            <div className="p-3.5 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] space-y-1.5 text-xs">
+              <div className="flex justify-between">
+                <span className="text-[var(--admin-text-muted)]">Cliente:</span>
+                <span className="font-semibold text-[var(--admin-text-main)]">
+                  {receiptModalComanda.clientName}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--admin-text-muted)]">Profissional:</span>
+                <span className="font-semibold text-[var(--admin-text-main)]">
+                  {receiptModalComanda.professionalName || "Geral"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--admin-text-muted)]">Pagamento:</span>
+                <span className="font-semibold text-[var(--admin-text-main)] uppercase">
+                  {receiptModalComanda.paymentMethod}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
+                Itens Consumidos
+              </span>
+              <div className="space-y-1.5">
+                {receiptModalComanda.items.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex justify-between items-center text-xs p-2 rounded-lg bg-[var(--admin-bg)] border border-[var(--admin-border)]/60"
+                  >
+                    <span className="font-medium text-[var(--admin-text-main)]">
+                      {item.quantity}x {item.title}
+                    </span>
+                    <span className="font-bold font-mono finance-positive tabular-nums">
+                      R$ {(item.price * item.quantity).toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-[var(--admin-border)] pt-3 space-y-1.5 text-xs">
+              <div className="flex justify-between text-[var(--admin-text-muted)]">
+                <span>Subtotal:</span>
+                <span className="font-mono finance-positive">
+                  R$ {receiptModalComanda.subtotal.toFixed(2)}
+                </span>
+              </div>
+              {receiptModalComanda.discount > 0 && (
+                <div className="flex justify-between finance-negative">
+                  <span>Desconto:</span>
+                  <span className="font-mono">- R$ {receiptModalComanda.discount.toFixed(2)}</span>
+                </div>
+              )}
+              {receiptModalComanda.tip > 0 && (
+                <div className="flex justify-between finance-positive">
+                  <span>Caixinha / Gorjeta:</span>
+                  <span className="font-mono">+ R$ {receiptModalComanda.tip.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm font-bold text-[var(--admin-text-main)] border-t border-[var(--admin-border)]/80 pt-2">
+                <span>TOTAL PAGO:</span>
+                <span className="font-mono text-base finance-positive tabular-nums">
+                  R$ {receiptModalComanda.total.toFixed(2)}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
+        </AdminModalV2>
       )}
 
       {activeTab !== "new" && (

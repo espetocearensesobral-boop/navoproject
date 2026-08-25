@@ -40,7 +40,7 @@ export const AdminFab: React.FC<AdminFabProps> = ({
       style={{
         position: "fixed",
       }}
-      className={`fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-4 lg:bottom-6 lg:right-6 z-40 group flex items-center justify-center h-14 w-14 hover:w-auto hover:px-5 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-full shadow-[0_8px_25px_rgba(0,0,0,0.35)] hover:shadow-[0_10px_35px_rgba(212,175,55,0.5)] active:scale-95 transition-all duration-300 ease-out cursor-pointer overflow-hidden border border-amber-200/40 select-none ${
+      className={`fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-5 md:bottom-8 md:right-8 z-30 group flex items-center justify-center h-14 w-14 hover:w-auto hover:px-5 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-full shadow-[0_8px_25px_rgba(0,0,0,0.35)] hover:shadow-[0_10px_35px_rgba(212,175,55,0.5)] active:scale-95 transition-all duration-300 ease-out cursor-pointer overflow-hidden border border-amber-200/40 select-none ${
         disabled ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
       } ${className}`}
     >
