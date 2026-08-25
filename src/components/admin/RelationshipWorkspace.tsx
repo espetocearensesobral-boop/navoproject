@@ -10,10 +10,12 @@ import {
   Star,
   Users,
   UserRound,
+  Zap,
 } from "lucide-react";
 import { NavoRewardsAdmin } from "./NavoRewardsAdmin";
 import { FollowUpManagement } from "./FollowUpManagement";
 import { BirthdaysManagement } from "./BirthdaysManagement";
+import { AppointmentRemindersManagement } from "./AppointmentRemindersManagement";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 
 type RelationshipTab =
@@ -22,6 +24,7 @@ type RelationshipTab =
   | "reviews"
   | "followup"
   | "birthdays"
+  | "reminders"
   | "referrals"
   | "rewards";
 type RelationshipGroupId = "relationship" | "retention" | "care";
@@ -96,9 +99,15 @@ const groups: RelationshipGroup[] = [
   {
     id: "care",
     label: "Cuidado e recorrência",
-    summary: "Aniversários e contatos de relacionamento",
+    summary: "Lembretes, aniversários e contatos de relacionamento",
     icon: Cake,
     options: [
+      {
+        id: "reminders",
+        label: "Lembretes WhatsApp",
+        description: "Lembretes 2h antes, confirmações e avisos",
+        icon: Zap,
+      },
       {
         id: "birthdays",
         label: "Aniversários",
@@ -157,6 +166,7 @@ export const RelationshipWorkspace: React.FC<{
   };
 
   const renderContent = () => {
+    if (activeTab === "reminders") return <AppointmentRemindersManagement />;
     if (activeTab === "followup") return <FollowUpManagement />;
     if (activeTab === "birthdays") return <BirthdaysManagement />;
     return (

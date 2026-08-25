@@ -5,16 +5,23 @@ import {
   ArrowRight,
   Banknote,
   CheckCircle2,
+  ChevronDown,
   ClipboardCheck,
   CreditCard,
   FileText,
+  HeartHandshake,
   Info,
   Loader2,
+  Minus,
+  Plus,
   Printer,
   QrCode,
   ReceiptText,
   Share2,
+  ShoppingBag,
+  Sparkles,
   Tag,
+  Trash2,
   UserRound,
   WalletCards,
   X,
@@ -24,6 +31,8 @@ import { useDialogFocus } from "../../hooks/useDialogFocus";
 import { useModalScrollLock } from "../../hooks/useModalScrollLock";
 import {
   createReceiptInSupabase,
+  fetchProductsFromSupabase,
+  fetchServicesFromSupabase,
   receiveReceiptInSupabase,
   type ReceiptItem,
   type ReceiptPaymentMethod,
@@ -33,6 +42,7 @@ import {
   fetchPrintSettings,
 } from "../../services/printSettingsService";
 import { escapePrintHtml, openPrintWindow } from "../../utils/printUtils";
+import { type ProductItem, type ServiceItem } from "../../types";
 
 export interface ReceiptCheckoutSource {
   appointmentId?: string;
@@ -43,6 +53,20 @@ export interface ReceiptCheckoutSource {
   professionalName?: string;
   serviceTitle: string;
   servicePrice?: number;
+}
+
+interface ExtraProductItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface ExtraServiceItem {
+  id: string;
+  title: string;
+  price: number;
+  quantity: number;
 }
 
 interface ReceiptCheckoutModalProps {
@@ -119,15 +143,39 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
   const [isCreating, setIsCreating] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Multi-item / Comanda State
+  const [extraProducts, setExtraProducts] = useState<ExtraProductItem[]>([]);
+  const [extraServices, setExtraServices] = useState<ExtraServiceItem[]>([]);
+  const [tipAmount, setTipAmount] = useState<number>(0);
+  const [availableProducts, setAvailableProducts] = useState<ProductItem[]>([]);
+  const [availableServices, setAvailableServices] = useState<ServiceItem[]>([]);
+  const [showProductPicker, setShowProductPicker] = useState(false);
+  const [showServicePicker, setShowServicePicker] = useState(false);
+  const [showTipPicker, setShowTipPicker] = useState(false);
+
   const dialogRef = useRef<HTMLDivElement>(null);
   useDialogFocus(true, dialogRef);
   useModalScrollLock(true);
 
+  // Carregar produtos e serviços do catálogo para adição rápida na comanda
+  useEffect(() => {
+    fetchProductsFromSupabase().then(setAvailableProducts).catch(() => {});
+    fetchServicesFromSupabase().then(setAvailableServices).catch(() => {});
+  }, []);
+
+  const extraItemsTotal = useMemo(() => {
+    const prods = extraProducts.reduce((sum, p) => sum + p.price * p.quantity, 0);
+    const svcs = extraServices.reduce((sum, s) => sum + s.price * s.quantity, 0);
+    return prods + svcs + tipAmount;
+  }, [extraProducts, extraServices, tipAmount]);
+
   const calculation = useMemo(() => {
-    const entered = Math.max(
+    const baseEntered = Math.max(
       0,
       Number(initialReceipt?.enteredAmount ?? originalAmount),
     );
+    const entered = baseEntered + extraItemsTotal;
     const discountRaw = parseMoney(discountValue);
     const surchargeRaw = parseMoney(surchargeValue);
     const discountPercent =
@@ -155,6 +203,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
       paymentMethod === "cash" ? parseMoney(cashReceived) : total;
 
     return {
+      baseEntered,
+      extraItemsTotal,
       entered,
       discountPercent,
       discountAmount,
@@ -169,6 +219,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
     cashReceived,
     discountMode,
     discountValue,
+    extraItemsTotal,
     initialReceipt?.enteredAmount,
     originalAmount,
     paymentMethod,
@@ -182,11 +233,101 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
     }
   }, [calculation.total, paymentMethod]);
 
+  const addProductToComanda = (prod: ProductItem) => {
+    setExtraProducts((prev) => {
+      const existing = prev.find((p) => p.id === prod.id);
+      if (existing) {
+        return prev.map((p) =>
+          p.id === prod.id ? { ...p, quantity: p.quantity + 1 } : p,
+        );
+      }
+      return [
+        ...prev,
+        { id: prod.id, name: prod.name, price: prod.price, quantity: 1 },
+      ];
+    });
+    setShowProductPicker(false);
+  };
+
+  const removeProductFromComanda = (id: string) => {
+    setExtraProducts((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const updateProductQuantity = (id: string, delta: number) => {
+    setExtraProducts((prev) =>
+      prev
+        .map((p) => {
+          if (p.id === id) {
+            const nextQty = p.quantity + delta;
+            return nextQty > 0 ? { ...p, quantity: nextQty } : null;
+          }
+          return p;
+        })
+        .filter(Boolean) as ExtraProductItem[],
+    );
+  };
+
+  const addServiceToComanda = (svc: ServiceItem) => {
+    setExtraServices((prev) => {
+      const existing = prev.find((s) => s.id === svc.id);
+      if (existing) {
+        return prev.map((s) =>
+          s.id === svc.id ? { ...s, quantity: s.quantity + 1 } : s,
+        );
+      }
+      return [
+        ...prev,
+        { id: svc.id, title: svc.title, price: svc.price, quantity: 1 },
+      ];
+    });
+    setShowServicePicker(false);
+  };
+
+  const removeServiceFromComanda = (id: string) => {
+    setExtraServices((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const updateServiceQuantity = (id: string, delta: number) => {
+    setExtraServices((prev) =>
+      prev
+        .map((s) => {
+          if (s.id === id) {
+            const nextQty = s.quantity + delta;
+            return nextQty > 0 ? { ...s, quantity: nextQty } : null;
+          }
+          return s;
+        })
+        .filter(Boolean) as ExtraServiceItem[],
+    );
+  };
+
+  const buildComandaSummaryNotes = () => {
+    const lines: string[] = [];
+    if (extraProducts.length > 0) {
+      lines.push(
+        `Produtos: ${extraProducts.map((p) => `${p.quantity}x ${p.name} (${money(p.price * p.quantity)})`).join(", ")}`,
+      );
+    }
+    if (extraServices.length > 0) {
+      lines.push(
+        `Serviços Extras: ${extraServices.map((s) => `${s.quantity}x ${s.title} (${money(s.price * s.quantity)})`).join(", ")}`,
+      );
+    }
+    if (tipAmount > 0) {
+      lines.push(`Gorjeta: ${money(tipAmount)}`);
+    }
+    if (observations.trim()) {
+      lines.push(`Obs: ${observations.trim()}`);
+    }
+    return lines.join(" | ");
+  };
+
   const ensurePendingReceipt = async () => {
     if (receipt) return receipt;
     setIsCreating(true);
     setError(null);
     try {
+      const fullNotes = buildComandaSummaryNotes();
       const created = await createReceiptInSupabase({
         appointmentId: source.appointmentId || null,
         clientId: source.clientId || null,
@@ -196,7 +337,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
         professionalName: source.professionalName || null,
         serviceTitle: source.serviceTitle,
         originalAmount,
-        enteredAmount: originalAmount,
+        enteredAmount: calculation.entered,
       });
       setReceipt(created);
       onPending(created);
@@ -235,15 +376,31 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           ? `<p><strong>Cliente:</strong> ${escapePrintHtml(receipt.clientName)}</p>`
           : "",
         settings.showService
-          ? `<p><strong>Serviço:</strong> ${escapePrintHtml(receipt.serviceTitle)}</p>`
+          ? `<p><strong>Serviço Principal:</strong> ${escapePrintHtml(receipt.serviceTitle)}</p>`
           : "",
         settings.showProfessional
           ? `<p><strong>Profissional:</strong> ${escapePrintHtml(receipt.professionalName || "Não informado")}</p>`
           : "",
         `<p><strong>Data:</strong> ${escapePrintHtml(new Date(receipt.receivedAt || Date.now()).toLocaleString("pt-BR"))}</p>`,
       ].join("");
+
+      const extraRowsHtml = [
+        ...extraProducts.map(
+          (p) =>
+            `<div class="print-row"><span>${p.quantity}x ${escapePrintHtml(p.name)}</span><strong>${escapePrintHtml(money(p.price * p.quantity))}</strong></div>`,
+        ),
+        ...extraServices.map(
+          (s) =>
+            `<div class="print-row"><span>${s.quantity}x ${escapePrintHtml(s.title)}</span><strong>${escapePrintHtml(money(s.price * s.quantity))}</strong></div>`,
+        ),
+        ...(tipAmount > 0
+          ? [
+              `<div class="print-row"><span>Gorjeta Barbeiro</span><strong>${escapePrintHtml(money(tipAmount))}</strong></div>`,
+            ]
+          : []),
+      ].join("");
+
       const valueRows = [
-        ["Valor original", money(receipt.originalAmount)],
         ["Valor base", money(receipt.enteredAmount)],
         ...(receipt.discountAmount > 0
           ? [["Desconto", `- ${money(receipt.discountAmount)}`]]
@@ -274,7 +431,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
             `<div class="print-row"><span>${escapePrintHtml(label)}</span><strong>${escapePrintHtml(value)}</strong></div>`,
         )
         .join("");
-      const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' : ""}<h2 class="print-center">Comprovante de Pagamento</h2><hr class="print-divider">${contextRows}<hr class="print-divider">${valueRows}${settings.showObservations && receipt.observations ? `<hr class="print-divider"><p><strong>Observações:</strong> ${escapePrintHtml(receipt.observations)}</p>` : ""}`;
+
+      const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' : ""}<h2 class="print-center">Comprovante de Pagamento</h2><hr class="print-divider">${contextRows}${extraRowsHtml ? `<hr class="print-divider"><p><strong>Itens da Comanda:</strong></p>${extraRowsHtml}` : ""}<hr class="print-divider">${valueRows}${settings.showObservations && receipt.observations ? `<hr class="print-divider"><p><strong>Observações:</strong> ${escapePrintHtml(receipt.observations)}</p>` : ""}`;
       if (
         !openPrintWindow({
           title: "Comprovante de Pagamento",
@@ -306,7 +464,18 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
     ).toLocaleString("pt-BR");
     const methodStr = paymentLabel[receipt.paymentMethod || "other"];
 
-    const msg = `*Navo Barber & Club - Comprovante de Pagamento*\n\nOlá, ${clientName}!\nConfirmamos o pagamento referente ao serviço *${receipt.serviceTitle}*.\n\n*Detalhes:*\n• Profissional: ${receipt.professionalName || "Profissional"}\n• Forma: ${methodStr}\n• Valor: *${totalFormatted}*\n• Data: ${dateFormatted}\n\nAgradecemos a preferência e até a próxima!`;
+    let itemsStr = `• ${receipt.serviceTitle}: ${money(originalAmount)}`;
+    if (extraProducts.length > 0) {
+      itemsStr += `\n• Produtos: ` + extraProducts.map((p) => `${p.quantity}x ${p.name} (${money(p.price * p.quantity)})`).join(", ");
+    }
+    if (extraServices.length > 0) {
+      itemsStr += `\n• Extras: ` + extraServices.map((s) => `${s.quantity}x ${s.title} (${money(s.price * s.quantity)})`).join(", ");
+    }
+    if (tipAmount > 0) {
+      itemsStr += `\n• Gorjeta: ${money(tipAmount)}`;
+    }
+
+    const msg = `*Navo Barber & Club - Comprovante de Pagamento*\n\nOlá, ${clientName}!\nConfirmamos o pagamento da sua comanda/atendimento.\n\n*Itens e Consumo:*\n${itemsStr}\n\n*Resumo:*\n• Profissional: ${receipt.professionalName || "Profissional"}\n• Forma: ${methodStr}\n• Total Pago: *${totalFormatted}*\n• Data: ${dateFormatted}\n\nAgradecemos a preferência e até a próxima!`;
 
     const targetUrl = phone
       ? `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`
@@ -327,6 +496,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
     setIsConfirming(true);
     setError(null);
     try {
+      const fullNotes = buildComandaSummaryNotes();
       const confirmed = await receiveReceiptInSupabase(receipt.id, {
         enteredAmount: calculation.entered,
         discountPercent: calculation.discountPercent,
@@ -337,7 +507,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
         paymentMethod,
         amountReceived: calculation.amountReceived,
         changeAmount: calculation.change,
-        observations: observations.trim() || null,
+        observations: fullNotes || null,
       });
       setReceipt(confirmed);
       onReceived(confirmed);
@@ -495,7 +665,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-2 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--color-gold-base)]/5 rounded-full blur-xl pointer-events-none" />
                 <div className="flex items-center justify-between text-xs text-[var(--color-content-muted)]">
-                  <span>Valor base do serviço</span>
+                  <span>Atendimento Principal</span>
                   <span className="font-semibold text-[var(--color-content-base)]">{source.serviceTitle}</span>
                 </div>
                 <div className="flex items-baseline justify-between">
@@ -507,6 +677,247 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                     <span className="text-[var(--color-content-base)]">{source.professionalName || "Profissional"}</span>
                   </div>
                 </div>
+              </div>
+
+              {/* SEÇÃO: COMANDA & ITENS ADICIONAIS */}
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--color-gold-base)]">
+                    <ShoppingBag className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
+                    <span>Comanda &amp; Itens Extras</span>
+                  </div>
+                  {extraItemsTotal > 0 && (
+                    <span className="text-xs font-bold text-status-success bg-status-success/10 px-2 py-0.5 rounded-full border border-status-success/20">
+                      + {money(extraItemsTotal)}
+                    </span>
+                  )}
+                </div>
+
+                {/* LISTA DE PRODUTOS DA COMANDA */}
+                {extraProducts.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-bold text-[var(--color-content-muted)] uppercase">Produtos Adicionados</span>
+                    {extraProducts.map((prod) => (
+                      <div
+                        key={prod.id}
+                        className="flex items-center justify-between p-2.5 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl text-xs"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <p className="font-bold text-[var(--color-content-base)] truncate">{prod.name}</p>
+                          <p className="text-[11px] text-[var(--color-content-muted)]">{money(prod.price)} un.</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex items-center bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-lg">
+                            <button
+                              type="button"
+                              onClick={() => updateProductQuantity(prod.id, -1)}
+                              className="w-7 h-7 flex items-center justify-center text-[var(--color-content-muted)] hover:text-[var(--color-content-base)]"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="w-6 text-center font-bold text-[var(--color-content-base)]">{prod.quantity}</span>
+                            <button
+                              type="button"
+                              onClick={() => updateProductQuantity(prod.id, 1)}
+                              className="w-7 h-7 flex items-center justify-center text-[var(--color-content-muted)] hover:text-[var(--color-content-base)]"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+                          <span className="font-bold text-[var(--color-content-base)] min-w-[60px] text-right">
+                            {money(prod.price * prod.quantity)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeProductFromComanda(prod.id)}
+                            className="text-status-error hover:opacity-80 p-1"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* LISTA DE SERVIÇOS EXTRAS */}
+                {extraServices.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-bold text-[var(--color-content-muted)] uppercase">Serviços Adicionais</span>
+                    {extraServices.map((svc) => (
+                      <div
+                        key={svc.id}
+                        className="flex items-center justify-between p-2.5 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl text-xs"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <p className="font-bold text-[var(--color-content-base)] truncate">{svc.title}</p>
+                          <p className="text-[11px] text-[var(--color-content-muted)]">{money(svc.price)} un.</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex items-center bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-lg">
+                            <button
+                              type="button"
+                              onClick={() => updateServiceQuantity(svc.id, -1)}
+                              className="w-7 h-7 flex items-center justify-center text-[var(--color-content-muted)] hover:text-[var(--color-content-base)]"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="w-6 text-center font-bold text-[var(--color-content-base)]">{svc.quantity}</span>
+                            <button
+                              type="button"
+                              onClick={() => updateServiceQuantity(svc.id, 1)}
+                              className="w-7 h-7 flex items-center justify-center text-[var(--color-content-muted)] hover:text-[var(--color-content-base)]"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+                          <span className="font-bold text-[var(--color-content-base)] min-w-[60px] text-right">
+                            {money(svc.price * svc.quantity)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeServiceFromComanda(svc.id)}
+                            className="text-status-error hover:opacity-80 p-1"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* GORJETA SELECIONADA */}
+                {tipAmount > 0 && (
+                  <div className="flex items-center justify-between p-2.5 bg-amber-500/10 border border-amber-500/25 rounded-xl text-xs">
+                    <div className="flex items-center gap-2">
+                      <HeartHandshake className="w-4 h-4 text-amber-500" />
+                      <span className="font-bold text-amber-500">Gorjeta para o Barbeiro</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-amber-500">{money(tipAmount)}</span>
+                      <button
+                        type="button"
+                        onClick={() => setTipAmount(0)}
+                        className="text-status-error hover:opacity-80 p-1"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* BOTÕES PARA ABRIR PICKERS */}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowProductPicker(!showProductPicker);
+                      setShowServicePicker(false);
+                      setShowTipPicker(false);
+                    }}
+                    className="min-h-[36px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-content-base)] hover:border-[var(--color-gold-base)] flex items-center gap-1.5 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
+                    <span>+ Produto</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowServicePicker(!showServicePicker);
+                      setShowProductPicker(false);
+                      setShowTipPicker(false);
+                    }}
+                    className="min-h-[36px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-content-base)] hover:border-[var(--color-gold-base)] flex items-center gap-1.5 transition-colors"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
+                    <span>+ Serviço Extra</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowTipPicker(!showTipPicker);
+                      setShowProductPicker(false);
+                      setShowServicePicker(false);
+                    }}
+                    className="min-h-[36px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-content-base)] hover:border-[var(--color-gold-base)] flex items-center gap-1.5 transition-colors"
+                  >
+                    <HeartHandshake className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
+                    <span>+ Gorjeta</span>
+                  </button>
+                </div>
+
+                {/* PICKER: PRODUTOS */}
+                {showProductPicker && (
+                  <div className="p-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl space-y-2 max-h-48 overflow-y-auto">
+                    <p className="text-[11px] font-bold text-[var(--color-content-muted)] uppercase">Selecione um Produto do Estoque:</p>
+                    {availableProducts.length === 0 ? (
+                      <p className="text-xs text-[var(--color-content-muted)]">Nenhum produto cadastrado no catálogo.</p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        {availableProducts.map((prod) => (
+                          <button
+                            key={prod.id}
+                            type="button"
+                            onClick={() => addProductToComanda(prod)}
+                            className="p-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-left hover:border-[var(--color-gold-base)] flex items-center justify-between text-xs transition-colors"
+                          >
+                            <span className="font-semibold text-[var(--color-content-base)] truncate pr-2">{prod.name}</span>
+                            <span className="font-bold text-[var(--color-gold-base)] shrink-0">{money(prod.price)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* PICKER: SERVIÇOS EXTRAS */}
+                {showServicePicker && (
+                  <div className="p-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl space-y-2 max-h-48 overflow-y-auto">
+                    <p className="text-[11px] font-bold text-[var(--color-content-muted)] uppercase">Selecione um Serviço Extra:</p>
+                    {availableServices.length === 0 ? (
+                      <p className="text-xs text-[var(--color-content-muted)]">Nenhum serviço adicional disponível.</p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        {availableServices.map((svc) => (
+                          <button
+                            key={svc.id}
+                            type="button"
+                            onClick={() => addServiceToComanda(svc)}
+                            className="p-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-left hover:border-[var(--color-gold-base)] flex items-center justify-between text-xs transition-colors"
+                          >
+                            <span className="font-semibold text-[var(--color-content-base)] truncate pr-2">{svc.title}</span>
+                            <span className="font-bold text-[var(--color-gold-base)] shrink-0">{money(svc.price)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* PICKER: GORJETA */}
+                {showTipPicker && (
+                  <div className="p-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl space-y-2">
+                    <p className="text-[11px] font-bold text-[var(--color-content-muted)] uppercase">Valor da Gorjeta ao Profissional:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {[5, 10, 15, 20, 50].map((amount) => (
+                        <button
+                          key={amount}
+                          type="button"
+                          onClick={() => {
+                            setTipAmount(amount);
+                            setShowTipPicker(false);
+                          }}
+                          className="px-3 py-1.5 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-base)] hover:border-amber-500 hover:text-amber-500 transition-colors"
+                        >
+                          + {money(amount)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* AJUSTES: DESCONTO E ACRÉSCIMO */}
@@ -741,16 +1152,40 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                   <strong className="text-[var(--color-content-base)]">{source.clientName}</strong>
                 </div>
                 <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)]">
-                  <span className="text-[var(--color-content-muted)]">Serviço</span>
-                  <span className="text-[var(--color-content-base)] font-semibold">{source.serviceTitle}</span>
+                  <span className="text-[var(--color-content-muted)]">Serviço principal</span>
+                  <span className="text-[var(--color-content-base)] font-semibold">{source.serviceTitle} ({money(originalAmount)})</span>
                 </div>
+                {extraProducts.length > 0 && (
+                  <div className="py-1 border-b border-[var(--color-border-subtle)] space-y-1">
+                    <span className="text-[var(--color-content-muted)] block">Produtos:</span>
+                    {extraProducts.map((p) => (
+                      <div key={p.id} className="flex justify-between text-[11px] pl-2 text-[var(--color-content-base)]">
+                        <span>{p.quantity}x {p.name}</span>
+                        <span className="font-semibold">{money(p.price * p.quantity)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {extraServices.length > 0 && (
+                  <div className="py-1 border-b border-[var(--color-border-subtle)] space-y-1">
+                    <span className="text-[var(--color-content-muted)] block">Serviços extras:</span>
+                    {extraServices.map((s) => (
+                      <div key={s.id} className="flex justify-between text-[11px] pl-2 text-[var(--color-content-base)]">
+                        <span>{s.quantity}x {s.title}</span>
+                        <span className="font-semibold">{money(s.price * s.quantity)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {tipAmount > 0 && (
+                  <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)] text-amber-500 font-medium">
+                    <span>Gorjeta Barbeiro</span>
+                    <span>+ {money(tipAmount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)]">
-                  <span className="text-[var(--color-content-muted)]">Profissional</span>
-                  <span className="text-[var(--color-content-base)]">{source.professionalName || "Não informado"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)]">
-                  <span className="text-[var(--color-content-muted)]">Valor original</span>
-                  <span className="text-[var(--color-content-base)]">{money(originalAmount)}</span>
+                  <span className="text-[var(--color-content-muted)]">Subtotal comanda</span>
+                  <span className="text-[var(--color-content-base)] font-bold">{money(calculation.entered)}</span>
                 </div>
                 {calculation.discountAmount > 0 && (
                   <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)] text-status-error font-medium">
