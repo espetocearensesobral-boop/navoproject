@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { handleEnterAsTab } from "../../utils/formUtils";
 import {
   deleteCashTransactionInSupabase,
@@ -250,21 +251,7 @@ export const ExpensesManagement: React.FC = () => {
           },
           { label: "lançamentos", value: expenses.length, tone: "neutral" },
         ]}
-        action={{ label: "Nova saída", onClick: openCreate, icon: Plus }}
       />
-
-      <div className="md:hidden">
-        <button
-          type="button"
-          onClick={openCreate}
-          title="Nova saída"
-          aria-label="Nova saída"
-          className="admin-btn admin-btn-destructive w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-status-error/30 bg-status-error/10 hover:bg-status-error/20 text-status-error shadow-md cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Nova saída</span>
-        </button>
-      </div>
 
       {error && (
         <div className="rounded-xl border border-status-error/30 bg-status-error/10 px-3.5 py-3 text-sm font-semibold text-status-error flex items-center justify-between gap-3">
@@ -651,6 +638,12 @@ export const ExpensesManagement: React.FC = () => {
           </div>
         </div>
       )}
+
+      <AdminFab
+        onClick={openCreate}
+        label="Nova Saída"
+        icon={Plus}
+      />
     </div>
   );
 };

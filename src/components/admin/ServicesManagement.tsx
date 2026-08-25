@@ -8,6 +8,7 @@ import {
 } from "../../services/supabaseDataService";
 import { DEFAULT_CATEGORIES, getCategoryName } from "../../data/categories";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { AdminEmptyState } from "./shared/AdminEmptyState";
 import { Button } from "../ui/Button";
 import { AdminLabel } from "../ui/AdminLabel";
@@ -377,24 +378,7 @@ export const ServicesManagement: React.FC = () => {
             tone: "finance-positive",
           },
         ]}
-        action={{
-          label: "Novo serviço",
-          onClick: handleOpenCreate,
-          icon: Plus,
-        }}
       />
-
-      {/* Ação mobile: mesmo padrão de Produtos & Estoque */}
-      <button
-        type="button"
-        onClick={handleOpenCreate}
-        title="Novo serviço"
-        aria-label="Novo serviço"
-        className="admin-btn admin-btn-primary md:hidden w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
-      >
-        <Plus className="w-4 h-4" />
-        <span>Novo serviço</span>
-      </button>
 
       {/* Success Notification Banner */}
       {successMsg && (
@@ -1283,6 +1267,12 @@ export const ServicesManagement: React.FC = () => {
           </div>
         </div>
       )}
+
+      <AdminFab
+        onClick={handleOpenCreate}
+        label="Novo Serviço"
+        icon={Plus}
+      />
     </div>
   );
 };

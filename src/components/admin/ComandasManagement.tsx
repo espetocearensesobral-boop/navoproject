@@ -18,6 +18,7 @@ import {
 } from "../../services/printSettingsService";
 import { escapePrintHtml, openPrintWindow } from "../../utils/printUtils";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { AdminTabs } from "./shared/AdminTabs";
 import {
   Receipt,
@@ -461,20 +462,7 @@ export const ComandasManagement: React.FC = () => {
         stats={[
           { label: "abertas", value: openComandas.length, tone: "success" },
         ]}
-        action={{ label: "Nova comanda", onClick: () => setActiveTab("new") }}
       />
-
-      {/* Ação (mobile) */}
-      <button
-        type="button"
-        onClick={() => setActiveTab("new")}
-        title="Nova comanda"
-        aria-label="Nova comanda"
-        className="admin-btn admin-btn-primary md:hidden w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer shrink-0"
-      >
-        <Plus className="w-4 h-4 stroke-[2.5]" />
-        <span>Nova comanda</span>
-      </button>
 
       {/* Navigation Tabs */}
       <AdminTabs
@@ -1128,6 +1116,14 @@ export const ComandasManagement: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {activeTab !== "new" && (
+        <AdminFab
+          onClick={() => setActiveTab("new")}
+          label="Nova Comanda"
+          icon={Plus}
+        />
       )}
     </div>
   );

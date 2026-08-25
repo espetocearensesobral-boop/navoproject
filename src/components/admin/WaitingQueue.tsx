@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { WaitingQueueItem, Professional, ServiceItem } from "../../types";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { AdminTabs } from "./shared/AdminTabs";
 import { AdminListSkeleton } from "./shared/AdminSkeleton";
 import { AdminEmptyState } from "./shared/AdminEmptyState";
@@ -518,36 +519,7 @@ export const WaitingQueue: React.FC = () => {
       <AdminPageHeader
         icon={Users}
         title="Fila de Espera"
-        action={
-          operationSettings.allowWalkIn
-            ? {
-                label: "Adicionar Encaixe",
-                onClick: () => {
-                  setIsServicePickerOpen(false);
-                  setIsAddModalOpen(true);
-                },
-                icon: Plus,
-              }
-            : undefined
-        }
       />
-
-      {/* Ação (mobile) */}
-      {operationSettings.allowWalkIn && (
-        <button
-          type="button"
-          onClick={() => {
-            setIsServicePickerOpen(false);
-            setIsAddModalOpen(true);
-          }}
-          title="Novo encaixe"
-          aria-label="Novo encaixe"
-          className="admin-btn admin-btn-primary md:hidden w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer shrink-0"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Novo encaixe</span>
-        </button>
-      )}
 
       {/* TOAST MESSAGE */}
       {lastNotification && (
@@ -1514,6 +1486,17 @@ export const WaitingQueue: React.FC = () => {
             />
           </label>
         </AdminModalV2>
+      )}
+
+      {operationSettings.allowWalkIn && (
+        <AdminFab
+          onClick={() => {
+            setIsServicePickerOpen(false);
+            setIsAddModalOpen(true);
+          }}
+          label="Novo Encaixe"
+          icon={Plus}
+        />
       )}
     </div>
   );

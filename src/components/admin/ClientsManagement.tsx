@@ -23,6 +23,7 @@ import { formatPhone } from "../../utils/masks";
 import { handleEnterAsTab } from "../../utils/formUtils";
 import { useDialogFocus } from "../../hooks/useDialogFocus";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
 import { AdminListSkeleton } from "./shared/AdminSkeleton";
 import { AdminEmptyState } from "./shared/AdminEmptyState";
@@ -276,22 +277,9 @@ export const ClientsManagement: React.FC = () => {
           { label: "VIP", value: vipCount, tone: "gold" },
           { label: "pts totais", value: totalPoints, tone: "info" },
         ]}
-        action={{ label: "Novo cliente", onClick: () => handleOpenModal() }}
       />
 
-      {/* MOBILE CTA + TOP BAR: mesmo padrão de Produtos & Estoque */}
-      <div className="md:hidden space-y-2">
-        <button
-          type="button"
-          onClick={() => handleOpenModal()}
-          title="Novo cliente"
-          aria-label="Novo cliente"
-          className="admin-btn admin-btn-primary w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Novo cliente</span>
-        </button>
-      </div>
+      {/* MOBILE SEARCH BAR */}
       <div className="md:hidden flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
@@ -933,6 +921,12 @@ export const ClientsManagement: React.FC = () => {
         variant="danger"
         isLoading={isDeleting}
         icon={<AlertTriangle className="h-6 w-6" aria-hidden="true" />}
+      />
+
+      <AdminFab
+        onClick={() => handleOpenModal()}
+        label="Novo Cliente"
+        icon={Plus}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import {
   deleteProfessionalInSupabase,
 } from "../../services/supabaseDataService";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { Button } from "../ui/Button";
 import { AdminLabel } from "../ui/AdminLabel";
 import { handleEnterAsTab } from "../../utils/formUtils";
@@ -325,11 +326,6 @@ export const ProfessionalsManagement: React.FC = () => {
         icon={Users}
         title="Equipe"
         stats={[{ label: "ativos", value: activeBarbers, tone: "gold" }]}
-        action={{
-          label: "Novo barbeiro",
-          onClick: handleOpenCreate,
-          icon: Plus,
-        }}
       />
 
       {/* TOAST MESSAGE */}
@@ -411,18 +407,8 @@ export const ProfessionalsManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* MOBILE: CTA, SEARCH AND FILTERS */}
+      {/* MOBILE: SEARCH AND FILTERS */}
       <div className="md:hidden space-y-2 mb-3">
-        <button
-          type="button"
-          onClick={handleOpenCreate}
-          title="Novo profissional"
-          aria-label="Novo profissional"
-          className="admin-btn admin-btn-primary w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Novo barbeiro</span>
-        </button>
         <div className="bg-[var(--admin-surface)] p-3 rounded-2xl border border-[var(--admin-border)]">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
@@ -1198,6 +1184,12 @@ export const ProfessionalsManagement: React.FC = () => {
           </div>
         </div>
       )}
+
+      <AdminFab
+        onClick={handleOpenCreate}
+        label="Novo Barbeiro"
+        icon={Plus}
+      />
     </div>
   );
 };

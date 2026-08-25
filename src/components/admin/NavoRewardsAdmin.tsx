@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { AdminTabs } from "./shared/AdminTabs";
 import { handleEnterAsTab } from "../../utils/formUtils";
 import {
@@ -2674,6 +2675,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {activeTab === "rewards" && (
+        <AdminFab
+          onClick={() => setShowAddRewardModal(true)}
+          label="Nova Oferta"
+          icon={Plus}
+        />
       )}
     </div>
   );

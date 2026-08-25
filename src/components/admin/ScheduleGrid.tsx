@@ -45,6 +45,7 @@ import {
   timeToMinutes,
 } from "../../utils/dateUtils";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { AdminListSkeleton } from "./shared/AdminSkeleton";
 import { AdminModalV2 } from "./shared/AdminModalV2";
 
@@ -400,14 +401,6 @@ export const ScheduleGrid: React.FC = () => {
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => setIsManualBookingOpen(true)}
-              className="admin-btn admin-btn-sm admin-btn-primary rounded-xl flex items-center gap-1.5 font-bold cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5 shrink-0" />
-              <span>Encaixe</span>
-            </button>
-            <button
-              type="button"
               onClick={() => setIsBlockModalOpen(true)}
               className="admin-btn-icon-sm admin-btn-destructive border border-status-error/30 rounded-xl cursor-pointer"
               title="Bloquear horário"
@@ -659,11 +652,6 @@ export const ScheduleGrid: React.FC = () => {
         <AdminPageHeader
           icon={Calendar}
           title="Agenda"
-          action={{
-            label: "Encaixe Manual",
-            onClick: () => setIsManualBookingOpen(true),
-            icon: Plus,
-          }}
         >
           <div className="flex flex-wrap items-center gap-3">
             <input
@@ -1197,6 +1185,12 @@ export const ScheduleGrid: React.FC = () => {
           </form>
         </AdminModalV2>
       )}
+
+      <AdminFab
+        onClick={() => setIsManualBookingOpen(true)}
+        label="Novo Agendamento"
+        icon={Plus}
+      />
     </div>
   );
 };

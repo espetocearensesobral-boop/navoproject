@@ -17,6 +17,7 @@ import {
   saveProductInSupabase,
 } from "../../services/supabaseDataService";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { handleEnterAsTab } from "../../utils/formUtils";
 
 const defaultProduct: ProductItem = {
@@ -196,21 +197,7 @@ export const ProductsManagement: React.FC = () => {
             tone: lowStockCount > 0 ? "warning" : "success",
           },
         ]}
-        action={{ label: "Novo produto", onClick: openCreate, icon: Plus }}
       />
-
-      <div className="md:hidden">
-        <button
-          type="button"
-          onClick={openCreate}
-          title="Novo produto"
-          aria-label="Novo produto"
-          className="admin-btn admin-btn-primary w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Novo produto</span>
-        </button>
-      </div>
 
       {toast && (
         <div className="rounded-xl border border-status-success/30 bg-status-success/10 p-3 text-xs font-semibold text-status-success">
@@ -660,6 +647,12 @@ export const ProductsManagement: React.FC = () => {
           </div>
         </div>
       ) : null}
+
+      <AdminFab
+        onClick={openCreate}
+        label="Novo Produto"
+        icon={Plus}
+      />
     </div>
   );
 };

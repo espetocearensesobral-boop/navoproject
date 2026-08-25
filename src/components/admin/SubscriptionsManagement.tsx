@@ -18,6 +18,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
+import { AdminFab } from "./shared/AdminFab";
 import { AdminTabs } from "./shared/AdminTabs";
 
 export interface SubscriptionPlan {
@@ -202,24 +203,7 @@ export const SubscriptionsManagement: React.FC = () => {
         stats={[
           { label: "assinantes", value: totalActiveSubscribers, tone: "gold" },
         ]}
-        action={{
-          label: "Novo plano",
-          onClick: () => setIsPlanModalOpen(true),
-          icon: Plus,
-        }}
       />
-
-      {/* Ação (mobile) */}
-      <button
-        type="button"
-        onClick={() => setIsPlanModalOpen(true)}
-        title="Novo plano"
-        aria-label="Novo plano"
-        className="admin-btn admin-btn-primary md:hidden w-full h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer shrink-0"
-      >
-        <Plus className="w-4 h-4 stroke-[2.5]" />
-        <span>Novo plano</span>
-      </button>
 
       {/* MRR Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -601,6 +585,12 @@ export const SubscriptionsManagement: React.FC = () => {
           </form>
         </div>
       )}
+
+      <AdminFab
+        onClick={() => setIsPlanModalOpen(true)}
+        label="Novo Plano"
+        icon={Plus}
+      />
     </div>
   );
 };
