@@ -171,7 +171,7 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
     });
   };
   return (
-    <div className="space-y-4 pb-6 px-4 mt-6 relative">
+    <div className="client-booking-screen space-y-4 pb-6 px-4 mt-6 relative">
       {/* Submitting Loading Overlay */}
       {isSubmitting && (
         <div className="fixed inset-0 z-[150] bg-surface-base/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4 animate-in fade-in duration-200">

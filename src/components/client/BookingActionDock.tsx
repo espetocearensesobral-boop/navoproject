@@ -40,7 +40,7 @@ export const BookingActionDock: React.FC<BookingActionDockProps> = ({
   confirmation,
 }) => {
   return (
-    <div className="sticky bottom-2 z-40 px-3 sm:px-4 my-2 flex justify-center pointer-events-none animate-fade-in pb-[env(safe-area-inset-bottom)]">
+    <div className="client-booking-dock sticky bottom-2 z-40 px-3 sm:px-4 my-2 flex justify-center pointer-events-none animate-fade-in pb-[env(safe-area-inset-bottom)]">
       <div className="pointer-events-auto w-full max-w-[560px] rounded-3xl border border-border-strong bg-surface-inverse/95 text-content-inverse shadow-2xl backdrop-blur-xl p-3 sm:p-3.5">
         {confirmation ? (
           <div className="flex flex-col gap-2.5" role="alertdialog" aria-label={confirmation.message}>

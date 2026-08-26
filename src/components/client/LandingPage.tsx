@@ -371,7 +371,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   );
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-auto bg-white text-neutral-900 font-sans antialiased relative selection:bg-gold-base/20 selection:text-neutral-900 no-scrollbar">
+    <div ref={containerRef} className="client-landing w-full h-full min-h-0 overflow-y-auto bg-white text-neutral-900 font-sans antialiased relative selection:bg-gold-base/20 selection:text-neutral-900 no-scrollbar">
       <AnimatePresence>
         {hasReachedPostHero && !isFinalCtaVisible && !isAnyLandingModalOpen && (
           <motion.div 
@@ -457,7 +457,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       {/* MENU OVERLAY REMOVIDO EM FAVOR DO DRAWER COMPARTILHADO */}
 
       {/* SECTION 0: HERO */}
-      <section className="relative w-full min-h-full shrink-0 bg-[#0a0a0a] text-[#f5f5f5] overflow-hidden flex flex-col justify-between box-border">
+      <section className="client-landing-hero relative w-full min-h-full shrink-0 bg-[#0a0a0a] text-[#f5f5f5] overflow-hidden flex flex-col justify-between box-border">
         {/* Background Image with Gradient Overlay */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center"
@@ -609,7 +609,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
 
       {/* SECTION: CONFIANÇA IMEDIATA */}
-      <section ref={postHeroRef} className="w-full bg-neutral-900 border-b border-white/5 py-4 px-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 shrink-0">
+      <section ref={postHeroRef} className="client-landing-trust w-full bg-neutral-900 border-b border-white/5 py-4 px-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 shrink-0">
         <div className="flex items-center gap-2">
           <div className="flex items-center text-gold-base">
             <Star className="w-4 h-4 fill-current" />
@@ -632,7 +632,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
 
       {/* SECTION: SERVIÇOS MAIS PROCURADOS */}
-      <section className="relative w-full py-16 px-[clamp(1rem,3vh,2rem)] bg-neutral-50 flex flex-col items-center shrink-0">
+      <section className="client-landing-section client-landing-services relative w-full py-16 px-[clamp(1rem,3vh,2rem)] bg-neutral-50 flex flex-col items-center shrink-0">
         <div className="max-w-5xl w-full mx-auto space-y-10">
           <div className="text-center space-y-3">
             <h2 className="font-serif text-[clamp(1.75rem,3vh,2.25rem)] font-bold text-neutral-900 tracking-tight">
@@ -719,7 +719,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
 
       {/* SECTION: COMO FUNCIONA */}
-      <section className="relative w-full py-16 px-[clamp(1rem,3vh,2rem)] bg-white flex flex-col items-center shrink-0 border-t border-neutral-100">
+      <section className="client-landing-section relative w-full py-16 px-[clamp(1rem,3vh,2rem)] bg-white flex flex-col items-center shrink-0 border-t border-neutral-100">
         <div className="max-w-5xl w-full mx-auto space-y-12">
           <div className="text-center space-y-3">
             <h2 className="font-serif text-[clamp(1.75rem,3vh,2.25rem)] font-bold text-neutral-900 tracking-tight">
@@ -768,7 +768,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 1: POR QUE A NAVO */}
-      <section className="relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+      <section className="client-landing-section relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <motion.div 
           initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -831,7 +831,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
       {/* SECTION 3: GALERIA */}
             {/* SECTION: EXPERIÊNCIA NAVO */}
-      <section id="experiencia" className="relative w-full py-16 px-[clamp(1rem,3vh,2rem)] bg-neutral-900 flex flex-col items-center shrink-0">
+      <section id="experiencia" className="client-landing-section client-landing-experience relative w-full py-16 px-[clamp(1rem,3vh,2rem)] bg-neutral-900 flex flex-col items-center shrink-0">
         <div className="max-w-5xl w-full mx-auto space-y-12">
           <div className="text-center space-y-3">
              <div className="flex justify-center items-center gap-1.5 mb-2 text-gold-base">
@@ -919,7 +919,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 5: LOCALIZAÇÃO */}
-      <section className="relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+      <section className="client-landing-section client-landing-location relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <motion.div 
           initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1061,7 +1061,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 6: FINAL CTA & FOOTER */}
-      <section ref={finalCtaRef} className="relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between bg-[#0a0b0e] text-white overflow-hidden box-border">
+      <section ref={finalCtaRef} className="client-landing-section client-landing-cta relative w-full h-full min-h-fit py-12 shrink-0 flex flex-col justify-between bg-[#0a0b0e] text-white overflow-hidden box-border">
         
         {/* Background Image with Dark Overlay */}
         <div 

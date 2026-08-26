@@ -183,7 +183,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
   const totalPrice = selectedServices.reduce((acc, curr) => acc + curr.price, 0);
 
   return (
-    <div className={`space-y-4 px-4 ${selectedServices.length > 0 ? 'pb-28' : 'pb-6'}`}>
+    <div className={`client-booking-screen space-y-4 px-4 ${selectedServices.length > 0 ? 'pb-28' : 'pb-6'}`}>
       {/* Sticky Header, Search and Filters Container */}
       <div className="sticky top-0 z-40 bg-surface-base -mx-4 px-4 pt-3 pb-3 mb-4 border-b border-border-subtle shadow-md space-y-2.5">
         {/* Step 1 Title & Progress Indicator */}
