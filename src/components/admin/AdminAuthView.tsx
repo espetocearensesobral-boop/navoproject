@@ -85,33 +85,12 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
   };
 
   return (
-    <div className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-[var(--admin-bg)] px-4 py-8 text-[var(--admin-text-main)] sm:px-6">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-cover bg-center opacity-[0.12] mix-blend-luminosity"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1200&q=80')",
-        }}
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-br from-gold-base/10 via-surface-base/80 to-[var(--admin-bg)]"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-[var(--admin-accent)]/10 blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute -bottom-40 -left-32 h-96 w-96 rounded-full bg-[var(--admin-accent)]/10 blur-3xl"
-      />
-
-      <main className="relative z-10 my-auto w-full max-w-md">
-        <div className="rounded-3xl border border-[var(--admin-border)] bg-[var(--admin-bg)]/90 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+    <div className="admin-shell admin-auth-shell relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-[var(--admin-bg)] px-4 py-8 text-[var(--admin-text-main)] sm:px-6">
+      <main className="relative z-10 my-auto w-full max-w-sm">
+        <div className="admin-auth-panel rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6 sm:p-8">
           <div className="mb-7 flex flex-col items-center text-center">
-            <div className="mb-5 rounded-full bg-[var(--admin-accent)] p-1 shadow-xl shadow-gold-base/20">
-              <div className="rounded-full bg-[var(--admin-bg)] p-1">
+            <div className="admin-auth-brand-mark mb-5 rounded-full border border-[var(--admin-border-strong)] bg-[var(--admin-bg)] p-1">
+              <div className="rounded-full border border-[var(--admin-border)] p-1">
                 <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[var(--admin-surface)] sm:h-24 sm:w-24">
                   {shopLogo ? (
                     <img
@@ -142,7 +121,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
           {errorMsg && (
             <div
               role="alert"
-              className="mb-5 flex items-start gap-3 rounded-2xl border border-status-error/20 bg-status-error/10 p-4 text-sm font-medium text-status-error"
+              className="mb-5 flex items-start gap-3 rounded-[var(--admin-radius-sm)] border border-status-error/20 bg-status-error/5 p-4 text-sm font-medium text-status-error"
             >
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
               <span>{errorMsg}</span>
@@ -152,7 +131,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
           {successMsg && (
             <div
               role="status"
-              className="mb-5 flex items-start gap-3 rounded-2xl border border-status-success/20 bg-status-success/10 p-4 text-sm font-medium text-status-success"
+              className="mb-5 flex items-start gap-3 rounded-[var(--admin-radius-sm)] border border-status-success/20 bg-status-success/5 p-4 text-sm font-medium text-status-success"
             >
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
               <span>{successMsg}</span>
@@ -179,7 +158,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
                   onChange={(event) =>
                     setLoginData({ ...loginData, loginId: event.target.value })
                   }
-                  className="min-h-12 w-full rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] pl-12 pr-4 text-base text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]"
+                  className="admin-input min-h-12 w-full rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] bg-[var(--admin-surface)] pl-12 pr-4 text-base text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]"
                 />
               </div>
             </div>
@@ -203,12 +182,12 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
                   onChange={(event) =>
                     setLoginData({ ...loginData, password: event.target.value })
                   }
-                  className="min-h-12 w-full rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] pl-12 pr-12 text-base text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]"
+                  className="admin-input min-h-12 w-full rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] bg-[var(--admin-surface)] pl-12 pr-12 text-base text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((visible) => !visible)}
-                  className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
+                  className="admin-btn-icon absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-[var(--admin-radius-sm)] text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
                   aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 >
                   {showPassword ? (
@@ -223,7 +202,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[var(--admin-accent)] px-4 text-sm font-extrabold text-[var(--admin-accent-text)] shadow-lg shadow-gold-base/20 transition-all hover:brightness-110 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50"
+              className="admin-btn admin-btn-primary mt-2 min-h-12 w-full gap-2 text-sm font-bold disabled:pointer-events-none disabled:opacity-50"
             >
               {isLoading ? (
                 <>

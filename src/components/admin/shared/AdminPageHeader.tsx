@@ -64,9 +64,9 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
   const ActionIcon = action?.icon ?? Plus;
 
   return (
-    <div className="hidden md:flex min-h-[48px] items-center justify-between gap-4 border-b border-[var(--admin-border)] pb-4 overflow-hidden">
+    <div className="admin-page-header hidden md:flex min-h-[48px] items-center justify-between gap-4 border-b border-[var(--admin-border)] pb-4 overflow-hidden">
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <div className="w-8 h-8 rounded-[var(--admin-radius-sm)] bg-[var(--admin-surface)] text-[var(--admin-accent)] flex items-center justify-center border border-[var(--admin-border)] shrink-0">
+        <div className="admin-page-header-icon w-8 h-8 rounded-[var(--admin-radius-sm)] bg-[var(--admin-surface)] text-[var(--admin-accent)] flex items-center justify-center border border-[var(--admin-border)] shrink-0">
           <Icon className="w-4 h-4" />
         </div>
 
@@ -97,7 +97,7 @@ export const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
         )}
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="admin-page-header-actions flex items-center gap-2 shrink-0">
         {children}
         {action && (
           <button

@@ -41,7 +41,7 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({
 }) => {
   return (
     <div
-      className={`admin-tabs flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 ${className}`}
+      className={`admin-tabs flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 ${className}`}
     >
       {tabs.map((tab) => {
         const Icon = tab.icon;
@@ -55,22 +55,20 @@ export const AdminTabs: React.FC<AdminTabsProps> = ({
             aria-disabled={tab.disabled || undefined}
             aria-current={isActive ? "page" : undefined}
             title={tab.label}
-            className={`shrink-0 min-h-10 sm:min-h-9 min-w-0 px-3 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-[0.98] ${
+            className={`admin-tab shrink-0 min-h-10 sm:min-h-9 min-w-0 px-3 text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-[0.98] ${
               tab.disabled
-                ? "bg-[var(--admin-bg)]/60 text-[var(--admin-text-muted)]/50 border border-[var(--admin-border)]/60 cursor-not-allowed"
+                ? "is-disabled text-[var(--admin-text-muted)]/50 cursor-not-allowed"
                 : isActive
-                  ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
-                  : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"
+                  ? "is-active text-[var(--admin-text-main)]"
+                  : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
             }`}
           >
             {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
             <span className="admin-button-label">{tab.label}</span>
             {typeof tab.count === "number" && (
               <span
-                className={`min-w-5 h-5 px-1 rounded-full text-[10px] flex items-center justify-center font-extrabold shrink-0 ${
-                  isActive
-                    ? "bg-[var(--admin-bg)]/25 text-surface-base"
-                    : "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]"
+                className={`admin-tab-count min-w-5 h-5 px-1 text-[10px] flex items-center justify-center font-bold shrink-0 ${
+                  isActive ? "is-active" : ""
                 }`}
               >
                 {tab.count}

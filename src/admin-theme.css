@@ -504,3 +504,313 @@ body,
   opacity: 0.6;
 }
 
+
+
+/* ==========================================================================
+   Navo Admin — Quiet Operations Layer
+   Final, admin-scoped refinement based on the Canva visual direction.
+   No selectors in this block affect the public/client experience.
+   ========================================================================== */
+.admin-shell {
+  --admin-sidebar-width: 248px;
+  --admin-header-height: 56px;
+  --admin-content-gutter: clamp(1rem, 2vw, 1.75rem);
+  --admin-surface-subtle: color-mix(in srgb, var(--admin-surface) 72%, var(--admin-bg));
+  --admin-surface-hover: color-mix(in srgb, var(--admin-text-main) 4%, var(--admin-surface));
+  --admin-surface-active: color-mix(in srgb, var(--admin-text-main) 7%, var(--admin-surface));
+  --admin-border: color-mix(in srgb, var(--admin-text-main) 11%, transparent);
+  --admin-border-strong: color-mix(in srgb, var(--admin-text-main) 17%, transparent);
+  --admin-control-height: 2.5rem;
+  --admin-radius-xs: 5px;
+  --admin-radius-sm: 7px;
+  --admin-radius-md: 9px;
+  --admin-radius-lg: 11px;
+  --admin-radius-xl: 13px;
+  --admin-shadow-soft: 0 8px 24px color-mix(in srgb, var(--admin-text-main) 7%, transparent);
+}
+
+.admin-shell .admin-layout-sidebar {
+  background: var(--admin-bg);
+  border-right-color: var(--admin-border);
+}
+
+.admin-shell .admin-layout-main {
+  background: var(--admin-bg);
+}
+
+.admin-shell .admin-content-wrapper {
+  padding: 1.25rem var(--admin-content-gutter) 2.5rem;
+}
+
+.admin-shell .admin-page-header {
+  min-height: 3rem;
+  padding-bottom: 1rem;
+  border-bottom-color: var(--admin-border);
+}
+
+.admin-shell .admin-page-header-icon {
+  background: transparent;
+  border-color: transparent;
+}
+
+.admin-shell .admin-page-header-actions .admin-btn-primary {
+  min-height: 2.25rem;
+}
+
+/* Surfaces use grouping and dividers before depth. */
+.admin-shell .admin-card,
+.admin-shell .admin-panel,
+.admin-shell .admin-table-container,
+.admin-shell .admin-modal {
+  background: var(--admin-surface);
+  border-color: var(--admin-border);
+  box-shadow: none;
+}
+
+.admin-shell .admin-card {
+  border-radius: var(--admin-radius-lg);
+}
+
+.admin-shell .admin-card-header,
+.admin-shell .admin-card-footer {
+  border-color: var(--admin-border);
+}
+
+.admin-shell .admin-card-nested,
+.admin-shell .admin-subcard {
+  background: transparent;
+  border-color: var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+}
+
+/* Buttons have a clear hierarchy instead of competing fills. */
+.admin-shell .admin-btn,
+.admin-shell .admin-btn-primary,
+.admin-shell .admin-btn-secondary,
+.admin-shell .admin-btn-ghost,
+.admin-shell .admin-btn-destructive,
+.admin-shell .admin-btn-icon,
+.admin-shell .admin-btn-sm,
+.admin-shell .admin-btn-icon-sm {
+  border-radius: var(--admin-radius-sm);
+  transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.admin-shell .admin-btn-primary {
+  background: var(--admin-accent);
+  color: var(--admin-accent-text);
+  border-color: var(--admin-accent);
+  box-shadow: none;
+}
+
+.admin-shell .admin-btn-primary:hover:not(:disabled) {
+  background: var(--admin-accent-hover);
+  border-color: var(--admin-accent-hover);
+}
+
+.admin-shell .admin-btn-secondary {
+  background: transparent;
+  border-color: var(--admin-border-strong);
+}
+
+.admin-shell .admin-btn-secondary:hover:not(:disabled) {
+  background: var(--admin-surface-hover);
+  border-color: var(--admin-border-strong);
+}
+
+.admin-shell .admin-btn-ghost,
+.admin-shell .admin-btn-icon {
+  background: transparent;
+}
+
+.admin-shell .admin-btn-ghost:hover:not(:disabled),
+.admin-shell .admin-btn-icon:hover:not(:disabled) {
+  background: var(--admin-surface-hover);
+}
+
+/* Sidebar: compact, grouped, with a quiet active marker. */
+.admin-shell .admin-nav-item {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.625rem;
+  margin: 1px 0.5rem;
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-text-muted);
+}
+
+.admin-shell .admin-nav-item:hover {
+  color: var(--admin-text-main);
+  background: var(--admin-surface-hover);
+}
+
+.admin-shell .admin-nav-item.active {
+  color: var(--admin-text-main);
+  background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
+  box-shadow: inset 2px 0 0 var(--admin-accent);
+}
+
+.admin-shell .admin-nav-item.active svg {
+  color: var(--admin-accent);
+}
+
+/* Secondary navigation is an underline system, not a row of pills. */
+.admin-shell .admin-tabs {
+  gap: 0.125rem;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-shell .admin-tab {
+  position: relative;
+  min-height: 2.25rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--admin-text-muted);
+}
+
+.admin-shell .admin-tab::after {
+  content: "";
+  position: absolute;
+  right: 0.75rem;
+  bottom: -1px;
+  left: 0.75rem;
+  height: 2px;
+  background: transparent;
+  transition: background-color 140ms ease;
+}
+
+.admin-shell .admin-tab:hover:not(:disabled) {
+  background: var(--admin-surface-hover);
+}
+
+.admin-shell .admin-tab.is-active {
+  color: var(--admin-text-main);
+}
+
+.admin-shell .admin-tab.is-active::after {
+  background: var(--admin-accent);
+}
+
+.admin-shell .admin-tab.is-disabled {
+  opacity: 0.5;
+}
+
+.admin-shell .admin-tab-count {
+  min-width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--admin-text-main) 7%, transparent);
+  color: var(--admin-text-muted);
+}
+
+.admin-shell .admin-tab-count.is-active {
+  background: color-mix(in srgb, var(--admin-accent) 13%, transparent);
+  color: var(--admin-accent);
+}
+
+/* Operational tables stay dense, quiet, and horizontally usable. */
+.admin-shell .admin-table-container {
+  border-radius: var(--admin-radius-lg);
+}
+
+.admin-shell .admin-table th {
+  background: transparent;
+  border-bottom-color: var(--admin-border);
+  color: var(--admin-text-muted);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+}
+
+.admin-shell .admin-table td {
+  border-bottom-color: var(--admin-border);
+}
+
+.admin-shell .admin-table tr:hover td {
+  background: var(--admin-surface-hover);
+}
+
+/* Inputs share one compact control language and one focus treatment. */
+.admin-shell .admin-input,
+.admin-shell .admin-select,
+.admin-shell .admin-textarea,
+.admin-shell input:not([type="checkbox"]):not([type="radio"]),
+.admin-shell select,
+.admin-shell textarea {
+  border-radius: var(--admin-radius-sm);
+  border-color: var(--admin-border-strong);
+  background: var(--admin-surface);
+}
+
+.admin-shell .admin-input:focus,
+.admin-shell .admin-select:focus,
+.admin-shell .admin-textarea:focus,
+.admin-shell input:not([type="checkbox"]):not([type="radio"]):focus,
+.admin-shell select:focus,
+.admin-shell textarea:focus {
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--admin-accent) 16%, transparent);
+}
+
+/* Status color is reserved for meaning; the container remains neutral. */
+.admin-shell .admin-badge {
+  border-radius: 4px;
+  background: transparent;
+  border-color: color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.admin-shell .admin-modal {
+  border-radius: var(--admin-radius-xl);
+  box-shadow: var(--admin-shadow-soft);
+}
+
+.admin-shell .admin-modal-header,
+.admin-shell .admin-modal-footer {
+  border-color: var(--admin-border);
+  background: transparent;
+}
+
+.admin-shell .admin-modal-footer {
+  padding-top: 0.875rem;
+}
+
+.admin-shell .admin-empty-state {
+  padding: 3.5rem 1rem;
+}
+
+.admin-shell .admin-empty-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.admin-shell [class*="shadow-lg"],
+.admin-shell [class*="shadow-xl"],
+.admin-shell [class*="shadow-2xl"] {
+  box-shadow: var(--admin-shadow-soft) !important;
+}
+
+@media (max-width: 1023px) {
+  .admin-shell .admin-content-wrapper {
+    padding: 1rem 0.875rem 5rem;
+  }
+
+  .admin-shell .admin-mobile-topbar,
+  .admin-shell .admin-mobile-bottom-bar {
+    background: var(--admin-bg);
+    border-color: var(--admin-border);
+  }
+
+  .admin-shell .admin-mobile-bottom-bar button[aria-current="page"] {
+    background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
+    color: var(--admin-text-main);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-shell *,
+  .admin-shell *::before,
+  .admin-shell *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
