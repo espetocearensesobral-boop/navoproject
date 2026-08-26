@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { and, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { checkSlotAvailability, fetchDaySlotContext, invalidateAvailabilityCache } from './availability.service.js';
-import { NAVOBOT_PROMPT_VERSION, NAVOBOT_SYSTEM_PROMPT } from './navobot-prompt.js';
+import { NAVOBOT_CONVERSATIONAL_PROMPT, NAVOBOT_PROMPT_VERSION, NAVOBOT_SYSTEM_PROMPT } from './navobot-prompt.js';
 import { getCurrentTimeBRT, getDayOfWeekKey, getTodayStringBRT, minutesToTime, timeToMinutes } from '../utils/datetime.js';
 import { generateBookingCode, matchPhoneNumbers, sanitizePhone } from '../utils/index.js';
 import {
@@ -16,6 +16,7 @@ import {
   parseDateFromText,
   parseTimeFromText,
   findServiceMatches,
+  findProfessionalMatches,
   type ExtractedEvolutionMessage,
   type NavoBotIntent,
 } from './navobot-intent.js';
@@ -200,7 +201,24 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
           properties: {
             intent: {
               type: 'STRING',
-              enum: ['menu', 'appointments', 'availability', 'book', 'confirm', 'reschedule', 'cancel', 'cancel_all', 'complaint', 'human', 'unknown'],
+              enum: [
+                'menu',
+                'appointments',
+                'availability',
+                'book',
+                'confirm',
+                'reschedule',
+                'cancel',
+                'cancel_all',
+                'complaint',
+                'human',
+                'shop_info',
+                'next_slot',
+                'last_slot',
+                'barbers',
+                'service_info',
+                'unknown',
+              ],
             },
             confidence: { type: 'NUMBER' },
           },
@@ -307,6 +325,169 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     return sent;
   }
 
+  async function notifyStaffViaWhatsApp({
+    conversation,
+    context,
+    clientMessage,
+    reason,
+    targetProfId,
+  }: {
+    conversation: Conversation;
+    context: BotContext;
+    clientMessage: string;
+    reason: 'human_request' | 'complaint' | 'unresolved' | 'booking_conflict' | string;
+    targetProfId?: string;
+  }) {
+    try {
+      const db = getDb();
+      const settings = await db.query.evolutionApiSettings.findFirst({
+        where: eq(schema.evolutionApiSettings.id, 'default'),
+      });
+
+      if (!settings?.enabled || !settings?.navoBotEnabled) return;
+
+      const rawClientPhone = sanitizePhone(conversation.phone);
+      const cleanPhone = rawClientPhone.replace(/\D/g, '');
+      const clientName = String(context.clientName || '').trim() || 'Cliente WhatsApp';
+
+      // Identifica o profissional selecionado ou com agendamento ativo
+      let profId = targetProfId || (context.professionalId && context.professionalId !== 'prof_any' ? context.professionalId : '');
+      let matchedAppointment: any = null;
+
+      if (!profId) {
+        const appointments = await findAppointments(conversation.phone);
+        if (appointments.length > 0) {
+          matchedAppointment = appointments[0];
+          profId = matchedAppointment.professionalId;
+        }
+      }
+
+      let assignedBarber: any = null;
+      if (profId) {
+        const professionals = await db.query.professionals.findMany();
+        assignedBarber = professionals.find((p: any) => p.id === profId);
+
+        // Se o barbeiro não tiver telefone na tabela de profissionais, busca na tabela profiles vinculada
+        if (assignedBarber && !assignedBarber.phone && assignedBarber.userId) {
+          const profProfile = await db.query.profiles.findFirst({
+            where: eq(schema.profiles.id, assignedBarber.userId),
+          });
+          if (profProfile?.phone) {
+            assignedBarber = { ...assignedBarber, phone: profProfile.phone };
+          }
+        }
+      }
+
+      const reasonLabels: Record<string, string> = {
+        human_request: 'Solicitação de Atendente / Barbeiro',
+        complaint: 'Reclamação de Cliente',
+        unresolved: 'Dúvida ou Solicitação fora do escopo do Bot',
+        booking_conflict: 'Dificuldade no agendamento / Conflito de horário',
+      };
+      const reasonText = reasonLabels[reason] || reason;
+
+      const encodedClientName = encodeURIComponent(clientName);
+      const waLink = `https://wa.me/${cleanPhone}?text=Ol%C3%A1%20${encodedClientName},%20sou%20da%20equipe%20da%20Navo%20Barber!`;
+
+      // 1. Notificar Barbeiro responsável se ativo e tiver telefone cadastrado
+      const notifyBarber = settings.notifyBarberOnHandoff !== false;
+      if (notifyBarber && assignedBarber?.phone) {
+        const barberPhone = sanitizePhone(assignedBarber.phone).replace(/\D/g, '');
+        if (barberPhone && barberPhone !== cleanPhone) {
+          const barberMessage =
+            `💈 *[Navo Barber - Encaminhamento de Cliente]*\n\n` +
+            `Olá *${assignedBarber.name}*, um cliente solicitou atendimento no WhatsApp da barbearia!\n\n` +
+            `👤 *Cliente:* ${clientName}\n` +
+            `📞 *Telefone:* ${rawClientPhone}\n` +
+            `📌 *Motivo:* ${reasonText}\n` +
+            `💬 *Mensagem:* "${clientMessage}"\n` +
+            (matchedAppointment ? `📅 *Agendamento:* ${dateLabel(matchedAppointment.date)} às ${matchedAppointment.timeSlot}\n` : '') +
+            `\n📲 *Clique abaixo para falar direto com o cliente:*\n${waLink}`;
+
+          await sendText(barberPhone, barberMessage);
+        }
+      }
+
+      // 2. Notificar Gerência / Recepção se telefone configurado
+      const notifyManager = settings.notifyManagerOnHandoff !== false;
+      const managerPhone = sanitizePhone(settings.managerNotificationPhone || '').replace(/\D/g, '');
+
+      if (notifyManager && managerPhone && managerPhone !== cleanPhone) {
+        const managerMessage =
+          `🔔 *[Navo Barber - Alerta de Atendimento Humano]*\n\n` +
+          `Um cliente no WhatsApp foi transferido para a equipe.\n\n` +
+          `👤 *Cliente:* ${clientName} (${rawClientPhone})\n` +
+          `✂️ *Barbeiro vinculado:* ${assignedBarber?.name || 'Geral / Não atribuído'}\n` +
+          `📌 *Motivo:* ${reasonText}\n` +
+          `💬 *Mensagem do Cliente:* "${clientMessage}"\n` +
+          (matchedAppointment ? `📅 *Agendamento:* ${dateLabel(matchedAppointment.date)} às ${matchedAppointment.timeSlot}\n` : '') +
+          `\n📲 *Clique para responder o cliente no WhatsApp:*\n${waLink}`;
+
+        await sendText(managerPhone, managerMessage);
+      }
+
+      // Atualiza o registro da conversa no banco
+      await db.update(schema.navoBotConversations).set({
+        handoffRequested: true,
+        handoffReason: reason,
+        assignedProfessionalId: assignedBarber?.id || null,
+        assignedProfessionalName: assignedBarber?.name || null,
+        updatedAt: new Date(),
+      }).where(eq(schema.navoBotConversations.id, conversation.id));
+
+    } catch (error) {
+      console.error('[NavoBot] Falha ao enviar notificação de handoff aos profissionais/gerente:', error);
+    }
+  }
+
+  async function notifyStaffFollowUp({
+    conversation,
+    context,
+    clientMessage,
+    followUpCount,
+  }: {
+    conversation: Conversation;
+    context: BotContext;
+    clientMessage: string;
+    followUpCount: number;
+  }) {
+    try {
+      const db = getDb();
+      const settings = await db.query.evolutionApiSettings.findFirst({
+        where: eq(schema.evolutionApiSettings.id, 'default'),
+      });
+      if (!settings?.enabled || !settings?.navoBotEnabled) return;
+
+      const rawClientPhone = sanitizePhone(conversation.phone);
+      const cleanPhone = rawClientPhone.replace(/\D/g, '');
+      const clientName = String(context.clientName || '').trim() || 'Cliente WhatsApp';
+      const waLink = `https://wa.me/${cleanPhone}`;
+
+      let targetPhone = '';
+      if ((conversation as any).assignedProfessionalId) {
+        const prof = await db.query.professionals.findFirst({
+          where: eq(schema.professionals.id, (conversation as any).assignedProfessionalId),
+        });
+        targetPhone = prof?.phone || '';
+      }
+      if (!targetPhone && settings.managerNotificationPhone) {
+        targetPhone = settings.managerNotificationPhone;
+      }
+
+      const cleanTargetPhone = sanitizePhone(targetPhone).replace(/\D/g, '');
+      if (cleanTargetPhone && cleanTargetPhone !== cleanPhone) {
+        const followUpMsg =
+          `💬 *[NavoBot - Nova mensagem de cliente aguardando atendimento]*\n\n` +
+          `👤 *Cliente:* ${clientName} (${rawClientPhone})\n` +
+          `💬 *Mensagem:* "${clientMessage}"\n\n` +
+          `📲 *Responder no WhatsApp:* ${waLink}`;
+        await sendText(cleanTargetPhone, followUpMsg);
+      }
+    } catch (error) {
+      console.error('[NavoBot] Falha ao notificar follow-up de handoff:', error);
+    }
+  }
+
   async function handleHumanState(conversation: Conversation, context: BotContext, text: string, contextualIntent: NavoBotIntent | null) {
     const stateIntent = contextualIntent || classifyDeterministicIntent(text);
     if (stateIntent === 'menu') {
@@ -346,6 +527,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
 
     const followUpCount = Number(context.humanFollowUpCount || 0);
     await updateConversation(conversation, 'human', { ...context, humanFollowUpCount: followUpCount + 1 }, true);
+    await notifyStaffFollowUp({ conversation, context, clientMessage: text, followUpCount: followUpCount + 1 });
     return reply(conversation, humanHandoffMessage(followUpCount));
   }
 
@@ -589,6 +771,375 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       return reply(conversation, `❌ Sem horários livres em *${dateLabel(date)}* para *${serviceTitles}*.\n\nInforme outra data para consultar novamente.`);
     }
     return reply(conversation, `✅ *Horários livres* em *${dateLabel(date)}*\nPara: ${serviceTitles}\n\n${slots.map((slot) => `▪️ *${slot}*`).join('   ')}\n\nPara agendar, responda *AGENDAR ${slots[0]}* (ou o horário que preferir).`);
+  }
+
+  const WEEKDAY_NAMES_PT: Record<string, string> = {
+    sunday: 'Domingo',
+    monday: 'Segunda-feira',
+    tuesday: 'Terça-feira',
+    wednesday: 'Quarta-feira',
+    thursday: 'Quinta-feira',
+    friday: 'Sexta-feira',
+    saturday: 'Sábado',
+  };
+
+  async function getShopAgendaSnapshot(targetDateStr?: string, professionalIdOrName?: string) {
+    const db = getDb();
+    const today = getTodayStringBRT();
+    const current = getCurrentTimeBRT();
+    const targetDate = targetDateStr && /^\d{4}-\d{2}-\d{2}$/.test(targetDateStr) ? targetDateStr : today;
+
+    const dayContext = await fetchDaySlotContext(targetDate);
+    const shop = dayContext.shopProf || {};
+    const operatingSchedule = shop.operatingSchedule || {};
+
+    const todayKey = getDayOfWeekKey(today);
+    const targetKey = getDayOfWeekKey(targetDate);
+
+    const todaySchedule = operatingSchedule[todayKey] || { open: shop.openTime || '09:00', close: shop.closeTime || '20:00', closed: false };
+    const targetSchedule = operatingSchedule[targetKey] || { open: shop.openTime || '09:00', close: shop.closeTime || '20:00', closed: false };
+
+    const todayOpenMins = timeToMinutes(todaySchedule.open || '09:00');
+    const todayCloseMins = timeToMinutes(todaySchedule.close || '20:00');
+    const isClosedToday = Boolean(todaySchedule.closed);
+    const isOpenNow = !isClosedToday && current.totalMinutes >= todayOpenMins && current.totalMinutes < todayCloseMins;
+
+    const targetOpenMins = timeToMinutes(targetSchedule.open || '09:00');
+    const targetCloseMins = timeToMinutes(targetSchedule.close || '20:00');
+    const isClosedTargetDate = Boolean(targetSchedule.closed);
+
+    const interval = dayContext.operationSettings?.slotIntervalMinutes || 30;
+    const standardDuration = 30;
+
+    // Professionals
+    const activeProfs = (dayContext.allProfessionals || []).filter((p: any) => p.isActive !== false);
+    const profWorkingStatus = activeProfs.map((p: any) => {
+      const pSchedule = p.workingHours?.[targetKey];
+      const isWorking = !pSchedule?.closed && (pSchedule?.start || targetSchedule.open);
+      return {
+        id: p.id,
+        name: p.name,
+        nickname: p.nickname || null,
+        roleTitle: p.roleTitle || 'Barbeiro',
+        isWorking: Boolean(isWorking),
+      };
+    });
+
+    // Calculate free slots for targetDate
+    const targetProfId = professionalIdOrName && professionalIdOrName !== 'prof_any' ? professionalIdOrName : '';
+    const availableSlots: string[] = [];
+    const slotsByBarber: Record<string, string[]> = {};
+
+    for (const prof of activeProfs) {
+      if (targetProfId && prof.id !== targetProfId) continue;
+      slotsByBarber[prof.name] = [];
+    }
+
+    if (!isClosedTargetDate) {
+      for (let minute = targetOpenMins; minute < targetCloseMins; minute += interval) {
+        if (targetDate === today && minute <= current.totalMinutes) continue;
+        const timeStr = minutesToTime(minute);
+
+        const check = await checkSlotAvailability({
+          dateStr: targetDate,
+          startMins: minute,
+          reqDuration: standardDuration,
+          profId: targetProfId,
+          todayBRT: today,
+          currTimeBRT: current,
+          preloaded: dayContext,
+        });
+
+        if (check.available && !check.requiresApproval) {
+          availableSlots.push(timeStr);
+          if (check.chosenProf?.name) {
+            if (!slotsByBarber[check.chosenProf.name]) slotsByBarber[check.chosenProf.name] = [];
+            if (!slotsByBarber[check.chosenProf.name].includes(timeStr)) {
+              slotsByBarber[check.chosenProf.name].push(timeStr);
+            }
+          }
+        }
+      }
+    }
+
+    // Services
+    const services = (await db.query.services.findMany()).filter((s: any) => s.title && Number(s.durationMinutes) > 0);
+
+    return {
+      shopName: shop.name || 'Navo Barber & Club',
+      unitName: shop.unitName || 'Unidade Principal',
+      address: shop.address || 'Rua Fortaleza, 1420 - Expectativa, Sobral - CE',
+      phone: shop.phone || '(88) 99999-9999',
+      todayDate: today,
+      targetDate,
+      todayDayName: WEEKDAY_NAMES_PT[todayKey] || 'Segunda-feira',
+      targetDayName: WEEKDAY_NAMES_PT[targetKey] || 'Segunda-feira',
+      currentTimeStr: current.timeStr,
+      isOpenNow,
+      isClosedToday,
+      todayOpenTime: todaySchedule.open || '09:00',
+      todayCloseTime: todaySchedule.close || '20:00',
+      isClosedTargetDate,
+      targetOpenTime: targetSchedule.open || '09:00',
+      targetCloseTime: targetSchedule.close || '20:00',
+      activeProfessionals: profWorkingStatus,
+      services: services.map((s: any) => ({
+        id: s.id,
+        title: s.title,
+        price: money(s.price),
+        durationMinutes: Number(s.durationMinutes || 30),
+        categorySlug: s.categorySlug || 'cabelo',
+      })),
+      earliestAvailableSlot: availableSlots[0] || null,
+      latestAvailableSlot: availableSlots.length ? availableSlots[availableSlots.length - 1] : null,
+      availableSlotsTargetDate: availableSlots.slice(0, 10),
+      totalFreeSlotsCount: availableSlots.length,
+      slotsByBarber,
+    };
+  }
+
+  async function answerContextualQueryWithAi({
+    text,
+    intent,
+    snapshot,
+    sourceState,
+    context,
+  }: {
+    text: string;
+    intent: string;
+    snapshot: any;
+    sourceState: string;
+    context: BotContext;
+  }): Promise<string | null> {
+    if (!ai) return null;
+    try {
+      const promptInput = `
+DADOS REAIS DA BARBEARIA (FONTE DA VERDADE):
+${JSON.stringify(snapshot, null, 2)}
+
+ESTADO ATUAL DA CONVERSA: ${sourceState}
+INTENÇÃO IDENTIFICADA: ${intent}
+CONTEXTO DA SESSÃO: ${JSON.stringify({
+        clientName: context.clientName,
+        selectedServiceIds: context.serviceIds,
+        selectedDate: context.date,
+        selectedTime: context.timeSlot,
+        selectedProfessionalId: context.professionalId,
+        pendingAction: context.pendingAction,
+      })}
+
+MENSAGEM DO CLIENTE:
+"${text}"
+      `.trim();
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{ role: 'user', parts: [{ text: promptInput }] }],
+        config: {
+          temperature: 0.2,
+          maxOutputTokens: 512,
+          thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: 'OBJECT',
+            properties: {
+              replyText: { type: 'STRING' },
+              actionSuggestion: {
+                type: 'STRING',
+                enum: ['book', 'availability', 'continue', 'menu', 'none'],
+              },
+            },
+            required: ['replyText'],
+          } as any,
+          systemInstruction: NAVOBOT_CONVERSATIONAL_PROMPT,
+        },
+      });
+
+      const responseText = extractGeminiText(response);
+      if (!responseText) return null;
+      const parsed = JSON.parse(responseText);
+      const replyText = String(parsed.replyText || '').trim();
+      return replyText || null;
+    } catch (error) {
+      console.warn('[NavoBot][Gemini] Erro ao gerar resposta contextual inteligente:', error);
+      return null;
+    }
+  }
+
+  function answerContextualQueryDeterministic({
+    text,
+    intent,
+    snapshot,
+    context,
+  }: {
+    text: string;
+    intent: string;
+    snapshot: any;
+    context: BotContext;
+  }): string {
+    const isToday = snapshot.targetDate === snapshot.todayDate;
+    const dateFormatted = dateLabel(snapshot.targetDate);
+
+    if (intent === 'shop_info') {
+      let statusText = '';
+      if (isToday) {
+        if (snapshot.isClosedToday) {
+          statusText = '❌ *Hoje a barbearia está fechada.*';
+        } else if (snapshot.isOpenNow) {
+          statusText = `🟢 *Estamos abertos agora!* Hoje atendemos até às *${snapshot.todayCloseTime}*.`;
+        } else {
+          statusText = `⏳ *Hoje nosso horário de atendimento é das ${snapshot.todayOpenTime} às ${snapshot.todayCloseTime}.*`;
+        }
+      } else {
+        if (snapshot.isClosedTargetDate) {
+          statusText = `❌ Em *${dateFormatted} (${snapshot.targetDayName})* a barbearia estará *fechada*.`;
+        } else {
+          statusText = `🕒 Em *${dateFormatted} (${snapshot.targetDayName})* atendemos das *${snapshot.targetOpenTime} às ${snapshot.targetCloseTime}*.`;
+        }
+      }
+
+      return (
+        `💈 *${snapshot.shopName}*\n\n` +
+        `${statusText}\n\n` +
+        `🕒 *Horários de Funcionamento:*\n` +
+        `• Seg a Qui: 09:00 às 20:00\n` +
+        `• Sexta: 09:00 às 21:00\n` +
+        `• Sábado: 09:00 às 20:00\n` +
+        `• Domingo: Fechado\n\n` +
+        `📍 *Endereço:* ${snapshot.address}\n\n` +
+        `💡 Para agendar um horário, envie *1* ou diga qual serviço você prefere!`
+      );
+    }
+
+    if (intent === 'next_slot') {
+      if (snapshot.isClosedTargetDate) {
+        return `❌ Em *${dateFormatted}* a barbearia estará fechada.\n\nInforme outra data para consultar os horários livres.`;
+      }
+      if (!snapshot.earliestAvailableSlot) {
+        return `❌ Não encontramos mais horários livres ${isToday ? 'para hoje' : `em ${dateFormatted}`}.\n\nVocê gostaria de consultar para amanhã?`;
+      }
+      const sampleSlots = snapshot.availableSlotsTargetDate.slice(0, 5).join('   ');
+      return (
+        `⚡ *Horário mais próximo disponível:*\n\n` +
+        `📅 *${isToday ? 'Hoje' : dateFormatted} (${snapshot.targetDayName}):* a partir das *${snapshot.earliestAvailableSlot}*\n` +
+        `🕒 Próximas opções livres:\n${sampleSlots}\n\n` +
+        `Para reservar, responda *AGENDAR ${snapshot.earliestAvailableSlot}* ou envie *1* para escolher o serviço!`
+      );
+    }
+
+    if (intent === 'last_slot') {
+      if (snapshot.isClosedTargetDate) {
+        return `❌ Em *${dateFormatted}* a barbearia estará fechada.`;
+      }
+      const lastSlot = snapshot.latestAvailableSlot;
+      const closeTime = snapshot.targetCloseTime;
+      if (!lastSlot) {
+        return `🌙 Em *${dateFormatted}* nosso expediente encerra às *${closeTime}*, mas não há mais vagas livres nesta data.`;
+      }
+      return (
+        `🌙 *Último horário de atendimento:*\n\n` +
+        `📅 *${dateFormatted} (${snapshot.targetDayName}):* fechamos às *${closeTime}*.\n` +
+        `✂️ O último horário livre para agendar é às *${lastSlot}*.\n\n` +
+        `Deseja agendar? Responda *AGENDAR ${lastSlot}* ou envie *1* para iniciar.`
+      );
+    }
+
+    if (intent === 'barbers') {
+      const working = snapshot.activeProfessionals.filter((p: any) => p.isWorking);
+      const off = snapshot.activeProfessionals.filter((p: any) => !p.isWorking);
+      let msg = `✂️ *Equipe de Barbeiros — ${isToday ? 'Hoje' : dateFormatted}*\n\n`;
+      if (working.length) {
+        msg += `💈 *Em atendimento:* \n` + working.map((p: any) => `• *${p.name}* (${p.roleTitle})`).join('\n');
+      } else {
+        msg += `Nenhum profissional escalado para esta data.`;
+      }
+      if (off.length) {
+        msg += `\n\n🏖️ *Folga:* ` + off.map((p: any) => p.name).join(', ');
+      }
+      msg += `\n\n💡 Deseja agendar com algum deles? Responda com o nome do barbeiro ou envie *1* para escolher o serviço!`;
+      return msg;
+    }
+
+    if (intent === 'service_info') {
+      const servicesList = snapshot.services
+        .map((s: any, idx: number) => `*${idx + 1}*. ${s.title} — ${s.price} (${s.durationMinutes}min)`)
+        .join('\n');
+      return (
+        `💈 *Tabela de Serviços & Valores:*\n\n` +
+        `${servicesList}\n\n` +
+        `💡 Para agendar, envie o número do serviço ou responda *1*!`
+      );
+    }
+
+    return menuText();
+  }
+
+  function getResumePromptForState(state: string, context: BotContext): string | null {
+    if (state === 'awaiting_service') {
+      return 'Qual serviço você deseja agendar? (Envie o número ou nome)';
+    }
+    if (state === 'awaiting_more_services') {
+      return 'Deseja incluir mais algum serviço? (Responda SIM ou NÃO)';
+    }
+    if (state === 'awaiting_professional') {
+      return 'Qual barbeiro você prefere? (Envie o número ou nome)';
+    }
+    if (state === 'awaiting_date') {
+      return 'Para qual dia você prefere agendar? (Ex: hoje, amanhã, 25/08)';
+    }
+    if (state === 'awaiting_time') {
+      return `Para *${dateLabel(context.date || getTodayStringBRT())}*, qual horário você prefere?`;
+    }
+    if (state === 'awaiting_confirmation') {
+      return 'Responda *SIM* para confirmar ou *NÃO* para cancelar.';
+    }
+    return null;
+  }
+
+  async function handleAgendaContextualQuery(
+    conversation: Conversation,
+    context: BotContext,
+    text: string,
+    intent: NavoBotIntent,
+    sourceState: string = 'idle'
+  ) {
+    const extractedDate = parseDateFromText(text) || context.date || context.availabilityDate || getTodayStringBRT();
+    const db = getDb();
+    const professionals = (await db.query.professionals.findMany()).filter((p: any) => p.isActive !== false);
+    const matchedProfs = findProfessionalMatches(professionals, text);
+    const profId = matchedProfs.length === 1 ? matchedProfs[0].id : context.professionalId || '';
+
+    const snapshot = await getShopAgendaSnapshot(extractedDate, profId);
+
+    let answer: string | null = null;
+    if (ai) {
+      answer = await answerContextualQueryWithAi({
+        text,
+        intent,
+        snapshot,
+        sourceState,
+        context,
+      });
+    }
+
+    if (!answer) {
+      answer = answerContextualQueryDeterministic({
+        text,
+        intent,
+        snapshot,
+        context,
+      });
+    }
+
+    // Se o usuário estava no meio de uma etapa do agendamento, retoma a pergunta ativa para não travar o fluxo
+    if (sourceState !== 'idle' && sourceState !== 'human') {
+      const resumePrompt = getResumePromptForState(sourceState, context);
+      if (resumePrompt && !answer.includes(resumePrompt)) {
+        answer += `\n\n📌 *Continuando seu agendamento:*\n${resumePrompt}`;
+      }
+    }
+
+    return reply(conversation, answer);
   }
 
   async function suggestSlots(date: string, duration: number, professionalId = '', excludeAppointmentId = '') {
@@ -878,6 +1429,9 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     }
     const isBareNumber = /^\s*\d+\s*$/.test(text);
     const canInterruptFlow = !isBareNumber && conversation.state !== 'idle' && conversation.state !== 'human' && stateIntent !== 'confirm';
+    if (canInterruptFlow && ['shop_info', 'next_slot', 'last_slot', 'barbers', 'service_info'].includes(stateIntent as string)) {
+      return handleAgendaContextualQuery(conversation, context, text, stateIntent as NavoBotIntent, conversation.state);
+    }
     if (canInterruptFlow && stateIntent === 'appointments') {
       const nextContext = contextForNewIntent(context);
       await updateConversation(conversation, 'idle', nextContext);
@@ -906,11 +1460,13 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (canInterruptFlow && stateIntent === 'complaint') {
       const nextContext = contextForNewIntent(context, { humanFollowUpCount: 0 });
       await updateConversation(conversation, 'human', nextContext, true);
+      await notifyStaffViaWhatsApp({ conversation, context: nextContext, clientMessage: text, reason: 'complaint' });
       return reply(conversation, 'Sinto muito pela experiência. Sua mensagem foi encaminhada para a equipe responsável. Se desejar, descreva o que aconteceu para facilitar a análise. Não é necessário repetir seus dados pessoais.');
     }
     if (canInterruptFlow && stateIntent === 'human') {
       const nextContext = contextForNewIntent(context);
       await updateConversation(conversation, 'human', nextContext, true);
+      await notifyStaffViaWhatsApp({ conversation, context: nextContext, clientMessage: text, reason: 'human_request' });
       return reply(conversation, 'Vou encaminhar sua conversa para a equipe. Em breve alguém continuará o atendimento por aqui.');
     }
     if (conversation.state === 'awaiting_availability_service') {
@@ -1051,12 +1607,31 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const aiIntent = !deterministic && conversation.state !== 'idle'
       ? await classifyWithAi(message.text, conversation.state, context)
       : null;
-    const interruptIntents = new Set<NavoBotIntent>(['menu', 'appointments', 'availability', 'book', 'cancel', 'cancel_all', 'complaint', 'reschedule', 'human']);
+    const interruptIntents = new Set<NavoBotIntent>([
+      'menu',
+      'appointments',
+      'availability',
+      'book',
+      'cancel',
+      'cancel_all',
+      'complaint',
+      'reschedule',
+      'human',
+      'shop_info',
+      'next_slot',
+      'last_slot',
+      'barbers',
+      'service_info',
+    ]);
     const contextualIntent = deterministic || (aiIntent && interruptIntents.has(aiIntent) ? aiIntent : null);
     const stateReply = await handleState(conversation, context, message.text, contextualIntent);
     if (stateReply !== null) return { handled: true, intent: contextualIntent || aiIntent || 'state' };
 
     const intent = contextualIntent || aiIntent || await classifyWithAi(message.text, conversation.state, context);
+    if (['shop_info', 'next_slot', 'last_slot', 'barbers', 'service_info'].includes(intent)) {
+      await handleAgendaContextualQuery(conversation, context, message.text, intent, 'idle');
+      return { handled: true, intent };
+    }
     if (intent === 'menu' || intent === 'unknown') {
       await updateConversation(conversation, 'idle', context);
       await reply(conversation, menuText(message.pushName));
@@ -1065,11 +1640,14 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     if (intent === 'complaint') {
       const nextContext = contextForNewIntent(context);
       await updateConversation(conversation, 'human', nextContext, true);
+      await notifyStaffViaWhatsApp({ conversation, context: nextContext, clientMessage: message.text, reason: 'complaint' });
       await reply(conversation, 'Sinto muito pela experiência. Sua mensagem foi encaminhada para a equipe responsável. Se desejar, descreva o que aconteceu para facilitar a análise. Não é necessário repetir seus dados pessoais.');
       return { handled: true, intent };
     }
     if (intent === 'human') {
-      await updateConversation(conversation, 'human', { ...context, humanFollowUpCount: 0 }, true);
+      const nextContext = { ...context, humanFollowUpCount: 0 };
+      await updateConversation(conversation, 'human', nextContext, true);
+      await notifyStaffViaWhatsApp({ conversation, context: nextContext, clientMessage: message.text, reason: 'human_request' });
       await reply(conversation, 'Sua solicitação foi encaminhada para a equipe responsável. O atendimento automático permanece pausado para evitar respostas desencontradas. Aguarde a análise da equipe.');
       return { handled: true, intent };
     }

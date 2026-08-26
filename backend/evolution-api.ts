@@ -1,5 +1,7 @@
 import express from 'express';
+import crypto from 'crypto';
 import { z } from 'zod';
+import { desc, eq } from 'drizzle-orm';
 import { requireAdmin, requireAuth } from './middleware/index.js';
 import { handleError } from './utils/index.js';
 import type { WhatsAppButtonsPayload, WhatsAppListPayload } from './services/whatsapp-provider.js';
@@ -10,12 +12,15 @@ const DEFAULT_SETTINGS = {
   baseUrl: '',
   instanceName: '',
   apiKey: '',
-    webhookEnabled: false,
-    webhookUrl: '',
-    webhookSecret: '',
+  webhookEnabled: false,
+  webhookUrl: '',
+  webhookSecret: '',
   navoBotEnabled: false,
   whatsappAccountType: 'personal_qr',
   useInteractiveMessages: false,
+  managerNotificationPhone: '',
+  notifyBarberOnHandoff: true,
+  notifyManagerOnHandoff: true,
 };
 
 const configSchema = z.object({
@@ -29,6 +34,9 @@ const configSchema = z.object({
   navoBotEnabled: z.boolean().optional(),
   whatsappAccountType: z.enum(['personal_qr', 'business_qr']).optional(),
   useInteractiveMessages: z.boolean().optional(),
+  managerNotificationPhone: z.string().trim().max(50).optional(),
+  notifyBarberOnHandoff: z.boolean().optional(),
+  notifyManagerOnHandoff: z.boolean().optional(),
 }).strict();
 
 const testMessageSchema = z.object({
@@ -72,6 +80,9 @@ function publicConfig(row: any) {
     navoBotEnabled: !!row?.navoBotEnabled,
     whatsappAccountType: row?.whatsappAccountType === 'business_qr' ? 'business_qr' : 'personal_qr',
     useInteractiveMessages: row?.useInteractiveMessages === true,
+    managerNotificationPhone: row?.managerNotificationPhone || '',
+    notifyBarberOnHandoff: row?.notifyBarberOnHandoff !== false,
+    notifyManagerOnHandoff: row?.notifyManagerOnHandoff !== false,
   };
 }
 
@@ -375,6 +386,152 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
       footerText: payload.footerText || 'NavoBot',
     });
   }
+
+  router.get('/conversations', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const db = getDb();
+      const conversations = await db.query.navoBotConversations.findMany({
+        orderBy: [desc(schema.navoBotConversations.lastInboundAt), desc(schema.navoBotConversations.updatedAt)],
+        limit: 100,
+      });
+
+      const profiles = await db.query.profiles.findMany();
+      const professionals = await db.query.professionals.findMany();
+
+      const enriched = await Promise.all(conversations.map(async (conv: any) => {
+        const cleanPhone = normalizePhone(conv.phone);
+        const profile = profiles.find((p: any) => p.phone && normalizePhone(p.phone).endsWith(cleanPhone.slice(-8)));
+        const clientName = (conv.context && typeof conv.context === 'object' && conv.context.clientName) || profile?.name || 'Cliente WhatsApp';
+
+        // Get latest 5 messages
+        const messages = await db.query.navoBotMessages.findMany({
+          where: eq(schema.navoBotMessages.conversationId, conv.id),
+          orderBy: [desc(schema.navoBotMessages.createdAt)],
+          limit: 10,
+        });
+
+        return {
+          id: conv.id,
+          phone: conv.phone,
+          cleanPhone,
+          state: conv.state,
+          handoffRequested: !!conv.handoffRequested,
+          handoffReason: conv.handoffReason || null,
+          assignedProfessionalId: conv.assignedProfessionalId || null,
+          assignedProfessionalName: conv.assignedProfessionalName || null,
+          clientName,
+          clientEmail: profile?.email || null,
+          lastInboundAt: conv.lastInboundAt,
+          lastOutboundAt: conv.lastOutboundAt,
+          resolvedAt: conv.resolvedAt,
+          context: conv.context,
+          messages: messages.reverse(),
+        };
+      }));
+
+      res.json(enriched);
+    } catch (error: any) {
+      console.error('[Evolution API] Falha ao listar conversas:', error);
+      return res.status(500).json({ error: error?.message || 'Não foi possível listar as conversas.' });
+    }
+  });
+
+  router.post('/conversations/:id/resolve', requireAuth, requireAdmin, async (req: any, res) => {
+    try {
+      const db = getDb();
+      const conversationId = req.params.id;
+      const userName = req.user?.name || req.user?.email || 'Administrador';
+
+      const [updated] = await db.update(schema.navoBotConversations).set({
+        state: 'idle',
+        handoffRequested: false,
+        resolvedAt: new Date(),
+        resolvedBy: userName,
+        updatedAt: new Date(),
+      }).where(eq(schema.navoBotConversations.id, conversationId)).returning();
+
+      if (!updated) return res.status(404).json({ error: 'Conversa não encontrada.' });
+      res.json({ success: true, conversation: updated });
+    } catch (error: any) {
+      return res.status(500).json({ error: error?.message || 'Não foi possível resolver a conversa.' });
+    }
+  });
+
+  router.post('/conversations/:id/resume-bot', requireAuth, requireAdmin, async (req: any, res) => {
+    try {
+      const db = getDb();
+      const conversationId = req.params.id;
+      const shouldNotifyClient = req.body?.notifyClient !== false;
+
+      const conversation = await db.query.navoBotConversations.findFirst({
+        where: eq(schema.navoBotConversations.id, conversationId),
+      });
+
+      if (!conversation) return res.status(404).json({ error: 'Conversa não encontrada.' });
+
+      await db.update(schema.navoBotConversations).set({
+        state: 'idle',
+        handoffRequested: false,
+        updatedAt: new Date(),
+      }).where(eq(schema.navoBotConversations.id, conversationId));
+
+      if (shouldNotifyClient) {
+        const resumeText = 'Olá! O atendimento com a nossa equipe foi concluído. Nosso assistente virtual voltou a ficar ativo. Se precisar de algo, envie *MENU* ou *AGENDAR*!';
+        await sendText(conversation.phone, resumeText);
+        await db.insert(schema.navoBotMessages).values({
+          id: `nbm_out_${crypto.randomUUID()}`,
+          conversationId: conversation.id,
+          messageId: `out_${crypto.randomUUID()}`,
+          phone: conversation.phone,
+          direction: 'outbound',
+          text: resumeText,
+          intent: 'bot_resumed',
+        }).onConflictDoNothing();
+      }
+
+      res.json({ success: true, message: 'Bot reativado para esta conversa.' });
+    } catch (error: any) {
+      return res.status(500).json({ error: error?.message || 'Não foi possível reativar o bot.' });
+    }
+  });
+
+  router.post('/conversations/:id/send-manual', requireAuth, requireAdmin, async (req: any, res) => {
+    try {
+      const text = String(req.body?.text || '').trim();
+      if (!text) return res.status(400).json({ error: 'Informe a mensagem para envio.' });
+
+      const db = getDb();
+      const conversationId = req.params.id;
+
+      const conversation = await db.query.navoBotConversations.findFirst({
+        where: eq(schema.navoBotConversations.id, conversationId),
+      });
+
+      if (!conversation) return res.status(404).json({ error: 'Conversa não encontrada.' });
+
+      const sent = await sendText(conversation.phone, text);
+      if (!sent) return res.status(502).json({ error: 'Falha ao despachar mensagem pelo WhatsApp.' });
+
+      await db.insert(schema.navoBotMessages).values({
+        id: `nbm_out_${crypto.randomUUID()}`,
+        conversationId: conversation.id,
+        messageId: `out_manual_${crypto.randomUUID()}`,
+        phone: conversation.phone,
+        direction: 'outbound',
+        text,
+        intent: 'manual_staff_reply',
+      }).onConflictDoNothing();
+
+      await db.update(schema.navoBotConversations).set({
+        lastOutboundAt: new Date(),
+        updatedAt: new Date(),
+      }).where(eq(schema.navoBotConversations.id, conversationId));
+
+      res.json({ success: true, message: 'Mensagem enviada com sucesso.' });
+    } catch (error: any) {
+      return res.status(500).json({ error: error?.message || 'Não foi possível enviar a mensagem manual.' });
+    }
+  });
 
   router.post('/send-test', requireAuth, requireAdmin, async (req, res) => {
     try {

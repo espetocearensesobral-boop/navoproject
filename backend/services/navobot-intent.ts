@@ -11,6 +11,11 @@ export type NavoBotIntent =
   | 'cancel_all'
   | 'complaint'
   | 'human'
+  | 'shop_info'
+  | 'next_slot'
+  | 'last_slot'
+  | 'barbers'
+  | 'service_info'
   | 'unknown';
 
 export type ExtractedEvolutionMessage = {
@@ -87,6 +92,42 @@ export function classifyDeterministicIntent(text: string): NavoBotIntent | null 
   if (/\b(cancelar|cancela|cancele|cancelamento|desmarcar|desmarque|nao vou conseguir ir|nao posso ir)\b/.test(normalized)) return 'cancel';
   if (/\b(reagendar|remarcar|mudar (o )?horario|trocar (o )?horario|alterar (o )?agendamento|mudar minha reserva|outro dia|outro horario|adiar)\b/.test(normalized)) return 'reschedule';
   if (/\b(meu|minha|minhas)\b.*\b(agendamento|agenda|reserva|horario|marcacao|voucher)\b/.test(normalized)) return 'appointments';
+
+  // 1. Perguntas de Horário de Funcionamento / Aberto / Fechado / Localização
+  if (
+    /\b(que horas\s+(fecha|abre|encerra|comeca|inicia)|horario\s+de\s+(funcionamento|atendimento|abertura|fechamento)|ta\s+aberto|esta\s+aberto|abre\s+hoje|fecha\s+hoje|abrem\s+hoje|aberto\s+hoje|fechado\s+hoje|funcionam\s+hoje|abre\s+(aos?\s+)?(sabados?|domingos?)|onde\s+fica|qual\s+(o\s+)?endereco|localizacao|como\s+chego)\b/.test(normalized)
+  ) {
+    return 'shop_info';
+  }
+
+  // 2. Perguntas sobre Horário mais próximo / Primeiro horário / Vaga imediata
+  if (
+    /\b(horario\s+mais\s+(proximo|perto|cedo)|primeiro\s+horario|tem\s+vaga\s+(agora|hoje|pra hoje|mais cedo|pra daqui a pouco)|vaga\s+(agora|imediata|mais cedo)|encaixe|consegue\s+me\s+encaixar|tem\s+horario\s+(livre\s+)?(agora|hoje|mais cedo|pra hoje))\b/.test(normalized)
+  ) {
+    return 'next_slot';
+  }
+
+  // 3. Perguntas sobre Último horário do dia
+  if (
+    /\b(ultimo\s+horario|ultima\s+vaga|ate\s+que\s+horas\s+(atendem|posso\s+agendar|tem\s+horario|da\s+pra\s+(ir|cortar|marcar))|qual\s+o\s+ultimo)\b/.test(normalized)
+  ) {
+    return 'last_slot';
+  }
+
+  // 4. Perguntas sobre Barbeiros / Quem está atendendo / Barbeiro liberado
+  if (
+    /\b((qual|quais)\s+barbeiros?\s+(esta|tao|estao)?\s*(liberado|livre|atendendo|disponivel)|quem\s+(esta|ta)\s+(atendendo|trabalhando|escalado|livre|liberado)|barbeiro\s+(livre|liberado|disponivel))\b/.test(normalized)
+  ) {
+    return 'barbers';
+  }
+
+  // 5. Perguntas sobre Preço e Duração de Serviços
+  if (
+    /\b(quanto\s+(custa|e|sai|fica)|qual\s+(o\s+)?(preco|valor)|tabela\s+de\s+precos|valores\s+dos\s+servicos|quanto\s+tempo\s+(demora|dura|leva))\b/.test(normalized)
+  ) {
+    return 'service_info';
+  }
+
   if (/\b(servicos?|precos?|catalogo|ver (os )?servicos?|mostrar (os )?servicos?|lista de servicos?)\b/.test(normalized)) return 'book';
   const asksAvailability = /\b(horarios?|horas?|disponiveis?|disponibilidade|vagas?|livres?)\b/.test(normalized);
   const asksPersonalAppointment = /\b(meu|minha|minhas|meus)\b.*\b(agendamento|agenda|reserva|horario|marcacao|voucher)\b/.test(normalized);
@@ -236,7 +277,29 @@ export function normalizeIntentName(value: unknown): NavoBotIntent {
   if (['cancel_all', 'cancelar todos', 'cancelar tudo', 'desmarcar todos'].includes(normalized)) return 'cancel_all';
   if (['complaint', 'reclamacao', 'reclamar', 'queixa'].includes(normalized)) return 'complaint';
   if (['human', 'humano', 'atendente'].includes(normalized)) return 'human';
+  if (['shop_info', 'horario_funcionamento', 'aberto', 'fechado', 'endereco', 'localizacao'].includes(normalized)) return 'shop_info';
+  if (['next_slot', 'horario_proximo', 'proximo_horario', 'vaga_agora', 'primeiro_horario'].includes(normalized)) return 'next_slot';
+  if (['last_slot', 'ultimo_horario', 'ultima_vaga'].includes(normalized)) return 'last_slot';
+  if (['barbers', 'barbeiros', 'barbeiro_liberado', 'quem_atende'].includes(normalized)) return 'barbers';
+  if (['service_info', 'precos', 'preco_servico', 'duracao_servico'].includes(normalized)) return 'service_info';
   return 'unknown';
+}
+
+export function findProfessionalMatches(professionals: Array<{ id: string; name: string; nickname?: string | null }>, text: string): Array<{ id: string; name: string; nickname?: string | null }> {
+  const normalizedText = normalizeText(text);
+  if (!normalizedText) return [];
+  return professionals.filter((prof) => {
+    const profName = normalizeText(prof.name);
+    const profNickname = prof.nickname ? normalizeText(prof.nickname) : '';
+    if (profName && normalizedText.includes(profName)) return true;
+    if (profNickname && profNickname.length >= 3 && normalizedText.includes(profNickname)) return true;
+    const firstName = profName.split(' ')[0];
+    if (firstName && firstName.length >= 3) {
+      const regex = new RegExp(`\\b${firstName}\\b`, 'i');
+      if (regex.test(normalizedText)) return true;
+    }
+    return false;
+  });
 }
 
 const SERVICE_STOP_WORDS = new Set(['a', 'as', 'o', 'os', 'um', 'uma', 'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'para', 'por']);

@@ -39,6 +39,8 @@ export const professionalPayloadSchema = z.object({
   name: z.string().trim().min(1).max(120),
   nickname: z.string().trim().max(80).nullable().optional(),
   roleTitle: z.string().trim().min(1).max(100),
+  phone: z.string().trim().max(50).nullable().optional(),
+  pixKey: z.string().trim().max(120).nullable().optional(),
   rating: z.coerce.number().min(0).max(5),
   reviewsCount: z.coerce.number().int().min(0).max(10000000),
   photoUrl: z.string().url().max(2000).nullable().optional(),

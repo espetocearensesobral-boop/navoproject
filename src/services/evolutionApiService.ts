@@ -11,6 +11,9 @@ export interface EvolutionApiSettings {
   navoBotEnabled: boolean;
   whatsappAccountType: 'personal_qr' | 'business_qr';
   useInteractiveMessages: boolean;
+  managerNotificationPhone?: string;
+  notifyBarberOnHandoff?: boolean;
+  notifyManagerOnHandoff?: boolean;
 }
 
 export interface EvolutionApiSettingsInput {
@@ -24,6 +27,36 @@ export interface EvolutionApiSettingsInput {
   useInteractiveMessages: boolean;
   apiKey?: string;
   webhookSecret?: string;
+  managerNotificationPhone?: string;
+  notifyBarberOnHandoff?: boolean;
+  notifyManagerOnHandoff?: boolean;
+}
+
+export interface BotConversationMessage {
+  id: string;
+  phone: string;
+  direction: 'inbound' | 'outbound';
+  text: string;
+  intent?: string | null;
+  createdAt: string;
+}
+
+export interface BotConversation {
+  id: string;
+  phone: string;
+  cleanPhone: string;
+  state: string;
+  handoffRequested: boolean;
+  handoffReason: string | null;
+  assignedProfessionalId: string | null;
+  assignedProfessionalName: string | null;
+  clientName: string;
+  clientEmail: string | null;
+  lastInboundAt: string | null;
+  lastOutboundAt: string | null;
+  resolvedAt: string | null;
+  context: any;
+  messages: BotConversationMessage[];
 }
 
 export interface NavoBotAiTestResult {
@@ -56,6 +89,9 @@ export const defaultEvolutionApiSettings: EvolutionApiSettings = {
   navoBotEnabled: false,
   whatsappAccountType: 'personal_qr',
   useInteractiveMessages: false,
+  managerNotificationPhone: '',
+  notifyBarberOnHandoff: true,
+  notifyManagerOnHandoff: true,
 };
 
 async function parseResponse<T>(response: Response, fallback: string): Promise<T> {
@@ -113,4 +149,32 @@ export async function testNavoBotAi(): Promise<NavoBotAiTestResult> {
     throw new Error(data?.error || data?.message || 'Não foi possível testar o Gemini do NavoBot.');
   }
   return data as NavoBotAiTestResult;
+}
+
+export async function fetchBotConversations(): Promise<BotConversation[]> {
+  const response = await authFetch('/api/evolution/conversations');
+  return parseResponse<BotConversation[]>(response, 'Não foi possível carregar as conversas do WhatsApp.');
+}
+
+export async function resolveBotConversation(id: string): Promise<void> {
+  const response = await authFetch(`/api/evolution/conversations/${id}/resolve`, {
+    method: 'POST',
+  });
+  await parseResponse(response, 'Não foi possível concluir o atendimento da conversa.');
+}
+
+export async function resumeBotForConversation(id: string, notifyClient = true): Promise<void> {
+  const response = await authFetch(`/api/evolution/conversations/${id}/resume-bot`, {
+    method: 'POST',
+    body: JSON.stringify({ notifyClient }),
+  });
+  await parseResponse(response, 'Não foi possível reativar o bot.');
+}
+
+export async function sendManualBotMessage(id: string, text: string): Promise<void> {
+  const response = await authFetch(`/api/evolution/conversations/${id}/send-manual`, {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  });
+  await parseResponse(response, 'Não foi possível enviar a mensagem.');
 }
