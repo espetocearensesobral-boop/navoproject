@@ -101,7 +101,7 @@ function configIsComplete(row: any): boolean {
   return !!(row?.enabled && row?.baseUrl && row?.instanceName && row?.apiKey);
 }
 
-async function evolutionRequest(baseUrl: string, apiKey: string, path: string, init: RequestInit = {}, timeoutMs = 8_000) {
+async function evolutionRequest(baseUrl: string, apiKey: string, path: string, init: RequestInit = {}, timeoutMs = 10_000) {
   const cleanBase = normalizeBaseUrl(baseUrl);
   if (!cleanBase) {
     throw new Error('URL da Evolution API não está configurada. Configure o endereço em Sistema > WhatsApp.');
@@ -135,7 +135,7 @@ async function evolutionRequest(baseUrl: string, apiKey: string, path: string, i
     return body;
   } catch (err: any) {
     if (err.name === 'AbortError') {
-      const error = new Error(`Tempo limite excedido (${timeoutMs / 1000}s) ao conectar à Evolution API em ${cleanBase}. Verifique se o servidor está online e acessível.`);
+      const error = new Error(`Tempo limite excedido (${timeoutMs / 1000}s) ao conectar à Evolution API em ${cleanBase}. Verifique se a porta está liberada no firewall do seu servidor/provedor (ex: Oracle Cloud, AWS, VPS) e se o serviço está ativo.`);
       throw error;
     }
     if (err.message === 'fetch failed' || err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED' || err.cause) {

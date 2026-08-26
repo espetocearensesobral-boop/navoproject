@@ -38,6 +38,10 @@ import {
   Scissors,
   AlertTriangle,
   Timer,
+  User,
+  Phone,
+  Sparkles,
+  Check,
 } from "lucide-react";
 import {
   getTodayStringBRT,
@@ -1024,29 +1028,43 @@ export const ScheduleGrid: React.FC = () => {
           icon={Scissors}
           eyebrow="Agenda Manual"
           title="Encaixe Presencial"
-          subtitle="Registrar agendamento direto na grade"
+          subtitle={`Grade de ${selectedDate.split("-").reverse().join("/")} • Inserção direta sem restrição`}
           accent="gold"
-          size="sm"
+          size="fullscreen"
           onClose={() => setIsManualBookingOpen(false)}
           footer={
-            <div className="flex items-center justify-end gap-2 w-full">
-              <button
-                type="button"
-                onClick={() => setIsManualBookingOpen(false)}
-                className="admin-btn admin-btn-sm admin-btn-secondary"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                form="manual-booking-form"
-                disabled={savingManualBooking}
-                className="admin-btn admin-btn-sm admin-btn-primary disabled:opacity-60 disabled:cursor-wait"
-              >
-                {savingManualBooking
-                  ? "Salvando..."
-                  : "Confirmar Agendamento"}
-              </button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
+              <div className="flex items-center gap-2 text-xs text-[var(--admin-text-muted)]">
+                <span className="w-2 h-2 rounded-full bg-[var(--admin-accent)] animate-pulse" />
+                <span>Encaixe manual aprovado e confirmado automaticamente</span>
+              </div>
+              <div className="flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsManualBookingOpen(false)}
+                  className="admin-btn admin-btn-sm admin-btn-secondary"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  form="manual-booking-form"
+                  disabled={savingManualBooking}
+                  className="admin-btn admin-btn-sm admin-btn-primary disabled:opacity-60 disabled:cursor-wait min-w-[180px]"
+                >
+                  {savingManualBooking ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Salvando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Confirmar Agendamento</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           }
         >
@@ -1054,134 +1072,299 @@ export const ScheduleGrid: React.FC = () => {
             id="manual-booking-form"
             onKeyDown={handleEnterAsTab}
             onSubmit={handleManualBookingSubmit}
-            className="space-y-3.5"
+            className="space-y-6"
           >
-            <div>
-              <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
-                Nome do Cliente *
-              </label>
-              <input
-                type="text"
-                value={manualBookingForm.client_name}
-                onChange={(e) =>
-                  setManualBookingForm({
-                    ...manualBookingForm,
-                    client_name: e.target.value,
-                  })
-                }
-                placeholder="Ex: Gabriel Santos"
-                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                required
-              />
+            {/* Top Grid: 2 Columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Cliente & Barbeiro (5 cols) */}
+              <div className="lg:col-span-5 space-y-5">
+                {/* Bloco 1: Dados do Cliente */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                    <User className="w-4 h-4" />
+                    <span>1. Dados do Cliente</span>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-[var(--admin-text-main)] block mb-1.5">
+                      Nome Completo *
+                    </label>
+                    <input
+                      type="text"
+                      value={manualBookingForm.client_name}
+                      onChange={(e) =>
+                        setManualBookingForm({
+                          ...manualBookingForm,
+                          client_name: e.target.value,
+                        })
+                      }
+                      placeholder="Ex: Gabriel Santos"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                      required
+                      autoFocus
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-[var(--admin-text-main)] block mb-1.5 flex items-center justify-between">
+                      <span>Telefone WhatsApp</span>
+                      <span className="text-[10px] text-[var(--admin-text-muted)] font-normal">
+                        Opcional para avisos
+                      </span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--admin-text-muted)]">
+                        <Phone className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        value={manualBookingForm.client_phone}
+                        onChange={(e) =>
+                          setManualBookingForm({
+                            ...manualBookingForm,
+                            client_phone: e.target.value,
+                          })
+                        }
+                        placeholder="(11) 98765-4321"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bloco 2: Profissional */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                      <Scissors className="w-4 h-4" />
+                      <span>2. Profissional Responsável</span>
+                    </div>
+                    <span className="text-xs text-[var(--admin-text-muted)]">
+                      {barbers.length} disponível(is)
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {barbers.map((b) => {
+                      const isSelected =
+                        manualBookingForm.professional_id === b.id;
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          onClick={() =>
+                            setManualBookingForm({
+                              ...manualBookingForm,
+                              professional_id: b.id,
+                            })
+                          }
+                          className={`p-3 rounded-xl border text-left flex items-center gap-3 transition-all ${
+                            isSelected
+                              ? "bg-[var(--admin-accent)]/10 border-[var(--admin-accent)] text-[var(--admin-text-main)] shadow-sm"
+                              : "bg-[var(--admin-bg)] border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:border-[var(--admin-accent)]/50 hover:text-[var(--admin-text-main)]"
+                          }`}
+                        >
+                          <div
+                            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
+                            style={{
+                              background: isSelected
+                                ? "var(--admin-accent)"
+                                : "var(--admin-surface)",
+                              color: isSelected
+                                ? "var(--admin-bg)"
+                                : "var(--admin-text-main)",
+                              border: "1px solid var(--admin-border)",
+                            }}
+                          >
+                            {b.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold truncate text-[var(--admin-text-main)]">
+                              {b.name}
+                            </p>
+                            <p className="text-[10px] text-[var(--admin-text-muted)] truncate">
+                              {b.role || "Barbeiro"}
+                            </p>
+                          </div>
+                          {isSelected && (
+                            <Check className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Serviço & Horário (7 cols) */}
+              <div className="lg:col-span-7 space-y-5">
+                {/* Bloco 3: Serviços */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                      <Sparkles className="w-4 h-4" />
+                      <span>3. Serviço Desejado *</span>
+                    </div>
+                    <span className="text-xs text-[var(--admin-text-muted)]">
+                      {services.length} serviço(s)
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[260px] overflow-y-auto pr-1">
+                    {services.map((service) => {
+                      const isSelected =
+                        manualBookingForm.service_id === service.id;
+                      const price = Number(service.price || 0);
+                      const duration = service.duration_minutes || 30;
+
+                      return (
+                        <button
+                          key={service.id}
+                          type="button"
+                          onClick={() =>
+                            setManualBookingForm({
+                              ...manualBookingForm,
+                              service_id: service.id,
+                            })
+                          }
+                          className={`p-3 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all ${
+                            isSelected
+                              ? "bg-[var(--admin-accent)]/10 border-[var(--admin-accent)] shadow-sm"
+                              : "bg-[var(--admin-bg)] border-[var(--admin-border)] hover:border-[var(--admin-accent)]/50"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2 w-full">
+                            <span className="text-xs font-bold text-[var(--admin-text-main)] line-clamp-1">
+                              {service.title}
+                            </span>
+                            {isSelected && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-[var(--admin-accent)] text-[var(--admin-bg)] shrink-0">
+                                Selecionado
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between text-xs w-full pt-1 border-t border-[var(--admin-border)]/50">
+                            <span className="text-[11px] text-[var(--admin-text-muted)] flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {duration} min
+                            </span>
+                            <span className="font-bold text-[var(--admin-accent)]">
+                              R$ {price.toFixed(2)}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Bloco 4: Horário */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                      <Clock className="w-4 h-4" />
+                      <span>4. Horário do Encaixe *</span>
+                    </div>
+                    <div className="text-xs font-mono font-bold text-[var(--admin-accent)] bg-[var(--admin-bg)] px-2.5 py-1 rounded-lg border border-[var(--admin-border)]">
+                      {manualBookingForm.time_slot}
+                    </div>
+                  </div>
+
+                  {/* Chips rápidos de horários */}
+                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-1.5 max-h-[140px] overflow-y-auto pr-1">
+                    {timeSlots.map((ts) => {
+                      const isSelected = manualBookingForm.time_slot === ts;
+                      return (
+                        <button
+                          key={ts}
+                          type="button"
+                          onClick={() =>
+                            setManualBookingForm({
+                              ...manualBookingForm,
+                              time_slot: ts,
+                            })
+                          }
+                          className={`py-1.5 px-2 rounded-lg text-xs font-mono font-semibold transition-all text-center ${
+                            isSelected
+                              ? "bg-[var(--admin-accent)] text-[var(--admin-bg)] font-bold shadow-sm"
+                              : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] border border-[var(--admin-border)]"
+                          }`}
+                        >
+                          {ts}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
-                  Telefone WhatsApp
-                </label>
-                <input
-                  type="text"
-                  value={manualBookingForm.client_phone}
-                  onChange={(e) =>
-                    setManualBookingForm({
-                      ...manualBookingForm,
-                      client_phone: e.target.value,
-                    })
-                  }
-                  placeholder="(11) 98765-4321"
-                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                />
-              </div>
+            {/* Resumo do Encaixe */}
+            {(() => {
+              const selectedService = services.find(
+                (s) => s.id === manualBookingForm.service_id,
+              );
+              const selectedBarber = barbers.find(
+                (b) => b.id === manualBookingForm.professional_id,
+              );
+              const duration = selectedService?.duration_minutes || 30;
+              const price = Number(selectedService?.price || 0);
 
-              <div>
-                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
-                  Barbeiro *
-                </label>
-                <select
-                  value={manualBookingForm.professional_id}
-                  onChange={(e) =>
-                    setManualBookingForm({
-                      ...manualBookingForm,
-                      professional_id: e.target.value,
-                    })
-                  }
-                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                >
-                  {barbers.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+              const calcEnd = (start: string, dur: number) => {
+                if (!start) return "";
+                const [h, m] = start.split(":").map(Number);
+                if (isNaN(h) || isNaN(m)) return start;
+                const total = h * 60 + m + dur;
+                const endH = Math.floor(total / 60) % 24;
+                const endM = total % 60;
+                return `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
+              };
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
-                  Serviço real *
-                </label>
-                <select
-                  value={manualBookingForm.service_id}
-                  onChange={(e) =>
-                    setManualBookingForm({
-                      ...manualBookingForm,
-                      service_id: e.target.value,
-                    })
-                  }
-                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                  required
-                >
-                  <option value="">Selecione</option>
-                  {services.map((service) => (
-                    <option key={service.id} value={service.id}>
-                      {service.title} — R${" "}
-                      {Number(service.price || 0).toFixed(2)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              const endTime = calcEnd(manualBookingForm.time_slot, duration);
 
-              <div>
-                <label className="text-xs font-bold text-[var(--admin-text-main)] block mb-1">
-                  Horário *
-                </label>
-                <select
-                  value={manualBookingForm.time_slot}
-                  onChange={(e) =>
-                    setManualBookingForm({
-                      ...manualBookingForm,
-                      time_slot: e.target.value,
-                    })
-                  }
-                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
-                  required
-                >
-                  {timeSlots.map((ts) => (
-                    <option key={ts} value={ts}>
-                      {ts}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+              return (
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--admin-surface)] to-[var(--admin-bg)] border border-[var(--admin-border)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] border border-[var(--admin-accent)]/30">
+                        Resumo do Encaixe
+                      </span>
+                      <span className="text-xs text-[var(--admin-text-muted)]">
+                        Data:{" "}
+                        <strong className="text-[var(--admin-text-main)]">
+                          {selectedDate.split("-").reverse().join("/")}
+                        </strong>
+                      </span>
+                    </div>
+                    <p className="text-sm font-bold text-[var(--admin-text-main)]">
+                      {manualBookingForm.client_name.trim() ||
+                        "Cliente não informado"}{" "}
+                      • {selectedService?.title || "Selecione o serviço"}
+                    </p>
+                    <p className="text-xs text-[var(--admin-text-muted)]">
+                      Profissional:{" "}
+                      <strong className="text-[var(--admin-text-main)]">
+                        {selectedBarber?.name || "Não selecionado"}
+                      </strong>{" "}
+                      • Horário:{" "}
+                      <strong className="text-[var(--admin-accent)] font-mono">
+                        {manualBookingForm.time_slot} → {endTime}
+                      </strong>{" "}
+                      ({duration} min)
+                    </p>
+                  </div>
 
-            {manualBookingForm.service_id &&
-              (() => {
-                const selectedService = services.find(
-                  (service) => service.id === manualBookingForm.service_id,
-                );
-                return selectedService ? (
-                  <p className="text-xs text-[var(--admin-text-muted)]">
-                    Duração real:{" "}
-                    <strong className="text-[var(--admin-accent)]">
-                      {selectedService.duration_minutes} min
-                    </strong>
-                    . O valor será recalculado pelo servidor.
-                  </p>
-                ) : null;
-              })()}
+                  <div className="text-left md:text-right shrink-0 bg-[var(--admin-bg)] md:bg-transparent p-3 md:p-0 rounded-xl w-full md:w-auto border md:border-0 border-[var(--admin-border)]">
+                    <span className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider block">
+                      Valor Total Estimado
+                    </span>
+                    <span className="text-xl font-bold text-[var(--admin-accent)] font-mono">
+                      R$ {price.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
           </form>
         </AdminModalV2>
       )}
