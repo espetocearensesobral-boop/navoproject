@@ -3271,3 +3271,33 @@ button, a, input, select, textarea {
 .admin-shell a[class~="bg-surface-elevated"] {
   color: var(--color-content-base) !important;
 }
+
+/* ========================================================================= */
+/* ADMIN NEUTRAL THEME OVERRIDES                                             */
+/* The admin panel uses a strictly neutral, high-contrast monochrome palette */
+/* (Zinc/Slate) for maximum efficiency and a clean, "enxuto" layout.         */
+/* ========================================================================= */
+
+[data-theme="dark"] .admin-shell {
+  --color-gold-base: #FAFAFA; /* Zinc 50 */
+  --color-gold-deep: #D4D4D8; /* Zinc 300 */
+  --color-gold-accent: #FFFFFF; 
+  --color-gold-hover: #FFFFFF;
+  --color-accent-solid: #FAFAFA;
+  --color-accent-text: #FAFAFA;
+  --color-accent-soft: rgba(250, 250, 250, 0.12);
+  --color-accent-strong: #D4D4D8;
+  --color-content-on-accent: #09090B; /* Zinc 950 for text on white button */
+}
+
+[data-theme="light"] .admin-shell {
+  --color-gold-base: #18181B; /* Zinc 900 */
+  --color-gold-deep: #09090B; /* Zinc 950 */
+  --color-gold-accent: #27272A; /* Zinc 800 */
+  --color-gold-hover: #09090B;
+  --color-accent-solid: #18181B;
+  --color-accent-text: #18181B;
+  --color-accent-soft: rgba(24, 24, 27, 0.08);
+  --color-accent-strong: #09090B;
+  --color-content-on-accent: #FFFFFF;
+}

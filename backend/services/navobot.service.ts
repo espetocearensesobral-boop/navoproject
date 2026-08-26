@@ -1449,11 +1449,6 @@ MENSAGEM DO CLIENTE:
       await updateConversation(conversation, 'idle', nextContext);
       return listAppointments(conversation);
     }
-    if (canInterruptFlow && stateIntent === 'gratitude') {
-      const nextContext = contextForNewIntent(context);
-      await updateConversation(conversation, 'idle', nextContext);
-      return reply(conversation, 'De nada! Estou à disposição. Se precisar de algo, é só chamar! 👋');
-    }
     if (canInterruptFlow && stateIntent === 'book') {
       const nextContext = contextForNewIntent(context, { pendingAction: 'book' });
       await updateConversation(conversation, 'idle', nextContext);
@@ -1639,6 +1634,7 @@ MENSAGEM DO CLIENTE:
       'last_slot',
       'barbers',
       'service_info',
+      'gratitude'
     ]);
     const contextualIntent = deterministic || (aiIntent && interruptIntents.has(aiIntent) ? aiIntent : null);
     const stateReply = await handleState(conversation, context, message.text, contextualIntent);
