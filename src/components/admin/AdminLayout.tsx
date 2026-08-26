@@ -38,6 +38,8 @@ import {
   FileText,
   Package,
   Award,
+  Star,
+  History,
   Scissors,
   MoreHorizontal,
   Store,
@@ -60,6 +62,8 @@ export type AdminTab =
   | "clientes"
   | "catalogo"
   | "relacionamento"
+  | "relacionamento_reviews"
+  | "relacionamento_followup"
   | "sistema";
 
 const ADMIN_ACTIVE_TAB_KEY = "navo-admin-active-tab";
@@ -76,6 +80,8 @@ const ADMIN_TAB_VALUES: AdminTab[] = [
   "clientes",
   "catalogo",
   "relacionamento",
+  "relacionamento_reviews",
+  "relacionamento_followup",
   "sistema",
 ];
 
@@ -90,12 +96,13 @@ const getStoredAdminTab = (): AdminTab => {
       servicos: "catalogo",
       profissionais: "catalogo",
       produtos: "catalogo",
-      relacionamento_dashboard: "relacionamento",
+      relacionamento: "relacionamento",
       relacionamento_loyalty: "relacionamento",
+      relacionamento_followup: "relacionamento_followup",
       relacionamento_rewards: "relacionamento",
       relacionamento_referrals: "relacionamento",
-      relacionamento_reviews: "relacionamento",
-      followup: "relacionamento",
+      relacionamento_reviews: "relacionamento_reviews",
+      followup: "relacionamento_followup",
       aniversariantes: "relacionamento",
       barbearia: "sistema",
       settings: "sistema",
@@ -355,7 +362,19 @@ export const AdminLayout: React.FC = () => {
       id: "relacionamento" as AdminTab,
       label: "Relacionamento",
       icon: Award,
-      description: "Fidelidade, avaliações e retorno",
+      description: "Workspace de CRM, fidelidade e crescimento",
+    },
+    {
+      id: "relacionamento_reviews" as AdminTab,
+      label: "Avaliações & NPS",
+      icon: Star,
+      description: "Feedbacks recebidos, prioridades e tratamento",
+    },
+    {
+      id: "relacionamento_followup" as AdminTab,
+      label: "Follow-up",
+      icon: History,
+      description: "Clientes para reativação e pós-atendimento",
     },
     {
       id: "sistema" as AdminTab,
@@ -386,12 +405,14 @@ export const AdminLayout: React.FC = () => {
     },
     {
       label: "Gestão",
+      tabs: ["relatorios", "campanhas", "clientes", "catalogo"],
+    },
+    {
+      label: "Relacionamento",
       tabs: [
-        "relatorios",
-        "campanhas",
-        "clientes",
-        "catalogo",
         "relacionamento",
+        "relacionamento_reviews",
+        "relacionamento_followup",
       ],
     },
     { label: "Configuração", tabs: ["sistema"] },
@@ -499,6 +520,10 @@ export const AdminLayout: React.FC = () => {
         return <CatalogWorkspace />;
       case "relacionamento":
         return <RelationshipWorkspace />;
+      case "relacionamento_reviews":
+        return <RelationshipWorkspace initialTab="reviews" />;
+      case "relacionamento_followup":
+        return <RelationshipWorkspace initialTab="followup" />;
       case "sistema":
         return (
           <SystemWorkspace
