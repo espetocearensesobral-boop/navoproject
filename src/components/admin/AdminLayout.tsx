@@ -11,7 +11,10 @@ import { WaitingQueue } from "./WaitingQueue";
 import { AdminAuthView } from "./AdminAuthView";
 import { CatalogWorkspace } from "./CatalogWorkspace";
 import { ReportsWorkspace } from "./ReportsWorkspace";
-import { RelationshipWorkspace } from "./RelationshipWorkspace";
+import { NavoRewardsAdmin } from "./NavoRewardsAdmin";
+import { FollowUpManagement } from "./FollowUpManagement";
+import { BirthdaysManagement } from "./BirthdaysManagement";
+import { AppointmentRemindersManagement } from "./AppointmentRemindersManagement";
 import { SystemWorkspace } from "./SystemWorkspace";
 import { AdminNotificationCenter } from "./AdminNotificationCenter";
 import { CampaignsWorkspace } from "./CampaignsWorkspace";
@@ -38,8 +41,11 @@ import {
   FileText,
   Package,
   Award,
+  Gift,
   Star,
   History,
+  Cake,
+  Zap,
   Scissors,
   MoreHorizontal,
   Store,
@@ -61,9 +67,14 @@ export type AdminTab =
   | "financeiro_saidas"
   | "clientes"
   | "catalogo"
-  | "relacionamento"
+  | "relacionamento_overview"
   | "relacionamento_reviews"
   | "relacionamento_followup"
+  | "relacionamento_birthdays"
+  | "fidelidade"
+  | "premios"
+  | "indicacoes"
+  | "lembretes"
   | "sistema";
 
 const ADMIN_ACTIVE_TAB_KEY = "navo-admin-active-tab";
@@ -79,9 +90,14 @@ const ADMIN_TAB_VALUES: AdminTab[] = [
   "financeiro_saidas",
   "clientes",
   "catalogo",
-  "relacionamento",
+  "relacionamento_overview",
   "relacionamento_reviews",
   "relacionamento_followup",
+  "relacionamento_birthdays",
+  "fidelidade",
+  "premios",
+  "indicacoes",
+  "lembretes",
   "sistema",
 ];
 
@@ -92,18 +108,18 @@ const getStoredAdminTab = (): AdminTab => {
     const legacyTabMap: Record<string, AdminTab> = {
       financeiro: "financeiro_recebimentos",
       financeiro_relatorios: "relatorios",
-      rewards: "relacionamento",
+      rewards: "premios",
       servicos: "catalogo",
       profissionais: "catalogo",
       produtos: "catalogo",
-      relacionamento: "relacionamento",
-      relacionamento_loyalty: "relacionamento",
+      relacionamento: "relacionamento_overview",
+      relacionamento_loyalty: "fidelidade",
       relacionamento_followup: "relacionamento_followup",
-      relacionamento_rewards: "relacionamento",
-      relacionamento_referrals: "relacionamento",
+      relacionamento_rewards: "premios",
+      relacionamento_referrals: "indicacoes",
       relacionamento_reviews: "relacionamento_reviews",
       followup: "relacionamento_followup",
-      aniversariantes: "relacionamento",
+      aniversariantes: "relacionamento_birthdays",
       barbearia: "sistema",
       settings: "sistema",
       settings_agenda: "sistema",
@@ -359,10 +375,10 @@ export const AdminLayout: React.FC = () => {
       description: "Serviços, equipe e estoque",
     },
     {
-      id: "relacionamento" as AdminTab,
-      label: "Relacionamento",
+      id: "relacionamento_overview" as AdminTab,
+      label: "Visão geral do CRM",
       icon: Award,
-      description: "Workspace de CRM, fidelidade e crescimento",
+      description: "Métricas de satisfação, retenção e fidelização",
     },
     {
       id: "relacionamento_reviews" as AdminTab,
@@ -375,6 +391,36 @@ export const AdminLayout: React.FC = () => {
       label: "Follow-up",
       icon: History,
       description: "Clientes para reativação e pós-atendimento",
+    },
+    {
+      id: "relacionamento_birthdays" as AdminTab,
+      label: "Aniversariantes",
+      icon: Cake,
+      description: "Clientes aniversariantes e ações de relacionamento",
+    },
+    {
+      id: "fidelidade" as AdminTab,
+      label: "Programa de fidelidade",
+      icon: Award,
+      description: "Níveis, pontos, saldos e regras do clube",
+    },
+    {
+      id: "premios" as AdminTab,
+      label: "Catálogo de prêmios",
+      icon: Gift,
+      description: "Benefícios, cupons e resgates",
+    },
+    {
+      id: "indicacoes" as AdminTab,
+      label: "Programa de indicações",
+      icon: UserCheck,
+      description: "Links, bônus e crescimento por indicação",
+    },
+    {
+      id: "lembretes" as AdminTab,
+      label: "Lembretes WhatsApp",
+      icon: Zap,
+      description: "Régua de comunicação e confirmações",
     },
     {
       id: "sistema" as AdminTab,
@@ -405,15 +451,36 @@ export const AdminLayout: React.FC = () => {
     },
     {
       label: "Gestão",
-      tabs: ["relatorios", "campanhas", "clientes", "catalogo"],
+      tabs: ["relatorios"],
     },
     {
-      label: "Relacionamento",
+      label: "Clientes",
+      tabs: ["clientes"],
+    },
+    {
+      label: "Relacionamentos",
       tabs: [
-        "relacionamento",
+        "relacionamento_overview",
         "relacionamento_reviews",
         "relacionamento_followup",
+        "relacionamento_birthdays",
       ],
+    },
+    {
+      label: "Fidelização",
+      tabs: ["fidelidade", "premios"],
+    },
+    {
+      label: "Crescimento",
+      tabs: ["campanhas", "indicacoes"],
+    },
+    {
+      label: "Catálogo",
+      tabs: ["catalogo"],
+    },
+    {
+      label: "Comunicação",
+      tabs: ["lembretes"],
     },
     { label: "Configuração", tabs: ["sistema"] },
   ];
@@ -518,12 +585,22 @@ export const AdminLayout: React.FC = () => {
         return <ClientsManagement />;
       case "catalogo":
         return <CatalogWorkspace />;
-      case "relacionamento":
-        return <RelationshipWorkspace />;
+      case "relacionamento_overview":
+        return <NavoRewardsAdmin initialTab="dashboard" />;
       case "relacionamento_reviews":
-        return <RelationshipWorkspace initialTab="reviews" />;
+        return <NavoRewardsAdmin initialTab="reviews" />;
       case "relacionamento_followup":
-        return <RelationshipWorkspace initialTab="followup" />;
+        return <FollowUpManagement />;
+      case "relacionamento_birthdays":
+        return <BirthdaysManagement />;
+      case "fidelidade":
+        return <NavoRewardsAdmin initialTab="loyalty" />;
+      case "premios":
+        return <NavoRewardsAdmin initialTab="rewards" />;
+      case "indicacoes":
+        return <NavoRewardsAdmin initialTab="referrals" />;
+      case "lembretes":
+        return <AppointmentRemindersManagement />;
       case "sistema":
         return (
           <SystemWorkspace
