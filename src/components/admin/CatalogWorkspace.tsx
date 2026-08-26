@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Award, ChevronDown, Package, Scissors, Users } from "lucide-react";
+import { ChevronDown, Package, Scissors, Users } from "lucide-react";
 import { ServicesManagement } from "./ServicesManagement";
 import { ProfessionalsManagement } from "./ProfessionalsManagement";
 import { ProductsManagement } from "./ProductsManagement";
-import { SubscriptionsManagement } from "./SubscriptionsManagement";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 
-export type CatalogSectionId = "services" | "professionals" | "products" | "subscriptions";
+export type CatalogSectionId = "services" | "professionals" | "products";
 
 type CatalogSection = {
   id: CatalogSectionId;
@@ -37,13 +36,6 @@ const sections: CatalogSection[] = [
     summary: "Cadastro, preços, quantidade e controle de estoque",
     icon: Package,
     component: ProductsManagement,
-  },
-  {
-    id: "subscriptions",
-    label: "Clube de Assinaturas",
-    summary: "Planos recorrentes, benefícios VIP e gestão de membros",
-    icon: Award,
-    component: SubscriptionsManagement,
   },
 ];
 

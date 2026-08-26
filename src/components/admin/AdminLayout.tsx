@@ -12,6 +12,7 @@ import { AdminAuthView } from "./AdminAuthView";
 import { CatalogWorkspace } from "./CatalogWorkspace";
 import { ReportsWorkspace } from "./ReportsWorkspace";
 import { NavoRewardsAdmin } from "./NavoRewardsAdmin";
+import { SubscriptionsManagement } from "./SubscriptionsManagement";
 import { FollowUpManagement } from "./FollowUpManagement";
 import { BirthdaysManagement } from "./BirthdaysManagement";
 import { AppointmentRemindersManagement } from "./AppointmentRemindersManagement";
@@ -42,6 +43,7 @@ import {
   Package,
   Award,
   Gift,
+  CreditCard,
   Star,
   History,
   Cake,
@@ -73,6 +75,7 @@ export type AdminTab =
   | "relacionamento_birthdays"
   | "fidelidade"
   | "premios"
+  | "assinaturas"
   | "indicacoes"
   | "lembretes"
   | "sistema";
@@ -96,6 +99,7 @@ const ADMIN_TAB_VALUES: AdminTab[] = [
   "relacionamento_birthdays",
   "fidelidade",
   "premios",
+  "assinaturas",
   "indicacoes",
   "lembretes",
   "sistema",
@@ -109,6 +113,8 @@ const getStoredAdminTab = (): AdminTab => {
       financeiro: "financeiro_recebimentos",
       financeiro_relatorios: "relatorios",
       rewards: "premios",
+      subscriptions: "assinaturas",
+      catalogo_subscriptions: "assinaturas",
       servicos: "catalogo",
       profissionais: "catalogo",
       produtos: "catalogo",
@@ -411,6 +417,12 @@ export const AdminLayout: React.FC = () => {
       description: "Benefícios, cupons e resgates",
     },
     {
+      id: "assinaturas" as AdminTab,
+      label: "Plano por assinatura",
+      icon: CreditCard,
+      description: "Planos recorrentes, benefícios e membros",
+    },
+    {
       id: "indicacoes" as AdminTab,
       label: "Programa de indicações",
       icon: UserCheck,
@@ -468,7 +480,7 @@ export const AdminLayout: React.FC = () => {
     },
     {
       label: "Fidelização",
-      tabs: ["fidelidade", "premios"],
+      tabs: ["fidelidade", "premios", "assinaturas"],
     },
     {
       label: "Crescimento",
@@ -597,6 +609,8 @@ export const AdminLayout: React.FC = () => {
         return <NavoRewardsAdmin initialTab="loyalty" />;
       case "premios":
         return <NavoRewardsAdmin initialTab="rewards" />;
+      case "assinaturas":
+        return <SubscriptionsManagement />;
       case "indicacoes":
         return <NavoRewardsAdmin initialTab="referrals" />;
       case "lembretes":
