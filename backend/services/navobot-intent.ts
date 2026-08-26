@@ -16,6 +16,7 @@ export type NavoBotIntent =
   | 'last_slot'
   | 'barbers'
   | 'service_info'
+  | 'gratitude'
   | 'unknown';
 
 export type ExtractedEvolutionMessage = {

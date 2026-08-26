@@ -29,6 +29,7 @@ INTENÇÕES DISPONÍVEIS
 - cancel_all: cancelar todos, todas as reservas, todos os agendamentos ou tudo que estiver ativo para o cliente.
 - complaint: reclamação, insatisfação, atraso, cobrança indevida, problema no atendimento, serviço ruim ou pedido para registrar uma queixa.
 - human: falar com atendente, equipe ou pessoa.
+- gratitude: agradecimento, despedida ou encerramento amigável da conversa (ex: "certo, obrigado", "valeu", "obrigado", "tchau").
 - unknown: mensagem ambígua ou fora do escopo.
 
 PRIORIDADE E QUEBRA DE CONTEXTO

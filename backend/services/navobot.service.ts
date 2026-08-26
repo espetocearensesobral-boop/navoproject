@@ -494,6 +494,10 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
       await updateConversation(conversation, 'idle', {});
       return reply(conversation, menuText());
     }
+    if (stateIntent === 'gratitude') {
+      await updateConversation(conversation, 'idle', {});
+      return reply(conversation, 'De nada! Estou à disposição. Se precisar de algo, é só chamar! 👋');
+    }
 
     const nextContext = contextForNewIntent(context);
     if (stateIntent === 'appointments') {
@@ -1075,6 +1079,9 @@ MENSAGEM DO CLIENTE:
   }
 
   function getResumePromptForState(state: string, context: BotContext): string | null {
+    if (state === 'awaiting_availability_service') {
+      return 'Qual serviço você deseja usar para consultar os horários? (Envie o número ou nome)';
+    }
     if (state === 'awaiting_service') {
       return 'Qual serviço você deseja agendar? (Envie o número ou nome)';
     }
@@ -1407,6 +1414,11 @@ MENSAGEM DO CLIENTE:
       await updateConversation(conversation, 'idle', preservedContext);
       return reply(conversation, menuText());
     }
+    if (stateIntent === 'gratitude') {
+      const preservedContext = context.clientName ? { clientName: context.clientName } : {};
+      await updateConversation(conversation, 'idle', preservedContext);
+      return reply(conversation, 'De nada! Estou à disposição. Se precisar de algo, é só chamar! 👋');
+    }
     if (stateIntent === 'availability') {
       const nextContext = contextForNewIntent(context, {
         pendingAction: undefined,
@@ -1436,6 +1448,11 @@ MENSAGEM DO CLIENTE:
       const nextContext = contextForNewIntent(context);
       await updateConversation(conversation, 'idle', nextContext);
       return listAppointments(conversation);
+    }
+    if (canInterruptFlow && stateIntent === 'gratitude') {
+      const nextContext = contextForNewIntent(context);
+      await updateConversation(conversation, 'idle', nextContext);
+      return reply(conversation, 'De nada! Estou à disposição. Se precisar de algo, é só chamar! 👋');
     }
     if (canInterruptFlow && stateIntent === 'book') {
       const nextContext = contextForNewIntent(context, { pendingAction: 'book' });
