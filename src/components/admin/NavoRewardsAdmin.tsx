@@ -2357,99 +2357,156 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             </div>
 
             {filteredReviews.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                {filteredReviews.map((rev: any) => (
-                  <button
-                    type="button"
-                    key={rev.id}
-                    onClick={() => openReviewFollowup(rev)}
-                    className="w-full text-left p-3.5 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] space-y-2 transition-colors hover:border-[var(--admin-accent)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent)]/40"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <Star
-                            key={s}
-                            className={`w-3.5 h-3.5 ${s <= rev.rating ? "fill-gold-base text-[var(--admin-accent)]" : "text-border-subtle"}`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-[var(--admin-text-muted)] num-tabular">
-                        {new Date(rev.createdAt).toLocaleDateString("pt-BR")}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${rev.managementStatus === "resolved" ? "bg-status-success/10 text-status-success" : rev.managementStatus === "in_review" ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]" : rev.managementStatus === "archived" ? "bg-[var(--admin-surface)] text-[var(--admin-text-muted)]" : "bg-status-warning/10 text-status-warning"}`}
-                      >
-                        {reviewStatusLabels[rev.managementStatus || "new"] ||
-                          "Nova"}
-                      </span>
-                      <span
-                        className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${rev.priority === "urgent" ? "border-status-error/40 text-status-error" : rev.priority === "high" ? "border-[var(--admin-accent)]/50 text-[var(--admin-accent)]" : "border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
-                      >
-                        Prioridade{" "}
-                        {reviewPriorityLabels[rev.priority || "normal"] ||
-                          "Normal"}
-                      </span>
-                    </div>
+              <div className="admin-table-container">
+                <div className="admin-table-wrap">
+                  <table className="admin-table admin-review-table">
+                    <caption className="sr-only">
+                      Pesquisas de pós-atendimento recebidas
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Avaliação</th>
+                        <th>Serviço / profissional</th>
+                        <th>Respostas</th>
+                        <th>Status</th>
+                        <th>Prioridade</th>
+                        <th className="text-right">Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredReviews.map((rev: any) => {
+                        const statusKey = rev.managementStatus || "new";
+                        const priorityKey = rev.priority || "normal";
+                        const statusClass =
+                          statusKey === "resolved"
+                            ? "admin-badge admin-badge-success"
+                            : statusKey === "in_review"
+                              ? "admin-badge admin-badge-gold"
+                              : statusKey === "archived"
+                                ? "admin-badge admin-badge-neutral"
+                                : "admin-badge admin-badge-warning";
+                        const priorityClass =
+                          priorityKey === "urgent"
+                            ? "admin-badge admin-badge-error"
+                            : priorityKey === "high"
+                              ? "admin-badge admin-badge-gold"
+                              : "admin-badge admin-badge-neutral";
+                        const clientLabel = rev.clientName || "Cliente anônimo";
 
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                      <span className="font-bold text-[var(--admin-text-main)]">
-                        {rev.clientName || "Cliente anônimo"}
-                      </span>
-                      {rev.isAnonymous && (
-                        <span className="rounded-full border border-[var(--admin-border)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--admin-text-muted)]">
-                          Anônimo
-                        </span>
-                      )}
-                    </div>
-                    {rev.serviceTitle && (
-                      <p className="line-clamp-2 text-xs font-bold text-[var(--admin-accent)]">
-                        {rev.serviceTitle}
-                      </p>
-                    )}
-                    <p className="text-xs text-[var(--admin-text-muted)]">
-                      Profissional:{" "}
-                      <span className="font-semibold text-[var(--admin-text-main)]">
-                        {rev.professionalName || "Não informado"}
-                      </span>
-                    </p>
-                    <p className="text-[var(--admin-text-main)] font-medium italic text-xs">
-                      "{rev.comment || "Sem observações adicionais."}"
-                    </p>
-
-                    <div className="text-xs text-[var(--admin-text-muted)] space-y-0.5 pt-2 border-t border-[var(--admin-border)]">
-                      <p>
-                        • Resultado:{" "}
-                        <span className="text-[var(--admin-text-main)] font-bold">
-                          {rev.understoodRequest || "Não informado"}
-                        </span>
-                      </p>
-                      <p>
-                        • Espera:{" "}
-                        <span className="text-[var(--admin-text-main)] font-bold">
-                          {rev.waitTimeAcceptable || "Não informado"}
-                        </span>
-                      </p>
-                      <p>
-                        • Experiência:{" "}
-                        <span className="text-[var(--admin-text-main)] font-bold">
-                          {rev.serviceExperience || "Não informado"}
-                        </span>
-                      </p>
-                      <p>
-                        • Recomendaria:{" "}
-                        <span className="text-[var(--admin-text-main)] font-bold">
-                          {rev.wouldRecommend || "Não informado"}
-                        </span>
-                      </p>
-                    </div>
-                  </button>
-                ))}
+                        return (
+                          <tr
+                            key={rev.id}
+                            tabIndex={0}
+                            className="cursor-pointer"
+                            aria-label={`Abrir avaliação de ${clientLabel}`}
+                            onClick={() => openReviewFollowup(rev)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                openReviewFollowup(rev);
+                              }
+                            }}
+                          >
+                            <td className="whitespace-nowrap text-[var(--admin-text-muted)] num-tabular">
+                              {new Date(rev.createdAt).toLocaleDateString("pt-BR")}
+                            </td>
+                            <td>
+                              <div className="min-w-[11rem]">
+                                <span className="block font-semibold text-[var(--admin-text-main)]">
+                                  {clientLabel}
+                                </span>
+                                {rev.isAnonymous && (
+                                  <span className="mt-1 inline-flex rounded-full border border-[var(--admin-border)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--admin-text-muted)]">
+                                    Anônimo
+                                  </span>
+                                )}
+                                <p
+                                  className="mt-1 max-w-[18rem] truncate text-xs italic text-[var(--admin-text-muted)]"
+                                  title={rev.comment || "Sem observações adicionais."}
+                                >
+                                  “{rev.comment || "Sem observações adicionais."}”
+                                </p>
+                              </div>
+                            </td>
+                            <td>
+                              <div
+                                className="flex items-center gap-1"
+                                aria-label={`${rev.rating || 0} de 5 estrelas`}
+                              >
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <Star
+                                    key={star}
+                                    className={`h-3.5 w-3.5 ${star <= Number(rev.rating || 0) ? "fill-gold-base text-[var(--admin-accent)]" : "text-border-subtle"}`}
+                                  />
+                                ))}
+                                <span className="ml-1 text-xs font-semibold text-[var(--admin-text-main)]">
+                                  {Number(rev.rating || 0).toFixed(1)}
+                                </span>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="min-w-[12rem] space-y-1">
+                                <span className="block max-w-[16rem] truncate font-semibold text-[var(--admin-accent)]">
+                                  {rev.serviceTitle || "Serviço não informado"}
+                                </span>
+                                <span className="block max-w-[16rem] truncate text-xs text-[var(--admin-text-muted)]">
+                                  {rev.professionalName || "Profissional não informado"}
+                                </span>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="admin-review-responses min-w-[14rem] space-y-1 text-xs text-[var(--admin-text-muted)]">
+                                <p>
+                                  <span className="font-semibold text-[var(--admin-text-main)]">Resultado:</span>{" "}
+                                  {rev.understoodRequest || "Não informado"}
+                                </p>
+                                <p>
+                                  <span className="font-semibold text-[var(--admin-text-main)]">Espera:</span>{" "}
+                                  {rev.waitTimeAcceptable || "Não informado"}
+                                </p>
+                                <p>
+                                  <span className="font-semibold text-[var(--admin-text-main)]">Experiência:</span>{" "}
+                                  {rev.serviceExperience || "Não informado"}
+                                </p>
+                                <p>
+                                  <span className="font-semibold text-[var(--admin-text-main)]">Recomendaria:</span>{" "}
+                                  {rev.wouldRecommend || "Não informado"}
+                                </p>
+                              </div>
+                            </td>
+                            <td>
+                              <span className={statusClass}>
+                                {reviewStatusLabels[statusKey] || "Nova"}
+                              </span>
+                            </td>
+                            <td>
+                              <span className={priorityClass}>
+                                {reviewPriorityLabels[priorityKey] || "Normal"}
+                              </span>
+                            </td>
+                            <td className="text-right">
+                              <button
+                                type="button"
+                                className="admin-btn admin-btn-secondary admin-btn-sm"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  openReviewFollowup(rev);
+                                }}
+                              >
+                                Abrir
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             ) : (
-              <p className="text-xs text-[var(--admin-text-muted)] py-6 text-center">
+              <p className="py-6 text-center text-xs text-[var(--admin-text-muted)]">
                 Nenhuma avaliação encontrada para os filtros atuais.
               </p>
             )}

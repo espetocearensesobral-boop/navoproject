@@ -1526,3 +1526,28 @@ body,
     transition: none;
   }
 }
+
+/* Review feed: keep the standard table readable while preserving every survey answer. */
+.admin-shell .admin-review-table {
+  min-width: 76rem;
+}
+
+.admin-shell .admin-review-table th,
+.admin-shell .admin-review-table td {
+  vertical-align: top;
+}
+
+.admin-shell .admin-review-table tbody tr:focus-visible td {
+  background: color-mix(in srgb, var(--admin-accent) 8%, var(--admin-surface-hover));
+  outline: none;
+}
+
+.admin-shell .admin-review-table .admin-review-responses p {
+  line-height: 1.35;
+}
+
+@media (max-width: 767px) {
+  .admin-shell .admin-review-table {
+    min-width: 70rem;
+  }
+}
