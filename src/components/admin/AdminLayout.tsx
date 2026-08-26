@@ -15,6 +15,7 @@ import { RelationshipWorkspace } from "./RelationshipWorkspace";
 import { SystemWorkspace } from "./SystemWorkspace";
 import { AdminNotificationCenter } from "./AdminNotificationCenter";
 import { CampaignsWorkspace } from "./CampaignsWorkspace";
+import { WhatsAppInboxManagement } from "./WhatsAppInboxManagement";
 import { authFetch } from "../../lib/api";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useAdminOperationNotifications } from "../../hooks/useAdminOperationNotifications";
@@ -25,6 +26,7 @@ import {
   Clock,
   UserCheck,
   Menu,
+  MessageCircle,
   X,
   ChevronRight,
   ChevronDown,
@@ -49,6 +51,7 @@ export type AdminTab =
   | "dashboard"
   | "agenda"
   | "queue"
+  | "atendimento"
   | "relatorios"
   | "campanhas"
   | "financeiro_recebimentos"
@@ -64,6 +67,7 @@ const ADMIN_TAB_VALUES: AdminTab[] = [
   "dashboard",
   "agenda",
   "queue",
+  "atendimento",
   "relatorios",
   "campanhas",
   "financeiro_recebimentos",
@@ -300,6 +304,12 @@ export const AdminLayout: React.FC = () => {
       description: "Atendimentos em andamento",
     },
     {
+      id: "atendimento" as AdminTab,
+      label: "Conversas",
+      icon: MessageCircle,
+      description: "Caixa de entrada do NavoBot e WhatsApp",
+    },
+    {
       id: "relatorios" as AdminTab,
       label: "Relatórios",
       icon: FileText,
@@ -365,7 +375,7 @@ export const AdminLayout: React.FC = () => {
   // Agrupamento puramente visual da navegação: reduz uma lista plana de 12 itens
   // a 4 blocos com propósito claro. Não altera AdminTab, rotas ou persistência de aba.
   const navGroups: { label: string; tabs: AdminTab[] }[] = [
-    { label: "Operação", tabs: ["dashboard", "agenda", "queue"] },
+    { label: "Operação", tabs: ["dashboard", "agenda", "queue", "atendimento"] },
     {
       label: "Financeiro",
       tabs: [
@@ -455,6 +465,8 @@ export const AdminLayout: React.FC = () => {
         return <ScheduleGrid />;
       case "queue":
         return <WaitingQueue />;
+      case "atendimento":
+        return <WhatsAppInboxManagement />;
       case "relatorios":
         return <ReportsWorkspace />;
       case "campanhas":

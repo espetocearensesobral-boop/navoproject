@@ -82,6 +82,17 @@ export async function initializeDb(): Promise<void> {
       db = drizzle(sqlClient, { schema });
       isDbConnected = true;
       console.log('[API] ✅ Conexão com Supabase estabelecida com sucesso.');
+
+      // Auto-migrate new columns
+      try {
+        await sqlClient`ALTER TABLE evolution_api_settings ADD COLUMN IF NOT EXISTS manager_notification_phone text DEFAULT ''`;
+        await sqlClient`ALTER TABLE evolution_api_settings ADD COLUMN IF NOT EXISTS notify_barber_on_handoff boolean NOT NULL DEFAULT true`;
+        await sqlClient`ALTER TABLE evolution_api_settings ADD COLUMN IF NOT EXISTS notify_manager_on_handoff boolean NOT NULL DEFAULT true`;
+        console.log('[API] ✅ Migração de evolution_api_settings aplicada com sucesso.');
+      } catch (e) {
+        console.error('[API] Falha na migração automática:', e);
+      }
+
       // Warm up connection pool asynchronously
       db.query.shopSettings.findFirst({ where: eq(schema.shopSettings.id, 'default') }).catch(() => {});
     } else {
