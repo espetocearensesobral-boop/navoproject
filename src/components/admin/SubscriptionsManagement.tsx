@@ -16,6 +16,8 @@ import {
   UserCheck,
   X,
   CreditCard,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminFab } from "./shared/AdminFab";
@@ -157,6 +159,11 @@ export const SubscriptionsManagement: React.FC = () => {
     "members" | "plans" | "commissions"
   >("members");
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    localStorage.setItem("navo_sub_plans_v1", JSON.stringify(plans));
+  }, [plans]);
 
   // New Plan Form State
   const [newPlanName, setNewPlanName] = useState("");
@@ -172,26 +179,67 @@ export const SubscriptionsManagement: React.FC = () => {
     (m) => m.status === "active",
   ).length;
 
-  const handleCreatePlan = (e: React.FormEvent) => {
+  const openNewPlanModal = () => {
+    setEditingPlanId(null);
+    setNewPlanName("");
+    setNewPlanPrice(129.9);
+    setNewPlanServices("Corte, Barba");
+    setNewPlanBarberFee(20);
+    setIsPlanModalOpen(true);
+  };
+
+  const openEditPlanModal = (plan: SubscriptionPlan) => {
+    setEditingPlanId(plan.id);
+    setNewPlanName(plan.name);
+    setNewPlanPrice(plan.price);
+    setNewPlanServices(plan.includedServices.join(", "));
+    setNewPlanBarberFee(plan.barberPerCutFee);
+    setIsPlanModalOpen(true);
+  };
+
+  const handleDeletePlan = (id: string) => {
+    if (confirm("Tem certeza que deseja excluir este plano?")) {
+      setPlans(plans.filter((p) => p.id !== id));
+    }
+  };
+
+  const handleSavePlan = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPlanName.trim()) return;
 
-    const newP: SubscriptionPlan = {
-      id: `plan_${Date.now()}`,
-      name: newPlanName.trim(),
-      price: Number(newPlanPrice),
-      billingCycle: "monthly",
-      includedServices: newPlanServices
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      productDiscountPct: 10,
-      barberPerCutFee: Number(newPlanBarberFee),
-      activeSubscribersCount: 0,
-    };
-
-    setPlans([...plans, newP]);
-    setNewPlanName("");
+    if (editingPlanId) {
+      setPlans(
+        plans.map((p) =>
+          p.id === editingPlanId
+            ? {
+                ...p,
+                name: newPlanName.trim(),
+                price: Number(newPlanPrice),
+                includedServices: newPlanServices
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean),
+                barberPerCutFee: Number(newPlanBarberFee),
+              }
+            : p
+        )
+      );
+    } else {
+      const newP: SubscriptionPlan = {
+        id: `plan_${Date.now()}`,
+        name: newPlanName.trim(),
+        price: Number(newPlanPrice),
+        billingCycle: "monthly",
+        includedServices: newPlanServices
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        productDiscountPct: 10,
+        barberPerCutFee: Number(newPlanBarberFee),
+        activeSubscribersCount: 0,
+      };
+      setPlans([...plans, newP]);
+    }
     setIsPlanModalOpen(false);
   };
 
@@ -392,16 +440,37 @@ export const SubscriptionsManagement: React.FC = () => {
               )}
 
               <div>
-                <h3 className="text-base font-bold text-[var(--admin-text-main)]">
-                  {plan.name}
-                </h3>
-                <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold finance-positive tabular-nums">
-                    R$ {plan.price.toFixed(2)}
-                  </span>
-                  <span className="text-xs text-[var(--admin-text-muted)]">
-                    /mês
-                  </span>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-base font-bold text-[var(--admin-text-main)]">
+                      {plan.name}
+                    </h3>
+                    <div className="mt-2 flex items-baseline gap-1">
+                      <span className="text-2xl font-bold finance-positive tabular-nums">
+                        R$ {plan.price.toFixed(2)}
+                      </span>
+                      <span className="text-xs text-[var(--admin-text-muted)]">
+                        /mês
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => openEditPlanModal(plan)}
+                      className="p-2 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:border-[var(--admin-accent)] transition-colors"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeletePlan(plan.id)}
+                      className="p-2 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-status-danger hover:border-status-danger transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-[var(--admin-border)]/80 space-y-2 text-xs">
@@ -480,12 +549,12 @@ export const SubscriptionsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* CREATE PLAN MODAL FULLSCREEN */}
+      {/* CREATE / EDIT PLAN MODAL FULLSCREEN */}
       {isPlanModalOpen && (
         <AdminModalV2
           icon={Award}
           eyebrow="Clube de Assinaturas & Recorrência"
-          title="Novo Plano de Assinatura"
+          title={editingPlanId ? "Editar Plano de Assinatura" : "Novo Plano de Assinatura"}
           subtitle="Configure mensalidade, repasse aos barbeiros, serviços inclusos e benefícios do clube."
           onClose={() => setIsPlanModalOpen(false)}
           size="fullscreen"
@@ -503,7 +572,7 @@ export const SubscriptionsManagement: React.FC = () => {
                 form="create-plan-form"
                 className="admin-btn admin-btn-primary h-11 px-6 text-sm font-bold"
               >
-                Criar Plano de Assinatura
+                {editingPlanId ? "Salvar Alterações" : "Criar Plano de Assinatura"}
               </button>
             </div>
           }
@@ -511,7 +580,7 @@ export const SubscriptionsManagement: React.FC = () => {
           <form
             id="create-plan-form"
             onKeyDown={handleEnterAsTab}
-            onSubmit={handleCreatePlan}
+            onSubmit={handleSavePlan}
             className="space-y-6"
           >
             {/* Section 1: Basic Plan Information */}
@@ -690,7 +759,7 @@ export const SubscriptionsManagement: React.FC = () => {
       )}
 
       <AdminFab
-        onClick={() => setIsPlanModalOpen(true)}
+        onClick={openNewPlanModal}
         label="Novo Plano"
         icon={Plus}
       />
