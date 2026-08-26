@@ -189,7 +189,10 @@ export const WhatsAppManagement: React.FC = () => {
         type: "success",
         text: "Configurações do WhatsApp salvas com sucesso.",
       });
-      setStatus(await fetchEvolutionApiStatus());
+      // Atualiza o status em segundo plano para não travar o botão de salvar
+      void fetchEvolutionApiStatus()
+        .then((st) => setStatus(st))
+        .catch(() => {});
     } catch (error: any) {
       setMessage({
         type: "error",
@@ -206,11 +209,13 @@ export const WhatsAppManagement: React.FC = () => {
     try {
       const result = await testEvolutionApi();
       setMessage({ type: "success", text: result });
-      setStatus(await fetchEvolutionApiStatus());
+      void fetchEvolutionApiStatus()
+        .then((st) => setStatus(st))
+        .catch(() => {});
     } catch (error: any) {
       setMessage({
         type: "error",
-        text: error?.message || "Não foi possível testar a conexão.",
+        text: error?.message || "Não foi possível testar a conexão com a Evolution API.",
       });
     } finally {
       setTesting(false);
@@ -223,6 +228,9 @@ export const WhatsAppManagement: React.FC = () => {
     try {
       const result = await applyEvolutionWebhook();
       setMessage({ type: "success", text: result });
+      void fetchEvolutionApiStatus()
+        .then((st) => setStatus(st))
+        .catch(() => {});
     } catch (error: any) {
       setMessage({
         type: "error",
@@ -243,7 +251,7 @@ export const WhatsAppManagement: React.FC = () => {
         ok: false,
         configured: false,
         usedGemini: false,
-        model: "gemini-3.6-flash",
+        model: "gemini-2.5-flash",
         latencyMs: 0,
         message:
           error?.message || "Não foi possível testar o Gemini do NavoBot.",
@@ -928,7 +936,7 @@ export const WhatsAppManagement: React.FC = () => {
                   Diagnóstico do Gemini
                 </h2>
                 <p className="text-xs text-[var(--admin-text-muted)] mt-1">
-                  Executa uma chamada real ao <code>gemini-3.6-flash</code> usado
+                  Executa uma chamada real ao <code>gemini-2.5-flash</code> usado
                   pelo NavoBot. Use para confirmar a chave e a comunicação com a
                   API.
                 </p>

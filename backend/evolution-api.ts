@@ -55,13 +55,24 @@ type EvolutionModuleDeps = {
 };
 
 function normalizeBaseUrl(value: string): string {
-  const raw = value.trim().replace(/\/+$/, '');
+  let raw = String(value || '').trim().replace(/\/+$/, '');
   if (!raw) return '';
-  const parsed = new URL(raw);
-  if (!['http:', 'https:'].includes(parsed.protocol)) {
-    throw new Error('A URL da Evolution API deve usar HTTP ou HTTPS.');
+  if (!/^https?:\/\//i.test(raw)) {
+    if (/^(localhost|127\.0\.0\.1|192\.168|10\.)/i.test(raw)) {
+      raw = `http://${raw}`;
+    } else {
+      raw = `https://${raw}`;
+    }
   }
-  return parsed.toString().replace(/\/+$/, '');
+  try {
+    const parsed = new URL(raw);
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      throw new Error('A URL deve usar HTTP ou HTTPS.');
+    }
+    return parsed.toString().replace(/\/+$/, '');
+  } catch (err: any) {
+    throw new Error(err?.message || 'A URL informada é inválida.');
+  }
 }
 
 function normalizePhone(value: string): string {
@@ -90,28 +101,49 @@ function configIsComplete(row: any): boolean {
   return !!(row?.enabled && row?.baseUrl && row?.instanceName && row?.apiKey);
 }
 
-async function evolutionRequest(baseUrl: string, apiKey: string, path: string, init: RequestInit = {}) {
+async function evolutionRequest(baseUrl: string, apiKey: string, path: string, init: RequestInit = {}, timeoutMs = 8_000) {
+  const cleanBase = normalizeBaseUrl(baseUrl);
+  if (!cleanBase) {
+    throw new Error('URL da Evolution API não está configurada. Configure o endereço em Sistema > WhatsApp.');
+  }
+  const cleanApiKey = String(apiKey || '').trim();
+  if (!cleanApiKey) {
+    throw new Error('Chave da API (apikey) não informada.');
+  }
+
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12_000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetch(`${baseUrl}${path}`, {
+    const response = await fetch(`${cleanBase}${path}`, {
       ...init,
       signal: controller.signal,
       headers: {
-        apikey: apiKey,
+        apikey: cleanApiKey,
         'Content-Type': 'application/json',
         ...(init.headers || {}),
       },
     });
     const body = await response.json().catch(() => null);
     if (!response.ok) {
-      const message = body?.message || body?.error || `Evolution API respondeu HTTP ${response.status}.`;
-      const error = new Error(message) as Error & { status?: number; body?: unknown };
+      const msg = body?.message || body?.error || (Array.isArray(body?.response?.message) ? body.response.message.join(', ') : `Evolution API respondeu HTTP ${response.status}.`);
+      const errorMsg = typeof msg === 'string' ? msg : JSON.stringify(msg);
+      const error = new Error(errorMsg) as Error & { status?: number; body?: unknown };
       error.status = response.status;
       error.body = body;
       throw error;
     }
     return body;
+  } catch (err: any) {
+    if (err.name === 'AbortError') {
+      const error = new Error(`Tempo limite excedido (${timeoutMs / 1000}s) ao conectar à Evolution API em ${cleanBase}. Verifique se o servidor está online e acessível.`);
+      throw error;
+    }
+    if (err.message === 'fetch failed' || err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED' || err.cause) {
+      const causeMsg = err.cause?.message || err.cause?.code || err.code || '';
+      const error = new Error(`Falha de conexão com a Evolution API (${cleanBase}): Servidor inacessível ou endereço incorreto${causeMsg ? ` [${causeMsg}]` : ''}. Verifique se a URL e a porta estão corretas e se a Evolution API está online.`);
+      throw error;
+    }
+    throw err;
   } finally {
     clearTimeout(timeout);
   }
@@ -135,33 +167,47 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
     const apiKey = apiKeyInput === undefined || apiKeyInput === '••••••••'
       ? (existing?.apiKey || '')
       : apiKeyInput;
+
+    let baseUrl = '';
+    const rawBaseUrl = String(data.baseUrl ?? existing?.baseUrl ?? '').trim();
+    if (rawBaseUrl) {
+      try {
+        baseUrl = normalizeBaseUrl(rawBaseUrl);
+      } catch (err: any) {
+        throw new Error(err?.message || 'A URL da Evolution API informada é inválida.');
+      }
+    }
+
+    let webhookUrl = '';
+    const rawWebhookUrl = String(data.webhookUrl ?? existing?.webhookUrl ?? '').trim();
+    if (rawWebhookUrl) {
+      try {
+        webhookUrl = normalizeBaseUrl(rawWebhookUrl);
+      } catch (err: any) {
+        throw new Error(err?.message || 'A URL do webhook informada é inválida.');
+      }
+    }
+
     const payload = {
       id: 'default',
       enabled: data.enabled !== undefined ? !!data.enabled : !!existing?.enabled,
-      baseUrl: normalizeBaseUrl(String(data.baseUrl ?? existing?.baseUrl ?? '')),
+      baseUrl,
       instanceName: String(data.instanceName ?? existing?.instanceName ?? '').trim(),
       apiKey,
       webhookEnabled: data.webhookEnabled !== undefined ? !!data.webhookEnabled : !!existing?.webhookEnabled,
-      webhookUrl: String(data.webhookUrl ?? existing?.webhookUrl ?? '').trim(),
+      webhookUrl,
       webhookSecret: typeof data.webhookSecret === 'string' && data.webhookSecret.trim() && data.webhookSecret !== '••••••••'
         ? data.webhookSecret.trim()
         : (existing?.webhookSecret || ''),
       navoBotEnabled: data.navoBotEnabled !== undefined ? !!data.navoBotEnabled : !!existing?.navoBotEnabled,
       whatsappAccountType: data.whatsappAccountType === 'business_qr' || existing?.whatsappAccountType === 'business_qr' ? 'business_qr' : 'personal_qr',
       useInteractiveMessages: data.useInteractiveMessages !== undefined ? !!data.useInteractiveMessages : existing?.useInteractiveMessages === true,
+      managerNotificationPhone: typeof data.managerNotificationPhone === 'string' ? data.managerNotificationPhone.trim() : (existing?.managerNotificationPhone || ''),
+      notifyBarberOnHandoff: data.notifyBarberOnHandoff !== undefined ? !!data.notifyBarberOnHandoff : (existing?.notifyBarberOnHandoff !== false),
+      notifyManagerOnHandoff: data.notifyManagerOnHandoff !== undefined ? !!data.notifyManagerOnHandoff : (existing?.notifyManagerOnHandoff !== false),
       updatedAt: new Date(),
     };
 
-    if (payload.webhookUrl) {
-      try {
-        const webhookUrl = new URL(payload.webhookUrl);
-        if (!['http:', 'https:'].includes(webhookUrl.protocol)) {
-          throw new Error('A URL do webhook deve usar HTTP ou HTTPS.');
-        }
-      } catch (err: any) {
-        throw new Error(err?.message || 'A URL do webhook informada é inválida.');
-      }
-    }
     if (payload.webhookEnabled && !payload.webhookUrl) {
       throw new Error('Informe a URL do webhook ou desative o webhook.');
     }
@@ -187,6 +233,9 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
           navoBotEnabled: payload.navoBotEnabled,
           whatsappAccountType: payload.whatsappAccountType,
           useInteractiveMessages: payload.useInteractiveMessages,
+          managerNotificationPhone: payload.managerNotificationPhone,
+          notifyBarberOnHandoff: payload.notifyBarberOnHandoff,
+          notifyManagerOnHandoff: payload.notifyManagerOnHandoff,
           updatedAt: payload.updatedAt,
         },
       })
@@ -231,17 +280,17 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
         return res.json({ configured: false, reachable: false, instanceName: settings?.instanceName || '', instanceStatus: 'not_configured', message: 'Integração desativada ou incompleta.' });
       }
       try {
-        const instances = await evolutionRequest(settings.baseUrl, settings.apiKey, '/instance/fetchInstances');
+        const instances = await evolutionRequest(settings.baseUrl, settings.apiKey, '/instance/fetchInstances', {}, 4_000);
         const instance = Array.isArray(instances)
-          ? instances.find((item: any) => item?.name === settings.instanceName || item?.instance?.instanceName === settings.instanceName)
+          ? instances.find((item: any) => item?.name === settings.instanceName || item?.instance?.instanceName === settings.instanceName || item?.instanceName === settings.instanceName)
           : null;
         return res.json({
           configured: true,
           reachable: true,
           instanceName: settings.instanceName,
-          instanceStatus: instance?.connectionStatus || instance?.status || 'not_created',
+          instanceStatus: instance?.connectionStatus || instance?.status || (instance ? 'created' : 'not_created'),
           instanceExists: !!instance,
-          message: 'Evolution API conectada.',
+          message: instance ? 'Evolution API conectada e instância localizada.' : 'Evolution API acessível, mas a instância ainda não foi criada no painel.',
         });
       } catch (error: any) {
         return res.json({ configured: true, reachable: false, instanceName: settings.instanceName, instanceStatus: 'unreachable', message: error?.message || 'Não foi possível alcançar a Evolution API.' });
@@ -254,9 +303,15 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
   router.post('/test', requireAuth, requireAdmin, async (_req, res) => {
     try {
       const settings = await requireConfigured();
-      const instances = await evolutionRequest(settings.baseUrl, settings.apiKey, '/instance/fetchInstances');
-      const instanceExists = Array.isArray(instances) && instances.some((item: any) => item?.name === settings.instanceName || item?.instance?.instanceName === settings.instanceName);
-      return res.json({ success: true, instanceExists, message: instanceExists ? 'Conexão testada e instância encontrada.' : 'Conexão testada. A instância configurada ainda não foi criada.' });
+      const instances = await evolutionRequest(settings.baseUrl, settings.apiKey, '/instance/fetchInstances', {}, 6_000);
+      const instanceExists = Array.isArray(instances) && instances.some((item: any) => item?.name === settings.instanceName || item?.instance?.instanceName === settings.instanceName || item?.instanceName === settings.instanceName);
+      return res.json({
+        success: true,
+        instanceExists,
+        message: instanceExists
+          ? `Conexão bem-sucedida! Instância "${settings.instanceName}" encontrada e respondendo na Evolution API.`
+          : `Conexão bem-sucedida com a Evolution API! No entanto, a instância "${settings.instanceName}" ainda não foi criada no painel.`,
+      });
     } catch (error: any) {
       return res.status(error?.status || 400).json({ error: error?.message || 'Não foi possível testar a Evolution API.' });
     }

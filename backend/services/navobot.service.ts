@@ -64,12 +64,11 @@ type Conversation = {
   handoffRequested: boolean;
 };
 
-const ai = process.env.GEMINI_API_KEY
-  ? new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
-      httpOptions: { headers: { 'User-Agent': 'navobot' } },
-    })
-  : null;
+function getAiClient(): GoogleGenAI | null {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+  return new GoogleGenAI({ apiKey });
+}
 
 function normalizeContext(value: unknown): BotContext {
   if (!value || typeof value !== 'object') return {};
@@ -178,6 +177,7 @@ function geminiResponseDiagnostics(response: any): string {
 }
 
 async function classifyWithAi(text: string, state: string, context: BotContext = {}): Promise<NavoBotIntent> {
+  const ai = getAiClient();
   if (!ai) {
     console.warn('[NavoBot][Gemini] Fallback não utilizado: GEMINI_API_KEY ausente.');
     return 'unknown';
@@ -915,6 +915,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     sourceState: string;
     context: BotContext;
   }): Promise<string | null> {
+    const ai = getAiClient();
     if (!ai) return null;
     try {
       const promptInput = `
@@ -935,6 +936,9 @@ CONTEXTO DA SESSÃO: ${JSON.stringify({
 MENSAGEM DO CLIENTE:
 "${text}"
       `.trim();
+
+      const ai = getAiClient();
+      if (!ai) return null;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -1119,6 +1123,7 @@ MENSAGEM DO CLIENTE:
     const snapshot = await getShopAgendaSnapshot(extractedDate, profId);
 
     let answer: string | null = null;
+    const ai = getAiClient();
     if (ai) {
       answer = await answerContextualQueryWithAi({
         text,
@@ -1702,6 +1707,7 @@ MENSAGEM DO CLIENTE:
   }
 
   async function testAiConnection() {
+    const ai = getAiClient();
     if (!ai) {
       return { ok: false, configured: false, usedGemini: false, model: 'gemini-2.5-flash', latencyMs: 0, message: 'GEMINI_API_KEY não está configurada no ambiente.' };
     }
