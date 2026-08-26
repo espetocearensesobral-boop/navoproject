@@ -153,16 +153,20 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
     };
 
     if (payload.webhookUrl) {
-      const webhookUrl = new URL(payload.webhookUrl);
-      if (!['http:', 'https:'].includes(webhookUrl.protocol)) {
-        throw new Error('A URL do webhook deve usar HTTP ou HTTPS.');
+      try {
+        const webhookUrl = new URL(payload.webhookUrl);
+        if (!['http:', 'https:'].includes(webhookUrl.protocol)) {
+          throw new Error('A URL do webhook deve usar HTTP ou HTTPS.');
+        }
+      } catch (err: any) {
+        throw new Error(err?.message || 'A URL do webhook informada é inválida.');
       }
     }
     if (payload.webhookEnabled && !payload.webhookUrl) {
       throw new Error('Informe a URL do webhook ou desative o webhook.');
     }
     if (payload.webhookEnabled && !payload.webhookSecret) {
-      throw new Error('Informe um segredo para autenticar os eventos do webhook.');
+      payload.webhookSecret = crypto.randomBytes(16).toString('hex');
     }
     if (payload.enabled && (!payload.baseUrl || !payload.instanceName || !payload.apiKey)) {
       throw new Error('Preencha URL, nome da instância e chave da API antes de ativar a integração.');
@@ -264,22 +268,63 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
       if (settings.webhookEnabled && !settings.webhookUrl) {
         return res.status(400).json({ error: 'Informe a URL do webhook antes de aplicar.' });
       }
-      await evolutionRequest(settings.baseUrl, settings.apiKey, `/webhook/set/${encodeURIComponent(settings.instanceName)}`, {
-        method: 'POST',
-        body: JSON.stringify({
-          webhook: {
-            enabled: !!settings.webhookEnabled,
-            url: settings.webhookUrl || '',
-            byEvents: false,
-            base64: false,
-            headers: { Authorization: `Bearer ${settings.webhookSecret}` },
-            events: ['MESSAGES_UPSERT', 'CONNECTION_UPDATE', 'QRCODE_UPDATED'],
-          },
-        }),
-      });
-      return res.json({ success: true, message: settings.webhookEnabled ? 'Webhook aplicado à instância.' : 'Webhook desativado na instância.' });
+
+      const events = [
+        'MESSAGES_UPSERT',
+        'messages.upsert',
+        'CONNECTION_UPDATE',
+        'connection.update',
+        'QRCODE_UPDATED',
+        'qrcode.updated',
+        'SEND_MESSAGE',
+        'send.message',
+        'MESSAGES_UPDATE',
+        'messages.update',
+      ];
+
+      const webhookPayload = {
+        webhook: {
+          enabled: !!settings.webhookEnabled,
+          url: settings.webhookUrl || '',
+          byEvents: false,
+          base64: false,
+          headers: settings.webhookSecret
+            ? {
+                Authorization: `Bearer ${settings.webhookSecret}`,
+                apikey: settings.webhookSecret,
+                'x-api-key': settings.webhookSecret,
+              }
+            : {},
+          events,
+        },
+        // Estrutura plana para versões da Evolution API que esperam propriedades na raiz
+        enabled: !!settings.webhookEnabled,
+        url: settings.webhookUrl || '',
+        webhookByEvents: false,
+        events,
+      };
+
+      try {
+        await evolutionRequest(settings.baseUrl, settings.apiKey, `/webhook/set/${encodeURIComponent(settings.instanceName)}`, {
+          method: 'POST',
+          body: JSON.stringify(webhookPayload),
+        });
+      } catch (err: any) {
+        // Tenta endpoint alternativo da Evolution API v2 se o padrão falhar
+        try {
+          await evolutionRequest(settings.baseUrl, settings.apiKey, `/webhook/instance/${encodeURIComponent(settings.instanceName)}`, {
+            method: 'POST',
+            body: JSON.stringify(webhookPayload),
+          });
+        } catch {
+          throw err;
+        }
+      }
+
+      return res.json({ success: true, message: settings.webhookEnabled ? 'Webhook aplicado com sucesso à instância da Evolution API.' : 'Webhook desativado na instância.' });
     } catch (error: any) {
-      return res.status(error?.status || 400).json({ error: error?.message || 'Não foi possível aplicar o webhook.' });
+      console.error('[Evolution API] Erro ao aplicar webhook:', error);
+      return res.status(error?.status || 400).json({ error: error?.message || 'Não foi possível aplicar o webhook na Evolution API.' });
     }
   });
 
@@ -289,8 +334,10 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
       ok: true,
       endpoint: '/api/evolution/webhook',
       accepts: 'POST',
-      configured: !!(settings?.webhookEnabled && settings?.webhookSecret),
+      configured: !!(settings?.webhookEnabled && settings?.webhookUrl),
+      hasSecret: !!settings?.webhookSecret,
       navobotEnabled: !!settings?.navoBotEnabled,
+      instanceName: settings?.instanceName || '',
     });
   });
 
@@ -309,28 +356,107 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
     }
   });
 
+  function validateWebhookAuth(req: express.Request, settings: any): boolean {
+    // Se não há segredo configurado, permite a requisição se a integração estiver ativa
+    if (!settings?.webhookSecret || !String(settings.webhookSecret).trim()) {
+      return true;
+    }
+    const secret = String(settings.webhookSecret).trim();
+
+    const authHeader = String(req.headers.authorization || '').trim();
+    if (authHeader === `Bearer ${secret}` || authHeader === secret) return true;
+
+    const apiKeyHeader = String(req.headers.apikey || req.headers['x-api-key'] || req.headers['x-webhook-secret'] || '').trim();
+    if (apiKeyHeader === secret) return true;
+
+    // Também aceita a chave mestra global da Evolution API
+    if (settings.apiKey && apiKeyHeader === String(settings.apiKey).trim()) return true;
+
+    const querySecret = String(req.query.secret || req.query.token || req.query.apikey || '').trim();
+    if (querySecret === secret) return true;
+
+    return false;
+  }
+
   router.post('/webhook', async (req, res) => {
     try {
       const settings = await getSettings();
-      if (!settings?.webhookEnabled || !settings.webhookSecret) return res.status(403).json({ error: 'Webhook não configurado.' });
-      const authorization = String(req.headers.authorization || '');
-      if (authorization !== `Bearer ${settings.webhookSecret}`) return res.status(401).json({ error: 'Webhook não autorizado.' });
-      const event = String(req.body?.event || 'UNKNOWN');
-      const instance = String(req.body?.instance || settings.instanceName || 'unknown');
-      if (settings.instanceName && instance !== settings.instanceName) return res.status(403).json({ error: 'Instância não autorizada.' });
-      console.log(`[Evolution Webhook] ${event} recebido para ${instance}`);
-      // Aguarda o processamento para que ambientes serverless não encerrem a execução antes do envio da resposta.
-      if (settings.navoBotEnabled && onWebhook) {
-        try {
-          await onWebhook(req.body);
-        } catch (error) {
-          console.error('[NavoBot] Falha ao processar webhook:', error);
+      if (!settings?.enabled && !settings?.navoBotEnabled && !settings?.webhookEnabled) {
+        return res.status(200).json({ received: true, note: 'integration_disabled' });
+      }
+
+      if (!validateWebhookAuth(req, settings)) {
+        console.warn('[Evolution Webhook] Falha de autenticação no webhook: segredo incorreto ou ausente.');
+        return res.status(401).json({ error: 'Webhook não autorizado. Verifique o segredo/token configurado.' });
+      }
+
+      const event = String(req.body?.event || req.body?.eventType || 'UNKNOWN');
+      const rawInstance = req.body?.instance || req.body?.instanceName;
+      const instance = typeof rawInstance === 'object' && rawInstance !== null
+        ? String(rawInstance.instanceName || rawInstance.name || '')
+        : String(rawInstance || settings?.instanceName || 'unknown');
+
+      // Se a instância foi explicitamente configurada e vier diferente, loga aviso
+      if (settings?.instanceName && instance && instance !== 'unknown') {
+        const configuredInst = String(settings.instanceName).trim().toLowerCase();
+        const incomingInst = instance.trim().toLowerCase();
+        if (configuredInst !== incomingInst) {
+          console.warn(`[Evolution Webhook] Instância diferente do configurado: recebido "${instance}", configurado "${settings.instanceName}". Processando mesmo assim.`);
         }
       }
+
+      console.log(`[Evolution Webhook] [${new Date().toISOString()}] Evento "${event}" recebido para instância "${instance}"`);
+
+      // Processa a mensagem com o NavoBot
+      if (settings?.navoBotEnabled !== false && onWebhook) {
+        try {
+          const result = await onWebhook(req.body);
+          console.log(`[Evolution Webhook] Resultado do processamento NavoBot:`, result);
+        } catch (error) {
+          console.error('[NavoBot] Falha ao processar evento do webhook:', error);
+        }
+      }
+
       return res.status(200).json({ received: true });
     } catch (error) {
-      console.error('[Evolution Webhook] Falha ao processar evento:', error);
+      console.error('[Evolution Webhook] Falha geral ao processar evento:', error);
       return res.status(200).json({ received: true });
+    }
+  });
+
+  // Simulador de webhook para testes no painel administrativo
+  router.post('/webhook/test-inbound', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      const phone = normalizePhone(String(req.body?.phone || '5511999999999'));
+      const text = String(req.body?.text || 'Oi').trim();
+      const pushName = String(req.body?.pushName || 'Cliente Teste').trim();
+      const settings = await getSettings();
+
+      if (!onWebhook) {
+        return res.status(503).json({ error: 'NavoBot não está ativo no servidor.' });
+      }
+
+      const mockPayload = {
+        event: 'messages.upsert',
+        instance: settings?.instanceName || 'navo-bot',
+        data: {
+          key: {
+            remoteJid: `${phone}@s.whatsapp.net`,
+            fromMe: false,
+            id: `test_${Date.now()}`,
+          },
+          pushName,
+          message: {
+            conversation: text,
+          },
+          messageTimestamp: Math.floor(Date.now() / 1000),
+        },
+      };
+
+      const result = await onWebhook(mockPayload);
+      return res.json({ success: true, simulatedPayload: mockPayload, botResult: result });
+    } catch (error: any) {
+      return res.status(500).json({ error: error?.message || 'Falha ao simular recebimento de webhook.' });
     }
   });
 
@@ -354,14 +480,27 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
     try {
       const settings = await requireConfigured();
       const number = normalizePhone(phone);
-      if (number.length < 8 || number.length > 15) return false;
+      if (number.length < 8 || number.length > 15) {
+        console.warn(`[Evolution API] Número de telefone inválido para envio: "${phone}"`);
+        return false;
+      }
+      const payload = {
+        number,
+        text,
+        textMessage: { text },
+        options: {
+          delay: 100,
+          presence: 'composing',
+        },
+      };
       await evolutionRequest(settings.baseUrl, settings.apiKey, `/message/sendText/${encodeURIComponent(settings.instanceName)}`, {
         method: 'POST',
-        body: JSON.stringify({ number, text }),
+        body: JSON.stringify(payload),
       });
+      console.log(`[Evolution API] Mensagem de texto enviada com sucesso para ${number}.`);
       return true;
-    } catch (error) {
-      console.error('[Evolution API] Falha ao enviar mensagem:', error);
+    } catch (error: any) {
+      console.error(`[Evolution API] Falha ao enviar mensagem para ${phone}:`, error?.message || error);
       return false;
     }
   }

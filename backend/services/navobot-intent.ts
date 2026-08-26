@@ -232,37 +232,152 @@ export function extractBookingCode(text: string): string | null {
   return candidates.find((candidate) => /\d/.test(candidate)) || null;
 }
 
+function unwrapMessageContent(msg: any): any {
+  if (!msg || typeof msg !== 'object') return {};
+  if (msg.ephemeralMessage?.message) return unwrapMessageContent(msg.ephemeralMessage.message);
+  if (msg.viewOnceMessage?.message) return unwrapMessageContent(msg.viewOnceMessage.message);
+  if (msg.viewOnceMessageV2?.message) return unwrapMessageContent(msg.viewOnceMessageV2.message);
+  if (msg.documentWithCaptionMessage?.message) return unwrapMessageContent(msg.documentWithCaptionMessage.message);
+  return msg;
+}
+
+function extractTextFromWhatsAppMessage(msg: any): string {
+  if (!msg) return '';
+  const unwrapped = unwrapMessageContent(msg);
+
+  if (typeof unwrapped === 'string') return unwrapped.trim();
+
+  // 1. Direct conversational text
+  if (typeof unwrapped.conversation === 'string' && unwrapped.conversation.trim()) {
+    return unwrapped.conversation.trim();
+  }
+
+  // 2. Extended text message
+  if (typeof unwrapped.extendedTextMessage?.text === 'string' && unwrapped.extendedTextMessage.text.trim()) {
+    return unwrapped.extendedTextMessage.text.trim();
+  }
+
+  // 3. Buttons reply
+  const buttonId = unwrapped.buttonsResponseMessage?.selectedButtonId || unwrapped.buttonsResponseMessage?.selectedDisplayText;
+  if (buttonId) return String(buttonId).trim();
+
+  // 4. List reply
+  const listId = unwrapped.listResponseMessage?.singleSelectReply?.selectedRowId || unwrapped.listResponseMessage?.title;
+  if (listId) return String(listId).trim();
+
+  // 5. Template reply
+  const templateId = unwrapped.templateButtonReplyMessage?.selectedId || unwrapped.templateButtonReplyMessage?.selectedDisplayText;
+  if (templateId) return String(templateId).trim();
+
+  // 6. Interactive response (WhatsApp Cloud / Evolution native flow)
+  if (unwrapped.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson) {
+    try {
+      const parsed = JSON.parse(unwrapped.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson);
+      const interactiveVal = parsed.id || parsed.selected_id || parsed.value || parsed.text;
+      if (interactiveVal) return String(interactiveVal).trim();
+    } catch {
+      // Ignore JSON parse error and fallback
+    }
+  }
+  if (unwrapped.interactiveResponseMessage?.body?.text) {
+    return String(unwrapped.interactiveResponseMessage.body.text).trim();
+  }
+
+  // 7. Media captions
+  if (typeof unwrapped.imageMessage?.caption === 'string' && unwrapped.imageMessage.caption.trim()) {
+    return unwrapped.imageMessage.caption.trim();
+  }
+  if (typeof unwrapped.videoMessage?.caption === 'string' && unwrapped.videoMessage.caption.trim()) {
+    return unwrapped.videoMessage.caption.trim();
+  }
+  if (typeof unwrapped.documentMessage?.caption === 'string' && unwrapped.documentMessage.caption.trim()) {
+    return unwrapped.documentMessage.caption.trim();
+  }
+
+  // 8. Top-level text/body fallback
+  if (typeof unwrapped.text === 'string' && unwrapped.text.trim()) return unwrapped.text.trim();
+  if (typeof unwrapped.body === 'string' && unwrapped.body.trim()) return unwrapped.body.trim();
+
+  return '';
+}
+
 export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage | null {
-  const event = String(payload?.event || '').toLowerCase();
-  if (event && !event.includes('messages.upsert') && !event.includes('messages_upsert')) return null;
+  if (!payload || typeof payload !== 'object') return null;
 
-  const data = payload?.data || payload;
-  const key = data?.key || {};
-  if (key.fromMe === true) return null;
+  const rawEvent = String(payload.event || payload.eventType || '').toLowerCase();
+  // Se houver evento explícito, aceita variações de mensagens
+  if (rawEvent) {
+    const isMessageEvent =
+      rawEvent.includes('messages.upsert') ||
+      rawEvent.includes('messages_upsert') ||
+      rawEvent.includes('messages-upsert') ||
+      rawEvent.includes('send_message') ||
+      rawEvent.includes('send.message') ||
+      rawEvent.includes('messages.update') ||
+      rawEvent.includes('message');
+    if (!isMessageEvent) return null;
+  }
 
-  const remoteJid = String(key.remoteJid || '').trim();
-  if (!remoteJid || remoteJid.endsWith('@g.us') || remoteJid.endsWith('@broadcast')) return null;
-  const alternativeJid = String(key.remoteJidAlt || key.senderPn || data?.sender || payload?.sender || '').trim();
-  const resolvedJid = remoteJid.endsWith('@lid') ? alternativeJid : remoteJid;
-  if (!resolvedJid || resolvedJid.endsWith('@lid')) return null;
+  // Desempacota payloads que contêm arrays ou mensagens aninhadas
+  let dataItem: any = payload.data || payload;
+  if (Array.isArray(dataItem)) {
+    // Procura o primeiro item que não seja fromMe
+    dataItem = dataItem.find((item: any) => item?.key?.fromMe !== true && item?.fromMe !== true) || dataItem[0];
+  } else if (Array.isArray(dataItem?.messages)) {
+    dataItem = dataItem.messages.find((item: any) => item?.key?.fromMe !== true && item?.fromMe !== true) || dataItem.messages[0];
+  } else if (Array.isArray(payload.messages)) {
+    dataItem = payload.messages.find((item: any) => item?.key?.fromMe !== true && item?.fromMe !== true) || payload.messages[0];
+  }
 
-  const rawText = data?.message?.conversation
-    || data?.message?.extendedTextMessage?.text
-    || data?.message?.imageMessage?.caption
-    || data?.message?.buttonsResponseMessage?.selectedButtonId
-    || data?.message?.listResponseMessage?.singleSelectReply?.selectedRowId
-    || data?.message?.templateButtonReplyMessage?.selectedId
-    || '';
-  const text = String(rawText).trim();
+  if (!dataItem || typeof dataItem !== 'object') return null;
+
+  const key = dataItem.key || {};
+  if (key.fromMe === true || dataItem.fromMe === true) return null;
+
+  const remoteJid = String(key.remoteJid || dataItem.remoteJid || dataItem.sender || dataItem.from || '').trim();
+  if (!remoteJid || remoteJid.endsWith('@g.us') || remoteJid.endsWith('@broadcast') || remoteJid.endsWith('@newsletter')) {
+    return null;
+  }
+
+  // Resolução de JID com privacidade (LID)
+  const alternativeJid = String(
+    key.remoteJidAlt ||
+    key.senderPn ||
+    key.participant ||
+    dataItem.sender ||
+    dataItem.senderPn ||
+    dataItem.participant ||
+    payload.sender ||
+    ''
+  ).trim();
+
+  let resolvedJid = remoteJid;
+  if (resolvedJid.endsWith('@lid')) {
+    resolvedJid = alternativeJid && !alternativeJid.endsWith('@lid') ? alternativeJid : '';
+  }
+  if (!resolvedJid) return null;
+
   const digits = resolvedJid.replace(/\D/g, '');
-  if (!text || digits.length < 8) return null;
+  if (digits.length < 8) return null;
+
+  // Extrai o texto da mensagem
+  const text = extractTextFromWhatsAppMessage(dataItem.message || dataItem);
+  if (!text) return null;
+
+  // Extrai nome da instância de forma segura
+  const rawInstance = payload.instance || dataItem.instance || payload.instanceName || dataItem.instanceName;
+  const instanceName = typeof rawInstance === 'object' && rawInstance !== null
+    ? String(rawInstance.instanceName || rawInstance.name || '')
+    : String(rawInstance || '');
+
+  const pushName = dataItem.pushName || payload.pushName || undefined;
 
   return {
-    instanceName: String(payload?.instance || data?.instance || ''),
-    messageId: String(key.id || `${digits}:${data?.messageTimestamp || Date.now()}`),
+    instanceName,
+    messageId: String(key.id || dataItem.id || `${digits}:${dataItem.messageTimestamp || Date.now()}`),
     phone: digits,
     text,
-    pushName: data?.pushName ? String(data.pushName) : undefined,
+    pushName: pushName ? String(pushName) : undefined,
   };
 }
 

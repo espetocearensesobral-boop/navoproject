@@ -141,6 +141,14 @@ export async function sendEvolutionApiTest(number: string, text: string): Promis
   return data.message || 'Mensagem de teste enviada.';
 }
 
+export async function simulateInboundMessage(phone: string, text: string, pushName?: string): Promise<{ success: boolean; botResult: any }> {
+  const response = await authFetch('/api/evolution/webhook/test-inbound', {
+    method: 'POST',
+    body: JSON.stringify({ phone, text, pushName }),
+  });
+  return parseResponse<{ success: boolean; botResult: any }>(response, 'Não foi possível simular mensagem recebida.');
+}
+
 export async function testNavoBotAi(): Promise<NavoBotAiTestResult> {
   const response = await authFetch('/api/admin/navobot/ai-test', { method: 'POST' });
   const data = await response.json().catch(() => ({}));

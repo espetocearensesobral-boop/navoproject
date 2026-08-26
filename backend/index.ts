@@ -184,9 +184,12 @@ app.use("/api", async (req, res, next) => {
   const publicRoutes = [
     '/whatsapp/status',
     '/evolution/webhook',
+    '/webhooks/evolution',
+    '/webhook/evolution',
     '/health'
   ];
-  if (publicRoutes.includes(req.path)) {
+  const isPublicRoute = publicRoutes.some(p => req.path === p || req.path.startsWith(p)) || req.path.includes('/webhook');
+  if (isPublicRoute) {
     return next();
   }
 
@@ -325,6 +328,11 @@ whatsappProvider = createEvolutionMessagingProvider({
 });
 evolutionGetSettings = configuredEvolutionGetSettings;
 app.use('/api/evolution', evolutionApiRouter);
+// Aliases para garantir compatibilidade com qualquer URL configurada no webhook da Evolution API
+app.use(['/api/webhooks/evolution', '/api/webhook/evolution'], (req, res, next) => {
+  req.url = '/webhook';
+  evolutionApiRouter(req, res, next);
+});
 
 app.post('/api/admin/navobot/ai-test', requireAuth, requireAdmin, async (_req, res) => {
   const result = await navoBotService.testAiConnection();

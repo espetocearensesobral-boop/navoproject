@@ -3,9 +3,11 @@ import {
   AlertCircle,
   Bell,
   Bot,
+  Check,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Copy,
   ExternalLink,
   Eye,
   EyeOff,
@@ -14,6 +16,7 @@ import {
   MessageCircle,
   MessageSquare,
   Phone,
+  Play,
   RefreshCw,
   RotateCcw,
   Save,
@@ -38,6 +41,7 @@ import {
   saveEvolutionApiSettings,
   sendEvolutionApiTest,
   sendManualBotMessage,
+  simulateInboundMessage,
   testEvolutionApi,
   testNavoBotAi,
   type BotConversation,
@@ -112,6 +116,12 @@ export const WhatsAppManagement: React.FC = () => {
   const [testText, setTestText] = useState(
     "Olá! Esta é uma mensagem de teste do Navo Premium.",
   );
+  const [copiedWebhook, setCopiedWebhook] = useState(false);
+  const [simPhone, setSimPhone] = useState("5511999998888");
+  const [simText, setSimText] = useState("Oi");
+  const [simPushName, setSimPushName] = useState("Cliente Teste");
+  const [simLoading, setSimLoading] = useState(false);
+  const [simResult, setSimResult] = useState<any>(null);
 
   const load = async (silent = false) => {
     if (!silent) setLoading(true);
@@ -257,6 +267,48 @@ export const WhatsAppManagement: React.FC = () => {
       });
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleCopyWebhookUrl = async () => {
+    const url = `${window.location.origin}/api/evolution/webhook`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedWebhook(true);
+      setTimeout(() => setCopiedWebhook(false), 2000);
+    } catch {
+      setMessage({ type: "error", text: "Não foi possível copiar automaticamente." });
+    }
+  };
+
+  const handleUseOriginWebhook = () => {
+    const url = `${window.location.origin}/api/evolution/webhook`;
+    update("webhookUrl", url);
+    setMessage({
+      type: "success",
+      text: "URL do Webhook atualizada com o domínio atual deste servidor.",
+    });
+  };
+
+  const handleSimulateInbound = async () => {
+    if (!simPhone.trim() || !simText.trim()) return;
+    setSimLoading(true);
+    setSimResult(null);
+    setMessage(null);
+    try {
+      const result = await simulateInboundMessage(simPhone.trim(), simText.trim(), simPushName.trim());
+      setSimResult(result);
+      setMessage({
+        type: "success",
+        text: "Simulação executada com sucesso! Veja o resultado do NavoBot abaixo.",
+      });
+    } catch (error: any) {
+      setMessage({
+        type: "error",
+        text: error?.message || "Não foi possível executar a simulação.",
+      });
+    } finally {
+      setSimLoading(false);
     }
   };
 
@@ -760,58 +812,88 @@ export const WhatsAppManagement: React.FC = () => {
                 </button>
               </div>
               {settings.webhookEnabled && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className="space-y-1 block">
-                    <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider">
-                      URL do webhook
-                    </span>
-                    <input
-                      value={settings.webhookUrl}
-                      onChange={(event) =>
-                        update("webhookUrl", event.target.value)
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label className="space-y-1 block">
+                      <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider">
+                        URL do webhook
+                      </span>
+                      <input
+                        value={settings.webhookUrl}
+                        onChange={(event) =>
+                          update("webhookUrl", event.target.value)
+                        }
+                        placeholder={`${window.location.origin}/api/evolution/webhook`}
+                        className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0 font-mono"
+                      />
+                    </label>
+                    <label className="space-y-1 block">
+                      <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider">
+                        Segredo do webhook{" "}
+                        {settings.hasWebhookSecret && (
+                          <span className="normal-case font-normal">(já salvo)</span>
+                        )}
+                      </span>
+                      <input
+                        type="password"
+                        value={webhookSecretInput}
+                        onChange={(event) =>
+                          setWebhookSecretInput(event.target.value)
+                        }
+                        placeholder={
+                          settings.hasWebhookSecret
+                            ? "••••••••"
+                            : "Defina um segredo ou deixe vazio para auto-gerar"
+                        }
+                        className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => void handleCopyWebhookUrl()}
+                        className="h-8 px-3 rounded-lg bg-[var(--admin-bg)] hover:bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] font-semibold text-xs flex items-center gap-1.5 transition-colors"
+                      >
+                        {copiedWebhook ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-status-success" />
+                            <span>URL Copiada!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copiar URL do Servidor</span>
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleUseOriginWebhook}
+                        className="h-8 px-3 rounded-lg bg-[var(--admin-bg)] hover:bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] font-semibold text-xs flex items-center gap-1.5 transition-colors"
+                      >
+                        <span>Preencher com URL deste Domínio</span>
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => void handleApplyWebhook()}
+                      disabled={
+                        applyingWebhook ||
+                        saving ||
+                        (!settings.webhookEnabled && !settings.webhookUrl)
                       }
-                      placeholder="https://seu-dominio.com/api/webhooks/evolution"
-                      className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
-                    />
-                  </label>
-                  <label className="space-y-1 block">
-                    <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider">
-                      Segredo do webhook{" "}
-                      {settings.hasWebhookSecret && (
-                        <span className="normal-case font-normal">(já salvo)</span>
-                      )}
-                    </span>
-                    <input
-                      type="password"
-                      value={webhookSecretInput}
-                      onChange={(event) =>
-                        setWebhookSecretInput(event.target.value)
-                      }
-                      placeholder={
-                        settings.hasWebhookSecret
-                          ? "••••••••"
-                          : "Defina um segredo"
-                      }
-                      className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
-                    />
-                  </label>
+                      className="h-8 px-4 rounded-lg bg-[var(--admin-accent)] hover:opacity-90 text-white font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 transition-opacity"
+                    >
+                      <Wifi className="w-3.5 h-3.5" />
+                      {applyingWebhook ? "Aplicando..." : "Aplicar Webhook na Evolution"}
+                    </button>
+                  </div>
                 </div>
               )}
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => void handleApplyWebhook()}
-                  disabled={
-                    applyingWebhook ||
-                    saving ||
-                    (!settings.webhookEnabled && !settings.webhookUrl)
-                  }
-                  className="h-9 w-full sm:w-auto px-4 rounded-xl bg-[var(--admin-surface)] hover:bg-surface-elevated text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
-                >
-                  <Wifi className="w-3.5 h-3.5" />
-                  {applyingWebhook ? "Aplicando..." : "Aplicar webhook"}
-                </button>
-              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-2">
@@ -883,8 +965,78 @@ export const WhatsAppManagement: React.FC = () => {
 
           <section className="p-4 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] space-y-3">
             <div>
+              <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
+                <Play className="w-4 h-4 text-[var(--admin-accent)]" />
+                Simulador de Mensagem Recebida (Testar NavoBot)
+              </h2>
+              <p className="text-xs text-[var(--admin-text-muted)] mt-1">
+                Simula o envio de uma mensagem de WhatsApp para testar a interpretação do NavoBot, fluxo de agendamento e respostas.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label className="space-y-1">
+                <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider">
+                  Telefone Simulado
+                </span>
+                <input
+                  value={simPhone}
+                  onChange={(event) => setSimPhone(event.target.value)}
+                  placeholder="5511999998888"
+                  inputMode="tel"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider">
+                  Nome do Cliente
+                </span>
+                <input
+                  value={simPushName}
+                  onChange={(event) => setSimPushName(event.target.value)}
+                  placeholder="Cliente Teste"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider">
+                  Mensagem
+                </span>
+                <input
+                  value={simText}
+                  onChange={(event) => setSimText(event.target.value)}
+                  placeholder="Ex: Oi, Quero agendar amanhã às 15h"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                />
+              </label>
+            </div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => void handleSimulateInbound()}
+                disabled={simLoading || !simPhone.trim() || !simText.trim()}
+                className="h-10 w-full sm:w-auto px-4 rounded-xl bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
+              >
+                <Play className={`w-4 h-4 ${simLoading ? "animate-spin" : ""}`} />
+                {simLoading ? "Simulando..." : "Simular Recebimento no Bot"}
+              </button>
+            </div>
+            {simResult && (
+              <div className="p-3 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] text-xs space-y-2">
+                <div className="font-bold text-[var(--admin-text-main)] flex items-center justify-between">
+                  <span>Resultado da Mensagem</span>
+                  <span className="text-status-success font-semibold">Processado</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-[var(--admin-surface)] text-[var(--admin-text-muted)] font-mono text-[11px] overflow-x-auto">
+                  <pre>{JSON.stringify(simResult.botResult, null, 2)}</pre>
+                </div>
+              </div>
+            )}
+          </section>
+
+          <section className="p-4 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] space-y-3">
+            <div>
               <h2 className="text-sm font-bold text-[var(--admin-text-main)]">
-                Mensagem de teste
+                Mensagem de teste (Envio Direto)
               </h2>
               <p className="text-xs text-[var(--admin-text-muted)] mt-1">
                 Use o telefone com código do país e DDD, somente números. Exemplo:
