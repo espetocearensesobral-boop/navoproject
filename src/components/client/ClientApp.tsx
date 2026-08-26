@@ -431,8 +431,8 @@ export const ClientApp: React.FC = () => {
 
   if (isAppInitializing) {
     return (
-      <div className="client-app-loading flex-1 bg-surface-base flex flex-col items-center justify-center p-6 space-y-4 animate-in fade-in duration-200 select-none">
-        <div className="client-loading-mark w-16 h-16 rounded-2xl bg-gold-base text-surface-base flex items-center justify-center text-surface-base shadow-2xl shadow-[0_0_30px_rgba(201,169,110,0.3)] animate-pulse">
+      <div className="flex-1 bg-surface-base flex flex-col items-center justify-center p-6 space-y-4 animate-in fade-in duration-200 select-none">
+        <div className="w-16 h-16 rounded-2xl bg-gold-base text-surface-base flex items-center justify-center text-surface-base shadow-2xl shadow-[0_0_30px_rgba(201,169,110,0.3)] animate-pulse">
           <Scissors className="w-9 h-9 stroke-[2.5]" />
         </div>
         <div className="text-center space-y-1">
@@ -457,7 +457,7 @@ export const ClientApp: React.FC = () => {
   );
 
   return (
-    <div className="client-app flex justify-center bg-surface-base w-full flex-1 overflow-hidden relative">
+    <div className="flex justify-center bg-surface-base w-full flex-1 overflow-hidden relative">
       {/* Skip Link for Keyboard Accessibility */}
       <a 
         href="#main-content" 
@@ -467,11 +467,11 @@ export const ClientApp: React.FC = () => {
       </a>
 
       {/* Web App View */}
-      <div className={`client-app-shell w-full ${activeTab === 'home' ? 'max-w-none lg:shadow-none' : 'max-w-none'} bg-surface-base flex flex-col flex-1 relative overflow-hidden mx-auto transition-[max-width] duration-300`}>
+      <div className={`w-full ${activeTab === 'home' ? 'max-w-none lg:shadow-none' : 'max-w-none'} bg-surface-base flex flex-col flex-1 relative overflow-hidden mx-auto transition-[max-width] duration-300`}>
 
         {/* Client App Header (hidden on home/landing page) */}
         {activeTab !== 'home' && (
-          <header className="client-app-header px-4 sm:px-6 py-2.5 sm:py-4 flex justify-between items-center bg-transparent z-10 shrink-0">
+          <header className="px-4 sm:px-6 py-2.5 sm:py-4 flex justify-between items-center bg-transparent z-10 shrink-0">
             <div className="flex items-center gap-3">
               {isGuest ? (
                 <button 
@@ -564,7 +564,7 @@ export const ClientApp: React.FC = () => {
         <main
           ref={mainRef}
           id="main-content"
-          className={`client-app-main flex-1 min-h-0 ${activeTab === 'home' ? 'overflow-hidden' : 'overflow-y-auto no-scrollbar'} outline-none flex flex-col`}
+          className={`flex-1 min-h-0 ${activeTab === 'home' ? 'overflow-hidden' : 'overflow-y-auto no-scrollbar'} outline-none flex flex-col`}
           tabIndex={-1}
           onTouchStart={pullToRefreshHandlers.onTouchStart}
           onTouchMove={pullToRefreshHandlers.onTouchMove}

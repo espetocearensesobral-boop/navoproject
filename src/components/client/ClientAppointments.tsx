@@ -375,7 +375,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
   if (isLoading) {
     return (
-      <div className="client-appointments-screen space-y-4 pb-6 px-4">
+      <div className="space-y-4 pb-6 px-4">
         <div className="h-20 card-elevation-1 rounded-2xl animate-shimmer" />
         <div className="h-16 card-elevation-1 rounded-2xl animate-shimmer" />
         <div className="h-40 card-elevation-1 rounded-2xl animate-shimmer" />
@@ -385,7 +385,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
   return (
     <div
-      className={`client-appointments-screen space-y-4 pt-2 sm:pt-4 pb-8 px-4 relative flex-1 flex flex-col ${
+      className={`space-y-4 pt-2 sm:pt-4 pb-8 px-4 relative flex-1 flex flex-col ${
         appointments.length === 0 ? 'min-h-[60vh] justify-center pt-0 my-auto' : ''
       }`}
     >

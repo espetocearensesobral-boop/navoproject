@@ -135,7 +135,7 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
 
   if (loading) {
     return (
-      <div className="client-account-screen p-8 text-center space-y-3">
+      <div className="p-8 text-center space-y-3">
         <div className="w-10 h-10 border-2 border-gold-base border-t-transparent rounded-full animate-spin mx-auto" />
         <p className="text-xs text-content-muted">Carregando sua carteira Navo Rewards...</p>
       </div>
@@ -149,7 +149,7 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
   const tierProgress = loyalty?.tierProgress ?? (tierNextGoal > 0 ? Math.min(100, Math.round((currentPoints / tierNextGoal) * 100)) : 100);
 
   return (
-    <div className="client-account-screen space-y-6 pb-8 px-4 max-w-xl mx-auto">
+    <div className="space-y-6 pb-8 px-4 max-w-xl mx-auto">
       {/* Review Modal Trigger */}
       {activeReviewAppointment && (
         <ReviewModal

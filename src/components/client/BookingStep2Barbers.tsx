@@ -116,7 +116,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
   };
 
   return (
-    <div className="client-booking-screen space-y-3 pb-28 px-4">
+    <div className="space-y-3 pb-28 px-4">
       {/* Active Filter Banner if Date/Time selected */}
       {selectedDate && (
         <div className="bg-surface-card border border-gold-base/30 rounded-card p-3 flex items-center justify-between text-xs animate-fade-in shadow-sm">

@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "./admin-theme.css";
-@import "./client-theme.css";
 
 @theme {
   --color-surface-base: var(--color-surface-base);

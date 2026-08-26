@@ -14,7 +14,7 @@ export const ClientSubscriptions: React.FC = () => {
   };
 
   return (
-    <div className="client-account-screen space-y-6 pb-6 px-4">
+    <div className="space-y-6 pb-6 px-4">
       {/* Active User Subscription Status Card */}
       <div className="bg-gradient-to-br from-surface-card to-surface-base p-5 rounded-2xl border border-gold-base/40 shadow-xl space-y-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-gold-base/5 rounded-full blur-2xl pointer-events-none" />

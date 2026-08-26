@@ -64,7 +64,7 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
 
 
   return (
-    <div className="client-booking-screen space-y-5 text-center pb-8 px-4 max-w-md mx-auto animate-in fade-in duration-300 mt-6">
+    <div className="space-y-5 text-center pb-8 px-4 max-w-md mx-auto animate-in fade-in duration-300 mt-6">
       {/* Ícone de Confirmação e Texto */}
       <div className="pt-2 flex flex-col items-center justify-center space-y-2">
         <div className="text-status-success flex items-center justify-center">
