@@ -1,4 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Activity,
+  AlertTriangle,
+  ArrowDownRight,
+  ArrowUpRight,
+  Banknote,
+  CalendarCheck2,
+  CalendarClock,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Clock3,
+  ListChecks,
+  Receipt,
+  UserCheck,
+  Users,
+  Wallet,
+} from "lucide-react";
 import {
   fetchAppointmentsFromSupabase,
   fetchOperationalReportFromSupabase,
@@ -6,53 +24,101 @@ import {
 } from "../../services/supabaseDataService";
 import { getTodayStringBRT } from "../../utils/dateUtils";
 import { Appointment } from "../../types";
-import {
-  Receipt,
-  Wallet,
-  CalendarCheck2,
-  Users,
-  UserCheck,
-  AlertTriangle,
-  ArrowUpRight,
-  ArrowDownRight,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
-import { AdminPageHeader } from "./shared/AdminPageHeader";
 import { AdminAppointmentFeed } from "./shared/AdminAppointmentFeed";
 import { AdminSkeleton } from "./shared/AdminSkeleton";
 
 interface NavoHomeViewProps {
   onNavigateToAgenda: () => void;
+  onNavigateToQueue: () => void;
+  onNavigateToReceipts: () => void;
 }
 
 const HISTORY_STATUSES = new Set(["cancelled", "completed", "no_show"]);
 
-/** Variação percentual vs. o mesmo período anterior (fornecida pela API quando a comparação está habilitada). */
+type UpcomingAppointment = {
+  id: string;
+  clientName: string;
+  professionalName: string;
+  serviceTitle: string;
+  timeSlot: string;
+  status: string;
+  finalAmount: number;
+};
+
+const STATUS_LABELS: Record<Appointment["status"], string> = {
+  pending: "Pendente",
+  pending_approval: "Aguardando aprovação",
+  confirmed: "Confirmado",
+  in_queue: "Na fila",
+  in_service: "Em atendimento",
+  completed: "Concluído",
+  cancelled: "Cancelado",
+  no_show: "Não compareceu",
+};
+
+const STATUS_TONES: Record<string, string> = {
+  pending: "is-warning",
+  pending_approval: "is-warning",
+  confirmed: "is-neutral",
+  in_queue: "is-info",
+  in_service: "is-success",
+  completed: "is-success",
+  cancelled: "is-error",
+  no_show: "is-error",
+};
+
+const formatCurrency = (value: number) =>
+  `R$ ${value.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
+const formatDateLabel = (value: string) => {
+  if (!value) return "Hoje";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+const formatStatus = (status: string) => {
+  if (status in STATUS_LABELS) {
+    return STATUS_LABELS[status as Appointment["status"]];
+  }
+  return status.replaceAll("_", " ");
+};
+
 const Trend: React.FC<{ current: number; previous?: number | null }> = ({
   current,
   previous,
 }) => {
   if (previous === undefined || previous === null) return null;
   if (previous === 0 && current === 0) return null;
+
   const diff = previous === 0 ? 100 : ((current - previous) / previous) * 100;
   const isUp = diff >= 0;
   const Icon = isUp ? ArrowUpRight : ArrowDownRight;
+
   return (
     <span
-      className={`inline-flex items-center gap-0.5 text-[11px] font-bold ${isUp ? "text-status-success" : "text-status-error"}`}
+      className={`admin-dashboard-trend ${isUp ? "is-positive" : "is-negative"}`}
     >
-      <Icon className="w-3 h-3" />
+      <Icon className="h-3.5 w-3.5" />
       {Math.abs(diff).toFixed(0)}%
-      <span className="text-[var(--admin-text-muted)] font-medium ml-0.5">
-        vs ontem
-      </span>
+      <span className="font-normal text-[var(--admin-text-muted)]">vs. período anterior</span>
     </span>
   );
 };
 
+const MetricSkeleton: React.FC = () => (
+  <div className="admin-dashboard-metric">
+    <AdminSkeleton className="h-3 w-24" />
+    <AdminSkeleton className="mt-4 h-7 w-32" />
+    <AdminSkeleton className="mt-3 h-3 w-28" />
+  </div>
+);
+
 export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
   onNavigateToAgenda,
+  onNavigateToQueue,
+  onNavigateToReceipts,
 }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [operationalReport, setOperationalReport] =
@@ -81,236 +147,452 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
   const todayStr =
     operationalReport?.summary.operationalDay || getTodayStringBRT();
   const todayAppointments = appointments
-    .filter((a) => a.date === todayStr)
+    .filter((appointment) => appointment.date === todayStr)
     .sort((a, b) => (a.time_slot || "").localeCompare(b.time_slot || ""));
-
   const activeToday = todayAppointments.filter(
-    (a) => !HISTORY_STATUSES.has(a.status),
+    (appointment) => !HISTORY_STATUSES.has(appointment.status),
   );
-  const historyToday = todayAppointments.filter((a) =>
-    HISTORY_STATUSES.has(a.status),
+  const historyToday = todayAppointments.filter((appointment) =>
+    HISTORY_STATUSES.has(appointment.status),
   );
   const pendingApprovalToday = todayAppointments.filter(
-    (a) => a.status === "pending_approval",
+    (appointment) => appointment.status === "pending_approval",
   );
 
   const summary = operationalReport?.summary;
   const comparison = operationalReport?.comparison;
-
-  const totalRevenueToday = summary?.totalIncome || 0;
-  const pendingAmount = summary?.pendingAmount || 0;
-  const pendingReceiptsCount = summary?.pendingReceipts || 0;
-  const ticketMedio = summary?.averageTicket || 0;
+  const totalRevenueToday = summary?.totalIncome ?? 0;
+  const pendingAmount = summary?.pendingAmount ?? 0;
+  const pendingReceiptsCount = summary?.pendingReceipts ?? 0;
+  const ticketMedio = summary?.averageTicket ?? 0;
   const inServiceToday =
     summary?.currentInChair ??
     activeToday.filter(
-      (a) => a.status === "in_service" || a.status === "in_chair",
+      (appointment) =>
+        appointment.status === "in_service" || appointment.status === "in_queue",
     ).length;
-  const waitingToday =
-    summary?.currentWaiting ??
-    activeToday.filter((a) => a.status === "confirmed").length;
+  const waitingToday = summary?.currentWaiting ?? 0;
+  const queueCount = summary?.currentQueue ?? waitingToday;
+  const completedToday = summary?.completedAppointments ?? 0;
+  const activeAppointmentCount =
+    summary?.todayActiveAppointments ?? activeToday.length;
+  const appointmentCount = summary?.todayAppointments ?? todayAppointments.length;
+  const completionRate = summary?.completionRate ?? 0;
   const closedOutToday = todayAppointments.filter(
-    (a) => a.status === "cancelled" || a.status === "no_show",
+    (appointment) =>
+      appointment.status === "cancelled" || appointment.status === "no_show",
   ).length;
 
   const uniqueClients = new Set(
-    appointments.map((a) => a.client_id || a.client_phone || a.client_name),
+    appointments.map(
+      (appointment) =>
+        appointment.client_id || appointment.client_phone || appointment.client_name,
+    ),
   ).size;
 
-  const todayFormatted = new Date(`${todayStr}T12:00:00`).toLocaleDateString(
-    "pt-BR",
-    {
+  const todayFormatted = formatDateLabel(
+    new Date(`${todayStr}T12:00:00`).toLocaleDateString("pt-BR", {
       weekday: "long",
       day: "numeric",
       month: "long",
       year: "numeric",
-    },
+    }),
   );
 
-  return (
-    <div className="space-y-4 animate-fade-in text-[var(--admin-text-main)] min-w-0">
-      {/* Header (desktop) */}
-      <AdminPageHeader
-        icon={Receipt}
-        title="Painel do Dia"
-        stats={[
-          { label: todayFormatted, value: "", tone: "gold" },
-          { label: "clientes na base", value: uniqueClients, tone: "muted" },
-        ]}
-      />
+  const upcomingAppointments = useMemo<UpcomingAppointment[]>(() => {
+    const reportAppointments = operationalReport?.upcomingAppointments ?? [];
+    if (reportAppointments.length > 0) {
+      return reportAppointments.slice(0, 6).map((appointment) => ({
+        id: appointment.id,
+        clientName: appointment.clientName,
+        professionalName: appointment.professionalName,
+        serviceTitle: appointment.serviceTitle,
+        timeSlot: appointment.timeSlot,
+        status: appointment.status,
+        finalAmount: appointment.finalAmount,
+      }));
+    }
 
-      {/* Atenção: só aparece quando existe algo que realmente precisa de decisão do admin. */}
-      {!loading && pendingApprovalToday.length > 0 && (
-        <div className="flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
-          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-          <p className="text-xs font-semibold text-amber-200 flex-1 min-w-0">
-            {pendingApprovalToday.length === 1
-              ? "1 agendamento fora do expediente aguardando aprovação."
-              : `${pendingApprovalToday.length} agendamentos fora do expediente aguardando aprovação.`}
+    return activeToday.slice(0, 6).map((appointment) => ({
+      id: appointment.id,
+      clientName: appointment.client_name,
+      professionalName: appointment.professional_name,
+      serviceTitle: appointment.services?.[0]?.title || "Serviço",
+      timeSlot: appointment.time_slot,
+      status: appointment.status,
+      finalAmount: appointment.final_amount || 0,
+    }));
+  }, [activeToday, operationalReport?.upcomingAppointments]);
+
+  const movement = operationalReport?.dailyMovement ?? [];
+  const visibleMovement = movement.slice(-7);
+  const maxMovement = Math.max(
+    1,
+    ...visibleMovement.map((item) => item.appointments),
+  );
+  const topServices = operationalReport?.topServices?.slice(0, 4) ?? [];
+  const peakHour = operationalReport?.peakHour;
+
+  return (
+    <div className="admin-dashboard min-w-0 space-y-6 text-[var(--admin-text-main)]">
+      <section className="admin-dashboard-hero" aria-labelledby="admin-dashboard-title">
+        <div className="min-w-0">
+          <p className="admin-dashboard-eyebrow">
+            Operação <span aria-hidden="true">/</span> {todayFormatted}
           </p>
+          <h1 id="admin-dashboard-title" className="admin-dashboard-title">
+            Visão do dia
+          </h1>
+          <p className="admin-dashboard-subtitle">
+            Acompanhe o ritmo da unidade, resolva pendências e mantenha a agenda fluindo.
+          </p>
+        </div>
+        <div className="admin-dashboard-hero-actions">
+          <div className="admin-dashboard-date" aria-label={`Data operacional: ${todayFormatted}`}>
+            <CalendarClock className="h-4 w-4" />
+            <span>{todayFormatted}</span>
+          </div>
           <button
             type="button"
             onClick={onNavigateToAgenda}
-            className="text-xs font-bold text-amber-300 hover:text-amber-100 underline underline-offset-2 shrink-0"
+            className="admin-btn admin-btn-primary admin-dashboard-primary-action"
+          >
+            <CalendarCheck2 className="h-4 w-4" />
+            Abrir agenda
+          </button>
+        </div>
+      </section>
+
+      {!loading && pendingApprovalToday.length > 0 && (
+        <div className="admin-dashboard-alert" role="status">
+          <div className="admin-dashboard-alert-icon">
+            <AlertTriangle className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="admin-dashboard-alert-title">
+              {pendingApprovalToday.length === 1
+                ? "1 agendamento fora do expediente aguarda aprovação"
+                : `${pendingApprovalToday.length} agendamentos fora do expediente aguardam aprovação`}
+            </p>
+            <p className="admin-dashboard-alert-copy">
+              Revise a solicitação antes do próximo atendimento.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onNavigateToAgenda}
+            className="admin-btn admin-btn-ghost admin-dashboard-alert-action"
           >
             Revisar
           </button>
         </div>
       )}
 
-      {/* KPI Cards & Operational State - Clean SaaS Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5" aria-busy={loading}>
-        {/* Principal KPIs */}
-        <div className="lg:col-span-8 flex flex-col gap-3.5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[var(--admin-border)] bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl overflow-hidden">
-            {loading ? (
-              <>
-                <AdminSkeleton className="h-28" />
-                <AdminSkeleton className="h-28" />
-                <AdminSkeleton className="h-28" />
-              </>
-            ) : (
-              <>
-                <div className="p-4 sm:p-5 flex flex-col justify-between hover:bg-[var(--admin-surface-hover)] transition-colors">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-2.5">
-                    <Receipt className="w-4 h-4 text-[var(--admin-accent)]" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider">Faturamento</span>
-                  </div>
-                  <div>
-                    <p className="text-xl sm:text-2xl font-bold text-status-success tabular-nums">
-                      R$ {totalRevenueToday.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-xs font-semibold text-[var(--admin-text-main)]">
-                        {summary?.completedAppointments || 0} concluídos
-                      </p>
-                      <Trend current={totalRevenueToday} previous={comparison?.totalIncome} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 sm:p-5 flex flex-col justify-between hover:bg-[var(--admin-surface-hover)] transition-colors">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-2.5">
-                    <Wallet className="w-4 h-4 text-amber-400" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider">A Receber</span>
-                  </div>
-                  <div>
-                    <p className={`text-xl sm:text-2xl font-bold tabular-nums ${pendingAmount > 0 ? "text-amber-400" : "text-[var(--admin-text-main)]"}`}>
-                      R$ {pendingAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                    </p>
-                    <p className="text-xs text-[var(--admin-text-muted)] mt-1">
-                      {pendingReceiptsCount === 0 ? "Caixa em dia" : `${pendingReceiptsCount} pendências financeiras`}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-4 sm:p-5 flex flex-col justify-between hover:bg-[var(--admin-surface-hover)] transition-colors">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-muted)] mb-2.5">
-                    <CalendarCheck2 className="w-4 h-4 text-[var(--admin-text-muted)]" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider">Ticket Médio</span>
-                  </div>
-                  <div>
-                    <p className="text-xl sm:text-2xl font-bold text-[var(--admin-text-main)] tabular-nums">
-                      R$ {ticketMedio.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-xs text-[var(--admin-text-muted)]">
-                        por atendimento
-                      </p>
-                      <Trend current={ticketMedio} previous={comparison?.averageTicket} />
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Operational Status (Agora) */}
-        <div className="lg:col-span-4">
-          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5 h-full flex flex-col justify-center">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-3.5">
-              Status Operacional
-            </h3>
-            {loading ? (
-               <div className="space-y-3">
-                 <AdminSkeleton className="h-6 w-full" />
-                 <AdminSkeleton className="h-6 w-3/4" />
-               </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-main)]">
-                    <UserCheck className="w-4 h-4 text-status-success" />
-                    <span className="text-xs sm:text-sm font-semibold">Em atendimento</span>
-                  </div>
-                  <span className="text-xs sm:text-sm font-bold tabular-nums bg-status-success/10 text-status-success px-2.5 py-0.5 rounded-full">{inServiceToday}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-main)]">
-                    <Users className="w-4 h-4 text-[var(--admin-accent)]" />
-                    <span className="text-xs sm:text-sm font-semibold">Aguardando</span>
-                  </div>
-                  <span className="text-xs sm:text-sm font-bold tabular-nums bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] px-2.5 py-0.5 rounded-full">{waitingToday}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-[var(--admin-text-main)]">
-                    <AlertTriangle className="w-4 h-4 text-status-error" />
-                    <span className="text-xs sm:text-sm font-semibold">Faltas / Cancelados</span>
-                  </div>
-                  <span className="text-xs sm:text-sm font-bold tabular-nums bg-status-error/10 text-status-error px-2.5 py-0.5 rounded-full">{closedOutToday}</span>
-                </div>
+      <section
+        className="admin-dashboard-metric-grid"
+        aria-busy={loading}
+        aria-label="Resumo operacional"
+      >
+        {loading ? (
+          <>
+            <MetricSkeleton />
+            <MetricSkeleton />
+            <MetricSkeleton />
+            <MetricSkeleton />
+          </>
+        ) : (
+          <>
+            <article className="admin-dashboard-metric is-emphasis">
+              <div className="admin-dashboard-metric-label">
+                <Banknote className="h-4 w-4" />
+                Recebido hoje
               </div>
+              <p className="admin-dashboard-metric-value finance-positive">
+                {formatCurrency(totalRevenueToday)}
+              </p>
+              <div className="admin-dashboard-metric-meta">
+                <span>{completedToday} concluídos</span>
+                <Trend current={totalRevenueToday} previous={comparison?.totalIncome} />
+              </div>
+            </article>
+
+            <article className="admin-dashboard-metric">
+              <div className="admin-dashboard-metric-label">
+                <ListChecks className="h-4 w-4" />
+                Agenda de hoje
+              </div>
+              <p className="admin-dashboard-metric-value">{appointmentCount}</p>
+              <div className="admin-dashboard-metric-meta">
+                <span>{completionRate.toFixed(0)}% concluído</span>
+                <Trend current={appointmentCount} previous={comparison?.appointments} />
+              </div>
+            </article>
+
+            <article className="admin-dashboard-metric">
+              <div className="admin-dashboard-metric-label">
+                <Clock3 className="h-4 w-4" />
+                Na operação agora
+              </div>
+              <p className="admin-dashboard-metric-value">{activeAppointmentCount}</p>
+              <div className="admin-dashboard-metric-meta">
+                <span>{inServiceToday} em atendimento</span>
+                <button type="button" onClick={onNavigateToQueue} className="admin-dashboard-inline-action">
+                  Ver fila
+                </button>
+              </div>
+            </article>
+
+            <article className={`admin-dashboard-metric ${pendingAmount > 0 ? "is-attention" : ""}`}>
+              <div className="admin-dashboard-metric-label">
+                <Wallet className="h-4 w-4" />
+                A acompanhar
+              </div>
+              <p className="admin-dashboard-metric-value">
+                {formatCurrency(pendingAmount)}
+              </p>
+              <div className="admin-dashboard-metric-meta">
+                <span>
+                  {pendingReceiptsCount === 0
+                    ? "Caixa em dia"
+                    : `${pendingReceiptsCount} pendências`}
+                </span>
+                {pendingReceiptsCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToReceipts}
+                    className="admin-dashboard-inline-action"
+                  >
+                    Ver recebimentos
+                  </button>
+                )}
+              </div>
+            </article>
+          </>
+        )}
+      </section>
+
+      <section className="admin-dashboard-live-grid" aria-label="Operação em tempo real">
+        <article className="admin-dashboard-panel admin-dashboard-state-panel">
+          <div className="admin-dashboard-panel-heading">
+            <div>
+              <p className="admin-dashboard-section-kicker">Agora</p>
+              <h2 className="admin-dashboard-panel-title">Status da operação</h2>
+            </div>
+            <Activity className="admin-dashboard-panel-heading-icon h-5 w-5" />
+          </div>
+
+          {loading ? (
+            <div className="space-y-4">
+              <AdminSkeleton className="h-12 w-full" />
+              <AdminSkeleton className="h-12 w-full" />
+              <AdminSkeleton className="h-12 w-full" />
+            </div>
+          ) : (
+            <div className="admin-dashboard-state-list">
+              <button type="button" onClick={onNavigateToQueue} className="admin-dashboard-state-row">
+                <span className="admin-dashboard-state-icon is-success">
+                  <UserCheck className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1 text-left">
+                  <span className="admin-dashboard-state-label">Em atendimento</span>
+                  <span className="admin-dashboard-state-caption">Cadeiras ocupadas agora</span>
+                </span>
+                <strong className="admin-dashboard-state-value">{inServiceToday}</strong>
+              </button>
+
+              <button type="button" onClick={onNavigateToQueue} className="admin-dashboard-state-row">
+                <span className="admin-dashboard-state-icon is-info">
+                  <Users className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1 text-left">
+                  <span className="admin-dashboard-state-label">Aguardando</span>
+                  <span className="admin-dashboard-state-caption">Clientes na fila ou confirmados</span>
+                </span>
+                <strong className="admin-dashboard-state-value">{queueCount}</strong>
+              </button>
+
+              <div className="admin-dashboard-state-row is-static">
+                <span className="admin-dashboard-state-icon is-muted">
+                  <CheckCircle2 className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="admin-dashboard-state-label">Encerrados</span>
+                  <span className="admin-dashboard-state-caption">Cancelamentos e faltas hoje</span>
+                </span>
+                <strong className="admin-dashboard-state-value">{closedOutToday}</strong>
+              </div>
+            </div>
+          )}
+
+          <div className="admin-dashboard-state-footer">
+            <span>
+              {uniqueClients} clientes na base
+            </span>
+            {peakHour && (
+              <span>
+                Pico previsto: <strong>{peakHour.label}</strong>
+              </span>
             )}
           </div>
-        </div>
-      </div>
+        </article>
 
-      {/* Atendimentos em andamento: o que precisa de atenção agora vem primeiro e visível por padrão. */}
-      <div className="admin-card p-0 overflow-hidden min-w-0">
-        <div className="h-14 px-4 border-b border-[var(--admin-border)] flex items-center justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <h3 className="admin-title-h3 truncate">
-              Em Andamento ({activeToday.length})
-            </h3>
+        <article className="admin-dashboard-panel admin-dashboard-upcoming-panel">
+          <div className="admin-dashboard-panel-heading">
+            <div>
+              <p className="admin-dashboard-section-kicker">Próximos passos</p>
+              <h2 className="admin-dashboard-panel-title">Próximos atendimentos</h2>
+            </div>
+            <button
+              type="button"
+              onClick={onNavigateToAgenda}
+              className="admin-btn admin-btn-ghost admin-btn-sm"
+            >
+              Agenda
+            </button>
           </div>
+
+          {loading ? (
+            <div className="space-y-3">
+              <AdminSkeleton className="h-14 w-full" />
+              <AdminSkeleton className="h-14 w-full" />
+              <AdminSkeleton className="h-14 w-full" />
+            </div>
+          ) : upcomingAppointments.length > 0 ? (
+            <div className="admin-dashboard-upcoming-list">
+              {upcomingAppointments.map((appointment) => (
+                <div className="admin-dashboard-upcoming-row" key={appointment.id}>
+                  <time className="admin-dashboard-upcoming-time">{appointment.timeSlot || "--:--"}</time>
+                  <div className="min-w-0 flex-1">
+                    <p className="admin-dashboard-upcoming-client">{appointment.clientName}</p>
+                    <p className="admin-dashboard-upcoming-meta">
+                      {appointment.serviceTitle} <span aria-hidden="true">·</span> {appointment.professionalName}
+                    </p>
+                  </div>
+                  <span className={`admin-dashboard-status ${STATUS_TONES[appointment.status] || "is-neutral"}`}>
+                    <span className="admin-dashboard-status-dot" aria-hidden="true" />
+                    {formatStatus(appointment.status)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="admin-dashboard-empty">
+              <CalendarClock className="h-7 w-7" />
+              <p>Nenhum atendimento pendente</p>
+              <span>A agenda está livre por enquanto.</span>
+            </div>
+          )}
+        </article>
+      </section>
+
+      <section className="admin-dashboard-insight-grid" aria-label="Ritmo e fechamento">
+        <article className="admin-dashboard-panel admin-dashboard-movement-panel">
+          <div className="admin-dashboard-panel-heading">
+            <div>
+              <p className="admin-dashboard-section-kicker">Ritmo da operação</p>
+              <h2 className="admin-dashboard-panel-title">Atendimentos recentes</h2>
+            </div>
+            <span className="admin-dashboard-panel-context">
+              {visibleMovement.length || 0} dias
+            </span>
+          </div>
+
+          {loading ? (
+            <div className="space-y-4">
+              <AdminSkeleton className="h-5 w-full" />
+              <AdminSkeleton className="h-5 w-4/5" />
+              <AdminSkeleton className="h-5 w-3/5" />
+            </div>
+          ) : visibleMovement.length > 0 ? (
+            <div className="admin-dashboard-movement-list">
+              {visibleMovement.map((item) => (
+                <div className="admin-dashboard-movement-row" key={item.date}>
+                  <span className="admin-dashboard-movement-label">{item.label}</span>
+                  <div className="admin-dashboard-movement-track" aria-hidden="true">
+                    <span
+                      className="admin-dashboard-movement-bar"
+                      style={{ width: `${Math.max(6, (item.appointments / maxMovement) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="admin-dashboard-movement-value">{item.appointments}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="admin-dashboard-empty is-compact">
+              <p>Sem dados de movimento para exibir</p>
+            </div>
+          )}
+
+          {topServices.length > 0 && (
+            <div className="admin-dashboard-top-services">
+              <div className="admin-dashboard-subsection-heading">
+                <span>Serviços mais procurados</span>
+                <span>Atendimentos</span>
+              </div>
+              {topServices.map((service) => (
+                <div className="admin-dashboard-service-row" key={service.serviceTitle}>
+                  <span className="min-w-0 truncate">{service.serviceTitle}</span>
+                  <strong>{service.count}</strong>
+                </div>
+              ))}
+            </div>
+          )}
+        </article>
+
+        <article className="admin-dashboard-panel admin-dashboard-finance-panel">
+          <div className="admin-dashboard-panel-heading">
+            <div>
+              <p className="admin-dashboard-section-kicker">Fechamento parcial</p>
+              <h2 className="admin-dashboard-panel-title">Caixa sob controle</h2>
+            </div>
+            <Receipt className="admin-dashboard-panel-heading-icon h-5 w-5" />
+          </div>
+
+          <div className="admin-dashboard-finance-primary">
+            <span>Recebido hoje</span>
+            <strong>{formatCurrency(totalRevenueToday)}</strong>
+            <Trend current={totalRevenueToday} previous={comparison?.totalIncome} />
+          </div>
+
+          <div className="admin-dashboard-finance-list">
+            <div className="admin-dashboard-finance-row">
+              <span><Wallet className="h-4 w-4" />A receber</span>
+              <strong className={pendingAmount > 0 ? "text-status-warning" : ""}>{formatCurrency(pendingAmount)}</strong>
+            </div>
+            <div className="admin-dashboard-finance-row">
+              <span><Banknote className="h-4 w-4" />Ticket médio</span>
+              <strong>{formatCurrency(ticketMedio)}</strong>
+            </div>
+            <div className="admin-dashboard-finance-row">
+              <span><Clock3 className="h-4 w-4" />Pico do dia</span>
+              <strong>{peakHour?.label || "Sem previsão"}</strong>
+            </div>
+          </div>
+
+          <div className="admin-dashboard-finance-footer">
+            <span>{pendingReceiptsCount === 0 ? "Nenhuma pendência financeira" : `${pendingReceiptsCount} recebimentos aguardando confirmação`}</span>
+            {pendingReceiptsCount > 0 && (
+              <button type="button" onClick={onNavigateToReceipts} className="admin-btn admin-btn-secondary admin-btn-sm">
+                Abrir recebimentos
+              </button>
+            )}
+          </div>
+        </article>
+      </section>
+
+      {historyToday.length > 0 && (
+        <section className="admin-dashboard-panel admin-dashboard-history-panel">
           <button
             type="button"
-            onClick={onNavigateToAgenda}
-            className="admin-btn admin-btn-sm admin-btn-primary cursor-pointer"
-            aria-label="Ver na Agenda"
-          >
-            <CalendarCheck2 className="w-4 h-4 shrink-0" />
-            <span className="hidden sm:inline">Ver na Agenda</span>
-          </button>
-        </div>
-
-        <AdminAppointmentFeed
-          appointments={activeToday}
-          onNavigateToAgenda={onNavigateToAgenda}
-          loading={loading}
-          emptyTitle="Nada pendente agora"
-          emptyDescription="Todos os atendimentos de hoje já foram concluídos ou a agenda está livre."
-        />
-      </div>
-
-      {/* Histórico do dia: informação real, mas de menor prioridade — recolhida por padrão para não competir com o que está em aberto. */}
-      {!loading && historyToday.length > 0 && (
-        <div className="admin-card p-0 overflow-hidden min-w-0">
-          <button
-            type="button"
-            onClick={() => setShowHistory((v) => !v)}
-            className="w-full h-14 px-4 flex items-center justify-between gap-3 text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] transition-colors"
+            onClick={() => setShowHistory((visible) => !visible)}
+            className="admin-dashboard-history-toggle"
             aria-expanded={showHistory}
           >
-            <span className="admin-title-h3 tracking-tight">
-              Concluídos e cancelados hoje ({historyToday.length})
+            <span>
+              Histórico de hoje <strong>({historyToday.length})</strong>
             </span>
-            {showHistory ? (
-              <ChevronUp className="w-5 h-5 shrink-0" />
-            ) : (
-              <ChevronDown className="w-5 h-5 shrink-0" />
-            )}
+            {showHistory ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
           {showHistory && (
             <div className="border-t border-[var(--admin-border)]">
@@ -322,7 +604,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
               />
             </div>
           )}
-        </div>
+        </section>
       )}
     </div>
   );

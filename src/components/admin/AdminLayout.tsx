@@ -459,7 +459,11 @@ export const AdminLayout: React.FC = () => {
     switch (activeTab) {
       case "dashboard":
         return (
-          <NavoHomeView onNavigateToAgenda={() => setActiveTab("agenda")} />
+          <NavoHomeView
+            onNavigateToAgenda={() => setActiveTab("agenda")}
+            onNavigateToQueue={() => setActiveTab("queue")}
+            onNavigateToReceipts={() => setActiveTab("financeiro_recebimentos")}
+          />
         );
       case "agenda":
         return <ScheduleGrid />;
