@@ -185,7 +185,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       themeColorMeta.setAttribute('content', activeTheme === 'light' ? '#F5F5F2' : scope === 'admin' ? '#10131A' : '#0A0A0A');
     }
 
-    if (palette && palette !== 'heritage') {
+    if (scope === 'client' && palette && palette !== 'heritage') {
       document.documentElement.setAttribute('data-palette', palette);
     } else {
       document.documentElement.removeAttribute('data-palette');
