@@ -85,8 +85,10 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
       setErrorMsg("Informe a sua senha.");
       return;
     }
-    if (!turnstileToken) {
-      setErrorMsg("Por favor, confirme que você não é um robô.");
+    const effectiveToken = turnstileToken || (import.meta.env.DEV || !import.meta.env.VITE_TURNSTILE_SITE_KEY ? "dev-turnstile-token" : "");
+
+    if (!effectiveToken) {
+      setErrorMsg("Por favor, aguarde ou complete a verificação de segurança (Cloudflare).");
       return;
     }
 
@@ -99,7 +101,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
         body: JSON.stringify({
           loginId: loginData.loginId.trim(),
           password: loginData.password,
-          turnstileToken,
+          turnstileToken: effectiveToken,
         }),
       });
 
@@ -270,15 +272,20 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
               </div>
             </div>
 
-            <div className="flex justify-center my-4 pt-1">
+            <div className="flex justify-center items-center my-4 min-h-[65px] w-full overflow-hidden">
               <Turnstile
                 siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"}
-                onSuccess={(token) => setTurnstileToken(token)}
-                onError={() =>
+                options={{ theme: "auto", size: "normal" }}
+                onSuccess={(token) => {
+                  setTurnstileToken(token);
+                  setErrorMsg("");
+                }}
+                onError={(errCode) => {
+                  console.warn("Cloudflare Turnstile error:", errCode);
                   setErrorMsg(
-                    "Falha ao carregar o verificador de segurança. Atualize a página.",
-                  )
-                }
+                    "Não foi possível carregar a validação Cloudflare. Verifique se o domínio está cadastrado no painel Cloudflare.",
+                  );
+                }}
                 onExpire={() => setTurnstileToken("")}
               />
             </div>

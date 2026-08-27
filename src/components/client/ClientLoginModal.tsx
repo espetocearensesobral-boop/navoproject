@@ -223,9 +223,16 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
 
     setIsSubmitting(true);
     
+    const effectiveToken = turnstileToken || (import.meta.env.DEV || !import.meta.env.VITE_TURNSTILE_SITE_KEY ? 'dev-turnstile-token' : '');
+
     if (mode === 'register') {
-      if (!isRegisterValid || !turnstileToken) {
-        setErrorMsg("Por favor, confirme que você não é um robô e preencha todos os campos.");
+      if (!isRegisterValid) {
+        setErrorMsg("Por favor, preencha todos os campos do cadastro corretamente.");
+        setIsSubmitting(false);
+        return;
+      }
+      if (!effectiveToken) {
+        setErrorMsg("Por favor, aguarde ou complete a verificação de segurança (Cloudflare).");
         setIsSubmitting(false);
         return;
       }
@@ -243,7 +250,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
             lgpdConsent: formData.lgpdConsent,
             lgpdConsentDate: new Date().toISOString(),
             referralCode: pendingRef || undefined,
-            turnstileToken
+            turnstileToken: effectiveToken
           })
         });
 
@@ -269,8 +276,13 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
         setErrorMsg(err.message || 'Erro ao cadastrar. Tente novamente.');
       }
     } else {
-      if (!isLoginValid || !turnstileToken) {
-        setErrorMsg("Por favor, confirme que você não é um robô.");
+      if (!isLoginValid) {
+        setErrorMsg("Informe seu e-mail/telefone e senha.");
+        setIsSubmitting(false);
+        return;
+      }
+      if (!effectiveToken) {
+        setErrorMsg("Por favor, aguarde ou complete a verificação de segurança (Cloudflare).");
         setIsSubmitting(false);
         return;
       }
@@ -281,7 +293,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
           body: JSON.stringify({
             loginId: formData.loginId,
             password: formData.password,
-            turnstileToken
+            turnstileToken: effectiveToken
           })
         });
 
@@ -462,19 +474,26 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
               </div>
             </div>
 
-            <div className="flex justify-center my-3.5 pt-1">
+            <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full overflow-hidden">
               <Turnstile
                 key="forgot-step1"
                 siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
-                onSuccess={(token) => setTurnstileToken(token)}
-                onError={() => setErrorMsg('Falha ao carregar o verificador de segurança. Atualize a página.')}
+                options={{ theme: 'auto', size: 'normal' }}
+                onSuccess={(token) => {
+                  setTurnstileToken(token);
+                  setErrorMsg('');
+                }}
+                onError={(err) => {
+                  console.warn('Turnstile error:', err);
+                  setErrorMsg('Não foi possível carregar a validação Cloudflare. Verifique a chave e domínio no painel Cloudflare.');
+                }}
                 onExpire={() => setTurnstileToken('')}
               />
             </div>
 
             <button
               type="submit"
-              disabled={isSubmittingForgot || !isForgotValid || !turnstileToken}
+              disabled={isSubmittingForgot || !isForgotValid}
               className="w-full bg-gold-base text-surface-base font-extrabold rounded-xl py-3 mt-2 active:scale-95 hover:opacity-95 shadow-lg shadow-[#C9A96E]/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
             >
               <KeyRound className="w-4 h-4" />
@@ -677,12 +696,19 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
               </div>
             )}
 
-            <div className="flex justify-center my-3.5 pt-1">
+            <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full overflow-hidden">
               <Turnstile
                 key={mode}
                 siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
-                onSuccess={(token) => setTurnstileToken(token)}
-                onError={() => setErrorMsg('Falha ao carregar o verificador de segurança. Atualize a página.')}
+                options={{ theme: 'auto', size: 'normal' }}
+                onSuccess={(token) => {
+                  setTurnstileToken(token);
+                  setErrorMsg('');
+                }}
+                onError={(err) => {
+                  console.warn('Turnstile error:', err);
+                  setErrorMsg('Não foi possível carregar a validação Cloudflare. Verifique a chave e domínio no painel Cloudflare.');
+                }}
                 onExpire={() => setTurnstileToken('')}
               />
             </div>
@@ -690,7 +716,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
             <button
               id={mode === 'register' ? 'reg-submit' : 'log-submit'}
               type="submit"
-              disabled={isSubmitting || (mode === 'register' ? !isRegisterValid : !isLoginValid) || !turnstileToken}
+              disabled={isSubmitting || (mode === 'register' ? !isRegisterValid : !isLoginValid)}
               className="w-full bg-gold-base text-surface-base font-extrabold rounded-xl py-3 mt-2 active:scale-95 hover:opacity-95 shadow-lg shadow-[#C9A96E]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base flex items-center justify-center"
             >
               {isSubmitting ? (mode === 'register' ? 'Cadastrando...' : 'Entrando...') : (mode === 'register' ? 'Cadastrar' : 'Entrar')}
