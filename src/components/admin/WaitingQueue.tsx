@@ -49,6 +49,10 @@ import {
   Users,
   ChevronDown,
   ChevronUp,
+  User,
+  Sparkles,
+  RefreshCw,
+  FileText,
 } from "lucide-react";
 
 export const WaitingQueue: React.FC = () => {
@@ -1205,38 +1209,48 @@ export const WaitingQueue: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL: ADD WALK-IN */}
+      {/* MODAL: ADD WALK-IN (Fullscreen) */}
       {isAddModalOpen && (
         <AdminModalV2
           icon={Plus}
           eyebrow="Recepção"
-          title="Novo encaixe"
-          subtitle="Adicione um cliente à recepção em poucos passos"
-          onClose={() => {
-            setIsServicePickerOpen(false);
-            setIsAddModalOpen(false);
-          }}
-          size="md"
+          title="Novo Encaixe na Fila"
+          subtitle="Adicione um cliente à fila de espera em poucos passos"
+          onClose={() => setIsAddModalOpen(false)}
+          size="fullscreen"
           footer={
-            <div className="receipt-v2-actions">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsServicePickerOpen(false);
-                  setIsAddModalOpen(false);
-                }}
-                className="receipt-v2-secondary"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                form="walk-in-form"
-                disabled={isSavingWalkIn}
-                className="receipt-v2-primary"
-              >
-                {isSavingWalkIn ? "Inserindo…" : "Inserir na fila"}
-              </button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
+              <div className="flex items-center gap-2 text-xs text-[var(--admin-text-muted)]">
+                <span className="w-2 h-2 rounded-full bg-[var(--admin-accent)] animate-pulse" />
+                <span>Encaixe será adicionado à fila de espera imediatamente</span>
+              </div>
+              <div className="flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="admin-btn admin-btn-sm admin-btn-secondary"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  form="walk-in-form"
+                  disabled={isSavingWalkIn}
+                  className="admin-btn admin-btn-sm admin-btn-primary disabled:opacity-60 disabled:cursor-wait min-w-[180px]"
+                >
+                  {isSavingWalkIn ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Inserindo...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Inserir na fila</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           }
         >
@@ -1244,153 +1258,236 @@ export const WaitingQueue: React.FC = () => {
             id="walk-in-form"
             onKeyDown={handleEnterAsTab}
             onSubmit={handleAddWalkInSubmit}
-            className="admin-modal-v2-form-grid"
+            className="space-y-6"
           >
-            <div className="admin-modal-v2-field">
-              <label
-                className="admin-modal-v2-field-label"
-                htmlFor="walk-in-client-name"
-              >
-                Nome do cliente *
-              </label>
-              <input
-                id="walk-in-client-name"
-                ref={clientNameInputRef}
-                type="text"
-                value={newClientName}
-                onChange={(e) => setNewClientName(e.target.value)}
-                placeholder="Ex: Gabriel Santos"
-                className="admin-modal-v2-input"
-                required
-              />
-            </div>
+            {/* Top Grid: 2 Columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Cliente & Barbeiro (5 cols) */}
+              <div className="lg:col-span-5 space-y-5">
+                {/* Bloco 1: Dados do Cliente */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                    <User className="w-4 h-4" />
+                    <span>1. Dados do Cliente</span>
+                  </div>
 
-            <div className="admin-modal-v2-field">
-              <label
-                className="admin-modal-v2-field-label"
-                htmlFor="walk-in-client-phone"
-              >
-                Telefone / WhatsApp
-              </label>
-              <input
-                id="walk-in-client-phone"
-                type="text"
-                value={newClientPhone}
-                onChange={(e) => setNewClientPhone(e.target.value)}
-                placeholder="(11) 99887-1122"
-                className="admin-modal-v2-input"
-              />
-            </div>
-
-            <div className="admin-modal-v2-form-grid admin-modal-v2-form-grid--2">
-              <div className="admin-modal-v2-field">
-                <label className="admin-modal-v2-field-label">Serviço *</label>
-                <button
-                  type="button"
-                  data-enter-action="true"
-                  onClick={() => setIsServicePickerOpen(true)}
-                  className="admin-modal-v2-picker"
-                  aria-haspopup="dialog"
-                  aria-expanded={isServicePickerOpen}
-                >
-                  <span
-                    className={`admin-clamp-2 ${!newServiceTitle ? "admin-modal-v2-picker-placeholder" : ""}`}
-                  >
-                    {newServiceTitle || "Selecionar serviço"}
-                  </span>
-                  <span className="admin-modal-v2-picker-price">
-                    R$ {newServicePrice.toFixed(2)}
-                  </span>
-                </button>
-              </div>
-
-              <div className="admin-modal-v2-field">
-                <label
-                  className="admin-modal-v2-field-label"
-                  htmlFor="walk-in-professional"
-                >
-                  Barbeiro *
-                </label>
-                <select
-                  id="walk-in-professional"
-                  value={newProfessionalId}
-                  onChange={(e) => {
-                    const id = e.target.value;
-                    setNewProfessionalId(id);
-                    const found = professionals.find((p) => p.id === id);
-                    if (found) setNewProfessionalName(found.name);
-                  }}
-                  className="admin-modal-v2-select"
-                >
-                  {professionals.map((p) => (
-                    <option
-                      key={p.id}
-                      value={p.id}
-                      className="bg-[var(--admin-surface)]"
+                  <div>
+                    <label
+                      htmlFor="walk-in-client-name"
+                      className="text-xs font-semibold text-[var(--admin-text-main)] block mb-1.5"
                     >
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                      Nome Completo *
+                    </label>
+                    <input
+                      id="walk-in-client-name"
+                      ref={clientNameInputRef}
+                      type="text"
+                      value={newClientName}
+                      onChange={(e) => setNewClientName(e.target.value)}
+                      placeholder="Ex: Gabriel Santos"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                      required
+                      autoFocus
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="walk-in-client-phone"
+                      className="text-xs font-semibold text-[var(--admin-text-main)] block mb-1.5 flex items-center justify-between"
+                    >
+                      <span>Telefone / WhatsApp</span>
+                      <span className="text-[10px] text-[var(--admin-text-muted)] font-normal">
+                        Opcional para avisos
+                      </span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--admin-text-muted)]">
+                        <Phone className="w-4 h-4" />
+                      </div>
+                      <input
+                        id="walk-in-client-phone"
+                        type="text"
+                        value={newClientPhone}
+                        onChange={(e) => setNewClientPhone(e.target.value)}
+                        placeholder="(11) 99887-1122"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bloco 2: Profissional */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                      <Scissors className="w-4 h-4" />
+                      <span>2. Profissional Responsável</span>
+                    </div>
+                    <span className="text-xs text-[var(--admin-text-muted)]">
+                      {professionals.length} disponível(is)
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {professionals.map((b) => {
+                      const isSelected = newProfessionalId === b.id;
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          onClick={() => {
+                            setNewProfessionalId(b.id);
+                            setNewProfessionalName(b.name);
+                          }}
+                          className={`p-3 rounded-xl border text-left flex items-center gap-3 transition-all ${
+                            isSelected
+                              ? "bg-[var(--admin-accent)]/10 border-[var(--admin-accent)] text-[var(--admin-text-main)] shadow-sm"
+                              : "bg-[var(--admin-bg)] border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:border-[var(--admin-accent)]/50 hover:text-[var(--admin-text-main)]"
+                          }`}
+                        >
+                          <div
+                            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
+                            style={{
+                              background: isSelected
+                                ? "var(--admin-accent)"
+                                : "var(--admin-surface)",
+                              color: isSelected
+                                ? "var(--admin-bg)"
+                                : "var(--admin-text-main)",
+                              border: "1px solid var(--admin-border)",
+                            }}
+                          >
+                            {b.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold truncate text-[var(--admin-text-main)]">
+                              {b.name}
+                            </p>
+                          </div>
+                          {isSelected && (
+                            <Check className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Serviço & Observações (7 cols) */}
+              <div className="lg:col-span-7 space-y-5">
+                {/* Bloco 3: Serviços */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                      <Sparkles className="w-4 h-4" />
+                      <span>3. Serviço Desejado *</span>
+                    </div>
+                    <span className="text-xs text-[var(--admin-text-muted)]">
+                      {services.length} serviço(s)
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[260px] overflow-y-auto pr-1">
+                    {services.map((service) => {
+                      const isSelected = newServiceTitle === service.title;
+                      const price = Number(service.price || 0);
+                      const duration = service.duration_minutes || 30;
+
+                      return (
+                        <button
+                          key={service.id}
+                          type="button"
+                          onClick={() => handleSelectWalkInService(service)}
+                          className={`p-3 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all ${
+                            isSelected
+                              ? "bg-[var(--admin-accent)]/10 border-[var(--admin-accent)] shadow-sm"
+                              : "bg-[var(--admin-bg)] border-[var(--admin-border)] hover:border-[var(--admin-accent)]/50"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2 w-full">
+                            <span className="text-xs font-bold text-[var(--admin-text-main)] line-clamp-1">
+                              {service.title}
+                            </span>
+                            {isSelected && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-[var(--admin-accent)] text-[var(--admin-bg)] shrink-0">
+                                Selecionado
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between text-xs w-full pt-1 border-t border-[var(--admin-border)]/50">
+                            <span className="text-[11px] text-[var(--admin-text-muted)] flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {duration} min
+                            </span>
+                            <span className="font-bold text-[var(--admin-accent)]">
+                              R$ {price.toFixed(2)}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Bloco 4: Observações */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
+                    <FileText className="w-4 h-4" />
+                    <span>4. Observações</span>
+                  </div>
+
+                  <div>
+                    <input
+                      id="walk-in-notes"
+                      type="text"
+                      value={newNotes}
+                      onChange={(e) => setNewNotes(e.target.value)}
+                      placeholder="Ex: Aceitou aguardar 15 min"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="admin-modal-v2-field">
-              <label
-                className="admin-modal-v2-field-label"
-                htmlFor="walk-in-notes"
-              >
-                Observações
-              </label>
-              <input
-                id="walk-in-notes"
-                type="text"
-                value={newNotes}
-                onChange={(e) => setNewNotes(e.target.value)}
-                placeholder="Ex: Aceitou aguardar 15 min"
-                className="admin-modal-v2-input"
-              />
-            </div>
-          </form>
-        </AdminModalV2>
-      )}
+            {/* Resumo do Encaixe */}
+            {(() => {
+              const selectedService = services.find((s) => s.title === newServiceTitle);
+              const price = Number(selectedService?.price || 0);
 
-      {/* MODAL: SERVICE PICKER */}
-      {isAddModalOpen && isServicePickerOpen && (
-        <AdminModalV2
-          icon={Scissors}
-          eyebrow="Novo encaixe"
-          title="Selecionar serviço"
-          onClose={() => setIsServicePickerOpen(false)}
-          size="lg"
-          labelledBy="service-picker-title"
-        >
-          {services.length === 0 ? (
-            <p className="py-10 text-center text-sm text-[var(--admin-text-muted)]">
-              Nenhum serviço disponível.
-            </p>
-          ) : (
-            <div className="admin-card-grid gap-2.5">
-              {services.map((service) => {
-                const isSelected = service.title === newServiceTitle;
-                return (
-                  <button
-                    key={service.id}
-                    type="button"
-                    onClick={() => handleSelectWalkInService(service)}
-                    className={`min-h-16 p-3.5 rounded-xl border text-left flex items-center justify-between gap-3 transition-colors ${isSelected ? "bg-[var(--admin-accent)]/10 border-[var(--admin-accent)] text-[var(--admin-text-main)]" : "bg-[var(--admin-bg)] border-[var(--admin-border)] text-[var(--admin-text-main)] hover:border-[var(--admin-accent)]/50"}`}
-                  >
-                    <span className="text-sm font-bold leading-snug">
-                      {service.title}
+              return (
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--admin-surface)] to-[var(--admin-bg)] border border-[var(--admin-border)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] border border-[var(--admin-accent)]/30">
+                        Resumo da Recepção
+                      </span>
+                    </div>
+                    <p className="text-sm font-bold text-[var(--admin-text-main)]">
+                      {newClientName.trim() || "Cliente não informado"} • {newServiceTitle || "Selecione o serviço"}
+                    </p>
+                    <p className="text-xs text-[var(--admin-text-muted)]">
+                      Profissional: <strong className="text-[var(--admin-text-main)]">{newProfessionalName || "Não selecionado"}</strong>
+                      {newNotes && (
+                        <span> • Obs: <strong className="text-[var(--admin-text-main)]">{newNotes}</strong></span>
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="text-left md:text-right shrink-0 bg-[var(--admin-bg)] md:bg-transparent p-3 md:p-0 rounded-xl w-full md:w-auto border md:border-0 border-[var(--admin-border)]">
+                    <span className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider block">
+                      Valor Estimado
                     </span>
-                    <span className="text-sm font-black finance-positive shrink-0">
-                      R$ {service.price.toFixed(2)}
+                    <span className="text-xl font-bold text-[var(--admin-accent)] font-mono">
+                      R$ {price.toFixed(2)}
                     </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+                  </div>
+                </div>
+              );
+            })()}
+          </form>
         </AdminModalV2>
       )}
 
