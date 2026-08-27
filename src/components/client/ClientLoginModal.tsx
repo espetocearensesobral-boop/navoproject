@@ -462,10 +462,20 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
               </div>
             </div>
 
+            <div className="flex justify-center my-3.5 pt-1">
+              <Turnstile
+                key="forgot-step1"
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                onSuccess={(token) => setTurnstileToken(token)}
+                onError={() => setErrorMsg('Falha ao carregar o verificador de segurança. Atualize a página.')}
+                onExpire={() => setTurnstileToken('')}
+              />
+            </div>
+
             <button
               type="submit"
-              disabled={isSubmittingForgot || !isForgotValid}
-              className="w-full bg-gold-base text-surface-base font-extrabold rounded-xl py-3 mt-4 active:scale-95 hover:opacity-95 shadow-lg shadow-[#C9A96E]/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+              disabled={isSubmittingForgot || !isForgotValid || !turnstileToken}
+              className="w-full bg-gold-base text-surface-base font-extrabold rounded-xl py-3 mt-2 active:scale-95 hover:opacity-95 shadow-lg shadow-[#C9A96E]/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
             >
               <KeyRound className="w-4 h-4" />
               <span>{isSubmittingForgot ? 'Enviando...' : 'Enviar Código de Recuperação'}</span>
@@ -574,7 +584,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
                 {mode === 'login' && (
                   <button
                     type="button"
-                    onClick={() => { setMode('forgot'); setErrorMsg(''); setSuccessMsg(''); }}
+                    onClick={() => { setMode('forgot'); setTurnstileToken(''); setErrorMsg(''); setSuccessMsg(''); }}
                     className="text-[11px] font-bold text-gold-base hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base rounded px-1"
                   >
                     Esqueci minha senha
@@ -667,11 +677,21 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
               </div>
             )}
 
+            <div className="flex justify-center my-3.5 pt-1">
+              <Turnstile
+                key={mode}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                onSuccess={(token) => setTurnstileToken(token)}
+                onError={() => setErrorMsg('Falha ao carregar o verificador de segurança. Atualize a página.')}
+                onExpire={() => setTurnstileToken('')}
+              />
+            </div>
+
             <button
               id={mode === 'register' ? 'reg-submit' : 'log-submit'}
               type="submit"
-              disabled={isSubmitting || (mode === 'register' ? !isRegisterValid : !isLoginValid)}
-              className="w-full bg-gold-base text-surface-base font-extrabold rounded-xl py-3 mt-4 active:scale-95 hover:opacity-95 shadow-lg shadow-[#C9A96E]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base flex items-center justify-center"
+              disabled={isSubmitting || (mode === 'register' ? !isRegisterValid : !isLoginValid) || !turnstileToken}
+              className="w-full bg-gold-base text-surface-base font-extrabold rounded-xl py-3 mt-2 active:scale-95 hover:opacity-95 shadow-lg shadow-[#C9A96E]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base flex items-center justify-center"
             >
               {isSubmitting ? (mode === 'register' ? 'Cadastrando...' : 'Entrando...') : (mode === 'register' ? 'Cadastrar' : 'Entrar')}
             </button>
@@ -680,7 +700,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
 
         <div className="mt-6 text-center">
           <button
-            onClick={() => { setMode(mode === 'register' ? 'login' : 'register'); setErrorMsg(''); setSuccessMsg(''); }}
+            onClick={() => { setMode(mode === 'register' ? 'login' : 'register'); setTurnstileToken(''); setErrorMsg(''); setSuccessMsg(''); }}
             className="text-xs font-bold text-content-base hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base rounded px-2 py-1"
           >
             {mode === 'register' ? 'Já tenho uma conta. Entrar' : mode === 'forgot' ? 'Voltar para o Entrar' : 'Não tem conta? Criar uma'}

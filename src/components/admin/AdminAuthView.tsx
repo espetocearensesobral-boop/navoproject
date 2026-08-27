@@ -279,6 +279,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
                     "Falha ao carregar o verificador de segurança. Atualize a página.",
                   )
                 }
+                onExpire={() => setTurnstileToken("")}
               />
             </div>
 
