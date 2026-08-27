@@ -455,16 +455,14 @@ export const WhatsAppInboxManagement: React.FC = () => {
  >
  <div
  className={`max-w-[85%] rounded-[var(--admin-radius-lg)] p-2.5 text-xs ${
- isInbound
- ?"bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-main)]"
- :"bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-medium"
- }`}
+                              isInbound
+                                ? "bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-main)]"
+                                : "bg-[var(--admin-accent)]/10 border border-[var(--admin-accent)]/20 text-[var(--admin-text-main)] font-medium"
+                            }`}
  >
  <p className="whitespace-pre-wrap">{msg.text}</p>
  <p
- className={`text-[9px] mt-1 text-right ${
- isInbound ?"text-[var(--admin-text-muted)]":"opacity-70"
- }`}
+ className="text-[9px] mt-1 text-right text-[var(--admin-text-muted)]"
  >
  {formatTimeAgo(msg.createdAt)}
  </p>
