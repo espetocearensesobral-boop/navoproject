@@ -250,8 +250,14 @@ export const FollowUpManagement: React.FC = () => {
  </article>
  ))}
  </div>
- </div>
- )}
- </div>
- );
+     </div>
+  )}
+      {selectedClient && (
+        <FollowUpActionModal
+          client={selectedClient}
+          onClose={() => setSelectedClient(null)}
+        />
+      )}
+    </div>
+  );
 };
