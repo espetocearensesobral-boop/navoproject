@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { motion } from "motion/react";
 import { useTheme } from '../../contexts/ThemeContext';
 import { ServiceItem } from '../../types';
 import { DEFAULT_CATEGORIES, getCategoryName } from '../../data/categories';
@@ -375,7 +376,9 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                       const thumbUrl = rawThumb ? optimizeImageUrl(rawThumb, 450) : null;
 
                       return (
-                        <div
+                        <motion.div
+                          whileTap={{ scale: 0.95 }}
+                          whileHover={{ scale: 1.02 }}
                           key={service.id}
                           role="button"
                           tabIndex={0}
@@ -392,7 +395,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                             hapticLight();
                             setModalService(service);
                           }}
-                          className={`w-48 sm:w-60 shrink-0 rounded-2xl border cursor-pointer relative overflow-hidden transition-all duration-300 group focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base flex flex-col justify-between shadow-xl hover:scale-[1.02] ${
+                          className={`w-48 sm:w-60 shrink-0 rounded-2xl border cursor-pointer relative overflow-hidden transition-all duration-300 group focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base flex flex-col justify-between shadow-xl  ${
                             isSelected
                               ? 'bg-surface-card border-gold-base ring-2 ring-gold-base shadow-gold-base/20'
                               : 'bg-surface-card border-border-subtle hover:border-gold-base/60'
@@ -438,7 +441,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
                   </div>
@@ -452,7 +455,9 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                       const thumbUrl = rawThumb ? optimizeImageUrl(rawThumb, 400) : null;
 
                       return (
-                        <div
+                        <motion.div
+                          whileTap={{ scale: 0.95 }}
+                          whileHover={{ scale: 1.02 }}
                           key={service.id}
                           role="button"
                           tabIndex={0}
@@ -469,7 +474,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                             hapticLight();
                             setModalService(service);
                           }}
-                          className={`w-full rounded-2xl border cursor-pointer relative overflow-hidden transition-all duration-300 group focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base flex flex-col justify-between shadow-md hover:shadow-xl hover:scale-[1.02] ${
+                          className={`w-full rounded-2xl border cursor-pointer relative overflow-hidden transition-all duration-300 group focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base flex flex-col justify-between shadow-md hover:shadow-xl  ${
                             isSelected
                               ? 'bg-surface-card border-gold-base ring-2 ring-gold-base shadow-gold-base/20'
                               : 'bg-surface-card border-border-subtle hover:border-gold-base/60'
@@ -515,7 +520,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
                   </div>

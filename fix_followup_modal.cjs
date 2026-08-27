@@ -1,89 +1,20 @@
-import React, { useState } from "react";
-import { createPortal } from "react-dom";
-import { Bot, Mail, MessageSquare, Phone, Send, Sparkles, X, Loader2 } from "lucide-react";
-import { authFetch } from "../../lib/api";
-import { AdminModalV2 } from "./shared/AdminModalV2";
+const fs = require('fs');
+const path = require('path');
 
+const filePath = path.join('src', 'components', 'admin', 'FollowUpActionModal.tsx');
+let content = fs.readFileSync(filePath, 'utf8');
 
-export interface FollowUpActionModalProps {
-  client: {
-    id: string;
-    name: string;
-    phone: string;
-    email: string;
-    lastVisit: string | null;
-    daysSinceLastVisit: number | null;
-    appointmentCount: number;
-    loyaltyTier: string;
-    hasPhone: boolean;
-    hasEmail: boolean;
-  };
-  onClose: () => void;
+const importsToAdd = `import { AdminModalV2 } from "./shared/AdminModalV2";\n`;
+if (!content.includes('AdminModalV2')) {
+  content = content.replace(/import \{ authFetch \} from "\.\.\/\.\.\/lib\/api";/, `import { authFetch } from "../../lib/api";\n${importsToAdd}`);
 }
 
-export const FollowUpActionModal: React.FC<FollowUpActionModalProps> = ({ client, onClose }) => {
-  const [message, setMessage] = useState("");
-  const [loadingAI, setLoadingAI] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-
-  const generateWithAI = async () => {
-    setLoadingAI(true);
-    setError(null);
-    try {
-      const res = await authFetch("/api/relationship/follow-up/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clientId: client.id,
-          name: client.name,
-          daysSinceLastVisit: client.daysSinceLastVisit,
-          appointmentCount: client.appointmentCount,
-          loyaltyTier: client.loyaltyTier,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Erro ao gerar mensagem");
-      setMessage(data.message);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoadingAI(false);
-    }
-  };
-
-  const handleSend = async () => {
-    if (!message.trim()) return;
-    setSending(true);
-    setError(null);
-    try {
-      const res = await authFetch("/api/relationship/follow-up/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clientId: client.id,
-          phone: client.phone,
-          message: message.trim(),
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Erro ao enviar mensagem");
-      setSuccess(true);
-      setTimeout(onClose, 2000);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setSending(false);
-    }
-  };
-
-  return (
+const replacement = `return (
     <AdminModalV2
       icon={Bot}
       eyebrow="Follow-up"
-      title={`Recuperar ${client.name.split(" ")[0]}`}
-      subtitle={`Ausente há ${client.daysSinceLastVisit || "?"} dias`}
+      title={\`Recuperar \${client.name.split(" ")[0]}\`}
+      subtitle={\`Ausente há \${client.daysSinceLastVisit || "?"} dias\`}
       onClose={onClose}
       size="md"
       accent="whatsapp"
@@ -165,4 +96,12 @@ export const FollowUpActionModal: React.FC<FollowUpActionModalProps> = ({ client
     </AdminModalV2>
   );
 };
+`;
 
+const replaceRegex = /return createPortal\([\s\S]*\}\;/;
+if (replaceRegex.test(content)) {
+  content = content.replace(replaceRegex, replacement);
+}
+
+fs.writeFileSync(filePath, content);
+console.log('Fixed FollowUpActionModal to AdminModalV2');

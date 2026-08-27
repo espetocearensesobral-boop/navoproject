@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from "motion/react";
 import { useTheme } from '../../contexts/ThemeContext';
 import { Professional, ServiceItem } from '../../types';
 import { fetchProfessionalsFromSupabase } from '../../services/supabaseDataService';
 import { BookingActionDock } from './BookingActionDock';
 import { UserCheck, Star, Zap, CheckCircle, ArrowLeft, ArrowRight, User, Loader2, Calendar, Clock, AlertCircle } from 'lucide-react';
 import { optimizeImageUrl } from '../../lib/imageUtils';
+import { hapticLight } from '../../lib/haptics';
 import { authFetch } from '../../lib/api';
 
 interface BookingStep2Props {
@@ -166,7 +168,9 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
             );
 
             return (
-              <div
+              <motion.div
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
                 key={barber.id}
                 role="button"
                 tabIndex={isOccupiedAtSlot ? -1 : 0}
@@ -177,20 +181,20 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                   if (isOccupiedAtSlot) return;
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    if ('vibrate' in navigator) navigator.vibrate(50);
+                    hapticLight();
                     onSelectBarber(barber);
                   }
                 }}
                 onClick={() => {
                   if (isOccupiedAtSlot) return;
-                  if ('vibrate' in navigator) navigator.vibrate(50);
+                  hapticLight();
                   onSelectBarber(barber);
                 }}
                 className={`flex items-center justify-between p-3.5 sm:p-4 rounded-card cursor-pointer transition-all duration-200 select-none relative overflow-hidden focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base ${
                   isOccupiedAtSlot
                     ? 'opacity-50 cursor-not-allowed bg-surface-card border border-status-danger/30'
                     : isSelected
-                    ? 'bg-gold-base/10 border-2 border-gold-base shadow-[0_0_20px_color-mix(in_srgb,var(--color-gold-base)_25%,transparent)] scale-[1.01]'
+                    ? 'bg-gold-base/10 border-2 border-gold-base shadow-[0_0_20px_color-mix(in_srgb,var(--color-gold-base)_25%,transparent)] '
                     : 'bg-surface-card border border-border-subtle hover:border-border-subtle hover:bg-surface-card'
                 }`}
               >
@@ -264,7 +268,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

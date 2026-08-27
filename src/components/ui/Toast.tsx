@@ -57,7 +57,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       {children}
       
       {/* Toast Container */}
-      <div className="fixed top-[calc(0.75rem+env(safe-area-inset-top))] left-3 right-3 sm:left-auto sm:top-4 sm:right-4 z-[250] flex flex-col gap-2 max-w-none sm:max-w-sm pointer-events-none" aria-live="polite">
+      <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] sm:bottom-auto sm:top-4 left-3 right-3 sm:left-auto sm:right-4 z-[250] flex flex-col-reverse sm:flex-col gap-2 max-w-none sm:max-w-sm pointer-events-none" aria-live="polite">
         {toasts.map((toast) => (
           <div
             key={toast.id}
