@@ -195,25 +195,33 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
         return;
       }
 
+      // Se o background push estiver ativado, o Service Worker já receberá a notificação
+      // do backend. Ignoramos a criação da notificação local para evitar duplicidade.
+      const shouldShowLocalAlert = !backgroundPushEnabled;
+
       for (const appointment of appointments) {
         const previous = previousSnapshot.appointments.get(appointment.id);
         const currentStatus = normalizeAppointmentStatus(appointment.status);
         if (!previous) {
-          await showNotification({
-            title: 'Novo agendamento',
-            body: `${appointment.client_name} · ${getServiceTitle(appointment)} · ${appointment.date} às ${appointment.time_slot}`,
-            tag: getAppointmentOperationKey(appointment.id, 'new'),
-          });
+          if (shouldShowLocalAlert) {
+            await showNotification({
+              title: 'Novo agendamento',
+              body: `${appointment.client_name} · ${getServiceTitle(appointment)} · ${appointment.date} às ${appointment.time_slot}`,
+              tag: getAppointmentOperationKey(appointment.id, 'new'),
+            });
+          }
           continue;
         }
         const previousStatus = normalizeAppointmentStatus(previous.status);
         if (previousStatus !== currentStatus) {
           const copy = appointmentStatusCopy[currentStatus];
-          if (copy) await showNotification({
-            title: copy.title,
-            body: `${appointment.client_name} · ${getServiceTitle(appointment)} · ${copy.body}`,
-            tag: getAppointmentOperationKey(appointment.id, currentStatus),
-          });
+          if (copy && shouldShowLocalAlert) {
+            await showNotification({
+              title: copy.title,
+              body: `${appointment.client_name} · ${getServiceTitle(appointment)} · ${copy.body}`,
+              tag: getAppointmentOperationKey(appointment.id, currentStatus),
+            });
+          }
         }
       }
 
@@ -223,30 +231,36 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
       for (const [appointmentId, previous] of previousSnapshot.appointments.entries()) {
         if (nextSnapshot.appointments.has(appointmentId) || normalizeAppointmentStatus(previous.status) === 'cancelled') continue;
         const copy = appointmentStatusCopy.cancelled;
-        await showNotification({
-          title: copy.title,
-          body: `${previous.client_name} · ${getServiceTitle(previous)} · ${copy.body}`,
-          tag: getAppointmentOperationKey(appointmentId, 'cancelled'),
-        });
+        if (shouldShowLocalAlert) {
+          await showNotification({
+            title: copy.title,
+            body: `${previous.client_name} · ${getServiceTitle(previous)} · ${copy.body}`,
+            tag: getAppointmentOperationKey(appointmentId, 'cancelled'),
+          });
+        }
       }
 
       for (const item of queue) {
         const previous = previousSnapshot.queue.get(item.id);
         if (!previous) {
-          await showNotification({
-            title: 'Novo cliente na fila',
-            body: `${item.client_name} · ${item.service_title} · ${item.professional_name || 'Profissional a definir'}`,
-            tag: getQueueOperationKey(item, 'new'),
-          });
+          if (shouldShowLocalAlert) {
+            await showNotification({
+              title: 'Novo cliente na fila',
+              body: `${item.client_name} · ${item.service_title} · ${item.professional_name || 'Profissional a definir'}`,
+              tag: getQueueOperationKey(item, 'new'),
+            });
+          }
           continue;
         }
         if (previous.status !== item.status) {
           const copy = queueStatusCopy[item.status];
-          if (copy) await showNotification({
-            title: copy.title,
-            body: `${item.client_name} · ${item.service_title} · ${copy.body}`,
-            tag: getQueueOperationKey(item, item.status),
-          });
+          if (copy && shouldShowLocalAlert) {
+            await showNotification({
+              title: copy.title,
+              body: `${item.client_name} · ${item.service_title} · ${copy.body}`,
+              tag: getQueueOperationKey(item, item.status),
+            });
+          }
         }
       }
 
@@ -254,11 +268,13 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
         const previous = previousSnapshot.receipts.get(receipt.id);
         if (!previous || previous.status !== receipt.status) {
           const copy = receiptStatusCopy[receipt.status];
-          if (copy) await showNotification({
-            title: copy.title,
-            body: `${receipt.clientName} · ${receipt.serviceTitle} · R$ ${Number(receipt.totalAmount || 0).toFixed(2).replace('.', ',')}`,
-            tag: getReceiptOperationKey(receipt, receipt.status),
-          });
+          if (copy && shouldShowLocalAlert) {
+            await showNotification({
+              title: copy.title,
+              body: `${receipt.clientName} · ${receipt.serviceTitle} · R$ ${Number(receipt.totalAmount || 0).toFixed(2).replace('.', ',')}`,
+              tag: getReceiptOperationKey(receipt, receipt.status),
+            });
+          }
         }
       }
 
@@ -268,7 +284,7 @@ export function useAdminOperationNotifications(isAuthorized = true): AdminNotifi
     } finally {
       isPollingRef.current = false;
     }
-  }, [isAuthorized, isEnabled, isSupported, showNotification]);
+  }, [isAuthorized, isEnabled, isSupported, showNotification, backgroundPushEnabled]);
 
   useEffect(() => {
     if (!isAuthorized || !isSupported || permission !== 'granted' || !isEnabled) {
