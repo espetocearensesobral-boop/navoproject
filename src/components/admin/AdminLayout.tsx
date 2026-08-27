@@ -461,6 +461,7 @@ export const AdminLayout: React.FC = () => {
       "relacionamento_followup",
       "relacionamento_reviews",
       "relacionamento_birthdays",
+      "lembretes",
     ],
   },
   {
@@ -479,7 +480,7 @@ export const AdminLayout: React.FC = () => {
     label: "Marketing & Retenção",
     tabs: ["campanhas", "fidelidade", "premios", "assinaturas", "indicacoes"],
   },
-  { label: "Configuração", tabs: ["lembretes", "sistema"] },
+  { label: "Configuração", tabs: ["sistema"] },
 ];
 
  const renderSidebarNavigation = (mobile = false) => (

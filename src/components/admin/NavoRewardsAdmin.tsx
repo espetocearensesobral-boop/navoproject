@@ -747,7 +747,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  <div className="space-y-4 min-w-0">
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
  {/* Distribuição por Nível VIP */}
- <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
+ <div className="bg-[var(--admin-surface)] p-5 space-y-4">
  <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
  <Crown className="w-4 h-4 text-[var(--admin-accent)]"/>
  <span>Distribuição por Nível VIP</span>
@@ -833,7 +833,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  </div>
 
  {/* Maiores Embaixadores */}
- <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
+ <div className="bg-[var(--admin-surface)] p-5 space-y-4">
  <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
  <Users className="w-4 h-4 text-[var(--admin-accent)]"/>
  <span>Top embaixadores</span>
@@ -888,982 +888,291 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  )}
 
  {/* TAB 2: CLUBE DE FIDELIDADE & NÍVEIS */}
- {activeTab ==="loyalty"&& (
- <div className="space-y-4 min-w-0">
- <form
- onKeyDown={handleEnterAsTab}
- onSubmit={handleSaveConfig}
- className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-4"
- >
- <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[var(--admin-border)]">
- <div>
- <h3 className="text-sm font-serif font-bold text-[var(--admin-text-main)] flex items-center gap-2">
- <Crown className="w-4 h-4 text-[var(--admin-accent)]"/>
- <span>Pontos e validade</span>
- </h3>
- <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
- Ajuste a taxa de conversão, multiplicadores e expiração.
- </p>
- </div>
+      {activeTab === "loyalty" && (
+        <div className="space-y-6 min-w-0">
+          <form
+            onKeyDown={handleEnterAsTab}
+            onSubmit={handleSaveConfig}
+            className="space-y-6"
+          >
+            <div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[var(--admin-border)]">
+                <div>
+                  <h3 className="text-sm font-serif font-bold text-[var(--admin-text-main)] flex items-center gap-2">
+                    <Crown className="w-4 h-4 text-[var(--admin-accent)]" />
+                    <span>Pontos e validade</span>
+                  </h3>
+                  <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
+                    Ajuste a taxa de conversão, multiplicadores e expiração.
+                  </p>
+                </div>
+                <button
+                  type="submit"
+                  disabled={savingConfig}
+                  className="h-9 px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-2 hover:bg-[var(--admin-accent)]/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>{savingConfig ? "Salvando..." : "Salvar Regras"}</span>
+                </button>
+              </div>
 
- <button
- type="submit"
- disabled={savingConfig}
- className="h-9 px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-2 hover:bg-[var(--admin-accent)]/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
- >
- <Save className="w-3.5 h-3.5"/>
- <span>{savingConfig ?"Salvando...":"Salvar Regras"}</span>
- </button>
- </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1">
+                    <DollarSign className="w-3.5 h-3.5" />
+                    Razão de Conversão
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[var(--admin-text-muted)] font-bold">
+                      R$
+                    </span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      value={config.currencyPerPoint}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          currencyPerPoint: Number(e.target.value),
+                        })
+                      }
+                      className="w-full bg-[var(--admin-bg)] border-b border-transparent focus:border-[var(--admin-accent)] rounded-none p-2 text-[var(--admin-text-main)] text-sm sm:text-xs font-bold focus:outline-none num-tabular"
+                    />
+                    <span className="text-[var(--admin-text-muted)] font-bold whitespace-nowrap">
+                      = 1 Pts
+                    </span>
+                  </div>
+                </div>
 
- <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
- <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
- <label className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1">
- <DollarSign className="w-3.5 h-3.5"/> Razão de Conversão
- </label>
- <div className="flex items-center gap-2">
- <span className="text-[var(--admin-text-muted)] font-bold">
- R$
- </span>
- <input
- type="number"
- step="0.1"
- min="0.1"
- value={config.currencyPerPoint}
- onChange={(e) =>
- setConfig({
- ...config,
- currencyPerPoint: Number(e.target.value),
- })
- }
- className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] text-xs font-bold focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
- />
- <span className="text-[var(--admin-text-muted)] font-bold whitespace-nowrap">
- = 1 Pts
- </span>
- </div>
- </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    Validade (Dias)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      value={config.expirationDays}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          expirationDays: Number(e.target.value),
+                        })
+                      }
+                      className="w-full bg-[var(--admin-bg)] border-b border-transparent focus:border-[var(--admin-accent)] rounded-none p-2 text-[var(--admin-text-main)] text-sm sm:text-xs font-bold focus:outline-none num-tabular"
+                    />
+                    <span className="text-[var(--admin-text-muted)] font-bold">
+                      dias
+                    </span>
+                  </div>
+                </div>
 
- <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
- <label className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1">
- <Clock className="w-3.5 h-3.5"/> Validade (Dias)
- </label>
- <div className="flex items-center gap-2">
- <input
- type="number"
- min="0"
- value={config.pointsValidityDays}
- onChange={(e) =>
- setConfig({
- ...config,
- pointsValidityDays: Number(e.target.value),
- })
- }
- className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] text-xs font-bold focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
- />
- <span className="text-[var(--admin-text-muted)] font-bold">
- dias
- </span>
- </div>
- </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1">
+                    <Gift className="w-3.5 h-3.5" />
+                    Bônus Aniversário
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      value={config.birthdayBonus}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          birthdayBonus: Number(e.target.value),
+                        })
+                      }
+                      className="w-full bg-[var(--admin-bg)] border-b border-transparent focus:border-[var(--admin-accent)] rounded-none p-2 text-[var(--admin-text-main)] text-sm sm:text-xs font-bold focus:outline-none num-tabular"
+                    />
+                    <span className="text-[var(--admin-text-muted)] font-bold">
+                      pts
+                    </span>
+                  </div>
+                </div>
+              </div>
 
- <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
- <label className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1">
- <Gift className="w-3.5 h-3.5"/> Bônus Aniversário
- </label>
- <div className="flex items-center gap-2">
- <input
- type="number"
- min="0"
- value={config.birthdayBonus}
- onChange={(e) =>
- setConfig({
- ...config,
- birthdayBonus: Number(e.target.value),
- })
- }
- className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] text-xs font-bold focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
- />
- <span className="text-[var(--admin-text-muted)] font-bold">
- pts
- </span>
- </div>
- </div>
- </div>
+              <div className="pt-3 text-xs text-[var(--admin-text-muted)]">
+                As alterações afetam novos créditos. Saldos antigos não são recalculados.
+              </div>
+            </div>
+          </form>
 
- <div className="pt-2 text-xs text-[var(--admin-text-muted)]">
- Os limites e multiplicadores dos níveis são mantidos na seção de
- níveis persistidos abaixo. As alterações passam por validação no
- servidor e afetam novos créditos, sem recalcular saldos
- históricos.
- </div>
- </form>
+          <div className="space-y-4 pt-4 border-t border-[var(--admin-border)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-[var(--admin-accent)]" /> Níveis VIP
+                </h3>
+                <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
+                  Mínimo de pontos e multiplicador aplicados no checkout.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTiers((current) => [
+                      ...current,
+                      {
+                        name: "Novo nível",
+                        minimumPoints: 0,
+                        multiplier: 1,
+                        displayOrder: current.length,
+                        color: "#D4AF5A",
+                        isActive: true,
+                      },
+                    ])
+                  }
+                  className="admin-btn admin-btn-sm admin-btn-secondary font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Novo nível
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveTiers}
+                  disabled={savingTiers || tiers.length === 0}
+                  className="admin-btn admin-btn-sm admin-btn-primary font-bold text-xs disabled:opacity-50 cursor-pointer"
+                >
+                  {savingTiers ? "Salvando..." : "Salvar níveis"}
+                </button>
+              </div>
+            </div>
 
- <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
- <div>
- <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
- <Crown className="w-4 h-4 text-[var(--admin-accent)]"/>{""}
- Níveis VIP reais
- </h3>
- <p className="text-xs text-[var(--admin-text-muted)] mt-1">
- Defina o mínimo de pontos e o multiplicador usado no próximo
- checkout confirmado.
- </p>
- </div>
- <div className="flex gap-2">
- <button
- type="button"
- onClick={() =>
- setTiers((current) => [
- ...current,
- {
- name:"Novo nível",
- minimumPoints: 0,
- multiplier: 1,
- displayOrder: current.length,
- color:"#D4AF5A",
- isActive: true,
- },
- ])
- }
- className="admin-btn admin-btn-sm admin-btn-secondary font-bold text-xs flex items-center gap-1.5 cursor-pointer"
- >
- <Plus className="w-3.5 h-3.5"/> Novo nível
- </button>
- <button
- type="button"
- onClick={handleSaveTiers}
- disabled={savingTiers || tiers.length === 0}
- className="admin-btn admin-btn-sm admin-btn-primary font-bold text-xs disabled:opacity-50 cursor-pointer"
- >
- {savingTiers ?"Salvando...":"Salvar níveis"}
- </button>
- </div>
- </div>
- <div className="space-y-2">
- {tiers.map((tier, index) => (
- <div
- key={tier.id || index}
- className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_120px_100px_82px_70px_auto] gap-2 items-center rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-2.5"
- >
- <input
- value={tier.name}
- onChange={(e) =>
- setTiers((current) =>
- current.map((item, itemIndex) =>
- itemIndex === index
- ? { ...item, name: e.target.value }
- : item,
- ),
- )
- }
- className="min-w-0 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2 text-xs font-bold text-[var(--admin-text-main)]"
- aria-label={`Nome do nível ${index + 1}`}
- />
- <input
- type="number"
- min="0"
- step="1"
- value={tier.minimumPoints}
- onChange={(e) =>
- setTiers((current) =>
- current.map((item, itemIndex) =>
- itemIndex === index
- ? { ...item, minimumPoints: Number(e.target.value) }
- : item,
- ),
- )
- }
- className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2 text-xs text-[var(--admin-text-main)] num-tabular"
- aria-label={`Pontos mínimos do nível ${index + 1}`}
- />
- <input
- type="number"
- min="0.1"
- max="20"
- step="0.1"
- value={tier.multiplier}
- onChange={(e) =>
- setTiers((current) =>
- current.map((item, itemIndex) =>
- itemIndex === index
- ? { ...item, multiplier: Number(e.target.value) }
- : item,
- ),
- )
- }
- className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2 text-xs text-[var(--admin-text-main)] num-tabular"
- aria-label={`Multiplicador do nível ${index + 1}`}
- />
- <input
- type="number"
- min="0"
- step="1"
- value={tier.displayOrder}
- onChange={(e) =>
- setTiers((current) =>
- current.map((item, itemIndex) =>
- itemIndex === index
- ? { ...item, displayOrder: Number(e.target.value) }
- : item,
- ),
- )
- }
- className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2 text-xs text-[var(--admin-text-main)] num-tabular"
- aria-label={`Ordem do nível ${index + 1}`}
- />
- <input
- type="color"
- value={tier.color ||"#D4AF5A"}
- onChange={(e) =>
- setTiers((current) =>
- current.map((item, itemIndex) =>
- itemIndex === index
- ? { ...item, color: e.target.value }
- : item,
- ),
- )
- }
- className="w-full h-9 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-1"
- aria-label={`Cor do nível ${index + 1}`}
- />
- <label className="flex items-center gap-2 text-xs text-[var(--admin-text-muted)]">
- <input
- type="checkbox"
- checked={Boolean(tier.isActive)}
- onChange={(e) =>
- setTiers((current) =>
- current.map((item, itemIndex) =>
- itemIndex === index
- ? { ...item, isActive: e.target.checked }
- : item,
- ),
- )
- }
- />{""}
- Ativo
- </label>
- </div>
- ))}
- </div>
- </div>
+            <div className="space-y-3">
+              {tiers.map((tier, index) => (
+                <div
+                  key={tier.id || index}
+                  className="flex flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_120px_100px_82px_70px_auto] gap-3 sm:gap-4 items-center bg-[var(--admin-surface)] border-l-2 border-transparent hover:border-[var(--admin-accent)] p-3 transition-colors"
+                >
+                  <div className="w-full sm:w-auto">
+                    <label className="block sm:hidden text-[10px] font-bold uppercase text-[var(--admin-text-muted)] mb-1">Nome do nível</label>
+                    <input
+                      value={tier.name}
+                      onChange={(e) =>
+                        setTiers((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? { ...item, name: e.target.value }
+                              : item,
+                          ),
+                        )
+                      }
+                      className="w-full sm:min-w-0 bg-transparent border-b border-[var(--admin-border)] rounded-none p-2 text-sm sm:text-xs font-bold text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                      aria-label={`Nome do nível ${index + 1}`}
+                    />
+                  </div>
 
- <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
- <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3 min-w-0">
- <div className="flex items-start justify-between gap-3">
- <div>
- <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider">
- Benefícios do Club
- </h3>
- <p className="text-xs text-[var(--admin-text-muted)] mt-1">
- Crie vantagens, descontos, cortes, produtos e regras de uso.
- </p>
- </div>
- <button
- type="button"
- onClick={() => openBenefitEditor()}
- className="admin-btn admin-btn-sm admin-btn-primary font-bold text-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
- >
- <Plus className="w-3.5 h-3.5"/> Novo benefício
- </button>
- </div>
- <div className="space-y-2">
- {benefits.length === 0 ? (
- <p className="text-xs text-[var(--admin-text-muted)] py-5 text-center">
- Nenhum benefício cadastrado.
- </p>
- ) : (
- benefits.map((benefit) => (
- <div
- key={benefit.id}
- className="p-3 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-start justify-between gap-3"
- >
- <div className="min-w-0">
- <div className="flex flex-wrap items-center gap-1.5">
- <span className="font-bold text-xs text-[var(--admin-text-main)]">
- {benefit.name}
- </span>
- {!benefit.isActive && (
- <span className="text-xs rounded-[var(--admin-radius-full)] px-2 py-0.5 bg-status-error/10 text-status-error font-bold">
- INATIVO
- </span>
- )}
- </div>
- <p className="text-xs text-[var(--admin-text-muted)] mt-1 line-clamp-2">
- {benefit.description}
- </p>
- <p className="text-xs text-[var(--admin-accent)] mt-1 font-bold">
- {benefit.benefitType}{""}
- {benefit.valueAmount !== null &&
- benefit.valueAmount !== undefined
- ? `• R$ ${Number(benefit.valueAmount).toFixed(2).replace(".",",")}`
- :""}{""}
- {benefit.tierIds?.length
- ? `• ${benefit.tierIds.length} nível(is)`
- :""}
- </p>
- </div>
- <div className="flex gap-1 shrink-0">
- <button
- type="button"
- onClick={() => openBenefitEditor(benefit)}
- className="h-8 px-2.5 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-[var(--admin-text-main)] text-xs font-bold"
- >
- Editar
- </button>
- {benefit.isActive && (
- <button
- type="button"
- onClick={async () => {
- if (!confirm("Desativar este benefício?")) return;
- try {
- await archiveLoyaltyBenefit(benefit.id);
- await loadData();
- } catch (err: any) {
- alert(
- err.message ||"Erro ao desativar benefício.",
- );
- }
- }}
- className="h-8 w-8 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-status-error flex items-center justify-center"
- title="Desativar benefício"
- >
- <Trash2 className="w-3.5 h-3.5"/>
- </button>
- )}
- </div>
- </div>
- ))
- )}
- </div>
- </div>
+                  <div className="w-full sm:w-auto">
+                    <label className="block sm:hidden text-[10px] font-bold uppercase text-[var(--admin-text-muted)] mb-1">Pts Mínimos</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={tier.minimumPoints}
+                      onChange={(e) =>
+                        setTiers((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? { ...item, minimumPoints: Number(e.target.value) }
+                              : item,
+                          ),
+                        )
+                      }
+                      className="w-full bg-[var(--admin-surface)] sm:bg-transparent border-b border-[var(--admin-border)] rounded-none p-2 text-sm sm:text-xs text-[var(--admin-text-main)] num-tabular focus:outline-none focus:border-[var(--admin-accent)]"
+                    />
+                  </div>
 
- <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3 min-w-0">
- <div className="flex items-start justify-between gap-3">
- <div>
- <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider">
- Planos do Club
- </h3>
- <p className="text-xs text-[var(--admin-text-muted)] mt-1">
- Defina nome, preço, periodicidade, bônus e benefícios. Ainda
- sem cobrança automática.
- </p>
- </div>
- <button
- type="button"
- onClick={() => openPlanEditor()}
- className="admin-btn admin-btn-sm admin-btn-primary font-bold text-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
- >
- <Plus className="w-3.5 h-3.5"/> Novo plano
- </button>
- </div>
- <div className="space-y-2">
- {plans.length === 0 ? (
- <p className="text-xs text-[var(--admin-text-muted)] py-5 text-center">
- Nenhum plano cadastrado.
- </p>
- ) : (
- plans.map((plan) => (
- <div
- key={plan.id}
- className="p-3 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-start justify-between gap-3"
- >
- <div className="min-w-0">
- <div className="flex flex-wrap items-center gap-1.5">
- <span className="font-bold text-xs text-[var(--admin-text-main)]">
- {plan.name}
- </span>
- <span
- className={`text-xs rounded-[var(--admin-radius-full)] px-2 py-0.5 font-bold ${plan.status ==="active"?"bg-status-success/10 text-status-success":"bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"}`}
- >
- {plan.status.toUpperCase()}
- </span>
- {plan.isFeatured && (
- <span className="text-xs rounded-[var(--admin-radius-full)] px-2 py-0.5 bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] font-bold">
- DESTAQUE
- </span>
- )}
- </div>
- <p className="text-xs text-[var(--admin-text-muted)] mt-1 line-clamp-2">
- {plan.description}
- </p>
- <p className="text-xs text-[var(--admin-accent)] mt-1 font-bold">
- R${""}
- {Number(plan.price || 0)
- .toFixed(2)
- .replace(".",",")}{""}
- {plan.billingPeriod !=="none"
- ? `• ${plan.billingPeriod}`
- :"• único"}{""}
- {plan.pointsBonus ? `• +${plan.pointsBonus} pts` :""}
- </p>
- </div>
- <div className="flex gap-1 shrink-0">
- <button
- type="button"
- onClick={() => openPlanEditor(plan)}
- className="h-8 px-2.5 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-[var(--admin-text-main)] text-xs font-bold"
- >
- Editar
- </button>
- {plan.status !=="archived"&& (
- <button
- type="button"
- onClick={async () => {
- if (!confirm("Arquivar este plano?")) return;
- try {
- await archiveLoyaltyPlan(plan.id);
- await loadData();
- } catch (err: any) {
- alert(err.message ||"Erro ao arquivar plano.");
- }
- }}
- className="h-8 w-8 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-status-error flex items-center justify-center"
- title="Arquivar plano"
- >
- <Trash2 className="w-3.5 h-3.5"/>
- </button>
- )}
- </div>
- </div>
- ))
- )}
- </div>
- </div>
- </div>
+                  <div className="w-full sm:w-auto">
+                    <label className="block sm:hidden text-[10px] font-bold uppercase text-[var(--admin-text-muted)] mb-1">Multiplicador</label>
+                    <div className="relative w-full">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--admin-text-muted)]">
+                        x
+                      </span>
+                      <input
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        value={tier.multiplier}
+                        onChange={(e) =>
+                          setTiers((current) =>
+                            current.map((item, itemIndex) =>
+                              itemIndex === index
+                                ? { ...item, multiplier: Number(e.target.value) }
+                                : item,
+                            ),
+                          )
+                        }
+                        className="w-full pl-6 bg-[var(--admin-surface)] sm:bg-transparent border-b border-[var(--admin-border)] rounded-none p-2 text-sm sm:text-xs text-[var(--admin-text-main)] num-tabular focus:outline-none focus:border-[var(--admin-accent)]"
+                      />
+                    </div>
+                  </div>
 
- {showBenefitModal && (
- <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-[var(--admin-bg)]/80 backdrop-blur-md">
- <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)] p-5 sm:p-6 shadow-2xl">
- <div className="mb-4">
- <h3 className="text-base font-serif font-bold text-[var(--admin-text-main)]">
- {editingBenefit ?"Editar benefício":"Novo benefício"}
- </h3>
- <p className="text-xs text-[var(--admin-text-muted)] mt-1">
- O benefício é cadastrado no banco e pode ser vinculado a um
- ou mais níveis.
- </p>
- </div>
- <form
- onKeyDown={handleEnterAsTab}
- onSubmit={handleSaveBenefit}
- className="space-y-3 text-xs"
- >
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Nome
- </span>
- <input
- autoFocus
- required
- value={benefitDraft.name}
- onChange={(e) =>
- setBenefitDraft({
- ...benefitDraft,
- name: e.target.value,
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- />
- </label>
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Tipo
- </span>
- <select
- value={benefitDraft.benefitType}
- onChange={(e) =>
- setBenefitDraft({
- ...benefitDraft,
- benefitType: e.target.value,
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- >
- <option value="discount_percent">
- Desconto percentual
- </option>
- <option value="discount_fixed">Desconto fixo</option>
- <option value="free_service">Serviço grátis</option>
- <option value="free_product">Produto grátis</option>
- <option value="points_bonus">Bônus de pontos</option>
- <option value="priority_queue">
- Prioridade na fila
- </option>
- <option value="custom">Personalizado</option>
- </select>
- </label>
- </div>
- <label className="space-y-1 block">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Descrição
- </span>
- <textarea
- required
- value={benefitDraft.description}
- onChange={(e) =>
- setBenefitDraft({
- ...benefitDraft,
- description: e.target.value,
- })
- }
- className="w-full min-h-[72px] bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- />
- </label>
- <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Valor numérico
- </span>
- <input
- type="number"
- min="0"
- step="0.01"
- value={benefitDraft.valueAmount ??""}
- onChange={(e) =>
- setBenefitDraft({
- ...benefitDraft,
- valueAmount:
- e.target.value ===""
- ? null
- : Number(e.target.value),
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- placeholder="Ex.: 10"
- />
- </label>
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Texto do valor
- </span>
- <input
- value={benefitDraft.valueText ||""}
- onChange={(e) =>
- setBenefitDraft({
- ...benefitDraft,
- valueText: e.target.value,
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- placeholder="Ex.: 10% OFF"
- />
- </label>
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Validade (dias)
- </span>
- <input
- type="number"
- min="1"
- value={benefitDraft.validityDays ??""}
- onChange={(e) =>
- setBenefitDraft({
- ...benefitDraft,
- validityDays:
- e.target.value ===""
- ? null
- : Number(e.target.value),
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- placeholder="Opcional"
- />
- </label>
- </div>
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Serviço relacionado
- </span>
- <select
- value={benefitDraft.serviceId ||""}
- onChange={(e) =>
- setBenefitDraft({
- ...benefitDraft,
- serviceId: e.target.value,
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- >
- <option value="">Todos os serviços</option>
- {services.map((service) => (
- <option key={service.id} value={service.id}>
- {service.title} — R${""}
- {Number(service.price || 0)
- .toFixed(2)
- .replace(".",",")}
- </option>
- ))}
- </select>
- </label>
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Produto relacionado
- </span>
- <select
- value={benefitDraft.productId ||""}
- onChange={(e) =>
- setBenefitDraft({
- ...benefitDraft,
- productId: e.target.value,
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- >
- <option value="">Todos os produtos</option>
- {products.map((product) => (
- <option key={product.id} value={product.id}>
- {product.name} — R${""}
- {Number(product.price || 0)
- .toFixed(2)
- .replace(".",",")}
- </option>
- ))}
- </select>
- </label>
- </div>
- <div>
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase mb-2">
- Níveis elegíveis
- </span>
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
- {tiers.map((tier) => (
- <label
- key={tier.id}
- className="flex items-start gap-2 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-2 text-xs text-[var(--admin-text-main)]"
- >
- <input
- type="checkbox"
- disabled={!tier.id}
- checked={Boolean(
- tier.id &&
- (benefitDraft.tierIds || []).includes(tier.id),
- )}
- onChange={(e) =>
- setBenefitDraft({
- ...benefitDraft,
- tierIds: e.target.checked
- ? [...(benefitDraft.tierIds || []), tier.id]
- : (benefitDraft.tierIds || []).filter(
- (id: string) => id !== tier.id,
- ),
- })
- }
- />
- {tier.name}
- {!tier.id && (
- <span className="text-xs text-[var(--admin-text-muted)]">
- (salve primeiro)
- </span>
- )}
- </label>
- ))}
- </div>
- </div>
- <div className="flex gap-2 pt-2">
- <button
- type="button"
- onClick={() => {
- setShowBenefitModal(false);
- setEditingBenefit(null);
- }}
- className="flex-1 h-10 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] font-bold"
- >
- Cancelar
- </button>
- <button
- type="submit"
- disabled={savingCatalogItem}
- className="flex-1 h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold disabled:opacity-50"
- >
- {savingCatalogItem ?"Salvando...":"Salvar benefício"}
- </button>
- </div>
- </form>
- </div>
- </div>
- )}
+                  <div className="w-full sm:w-auto">
+                    <label className="block sm:hidden text-[10px] font-bold uppercase text-[var(--admin-text-muted)] mb-1">Cor</label>
+                    <input
+                      type="color"
+                      value={tier.color}
+                      onChange={(e) =>
+                        setTiers((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? { ...item, color: e.target.value }
+                              : item,
+                          ),
+                        )
+                      }
+                      className="w-full h-8 sm:h-9 cursor-pointer rounded bg-transparent border-none p-0 focus:outline-none"
+                    />
+                  </div>
 
- {showPlanModal && (
- <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-[var(--admin-bg)]/80 backdrop-blur-md">
- <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)] p-5 sm:p-6 shadow-2xl">
- <div className="mb-4">
- <h3 className="text-base font-serif font-bold text-[var(--admin-text-main)]">
- {editingPlan ?"Editar plano":"Novo plano"}
- </h3>
- <p className="text-xs text-[var(--admin-text-muted)] mt-1">
- O valor é salvo como catálogo. Nenhuma cobrança ou
- assinatura é criada nesta etapa.
- </p>
- </div>
- <form
- onKeyDown={handleEnterAsTab}
- onSubmit={handleSavePlan}
- className="space-y-3 text-xs"
- >
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Nome
- </span>
- <input
- autoFocus
- required
- value={planDraft.name}
- onChange={(e) =>
- setPlanDraft({ ...planDraft, name: e.target.value })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- />
- </label>
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Preço (R$)
- </span>
- <input
- type="number"
- min="0"
- step="0.01"
- value={planDraft.price}
- onChange={(e) =>
- setPlanDraft({
- ...planDraft,
- price: Number(e.target.value),
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- />
- </label>
- </div>
- <label className="space-y-1 block">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Descrição
- </span>
- <textarea
- required
- value={planDraft.description}
- onChange={(e) =>
- setPlanDraft({
- ...planDraft,
- description: e.target.value,
- })
- }
- className="w-full min-h-[72px] bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- />
- </label>
- <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Periodicidade
- </span>
- <select
- value={planDraft.billingPeriod}
- onChange={(e) =>
- setPlanDraft({
- ...planDraft,
- billingPeriod: e.target.value,
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- >
- <option value="none">Pagamento único / catálogo</option>
- <option value="monthly">Mensal</option>
- <option value="quarterly">Trimestral</option>
- <option value="annual">Anual</option>
- </select>
- </label>
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Bônus de pontos
- </span>
- <input
- type="number"
- min="0"
- value={planDraft.pointsBonus}
- onChange={(e) =>
- setPlanDraft({
- ...planDraft,
- pointsBonus: Number(e.target.value),
- })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- />
- </label>
- <label className="space-y-1">
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase">
- Status
- </span>
- <select
- value={planDraft.status}
- onChange={(e) =>
- setPlanDraft({ ...planDraft, status: e.target.value })
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
- >
- <option value="draft">Rascunho</option>
- <option value="active">Ativo</option>
- <option value="archived">Arquivado</option>
- </select>
- </label>
- </div>
- <label className="flex items-center gap-2 text-xs text-[var(--admin-text-main)]">
- <input
- type="checkbox"
- checked={Boolean(planDraft.isFeatured)}
- onChange={(e) =>
- setPlanDraft({
- ...planDraft,
- isFeatured: e.target.checked,
- })
- }
- />{""}
- Destacar este plano para o cliente
- </label>
- <div>
- <span className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase mb-2">
- Benefícios incluídos
- </span>
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto">
- {benefits
- .filter((benefit) => benefit.isActive)
- .map((benefit) => (
- <label
- key={benefit.id}
- className="flex items-start gap-2 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-2 text-xs text-[var(--admin-text-main)]"
- >
- <input
- type="checkbox"
- checked={(planDraft.benefitIds || []).includes(
- benefit.id,
- )}
- onChange={(e) =>
- setPlanDraft({
- ...planDraft,
- benefitIds: e.target.checked
- ? [
- ...(planDraft.benefitIds || []),
- benefit.id,
- ]
- : (planDraft.benefitIds || []).filter(
- (id: string) => id !== benefit.id,
- ),
- })
- }
- />
- <span>
- <strong>{benefit.name}</strong>
- <span className="block text-[var(--admin-text-muted)] mt-0.5">
- {benefit.description}
- </span>
- </span>
- </label>
- ))}
- </div>
- </div>
- <div className="flex gap-2 pt-2">
- <button
- type="button"
- onClick={() => {
- setShowPlanModal(false);
- setEditingPlan(null);
- }}
- className="flex-1 h-10 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] font-bold"
- >
- Cancelar
- </button>
- <button
- type="submit"
- disabled={savingCatalogItem}
- className="flex-1 h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold disabled:opacity-50"
- >
- {savingCatalogItem ?"Salvando...":"Salvar plano"}
- </button>
- </div>
- </form>
- </div>
- </div>
- )}
+                  <div className="w-full sm:w-auto flex items-center justify-between sm:justify-center">
+                    <label className="block sm:hidden text-[10px] font-bold uppercase text-[var(--admin-text-muted)] mb-1">Ativo</label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setTiers((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? { ...item, isActive: !item.isActive }
+                              : item,
+                          ),
+                        )
+                      }
+                      className={`w-10 h-5 rounded-full relative transition-colors focus:outline-none ${
+                        tier.isActive ? "bg-status-success" : "bg-[var(--admin-border)]"
+                      }`}
+                    >
+                      <div
+                        className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                          tier.isActive ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </button>
+                  </div>
 
- {/* Ajuste Manual */}
- <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
- <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
- <Zap className="w-4 h-4 text-[var(--admin-accent)]"/>
- <span>Ajuste Manual de Pontuação de Clientes</span>
- </h3>
-
- <form
- onKeyDown={handleEnterAsTab}
- onSubmit={handleManualPointsSubmit}
- className="space-y-3 w-full text-xs"
- >
- <div>
- <label className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider mb-1">
- Selecione o Cliente
- </label>
- <select
- value={selectedClient}
- onChange={(e) => setSelectedClient(e.target.value)}
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
- >
- <option value="">-- Escolha o cliente --</option>
- {clients.map((c) => (
- <option key={c.id} value={c.id}>
- {c.name} ({c.phone ||"Sem tel"}) - Atual:{""}
- {c.loyaltyPoints || 0} pts
- </option>
- ))}
- </select>
- </div>
-
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
- <div>
- <label className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider mb-1">
- Pontos (Ex: +100 ou -50)
- </label>
- <input
- type="number"
- value={manualPointsAmount}
- onChange={(e) =>
- setManualPointsAmount(Number(e.target.value))
- }
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
- />
- </div>
- <div>
- <label className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider mb-1">
- Motivo
- </label>
- <input
- type="text"
- placeholder="Ex: Cortesia VIP"
- value={manualPointsReason}
- onChange={(e) => setManualPointsReason(e.target.value)}
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
- />
- </div>
- </div>
-
- <button
- type="submit"
- className="h-9 px-4 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold rounded-[var(--admin-radius-lg)] hover:bg-[var(--admin-accent)]/90 text-xs active:scale-95"
- >
- Aplicar Ajuste de Pontos
- </button>
-
- {manualSuccessMsg && (
- <div className="p-2.5 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-[var(--admin-radius-lg)]">
- {manualSuccessMsg}
- </div>
- )}
- </form>
- </div>
- </div>
- )}
-
- {/* TAB 3: CATÁLOGO DE PRÊMIOS & CUPONS */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setTiers((current) =>
+                        current.filter((_, itemIndex) => itemIndex !== index),
+                      )
+                    }
+                    className="w-full sm:w-auto sm:p-2 flex items-center justify-center text-[var(--admin-text-muted)] hover:text-status-error focus:outline-none sm:opacity-50 sm:hover:opacity-100"
+                    aria-label="Remover nível"
+                  >
+                    <Trash2 className="w-4 h-4 hidden sm:block" />
+                    <span className="sm:hidden text-xs font-bold text-status-error flex items-center gap-1"><Trash2 className="w-3.5 h-3.5"/> Remover nível</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* TAB 3: CATÁLOGO DE PRÊMIOS & CUPONS */}
  {activeTab ==="rewards"&& (
  <div className="space-y-4 min-w-0">
  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-[var(--admin-surface)] p-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)]">
@@ -2056,221 +1365,221 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  )}
 
  {/* TAB 4: MOTOR DE INDICAÇÕES */}
- {activeTab ==="referrals"&& (
- <div className="space-y-4 min-w-0">
- <form
- onKeyDown={handleEnterAsTab}
- onSubmit={handleSaveConfig}
- className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-4"
- >
- <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[var(--admin-border)]">
- <div>
- <h3 className="text-sm font-serif font-bold text-[var(--admin-text-main)] flex items-center gap-2">
- <Users className="w-4 h-4 text-[var(--admin-accent)]"/>
- <span>Configuração do Motor de Indicações</span>
- </h3>
- <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
- Defina os bônus para quem indica e quem é indicado.
- </p>
- </div>
+      {activeTab === "referrals" && (
+        <div className="space-y-8 min-w-0">
+          <form
+            onKeyDown={handleEnterAsTab}
+            onSubmit={handleSaveConfig}
+            className="space-y-6"
+          >
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[var(--admin-border)]">
+              <div>
+                <h3 className="text-sm font-serif font-bold text-[var(--admin-text-main)] flex items-center gap-2">
+                  <Users className="w-4 h-4 text-[var(--admin-accent)]" />
+                  <span>Configuração do Motor</span>
+                </h3>
+                <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
+                  Defina os bônus para indicações.
+                </p>
+              </div>
+              <button
+                type="submit"
+                disabled={savingConfig}
+                className="h-9 px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-2 hover:bg-[var(--admin-accent)]/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{savingConfig ? "Salvando..." : "Salvar Regras"}</span>
+              </button>
+            </div>
 
- <button
- type="submit"
- disabled={savingConfig}
- className="h-9 px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-2 hover:bg-[var(--admin-accent)]/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
- >
- <Save className="w-3.5 h-3.5"/>
- <span>{savingConfig ?"Salvando...":"Salvar Regras"}</span>
- </button>
- </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-2">
+              <div className="space-y-2">
+                <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block">
+                  Bônus de Quem Indica
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={config.referralPoints?.referrerBonus || 100}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        referralPoints: {
+                          ...config.referralPoints,
+                          referrerBonus: Number(e.target.value),
+                        },
+                      })
+                    }
+                    className="w-full bg-[var(--admin-bg)] border-b border-transparent focus:border-[var(--admin-accent)] rounded-none p-2 text-[var(--admin-text-main)] font-bold text-sm sm:text-xs num-tabular focus:outline-none"
+                  />
+                  <span className="text-[var(--admin-text-muted)] font-bold">
+                    pts
+                  </span>
+                </div>
+              </div>
 
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
- <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1.5">
- <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block admin-safe-wrap">
- Bônus de Quem Indica
- </span>
- <div className="flex items-center gap-2">
- <input
- type="number"
- value={config.referralPoints?.referrerBonus || 100}
- onChange={(e) =>
- setConfig({
- ...config,
- referralPoints: {
- ...config.referralPoints,
- referrerBonus: Number(e.target.value),
- },
- })
- }
- className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
- />
- <span className="text-[var(--admin-text-muted)] font-bold">
- pts
- </span>
- </div>
- </div>
+              <div className="space-y-2">
+                <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block">
+                  Bônus do Amigo Indicado
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={config.referralPoints?.referredBonus || 50}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        referralPoints: {
+                          ...config.referralPoints,
+                          referredBonus: Number(e.target.value),
+                        },
+                      })
+                    }
+                    className="w-full bg-[var(--admin-bg)] border-b border-transparent focus:border-[var(--admin-accent)] rounded-none p-2 text-[var(--admin-text-main)] font-bold text-sm sm:text-xs num-tabular focus:outline-none"
+                  />
+                  <span className="text-[var(--admin-text-muted)] font-bold">
+                    pts
+                  </span>
+                </div>
+              </div>
 
- <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1.5">
- <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block admin-safe-wrap">
- Bônus do Amigo Indicado
- </span>
- <div className="flex items-center gap-2">
- <input
- type="number"
- value={config.referralPoints?.referredBonus || 50}
- onChange={(e) =>
- setConfig({
- ...config,
- referralPoints: {
- ...config.referralPoints,
- referredBonus: Number(e.target.value),
- },
- })
- }
- className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
- />
- <span className="text-[var(--admin-text-muted)] font-bold">
- pts
- </span>
- </div>
- </div>
+              <div className="space-y-2">
+                <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block">
+                  Meta Amigos (Milestone)
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={config.referralPoints?.milestoneCount || 5}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        referralPoints: {
+                          ...config.referralPoints,
+                          milestoneCount: Number(e.target.value),
+                        },
+                      })
+                    }
+                    className="w-full bg-[var(--admin-bg)] border-b border-transparent focus:border-[var(--admin-accent)] rounded-none p-2 text-[var(--admin-text-main)] font-bold text-sm sm:text-xs num-tabular focus:outline-none"
+                  />
+                  <span className="text-[var(--admin-text-muted)] font-bold">
+                    amigos
+                  </span>
+                </div>
+              </div>
 
- <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1.5">
- <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block admin-safe-wrap">
- Meta Amigos (Milestone)
- </span>
- <div className="flex items-center gap-2">
- <input
- type="number"
- value={config.referralPoints?.milestoneCount || 5}
- onChange={(e) =>
- setConfig({
- ...config,
- referralPoints: {
- ...config.referralPoints,
- milestoneCount: Number(e.target.value),
- },
- })
- }
- className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
- />
- <span className="text-[var(--admin-text-muted)] font-bold">
- amigos
- </span>
- </div>
- </div>
+              <div className="space-y-2">
+                <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block">
+                  Bônus Extra (Milestone)
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={config.referralPoints?.milestoneBonus || 500}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        referralPoints: {
+                          ...config.referralPoints,
+                          milestoneBonus: Number(e.target.value),
+                        },
+                      })
+                    }
+                    className="w-full bg-[var(--admin-bg)] border-b border-transparent focus:border-[var(--admin-accent)] rounded-none p-2 text-[var(--admin-text-main)] font-bold text-sm sm:text-xs num-tabular focus:outline-none"
+                  />
+                  <span className="text-[var(--admin-text-muted)] font-bold">
+                    pts
+                  </span>
+                </div>
+              </div>
+            </div>
+          </form>
 
- <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1.5">
- <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block admin-safe-wrap">
- Bônus Milestone
- </span>
- <div className="flex items-center gap-2">
- <input
- type="number"
- value={config.referralPoints?.milestoneBonus || 1000}
- onChange={(e) =>
- setConfig({
- ...config,
- referralPoints: {
- ...config.referralPoints,
- milestoneBonus: Number(e.target.value),
- },
- })
- }
- className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
- />
- <span className="text-[var(--admin-text-muted)] font-bold">
- pts
- </span>
- </div>
- </div>
- </div>
- </form>
+          {/* Gerador de Link de Indicação */}
+          <div className="pt-6 border-t border-[var(--admin-border)] space-y-4">
+            <h3 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-[var(--admin-accent)]" />
+              <span>Link de indicação (Gerador)</span>
+            </h3>
+            
+            <div className="space-y-4 w-full">
+              <div>
+                <label className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider mb-2">
+                  Cliente remetente
+                </label>
+                <select
+                  value={refClient?.id || ""}
+                  onChange={(e) => {
+                    const found = clients.find((c) => c.id === e.target.value);
+                    if (found) setRefClient(found);
+                  }}
+                  className="w-full bg-[var(--admin-surface)] border-b border-[var(--admin-border)] p-2 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                >
+                  <option value="">Selecione um cliente...</option>
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} - Código: {c.referralCode || "Sem código"}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
- {/* Gerador de Link de Indicação */}
- <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
- <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
- <Share2 className="w-4 h-4 text-[var(--admin-accent)]"/>
- <span>Link de indicação</span>
- </h3>
+              <div>
+                <label className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider mb-2">
+                  Mensagem do WhatsApp
+                </label>
+                <textarea
+                  value={customRefMsg}
+                  onChange={(e) => setCustomRefMsg(e.target.value)}
+                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-md p-3 text-sm sm:text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-h-[80px]"
+                />
+              </div>
 
- <div className="space-y-3 w-full text-xs">
- <div>
- <label className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider mb-1">
- Cliente remetente
- </label>
- <select
- value={refClient?.id ||""}
- onChange={(e) => {
- const found = clients.find((c) => c.id === e.target.value);
- if (found) setRefClient(found);
- }}
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
- >
- {clients.map((c) => (
- <option key={c.id} value={c.id}>
- {c.name} - Código: {c.referralCode ||"Sem código"}
- </option>
- ))}
- </select>
- </div>
-
- <div>
- <label className="block text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider mb-1">
- Mensagem do WhatsApp
- </label>
- <textarea
- value={customRefMsg}
- onChange={(e) => setCustomRefMsg(e.target.value)}
- className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-h-[60px]"
- />
- </div>
-
- <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
- <span className="text-xs font-bold uppercase text-[var(--admin-text-muted)] block">
- Link Único Gerado
- </span>
- <div className="flex flex-col sm:flex-row gap-2">
- <input
- type="text"
- readOnly
- value={generatedRefUrl}
- className="flex-1 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-xs font-mono text-[var(--admin-accent)] min-w-0"
- />
- <button
- onClick={() => copyToClipboard(generatedRefUrl)}
- className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs rounded-[var(--admin-radius-lg)] hover:bg-[var(--admin-accent)]/90 shrink-0 flex items-center justify-center gap-1"
- >
- {copiedLink ? (
- <Check className="w-3.5 h-3.5"/>
- ) : (
- <Copy className="w-3.5 h-3.5"/>
- )}
- <span>{copiedLink ?"Copiado!":"Copiar"}</span>
- </button>
- <button
- onClick={() =>
- shareViaWhatsapp(
- refClient?.phone ||"",
- `${customRefMsg} ${generatedRefUrl}`,
- )
- }
- className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-whatsapp text-whatsapp-on font-bold text-xs rounded-[var(--admin-radius-lg)] hover:opacity-90 shrink-0 flex items-center justify-center gap-1"
- >
- <Send className="w-3.5 h-3.5"/>
- <span>WhatsApp</span>
- </button>
- </div>
- </div>
- </div>
- </div>
- </div>
- )}
-
- {/* TAB 5: AVALIAÇÕES & NPS */}
+              <div className="space-y-2 pt-2">
+                <span className="text-[10px] font-bold uppercase text-[var(--admin-text-muted)] block">
+                  Link Único
+                </span>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={generatedRefUrl}
+                    className="flex-1 bg-[var(--admin-bg)] border-b border-[var(--admin-border)] p-2 text-xs font-mono text-[var(--admin-accent)] min-w-0"
+                  />
+                  <button
+                    onClick={() => copyToClipboard(generatedRefUrl)}
+                    className="h-10 sm:h-9 w-full sm:w-auto px-4 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs rounded-md hover:bg-[var(--admin-accent)]/90 flex items-center justify-center gap-1"
+                  >
+                    {copiedLink ? (
+                      <Check className="w-3.5 h-3.5" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                    <span>{copiedLink ? "Copiado!" : "Copiar"}</span>
+                  </button>
+                  {generatedRefUrl && (
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(
+                        customRefMsg.replace("{link}", generatedRefUrl),
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="h-10 sm:h-9 w-full sm:w-auto px-4 border border-[#25D366] text-[#25D366] font-bold text-xs rounded-md hover:bg-[#25D366]/10 flex items-center justify-center gap-1"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Enviar Zap</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* TAB 5: AVALIAÇÕES & NPS */}
  {activeTab ==="reviews"&& (
  <div className="space-y-4 min-w-0">
- <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
+ <div className="bg-[var(--admin-surface)] p-5 space-y-4">
  <div className="flex items-center justify-between gap-3">
  <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
  <QrCode className="w-4 h-4 text-[var(--admin-accent)]"/>
@@ -2314,7 +1623,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  </div>
 
  {/* Feed de Avaliações */}
- <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
+ <div className="bg-[var(--admin-surface)] p-5 space-y-4">
  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
  <h4 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
  <MessageSquare className="w-4 h-4 text-[var(--admin-accent)]"/>
