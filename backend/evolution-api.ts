@@ -52,6 +52,7 @@ type EvolutionModuleDeps = {
   eq: any;
   onWebhook?: (payload: any) => Promise<unknown>;
   onInactivitySweep?: () => Promise<unknown>;
+  onTestAi?: () => Promise<unknown>;
 };
 
 function normalizeBaseUrl(value: string): string {
@@ -149,7 +150,7 @@ async function evolutionRequest(baseUrl: string, apiKey: string, path: string, i
   }
 }
 
-export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInactivitySweep }: EvolutionModuleDeps) {
+export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInactivitySweep, onTestAi }: EvolutionModuleDeps) {
   const router = express.Router();
 
   async function getSettings(): Promise<any> {
@@ -528,6 +529,32 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
       return res.json({ success: true, simulatedPayload: mockPayload, botResult: result });
     } catch (error: any) {
       return res.status(500).json({ error: error?.message || 'Falha ao simular recebimento de webhook.' });
+    }
+  });
+
+  router.post('/ai-test', requireAuth, requireAdmin, async (req, res) => {
+    try {
+      if (!onTestAi) {
+        return res.status(503).json({
+          ok: false,
+          configured: false,
+          usedGemini: false,
+          model: 'gemini-2.5-flash',
+          latencyMs: 0,
+          message: 'Serviço de IA do NavoBot não inicializado.',
+        });
+      }
+      const result: any = await onTestAi();
+      return res.json(result);
+    } catch (error: any) {
+      return res.status(500).json({
+        ok: false,
+        configured: false,
+        usedGemini: false,
+        model: 'gemini-2.5-flash',
+        latencyMs: 0,
+        message: error?.message || 'Falha ao testar conexão com o Gemini.',
+      });
     }
   });
 

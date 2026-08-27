@@ -137,7 +137,27 @@ const emailModule = createEmailModule(() => db, schema, eq);
 const emailRouter = emailModule.router;
 
 import { createEvolutionApiModule } from './evolution-api.js';
-const evolutionApiModule = createEvolutionApiModule({ getDb: () => db, schema, eq, onWebhook: undefined, onInactivitySweep: undefined });
+import { createNavoBotService } from './services/navobot.service.js';
+
+let navobotService: ReturnType<typeof createNavoBotService> | null = null;
+
+const evolutionApiModule = createEvolutionApiModule({
+  getDb: () => db,
+  schema,
+  eq,
+  onWebhook: (payload) => (navobotService ? navobotService.handleWebhook(payload) : Promise.resolve({ ignored: true, reason: 'navobot_not_ready' })),
+  onInactivitySweep: () => (navobotService ? navobotService.processInactivitySweep() : Promise.resolve({ skipped: true, reason: 'navobot_not_ready' })),
+  onTestAi: () => (navobotService ? navobotService.testAiConnection() : Promise.resolve({ ok: false, configured: false, usedGemini: false, model: 'gemini-2.5-flash', latencyMs: 0, message: 'NavoBot não inicializado.' })),
+});
+
+navobotService = createNavoBotService({
+  getDb: () => db,
+  schema,
+  sendText: evolutionApiModule.sendText,
+  sendButtons: evolutionApiModule.sendButtons,
+  sendList: evolutionApiModule.sendList,
+});
+
 const evolutionApiRouter = evolutionApiModule.router;
 
 
@@ -178,6 +198,20 @@ app.use('/api/email/config', requireAuth, requireAdmin);
 app.use('/api/email/test', requireAuth, requireAdmin);
 app.use('/api/email', emailRouter);
 app.use('/api/evolution', evolutionApiRouter);
+app.post('/api/admin/navobot/ai-test', requireAuth, requireAdmin, async (req, res) => {
+  if (!navobotService) {
+    return res.status(503).json({
+      ok: false,
+      configured: false,
+      usedGemini: false,
+      model: 'gemini-2.5-flash',
+      latencyMs: 0,
+      message: 'Serviço de IA do NavoBot não inicializado.',
+    });
+  }
+  const result = await navobotService.testAiConnection();
+  return res.json(result);
+});
 
 app.use('/api/subscriptions', subscriptionsRouter);
 app.use('/api/audit', auditRouter);

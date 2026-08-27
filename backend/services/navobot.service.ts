@@ -66,7 +66,7 @@ type Conversation = {
 };
 
 function getAiClient(): GoogleGenAI | null {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
   if (!apiKey) return null;
   return new GoogleGenAI({ apiKey });
 }
