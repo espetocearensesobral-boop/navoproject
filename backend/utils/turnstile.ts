@@ -1,8 +1,14 @@
-export async function verifyTurnstileToken(token: string | undefined): Promise<boolean> {
-  const secretKey = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA';
+export async function verifyTurnstileToken(
+  token: string | undefined,
+  remoteip?: string
+): Promise<boolean> {
+  const secretKey =
+    process.env.TURNSTILE_SECRET ||
+    process.env.TURNSTILE_SECRET_KEY ||
+    '1x0000000000000000000000000000000AA';
 
   // Se o segredo não estiver configurado em desenvolvimento/preview ou token de bypass
-  if (!process.env.TURNSTILE_SECRET_KEY && process.env.NODE_ENV !== 'production') {
+  if (!process.env.TURNSTILE_SECRET && !process.env.TURNSTILE_SECRET_KEY && process.env.NODE_ENV !== 'production') {
     return true;
   }
 
@@ -15,15 +21,20 @@ export async function verifyTurnstileToken(token: string | undefined): Promise<b
   }
   
   try {
+    const params = new URLSearchParams({
+      secret: secretKey,
+      response: token,
+    });
+    if (remoteip) {
+      params.append('remoteip', remoteip);
+    }
+
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        secret: secretKey,
-        response: token
-      })
+      body: params,
     });
     
     const data = await response.json();
@@ -38,8 +49,8 @@ export async function verifyTurnstileToken(token: string | undefined): Promise<b
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
           secret: '1x0000000000000000000000000000000AA',
-          response: token
-        })
+          response: token,
+        }),
       });
       const testData = await testFallback.json();
       if (testData.success === true) {
@@ -58,3 +69,4 @@ export async function verifyTurnstileToken(token: string | undefined): Promise<b
     return false;
   }
 }
+

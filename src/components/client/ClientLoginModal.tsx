@@ -427,11 +427,20 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
             </div>
 
             
-            <div className="flex justify-center my-4">
+            <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full overflow-hidden">
               <Turnstile
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
-                onSuccess={(token) => setTurnstileToken(token)}
-                onError={() => setErrorMsg('Falha ao carregar o verificador de segurança. Atualize a página.')}
+                key="reset-password-step"
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAAEeQDhUHqW5LUyd4'}
+                options={{ theme: 'auto', size: 'normal', action: 'reset-password' }}
+                onSuccess={(token) => {
+                  setTurnstileToken(token);
+                  setErrorMsg('');
+                }}
+                onError={(err) => {
+                  console.warn('Turnstile error:', err);
+                  setErrorMsg('Não foi possível carregar a validação Cloudflare. Verifique a chave e domínio no painel Cloudflare.');
+                }}
+                onExpire={() => setTurnstileToken('')}
               />
             </div>
 <button
@@ -477,8 +486,8 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
             <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full overflow-hidden">
               <Turnstile
                 key="forgot-step1"
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
-                options={{ theme: 'auto', size: 'normal' }}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAAEeQDhUHqW5LUyd4'}
+                options={{ theme: 'auto', size: 'normal', action: 'forgot-password' }}
                 onSuccess={(token) => {
                   setTurnstileToken(token);
                   setErrorMsg('');
@@ -699,8 +708,12 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
             <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full overflow-hidden">
               <Turnstile
                 key={mode}
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
-                options={{ theme: 'auto', size: 'normal' }}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAAEeQDhUHqW5LUyd4'}
+                options={{
+                  theme: 'auto',
+                  size: 'normal',
+                  action: mode === 'register' ? 'client-register' : 'client-login',
+                }}
                 onSuccess={(token) => {
                   setTurnstileToken(token);
                   setErrorMsg('');

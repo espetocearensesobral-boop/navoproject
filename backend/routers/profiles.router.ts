@@ -49,8 +49,9 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
       return res.status(503).json({ error: userErrors.dbDisconnected });
     }
     const { name, email, phone, birthday, password, role, id, avatar_url, avatarUrl, lgpdConsent, lgpdConsentDate, turnstileToken, ...rest } = req.body;
+    const cfToken = turnstileToken || req.body['cf-turnstile-response'];
 
-    if (!(await verifyTurnstileToken(turnstileToken))) {
+    if (!(await verifyTurnstileToken(cfToken, req.ip))) {
       return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
     }
 

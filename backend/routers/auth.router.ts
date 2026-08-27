@@ -48,8 +48,9 @@ authRouter.post("/login", authLimiter, async (req, res) => {
       return res.status(503).json({ error: userErrors.dbDisconnected });
     }
     const { loginId, password, turnstileToken } = req.body;
+    const cfToken = turnstileToken || req.body['cf-turnstile-response'];
 
-    if (!(await verifyTurnstileToken(turnstileToken))) {
+    if (!(await verifyTurnstileToken(cfToken, req.ip))) {
       return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
     }
     
@@ -138,8 +139,9 @@ const handleAdminLogin = async (req: any, res: any) => {
       return res.status(503).json({ error: userErrors.dbDisconnected });
     }
     const { loginId, password, turnstileToken } = req.body;
+    const cfToken = turnstileToken || req.body['cf-turnstile-response'];
 
-    if (!(await verifyTurnstileToken(turnstileToken))) {
+    if (!(await verifyTurnstileToken(cfToken, req.ip))) {
       return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
     }
     
@@ -207,8 +209,9 @@ authRouter.post("/admin-login", authLimiter, handleAdminLogin);
 authRouter.post("/forgot-password", authLimiter, async (req, res) => {
   try {
     const { loginId, turnstileToken } = req.body;
+    const cfToken = turnstileToken || req.body['cf-turnstile-response'];
 
-    if (!(await verifyTurnstileToken(turnstileToken))) {
+    if (!(await verifyTurnstileToken(cfToken, req.ip))) {
       return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
     }
     if (!loginId) {
@@ -253,8 +256,9 @@ authRouter.post("/forgot-password", authLimiter, async (req, res) => {
 authRouter.post("/reset-password", authLimiter, async (req, res) => {
   try {
     const { loginId, code, newPassword, turnstileToken } = req.body;
+    const cfToken = turnstileToken || req.body['cf-turnstile-response'];
 
-    if (!(await verifyTurnstileToken(turnstileToken))) {
+    if (!(await verifyTurnstileToken(cfToken, req.ip))) {
       return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
     }
     if (!loginId || !code || !newPassword) {

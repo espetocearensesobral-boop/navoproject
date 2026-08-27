@@ -274,8 +274,8 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
 
             <div className="flex justify-center items-center my-4 min-h-[65px] w-full overflow-hidden">
               <Turnstile
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"}
-                options={{ theme: "auto", size: "normal" }}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAEeQDhUHqW5LUyd4"}
+                options={{ theme: "auto", size: "normal", action: "admin-login" }}
                 onSuccess={(token) => {
                   setTurnstileToken(token);
                   setErrorMsg("");

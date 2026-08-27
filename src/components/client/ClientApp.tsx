@@ -15,6 +15,7 @@ import { BookingStep5Confirmation } from "./BookingStep5Confirmation";
 import { LandingPage } from './LandingPage';
 import { PublicReviewModal } from './PublicReviewModal';
 import { PullToRefreshIndicator } from '../shared/PullToRefreshIndicator';
+import { showToast } from '../ui/Toast';
 import { usePullToRefresh } from '../../hooks/usePullToRefresh';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Calendar, Crown, Award, Clock, Home, Menu, Smartphone, User, Sparkles, Scissors, Loader2, Sun, Moon, CheckCircle2, Info, AlertTriangle, Sliders, Download } from 'lucide-react';
@@ -53,15 +54,10 @@ export const ClientApp: React.FC = () => {
   const landingScrollRef = useRef<HTMLElement | null>(null);
   const [appointmentsRefreshKey, setAppointmentsRefreshKey] = useState(0);
 
-  // Toast Notification System State
-  const [toast, setToast] = useState<{ id: number; message: string; type?: 'success' | 'info' | 'warning' } | null>(null);
-
-  const showToast = (message: string, type: 'success' | 'info' | 'warning' = 'info') => {
+  // Toast Notification Wrapper
+  const handleShowToast = (message: string, type: 'success' | 'info' | 'warning' = 'info') => {
     hapticLight();
-    setToast({ id: Date.now(), message, type });
-    setTimeout(() => {
-      setToast(null);
-    }, 3000);
+    showToast(type, message);
   };
 
   // Touch Swipe Gesture Handling
@@ -534,32 +530,6 @@ export const ClientApp: React.FC = () => {
           </header>
         )}
 
-        {/* Floating Toast Notification */}
-        <AnimatePresence>
-          {toast && (
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-16 left-4 right-4 z-[90] pointer-events-none flex justify-center"
-            >
-              <div className={`px-4 py-2.5 rounded-2xl shadow-2xl border backdrop-blur-xl flex items-center gap-2.5 max-w-sm text-xs font-bold ${
-                toast.type === 'success'
-                  ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/40 shadow-emerald-950/30'
-                  : toast.type === 'warning'
-                    ? 'bg-amber-950/90 text-amber-300 border-amber-500/40 shadow-amber-950/30'
-                    : 'bg-surface-card/95 text-gold-base border-gold-base/40 shadow-black/50'
-              }`}>
-                {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />}
-                {toast.type === 'warning' && <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />}
-                {toast.type === 'info' && <Sparkles className="w-4 h-4 shrink-0 text-gold-base" />}
-                <span>{toast.message}</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Main Content Area with Swipe Gesture */}
         <main
           ref={mainRef}
@@ -826,7 +796,7 @@ export const ClientApp: React.FC = () => {
       <PWAInstallModal
         isOpen={isPwaModalOpen}
         onClose={() => setIsPwaModalOpen(false)}
-        onShowToast={showToast}
+        onShowToast={handleShowToast}
       />
       </Suspense>
 
