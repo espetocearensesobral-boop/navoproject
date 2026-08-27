@@ -55,7 +55,7 @@ export const SubscriptionsManagement: React.FC = () => {
 
   const fetchPlans = async () => {
     try {
-      const res = await fetch('/api/subscriptions/plans');
+      const res = await fetch('/api/subscriptions/plans', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setPlans(data);
@@ -73,7 +73,7 @@ export const SubscriptionsManagement: React.FC = () => {
 
   const fetchMembers = async () => {
     try {
-      const res = await fetch('/api/subscriptions/members');
+      const res = await fetch('/api/subscriptions/members', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setMembers(data);

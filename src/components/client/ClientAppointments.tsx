@@ -246,7 +246,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
     try {
       const [res] = await Promise.all([
-        fetch(`/api/appointments/lookup/step1?phone=${encodeURIComponent(numbers)}`),
+        fetch(`/api/appointments/lookup/step1?phone=${encodeURIComponent(numbers)}`, { credentials: 'include' }),
         new Promise(res => setTimeout(res, 400))
       ]);
 

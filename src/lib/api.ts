@@ -33,11 +33,22 @@ export const authFetch = async (endpoint: string, options: RequestInit = {}) => 
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+  const response = await fetch(url, {
     ...options,
     headers,
     credentials: 'include',
   });
+
+    // Intercept HTML responses from proxy/auth failures
+  const originalJson = response.json.bind(response);
+  response.json = async () => {
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('text/html') || response.url.includes('__cookie_check')) {
+      throw new Error('Erro de conexão: O navegador bloqueou o acesso ou a sessão expirou. Se estiver no modo de visualização, tente abrir o app em uma nova guia.');
+    }
+    return originalJson();
+  };
 
   if (response.status === 401 && typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('navo:auth-expired'));

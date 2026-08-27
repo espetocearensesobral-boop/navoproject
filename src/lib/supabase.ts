@@ -20,7 +20,7 @@ export async function testSupabaseConnection(): Promise<ConnectionStatus> {
   const startTime = performance.now();
   
   try {
-    const res = await fetch('/api/services');
+    const res = await fetch('/api/services', { credentials: 'include' });
     const latencyMs = Math.round(performance.now() - startTime);
     
     if (!res.ok) {

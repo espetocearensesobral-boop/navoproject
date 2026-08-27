@@ -11,7 +11,7 @@ export const ClientSubscriptions: React.FC = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const res = await fetch('/api/subscriptions/plans');
+        const res = await fetch('/api/subscriptions/plans', { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           setSubscriptionPlans(data);

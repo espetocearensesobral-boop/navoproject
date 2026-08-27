@@ -61,7 +61,7 @@ export const AppointmentRemindersManagement: React.FC = () => {
   useEffect(() => {
     const fetchRem = async () => {
       try {
-        const res = await fetch('/api/reminders');
+        const res = await fetch('/api/reminders', { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           const mapped: Record<string, string> = {};

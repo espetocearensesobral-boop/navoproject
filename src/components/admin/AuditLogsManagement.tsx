@@ -44,7 +44,7 @@ export const AuditLogsManagement: React.FC = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await fetch('/api/audit');
+        const res = await fetch('/api/audit', { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           // Map DB structure to AuditLogItem
