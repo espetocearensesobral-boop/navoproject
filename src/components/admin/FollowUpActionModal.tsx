@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { Bot, Mail, MessageSquare, Phone, Send, Sparkles, X, Loader2 } from "lucide-react";
 import { authFetch } from "../../lib/api";
 
@@ -75,7 +76,7 @@ export const FollowUpActionModal: React.FC<FollowUpActionModalProps> = ({ client
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200">
       <div className="bg-[var(--admin-surface)] w-full max-w-lg rounded-[var(--admin-radius-2xl)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <div className="px-5 py-4 flex items-center justify-between border-b border-[var(--admin-border)] shrink-0">
@@ -172,6 +173,7 @@ export const FollowUpActionModal: React.FC<FollowUpActionModalProps> = ({ client
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
