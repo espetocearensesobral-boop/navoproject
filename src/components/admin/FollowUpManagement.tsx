@@ -6,7 +6,7 @@ import {
  Search,
  RefreshCw,
  UsersRound,
- Clock3,
+ Clock3, Bot,
 } from"lucide-react";
 import { authFetch } from"../../lib/api";
 import { AdminPageHeader } from"./shared/AdminPageHeader";
@@ -42,7 +42,10 @@ const formatDate = (value: string | null) =>
 const whatsappUrl = (phone: string) =>
  `https://wa.me/55${phone.replace(/\D/g,"")}`;
 
+import { FollowUpActionModal } from "./FollowUpActionModal";
+
 export const FollowUpManagement: React.FC = () => {
+  const [selectedClient, setSelectedClient] = useState<FollowUpClient | null>(null);
  const [thresholdDays, setThresholdDays] = useState(60);
  const [search, setSearch] = useState("");
  const [data, setData] = useState<FollowUpResponse | null>(null);
@@ -233,6 +236,16 @@ export const FollowUpManagement: React.FC = () => {
  <Mail className="w-4 h-4"/>
  </a>
  )}
+              {client.hasPhone && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedClient(client)}
+                  title="Mensagem Inteligente"
+                  className="w-10 h-10 rounded-[var(--admin-radius-lg)] border border-[var(--admin-accent)]/30 text-[var(--admin-accent)] flex items-center justify-center hover:bg-[var(--admin-accent)]/10 transition-colors"
+                >
+                  <Bot className="w-4 h-4" />
+                </button>
+              )}
  </div>
  </article>
  ))}
