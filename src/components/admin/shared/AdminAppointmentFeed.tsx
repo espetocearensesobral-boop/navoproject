@@ -30,11 +30,11 @@ const statusLabel: Record<string, string> = {
 
 const statusClass: Record<string, string> = {
   confirmed: "text-[var(--admin-accent)]",
-  pending_approval: "text-amber-400",
-  in_queue: "text-amber-400",
+  pending_approval: "text-amber-700 dark:text-amber-400",
+  in_queue: "text-amber-700 dark:text-amber-400",
   in_service: "text-status-success",
   in_chair: "text-status-success",
-  completed: "text-blue-400",
+  completed: "text-blue-700 dark:text-blue-400",
   cancelled: "text-status-error",
   no_show: "text-status-error",
 };

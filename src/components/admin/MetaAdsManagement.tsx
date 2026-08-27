@@ -69,10 +69,10 @@ const statusLabel: Record<string, string> = {
 
 const statusClass: Record<string, string> = {
   ACTIVE: "bg-status-success/10 text-status-success",
-  PAUSED: "bg-amber-500/10 text-amber-300",
+  PAUSED: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
   ARCHIVED: "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]",
-  DELETED: "bg-red-500/10 text-red-300",
-  WITH_ISSUES: "bg-red-500/10 text-red-300",
+  DELETED: "bg-red-500/10 text-red-700 dark:text-red-300",
+  WITH_ISSUES: "bg-red-500/10 text-red-700 dark:text-red-300",
 };
 
 const dateToday = () => new Date().toISOString().slice(0, 10);
@@ -443,7 +443,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
 
       {message && (
         <div
-          className={`flex items-start gap-2 rounded-[var(--admin-radius-md)] border px-3 py-2.5 text-sm ${message.type === "success" ? "border-status-success/30 bg-status-success/10 text-status-success" : "border-red-500/30 bg-red-500/10 text-red-300"}`}
+          className={`flex items-start gap-2 rounded-[var(--admin-radius-md)] border px-3 py-2.5 text-sm ${message.type === "success" ? "border-status-success/30 bg-status-success/10 text-status-success" : "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300"}`}
           role="status"
         >
           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
@@ -466,7 +466,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
               type="button"
               onClick={() => void load()}
               disabled={loading}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-[var(--admin-radius-sm)] border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"
+              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-[var(--admin-radius-sm)] border border-amber-400/30 px-3 text-xs font-bold text-amber-700 dark:text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"
             >
               <RefreshCw
                 className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
@@ -514,7 +514,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
             <button
               type="button"
               onClick={onOpenSettings}
-              className="min-h-9 rounded-[var(--admin-radius-sm)] border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10"
+              className="min-h-9 rounded-[var(--admin-radius-sm)] border border-amber-400/30 px-3 text-xs font-bold text-amber-700 dark:text-amber-200 hover:bg-amber-500/10"
             >
               Revisar configuração
             </button>
@@ -550,7 +550,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
           label="Cliques"
           value={formatCompactNumber(totals.clicks)}
           helper="Cliques no destino"
-          tone="text-blue-300"
+          tone="text-blue-700 dark:text-blue-300"
         />
         <MetricCard
           icon={Eye}
@@ -659,7 +659,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
                           onClick={() =>
                             setStatusTarget({ campaign, status: "PAUSED" })
                           }
-                          className="inline-flex h-8 items-center gap-1 rounded-[var(--admin-radius-sm)] border border-amber-500/30 px-2.5 text-[11px] font-bold text-amber-200 hover:bg-amber-500/10"
+                          className="inline-flex h-8 items-center gap-1 rounded-[var(--admin-radius-sm)] border border-amber-500/30 px-2.5 text-[11px] font-bold text-amber-700 dark:text-amber-200 hover:bg-amber-500/10"
                         >
                           <Pause className="h-3 w-3" />{" "}
                           {CAMPAIGNS_DEMO_MODE ? "Simular pausa" : "Pausar"}
@@ -704,7 +704,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
                       <p className="text-[10px] text-[var(--admin-text-muted)]">
                         Cliques
                       </p>
-                      <p className="mt-1 text-xs font-bold text-blue-300">
+                      <p className="mt-1 text-xs font-bold text-blue-700 dark:text-blue-300">
                         {formatCompactNumber(campaign.clicks)}
                       </p>
                     </div>
@@ -727,7 +727,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
                     </div>
                   </div>
                   {campaign.errorMessage && (
-                    <p className="mt-3 rounded-[var(--admin-radius-sm)] bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                    <p className="mt-3 rounded-[var(--admin-radius-sm)] bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-300">
                       {campaign.errorMessage}
                     </p>
                   )}

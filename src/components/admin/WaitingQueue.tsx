@@ -919,7 +919,7 @@ export const WaitingQueue: React.FC = () => {
                                       item.client_name,
                                     )
                                   }
-                                  className="w-9 h-9 rounded-[var(--admin-radius-md)] bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-wait transition-colors"
+                                  className="w-9 h-9 rounded-[var(--admin-radius-md)] bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-wait transition-colors"
                                   title="Remover da fila"
                                   aria-label="Remover da fila"
                                 >

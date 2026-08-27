@@ -74,7 +74,7 @@ export const CampaignsWorkspace: React.FC<CampaignsWorkspaceProps> = ({
     <div className="admin-campaigns-workspace min-w-0 space-y-4">
       {CAMPAIGNS_DEMO_MODE && (
         <div
-          className="rounded-[var(--admin-radius-md)] border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-xs text-blue-100"
+          className="rounded-[var(--admin-radius-md)] border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-xs text-blue-700 dark:text-blue-200"
           role="status"
         >
           <strong>Apresentação:</strong> os dados exibidos são demonstrativos e

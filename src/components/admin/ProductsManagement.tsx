@@ -261,7 +261,7 @@ export const ProductsManagement: React.FC = () => {
           <button
             type="button"
             onClick={() => setOnlyLowStock((value) => !value)}
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-full)] text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors ${onlyLowStock ? "bg-amber-500 text-white" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-full)] text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors ${onlyLowStock ? "bg-amber-500 text-amber-950" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
           >
             <AlertTriangle className="w-3.5 h-3.5" /> Baixo estoque (
             {lowStockCount})
@@ -283,7 +283,7 @@ export const ProductsManagement: React.FC = () => {
         <button
           type="button"
           onClick={() => setOnlyLowStock((value) => !value)}
-          className={`h-10 px-3 rounded-[var(--admin-radius-lg)] border text-xs font-semibold flex items-center justify-center gap-2 ${onlyLowStock ? "border-amber-400/50 bg-amber-500/15 text-amber-300" : "border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"}`}
+          className={`h-10 px-3 rounded-[var(--admin-radius-lg)] border text-xs font-semibold flex items-center justify-center gap-2 ${onlyLowStock ? "border-amber-400/50 bg-amber-500/15 text-amber-700 dark:text-amber-300" : "border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"}`}
         >
           <AlertTriangle className="w-3.5 h-3.5" /> Baixo estoque (
           {lowStockCount})

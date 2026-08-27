@@ -47,8 +47,8 @@ interface AdminPageHeaderProps {
 const TONE_CLASSES: Record<NonNullable<AdminStat["tone"]>, string> = {
   gold: "text-[var(--admin-accent)]",
   success: "text-status-success",
-  info: "text-blue-400",
-  warning: "text-amber-400",
+  info: "text-blue-700 dark:text-blue-400",
+  warning: "text-amber-700 dark:text-amber-400",
   muted: "text-[var(--admin-text-muted)]",
   "finance-positive": "finance-positive",
   "finance-negative": "finance-negative",

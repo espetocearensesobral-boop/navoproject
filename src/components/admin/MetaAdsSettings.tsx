@@ -323,7 +323,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
 
       {CAMPAIGNS_DEMO_MODE && (
         <div
-          className="rounded-[var(--admin-radius-md)] border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-xs text-blue-100"
+          className="rounded-[var(--admin-radius-md)] border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-xs text-blue-700 dark:text-blue-200"
           role="status"
         >
           <strong>Configuração demonstrativa:</strong> conexão, ativos e ações
@@ -334,7 +334,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
 
       {message && (
         <div
-          className={`flex items-start gap-2 rounded-[var(--admin-radius-md)] border px-3 py-2.5 text-sm ${message.type === "success" ? "border-status-success/30 bg-status-success/10 text-status-success" : "border-red-500/30 bg-red-500/10 text-red-300"}`}
+          className={`flex items-start gap-2 rounded-[var(--admin-radius-md)] border px-3 py-2.5 text-sm ${message.type === "success" ? "border-status-success/30 bg-status-success/10 text-status-success" : "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300"}`}
           role="status"
         >
           {message.type === "success" ? (
@@ -361,7 +361,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
               type="button"
               onClick={() => void load()}
               disabled={loading}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-[var(--admin-radius-lg)] border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"
+              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-[var(--admin-radius-lg)] border border-amber-400/30 px-3 text-xs font-bold text-amber-700 dark:text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"
             >
               <RefreshCw
                 className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
@@ -375,7 +375,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
       {!status?.configured && (
         <section className="rounded-[var(--admin-radius-lg)] border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5">
           <div className="flex items-start gap-3">
-            <KeyRound className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <KeyRound className="mt-0.5 h-5 w-5 shrink-0 text-amber-700 dark:text-amber-300" />
             <div className="min-w-0">
               <h2 className="text-sm font-bold text-[var(--admin-text-main)]">
                 Integração ainda não configurada no servidor
@@ -387,7 +387,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
               </p>
               <p className="mt-2 text-xs text-[var(--admin-text-muted)]">
                 Callback esperado:{" "}
-                <code className="break-all text-amber-200">
+                <code className="break-all text-amber-700 dark:text-amber-200">
                   /api/meta-ads/oauth/callback
                 </code>{" "}
                 · Graph API: {status?.graphApiVersion || "v26.0"}
@@ -454,7 +454,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
                 </strong>
               </div>
               {connection?.lastError && (
-                <p className="rounded-[var(--admin-radius-lg)] bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                <p className="rounded-[var(--admin-radius-lg)] bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-300">
                   {connection.lastError}
                 </p>
               )}
@@ -474,7 +474,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
                   type="button"
                   onClick={() => setDisconnectOpen(true)}
                   disabled={busy}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-[var(--admin-radius-lg)] bg-red-500/10 px-3 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-[var(--admin-radius-lg)] bg-red-500/10 px-3 text-xs font-bold text-red-700 dark:text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
                 >
                   <LogOut className="h-3.5 w-3.5" /> Desconectar
                 </button>
@@ -501,7 +501,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
 
         <div className="rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] p-4 sm:p-5">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--admin-radius-lg)] bg-blue-500/10 text-blue-300">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--admin-radius-lg)] bg-blue-500/10 text-blue-700 dark:text-blue-300">
               <ShieldCheck className="h-4 w-4" />
             </div>
             <div>
@@ -600,7 +600,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
             </label>
           </div>
           {accounts.length === 0 || pages.length === 0 ? (
-            <p className="mt-3 text-xs text-amber-300">
+            <p className="mt-3 text-xs text-amber-700 dark:text-amber-300">
               A Meta não retornou todos os ativos. Verifique permissões, acesso
               à conta de anúncios e vínculo da Página.
             </p>

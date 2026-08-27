@@ -466,7 +466,7 @@ export const ServicesManagement: React.FC = () => {
               onClick={() => setFilterType("gallery")}
               className={`px-2.5 py-1 rounded-[var(--admin-radius-sm)] text-xs font-semibold transition-all ${
                 filterType === "gallery"
-                  ? "bg-blue-500/20 text-blue-300"
+                  ? "bg-blue-500/10 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
               }`}
             >

@@ -379,11 +379,11 @@ export const ProfessionalsManagement: React.FC = () => {
             <span className="text-xs font-bold uppercase tracking-wider">
               Média Avaliação
             </span>
-            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-amber-500/10 text-amber-400 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center">
               <Star className="w-3.5 h-3.5 fill-amber-400" />
             </div>
           </div>
-          <p className="text-lg font-mono num-tabular font-bold text-amber-400">
+          <p className="text-lg font-mono num-tabular font-bold text-amber-700 dark:text-amber-400">
             {avgRating} / 5
           </p>
           <p className="text-xs text-[var(--admin-text-muted)] mt-1 font-medium truncate">
@@ -396,7 +396,7 @@ export const ProfessionalsManagement: React.FC = () => {
             <span className="text-xs font-bold uppercase tracking-wider">
               Comissão Média
             </span>
-            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-blue-500/10 text-blue-400 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-blue-500/10 text-blue-700 dark:text-blue-400 flex items-center justify-center">
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -589,7 +589,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleToggleStatus(barber)}
-                            className={`admin-btn-icon-sm rounded ${isActive ? "text-status-success hover:bg-status-success/10" : "text-red-400 hover:bg-red-500/10"}`}
+                            className={`admin-btn-icon-sm rounded ${isActive ? "text-status-success hover:bg-status-success/10" : "text-red-700 dark:text-red-400 hover:bg-red-500/10"}`}
                             title={isActive ? "Pausar" : "Ativar"}
                           >
                             <Power className="w-4 h-4" />
@@ -1142,7 +1142,7 @@ export const ProfessionalsManagement: React.FC = () => {
                       className={`px-4 py-2 rounded-[var(--admin-radius-lg)] text-xs font-bold transition-colors ${
                         (formData.is_active ?? true)
                           ? "bg-status-success text-white shadow-xs"
-                          : "bg-red-500/20 text-red-400 border border-red-500/30"
+                          : "bg-red-500/20 text-red-700 dark:text-red-400 border border-red-500/30"
                       }`}
                     >
                       {(formData.is_active ?? true) ? "● Ativo na Agenda" : "○ Pausado"}

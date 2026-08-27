@@ -774,7 +774,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 </div>
 
                 <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
-                  <div className="flex items-center justify-between text-slate-400 mb-1">
+                  <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
                     <span className="text-xs font-bold uppercase tracking-wider truncate">
                       Prata
                     </span>

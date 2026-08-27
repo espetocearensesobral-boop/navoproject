@@ -520,16 +520,16 @@ export const ScheduleGrid: React.FC = () => {
                               }
                               className={`p-4 rounded-[var(--admin-radius-lg)] border border-l-4 shadow-sm transition-all ${
                                 isPending
-                                  ? "bg-amber-500/10 border-amber-500/50 text-amber-200 shadow-sm"
+                                  ? "bg-amber-500/10 border-amber-500/50 text-amber-700 dark:text-amber-200 shadow-sm"
                                   : operationalState.isLate
                                     ? "bg-amber-500/5 border-amber-500/60"
                                     : "bg-[var(--admin-surface)] border-[var(--admin-border)]"
                               }`}
                             >
                               {isPending && (
-                                <div className="flex items-center justify-between text-xs font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-[var(--admin-radius-lg)] border border-amber-500/30">
+                                <div className="flex items-center justify-between text-xs font-bold text-amber-700 dark:text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-[var(--admin-radius-lg)] border border-amber-500/30">
                                   <div className="flex items-center gap-1">
-                                    <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                    <ShieldAlert className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
                                     <span>Fora do horário</span>
                                   </div>
                                   <span className="text-xs bg-amber-400 text-black px-1.5 rounded-[var(--admin-radius-lg)] font-extrabold">
@@ -574,7 +574,7 @@ export const ScheduleGrid: React.FC = () => {
                                   <span
                                     className={`px-2 py-0.5 rounded-[var(--admin-radius-full)] font-semibold text-xs ${
                                       isPending
-                                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                        ? "bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30"
                                         : apt.status === "completed"
                                           ? "bg-status-success/15 text-status-success"
                                           : operationalState.isInService
@@ -619,17 +619,17 @@ export const ScheduleGrid: React.FC = () => {
                           return (
                             <div
                               key={block.id}
-                              className="min-h-[72px] p-4 rounded-[var(--admin-radius-xl)] bg-red-500/10 border border-red-500/25 flex items-center justify-between text-sm text-red-300 shadow-sm"
+                              className="min-h-[72px] p-4 rounded-[var(--admin-radius-xl)] bg-red-500/10 border border-red-500/25 flex items-center justify-between text-sm text-red-700 dark:text-red-300 shadow-sm"
                             >
                               <div className="flex items-center gap-1.5 truncate">
-                                <Lock className="w-3 h-3 text-red-400 shrink-0" />
+                                <Lock className="w-3 h-3 text-red-700 dark:text-red-400 shrink-0" />
                                 <span className="font-semibold truncate">
                                   {barber.name}: {block.reason}
                                 </span>
                               </div>
                               <button
                                 onClick={() => handleUnblock(block.id)}
-                                className="text-xs text-red-400 underline font-bold shrink-0 ml-1"
+                                className="text-xs text-red-700 dark:text-red-400 underline font-bold shrink-0 ml-1"
                               >
                                 Desbloquear
                               </button>
@@ -799,8 +799,8 @@ export const ScheduleGrid: React.FC = () => {
                               }`}
                             >
                               {isPending && (
-                                <div className="flex items-center gap-1 text-xs font-bold text-amber-300 uppercase tracking-wide">
-                                  <ShieldAlert className="w-3 h-3 text-amber-400 shrink-0" />
+                                <div className="flex items-center gap-1 text-xs font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide">
+                                  <ShieldAlert className="w-3 h-3 text-amber-700 dark:text-amber-400 shrink-0" />
                                   <span>Fora do expediente</span>
                                 </div>
                               )}
@@ -857,16 +857,16 @@ export const ScheduleGrid: React.FC = () => {
                               )}
                             </div>
                           ) : block ? (
-                            <div className="w-full bg-red-950/30 border border-red-500/30 p-2 rounded-[var(--admin-radius-lg)] flex items-center justify-between text-xs text-red-300">
+                            <div className="w-full bg-red-500/10 dark:bg-red-950/30 border border-red-500/30 p-2 rounded-[var(--admin-radius-lg)] flex items-center justify-between text-xs text-red-700 dark:text-red-300">
                               <div className="flex items-center space-x-1.5">
-                                <Lock className="w-3.5 h-3.5 text-red-400" />
+                                <Lock className="w-3.5 h-3.5 text-red-700 dark:text-red-400" />
                                 <span className="font-semibold text-xs">
                                   {block.reason}
                                 </span>
                               </div>
                               <button
                                 onClick={() => handleUnblock(block.id)}
-                                className="text-red-400 hover:text-[var(--admin-text-main)] text-xs underline ml-2"
+                                className="text-red-700 dark:text-red-400 hover:text-[var(--admin-text-main)] text-xs underline ml-2"
                                 title="Desbloquear horário"
                               >
                                 Desbloquear

@@ -177,8 +177,8 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
 
       {/* TOAST MESSAGE */}
       {toastMsg && (
-        <div className="bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 p-3.5 rounded-[var(--admin-radius-lg)] flex items-center gap-2.5 text-xs font-bold animate-fade-in shadow-md">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+        <div className="bg-emerald-500/10 dark:bg-emerald-950/40 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 p-3.5 rounded-[var(--admin-radius-lg)] flex items-center gap-2.5 text-xs font-bold animate-fade-in shadow-md">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
           <span>{toastMsg}</span>
         </div>
       )}
@@ -348,7 +348,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                           'Logo removida. Clique em "Salvar Alterações" para confirmar.',
                         );
                       }}
-                      className="h-9 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center gap-1.5 transition-all"
+                      className="h-9 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-700 dark:text-red-400 rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center gap-1.5 transition-all"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       <span>Remover</span>
@@ -451,7 +451,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
           >
             <div className="flex items-start gap-3">
               <AlertTriangle
-                className={`w-4 h-4 shrink-0 mt-0.5 ${profile.allowOutsideHoursApproval ? "text-amber-400" : "text-[var(--admin-text-muted)]"}`}
+                className={`w-4 h-4 shrink-0 mt-0.5 ${profile.allowOutsideHoursApproval ? "text-amber-700 dark:text-amber-400" : "text-[var(--admin-text-muted)]"}`}
               />
               <div>
                 <div className="text-xs font-bold text-[var(--admin-text-main)]">
@@ -526,8 +526,8 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                       <span
                         className={`text-xs font-bold uppercase px-2 py-0.5 rounded-[var(--admin-radius-lg)] ${
                           sch.active
-                            ? "bg-emerald-950/60 text-emerald-400"
-                            : "bg-red-950/60 text-red-400"
+                            ? "bg-emerald-500/10 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400"
+                            : "bg-red-500/10 dark:bg-red-950/60 text-red-700 dark:text-red-400"
                         }`}
                       >
                         {sch.active ? "Aberto" : "Fechado"}

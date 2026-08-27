@@ -322,7 +322,7 @@ export const FinancialStatementManagement: React.FC = () => {
                     : (item.id as typeof filterStatus),
                 )
               }
-              className={`shrink-0 h-9 px-3.5 rounded-[var(--admin-radius-full)] border text-xs font-bold transition-colors ${filterStatus === item.id ? "bg-amber-500 border-amber-500 text-white" : "bg-[var(--admin-surface)] border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
+              className={`shrink-0 h-9 px-3.5 rounded-[var(--admin-radius-full)] border text-xs font-bold transition-colors ${filterStatus === item.id ? "bg-amber-500 border-amber-500 text-amber-950" : "bg-[var(--admin-surface)] border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
             >
               {item.label}
             </button>

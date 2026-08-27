@@ -667,7 +667,7 @@ export const ClientsManagement: React.FC = () => {
         >
           <div className="space-y-3">
             {errorMsg && (
-              <div className="p-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-[var(--admin-radius-lg)] text-xs font-bold">
+              <div className="p-2.5 bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-400 rounded-[var(--admin-radius-lg)] text-xs font-bold">
                 {errorMsg}
               </div>
             )}
