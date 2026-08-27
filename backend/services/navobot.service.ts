@@ -17,6 +17,7 @@ import {
   parseTimeFromText,
   findServiceMatches,
   findProfessionalMatches,
+  type ExtractedEvolutionAudio,
   type ExtractedEvolutionMessage,
   type NavoBotIntent,
 } from './navobot-intent.js';
@@ -174,6 +175,94 @@ function geminiResponseDiagnostics(response: any): string {
   const finishReason = response?.candidates?.[0]?.finishReason;
   const blockReason = response?.promptFeedback?.blockReason;
   return [finishReason && `finishReason=${finishReason}`, blockReason && `blockReason=${blockReason}`].filter(Boolean).join(', ');
+}
+
+async function transcribeAudioWithGemini(audio: ExtractedEvolutionAudio): Promise<string | null> {
+  const ai = getAiClient();
+  if (!ai) {
+    console.warn('[NavoBot][Voice] Transcrição de áudio não realizada: GEMINI_API_KEY ausente.');
+    return null;
+  }
+
+  let base64Data = audio.base64;
+  let mimeType = audio.mimetype || 'audio/ogg; codecs=opus';
+
+  // Se vier apenas a URL, faz o download do áudio e converte para base64
+  if (!base64Data && audio.url) {
+    try {
+      console.info(`[NavoBot][Voice] Baixando áudio a partir da URL: ${audio.url.slice(0, 60)}...`);
+      const response = await fetch(audio.url, { headers: { 'User-Agent': 'NavoBot/1.0' } });
+      if (!response.ok) {
+        console.warn(`[NavoBot][Voice] Falha ao baixar áudio da URL: status ${response.status}`);
+        return null;
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      base64Data = Buffer.from(arrayBuffer).toString('base64');
+      const detectedMime = response.headers.get('content-type');
+      if (detectedMime) mimeType = detectedMime;
+    } catch (err: any) {
+      console.warn(`[NavoBot][Voice] Erro ao baixar áudio para transcrição: ${err?.message || err}`);
+      return null;
+    }
+  }
+
+  // Se o base64 contiver data URL prefix (ex: data:audio/ogg;base64,...), limpa
+  if (base64Data && base64Data.includes('base64,')) {
+    const parts = base64Data.split('base64,');
+    const mimeMatch = parts[0].match(/data:(.*?);/);
+    if (mimeMatch?.[1]) mimeType = mimeMatch[1];
+    base64Data = parts[1];
+  }
+
+  if (!base64Data) {
+    console.warn('[NavoBot][Voice] Mensagem de áudio recebida sem dados base64 nem URL acessível.');
+    return null;
+  }
+
+  // Normaliza o MIME type para formato aceito pelo Gemini
+  let normalizedMimeType = mimeType.split(';')[0].trim().toLowerCase();
+  if (!normalizedMimeType || normalizedMimeType === 'audio/*') {
+    normalizedMimeType = 'audio/ogg';
+  }
+
+  try {
+    console.info(`[NavoBot][Voice] Transcrevendo áudio com Gemini (mime: ${normalizedMimeType})...`);
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              inlineData: {
+                data: base64Data,
+                mimeType: normalizedMimeType,
+              },
+            },
+            {
+              text: 'Transcreva com precisão a mensagem de voz deste cliente de barbearia/salão para texto em português. Retorne APENAS a transcrição textual exata do que foi dito pelo cliente, sem introduções, aspas ou comentários adicionais.',
+            },
+          ],
+        },
+      ],
+      config: {
+        temperature: 0.0,
+        maxOutputTokens: 256,
+        thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
+      },
+    });
+
+    const transcribed = extractGeminiText(response);
+    if (transcribed) {
+      console.info(`[NavoBot][Voice] Áudio transcrito com sucesso: "${transcribed.slice(0, 100)}..."`);
+      return transcribed.trim();
+    }
+    console.warn(`[NavoBot][Voice] Gemini processou áudio mas não retornou texto transcrito. ${geminiResponseDiagnostics(response)}`);
+    return null;
+  } catch (error: any) {
+    console.error('[NavoBot][Voice] Erro ao transcrever áudio com Gemini:', error?.message || error);
+    return null;
+  }
 }
 
 async function classifyWithAi(text: string, state: string, context: BotContext = {}): Promise<NavoBotIntent> {
@@ -1743,7 +1832,29 @@ MENSAGEM DO CLIENTE:
 
   async function handleWebhook(payload: any) {
     const message = extractEvolutionMessage(payload);
-    if (!message) return { ignored: true, reason: 'not_an_inbound_text_message' };
+    if (!message) return { ignored: true, reason: 'not_an_inbound_message' };
+
+    // Se a mensagem for de áudio (ou não tiver texto e tiver áudio), transcreve com Gemini
+    if (message.audio && (!message.text || !message.text.trim())) {
+      console.info(`[NavoBot] Mensagem de voz recebida de ${message.phone}. Iniciando reconhecimento de voz...`);
+      const transcribedText = await transcribeAudioWithGemini(message.audio);
+      if (transcribedText) {
+        message.text = transcribedText;
+        console.info(`[NavoBot] Áudio de ${message.phone} transcrito para: "${transcribedText}"`);
+      } else {
+        console.warn(`[NavoBot] Não foi possível transcrever áudio de ${message.phone}. Enviando aviso amigável ao cliente.`);
+        await sendText(
+          message.phone,
+          'Recebi seu áudio, mas não consegui entender com clareza o que foi dito. Poderia, por favor, enviar por texto ou mandar outro áudio?'
+        );
+        return { ignored: false, processed: true, audioTranscriptionFailed: true };
+      }
+    }
+
+    if (!message.text || !message.text.trim()) {
+      return { ignored: true, reason: 'empty_message_after_audio_processing' };
+    }
+
     return handleMessage(message);
   }
 

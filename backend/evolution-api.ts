@@ -483,12 +483,30 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
   router.post('/webhook/test-inbound', requireAuth, requireAdmin, async (req, res) => {
     try {
       const phone = normalizePhone(String(req.body?.phone || '5511999999999'));
-      const text = String(req.body?.text || 'Oi').trim();
+      const text = String(req.body?.text || '').trim();
       const pushName = String(req.body?.pushName || 'Cliente Teste').trim();
+      const audioBase64 = typeof req.body?.audioBase64 === 'string' ? req.body.audioBase64.trim() : undefined;
+      const audioUrl = typeof req.body?.audioUrl === 'string' ? req.body.audioUrl.trim() : undefined;
+      const audioMimeType = typeof req.body?.audioMimeType === 'string' ? req.body.audioMimeType.trim() : 'audio/ogg; codecs=opus';
       const settings = await getSettings();
 
       if (!onWebhook) {
         return res.status(503).json({ error: 'NavoBot não está ativo no servidor.' });
+      }
+
+      let messagePayload: any = {
+        conversation: text || 'Oi',
+      };
+
+      if (audioBase64 || audioUrl) {
+        messagePayload = {
+          audioMessage: {
+            base64: audioBase64,
+            url: audioUrl,
+            mimetype: audioMimeType,
+            seconds: Number(req.body?.audioSeconds || 5),
+          },
+        };
       }
 
       const mockPayload = {
@@ -501,9 +519,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
             id: `test_${Date.now()}`,
           },
           pushName,
-          message: {
-            conversation: text,
-          },
+          message: messagePayload,
           messageTimestamp: Math.floor(Date.now() / 1000),
         },
       };

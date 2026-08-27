@@ -19,12 +19,20 @@ export type NavoBotIntent =
   | 'gratitude'
   | 'unknown';
 
+export type ExtractedEvolutionAudio = {
+  base64?: string;
+  url?: string;
+  mimetype?: string;
+  seconds?: number;
+};
+
 export type ExtractedEvolutionMessage = {
   instanceName: string;
   messageId: string;
   phone: string;
   text: string;
   pushName?: string;
+  audio?: ExtractedEvolutionAudio;
 };
 
 const WEEKDAY_ALIASES: Record<string, keyof typeof WEEKDAY_OFFSETS> = {
@@ -301,6 +309,44 @@ function extractTextFromWhatsAppMessage(msg: any): string {
   return '';
 }
 
+function extractAudioFromWhatsAppMessage(msg: any): ExtractedEvolutionAudio | null {
+  if (!msg) return null;
+  const unwrapped = unwrapMessageContent(msg);
+  if (!unwrapped || typeof unwrapped !== 'object') return null;
+
+  const audioObj = unwrapped.audioMessage || unwrapped.pttMessage || unwrapped.voiceMessage || unwrapped.audio;
+  if (!audioObj) return null;
+
+  const base64 = typeof audioObj.base64 === 'string' && audioObj.base64.trim()
+    ? audioObj.base64.trim()
+    : typeof unwrapped.base64 === 'string' && unwrapped.base64.trim()
+    ? unwrapped.base64.trim()
+    : undefined;
+
+  const url = typeof audioObj.url === 'string' && audioObj.url.trim()
+    ? audioObj.url.trim()
+    : typeof audioObj.mediaUrl === 'string' && audioObj.mediaUrl.trim()
+    ? audioObj.mediaUrl.trim()
+    : typeof unwrapped.mediaUrl === 'string' && unwrapped.mediaUrl.trim()
+    ? unwrapped.mediaUrl.trim()
+    : undefined;
+
+  const mimetype = typeof audioObj.mimetype === 'string' && audioObj.mimetype.trim()
+    ? audioObj.mimetype.trim()
+    : typeof audioObj.mimeType === 'string' && audioObj.mimeType.trim()
+    ? audioObj.mimeType.trim()
+    : 'audio/ogg; codecs=opus';
+
+  const seconds = typeof audioObj.seconds === 'number' ? audioObj.seconds : undefined;
+
+  if (base64 || url) {
+    return { base64, url, mimetype, seconds };
+  }
+
+  // Se audioObj existir mesmo sem base64/url imediatos, retorna os metadados
+  return { mimetype, seconds };
+}
+
 export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage | null {
   if (!payload || typeof payload !== 'object') return null;
 
@@ -360,9 +406,12 @@ export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage
   const digits = resolvedJid.replace(/\D/g, '');
   if (digits.length < 8) return null;
 
+  // Extrai o áudio se presente
+  const audio = extractAudioFromWhatsAppMessage(dataItem.message || dataItem);
+
   // Extrai o texto da mensagem
   const text = extractTextFromWhatsAppMessage(dataItem.message || dataItem);
-  if (!text) return null;
+  if (!text && !audio) return null;
 
   // Extrai nome da instância de forma segura
   const rawInstance = payload.instance || dataItem.instance || payload.instanceName || dataItem.instanceName;
@@ -376,8 +425,9 @@ export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage
     instanceName,
     messageId: String(key.id || dataItem.id || `${digits}:${dataItem.messageTimestamp || Date.now()}`),
     phone: digits,
-    text,
+    text: text || '',
     pushName: pushName ? String(pushName) : undefined,
+    audio: audio || undefined,
   };
 }
 
