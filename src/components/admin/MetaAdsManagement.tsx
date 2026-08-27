@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from"react";
-import { useToast } from "../ui/Toast";
+import { showToast } from "../ui/Toast";
 import { createPortal } from"react-dom";
 import {
  BarChart3,

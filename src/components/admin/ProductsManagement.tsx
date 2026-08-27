@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from"react";
-import { useToast } from "../ui/Toast";
+import { showToast } from "../ui/Toast";
 import {
  AlertTriangle,
  Boxes,
@@ -103,11 +103,7 @@ export const ProductsManagement: React.FC = () => {
  return matchesQuery && matchesStock && matchesCategory;
  });
 
- const showToast = (message: string) => {
- showToast("success", "Sucesso", message);
- window.setTimeout(() => showToast("success", "Sucesso", null), 3500);
- };
-
+ 
  const openCreate = () => {
  setEditingProduct(null);
  setForm({ ...defaultProduct });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from"react";
-import { useToast } from "../ui/Toast";
+import { showToast } from "../ui/Toast";
 import {
  AlertCircle,
  CheckCircle2,

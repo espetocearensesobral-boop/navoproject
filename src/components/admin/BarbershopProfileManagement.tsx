@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from"react";
-import { useToast } from "../ui/Toast";
+import { showToast } from "../ui/Toast";
 import { handleEnterAsTab } from"../../utils/formUtils";
 import { formatPhone } from"../../utils/masks";
 import {
@@ -66,11 +66,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
  setLoading(false);
  };
 
- const showToast = (msg: string) => {
- showToast("success", "Sucesso", msg);
- setTimeout(() => showToast("success", "Sucesso", null), 4000);
- };
-
+ 
  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
  const file = e.target.files?.[0];
  if (!file) return;
