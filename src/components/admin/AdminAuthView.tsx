@@ -96,14 +96,14 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
       <main className="relative z-10 my-auto w-full max-w-sm">
         <div className="admin-auth-panel rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6 sm:p-8">
           <div className="mb-7 flex flex-col items-center text-center">
-            <div className="admin-auth-brand-mark mb-5 rounded-full border border-[var(--admin-border-strong)] bg-[var(--admin-bg)] p-1">
-              <div className="rounded-full border border-[var(--admin-border)] p-1">
-                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[var(--admin-surface)] sm:h-24 sm:w-24">
+            <div className="admin-auth-brand-mark mb-5 rounded-[var(--admin-radius-full)] border border-[var(--admin-border-strong)] bg-[var(--admin-bg)] p-1">
+              <div className="rounded-[var(--admin-radius-full)] border border-[var(--admin-border)] p-1">
+                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-[var(--admin-radius-full)] bg-[var(--admin-surface)] sm:h-24 sm:w-24">
                   {shopLogo ? (
                     <img
                       src={shopLogo}
                       alt={shopName}
-                      className="h-full w-full rounded-full object-cover"
+                      className="h-full w-full rounded-[var(--admin-radius-full)] object-cover"
                     />
                   ) : (
                     <Scissors className="h-9 w-9 text-[var(--admin-accent)]" />
@@ -220,7 +220,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
             >
               {isLoading ? (
                 <>
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-surface-base/30 border-t-surface-base" />
+                  <div className="h-5 w-5 animate-spin rounded-[var(--admin-radius-full)] border-2 border-surface-base/30 border-t-surface-base" />
                   <span>Entrando...</span>
                 </>
               ) : (

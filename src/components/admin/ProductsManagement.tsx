@@ -203,12 +203,12 @@ export const ProductsManagement: React.FC = () => {
       />
 
       {toast && (
-        <div className="rounded-xl border border-status-success/30 bg-status-success/10 p-3 text-xs font-semibold text-status-success">
+        <div className="rounded-[var(--admin-radius-lg)] border border-status-success/30 bg-status-success/10 p-3 text-xs font-semibold text-status-success">
           {toast}
         </div>
       )}
       {error && (
-        <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3 text-xs font-semibold text-status-error flex items-center justify-between gap-3">
+        <div className="rounded-[var(--admin-radius-lg)] border border-status-error/30 bg-status-error/10 p-3 text-xs font-semibold text-status-error flex items-center justify-between gap-3">
           <span>{error}</span>
           <button
             type="button"
@@ -228,7 +228,7 @@ export const ProductsManagement: React.FC = () => {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Produto, marca ou categoria"
-            className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 pr-3 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
+            className="w-full h-10 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 pr-3 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
           />
         </div>
         <div
@@ -241,7 +241,7 @@ export const ProductsManagement: React.FC = () => {
               setCategoryFilter("all");
               setOnlyLowStock(false);
             }}
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === "all" && !onlyLowStock ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-full)] text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === "all" && !onlyLowStock ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
           >
             Todos ({products.length})
           </button>
@@ -253,7 +253,7 @@ export const ProductsManagement: React.FC = () => {
                 setCategoryFilter(category);
                 setOnlyLowStock(false);
               }}
-              className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === category && !onlyLowStock ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-full)] text-sm font-semibold whitespace-nowrap transition-colors ${categoryFilter === category && !onlyLowStock ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
             >
               {category}
             </button>
@@ -261,7 +261,7 @@ export const ProductsManagement: React.FC = () => {
           <button
             type="button"
             onClick={() => setOnlyLowStock((value) => !value)}
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors ${onlyLowStock ? "bg-amber-500 text-white" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-full)] text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors ${onlyLowStock ? "bg-amber-500 text-white" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
           >
             <AlertTriangle className="w-3.5 h-3.5" /> Baixo estoque (
             {lowStockCount})
@@ -277,13 +277,13 @@ export const ProductsManagement: React.FC = () => {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Produto, marca ou categoria"
-            className="w-full h-10 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 pr-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
+            className="w-full h-10 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 pr-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)]"
           />
         </div>
         <button
           type="button"
           onClick={() => setOnlyLowStock((value) => !value)}
-          className={`h-10 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 ${onlyLowStock ? "border-amber-400/50 bg-amber-500/15 text-amber-300" : "border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"}`}
+          className={`h-10 px-3 rounded-[var(--admin-radius-lg)] border text-xs font-semibold flex items-center justify-center gap-2 ${onlyLowStock ? "border-amber-400/50 bg-amber-500/15 text-amber-300" : "border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"}`}
         >
           <AlertTriangle className="w-3.5 h-3.5" /> Baixo estoque (
           {lowStockCount})
@@ -291,11 +291,11 @@ export const ProductsManagement: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-10 text-center text-xs text-[var(--admin-text-muted)]">
+        <div className="rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)] bg-[var(--admin-surface)] p-10 text-center text-xs text-[var(--admin-text-muted)]">
           Carregando estoque...
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] p-10 text-center text-xs text-[var(--admin-text-muted)]">
+        <div className="rounded-[var(--admin-radius-xl)] border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] p-10 text-center text-xs text-[var(--admin-text-muted)]">
           Nenhum produto encontrado.
         </div>
       ) : (
@@ -393,7 +393,7 @@ export const ProductsManagement: React.FC = () => {
                     aria-expanded={isExpanded}
                     className="w-full min-h-[76px] p-3.5 text-left flex items-center gap-3 hover:bg-[var(--admin-bg)]/40"
                   >
-                    <div className="w-11 h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0">
+                    <div className="w-11 h-11 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0">
                       {product.image_url ? (
                         <img src={product.image_url} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -456,14 +456,14 @@ export const ProductsManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => openEdit(product)}
-                          className="flex-1 min-h-10 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5"
+                          className="flex-1 min-h-10 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5"
                         >
                           <Edit3 className="w-4 h-4" /> Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(product)}
-                          className="w-10 h-10 shrink-0 rounded-lg border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center"
+                          className="w-10 h-10 shrink-0 rounded-[var(--admin-radius-md)] border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -522,7 +522,7 @@ export const ProductsManagement: React.FC = () => {
             className="space-y-6"
           >
             {/* Section 1: Basic Info */}
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-5 shadow-xs">
               <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--admin-accent)] flex items-center gap-2">
                 <Package className="w-4 h-4" />
                 <span>1. Identificação do Produto</span>
@@ -540,7 +540,7 @@ export const ProductsManagement: React.FC = () => {
                       value={form.name}
                       onChange={(event) => updateForm("name", event.target.value)}
                       placeholder="Ex: Pomada Modeladora Efeito Matte 150g"
-                      className="w-full h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
                     />
                   </label>
                 </div>
@@ -555,7 +555,7 @@ export const ProductsManagement: React.FC = () => {
                       value={form.brand}
                       onChange={(event) => updateForm("brand", event.target.value)}
                       placeholder="Ex: BarberX Professional"
-                      className="w-full h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                     />
                   </label>
                 </div>
@@ -570,7 +570,7 @@ export const ProductsManagement: React.FC = () => {
                       onChange={(event) =>
                         updateForm("category", event.target.value)
                       }
-                      className="w-full h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                     >
                       {categories.map((category) => (
                         <option key={category} value={category}>
@@ -587,7 +587,7 @@ export const ProductsManagement: React.FC = () => {
                       URL da Imagem do Produto (Opcional)
                     </span>
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0">
+                      <div className="w-11 h-11 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0">
                         {form.image_url ? (
                           <img src={form.image_url} alt="Preview" className="w-full h-full object-cover" />
                         ) : (
@@ -601,7 +601,7 @@ export const ProductsManagement: React.FC = () => {
                           updateForm("image_url", event.target.value)
                         }
                         placeholder="https://exemplo.com/fotos/pomada.jpg"
-                        className="w-full h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                        className="w-full h-11 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                       />
                     </div>
                   </label>
@@ -610,7 +610,7 @@ export const ProductsManagement: React.FC = () => {
             </div>
 
             {/* Section 2: Pricing & Commissions */}
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-5 shadow-xs">
               <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--admin-accent)] flex items-center gap-2">
                 <DollarSign className="w-4 h-4" />
                 <span>2. Precificação & Margem de Lucro</span>
@@ -631,7 +631,7 @@ export const ProductsManagement: React.FC = () => {
                       onChange={(event) =>
                         updateForm("price", Number(event.target.value))
                       }
-                      className="w-full h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base font-mono font-bold text-status-success outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base font-mono font-bold text-status-success outline-none focus:border-[var(--admin-accent)] transition-colors"
                     />
                   </label>
                 </div>
@@ -649,7 +649,7 @@ export const ProductsManagement: React.FC = () => {
                       onChange={(event) =>
                         updateForm("cost_price", Number(event.target.value))
                       }
-                      className="w-full h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base font-mono text-status-error outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base font-mono text-status-error outline-none focus:border-[var(--admin-accent)] transition-colors"
                     />
                   </label>
                 </div>
@@ -672,7 +672,7 @@ export const ProductsManagement: React.FC = () => {
                             Number(event.target.value),
                           )
                         }
-                        className="w-full h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base font-mono font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                        className="w-full h-11 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base font-mono font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                       />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-[var(--admin-text-muted)]">
                         %
@@ -684,7 +684,7 @@ export const ProductsManagement: React.FC = () => {
 
               {/* Profit simulator */}
               {form.price > 0 && (
-                <div className="p-4 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="p-4 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div>
                     <span className="text-xs text-[var(--admin-text-muted)] uppercase tracking-wider font-bold block">
                       Margem Bruta por Unidade:
@@ -706,7 +706,7 @@ export const ProductsManagement: React.FC = () => {
             </div>
 
             {/* Section 3: Stock Control */}
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-5 shadow-xs">
               <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--admin-accent)] flex items-center gap-2">
                 <Boxes className="w-4 h-4" />
                 <span>3. Gestão e Controle de Estoque</span>
@@ -727,7 +727,7 @@ export const ProductsManagement: React.FC = () => {
                       onChange={(event) =>
                         updateForm("stock_quantity", Number(event.target.value))
                       }
-                      className="w-full h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                     />
                   </label>
                 </div>
@@ -746,7 +746,7 @@ export const ProductsManagement: React.FC = () => {
                       onChange={(event) =>
                         updateForm("min_stock_alert", Number(event.target.value))
                       }
-                      className="w-full h-11 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 text-base text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                     />
                   </label>
                 </div>

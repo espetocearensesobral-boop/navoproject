@@ -150,7 +150,7 @@ export const OperationalReportsManagement: React.FC = () => {
               key={option.id}
               type="button"
               onClick={() => setPeriod(option.id)}
-              className={`shrink-0 h-10 px-4 rounded-full text-sm font-bold transition-colors ${period === option.id ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"}`}
+              className={`shrink-0 h-10 px-4 rounded-[var(--admin-radius-full)] text-sm font-bold transition-colors ${period === option.id ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"}`}
             >
               {option.label}
             </button>
@@ -169,7 +169,7 @@ export const OperationalReportsManagement: React.FC = () => {
               key={view.id}
               type="button"
               onClick={() => setActiveView(view.id as typeof activeView)}
-              className={`shrink-0 h-10 px-4 rounded-xl text-sm font-bold border transition-colors ${activeView === view.id ? "bg-[var(--admin-surface)] border-[var(--admin-accent)] text-[var(--admin-accent)]" : "border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"}`}
+              className={`shrink-0 h-10 px-4 rounded-[var(--admin-radius-lg)] text-sm font-bold border transition-colors ${activeView === view.id ? "bg-[var(--admin-surface)] border-[var(--admin-accent)] text-[var(--admin-accent)]" : "border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"}`}
             >
               {view.label}
             </button>
@@ -178,12 +178,12 @@ export const OperationalReportsManagement: React.FC = () => {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">
+        <div className="rounded-[var(--admin-radius-lg)] border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">
           {error}
         </div>
       )}
       {loading && !report ? (
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-12 text-center text-[var(--admin-text-muted)]">
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-12 text-center text-[var(--admin-text-muted)]">
           <Loader2 className="w-5 h-5 animate-spin inline mr-2" />
           Carregando relatório…
         </div>
@@ -253,7 +253,7 @@ const ComparisonStrip: React.FC<{ report: OperationalReportData }> = ({
     return `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`;
   };
   return (
-    <section className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-3">
+    <section className="rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-xs font-bold text-[var(--admin-text-main)]">
@@ -265,15 +265,15 @@ const ComparisonStrip: React.FC<{ report: OperationalReportData }> = ({
           </p>
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2.5 py-1 text-[var(--admin-text-muted)]">
+          <span className="rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2.5 py-1 text-[var(--admin-text-muted)]">
             Agendas{" "}
             {delta(report.summary.appointments, report.comparison.appointments)}
           </span>
-          <span className="rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2.5 py-1 finance-positive">
+          <span className="rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2.5 py-1 finance-positive">
             Entradas{" "}
             {delta(report.summary.totalIncome, report.comparison.totalIncome)}
           </span>
-          <span className="rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2.5 py-1 text-[var(--admin-text-muted)]">
+          <span className="rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2.5 py-1 text-[var(--admin-text-muted)]">
             Ticket{" "}
             {delta(
               report.summary.averageTicket,
@@ -374,7 +374,7 @@ const WeeklyMovement: React.FC<{
   report: OperationalReportData;
   maxWeekly: number;
 }> = ({ report, maxWeekly }) => (
-  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
     <SectionTitle
       icon={BarChart3}
       title="Movimento semanal"
@@ -389,13 +389,13 @@ const WeeklyMovement: React.FC<{
           <div className="w-full h-[calc(100%-1.75rem)] flex items-end justify-center gap-1">
             <span
               title={`${day.appointments} agendamentos`}
-              className="w-3 sm:w-5 rounded-t-md bg-[var(--admin-accent)]/30 relative"
+              className="w-3 sm:w-5 rounded-t-[var(--admin-radius-sm)] bg-[var(--admin-accent)]/30 relative"
               style={{
                 height: `${Math.max(day.appointments ? 7 : 0, (day.appointments / maxWeekly) * 100)}%`,
               }}
             >
               <i
-                className="absolute bottom-0 left-0 right-0 rounded-t-md bg-[var(--admin-accent)]"
+                className="absolute bottom-0 left-0 right-0 rounded-t-[var(--admin-radius-sm)] bg-[var(--admin-accent)]"
                 style={{
                   height: `${day.appointments ? Math.max(8, (day.completed / day.appointments) * 100) : 0}%`,
                 }}
@@ -410,11 +410,11 @@ const WeeklyMovement: React.FC<{
     </div>
     <div className="mt-4 flex flex-wrap gap-4 text-xs text-[var(--admin-text-muted)]">
       <span className="flex items-center gap-1.5">
-        <i className="w-2.5 h-2.5 rounded-sm bg-[var(--admin-accent)]" />
+        <i className="w-2.5 h-2.5 rounded-[var(--admin-radius-xs)] bg-[var(--admin-accent)]" />
         Concluídos
       </span>
       <span className="flex items-center gap-1.5">
-        <i className="w-2.5 h-2.5 rounded-sm bg-[var(--admin-accent)]/30" />
+        <i className="w-2.5 h-2.5 rounded-[var(--admin-radius-xs)] bg-[var(--admin-accent)]/30" />
         Total agendado
       </span>
     </div>
@@ -429,7 +429,7 @@ const DailyMovement: React.FC<{ report: OperationalReportData }> = ({
     ...report.dailyMovement.map((day) => day.appointments),
   );
   return (
-    <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+    <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
       <SectionTitle
         icon={CalendarDays}
         title="Evolução diária"
@@ -443,9 +443,9 @@ const DailyMovement: React.FC<{ report: OperationalReportData }> = ({
               <span className="w-12 text-xs font-mono text-[var(--admin-text-muted)]">
                 {day.label}
               </span>
-              <div className="flex-1 h-2 rounded-full bg-[var(--admin-bg)] overflow-hidden">
+              <div className="flex-1 h-2 rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] overflow-hidden">
                 <span
-                  className="block h-full rounded-full bg-[var(--admin-accent)]"
+                  className="block h-full rounded-[var(--admin-radius-full)] bg-[var(--admin-accent)]"
                   style={{ width: `${(day.appointments / max) * 100}%` }}
                 />
               </div>
@@ -469,7 +469,7 @@ const PeakHours: React.FC<{
   report: OperationalReportData;
   maxHour: number;
 }> = ({ report, maxHour }) => (
-  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
     <SectionTitle
       icon={Clock3}
       title="Horários de pico"
@@ -491,9 +491,9 @@ const PeakHours: React.FC<{
             <span className="w-10 text-sm font-mono font-bold text-[var(--admin-text-main)]">
               {hour.label}
             </span>
-            <div className="flex-1 h-2 rounded-full bg-[var(--admin-bg)] overflow-hidden">
+            <div className="flex-1 h-2 rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] overflow-hidden">
               <span
-                className="block h-full rounded-full bg-status-warning"
+                className="block h-full rounded-[var(--admin-radius-full)] bg-status-warning"
                 style={{ width: `${(hour.count / maxHour) * 100}%` }}
               />
             </div>
@@ -510,7 +510,7 @@ const PeakHours: React.FC<{
 const TopServices: React.FC<{ report: OperationalReportData }> = ({
   report,
 }) => (
-  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
     <SectionTitle
       icon={Scissors}
       title="Top 5 serviços"
@@ -523,9 +523,9 @@ const TopServices: React.FC<{ report: OperationalReportData }> = ({
         {report.topServices.map((service, index) => (
           <div
             key={service.serviceTitle}
-            className="p-3 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center gap-3"
+            className="p-3 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center gap-3"
           >
-            <span className="w-8 h-8 rounded-lg bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold flex items-center justify-center shrink-0">
               #{index + 1}
             </span>
             <div className="min-w-0 flex-1">
@@ -554,7 +554,7 @@ const TopServices: React.FC<{ report: OperationalReportData }> = ({
 const ProfessionalsRanking: React.FC<{ report: OperationalReportData }> = ({
   report,
 }) => (
-  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
     <SectionTitle
       icon={UserRound}
       title="Performance da equipe"
@@ -567,9 +567,9 @@ const ProfessionalsRanking: React.FC<{ report: OperationalReportData }> = ({
         {report.topProfessionals.map((professional, index) => (
           <div
             key={professional.professionalName}
-            className="p-3 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center gap-3"
+            className="p-3 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center gap-3"
           >
-            <span className="w-8 h-8 rounded-lg bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold flex items-center justify-center shrink-0">
               #{index + 1}
             </span>
             <div className="min-w-0 flex-1">
@@ -596,7 +596,7 @@ const ProfessionalsRanking: React.FC<{ report: OperationalReportData }> = ({
 const QueueSnapshot: React.FC<{ report: OperationalReportData }> = ({
   report,
 }) => (
-  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
     <SectionTitle
       icon={Users}
       title="Fila e operação"
@@ -612,7 +612,7 @@ const QueueSnapshot: React.FC<{ report: OperationalReportData }> = ({
         .map((item) => (
           <div
             key={item.status}
-            className="p-3 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)]"
+            className="p-3 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)]"
           >
             <p className="text-xs text-[var(--admin-text-muted)] admin-safe-wrap">
               {queueLabels[item.status] || item.status}
@@ -629,7 +629,7 @@ const QueueSnapshot: React.FC<{ report: OperationalReportData }> = ({
 const TodaySchedule: React.FC<{ report: OperationalReportData }> = ({
   report,
 }) => (
-  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+  <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
     <SectionTitle
       icon={CalendarDays}
       title="Próximos hoje"
@@ -655,7 +655,7 @@ const TodaySchedule: React.FC<{ report: OperationalReportData }> = ({
                 {appointment.serviceTitle} · {appointment.professionalName}
               </p>
             </div>
-            <span className="text-xs font-bold px-2 py-1 rounded-full bg-[var(--admin-bg)] text-[var(--admin-text-muted)] shrink-0">
+            <span className="text-xs font-bold px-2 py-1 rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] shrink-0">
               {statusLabels[appointment.status] || appointment.status}
             </span>
           </div>
@@ -707,13 +707,13 @@ const MetricCard: React.FC<{
         ? "finance-negative"
         : "text-[var(--admin-text-main)]";
   return (
-    <div className="min-w-0 p-3.5 sm:p-4 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl">
+    <div className="min-w-0 p-3.5 sm:p-4 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)]">
       <div className="flex items-start justify-between gap-2">
         <p className="text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] admin-safe-wrap">
           {label}
         </p>
         <span
-          className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${toneClass}`}
+          className={`w-8 h-8 rounded-[var(--admin-radius-md)] shrink-0 flex items-center justify-center ${toneClass}`}
         >
           <Icon className="w-4 h-4" />
         </span>
@@ -736,9 +736,9 @@ const MiniMetric: React.FC<{
   icon: React.ElementType;
   tone: "positive" | "negative" | "warning";
 }> = ({ label, value, detail, icon: Icon, tone }) => (
-  <div className="p-3.5 rounded-xl bg-[var(--admin-surface)] border border-[var(--admin-border)] flex items-start gap-3">
+  <div className="p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] border border-[var(--admin-border)] flex items-start gap-3">
     <span
-      className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${tone === "positive" ? "text-status-success bg-status-success/10" : tone === "negative" ? "text-status-error bg-status-error/10" : "text-amber-500 bg-amber-500/10"}`}
+      className={`w-8 h-8 rounded-[var(--admin-radius-md)] shrink-0 flex items-center justify-center ${tone === "positive" ? "text-status-success bg-status-success/10" : tone === "negative" ? "text-status-error bg-status-error/10" : "text-amber-500 bg-amber-500/10"}`}
     >
       <Icon className="w-4 h-4" />
     </span>

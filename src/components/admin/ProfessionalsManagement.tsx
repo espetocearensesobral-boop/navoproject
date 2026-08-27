@@ -332,7 +332,7 @@ export const ProfessionalsManagement: React.FC = () => {
 
       {/* TOAST MESSAGE */}
       {toastMsg && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
+        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-[var(--admin-radius-lg)] flex items-center gap-2 text-xs font-bold animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{toastMsg}</span>
         </div>
@@ -340,12 +340,12 @@ export const ProfessionalsManagement: React.FC = () => {
 
       {/* COMPACT KPI CARDS */}
       <div className="hidden md:grid grid-cols-2 md:grid-cols-4 gap-2.5">
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
             <span className="text-xs font-bold uppercase tracking-wider">
               Total Equipe
             </span>
-            <div className="w-6 h-6 rounded-lg bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center">
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -357,12 +357,12 @@ export const ProfessionalsManagement: React.FC = () => {
           </p>
         </div>
 
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
             <span className="text-xs font-bold uppercase tracking-wider">
               Ativos na Agenda
             </span>
-            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-status-success/10 text-status-success flex items-center justify-center">
               <UserCheck className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -374,12 +374,12 @@ export const ProfessionalsManagement: React.FC = () => {
           </p>
         </div>
 
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
             <span className="text-xs font-bold uppercase tracking-wider">
               Média Avaliação
             </span>
-            <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-amber-500/10 text-amber-400 flex items-center justify-center">
               <Star className="w-3.5 h-3.5 fill-amber-400" />
             </div>
           </div>
@@ -391,12 +391,12 @@ export const ProfessionalsManagement: React.FC = () => {
           </p>
         </div>
 
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
             <span className="text-xs font-bold uppercase tracking-wider">
               Comissão Média
             </span>
-            <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-blue-500/10 text-blue-400 flex items-center justify-center">
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -411,7 +411,7 @@ export const ProfessionalsManagement: React.FC = () => {
 
       {/* MOBILE: SEARCH AND FILTERS */}
       <div className="md:hidden space-y-2 mb-3">
-        <div className="bg-[var(--admin-surface)] p-3 rounded-2xl border border-[var(--admin-border)]">
+        <div className="bg-[var(--admin-surface)] p-3 rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)]">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
             <input
@@ -419,7 +419,7 @@ export const ProfessionalsManagement: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar profissional..."
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-3 py-2.5 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-10 pr-3 py-2.5 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
             />
           </div>
         </div>
@@ -430,21 +430,21 @@ export const ProfessionalsManagement: React.FC = () => {
           <button
             type="button"
             onClick={() => setStatusFilter("all")}
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === "all" ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-full)] text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === "all" ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
           >
             Todos ({totalBarbers})
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter("active")}
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === "active" ? "bg-status-success text-white" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-full)] text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === "active" ? "bg-status-success text-white" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
           >
             Ativos ({activeBarbers})
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter("inactive")}
-            className={`shrink-0 min-h-11 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === "inactive" ? "bg-red-500 text-white" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
+            className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-full)] text-sm font-semibold whitespace-nowrap transition-colors ${statusFilter === "inactive" ? "bg-red-500 text-white" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"}`}
           >
             Pausados ({totalBarbers - activeBarbers})
           </button>
@@ -452,7 +452,7 @@ export const ProfessionalsManagement: React.FC = () => {
       </div>
 
       {/* DESKTOP SEARCH AND FILTERS */}
-      <div className="hidden md:flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-[var(--admin-surface)] p-2.5 rounded-xl border border-[var(--admin-border)]">
+      <div className="hidden md:flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-[var(--admin-surface)] p-2.5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)]">
         <div className="relative flex-1">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
           <input
@@ -460,7 +460,7 @@ export const ProfessionalsManagement: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nome, apelido, cargo ou especialidade..."
-            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-8 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
           />
         </div>
 
@@ -471,7 +471,7 @@ export const ProfessionalsManagement: React.FC = () => {
           >
             <button
               onClick={() => setStatusFilter("all")}
-              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-lg)] text-sm font-semibold whitespace-nowrap transition-colors ${
                 statusFilter === "all"
                   ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
                   : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
@@ -481,7 +481,7 @@ export const ProfessionalsManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setStatusFilter("active")}
-              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-lg)] text-sm font-semibold whitespace-nowrap transition-colors ${
                 statusFilter === "active"
                   ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
                   : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
@@ -491,7 +491,7 @@ export const ProfessionalsManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setStatusFilter("inactive")}
-              className={`shrink-0 min-h-11 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
+              className={`shrink-0 min-h-11 px-4 py-2 rounded-[var(--admin-radius-lg)] text-sm font-semibold whitespace-nowrap transition-colors ${
                 statusFilter === "inactive"
                   ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
                   : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
@@ -543,7 +543,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         <div className="w-10 h-10 rounded border border-[var(--admin-border)] overflow-hidden relative">
                           <img src={barber.photo_url} alt={barber.name} className="w-full h-full object-cover" />
                           <span
-                            className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-white ${
+                            className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-[var(--admin-radius-full)] border border-white ${
                               isActive ? "bg-status-success" : "bg-red-500"
                             }`}
                           />
@@ -656,10 +656,10 @@ export const ProfessionalsManagement: React.FC = () => {
                     aria-expanded={isExpanded}
                     className="w-full min-h-[76px] p-3.5 text-left flex items-center gap-3 hover:bg-[var(--admin-bg)]/40"
                   >
-                    <div className="w-11 h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0 relative">
+                    <div className="w-11 h-11 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0 relative">
                        <img src={barber.photo_url} alt="" className="w-full h-full object-cover" />
                        <span
-                         className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-[var(--admin-surface)] ${
+                         className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-[var(--admin-radius-full)] border border-[var(--admin-surface)] ${
                            isActive ? "bg-status-success" : "bg-red-500"
                          }`}
                        />
@@ -699,11 +699,11 @@ export const ProfessionalsManagement: React.FC = () => {
                       )}
                       
                       <div className="grid grid-cols-2 gap-2 mb-3">
-                         <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg p-2">
+                         <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2">
                             <p className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)] font-bold">Contato</p>
                             <p className="text-xs font-bold text-[var(--admin-text-main)] mt-0.5 admin-clamp-1">{barber.phone || "Não inf."}</p>
                          </div>
-                         <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg p-2">
+                         <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2">
                             <p className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)] font-bold">Chave PIX</p>
                             <p className="text-xs font-bold text-[var(--admin-text-main)] mt-0.5 admin-clamp-1">{barber.pix_key || "Não inf."}</p>
                          </div>
@@ -713,7 +713,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleToggleStatus(barber)}
-                          className={`flex-1 min-h-10 rounded-lg border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                          className={`flex-1 min-h-10 rounded-[var(--admin-radius-md)] border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
                             isActive
                               ? "bg-red-500/10 text-red-500 border-red-500/20"
                               : "bg-status-success/10 text-status-success border-status-success/20"
@@ -726,7 +726,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             href={`https://wa.me/55${barber.phone.replace(/\D/g, "")}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex-1 min-h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                            className="flex-1 min-h-10 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
                           >
                              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                           </a>
@@ -736,14 +736,14 @@ export const ProfessionalsManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(barber)}
-                          className="flex-1 min-h-10 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5"
+                          className="flex-1 min-h-10 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] text-xs font-bold flex items-center justify-center gap-1.5"
                         >
                           <Edit2 className="w-4 h-4" /> Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(barber.id)}
-                          className="w-10 h-10 shrink-0 rounded-lg border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center"
+                          className="w-10 h-10 shrink-0 rounded-[var(--admin-radius-md)] border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -794,11 +794,11 @@ export const ProfessionalsManagement: React.FC = () => {
         >
           <div className="space-y-6">
             {/* Modal Tabs Header */}
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-2 flex flex-wrap sm:flex-nowrap gap-2 shadow-xs">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-2 flex flex-wrap sm:flex-nowrap gap-2 shadow-xs">
               <button
                 type="button"
                 onClick={() => setActiveFormTab("profile")}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-[var(--admin-radius-lg)] text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "profile"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
@@ -811,7 +811,7 @@ export const ProfessionalsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveFormTab("specialties")}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-[var(--admin-radius-lg)] text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "specialties"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
@@ -824,7 +824,7 @@ export const ProfessionalsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveFormTab("commission")}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-[var(--admin-radius-lg)] text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "commission"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
@@ -837,7 +837,7 @@ export const ProfessionalsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveFormTab("schedule")}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-[var(--admin-radius-lg)] text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "schedule"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
@@ -857,7 +857,7 @@ export const ProfessionalsManagement: React.FC = () => {
             >
               {/* TAB 1: PROFILE */}
               {activeFormTab === "profile" && (
-                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-6 shadow-xs">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block">
@@ -872,7 +872,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             setFormData({ ...formData, name: e.target.value })
                           }
                           placeholder="Ex: Carlos Eduardo Silva"
-                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
                         />
                       </label>
                     </div>
@@ -889,7 +889,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             setFormData({ ...formData, nickname: e.target.value })
                           }
                           placeholder="Ex: Carlão Fade (Cadeira 01)"
-                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                         />
                       </label>
                     </div>
@@ -906,7 +906,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             setFormData({ ...formData, role: e.target.value })
                           }
                           placeholder="Ex: Master Barber & Visagista"
-                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                         />
                       </label>
                     </div>
@@ -923,7 +923,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             setFormData({ ...formData, phone: e.target.value })
                           }
                           placeholder="(11) 99887-6655"
-                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                         />
                       </label>
                     </div>
@@ -941,13 +941,13 @@ export const ProfessionalsManagement: React.FC = () => {
                           setFormData({ ...formData, bio: e.target.value })
                         }
                         placeholder="Mais de 8 anos de experiência em cortes clássicos e modernos, barba terapia e visagismo masculino..."
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] resize-none transition-colors"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] resize-none transition-colors"
                       />
                     </label>
                   </div>
 
                   {/* Photo selection */}
-                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-4">
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-4">
                     <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                       Foto de Perfil do Profissional
                     </p>
@@ -956,7 +956,7 @@ export const ProfessionalsManagement: React.FC = () => {
                       <img
                         src={formData.photo_url}
                         alt="Preview do Barbeiro"
-                        className="w-16 h-16 rounded-2xl object-cover border-2 border-[var(--admin-accent)] shrink-0 shadow-xs"
+                        className="w-16 h-16 rounded-[var(--admin-radius-xl)] object-cover border-2 border-[var(--admin-accent)] shrink-0 shadow-xs"
                       />
                       <input
                         type="url"
@@ -968,7 +968,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           })
                         }
                         placeholder="Cole a URL da imagem de perfil..."
-                        className="w-full h-11 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                        className="w-full h-11 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                       />
                     </div>
 
@@ -984,7 +984,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             onClick={() =>
                               setFormData({ ...formData, photo_url: preset.url })
                             }
-                            className={`group relative rounded-xl overflow-hidden border-2 transition-all h-20 ${
+                            className={`group relative rounded-[var(--admin-radius-lg)] overflow-hidden border-2 transition-all h-20 ${
                               formData.photo_url === preset.url
                                 ? "border-[var(--admin-accent)] ring-2 ring-[var(--admin-accent)]"
                                 : "border-[var(--admin-border)] opacity-70 hover:opacity-100 hover:border-[var(--admin-accent)]/50"
@@ -1010,7 +1010,7 @@ export const ProfessionalsManagement: React.FC = () => {
 
               {/* TAB 2: SPECIALTIES */}
               {activeFormTab === "specialties" && (
-                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-6 shadow-xs">
                   <div>
                     <label className="block">
                       <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
@@ -1021,12 +1021,12 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={specialtiesText}
                         onChange={(e) => setSpecialtiesText(e.target.value)}
                         placeholder="Ex: Degradê Navalhado, Barboterapia Imperial, Cortes Clássicos, Visagismo"
-                        className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                        className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
                       />
                     </label>
                   </div>
 
-                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-3">
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
                     <p className="text-xs font-bold text-[var(--admin-accent)] flex items-center gap-1.5 uppercase">
                       <Sparkles className="w-4 h-4" />
                       <span>Clique para adicionar especialidades sugeridas:</span>
@@ -1037,7 +1037,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           key={tag}
                           type="button"
                           onClick={() => handleAddSpecialtyTag(tag)}
-                          className="px-3.5 py-2 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:border-[var(--admin-accent)] border border-[var(--admin-border)] text-xs font-bold transition-colors"
+                          className="px-3.5 py-2 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:border-[var(--admin-accent)] border border-[var(--admin-border)] text-xs font-bold transition-colors"
                         >
                           + {tag}
                         </button>
@@ -1049,7 +1049,7 @@ export const ProfessionalsManagement: React.FC = () => {
 
               {/* TAB 3: COMMISSION & PIX */}
               {activeFormTab === "commission" && (
-                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-6 shadow-xs">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block">
@@ -1070,7 +1070,7 @@ export const ProfessionalsManagement: React.FC = () => {
                                 commission_rate: Number(e.target.value),
                               })
                             }
-                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-base font-bold finance-positive focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-base font-bold finance-positive focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                           />
                           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold finance-positive">
                             {Math.round((formData.commission_rate || 0) * 100)}%
@@ -1091,17 +1091,17 @@ export const ProfessionalsManagement: React.FC = () => {
                             setFormData({ ...formData, pix_key: e.target.value })
                           }
                           placeholder="CPF, e-mail, telefone ou chave aleatória"
-                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors font-mono"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors font-mono"
                         />
                       </label>
                     </div>
                   </div>
 
-                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
                     <p className="text-xs text-[var(--admin-accent)] font-bold uppercase tracking-wider">
                       Simulador de Repasse Financeiro Automático
                     </p>
-                    <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] gap-3">
+                    <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] gap-3">
                       <div>
                         <span className="text-xs text-[var(--admin-text-muted)] block">Para cada R$ 100,00 faturados na comanda:</span>
                         <span className="text-base font-bold text-[var(--admin-text-main)]">
@@ -1121,8 +1121,8 @@ export const ProfessionalsManagement: React.FC = () => {
 
               {/* TAB 4: SCHEDULE */}
               {activeFormTab === "schedule" && (
-                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
-                  <div className="p-4 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl flex items-center justify-between">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-6 shadow-xs">
+                  <div className="p-4 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] flex items-center justify-between">
                     <div>
                       <span className="text-sm font-bold text-[var(--admin-text-main)] block">
                         Disponibilidade de Agendamento Online
@@ -1139,7 +1139,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           is_active: !(formData.is_active ?? true),
                         })
                       }
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
+                      className={`px-4 py-2 rounded-[var(--admin-radius-lg)] text-xs font-bold transition-colors ${
                         (formData.is_active ?? true)
                           ? "bg-status-success text-white shadow-xs"
                           : "bg-red-500/20 text-red-400 border border-red-500/30"
@@ -1177,7 +1177,7 @@ export const ProfessionalsManagement: React.FC = () => {
                               },
                             })
                           }
-                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                         />
                       </label>
                     </div>
@@ -1209,7 +1209,7 @@ export const ProfessionalsManagement: React.FC = () => {
                               },
                             })
                           }
-                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                         />
                       </label>
                     </div>
@@ -1228,7 +1228,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             key={day}
                             type="button"
                             onClick={() => toggleDay(day)}
-                            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                            className={`px-4 py-2.5 rounded-[var(--admin-radius-lg)] text-xs font-bold transition-all ${
                               isActive
                                 ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                                 : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:text-[var(--admin-text-main)]"

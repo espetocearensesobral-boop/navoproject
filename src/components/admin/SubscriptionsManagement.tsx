@@ -189,12 +189,12 @@ export const SubscriptionsManagement: React.FC = () => {
 
       {/* MRR Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
             <span className="text-xs font-bold uppercase tracking-wider truncate">
               MRR
             </span>
-            <div className="w-6 h-6 rounded-lg bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -206,12 +206,12 @@ export const SubscriptionsManagement: React.FC = () => {
           </p>
         </div>
 
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
             <span className="text-xs font-bold uppercase tracking-wider truncate">
               Membros Ativos
             </span>
-            <div className="w-6 h-6 rounded-lg bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center shrink-0">
               <Users className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
             </div>
           </div>
@@ -229,12 +229,12 @@ export const SubscriptionsManagement: React.FC = () => {
           </p>
         </div>
 
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between col-span-2 sm:col-span-1">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between col-span-2 sm:col-span-1">
           <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
             <span className="text-xs font-bold uppercase tracking-wider truncate">
               Atend. do Clube
             </span>
-            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-status-success/10 text-status-success flex items-center justify-center shrink-0">
               <Scissors className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -285,7 +285,7 @@ export const SubscriptionsManagement: React.FC = () => {
                       {m.planName}
                     </td>
                     <td>
-                      <span className="bg-status-success/15 text-status-success font-bold text-xs px-2 py-0.5 rounded-xl uppercase">
+                      <span className="bg-status-success/15 text-status-success font-bold text-xs px-2 py-0.5 rounded-[var(--admin-radius-lg)] uppercase">
                         {m.status === "active" ? "Ativo" : "Pendente"}
                       </span>
                     </td>
@@ -293,7 +293,7 @@ export const SubscriptionsManagement: React.FC = () => {
                       {new Date(m.nextBillingDate).toLocaleDateString("pt-BR")}
                     </td>
                     <td className="text-center font-bold">
-                      <span className="bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] px-2 py-0.5 rounded-xl">
+                      <span className="bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] px-2 py-0.5 rounded-[var(--admin-radius-lg)]">
                         {m.cutsUsedThisMonth} cortes
                       </span>
                     </td>
@@ -318,7 +318,7 @@ export const SubscriptionsManagement: React.FC = () => {
                       {m.clientPhone}
                     </p>
                   </div>
-                  <span className="shrink-0 bg-status-success/15 text-status-success font-bold text-[11px] px-2 py-1 rounded-full uppercase">
+                  <span className="shrink-0 bg-status-success/15 text-status-success font-bold text-[11px] px-2 py-1 rounded-[var(--admin-radius-full)] uppercase">
                     {m.status === "active" ? "Ativo" : "Pendente"}
                   </span>
                 </div>
@@ -360,14 +360,14 @@ export const SubscriptionsManagement: React.FC = () => {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`bg-[var(--admin-surface)] border rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-4 relative ${
+              className={`bg-[var(--admin-surface)] border rounded-[var(--admin-radius-xl)] p-5 shadow-xs flex flex-col justify-between space-y-4 relative ${
                 plan.popular
                   ? "border-[var(--admin-accent)] shadow-md"
                   : "border-[var(--admin-border)]"
               }`}
             >
               {plan.popular && (
-                <span className="absolute -top-3 right-4 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-extrabold uppercase px-2.5 py-0.5 rounded-full shadow-xs">
+                <span className="absolute -top-3 right-4 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-extrabold uppercase px-2.5 py-0.5 rounded-[var(--admin-radius-full)] shadow-xs">
                   Mais Vendido
                 </span>
               )}
@@ -392,14 +392,14 @@ export const SubscriptionsManagement: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => openEditPlanModal(plan)}
-                      className="p-2 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:border-[var(--admin-accent)] transition-colors"
+                      className="p-2 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:border-[var(--admin-accent)] transition-colors"
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeletePlan(plan.id)}
-                      className="p-2 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-status-danger hover:border-status-danger transition-colors"
+                      className="p-2 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-status-danger hover:border-status-danger transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -441,7 +441,7 @@ export const SubscriptionsManagement: React.FC = () => {
 
       {/* TAB 3: COMMISSIONS */}
       {activeTab === "commissions" && (
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-5 space-y-3 shadow-xs">
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-5 space-y-3 shadow-xs">
           <h3 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-[var(--admin-accent)]" />
             <span>Regras de comissão</span>
@@ -455,7 +455,7 @@ export const SubscriptionsManagement: React.FC = () => {
             {plans.map((p) => (
               <div
                 key={p.id}
-                className="flex justify-between items-center bg-[var(--admin-bg)] p-3 rounded-xl border border-[var(--admin-border)] text-xs"
+                className="flex justify-between items-center bg-[var(--admin-bg)] p-3 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] text-xs"
               >
                 <div>
                   <span className="font-bold text-[var(--admin-text-main)] block">
@@ -517,7 +517,7 @@ export const SubscriptionsManagement: React.FC = () => {
             className="space-y-6"
           >
             {/* Section 1: Basic Plan Information */}
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-5 shadow-xs">
               <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--admin-accent)] flex items-center gap-2">
                 <Award className="w-4 h-4" />
                 <span>1. Dados Principais do Plano</span>
@@ -536,7 +536,7 @@ export const SubscriptionsManagement: React.FC = () => {
                       placeholder="Ex: Clube Cabelo & Barba VIP"
                       value={newPlanName}
                       onChange={(e) => setNewPlanName(e.target.value)}
-                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
                     />
                   </label>
                 </div>
@@ -547,7 +547,7 @@ export const SubscriptionsManagement: React.FC = () => {
                       Ciclo de Cobrança
                     </span>
                     <select
-                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
                     >
                       <option value="monthly">Mensal (Cobrado a cada 30 dias)</option>
                       <option value="quarterly">Trimestral (Cobrado a cada 90 dias)</option>
@@ -559,7 +559,7 @@ export const SubscriptionsManagement: React.FC = () => {
             </div>
 
             {/* Section 2: Pricing and Barber Commission */}
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-5 shadow-xs">
               <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--admin-accent)] flex items-center gap-2">
                 <DollarSign className="w-4 h-4" />
                 <span>2. Valores e Repasse por Atendimento</span>
@@ -578,7 +578,7 @@ export const SubscriptionsManagement: React.FC = () => {
                       step="5"
                       value={newPlanPrice}
                       onChange={(e) => setNewPlanPrice(Number(e.target.value))}
-                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-base font-mono font-bold finance-positive outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-base font-mono font-bold finance-positive outline-none focus:border-[var(--admin-accent)] transition-colors"
                     />
                   </label>
                 </div>
@@ -595,7 +595,7 @@ export const SubscriptionsManagement: React.FC = () => {
                       step="1"
                       value={newPlanBarberFee}
                       onChange={(e) => setNewPlanBarberFee(Number(e.target.value))}
-                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-base font-mono font-bold finance-negative outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-base font-mono font-bold finance-negative outline-none focus:border-[var(--admin-accent)] transition-colors"
                     />
                   </label>
                 </div>
@@ -610,13 +610,13 @@ export const SubscriptionsManagement: React.FC = () => {
                       min="0"
                       max="100"
                       defaultValue={15}
-                      className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-base font-mono font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                      className="w-full h-11 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-base font-mono font-bold text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                     />
                   </label>
                 </div>
               </div>
 
-              <div className="p-4 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="p-4 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="text-xs text-[var(--admin-text-muted)]">
                   <p className="font-bold text-[var(--admin-text-main)]">Projeção por Membro Ativo:</p>
                   <p className="mt-0.5">Se o cliente fizer 2 visitas/mês, a barbearia retém R$ {(newPlanPrice - newPlanBarberFee * 2).toFixed(2)} de margem líquida.</p>
@@ -631,7 +631,7 @@ export const SubscriptionsManagement: React.FC = () => {
             </div>
 
             {/* Section 3: Services Included */}
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-5 shadow-xs">
               <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--admin-accent)] flex items-center gap-2">
                 <Scissors className="w-4 h-4" />
                 <span>3. Serviços e Benefícios Inclusos</span>
@@ -648,12 +648,12 @@ export const SubscriptionsManagement: React.FC = () => {
                     placeholder="Ex: Corte Ilimitado, Barboterapia Imperial, Bebida Cortesia, Lavagem Especial"
                     value={newPlanServices}
                     onChange={(e) => setNewPlanServices(e.target.value)}
-                    className="w-full h-11 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
+                    className="w-full h-11 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-4 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors font-medium"
                   />
                 </label>
               </div>
 
-              <div className="p-4 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
+              <div className="p-4 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
                 <p className="text-xs font-bold text-[var(--admin-accent)] flex items-center gap-1.5 uppercase">
                   <Sparkles className="w-4 h-4" />
                   <span>Benefícios rápidos para adicionar:</span>
@@ -679,7 +679,7 @@ export const SubscriptionsManagement: React.FC = () => {
                           );
                         }
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:border-[var(--admin-accent)] border border-[var(--admin-border)] text-xs font-bold transition-colors"
+                      className="px-3 py-1.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:border-[var(--admin-accent)] border border-[var(--admin-border)] text-xs font-bold transition-colors"
                     >
                       + {benefit}
                     </button>

@@ -308,7 +308,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
 
       {CAMPAIGNS_DEMO_MODE && (
         <div
-          className="rounded-lg border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-xs text-blue-100"
+          className="rounded-[var(--admin-radius-md)] border border-blue-400/25 bg-blue-500/10 px-3 py-2 text-xs text-blue-100"
           role="status"
         >
           <strong>Configuração demonstrativa:</strong> conexão, conta e ações
@@ -319,7 +319,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
 
       {message && (
         <div
-          className={`flex items-start gap-2 rounded-lg border px-3 py-2.5 text-sm ${message.type === "success" ? "border-status-success/30 bg-status-success/10 text-status-success" : "border-red-500/30 bg-red-500/10 text-red-300"}`}
+          className={`flex items-start gap-2 rounded-[var(--admin-radius-md)] border px-3 py-2.5 text-sm ${message.type === "success" ? "border-status-success/30 bg-status-success/10 text-status-success" : "border-red-500/30 bg-red-500/10 text-red-300"}`}
           role="status"
         >
           <span>
@@ -334,7 +334,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
       )}
 
       {loadError && (
-        <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+        <section className="rounded-[var(--admin-radius-lg)] border border-amber-500/30 bg-amber-500/10 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
               <h2 className="text-sm font-bold text-[var(--admin-text-main)]">
@@ -348,7 +348,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
               type="button"
               onClick={() => void load()}
               disabled={loading}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"
+              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-[var(--admin-radius-lg)] border border-amber-400/30 px-3 text-xs font-bold text-amber-200 hover:bg-amber-500/10 disabled:opacity-50"
             >
               <RefreshCw
                 className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
@@ -360,7 +360,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
       )}
 
       {!status?.configured && (
-        <section className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5">
+        <section className="rounded-[var(--admin-radius-lg)] border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5">
           <div className="flex items-start gap-3">
             <KeyRound className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
             <div className="min-w-0">
@@ -387,10 +387,10 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
 
       {/* Cards de Status e Políticas */}
       <section className="grid gap-4 lg:grid-cols-[1.15fr_.85fr]">
-        <div className="rounded-xl bg-[var(--admin-surface)] p-4 sm:p-5">
+        <div className="rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] p-4 sm:p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-300">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--admin-radius-lg)] bg-blue-500/10 text-blue-300">
                 <Link2 className="h-4 w-4" />
               </div>
               <div className="min-w-0">
@@ -407,7 +407,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
               </div>
             </div>
             {connected && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-status-success/10 px-2 py-1 text-[11px] font-bold text-status-success">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-[var(--admin-radius-full)] bg-status-success/10 px-2 py-1 text-[11px] font-bold text-status-success">
                 <CheckCircle2 className="h-3 w-3" />{" "}
                 {CAMPAIGNS_DEMO_MODE ? "Demo" : "Ativa"}
               </span>
@@ -442,7 +442,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
                 </strong>
               </div>
               {connection?.lastError && (
-                <p className="rounded-xl bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                <p className="rounded-[var(--admin-radius-lg)] bg-red-500/10 px-3 py-2 text-xs text-red-300">
                   {connection.lastError}
                 </p>
               )}
@@ -451,7 +451,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
                   type="button"
                   onClick={refreshAssets}
                   disabled={busy}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-xl bg-[var(--admin-bg)]/70 px-3 text-xs font-bold text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-bg)] disabled:opacity-50"
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 px-3 text-xs font-bold text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-bg)] disabled:opacity-50"
                 >
                   <RefreshCw
                     className={`h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`}
@@ -462,14 +462,14 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
                   type="button"
                   onClick={() => setDisconnectOpen(true)}
                   disabled={busy}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-xl bg-red-500/10 px-3 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-[var(--admin-radius-lg)] bg-red-500/10 px-3 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
                 >
                   <LogOut className="h-3.5 w-3.5" /> Desconectar
                 </button>
               </div>
             </div>
           ) : (
-            <div className="mt-4 rounded-xl bg-[var(--admin-bg)]/70 p-4 text-sm text-[var(--admin-text-muted)]">
+            <div className="mt-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 p-4 text-sm text-[var(--admin-text-muted)]">
               <p>
                 {CAMPAIGNS_DEMO_MODE
                   ? "A demonstração foi desconectada apenas localmente. A integração real poderá ser configurada depois."
@@ -479,16 +479,16 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
                 type="button"
                 onClick={connect}
                 disabled={!status?.configured || busy}
-                className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--admin-accent)] px-4 text-sm font-bold text-[var(--admin-accent-text)] transition-colors hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"
+                className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] px-4 text-sm font-bold text-[var(--admin-accent-text)] transition-colors hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"
               >
                 <Link2 className="h-4 w-4" /> Conectar Google Ads
               </button>
             </div>
           )}
         </div>
-        <div className="rounded-xl bg-[var(--admin-surface)] p-4 sm:p-5">
+        <div className="rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] p-4 sm:p-5">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-300">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--admin-radius-md)] bg-blue-500/10 text-blue-300">
               <ShieldCheck className="h-4 w-4" />
             </div>
             <div>
@@ -533,7 +533,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
       </section>
 
       {connected && (
-        <section className="rounded-xl bg-[var(--admin-surface)] p-4 sm:p-5">
+        <section className="rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="text-sm font-bold text-[var(--admin-text-main)]">
@@ -549,7 +549,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
               type="button"
               onClick={saveCustomer}
               disabled={busy || !customerId}
-              className="min-h-9 rounded-xl bg-[var(--admin-accent)] px-3 text-xs font-bold text-[var(--admin-accent-text)] hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"
+              className="min-h-9 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] px-3 text-xs font-bold text-[var(--admin-accent-text)] hover:bg-gold-hover disabled:pointer-events-none disabled:opacity-50"
             >
               Salvar seleção
             </button>
@@ -560,7 +560,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
               <select
                 value={customerId}
                 onChange={(event) => setCustomerId(event.target.value)}
-                className="mt-1.5 h-10 w-full rounded-xl bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="mt-1.5 h-10 w-full rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] px-3 text-sm text-[var(--admin-text-main)] outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               >
                 <option value="">Selecione</option>
                 {customers
@@ -580,7 +580,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
               type="button"
               onClick={refreshAssets}
               disabled={busy}
-              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-[var(--admin-bg)]/70 px-3 text-xs font-bold text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] disabled:opacity-50"
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 px-3 text-xs font-bold text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] disabled:opacity-50"
             >
               <RefreshCw
                 className={`h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`}

@@ -587,12 +587,12 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           <div className="receipt-v2-progress px-5 sm:px-6 mb-3">
             <div className="flex items-center gap-2">
               <div
-                className={`flex-1 h-1.5 rounded-full transition-all ${
+                className={`flex-1 h-1.5 rounded-[var(--admin-radius-full)] transition-all ${
                   step >= 1 ? "bg-[var(--color-gold-base)]" : "bg-[var(--color-border-subtle)]"
                 }`}
               />
               <div
-                className={`flex-1 h-1.5 rounded-full transition-all ${
+                className={`flex-1 h-1.5 rounded-[var(--admin-radius-full)] transition-all ${
                   step >= 2 ? "bg-[var(--color-gold-base)]" : "bg-[var(--color-border-subtle)]"
                 }`}
               />
@@ -604,7 +604,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
         <div className="receipt-v2-scroll">
           {error && (
             <div
-              className="mb-4 rounded-xl border border-status-error/30 bg-status-error/10 p-3 text-xs font-semibold text-status-error flex items-start gap-2"
+              className="mb-4 rounded-[var(--admin-radius-lg)] border border-status-error/30 bg-status-error/10 p-3 text-xs font-semibold text-status-error flex items-start gap-2"
               role="alert"
             >
               <Info className="w-4 h-4 shrink-0 mt-0.5" />
@@ -615,8 +615,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           {/* PASSO: DECISÃO INICIAL (FILA) */}
           {step === "decision" && !isConfirmed && (
             <div className="space-y-4">
-              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 sm:p-5 text-center space-y-2 shadow-xs">
-                <div className="w-12 h-12 rounded-full bg-status-success/15 text-status-success mx-auto flex items-center justify-center">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-xl)] p-4 sm:p-5 text-center space-y-2 shadow-xs">
+                <div className="w-12 h-12 rounded-[var(--admin-radius-full)] bg-status-success/15 text-status-success mx-auto flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <h3 className="text-base font-bold text-[var(--color-content-base)]">
@@ -630,7 +630,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 </div>
               </div>
 
-              <div className="bg-[var(--color-surface-base)]/50 border border-[var(--color-border-subtle)] rounded-xl p-3.5 text-xs text-[var(--color-content-muted)] space-y-1.5">
+              <div className="bg-[var(--color-surface-base)]/50 border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-lg)] p-3.5 text-xs text-[var(--color-content-muted)] space-y-1.5">
                 <p className="font-bold text-[var(--color-content-base)] flex items-center gap-1.5">
                   <Info className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
                   <span>O que deseja fazer agora?</span>
@@ -662,8 +662,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               className="space-y-4"
             >
               {/* CARD HERO DE ATENDIMENTO COM PALETA DO SISTEMA */}
-              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-2 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--color-gold-base)]/5 rounded-full blur-xl pointer-events-none" />
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-xl)] p-4 space-y-2 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--color-gold-base)]/5 rounded-[var(--admin-radius-full)] blur-xl pointer-events-none" />
                 <div className="flex items-center justify-between text-xs text-[var(--color-content-muted)]">
                   <span>Atendimento Principal</span>
                   <span className="font-semibold text-[var(--color-content-base)]">{source.serviceTitle}</span>
@@ -672,7 +672,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                   <div className="text-2xl font-serif font-bold text-[var(--color-content-base)]">
                     {money(originalAmount)}
                   </div>
-                  <div className="text-xs text-[var(--color-content-muted)] flex items-center gap-1 bg-[var(--color-surface-card)] px-2.5 py-1 rounded-full border border-[var(--color-border-subtle)]">
+                  <div className="text-xs text-[var(--color-content-muted)] flex items-center gap-1 bg-[var(--color-surface-card)] px-2.5 py-1 rounded-[var(--admin-radius-full)] border border-[var(--color-border-subtle)]">
                     <UserRound className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
                     <span className="text-[var(--color-content-base)]">{source.professionalName || "Profissional"}</span>
                   </div>
@@ -680,14 +680,14 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
 
               {/* SEÇÃO: COMANDA & ITENS ADICIONAIS */}
-              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-3">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-xl)] p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--color-gold-base)]">
                     <ShoppingBag className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
                     <span>Comanda &amp; Itens Extras</span>
                   </div>
                   {extraItemsTotal > 0 && (
-                    <span className="text-xs font-bold text-status-success bg-status-success/10 px-2 py-0.5 rounded-full border border-status-success/20">
+                    <span className="text-xs font-bold text-status-success bg-status-success/10 px-2 py-0.5 rounded-[var(--admin-radius-full)] border border-status-success/20">
                       + {money(extraItemsTotal)}
                     </span>
                   )}
@@ -700,14 +700,14 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                     {extraProducts.map((prod) => (
                       <div
                         key={prod.id}
-                        className="flex items-center justify-between p-2.5 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl text-xs"
+                        className="flex items-center justify-between p-2.5 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-lg)] text-xs"
                       >
                         <div className="min-w-0 pr-2">
                           <p className="font-bold text-[var(--color-content-base)] truncate">{prod.name}</p>
                           <p className="text-[11px] text-[var(--color-content-muted)]">{money(prod.price)} un.</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <div className="flex items-center bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-lg">
+                          <div className="flex items-center bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-md)]">
                             <button
                               type="button"
                               onClick={() => updateProductQuantity(prod.id, -1)}
@@ -747,14 +747,14 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                     {extraServices.map((svc) => (
                       <div
                         key={svc.id}
-                        className="flex items-center justify-between p-2.5 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl text-xs"
+                        className="flex items-center justify-between p-2.5 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-lg)] text-xs"
                       >
                         <div className="min-w-0 pr-2">
                           <p className="font-bold text-[var(--color-content-base)] truncate">{svc.title}</p>
                           <p className="text-[11px] text-[var(--color-content-muted)]">{money(svc.price)} un.</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <div className="flex items-center bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-lg">
+                          <div className="flex items-center bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-md)]">
                             <button
                               type="button"
                               onClick={() => updateServiceQuantity(svc.id, -1)}
@@ -789,7 +789,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
 
                 {/* GORJETA SELECIONADA */}
                 {tipAmount > 0 && (
-                  <div className="flex items-center justify-between p-2.5 bg-amber-500/10 border border-amber-500/25 rounded-xl text-xs">
+                  <div className="flex items-center justify-between p-2.5 bg-amber-500/10 border border-amber-500/25 rounded-[var(--admin-radius-lg)] text-xs">
                     <div className="flex items-center gap-2">
                       <HeartHandshake className="w-4 h-4 text-amber-500" />
                       <span className="font-bold text-amber-500">Gorjeta para o Barbeiro</span>
@@ -816,7 +816,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                       setShowServicePicker(false);
                       setShowTipPicker(false);
                     }}
-                    className="min-h-[36px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-content-base)] hover:border-[var(--color-gold-base)] flex items-center gap-1.5 transition-colors"
+                    className="min-h-[36px] px-3 rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-content-base)] hover:border-[var(--color-gold-base)] flex items-center gap-1.5 transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
                     <span>+ Produto</span>
@@ -829,7 +829,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                       setShowProductPicker(false);
                       setShowTipPicker(false);
                     }}
-                    className="min-h-[36px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-content-base)] hover:border-[var(--color-gold-base)] flex items-center gap-1.5 transition-colors"
+                    className="min-h-[36px] px-3 rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-content-base)] hover:border-[var(--color-gold-base)] flex items-center gap-1.5 transition-colors"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
                     <span>+ Serviço Extra</span>
@@ -842,7 +842,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                       setShowProductPicker(false);
                       setShowServicePicker(false);
                     }}
-                    className="min-h-[36px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-content-base)] hover:border-[var(--color-gold-base)] flex items-center gap-1.5 transition-colors"
+                    className="min-h-[36px] px-3 rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-content-base)] hover:border-[var(--color-gold-base)] flex items-center gap-1.5 transition-colors"
                   >
                     <HeartHandshake className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
                     <span>+ Gorjeta</span>
@@ -851,7 +851,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
 
                 {/* PICKER: PRODUTOS */}
                 {showProductPicker && (
-                  <div className="p-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl space-y-2 max-h-48 overflow-y-auto">
+                  <div className="p-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-lg)] space-y-2 max-h-48 overflow-y-auto">
                     <p className="text-[11px] font-bold text-[var(--color-content-muted)] uppercase">Selecione um Produto do Estoque:</p>
                     {availableProducts.length === 0 ? (
                       <p className="text-xs text-[var(--color-content-muted)]">Nenhum produto cadastrado no catálogo.</p>
@@ -862,7 +862,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                             key={prod.id}
                             type="button"
                             onClick={() => addProductToComanda(prod)}
-                            className="p-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-left hover:border-[var(--color-gold-base)] flex items-center justify-between text-xs transition-colors"
+                            className="p-2 rounded-[var(--admin-radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-left hover:border-[var(--color-gold-base)] flex items-center justify-between text-xs transition-colors"
                           >
                             <span className="font-semibold text-[var(--color-content-base)] truncate pr-2">{prod.name}</span>
                             <span className="font-bold text-[var(--color-gold-base)] shrink-0">{money(prod.price)}</span>
@@ -875,7 +875,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
 
                 {/* PICKER: SERVIÇOS EXTRAS */}
                 {showServicePicker && (
-                  <div className="p-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl space-y-2 max-h-48 overflow-y-auto">
+                  <div className="p-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-lg)] space-y-2 max-h-48 overflow-y-auto">
                     <p className="text-[11px] font-bold text-[var(--color-content-muted)] uppercase">Selecione um Serviço Extra:</p>
                     {availableServices.length === 0 ? (
                       <p className="text-xs text-[var(--color-content-muted)]">Nenhum serviço adicional disponível.</p>
@@ -886,7 +886,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                             key={svc.id}
                             type="button"
                             onClick={() => addServiceToComanda(svc)}
-                            className="p-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-left hover:border-[var(--color-gold-base)] flex items-center justify-between text-xs transition-colors"
+                            className="p-2 rounded-[var(--admin-radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-left hover:border-[var(--color-gold-base)] flex items-center justify-between text-xs transition-colors"
                           >
                             <span className="font-semibold text-[var(--color-content-base)] truncate pr-2">{svc.title}</span>
                             <span className="font-bold text-[var(--color-gold-base)] shrink-0">{money(svc.price)}</span>
@@ -899,7 +899,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
 
                 {/* PICKER: GORJETA */}
                 {showTipPicker && (
-                  <div className="p-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-xl space-y-2">
+                  <div className="p-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-lg)] space-y-2">
                     <p className="text-[11px] font-bold text-[var(--color-content-muted)] uppercase">Valor da Gorjeta ao Profissional:</p>
                     <div className="flex flex-wrap gap-2">
                       {[5, 10, 15, 20, 50].map((amount) => (
@@ -910,7 +910,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                             setTipAmount(amount);
                             setShowTipPicker(false);
                           }}
-                          className="px-3 py-1.5 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-base)] hover:border-amber-500 hover:text-amber-500 transition-colors"
+                          className="px-3 py-1.5 rounded-[var(--admin-radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-base)] hover:border-amber-500 hover:text-amber-500 transition-colors"
                         >
                           + {money(amount)}
                         </button>
@@ -921,7 +921,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
 
               {/* AJUSTES: DESCONTO E ACRÉSCIMO */}
-              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-3">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-xl)] p-4 space-y-3">
                 <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--color-gold-base)]">
                   <Tag className="w-3.5 h-3.5 text-[var(--color-gold-base)]" />
                   <span>Ajustes de Valor</span>
@@ -936,7 +936,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                         {calculation.discountAmount > 0 ? `− ${money(calculation.discountAmount)}` : "R$ 0,00"}
                       </span>
                     </div>
-                    <div className="flex rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] overflow-hidden focus-within:border-[var(--color-gold-base)] focus-within:ring-1 focus-within:ring-[var(--color-gold-base)] transition-all">
+                    <div className="flex rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] overflow-hidden focus-within:border-[var(--color-gold-base)] focus-within:ring-1 focus-within:ring-[var(--color-gold-base)] transition-all">
                       <div className="flex border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-base)]">
                         <button
                           type="button"
@@ -982,7 +982,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                         {calculation.surchargeAmount > 0 ? `+ ${money(calculation.surchargeAmount)}` : "R$ 0,00"}
                       </span>
                     </div>
-                    <div className="flex rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] overflow-hidden focus-within:border-[var(--color-gold-base)] focus-within:ring-1 focus-within:ring-[var(--color-gold-base)] transition-all">
+                    <div className="flex rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] overflow-hidden focus-within:border-[var(--color-gold-base)] focus-within:ring-1 focus-within:ring-[var(--color-gold-base)] transition-all">
                       <div className="flex border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-base)]">
                         <button
                           type="button"
@@ -1022,12 +1022,12 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
 
               {/* FORMA DE PAGAMENTO */}
-              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-3">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-xl)] p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-content-muted)]">
                     Forma de Pagamento
                   </span>
-                  <span className="text-xs font-bold text-[var(--color-gold-hover)] bg-[var(--color-gold-base)]/10 px-2 py-0.5 rounded-full border border-[var(--color-gold-base)]/20">
+                  <span className="text-xs font-bold text-[var(--color-gold-hover)] bg-[var(--color-gold-base)]/10 px-2 py-0.5 rounded-[var(--admin-radius-full)] border border-[var(--color-gold-base)]/20">
                     {paymentLabel[paymentMethod]}
                   </span>
                 </div>
@@ -1041,7 +1041,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                         key={opt.id}
                         type="button"
                         onClick={() => setPaymentMethod(opt.id)}
-                        className={`p-2.5 rounded-xl border flex items-center gap-2 transition-all text-left ${
+                        className={`p-2.5 rounded-[var(--admin-radius-lg)] border flex items-center gap-2 transition-all text-left ${
                           isSelected
                             ? "border-[var(--color-gold-base)] bg-[var(--color-gold-base)]/15 text-[var(--color-gold-hover)] shadow-xs"
                             : "border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-[var(--color-content-muted)] hover:text-[var(--color-content-base)] hover:border-[var(--color-border-subtle)]"
@@ -1056,7 +1056,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
 
                 {/* CASO DINHEIRO: VALOR RECEBIDO E TROCO */}
                 {paymentMethod === "cash" && (
-                  <div className="mt-3 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 space-y-2">
+                  <div className="mt-3 p-3 rounded-[var(--admin-radius-lg)] border border-amber-500/30 bg-amber-500/10 space-y-2">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-amber-500">
                       <Banknote className="w-4 h-4" />
                       <span>Cálculo de Troco em Dinheiro</span>
@@ -1072,10 +1072,10 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                           step="0.01"
                           value={cashReceived}
                           onChange={(e) => setCashReceived(e.target.value)}
-                          className="w-full h-9 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] px-3 text-sm font-bold text-[var(--color-content-base)] focus:outline-none focus:border-[var(--color-gold-base)]"
+                          className="w-full h-9 rounded-[var(--admin-radius-md)] bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] px-3 text-sm font-bold text-[var(--color-content-base)] focus:outline-none focus:border-[var(--color-gold-base)]"
                         />
                       </div>
-                      <div className="flex flex-col justify-center bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-lg p-2.5">
+                      <div className="flex flex-col justify-center bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-md)] p-2.5">
                         <span className="text-[10px] uppercase font-bold text-[var(--color-content-muted)]">
                           Troco a devolver
                         </span>
@@ -1097,7 +1097,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
 
               {/* OBSERVAÇÕES */}
-              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-1.5">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-xl)] p-4 space-y-1.5">
                 <label className="block text-xs font-bold uppercase tracking-wider text-[var(--color-content-muted)]">
                   Observações adicionais (opcional)
                 </label>
@@ -1106,12 +1106,12 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                   value={observations}
                   onChange={(e) => setObservations(e.target.value)}
                   placeholder="Ex: pago no PIX da empresa / desconto acordado"
-                  className="w-full h-9 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] px-3 text-xs text-[var(--color-content-base)] placeholder:text-[var(--color-content-muted)] focus:outline-none focus:border-[var(--color-gold-base)] transition-colors"
+                  className="w-full h-9 rounded-[var(--admin-radius-lg)] bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] px-3 text-xs text-[var(--color-content-base)] placeholder:text-[var(--color-content-muted)] focus:outline-none focus:border-[var(--color-gold-base)] transition-colors"
                 />
               </div>
 
               {/* TOTAL EM DESTAQUE COM GRADIENTE DOURADO/HERITAGE */}
-              <div className="bg-gradient-to-r from-[var(--color-surface-card)] via-[var(--color-surface-base)] to-[var(--color-surface-card)] border border-[var(--color-gold-base)]/30 rounded-2xl p-4 flex items-center justify-between shadow-xs">
+              <div className="bg-gradient-to-r from-[var(--color-surface-card)] via-[var(--color-surface-base)] to-[var(--color-surface-card)] border border-[var(--color-gold-base)]/30 rounded-[var(--admin-radius-xl)] p-4 flex items-center justify-between shadow-xs">
                 <div>
                   <span className="text-xs uppercase font-bold text-[var(--color-gold-base)] block">
                     Total Final a Receber
@@ -1133,7 +1133,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           {step === 2 && !isConfirmed && (
             <div className="space-y-4">
               {/* HERO REVISÃO */}
-              <div className="bg-gradient-to-b from-[var(--color-surface-card)] to-[var(--color-surface-base)] border border-[var(--color-gold-base)]/25 rounded-2xl p-5 text-center space-y-1 shadow-xs">
+              <div className="bg-gradient-to-b from-[var(--color-surface-card)] to-[var(--color-surface-base)] border border-[var(--color-gold-base)]/25 rounded-[var(--admin-radius-xl)] p-5 text-center space-y-1 shadow-xs">
                 <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-gold-base)]">
                   Confirmar recebimento de
                 </span>
@@ -1146,7 +1146,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
 
               {/* DETALHES CONSOLIDADOS */}
-              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-2.5 text-xs">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-xl)] p-4 space-y-2.5 text-xs">
                 <div className="flex justify-between py-1 border-b border-[var(--color-border-subtle)]">
                   <span className="text-[var(--color-content-muted)]">Cliente</span>
                   <strong className="text-[var(--color-content-base)]">{source.clientName}</strong>
@@ -1214,14 +1214,14 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 {observations.trim() && (
                   <div className="pt-1">
                     <span className="text-[var(--color-content-muted)] block mb-0.5">Observações:</span>
-                    <p className="italic text-[var(--color-content-base)] bg-[var(--color-surface-card)] p-2 rounded-lg border border-[var(--color-border-subtle)]">
+                    <p className="italic text-[var(--color-content-base)] bg-[var(--color-surface-card)] p-2 rounded-[var(--admin-radius-md)] border border-[var(--color-border-subtle)]">
                       {observations}
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-xl p-3 flex items-start gap-2 text-xs text-[var(--color-content-muted)]">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-lg)] p-3 flex items-start gap-2 text-xs text-[var(--color-content-muted)]">
                 <Info className="w-4 h-4 text-[var(--color-gold-base)] shrink-0 mt-0.5" />
                 <span>
                   Ao confirmar, o status passará para <strong className="text-[var(--color-content-base)]">Recebido</strong> e o lançamento entrará automaticamente no fluxo de caixa.
@@ -1233,8 +1233,8 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
           {/* PASSO FINAL: RECEBIMENTO CONFIRMADO (COMPROVANTE) */}
           {isConfirmed && receipt && (
             <div className="space-y-4">
-              <div className="bg-[var(--color-surface-base)] border border-status-success/30 rounded-2xl p-5 text-center space-y-2 shadow-xs">
-                <div className="w-12 h-12 rounded-full bg-status-success/20 text-status-success mx-auto flex items-center justify-center">
+              <div className="bg-[var(--color-surface-base)] border border-status-success/30 rounded-[var(--admin-radius-xl)] p-5 text-center space-y-2 shadow-xs">
+                <div className="w-12 h-12 rounded-[var(--admin-radius-full)] bg-status-success/20 text-status-success mx-auto flex items-center justify-center">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
                 <h3 className="text-base font-bold text-[var(--color-content-base)]">
@@ -1249,7 +1249,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               </div>
 
               {/* CARD DE COMPROVANTE */}
-              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-2 text-xs">
+              <div className="bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] rounded-[var(--admin-radius-xl)] p-4 space-y-2 text-xs">
                 <div className="flex items-center justify-between pb-2 border-b border-[var(--color-border-subtle)]">
                   <span className="font-bold flex items-center gap-1.5 text-[var(--color-content-base)]">
                     <FileText className="w-4 h-4 text-[var(--color-gold-base)]" />
@@ -1297,7 +1297,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="button"
                 onClick={handleRegisterLater}
                 disabled={isCreating}
-                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-muted)] hover:bg-[var(--color-surface-card)] hover:text-[var(--color-content-base)] transition-colors"
+                className="flex-1 min-h-[44px] px-3 rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-muted)] hover:bg-[var(--color-surface-card)] hover:text-[var(--color-content-base)] transition-colors"
               >
                 {isCreating ? "Salvando…" : "Registrar depois"}
               </button>
@@ -1305,7 +1305,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="button"
                 onClick={handleRegisterNow}
                 disabled={isCreating}
-                className="flex-[1.5] min-h-[44px] px-4 rounded-xl bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--color-gold-hover)] transition-all shadow-xs"
+                className="flex-[1.5] min-h-[44px] px-4 rounded-[var(--admin-radius-lg)] bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--color-gold-hover)] transition-all shadow-xs"
               >
                 {isCreating ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -1323,7 +1323,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-muted)] hover:bg-[var(--color-surface-card)] hover:text-[var(--color-content-base)] transition-colors flex items-center justify-center gap-1"
+                className="flex-1 min-h-[44px] px-3 rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-muted)] hover:bg-[var(--color-surface-card)] hover:text-[var(--color-content-base)] transition-colors flex items-center justify-center gap-1"
               >
                 <X className="w-4 h-4" />
                 <span>Cancelar</span>
@@ -1332,7 +1332,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="submit"
                 form="checkout-step-1-form"
                 disabled={calculation.isCashShort}
-                className="flex-[1.8] min-h-[44px] px-4 rounded-xl bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--color-gold-hover)] disabled:opacity-50 transition-all shadow-xs"
+                className="flex-[1.8] min-h-[44px] px-4 rounded-[var(--admin-radius-lg)] bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[var(--color-gold-hover)] disabled:opacity-50 transition-all shadow-xs"
               >
                 <span>Revisar ({money(calculation.total)})</span>
                 <ArrowRight className="w-4 h-4" />
@@ -1347,7 +1347,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="button"
                 onClick={() => setStep(1)}
                 disabled={isConfirming}
-                className="flex-1 min-h-[44px] px-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-muted)] hover:bg-[var(--color-surface-card)] hover:text-[var(--color-content-base)] transition-colors flex items-center justify-center gap-1"
+                className="flex-1 min-h-[44px] px-3 rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-xs font-bold text-[var(--color-content-muted)] hover:bg-[var(--color-surface-card)] hover:text-[var(--color-content-base)] transition-colors flex items-center justify-center gap-1"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Voltar</span>
@@ -1356,7 +1356,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
                 type="button"
                 onClick={handleConfirmReceipt}
                 disabled={isConfirming}
-                className="flex-[2] min-h-[44px] px-4 rounded-xl bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] hover:bg-[var(--color-gold-hover)] text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs"
+                className="flex-[2] min-h-[44px] px-4 rounded-[var(--admin-radius-lg)] bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] hover:bg-[var(--color-gold-hover)] text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs"
               >
                 {isConfirming ? (
                   <>
@@ -1379,7 +1379,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               <button
                 type="button"
                 onClick={handleShareWhatsApp}
-                className="min-h-[44px] px-2 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-[11px] font-bold text-status-success hover:bg-[var(--color-surface-card)] transition-colors flex items-center justify-center gap-1"
+                className="min-h-[44px] px-2 rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-[11px] font-bold text-status-success hover:bg-[var(--color-surface-card)] transition-colors flex items-center justify-center gap-1"
                 title="Compartilhar no WhatsApp"
               >
                 <Share2 className="w-3.5 h-3.5 text-status-success" />
@@ -1389,7 +1389,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               <button
                 type="button"
                 onClick={handlePrintReceipt}
-                className="min-h-[44px] px-2 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-[11px] font-bold text-[var(--color-content-muted)] hover:text-[var(--color-content-base)] hover:bg-[var(--color-surface-card)] transition-colors flex items-center justify-center gap-1"
+                className="min-h-[44px] px-2 rounded-[var(--admin-radius-lg)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-base)] text-[11px] font-bold text-[var(--color-content-muted)] hover:text-[var(--color-content-base)] hover:bg-[var(--color-surface-card)] transition-colors flex items-center justify-center gap-1"
                 title="Imprimir Comprovante"
               >
                 <Printer className="w-3.5 h-3.5" />
@@ -1398,7 +1398,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="min-h-[44px] px-3 rounded-xl bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] text-xs font-bold flex items-center justify-center gap-1 hover:bg-[var(--color-gold-hover)] transition-all shadow-xs"
+                className="min-h-[44px] px-3 rounded-[var(--admin-radius-lg)] bg-[var(--color-gold-base)] text-[var(--color-content-on-accent)] text-xs font-bold flex items-center justify-center gap-1 hover:bg-[var(--color-gold-hover)] transition-all shadow-xs"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Concluir</span>

@@ -85,7 +85,7 @@ export const CatalogWorkspace: React.FC<{ initialTab?: CatalogSectionId }> = () 
                 sectionRefs.current[section.id] = el;
               }}
               tabIndex={-1}
-              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors focus:outline-none ${
+              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-[var(--admin-radius-lg)] border bg-[var(--admin-surface)] transition-colors focus:outline-none ${
                 isOpen
                   ? "border-[var(--admin-accent)]/40 shadow-xs ring-1 ring-[var(--admin-accent)]/20"
                   : "border-[var(--admin-border)]"
@@ -100,7 +100,7 @@ export const CatalogWorkspace: React.FC<{ initialTab?: CatalogSectionId }> = () 
                 className="flex min-h-[74px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-bg)] sm:px-5 cursor-pointer"
               >
                 <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--admin-radius-lg)] transition-colors ${
                     isOpen
                       ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]"
                       : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"

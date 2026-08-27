@@ -102,7 +102,7 @@ export const QrCodeManagement: React.FC = () => {
       {/* Ação (mobile) */}
       <button
         onClick={handlePrintTotem}
-        className="md:hidden w-full bg-[var(--admin-accent)] hover:bg-gold-hover text-[var(--admin-accent-text)] px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
+        className="md:hidden w-full bg-[var(--admin-accent)] hover:bg-gold-hover text-[var(--admin-accent-text)] px-4 py-2.5 rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all shrink-0"
       >
         <Printer className="w-4 h-4" />
         <span>Imprimir totem</span>
@@ -111,7 +111,7 @@ export const QrCodeManagement: React.FC = () => {
       {/* Main Container */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Printable Card Totem */}
-        <div className="qr-print-sheet bg-[var(--admin-surface)] rounded-2xl p-6 text-center space-y-4 font-serif relative overflow-hidden">
+        <div className="qr-print-sheet bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] p-6 text-center space-y-4 font-serif relative overflow-hidden">
           <div className="qr-print-brand space-y-1">
             <h2 className="text-2xl font-bold tracking-widest uppercase text-[var(--admin-text-main)]">
               NAVO PREMIUM
@@ -122,7 +122,7 @@ export const QrCodeManagement: React.FC = () => {
           </div>
 
           {/* QR Code Container */}
-          <div className="qr-print-code bg-[var(--admin-bg)]/80 p-4 rounded-2xl inline-block mx-auto">
+          <div className="qr-print-code bg-[var(--admin-bg)]/80 p-4 rounded-[var(--admin-radius-xl)] inline-block mx-auto">
             <QRCodeSVG
               value={bookingUrl}
               size={220}
@@ -130,7 +130,7 @@ export const QrCodeManagement: React.FC = () => {
               includeMargin
               fgColor="#111111"
               bgColor="#ffffff"
-              className="mx-auto rounded-lg"
+              className="mx-auto rounded-[var(--admin-radius-md)]"
             />
           </div>
 
@@ -145,7 +145,7 @@ export const QrCodeManagement: React.FC = () => {
         </div>
 
         {/* Link & Digital Sharing Options */}
-        <div className="qr-print-exclude bg-[var(--admin-surface)] rounded-2xl p-6 space-y-5 flex flex-col justify-between">
+        <div className="qr-print-exclude bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] p-6 space-y-5 flex flex-col justify-between">
           <div className="space-y-3">
             <h3 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
               <Share2 className="w-4 h-4 text-[var(--admin-accent)]" />
@@ -155,7 +155,7 @@ export const QrCodeManagement: React.FC = () => {
               Cole na bio, no WhatsApp ou envie aos clientes.
             </p>
 
-            <div className="flex items-center gap-2 bg-[var(--admin-bg)]/80 p-2.5 rounded-xl">
+            <div className="flex items-center gap-2 bg-[var(--admin-bg)]/80 p-2.5 rounded-[var(--admin-radius-lg)]">
               <input
                 type="text"
                 readOnly
@@ -164,7 +164,7 @@ export const QrCodeManagement: React.FC = () => {
               />
               <button
                 onClick={handleCopy}
-                className="bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] hover:bg-[var(--admin-accent)] hover:text-[var(--admin-accent-text)] px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shrink-0"
+                className="bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] hover:bg-[var(--admin-accent)] hover:text-[var(--admin-accent-text)] px-3 py-1.5 rounded-[var(--admin-radius-md)] text-xs font-bold transition-all flex items-center gap-1 shrink-0"
               >
                 {copied ? (
                   <Check className="w-3.5 h-3.5" />
@@ -190,7 +190,7 @@ export const QrCodeManagement: React.FC = () => {
               href={bookingUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
+              className="w-full bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] p-2.5 rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center justify-center gap-2 transition-all"
             >
               <ExternalLink className="w-4 h-4 text-[var(--admin-accent)]" />
               <span>Testar Link do Cliente</span>

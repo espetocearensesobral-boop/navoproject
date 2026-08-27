@@ -219,7 +219,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
 
       {message && (
         <div
-          className={`p-3 rounded-xl flex items-center gap-2 text-xs font-bold ${
+          className={`p-3 rounded-[var(--admin-radius-lg)] flex items-center gap-2 text-xs font-bold ${
             message.type === "success"
               ? "bg-status-success/10 border border-status-success/30 text-status-success"
               : "bg-status-error/10 border border-status-error/30 text-status-error"
@@ -235,7 +235,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
       )}
 
       {/* TOP CONTROLS & FILTER */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-[var(--admin-surface)] p-3 rounded-xl border border-[var(--admin-border)]">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-[var(--admin-surface)] p-3 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)]">
         <div className="relative flex-1">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
           <input
@@ -243,7 +243,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             placeholder="Buscar por cliente, telefone ou barbeiro..."
-            className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+            className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-8 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
           />
         </div>
 
@@ -251,7 +251,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
           <button
             type="button"
             onClick={() => setConversationFilter("all")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 rounded-[var(--admin-radius-md)] text-xs font-semibold whitespace-nowrap transition-colors ${
               conversationFilter === "all"
                 ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
                 : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
@@ -262,19 +262,19 @@ export const WhatsAppInboxManagement: React.FC = () => {
           <button
             type="button"
             onClick={() => setConversationFilter("pending_human")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-[var(--admin-radius-md)] text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
               conversationFilter === "pending_human"
                 ? "bg-amber-500 text-black font-bold"
                 : "bg-[var(--admin-bg)] text-amber-500 hover:bg-amber-500/10"
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-amber-500" />
+            <span className="w-2 h-2 rounded-[var(--admin-radius-full)] bg-amber-500" />
             Aguardando ({pendingHandoffCount})
           </button>
           <button
             type="button"
             onClick={() => setConversationFilter("bot_active")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 rounded-[var(--admin-radius-md)] text-xs font-semibold whitespace-nowrap transition-colors ${
               conversationFilter === "bot_active"
                 ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
                 : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
@@ -286,7 +286,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
             type="button"
             onClick={() => void loadConversations()}
             disabled={conversationsLoading}
-            className="p-1.5 rounded-lg bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
+            className="p-1.5 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
             title="Recarregar conversas"
           >
             <RefreshCw
@@ -298,7 +298,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
 
       {/* CONVERSATION CARDS */}
       {filteredConversations.length === 0 ? (
-        <div className="p-10 text-center bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] space-y-2">
+        <div className="p-10 text-center bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
           <Headphones className="w-8 h-8 text-[var(--admin-text-muted)] mx-auto opacity-50" />
           <p className="text-sm font-bold text-[var(--admin-text-main)]">
             Nenhuma conversa encontrada
@@ -320,7 +320,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
             return (
               <article
                 key={conv.id}
-                className={`bg-[var(--admin-surface)] rounded-xl border transition-all overflow-hidden ${
+                className={`bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border transition-all overflow-hidden ${
                   isHuman
                     ? "border-amber-500/40 shadow-sm"
                     : "border-[var(--admin-border)]"
@@ -330,7 +330,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
                 <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[var(--admin-bg)]/30">
                   <div className="flex items-start gap-3 min-w-0">
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                      className={`w-10 h-10 rounded-[var(--admin-radius-lg)] flex items-center justify-center shrink-0 ${
                         isHuman
                           ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
                           : "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border border-[var(--admin-accent)]/20"
@@ -352,11 +352,11 @@ export const WhatsAppInboxManagement: React.FC = () => {
                           {formatPhoneNumber(conv.phone)}
                         </span>
                         {isHuman ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                          <span className="px-2 py-0.5 rounded-[var(--admin-radius-full)] text-[10px] font-bold bg-amber-500/15 text-amber-500 border border-amber-500/30">
                             🔔 Atendimento Humano
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-status-success/10 text-status-success border border-status-success/20">
+                          <span className="px-2 py-0.5 rounded-[var(--admin-radius-full)] text-[10px] font-medium bg-status-success/10 text-status-success border border-status-success/20">
                             🤖 Bot Ativo
                           </span>
                         )}
@@ -387,7 +387,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
                       href={waDirectLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="h-8 px-3 rounded-lg bg-status-success text-white font-bold text-xs flex items-center gap-1.5 shadow-sm hover:brightness-105 transition-all"
+                      className="h-8 px-3 rounded-[var(--admin-radius-md)] bg-status-success text-white font-bold text-xs flex items-center gap-1.5 shadow-sm hover:brightness-105 transition-all"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Abrir no</span> WhatsApp
@@ -400,7 +400,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
                           type="button"
                           onClick={() => void handleResumeBot(conv.id)}
                           disabled={resumingId === conv.id}
-                          className="h-8 px-2.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-bg)] text-xs font-medium text-[var(--admin-text-main)] flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                          className="h-8 px-2.5 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-bg)] text-xs font-medium text-[var(--admin-text-main)] flex items-center gap-1.5 transition-colors disabled:opacity-50"
                           title="Reativar robô"
                         >
                           <RotateCcw className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
@@ -411,7 +411,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
                           type="button"
                           onClick={() => void handleResolveConversation(conv.id)}
                           disabled={resolvingId === conv.id}
-                          className="h-8 px-2.5 rounded-lg border border-status-success/30 bg-status-success/10 hover:bg-status-success/20 text-xs font-bold text-status-success flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                          className="h-8 px-2.5 rounded-[var(--admin-radius-md)] border border-status-success/30 bg-status-success/10 hover:bg-status-success/20 text-xs font-bold text-status-success flex items-center gap-1.5 transition-colors disabled:opacity-50"
                           title="Concluir atendimento"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
@@ -423,7 +423,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setExpandedConvId(isExpanded ? null : conv.id)}
-                      className="h-8 w-8 rounded-lg border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] bg-[var(--admin-surface)] transition-colors"
+                      className="h-8 w-8 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] bg-[var(--admin-surface)] transition-colors"
                     >
                       {isExpanded ? (
                         <ChevronUp className="w-4 h-4" />
@@ -454,7 +454,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
                                 }`}
                               >
                                 <div
-                                  className={`max-w-[85%] rounded-xl p-2.5 text-xs ${
+                                  className={`max-w-[85%] rounded-[var(--admin-radius-lg)] p-2.5 text-xs ${
                                     isInbound
                                       ? "bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-main)]"
                                       : "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-medium"
@@ -502,13 +502,13 @@ export const WhatsAppInboxManagement: React.FC = () => {
                               void handleSendManualReply(conv.id);
                             }
                           }}
-                          className="flex-1 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                          className="flex-1 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-3 py-2 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                         />
                         <button
                           type="button"
                           onClick={() => void handleSendManualReply(conv.id)}
                           disabled={replyingId === conv.id || !manualReplyText[conv.id]?.trim()}
-                          className="px-4 rounded-xl bg-[var(--admin-accent)] hover:brightness-110 text-[var(--admin-accent-text)] font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 transition-all shrink-0"
+                          className="px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] hover:brightness-110 text-[var(--admin-accent-text)] font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 transition-all shrink-0"
                         >
                           <Send className="w-3.5 h-3.5" />
                           {replyingId === conv.id ? "Enviando..." : "Enviar"}

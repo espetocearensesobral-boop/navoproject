@@ -59,14 +59,14 @@ export const AdminAppointmentFeed: React.FC<AdminAppointmentFeedProps> = ({
         {[1, 2, 3].map((item) => (
           <div
             key={item}
-            className="flex items-center gap-3 rounded-lg bg-[var(--admin-bg)]/70 px-2 py-2"
+            className="flex items-center gap-3 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)]/70 px-2 py-2"
           >
-            <AdminSkeleton className="h-8 w-8 shrink-0 rounded-lg" />
+            <AdminSkeleton className="h-8 w-8 shrink-0 rounded-[var(--admin-radius-md)]" />
             <div className="min-w-0 flex-1 space-y-2">
               <AdminSkeleton className="h-2.5 w-2/5" />
               <AdminSkeleton className="h-2.5 w-3/5" />
             </div>
-            <AdminSkeleton className="h-7 w-12 shrink-0 rounded-md" />
+            <AdminSkeleton className="h-7 w-12 shrink-0 rounded-[var(--admin-radius-sm)]" />
           </div>
         ))}
       </div>

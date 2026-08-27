@@ -255,7 +255,7 @@ export const ExpensesManagement: React.FC = () => {
       />
 
       {error && (
-        <div className="rounded-xl border border-status-error/30 bg-status-error/10 px-3.5 py-3 text-sm font-semibold text-status-error flex items-center justify-between gap-3">
+        <div className="rounded-[var(--admin-radius-lg)] border border-status-error/30 bg-status-error/10 px-3.5 py-3 text-sm font-semibold text-status-error flex items-center justify-between gap-3">
           <span>{error}</span>
           <button
             type="button"
@@ -267,7 +267,7 @@ export const ExpensesManagement: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl overflow-hidden">
+      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] overflow-hidden">
         <div className="p-3 sm:p-4 border-b border-[var(--admin-border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h2 className="text-sm sm:text-base font-bold text-[var(--admin-text-main)]">
@@ -283,7 +283,7 @@ export const ExpensesManagement: React.FC = () => {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Buscar descrição ou categoria..."
-              className="w-full h-9 rounded-lg bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-9 pr-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+              className="w-full h-9 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-9 pr-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
             />
           </div>
         </div>
@@ -326,7 +326,7 @@ export const ExpensesManagement: React.FC = () => {
                       </td>
                       <td>
                         <div className="flex items-center gap-3">
-                           <span className="w-8 h-8 shrink-0 rounded-lg bg-status-error/10 text-status-error flex items-center justify-center">
+                           <span className="w-8 h-8 shrink-0 rounded-[var(--admin-radius-md)] bg-status-error/10 text-status-error flex items-center justify-center">
                              <ArrowDownRight className="w-4 h-4" />
                            </span>
                            <div>
@@ -342,7 +342,7 @@ export const ExpensesManagement: React.FC = () => {
                         </div>
                       </td>
                       <td>
-                        <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)]">
+                        <span className="px-2 py-0.5 rounded-[var(--admin-radius-full)] text-[11px] font-semibold bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)]">
                           {expense.category}
                         </span>
                       </td>
@@ -357,7 +357,7 @@ export const ExpensesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => openEdit(expense)}
-                            className="admin-btn-icon-sm rounded-md text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:bg-[var(--admin-surface-hover)]"
+                            className="admin-btn-icon-sm rounded-[var(--admin-radius-sm)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:bg-[var(--admin-surface-hover)]"
                             aria-label={`Editar ${expense.description}`}
                           >
                             <Edit3 className="w-4 h-4" />
@@ -365,7 +365,7 @@ export const ExpensesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleDelete(expense)}
-                            className="admin-btn-icon-sm rounded-md text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
+                            className="admin-btn-icon-sm rounded-[var(--admin-radius-sm)] text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
                             aria-label={`Excluir ${expense.description}`}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -385,7 +385,7 @@ export const ExpensesManagement: React.FC = () => {
                   key={expense.id}
                   className="p-4 sm:px-5 flex items-start gap-3"
                 >
-                  <span className="w-10 h-10 shrink-0 rounded-xl bg-status-error/10 text-status-error flex items-center justify-center">
+                  <span className="w-10 h-10 shrink-0 rounded-[var(--admin-radius-lg)] bg-status-error/10 text-status-error flex items-center justify-center">
                     <ArrowDownRight className="w-5 h-5" />
                   </span>
                   <div className="flex-1 min-w-0">
@@ -393,7 +393,7 @@ export const ExpensesManagement: React.FC = () => {
                       <h3 className="text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
                         {expense.description}
                       </h3>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] admin-safe-wrap">
+                      <span className="px-2 py-0.5 rounded-[var(--admin-radius-full)] text-[10px] font-semibold bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] admin-safe-wrap">
                         {expense.category}
                       </span>
                     </div>
@@ -417,7 +417,7 @@ export const ExpensesManagement: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => openEdit(expense)}
-                        className="w-8 h-8 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)] flex items-center justify-center transition-colors"
+                        className="w-8 h-8 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)] flex items-center justify-center transition-colors"
                         aria-label={`Editar ${expense.description}`}
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -425,7 +425,7 @@ export const ExpensesManagement: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleDelete(expense)}
-                        className="w-8 h-8 rounded-lg border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center transition-colors"
+                        className="w-8 h-8 rounded-[var(--admin-radius-md)] border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center transition-colors"
                         aria-label={`Excluir ${expense.description}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -472,7 +472,7 @@ export const ExpensesManagement: React.FC = () => {
           }
         >
           {modalError && (
-            <div className="mb-4 rounded-xl border border-status-error/30 bg-status-error/10 p-3 text-xs font-semibold text-status-error flex items-start justify-between gap-2 animate-fade-in">
+            <div className="mb-4 rounded-[var(--admin-radius-lg)] border border-status-error/30 bg-status-error/10 p-3 text-xs font-semibold text-status-error flex items-start justify-between gap-2 animate-fade-in">
               <span>{modalError}</span>
               <button
                 type="button"
@@ -507,7 +507,7 @@ export const ExpensesManagement: React.FC = () => {
                     }))
                   }
                   placeholder="Ex.: Produtos para revenda, Aluguel, Conta de luz"
-                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                  className="w-full h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                 />
               </label>
 
@@ -523,7 +523,7 @@ export const ExpensesManagement: React.FC = () => {
                       category: event.target.value,
                     }))
                   }
-                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                  className="w-full h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                 >
                   {categories.map((category) => (
                     <option key={category} value={category}>
@@ -547,7 +547,7 @@ export const ExpensesManagement: React.FC = () => {
                       date: event.target.value,
                     }))
                   }
-                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                  className="w-full h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                 />
               </label>
 
@@ -566,7 +566,7 @@ export const ExpensesManagement: React.FC = () => {
                     value={amountInput}
                     onChange={(event) => setAmountInput(event.target.value)}
                     placeholder="0,00"
-                    className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-9 pr-3 text-xs font-mono font-bold text-status-error placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                    className="w-full h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-9 pr-3 text-xs font-mono font-bold text-status-error placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                   />
                 </div>
               </label>
@@ -583,7 +583,7 @@ export const ExpensesManagement: React.FC = () => {
                       paymentMethod: event.target.value,
                     }))
                   }
-                  className="w-full h-10 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                  className="w-full h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                 >
                   {paymentMethods.map((method) => (
                     <option key={method.id} value={method.id}>
@@ -607,7 +607,7 @@ export const ExpensesManagement: React.FC = () => {
                     }))
                   }
                   placeholder="Observações complementares (opcional)"
-                  className="w-full rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 py-2 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] resize-none focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                  className="w-full rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-3 py-2 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] resize-none focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
                 />
               </label>
             </div>

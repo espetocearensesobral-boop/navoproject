@@ -367,7 +367,7 @@ export const ScheduleGrid: React.FC = () => {
       {/* SUCCESS NOTIFICATION */}
       {successMsg && (
         <div
-          className={`p-3 rounded-xl text-sm font-semibold flex items-center justify-between animate-fade-in ${notificationTone === "error" ? "bg-status-error/15 border border-status-error/30 text-status-error" : "bg-status-success/15 border border-status-success/30 text-status-success"}`}
+          className={`p-3 rounded-[var(--admin-radius-lg)] text-sm font-semibold flex items-center justify-between animate-fade-in ${notificationTone === "error" ? "bg-status-error/15 border border-status-error/30 text-status-error" : "bg-status-success/15 border border-status-success/30 text-status-success"}`}
         >
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4" />
@@ -387,17 +387,17 @@ export const ScheduleGrid: React.FC = () => {
       {/* ========================================================= */}
       <div className="md:hidden space-y-3">
         {/* Compact Top Action Bar */}
-        <div className="admin-card p-3 rounded-2xl flex items-center justify-between gap-2">
+        <div className="admin-card p-3 rounded-[var(--admin-radius-xl)] flex items-center justify-between gap-2">
           {/* Quick Date Selector */}
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-accent)] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] text-[var(--admin-accent)] flex items-center justify-center shrink-0">
               <Calendar className="w-4 h-4" />
             </div>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="admin-input h-8 text-xs font-bold max-w-[130px] rounded-xl px-2"
+              className="admin-input h-8 text-xs font-bold max-w-[130px] rounded-[var(--admin-radius-lg)] px-2"
             />
           </div>
 
@@ -406,7 +406,7 @@ export const ScheduleGrid: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsBlockModalOpen(true)}
-              className="admin-btn-icon-sm admin-btn-destructive border border-status-error/30 rounded-xl cursor-pointer"
+              className="admin-btn-icon-sm admin-btn-destructive border border-status-error/30 rounded-[var(--admin-radius-lg)] cursor-pointer"
               title="Bloquear horário"
               aria-label="Bloquear horário"
             >
@@ -494,7 +494,7 @@ export const ScheduleGrid: React.FC = () => {
                         className="min-h-[72px] px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] border-2 border-dashed border-[var(--admin-border)] hover:border-[var(--admin-accent)]/50 flex items-center justify-between text-base font-semibold text-[var(--admin-text-muted)] cursor-pointer group transition-colors"
                       >
                         <span>Livre</span>
-                        <span className="w-10 h-10 rounded-full bg-[var(--admin-bg)] text-[var(--admin-text-muted)] group-hover:text-[var(--admin-accent)] flex items-center justify-center transition-colors">
+                        <span className="w-10 h-10 rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] group-hover:text-[var(--admin-accent)] flex items-center justify-center transition-colors">
                           <Plus className="w-5 h-5" />
                         </span>
                       </div>
@@ -527,12 +527,12 @@ export const ScheduleGrid: React.FC = () => {
                               }`}
                             >
                               {isPending && (
-                                <div className="flex items-center justify-between text-xs font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-xl border border-amber-500/30">
+                                <div className="flex items-center justify-between text-xs font-bold text-amber-300 mb-1.5 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded-[var(--admin-radius-lg)] border border-amber-500/30">
                                   <div className="flex items-center gap-1">
                                     <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                                     <span>Fora do horário</span>
                                   </div>
-                                  <span className="text-xs bg-amber-400 text-black px-1.5 rounded-xl font-extrabold">
+                                  <span className="text-xs bg-amber-400 text-black px-1.5 rounded-[var(--admin-radius-lg)] font-extrabold">
                                     Pendente
                                   </span>
                                 </div>
@@ -563,7 +563,7 @@ export const ScheduleGrid: React.FC = () => {
                                 </span>
                                 <div className="flex flex-col items-end gap-1 shrink-0">
                                   {operationalState.remainingMinutes > 0 && (
-                                    <span className="inline-flex items-center gap-1 text-xs font-bold text-status-info bg-status-info/10 border border-status-info/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                    <span className="inline-flex items-center gap-1 text-xs font-bold text-status-info bg-status-info/10 border border-status-info/20 px-2 py-0.5 rounded-[var(--admin-radius-full)] whitespace-nowrap">
                                       <Timer className="w-3 h-3" />
                                       Faltam {
                                         operationalState.remainingMinutes
@@ -572,7 +572,7 @@ export const ScheduleGrid: React.FC = () => {
                                     </span>
                                   )}
                                   <span
-                                    className={`px-2 py-0.5 rounded-full font-semibold text-xs ${
+                                    className={`px-2 py-0.5 rounded-[var(--admin-radius-full)] font-semibold text-xs ${
                                       isPending
                                         ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
                                         : apt.status === "completed"
@@ -604,7 +604,7 @@ export const ScheduleGrid: React.FC = () => {
                                     onClick={() =>
                                       handleAcceptPendingAppointment(apt.id)
                                     }
-                                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95"
+                                    className="px-2.5 py-1 rounded-[var(--admin-radius-md)] bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95"
                                   >
                                     <CheckCircle2 className="w-3 h-3" />
                                     <span>Aceitar</span>
@@ -619,7 +619,7 @@ export const ScheduleGrid: React.FC = () => {
                           return (
                             <div
                               key={block.id}
-                              className="min-h-[72px] p-4 rounded-2xl bg-red-500/10 border border-red-500/25 flex items-center justify-between text-sm text-red-300 shadow-sm"
+                              className="min-h-[72px] p-4 rounded-[var(--admin-radius-xl)] bg-red-500/10 border border-red-500/25 flex items-center justify-between text-sm text-red-300 shadow-sm"
                             >
                               <div className="flex items-center gap-1.5 truncate">
                                 <Lock className="w-3 h-3 text-red-400 shrink-0" />
@@ -662,13 +662,13 @@ export const ScheduleGrid: React.FC = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="admin-input h-9 text-xs font-bold rounded-xl px-3"
+              className="admin-input h-9 text-xs font-bold rounded-[var(--admin-radius-lg)] px-3"
             />
 
             <select
               value={selectedBarberId}
               onChange={(e) => setSelectedBarberId(e.target.value)}
-              className="admin-input h-9 text-xs font-bold rounded-xl px-3"
+              className="admin-input h-9 text-xs font-bold rounded-[var(--admin-radius-lg)] px-3"
             >
               <option value="all">Todos os barbeiros</option>
               {barbers.map((b) => (
@@ -681,7 +681,7 @@ export const ScheduleGrid: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsBlockModalOpen(true)}
-              className="admin-btn admin-btn-sm admin-btn-destructive border border-status-error/30 rounded-xl flex items-center gap-1.5 cursor-pointer"
+              className="admin-btn admin-btn-sm admin-btn-destructive border border-status-error/30 rounded-[var(--admin-radius-lg)] flex items-center gap-1.5 cursor-pointer"
             >
               <Lock className="w-3.5 h-3.5" />
               <span>Bloquear Horário</span>
@@ -712,7 +712,7 @@ export const ScheduleGrid: React.FC = () => {
                   <img
                     src={barber.photo_url}
                     alt={barber.name}
-                    className="w-6 h-6 rounded-full object-cover border border-[var(--admin-accent)]"
+                    className="w-6 h-6 rounded-[var(--admin-radius-full)] object-cover border border-[var(--admin-accent)]"
                   />
                   <span className="text-[var(--admin-text-main)] font-bold truncate">
                     {barber.name}
@@ -744,7 +744,7 @@ export const ScheduleGrid: React.FC = () => {
                     >
                       {isNowRow && (
                         <span
-                          className="w-1.5 h-1.5 rounded-full bg-[var(--admin-accent)] shrink-0"
+                          className="w-1.5 h-1.5 rounded-[var(--admin-radius-full)] bg-[var(--admin-accent)] shrink-0"
                           aria-hidden="true"
                         />
                       )}
@@ -826,7 +826,7 @@ export const ScheduleGrid: React.FC = () => {
                                   ) : null}
                                   {!isPending && (
                                     <span
-                                      className={`px-1.5 py-0.5 rounded-xl text-xs font-bold ${
+                                      className={`px-1.5 py-0.5 rounded-[var(--admin-radius-lg)] text-xs font-bold ${
                                         operationalState?.isInService
                                           ? "bg-status-info/10 text-status-info border border-status-info/20"
                                           : "bg-status-success/20 text-status-success"
@@ -849,7 +849,7 @@ export const ScheduleGrid: React.FC = () => {
                                   onClick={() =>
                                     handleAcceptPendingAppointment(apt.id)
                                   }
-                                  className="w-full mt-1 px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1 transition-colors active:scale-[0.97]"
+                                  className="w-full mt-1 px-2 py-1 rounded-[var(--admin-radius-md)] bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1 transition-colors active:scale-[0.97]"
                                 >
                                   <CheckCircle2 className="w-3 h-3" />
                                   <span>Aceitar</span>
@@ -857,7 +857,7 @@ export const ScheduleGrid: React.FC = () => {
                               )}
                             </div>
                           ) : block ? (
-                            <div className="w-full bg-red-950/30 border border-red-500/30 p-2 rounded-xl flex items-center justify-between text-xs text-red-300">
+                            <div className="w-full bg-red-950/30 border border-red-500/30 p-2 rounded-[var(--admin-radius-lg)] flex items-center justify-between text-xs text-red-300">
                               <div className="flex items-center space-x-1.5">
                                 <Lock className="w-3.5 h-3.5 text-red-400" />
                                 <span className="font-semibold text-xs">
@@ -936,7 +936,7 @@ export const ScheduleGrid: React.FC = () => {
                     professional_id: e.target.value,
                   })
                 }
-                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
+                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
               >
                 {barbers.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -968,7 +968,7 @@ export const ScheduleGrid: React.FC = () => {
                           : blockForm.end_time,
                     })
                   }
-                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
+                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
                 >
                   {timeSlots.map((ts) => (
                     <option key={ts} value={ts}>
@@ -986,7 +986,7 @@ export const ScheduleGrid: React.FC = () => {
                   onChange={(e) =>
                     setBlockForm({ ...blockForm, end_time: e.target.value })
                   }
-                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
+                  className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
                 >
                   {timeSlots
                     .filter(
@@ -1014,7 +1014,7 @@ export const ScheduleGrid: React.FC = () => {
                   setBlockForm({ ...blockForm, reason: e.target.value })
                 }
                 placeholder="Ex: Almoço, Intervalo, Consulta Médica"
-                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
+                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:border-status-error/60 transition-colors"
                 required
               />
             </div>
@@ -1035,7 +1035,7 @@ export const ScheduleGrid: React.FC = () => {
           footer={
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
               <div className="flex items-center gap-2 text-xs text-[var(--admin-text-muted)]">
-                <span className="w-2 h-2 rounded-full bg-[var(--admin-accent)] animate-pulse" />
+                <span className="w-2 h-2 rounded-[var(--admin-radius-full)] bg-[var(--admin-accent)] animate-pulse" />
                 <span>Encaixe manual aprovado e confirmado automaticamente</span>
               </div>
               <div className="flex items-center justify-end gap-2.5">
@@ -1079,7 +1079,7 @@ export const ScheduleGrid: React.FC = () => {
               {/* Left Column: Cliente & Barbeiro (5 cols) */}
               <div className="lg:col-span-5 space-y-5">
                 {/* Bloco 1: Dados do Cliente */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-4">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-4">
                   <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                     <User className="w-4 h-4" />
                     <span>1. Dados do Cliente</span>
@@ -1099,7 +1099,7 @@ export const ScheduleGrid: React.FC = () => {
                         })
                       }
                       placeholder="Ex: Gabriel Santos"
-                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
                       required
                       autoFocus
                     />
@@ -1126,14 +1126,14 @@ export const ScheduleGrid: React.FC = () => {
                           })
                         }
                         placeholder="(11) 98765-4321"
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-10 pr-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Bloco 2: Profissional */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                       <Scissors className="w-4 h-4" />
@@ -1158,14 +1158,14 @@ export const ScheduleGrid: React.FC = () => {
                               professional_id: b.id,
                             })
                           }
-                          className={`p-3 rounded-xl border text-left flex items-center gap-3 transition-all ${
+                          className={`p-3 rounded-[var(--admin-radius-lg)] border text-left flex items-center gap-3 transition-all ${
                             isSelected
                               ? "bg-[var(--admin-accent)]/10 border-[var(--admin-accent)] text-[var(--admin-text-main)] shadow-sm"
                               : "bg-[var(--admin-bg)] border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:border-[var(--admin-accent)]/50 hover:text-[var(--admin-text-main)]"
                           }`}
                         >
                           <div
-                            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
+                            className="w-9 h-9 rounded-[var(--admin-radius-full)] flex items-center justify-center font-bold text-xs shrink-0"
                             style={{
                               background: isSelected
                                 ? "var(--admin-accent)"
@@ -1199,7 +1199,7 @@ export const ScheduleGrid: React.FC = () => {
               {/* Right Column: Serviço & Horário (7 cols) */}
               <div className="lg:col-span-7 space-y-5">
                 {/* Bloco 3: Serviços */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                       <Sparkles className="w-4 h-4" />
@@ -1227,7 +1227,7 @@ export const ScheduleGrid: React.FC = () => {
                               service_id: service.id,
                             })
                           }
-                          className={`p-3 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all ${
+                          className={`p-3 rounded-[var(--admin-radius-lg)] border text-left flex flex-col justify-between gap-2 transition-all ${
                             isSelected
                               ? "bg-[var(--admin-accent)]/10 border-[var(--admin-accent)] shadow-sm"
                               : "bg-[var(--admin-bg)] border-[var(--admin-border)] hover:border-[var(--admin-accent)]/50"
@@ -1259,13 +1259,13 @@ export const ScheduleGrid: React.FC = () => {
                 </div>
 
                 {/* Bloco 4: Horário */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                       <Clock className="w-4 h-4" />
                       <span>4. Horário do Encaixe *</span>
                     </div>
-                    <div className="text-xs font-mono font-bold text-[var(--admin-accent)] bg-[var(--admin-bg)] px-2.5 py-1 rounded-lg border border-[var(--admin-border)]">
+                    <div className="text-xs font-mono font-bold text-[var(--admin-accent)] bg-[var(--admin-bg)] px-2.5 py-1 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)]">
                       {manualBookingForm.time_slot}
                     </div>
                   </div>
@@ -1284,7 +1284,7 @@ export const ScheduleGrid: React.FC = () => {
                               time_slot: ts,
                             })
                           }
-                          className={`py-1.5 px-2 rounded-lg text-xs font-mono font-semibold transition-all text-center ${
+                          className={`py-1.5 px-2 rounded-[var(--admin-radius-md)] text-xs font-mono font-semibold transition-all text-center ${
                             isSelected
                               ? "bg-[var(--admin-accent)] text-[var(--admin-bg)] font-bold shadow-sm"
                               : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface)] border border-[var(--admin-border)]"
@@ -1323,7 +1323,7 @@ export const ScheduleGrid: React.FC = () => {
               const endTime = calcEnd(manualBookingForm.time_slot, duration);
 
               return (
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--admin-surface)] to-[var(--admin-bg)] border border-[var(--admin-border)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-gradient-to-r from-[var(--admin-surface)] to-[var(--admin-bg)] border border-[var(--admin-border)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] border border-[var(--admin-accent)]/30">
@@ -1354,7 +1354,7 @@ export const ScheduleGrid: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="text-left md:text-right shrink-0 bg-[var(--admin-bg)] md:bg-transparent p-3 md:p-0 rounded-xl w-full md:w-auto border md:border-0 border-[var(--admin-border)]">
+                  <div className="text-left md:text-right shrink-0 bg-[var(--admin-bg)] md:bg-transparent p-3 md:p-0 rounded-[var(--admin-radius-lg)] w-full md:w-auto border md:border-0 border-[var(--admin-border)]">
                     <span className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider block">
                       Valor Total Estimado
                     </span>

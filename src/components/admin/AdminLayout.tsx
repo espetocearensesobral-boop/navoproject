@@ -297,7 +297,7 @@ export const AdminLayout: React.FC = () => {
   if (isLoadingAuth) {
     return (
       <div className="flex h-[100dvh] items-center justify-center bg-[var(--admin-bg)]">
-        <div className="w-8 h-8 border-4 border-[var(--admin-accent)]/20 border-t-gold-base rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[var(--admin-accent)]/20 border-t-gold-base rounded-[var(--admin-radius-full)] animate-spin" />
       </div>
     );
   }
@@ -639,7 +639,7 @@ export const AdminLayout: React.FC = () => {
         {/* Logo Header */}
         <div className="flex items-center h-[var(--admin-header-height)] px-4 border-b border-[var(--admin-border)] shrink-0">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-lg flex items-center justify-center shrink-0 font-bold">
+            <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-md)] flex items-center justify-center shrink-0 font-bold">
               <Scissors className="w-4 h-4" />
             </div>
             <h1 className="admin-title-h3 truncate">Navo Premium</h1>
@@ -719,7 +719,7 @@ export const AdminLayout: React.FC = () => {
           <button
             type="button"
             onClick={toggleTheme}
-            className="admin-btn-icon admin-btn-ghost rounded-full"
+            className="admin-btn-icon admin-btn-ghost rounded-[var(--admin-radius-full)]"
             title={theme === "dark" ? "Modo claro" : "Modo escuro"}
             aria-label={
               theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"
@@ -734,7 +734,7 @@ export const AdminLayout: React.FC = () => {
           <button
             type="button"
             onClick={openMobileNavigation}
-            className="admin-btn-icon admin-btn-ghost rounded-full"
+            className="admin-btn-icon admin-btn-ghost rounded-[var(--admin-radius-full)]"
             aria-label="Abrir Menu de Navegação"
           >
             <Menu className="w-5 h-5" />

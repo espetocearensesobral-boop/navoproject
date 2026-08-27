@@ -98,7 +98,7 @@ export const FollowUpManagement: React.FC = () => {
         action={{ label: "Atualizar", onClick: load }}
       />
 
-      <div className="bg-status-warning/10 border border-status-warning/30 rounded-xl p-3 text-xs text-[var(--admin-text-muted)] flex items-start gap-2">
+      <div className="bg-status-warning/10 border border-status-warning/30 rounded-[var(--admin-radius-lg)] p-3 text-xs text-[var(--admin-text-muted)] flex items-start gap-2">
         <Clock3 className="w-4 h-4 text-status-warning shrink-0 mt-0.5" />
         <p>
           Clientes sem retorno. O módulo não envia mensagens; use os canais do
@@ -106,7 +106,7 @@ export const FollowUpManagement: React.FC = () => {
         </p>
       </div>
 
-      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-3 space-y-3">
+      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-3 space-y-3">
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--admin-text-muted)]" />
@@ -115,13 +115,13 @@ export const FollowUpManagement: React.FC = () => {
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && load()}
               placeholder="Buscar cliente..."
-              className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-9 pr-3 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+              className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-9 pr-3 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
             />
           </div>
           <button
             type="button"
             onClick={load}
-            className="h-11 px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-2"
+            className="h-11 px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />{" "}
             Atualizar
@@ -136,7 +136,7 @@ export const FollowUpManagement: React.FC = () => {
               key={days}
               type="button"
               onClick={() => setThresholdDays(days)}
-              className={`shrink-0 min-h-10 px-4 rounded-xl border text-sm font-semibold ${thresholdDays === days ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] border-[var(--admin-accent)]" : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border-[var(--admin-border)]"}`}
+              className={`shrink-0 min-h-10 px-4 rounded-[var(--admin-radius-lg)] border text-sm font-semibold ${thresholdDays === days ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] border-[var(--admin-accent)]" : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border-[var(--admin-border)]"}`}
             >
               {days} dias sem retorno
             </button>
@@ -145,17 +145,17 @@ export const FollowUpManagement: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-3 rounded-xl bg-status-error/10 border border-status-error/30 text-status-error text-sm font-semibold">
+        <div className="p-3 rounded-[var(--admin-radius-lg)] bg-status-error/10 border border-status-error/30 text-status-error text-sm font-semibold">
           {error}
         </div>
       )}
 
       {loading ? (
         <div className="py-16 flex justify-center">
-          <div className="w-7 h-7 border-2 border-[var(--admin-accent)] border-t-transparent rounded-full animate-spin" />
+          <div className="w-7 h-7 border-2 border-[var(--admin-accent)] border-t-transparent rounded-[var(--admin-radius-full)] animate-spin" />
         </div>
       ) : clients.length === 0 ? (
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-10 text-center space-y-2">
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-10 text-center space-y-2">
           <UsersRound className="w-10 h-10 text-[var(--admin-text-muted)] mx-auto" />
           <h3 className="text-base font-bold text-[var(--admin-text-main)]">
             Nenhum cliente nesta faixa
@@ -165,7 +165,7 @@ export const FollowUpManagement: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl overflow-hidden">
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] overflow-hidden">
           <div className="px-4 py-3 border-b border-[var(--admin-border)] flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-bold text-[var(--admin-text-main)]">
@@ -185,7 +185,7 @@ export const FollowUpManagement: React.FC = () => {
                 key={client.id}
                 className="p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
               >
-                <div className="w-11 h-11 rounded-full bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center font-bold shrink-0">
+                <div className="w-11 h-11 rounded-[var(--admin-radius-full)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center font-bold shrink-0">
                   {client.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -193,7 +193,7 @@ export const FollowUpManagement: React.FC = () => {
                     <h3 className="text-sm font-bold text-[var(--admin-text-main)] truncate">
                       {client.name}
                     </h3>
-                    <span className="px-2 py-1 rounded-md bg-[var(--admin-bg)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-muted)]">
+                    <span className="px-2 py-1 rounded-[var(--admin-radius-sm)] bg-[var(--admin-bg)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-muted)]">
                       {client.loyaltyTier}
                     </span>
                   </div>
@@ -219,7 +219,7 @@ export const FollowUpManagement: React.FC = () => {
                       target="_blank"
                       rel="noreferrer"
                       title="Abrir WhatsApp"
-                      className="w-10 h-10 rounded-xl border border-status-success/30 text-status-success flex items-center justify-center"
+                      className="w-10 h-10 rounded-[var(--admin-radius-lg)] border border-status-success/30 text-status-success flex items-center justify-center"
                     >
                       <Phone className="w-4 h-4" />
                     </a>
@@ -228,7 +228,7 @@ export const FollowUpManagement: React.FC = () => {
                     <a
                       href={`mailto:${client.email}`}
                       title="Enviar e-mail"
-                      className="w-10 h-10 rounded-xl border border-[var(--admin-accent)]/30 text-[var(--admin-accent)] flex items-center justify-center"
+                      className="w-10 h-10 rounded-[var(--admin-radius-lg)] border border-[var(--admin-accent)]/30 text-[var(--admin-accent)] flex items-center justify-center"
                     >
                       <Mail className="w-4 h-4" />
                     </a>

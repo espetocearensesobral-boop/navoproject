@@ -12,7 +12,7 @@ export const AdminSkeleton: React.FC<AdminSkeletonProps> = ({
   <div
     aria-label={label}
     aria-busy="true"
-    className={`admin-skeleton rounded-lg bg-[var(--admin-bg)] ${className}`}
+    className={`admin-skeleton rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] ${className}`}
   />
 );
 
@@ -33,14 +33,14 @@ export const AdminListSkeleton: React.FC<AdminListSkeletonProps> = ({
     {Array.from({ length: rows }, (_, index) => (
       <div
         key={index}
-        className="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-3"
+        className="flex items-center gap-3 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-3"
       >
-        <AdminSkeleton className="h-10 w-10 shrink-0 rounded-full" />
+        <AdminSkeleton className="h-10 w-10 shrink-0 rounded-[var(--admin-radius-full)]" />
         <div className="min-w-0 flex-1 space-y-2">
           <AdminSkeleton className="h-3 w-2/5" />
           <AdminSkeleton className="h-2.5 w-3/4" />
         </div>
-        <AdminSkeleton className="h-8 w-16 shrink-0 rounded-md" />
+        <AdminSkeleton className="h-8 w-16 shrink-0 rounded-[var(--admin-radius-sm)]" />
       </div>
     ))}
   </div>
@@ -53,11 +53,11 @@ export const AdminPageSkeleton: React.FC = () => (
         <AdminSkeleton className="h-4 w-32" />
         <AdminSkeleton className="h-2.5 w-52 max-w-[60vw]" />
       </div>
-      <AdminSkeleton className="h-10 w-24 rounded-xl" />
+      <AdminSkeleton className="h-10 w-24 rounded-[var(--admin-radius-lg)]" />
     </div>
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {Array.from({ length: 4 }, (_, index) => (
-        <AdminSkeleton key={index} className="h-20 rounded-xl" />
+        <AdminSkeleton key={index} className="h-20 rounded-[var(--admin-radius-lg)]" />
       ))}
     </div>
     <AdminListSkeleton rows={4} />

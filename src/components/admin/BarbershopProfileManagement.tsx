@@ -164,7 +164,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[var(--admin-accent)]/20 border-t-gold-base rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[var(--admin-accent)]/20 border-t-gold-base rounded-[var(--admin-radius-full)] animate-spin" />
       </div>
     );
   }
@@ -177,7 +177,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
 
       {/* TOAST MESSAGE */}
       {toastMsg && (
-        <div className="bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 p-3.5 rounded-xl flex items-center gap-2.5 text-xs font-bold animate-fade-in shadow-md">
+        <div className="bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 p-3.5 rounded-[var(--admin-radius-lg)] flex items-center gap-2.5 text-xs font-bold animate-fade-in shadow-md">
           <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
           <span>{toastMsg}</span>
         </div>
@@ -221,7 +221,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                   setProfile((p) => ({ ...p, name: e.target.value }))
                 }
                 placeholder="Ex: Navo Barber & Club"
-                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
 
@@ -236,7 +236,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                   setProfile((p) => ({ ...p, unitName: e.target.value }))
                 }
                 placeholder="Ex: Unidade Expectativa"
-                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
@@ -252,7 +252,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 setProfile((p) => ({ ...p, slogan: e.target.value }))
               }
               placeholder="Ex: Estilo, Tradição e Excelência na Medida Certa"
-              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             />
           </div>
 
@@ -267,12 +267,12 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 setProfile((p) => ({ ...p, description: e.target.value }))
               }
               placeholder="Apresente sua barbearia para os clientes no aplicativo..."
-              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] resize-none"
+              className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] resize-none"
             />
           </div>
 
           {/* LOGO DA BARBEARIA / IDENTIDADE VISUAL */}
-          <div className="bg-[var(--admin-bg)]/70 rounded-xl p-4 sm:p-5 space-y-4">
+          <div className="bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-4 sm:p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <label className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider block">
@@ -288,14 +288,14 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pt-1">
               {/* Preview Circular estilo Instagram com Anel Gradiente Dourado */}
               <div className="flex flex-col items-center shrink-0">
-                <div className="relative p-[3px] rounded-full bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 shadow-lg">
-                  <div className="p-[2px] bg-[#0a0a0a] rounded-full">
-                    <div className="w-[100px] h-[100px] rounded-full overflow-hidden bg-neutral-900 flex items-center justify-center relative shadow-inner">
+                <div className="relative p-[3px] rounded-[var(--admin-radius-full)] bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 shadow-lg">
+                  <div className="p-[2px] bg-[#0a0a0a] rounded-[var(--admin-radius-full)]">
+                    <div className="w-[100px] h-[100px] rounded-[var(--admin-radius-full)] overflow-hidden bg-neutral-900 flex items-center justify-center relative shadow-inner">
                       {profile.logoUrl ? (
                         <img
                           src={profile.logoUrl}
                           alt="Pré-visualização da Logo"
-                          className="w-full h-full object-cover rounded-full"
+                          className="w-full h-full object-cover rounded-[var(--admin-radius-full)]"
                           onError={(e) => {
                             (e.currentTarget as HTMLElement).style.display =
                               "none";
@@ -316,7 +316,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                       </div>
                     </div>
                   </div>
-                  <div className="absolute -bottom-0.5 -right-0.5 bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 p-1.5 rounded-full text-surface-base shadow-md border border-[#0a0a0a]">
+                  <div className="absolute -bottom-0.5 -right-0.5 bg-gradient-to-tr from-amber-600 via-gold-base to-amber-300 p-1.5 rounded-[var(--admin-radius-full)] text-surface-base shadow-md border border-[#0a0a0a]">
                     <Instagram className="w-3 h-3" />
                   </div>
                 </div>
@@ -328,7 +328,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
               {/* Upload & Link Controls */}
               <div className="flex-1 w-full space-y-3 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <label className="cursor-pointer h-9 px-3.5 bg-[var(--admin-accent)] hover:opacity-90 text-[var(--admin-accent-text)] rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-sm">
+                  <label className="cursor-pointer h-9 px-3.5 bg-[var(--admin-accent)] hover:opacity-90 text-[var(--admin-accent-text)] rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-sm">
                     <Upload className="w-3.5 h-3.5" />
                     <span>Carregar Imagem do Dispositivo</span>
                     <input
@@ -348,7 +348,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                           'Logo removida. Clique em "Salvar Alterações" para confirmar.',
                         );
                       }}
-                      className="h-9 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                      className="h-9 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center gap-1.5 transition-all"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       <span>Remover</span>
@@ -367,7 +367,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                       setProfile((p) => ({ ...p, logoUrl: e.target.value }))
                     }
                     placeholder="https://exemplo.com/sua-logomarca.png"
-                    className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                    className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
                   />
                   <span className="text-xs text-[var(--admin-text-muted)] mt-1 block">
                     Formatos suportados: PNG, JPG, WEBP ou SVG (Recomendado:
@@ -394,7 +394,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 Horários Semanal
               </h2>
             </div>
-            <div className="text-xs text-[var(--admin-text-muted)] bg-[var(--admin-bg)] px-2.5 py-1 rounded-xl">
+            <div className="text-xs text-[var(--admin-text-muted)] bg-[var(--admin-bg)] px-2.5 py-1 rounded-[var(--admin-radius-lg)]">
               Slot de atendimento:{" "}
               <strong className="text-[var(--admin-accent)] font-mono">
                 30 minutos
@@ -402,7 +402,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
             </div>
           </div>
 
-          <div className="bg-[var(--admin-bg)]/70 p-3.5 rounded-xl text-xs text-[var(--admin-text-muted)] flex items-start gap-2.5">
+          <div className="bg-[var(--admin-bg)]/70 p-3.5 rounded-[var(--admin-radius-lg)] text-xs text-[var(--admin-text-muted)] flex items-start gap-2.5">
             <Info className="w-4 h-4 text-[var(--admin-accent)] shrink-0 mt-0.5" />
             <p>
               Os horários definidos aqui controlam diretamente as opções de
@@ -412,7 +412,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
           </div>
 
           {/* GENERAL DEFAULT OPEN & CLOSE TIMES */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[var(--admin-bg)]/70 p-4 rounded-xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[var(--admin-bg)]/70 p-4 rounded-[var(--admin-radius-lg)]">
             <div>
               <label className="text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider block mb-1">
                 Horário Padrão de Abertura
@@ -423,7 +423,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, openTime: e.target.value }))
                 }
-                className="w-full bg-[var(--admin-surface)] rounded-xl p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
             <div>
@@ -436,14 +436,14 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, closeTime: e.target.value }))
                 }
-                className="w-full bg-[var(--admin-surface)] rounded-xl p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
 
           {/* TOGGLE: HORÁRIO FORA DE EXPEDIENTE COM APROVAÇÃO */}
           <div
-            className={`p-4 rounded-xl transition-all flex items-start justify-between gap-4 ${
+            className={`p-4 rounded-[var(--admin-radius-lg)] transition-all flex items-start justify-between gap-4 ${
               profile.allowOutsideHoursApproval
                 ? "bg-amber-500/10"
                 : "bg-[var(--admin-bg)]/70"
@@ -477,7 +477,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 }
                 className="sr-only peer"
               />
-              <div className="w-9 h-5 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
+              <div className="w-9 h-5 bg-stone-700 peer-focus:outline-none rounded-[var(--admin-radius-full)] peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-[var(--admin-radius-full)] after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
             </label>
           </div>
 
@@ -498,7 +498,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 return (
                   <div
                     key={dayItem.key}
-                    className={`p-3 rounded-xl transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+                    className={`p-3 rounded-[var(--admin-radius-lg)] transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
                       sch.active
                         ? "bg-[var(--admin-bg)]/80"
                         : "bg-[var(--admin-bg)]/40 opacity-60"
@@ -518,13 +518,13 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                           }
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
+                        <div className="w-9 h-5 bg-stone-700 peer-focus:outline-none rounded-[var(--admin-radius-full)] peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-[var(--admin-radius-full)] after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--admin-accent)]"></div>
                       </label>
                       <div className="w-28 font-bold text-xs text-[var(--admin-text-main)]">
                         {dayItem.label}
                       </div>
                       <span
-                        className={`text-xs font-bold uppercase px-2 py-0.5 rounded-xl ${
+                        className={`text-xs font-bold uppercase px-2 py-0.5 rounded-[var(--admin-radius-lg)] ${
                           sch.active
                             ? "bg-emerald-950/60 text-emerald-400"
                             : "bg-red-950/60 text-red-400"
@@ -550,7 +550,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                                 e.target.value,
                               )
                             }
-                            className="bg-[var(--admin-surface)] rounded-xl px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                            className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
                           />
                         </div>
 
@@ -572,7 +572,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                                 e.target.value,
                               )
                             }
-                            className="bg-[var(--admin-surface)] rounded-xl px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                            className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
                           />
                         </div>
                       </div>
@@ -593,12 +593,12 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
               Amostra dos Horários Gerados Automaticamente ({sampleSlots.length}{" "}
               horários)
             </label>
-            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-[var(--admin-bg)]/70 rounded-xl custom-scrollbar">
+            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] custom-scrollbar">
               {sampleSlots.length > 0 ? (
                 sampleSlots.map((slot) => (
                   <span
                     key={slot}
-                    className="px-2 py-1 bg-[var(--admin-surface)] rounded-xl text-xs font-mono font-bold text-[var(--admin-accent)]"
+                    className="px-2 py-1 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] text-xs font-mono font-bold text-[var(--admin-accent)]"
                   >
                     {slot}
                   </span>
@@ -638,7 +638,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 setProfile((p) => ({ ...p, address: e.target.value }))
               }
               placeholder="Ex: Rua Fortaleza, 1420 - Expectativa, Sobral - CE"
-              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             />
           </div>
 
@@ -657,7 +657,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                   }))
                 }
                 placeholder="(11) 99999-8888"
-                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
 
@@ -675,7 +675,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                   }))
                 }
                 placeholder="5511999998888"
-                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
@@ -695,7 +695,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                   }))
                 }
                 placeholder="(11) 3211-0000"
-                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
 
@@ -710,7 +710,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                   setProfile((p) => ({ ...p, email: e.target.value }))
                 }
                 placeholder="contato@barbearianavo.com.br"
-                className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
@@ -736,7 +736,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
               Perfil no Instagram (@usuario)
             </label>
             <div className="flex min-w-0">
-              <span className="bg-[var(--admin-bg)] rounded-l-xl px-3 py-2.5 text-[var(--admin-text-muted)] font-bold text-xs shrink-0 flex items-center">
+              <span className="bg-[var(--admin-bg)] rounded-l-[var(--admin-radius-lg)] px-3 py-2.5 text-[var(--admin-text-muted)] font-bold text-xs shrink-0 flex items-center">
                 @
               </span>
               <input
@@ -749,7 +749,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                   }))
                 }
                 placeholder="barbearianavo"
-                className="flex-1 min-w-0 bg-[var(--admin-bg)] rounded-r-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="flex-1 min-w-0 bg-[var(--admin-bg)] rounded-r-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
             </div>
           </div>
@@ -765,7 +765,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 setProfile((p) => ({ ...p, facebookUrl: e.target.value }))
               }
               placeholder="https://facebook.com/barbearianavo"
-              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             />
           </div>
 
@@ -780,7 +780,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
                 setProfile((p) => ({ ...p, mapsUrl: e.target.value }))
               }
               placeholder="https://maps.google.com/?q=..."
-              className="w-full bg-[var(--admin-bg)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             />
           </div>
         </form>
@@ -841,12 +841,12 @@ const AppearanceTabContent: React.FC = () => {
               type="button"
               onClick={() => setPalette(item.id)}
               aria-pressed={selected}
-              className={`group text-left rounded-xl p-3 transition-all active:scale-[0.98] ${selected ? "bg-[var(--admin-accent)]/15 shadow-xs ring-1 ring-[var(--admin-accent)]/30" : "bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)]"}`}
+              className={`group text-left rounded-[var(--admin-radius-lg)] p-3 transition-all active:scale-[0.98] ${selected ? "bg-[var(--admin-accent)]/15 shadow-xs ring-1 ring-[var(--admin-accent)]/30" : "bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)]"}`}
             >
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2 min-w-0">
                   <span
-                    className="w-8 h-8 rounded-xl shrink-0 shadow-inner"
+                    className="w-8 h-8 rounded-[var(--admin-radius-lg)] shrink-0 shadow-inner"
                     style={{
                       background: `linear-gradient(135deg, ${item.accentSoft}, ${item.deep})`,
                     }}
@@ -861,22 +861,22 @@ const AppearanceTabContent: React.FC = () => {
                   </span>
                 </div>
                 {selected && (
-                  <span className="w-5 h-5 rounded-full flex items-center justify-center bg-[var(--admin-accent)] text-[var(--admin-accent-text)]">
+                  <span className="w-5 h-5 rounded-[var(--admin-radius-full)] flex items-center justify-center bg-[var(--admin-accent)] text-[var(--admin-accent-text)]">
                     <Check className="w-3 h-3" />
                   </span>
                 )}
               </div>
               <div className="flex gap-1.5" aria-hidden="true">
                 <span
-                  className="h-1.5 flex-1 rounded-full"
+                  className="h-1.5 flex-1 rounded-[var(--admin-radius-full)]"
                   style={{ backgroundColor: item.deep }}
                 />
                 <span
-                  className="h-1.5 flex-1 rounded-full"
+                  className="h-1.5 flex-1 rounded-[var(--admin-radius-full)]"
                   style={{ backgroundColor: item.accent }}
                 />
                 <span
-                  className="h-1.5 flex-1 rounded-full"
+                  className="h-1.5 flex-1 rounded-[var(--admin-radius-full)]"
                   style={{ backgroundColor: item.accentSoft }}
                 />
               </div>

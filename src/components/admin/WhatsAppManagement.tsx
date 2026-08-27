@@ -361,7 +361,7 @@ export const WhatsAppManagement: React.FC = () => {
 
       {message && (
         <div
-          className={`p-3 rounded-xl flex items-center gap-2 text-xs font-bold ${
+          className={`p-3 rounded-[var(--admin-radius-lg)] flex items-center gap-2 text-xs font-bold ${
             message.type === "success"
               ? "bg-status-success/10 border border-status-success/30 text-status-success"
               : "bg-status-error/10 border border-status-error/30 text-status-error"
@@ -381,7 +381,7 @@ export const WhatsAppManagement: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab("handoff_settings")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-4 py-2 rounded-[var(--admin-radius-lg)] text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === "handoff_settings"
               ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-sm"
               : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
@@ -394,7 +394,7 @@ export const WhatsAppManagement: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab("connection")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-4 py-2 rounded-[var(--admin-radius-lg)] text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === "connection"
               ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-sm"
               : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)]"
@@ -408,9 +408,9 @@ export const WhatsAppManagement: React.FC = () => {
       {/* TAB 2: ALERTAS & ENCAMINHAMENTO WHATSAPP */}
       {activeTab === "handoff_settings" && (
         <div className="space-y-4">
-          <section className="p-4 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] space-y-4">
+          <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
                 <Bell className="w-5 h-5" />
               </div>
               <div>
@@ -426,7 +426,7 @@ export const WhatsAppManagement: React.FC = () => {
             </div>
 
             {/* FLOW EXPLANATION BANNER */}
-            <div className="p-3.5 rounded-xl bg-[var(--admin-bg)]/80 border border-[var(--admin-border)] space-y-2 text-xs">
+            <div className="p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/80 border border-[var(--admin-border)] space-y-2 text-xs">
               <p className="font-bold text-[var(--admin-text-main)] flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-[var(--admin-accent)]" />
                 Como funciona o fluxo de notificação:
@@ -458,7 +458,7 @@ export const WhatsAppManagement: React.FC = () => {
             </div>
 
             {/* TOGGLE: NOTIFY BARBER */}
-            <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl bg-[var(--admin-bg)]/70 border border-[var(--admin-border)]">
+            <div className="flex items-center justify-between gap-4 p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 border border-[var(--admin-border)]">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[var(--admin-text-main)] flex items-center gap-1.5">
                   <Scissors className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
@@ -479,14 +479,14 @@ export const WhatsAppManagement: React.FC = () => {
                     !(settings.notifyBarberOnHandoff !== false),
                   )
                 }
-                className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
+                className={`w-11 h-6 rounded-[var(--admin-radius-full)] transition-colors shrink-0 relative ${
                   settings.notifyBarberOnHandoff !== false
                     ? "bg-[var(--admin-accent)]"
                     : "bg-[var(--admin-border)]"
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  className={`absolute top-0.5 w-5 h-5 rounded-[var(--admin-radius-full)] bg-white shadow transition-transform ${
                     settings.notifyBarberOnHandoff !== false
                       ? "translate-x-5"
                       : "translate-x-0.5"
@@ -496,7 +496,7 @@ export const WhatsAppManagement: React.FC = () => {
             </div>
 
             {/* TOGGLE: NOTIFY MANAGER */}
-            <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl bg-[var(--admin-bg)]/70 border border-[var(--admin-border)]">
+            <div className="flex items-center justify-between gap-4 p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 border border-[var(--admin-border)]">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[var(--admin-text-main)] flex items-center gap-1.5">
                   <UserCheck className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
@@ -517,14 +517,14 @@ export const WhatsAppManagement: React.FC = () => {
                     !(settings.notifyManagerOnHandoff !== false),
                   )
                 }
-                className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
+                className={`w-11 h-6 rounded-[var(--admin-radius-full)] transition-colors shrink-0 relative ${
                   settings.notifyManagerOnHandoff !== false
                     ? "bg-[var(--admin-accent)]"
                     : "bg-[var(--admin-border)]"
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  className={`absolute top-0.5 w-5 h-5 rounded-[var(--admin-radius-full)] bg-white shadow transition-transform ${
                     settings.notifyManagerOnHandoff !== false
                       ? "translate-x-5"
                       : "translate-x-0.5"
@@ -534,7 +534,7 @@ export const WhatsAppManagement: React.FC = () => {
             </div>
 
             {/* MANAGER PHONE INPUT */}
-            <label className="block p-3.5 rounded-xl bg-[var(--admin-bg)]/70 border border-[var(--admin-border)] space-y-1.5">
+            <label className="block p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 border border-[var(--admin-border)] space-y-1.5">
               <span className="block text-xs font-bold text-[var(--admin-text-main)] flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
                 Telefone da Gerência / Recepção para Alertas (com DDD)
@@ -546,7 +546,7 @@ export const WhatsAppManagement: React.FC = () => {
                   update("managerNotificationPhone", e.target.value)
                 }
                 placeholder="Ex: 5511999998888 ou (11) 99999-8888"
-                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               />
               <span className="block text-[11px] text-[var(--admin-text-muted)]">
                 Este número receberá os alertas quando um cliente solicitar
@@ -573,7 +573,7 @@ export const WhatsAppManagement: React.FC = () => {
       {/* TAB 3: CONEXÃO & API EVOLUTION */}
       {activeTab === "connection" && (
         <div className="space-y-4">
-          <section className="p-4 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] space-y-4">
+          <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
@@ -603,7 +603,7 @@ export const WhatsAppManagement: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl bg-[var(--admin-bg)]/70">
+            <div className="flex items-center justify-between gap-4 p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[var(--admin-text-main)]">
                   Ativar integração
@@ -617,21 +617,21 @@ export const WhatsAppManagement: React.FC = () => {
                 role="switch"
                 aria-checked={settings.enabled}
                 onClick={() => update("enabled", !settings.enabled)}
-                className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
+                className={`w-11 h-6 rounded-[var(--admin-radius-full)] transition-colors shrink-0 relative ${
                   settings.enabled
                     ? "bg-[var(--admin-accent)]"
                     : "bg-[var(--admin-border)]"
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  className={`absolute top-0.5 w-5 h-5 rounded-[var(--admin-radius-full)] bg-white shadow transition-transform ${
                     settings.enabled ? "translate-x-5" : "translate-x-0.5"
                   }`}
                 />
               </button>
             </div>
 
-            <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl bg-[var(--admin-accent)]/10">
+            <div className="flex items-center justify-between gap-4 p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)]/10">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[var(--admin-text-main)]">
                   Ativar NavoBot
@@ -648,21 +648,21 @@ export const WhatsAppManagement: React.FC = () => {
                 onClick={() =>
                   update("navoBotEnabled", !settings.navoBotEnabled)
                 }
-                className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
+                className={`w-11 h-6 rounded-[var(--admin-radius-full)] transition-colors shrink-0 relative ${
                   settings.navoBotEnabled
                     ? "bg-[var(--admin-accent)]"
                     : "bg-[var(--admin-border)]"
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  className={`absolute top-0.5 w-5 h-5 rounded-[var(--admin-radius-full)] bg-white shadow transition-transform ${
                     settings.navoBotEnabled ? "translate-x-5" : "translate-x-0.5"
                   }`}
                 />
               </button>
             </div>
 
-            <label className="block p-3.5 rounded-xl bg-[var(--admin-bg)]/70 space-y-2">
+            <label className="block p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 space-y-2">
               <span className="block text-xs font-bold text-[var(--admin-text-main)]">
                 Tipo de conta conectada por QR Code
               </span>
@@ -675,7 +675,7 @@ export const WhatsAppManagement: React.FC = () => {
                       .value as EvolutionApiSettings["whatsappAccountType"],
                   )
                 }
-                className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               >
                 <option value="personal_qr">WhatsApp pessoal</option>
                 <option value="business_qr">WhatsApp Business</option>
@@ -687,7 +687,7 @@ export const WhatsAppManagement: React.FC = () => {
               </span>
             </label>
 
-            <div className="flex items-center justify-between gap-4 p-3.5 rounded-xl bg-[var(--admin-bg)]/70">
+            <div className="flex items-center justify-between gap-4 p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[var(--admin-text-main)]">
                   Mensagens interativas (botões e listas)
@@ -708,14 +708,14 @@ export const WhatsAppManagement: React.FC = () => {
                     !settings.useInteractiveMessages,
                   )
                 }
-                className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
+                className={`w-11 h-6 rounded-[var(--admin-radius-full)] transition-colors shrink-0 relative ${
                   settings.useInteractiveMessages
                     ? "bg-[var(--admin-accent)]"
                     : "bg-[var(--admin-border)]"
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  className={`absolute top-0.5 w-5 h-5 rounded-[var(--admin-radius-full)] bg-white shadow transition-transform ${
                     settings.useInteractiveMessages
                       ? "translate-x-5"
                       : "translate-x-0.5"
@@ -733,7 +733,7 @@ export const WhatsAppManagement: React.FC = () => {
                   value={settings.baseUrl}
                   onChange={(event) => update("baseUrl", event.target.value)}
                   placeholder="http://129.159.50.100:8080"
-                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                 />
                 <span className="block text-xs text-[var(--admin-text-muted)]">
                   Não inclua a rota final, como `/instance` ou `/message`.
@@ -749,7 +749,7 @@ export const WhatsAppManagement: React.FC = () => {
                     update("instanceName", event.target.value)
                   }
                   placeholder="navo-bot"
-                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                 />
               </label>
               <label className="space-y-1">
@@ -769,7 +769,7 @@ export const WhatsAppManagement: React.FC = () => {
                         ? "••••••••"
                         : "Cole a chave da Evolution API"
                     }
-                    className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 pr-10 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                    className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 pr-10 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                   />
                   <button
                     type="button"
@@ -787,7 +787,7 @@ export const WhatsAppManagement: React.FC = () => {
               </label>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-[var(--admin-bg)]/70 space-y-3">
+            <div className="p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 space-y-3">
               <div className="flex items-center justify-between gap-4">
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-[var(--admin-text-main)]">
@@ -804,14 +804,14 @@ export const WhatsAppManagement: React.FC = () => {
                   onClick={() =>
                     update("webhookEnabled", !settings.webhookEnabled)
                   }
-                  className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
+                  className={`w-11 h-6 rounded-[var(--admin-radius-full)] transition-colors shrink-0 relative ${
                     settings.webhookEnabled
                       ? "bg-[var(--admin-accent)]"
                       : "bg-[var(--admin-border)]"
                   }`}
                 >
                   <span
-                    className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                    className={`absolute top-0.5 w-5 h-5 rounded-[var(--admin-radius-full)] bg-white shadow transition-transform ${
                       settings.webhookEnabled
                         ? "translate-x-5"
                         : "translate-x-0.5"
@@ -832,7 +832,7 @@ export const WhatsAppManagement: React.FC = () => {
                           update("webhookUrl", event.target.value)
                         }
                         placeholder={`${window.location.origin}/api/evolution/webhook`}
-                        className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0 font-mono"
+                        className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0 font-mono"
                       />
                     </label>
                     <label className="space-y-1 block">
@@ -853,7 +853,7 @@ export const WhatsAppManagement: React.FC = () => {
                             ? "••••••••"
                             : "Defina um segredo ou deixe vazio para auto-gerar"
                         }
-                        className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                        className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                       />
                     </label>
                   </div>
@@ -863,7 +863,7 @@ export const WhatsAppManagement: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => void handleCopyWebhookUrl()}
-                        className="h-8 px-3 rounded-lg bg-[var(--admin-bg)] hover:bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] font-semibold text-xs flex items-center gap-1.5 transition-colors"
+                        className="h-8 px-3 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] hover:bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] font-semibold text-xs flex items-center gap-1.5 transition-colors"
                       >
                         {copiedWebhook ? (
                           <>
@@ -880,7 +880,7 @@ export const WhatsAppManagement: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleUseOriginWebhook}
-                        className="h-8 px-3 rounded-lg bg-[var(--admin-bg)] hover:bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] font-semibold text-xs flex items-center gap-1.5 transition-colors"
+                        className="h-8 px-3 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] hover:bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] font-semibold text-xs flex items-center gap-1.5 transition-colors"
                       >
                         <span>Preencher com URL deste Domínio</span>
                       </button>
@@ -894,7 +894,7 @@ export const WhatsAppManagement: React.FC = () => {
                         saving ||
                         (!settings.webhookEnabled && !settings.webhookUrl)
                       }
-                      className="h-8 px-4 rounded-lg bg-[var(--admin-accent)] hover:opacity-90 text-white font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 transition-opacity"
+                      className="h-8 px-4 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)] hover:opacity-90 text-white font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 transition-opacity"
                     >
                       <Wifi className="w-3.5 h-3.5" />
                       {applyingWebhook ? "Aplicando..." : "Aplicar Webhook na Evolution"}
@@ -928,7 +928,7 @@ export const WhatsAppManagement: React.FC = () => {
             </div>
           </section>
 
-          <section className="p-4 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] space-y-3">
+          <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
@@ -945,7 +945,7 @@ export const WhatsAppManagement: React.FC = () => {
                 type="button"
                 onClick={() => void handleAiTest()}
                 disabled={testingAi}
-                className="h-9 px-3 rounded-xl bg-[var(--admin-bg)]/80 text-[var(--admin-text-main)] font-bold text-xs flex items-center gap-2 shrink-0 disabled:opacity-50"
+                className="h-9 px-3 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/80 text-[var(--admin-text-main)] font-bold text-xs flex items-center gap-2 shrink-0 disabled:opacity-50"
               >
                 <Loader2
                   className={`w-3.5 h-3.5 ${testingAi ? "animate-spin" : ""}`}
@@ -955,7 +955,7 @@ export const WhatsAppManagement: React.FC = () => {
             </div>
             {aiResult && (
               <div
-                className={`p-3 rounded-xl text-xs ${
+                className={`p-3 rounded-[var(--admin-radius-lg)] text-xs ${
                   aiResult.ok
                     ? "bg-status-success/10 text-status-success"
                     : "bg-status-error/10 text-status-error"
@@ -971,7 +971,7 @@ export const WhatsAppManagement: React.FC = () => {
             )}
           </section>
 
-          <section className="p-4 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] space-y-3">
+          <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
             <div>
               <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
                 <Play className="w-4 h-4 text-[var(--admin-accent)]" />
@@ -991,7 +991,7 @@ export const WhatsAppManagement: React.FC = () => {
                   onChange={(event) => setSimPhone(event.target.value)}
                   placeholder="5511999998888"
                   inputMode="tel"
-                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                 />
               </label>
               <label className="space-y-1">
@@ -1002,7 +1002,7 @@ export const WhatsAppManagement: React.FC = () => {
                   value={simPushName}
                   onChange={(event) => setSimPushName(event.target.value)}
                   placeholder="Cliente Teste"
-                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                 />
               </label>
               <label className="space-y-1">
@@ -1013,7 +1013,7 @@ export const WhatsAppManagement: React.FC = () => {
                   value={simText}
                   onChange={(event) => setSimText(event.target.value)}
                   placeholder="Ex: Oi, Quero agendar amanhã às 15h"
-                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                 />
               </label>
             </div>
@@ -1022,26 +1022,26 @@ export const WhatsAppManagement: React.FC = () => {
                 type="button"
                 onClick={() => void handleSimulateInbound()}
                 disabled={simLoading || !simPhone.trim() || !simText.trim()}
-                className="h-10 w-full sm:w-auto px-4 rounded-xl bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
+                className="h-10 w-full sm:w-auto px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
               >
                 <Play className={`w-4 h-4 ${simLoading ? "animate-spin" : ""}`} />
                 {simLoading ? "Simulando..." : "Simular Recebimento no Bot"}
               </button>
             </div>
             {simResult && (
-              <div className="p-3 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] text-xs space-y-2">
+              <div className="p-3 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] text-xs space-y-2">
                 <div className="font-bold text-[var(--admin-text-main)] flex items-center justify-between">
                   <span>Resultado da Mensagem</span>
                   <span className="text-status-success font-semibold">Processado</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[var(--admin-surface)] text-[var(--admin-text-muted)] font-mono text-[11px] overflow-x-auto">
+                <div className="p-2.5 rounded-[var(--admin-radius-md)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] font-mono text-[11px] overflow-x-auto">
                   <pre>{JSON.stringify(simResult.botResult, null, 2)}</pre>
                 </div>
               </div>
             )}
           </section>
 
-          <section className="p-4 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] space-y-3">
+          <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
             <div>
               <h2 className="text-sm font-bold text-[var(--admin-text-main)]">
                 Mensagem de teste (Envio Direto)
@@ -1061,7 +1061,7 @@ export const WhatsAppManagement: React.FC = () => {
                   onChange={(event) => setTestNumber(event.target.value)}
                   placeholder="5511999998888"
                   inputMode="tel"
-                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                 />
               </label>
               <label className="space-y-1 sm:col-span-2">
@@ -1071,7 +1071,7 @@ export const WhatsAppManagement: React.FC = () => {
                 <input
                   value={testText}
                   onChange={(event) => setTestText(event.target.value)}
-                  className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+                  className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
                 />
               </label>
             </div>
@@ -1080,7 +1080,7 @@ export const WhatsAppManagement: React.FC = () => {
                 type="button"
                 onClick={() => void handleSendTest()}
                 disabled={sending || !testNumber.trim() || !testText.trim()}
-                className="h-10 w-full sm:w-auto px-4 rounded-xl bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
+                className="h-10 w-full sm:w-auto px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/80 hover:bg-[var(--admin-bg)] text-[var(--admin-text-main)] font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
               >
                 <Send className="w-4 h-4" />
                 {sending ? "Enviando..." : "Enviar mensagem de teste"}

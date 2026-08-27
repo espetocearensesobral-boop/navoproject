@@ -528,7 +528,7 @@ export const WaitingQueue: React.FC = () => {
       {/* TOAST MESSAGE */}
       {lastNotification && (
         <div
-          className={`${notificationType === "error" ? "bg-status-error/10 border-status-error/30 text-status-error" : "bg-status-success/10 border-status-success/30 text-status-success"} p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in`}
+          className={`${notificationType === "error" ? "bg-status-error/10 border-status-error/30 text-status-error" : "bg-status-success/10 border-status-success/30 text-status-success"} p-3 rounded-[var(--admin-radius-lg)] flex items-center gap-2 text-xs font-bold animate-fade-in`}
         >
           {notificationType === "error" ? (
             <X className="w-4 h-4 shrink-0" />
@@ -548,11 +548,11 @@ export const WaitingQueue: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar cliente, serviço ou barbeiro..."
-            className="w-full h-9 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg pl-9 pr-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+            className="w-full h-9 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] pl-9 pr-3 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
           />
         </div>
 
-        <div className="admin-card p-2.5 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+        <div className="admin-card p-2.5 rounded-[var(--admin-radius-lg)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
           <div className="flex items-center gap-2 w-full sm:w-56 md:w-64 shrink-0">
             <Filter
               className="w-3.5 h-3.5 text-[var(--admin-text-muted)] shrink-0"
@@ -561,7 +561,7 @@ export const WaitingQueue: React.FC = () => {
             <select
               value={selectedBarberFilter}
               onChange={(e) => setSelectedBarberFilter(e.target.value)}
-              className="min-h-9 flex-1 min-w-0 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-lg px-2.5 text-xs text-[var(--admin-text-main)] font-semibold outline-none cursor-pointer transition-colors focus:border-[var(--admin-accent)]"
+              className="min-h-9 flex-1 min-w-0 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] px-2.5 text-xs text-[var(--admin-text-main)] font-semibold outline-none cursor-pointer transition-colors focus:border-[var(--admin-accent)]"
               aria-label="Filtrar por barbeiro"
             >
               <option value="all">Todos os barbeiros</option>
@@ -594,15 +594,15 @@ export const WaitingQueue: React.FC = () => {
       {activeTab === "kanban" ? (
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.85fr)] gap-4 items-stretch">
           {/* EM ATENDIMENTO: ações em curso */}
-          <section className="order-2 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-xl p-3 sm:p-4">
+          <section className="order-2 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-[var(--admin-radius-lg)] p-3 sm:p-4">
             <div className="flex items-center justify-between gap-3 shrink-0">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-status-success" />
+                <div className="w-2 h-2 rounded-[var(--admin-radius-full)] bg-status-success" />
                 <span className="text-xs font-bold text-status-success uppercase tracking-wider">
                   Em atendimento
                 </span>
               </div>
-              <span className="text-xs bg-status-success/10 text-status-success px-2.5 py-1 rounded-full font-black border border-status-success/20 whitespace-nowrap">
+              <span className="text-xs bg-status-success/10 text-status-success px-2.5 py-1 rounded-[var(--admin-radius-full)] font-black border border-status-success/20 whitespace-nowrap">
                 {inChairList.length} na cadeira
               </span>
             </div>
@@ -631,7 +631,7 @@ export const WaitingQueue: React.FC = () => {
                 {inChairList.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-[var(--admin-surface)] p-3.5 rounded-xl border border-status-success/45 shadow-sm space-y-3 relative"
+                    className="bg-[var(--admin-surface)] p-3.5 rounded-[var(--admin-radius-lg)] border border-status-success/45 shadow-sm space-y-3 relative"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -649,7 +649,7 @@ export const WaitingQueue: React.FC = () => {
                       )}
                     </div>
 
-                    <div className="p-2 bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] space-y-1 text-xs">
+                    <div className="p-2 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1 text-xs">
                       <div className="flex justify-between text-[var(--admin-text-muted)]">
                         <span>Barbeiro:</span>
                         <strong className="text-[var(--admin-text-main)]">
@@ -677,7 +677,7 @@ export const WaitingQueue: React.FC = () => {
                         type="button"
                         disabled={actionLoadingId === item.id}
                         onClick={() => handleRevertToWaiting(item.id)}
-                        className="p-1.5 rounded-lg bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] disabled:opacity-50 disabled:cursor-wait transition-colors"
+                        className="p-1.5 rounded-[var(--admin-radius-md)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] border border-[var(--admin-border)] disabled:opacity-50 disabled:cursor-wait transition-colors"
                         title="Retornar para Recepção"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
@@ -686,7 +686,7 @@ export const WaitingQueue: React.FC = () => {
                         type="button"
                         disabled={actionLoadingId === item.id}
                         onClick={() => handleFinishService(item)}
-                        className="flex-1 py-1.5 rounded-xl bg-status-success text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-[0.97] transition-[transform,background-color] duration-150 disabled:opacity-60 disabled:cursor-wait"
+                        className="flex-1 py-1.5 rounded-[var(--admin-radius-lg)] bg-status-success text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-[0.97] transition-[transform,background-color] duration-150 disabled:opacity-60 disabled:cursor-wait"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>
@@ -703,7 +703,7 @@ export const WaitingQueue: React.FC = () => {
           </section>
 
           {/* RECEPÇÃO: FILA DE PRÓXIMAS AÇÕES */}
-          <section className="order-1 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 admin-card p-3 sm:p-4 rounded-xl">
+          <section className="order-1 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 admin-card p-3 sm:p-4 rounded-[var(--admin-radius-lg)]">
             <div className="flex items-center justify-between gap-3 pb-2 border-b border-[var(--admin-border)] shrink-0">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
@@ -723,7 +723,7 @@ export const WaitingQueue: React.FC = () => {
                   )}{" "}
                   min
                 </span>
-                <span className="text-xs bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] px-2.5 py-1 rounded-full font-black border border-[var(--admin-accent)]/20 whitespace-nowrap">
+                <span className="text-xs bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] px-2.5 py-1 rounded-[var(--admin-radius-full)] font-black border border-[var(--admin-accent)]/20 whitespace-nowrap">
                   {waitingList.length} aguardando
                 </span>
               </div>
@@ -762,11 +762,11 @@ export const WaitingQueue: React.FC = () => {
                     return (
                       <article
                         key={item.id}
-                        className={`overflow-hidden rounded-xl border transition-colors ${isExpanded ? "border-[var(--admin-accent)]/45 bg-[var(--admin-bg)]" : "border-[var(--admin-border)] bg-[var(--admin-bg)]/45 hover:border-[var(--admin-accent)]/35"}`}
+                        className={`overflow-hidden rounded-[var(--admin-radius-lg)] border transition-colors ${isExpanded ? "border-[var(--admin-accent)]/45 bg-[var(--admin-bg)]" : "border-[var(--admin-border)] bg-[var(--admin-bg)]/45 hover:border-[var(--admin-accent)]/35"}`}
                       >
                         <div className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-7 h-7 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-black text-xs flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-black text-xs flex items-center justify-center shrink-0">
                               #{index + 1}
                             </div>
                             <div className="min-w-0">
@@ -775,7 +775,7 @@ export const WaitingQueue: React.FC = () => {
                                   {item.client_name}
                                 </h4>
                                 {item.notes && (
-                                  <span className="shrink-0 px-1.5 py-0.5 bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold rounded-xl border border-[var(--admin-accent)]/20">
+                                  <span className="shrink-0 px-1.5 py-0.5 bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold rounded-[var(--admin-radius-lg)] border border-[var(--admin-accent)]/20">
                                     Encaixe
                                   </span>
                                 )}
@@ -796,7 +796,7 @@ export const WaitingQueue: React.FC = () => {
                               type="button"
                               disabled={actionLoadingId === item.id}
                               onClick={() => handleAdvanceToChair(item.id)}
-                              className="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-extrabold text-xs flex items-center justify-center gap-1 hover:bg-[var(--admin-accent)]/80 active:scale-95 disabled:opacity-60 disabled:cursor-wait transition-colors"
+                              className="flex-1 sm:flex-none px-3 py-2 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-extrabold text-xs flex items-center justify-center gap-1 hover:bg-[var(--admin-accent)]/80 active:scale-95 disabled:opacity-60 disabled:cursor-wait transition-colors"
                             >
                               <Play className="w-3 h-3 fill-[var(--admin-bg)]" />
                               <span>
@@ -818,7 +818,7 @@ export const WaitingQueue: React.FC = () => {
                                   ? `Recolher ${item.client_name}`
                                   : `Expandir ${item.client_name}`
                               }
-                              className="w-9 h-9 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:border-[var(--admin-accent)]/35 flex items-center justify-center shrink-0 transition-colors"
+                              className="w-9 h-9 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] hover:border-[var(--admin-accent)]/35 flex items-center justify-center shrink-0 transition-colors"
                             >
                               {isExpanded ? (
                                 <ChevronUp className="w-4 h-4" />
@@ -832,7 +832,7 @@ export const WaitingQueue: React.FC = () => {
                         {isExpanded && (
                           <div className="border-t border-[var(--admin-border)] bg-[var(--admin-surface)]/60 p-3 sm:p-3.5 space-y-3">
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                              <div className="rounded-lg bg-[var(--admin-bg)] p-2.5">
+                              <div className="rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] p-2.5">
                                 <span className="block text-[var(--admin-text-muted)] uppercase font-bold tracking-wide">
                                   Tempo estimado
                                 </span>
@@ -845,7 +845,7 @@ export const WaitingQueue: React.FC = () => {
                                   min
                                 </strong>
                               </div>
-                              <div className="rounded-lg bg-[var(--admin-bg)] p-2.5">
+                              <div className="rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] p-2.5">
                                 <span className="block text-[var(--admin-text-muted)] uppercase font-bold tracking-wide">
                                   Barbeiro
                                 </span>
@@ -853,7 +853,7 @@ export const WaitingQueue: React.FC = () => {
                                   {item.professional_name || "A definir"}
                                 </strong>
                               </div>
-                              <div className="rounded-lg bg-[var(--admin-bg)] p-2.5 col-span-2 sm:col-span-1">
+                              <div className="rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] p-2.5 col-span-2 sm:col-span-1">
                                 <span className="block text-[var(--admin-text-muted)] uppercase font-bold tracking-wide">
                                   Horário
                                 </span>
@@ -878,7 +878,7 @@ export const WaitingQueue: React.FC = () => {
                                   onClick={() =>
                                     handleMoveQueueItem(item, "up")
                                   }
-                                  className="w-9 h-9 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] disabled:opacity-25 transition-colors"
+                                  className="w-9 h-9 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] disabled:opacity-25 transition-colors"
                                   aria-busy={actionLoadingId === item.id}
                                   title="Subir na fila"
                                   aria-label="Subir na fila"
@@ -891,7 +891,7 @@ export const WaitingQueue: React.FC = () => {
                                   onClick={() =>
                                     handleMoveQueueItem(item, "down")
                                   }
-                                  className="w-9 h-9 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] disabled:opacity-25 transition-colors"
+                                  className="w-9 h-9 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] disabled:opacity-25 transition-colors"
                                   aria-busy={actionLoadingId === item.id}
                                   title="Descer na fila"
                                   aria-label="Descer na fila"
@@ -904,7 +904,7 @@ export const WaitingQueue: React.FC = () => {
                                   type="button"
                                   disabled={actionLoadingId === item.id}
                                   onClick={() => handleOpenWhatsAppModal(item)}
-                                  className="w-9 h-9 rounded-lg bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border border-[#25D366]/30 disabled:opacity-50 transition-colors"
+                                  className="w-9 h-9 rounded-[var(--admin-radius-md)] bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border border-[#25D366]/30 disabled:opacity-50 transition-colors"
                                   title="Avisar WhatsApp"
                                   aria-label="Avisar WhatsApp"
                                 >
@@ -919,7 +919,7 @@ export const WaitingQueue: React.FC = () => {
                                       item.client_name,
                                     )
                                   }
-                                  className="w-9 h-9 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-wait transition-colors"
+                                  className="w-9 h-9 rounded-[var(--admin-radius-md)] bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-wait transition-colors"
                                   title="Remover da fila"
                                   aria-label="Remover da fila"
                                 >
@@ -939,7 +939,7 @@ export const WaitingQueue: React.FC = () => {
         </div>
       ) : activeTab === "history" ? (
         /* HISTORY TAB */
-        <div className="admin-card overflow-hidden p-0 rounded-2xl">
+        <div className="admin-card overflow-hidden p-0 rounded-[var(--admin-radius-xl)]">
           <div className="p-4 border-b border-[var(--admin-border)]">
             <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-status-success" />
@@ -1017,7 +1017,7 @@ export const WaitingQueue: React.FC = () => {
                           </p>
                         </div>
                         <span
-                          className={`shrink-0 px-2 py-1 rounded-full text-[11px] font-bold ${isCancelled ? "bg-status-error/15 text-status-error" : "bg-status-success/15 text-status-success"}`}
+                          className={`shrink-0 px-2 py-1 rounded-[var(--admin-radius-full)] text-[11px] font-bold ${isCancelled ? "bg-status-error/15 text-status-error" : "bg-status-success/15 text-status-success"}`}
                         >
                           {isCancelled ? "Cancelado" : "Concluído"}
                         </span>
@@ -1053,7 +1053,7 @@ export const WaitingQueue: React.FC = () => {
         </div>
       ) : (
         /* ABANDONED ITEMS TAB */
-        <div className="admin-card overflow-hidden p-0 rounded-2xl">
+        <div className="admin-card overflow-hidden p-0 rounded-[var(--admin-radius-xl)]">
           <div className="p-4 border-b border-[var(--admin-border)] flex items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
@@ -1174,7 +1174,7 @@ export const WaitingQueue: React.FC = () => {
                         onClick={() =>
                           handleReturnToQueue(item.id, item.client_name)
                         }
-                        className="flex-1 py-2 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-[var(--admin-accent)]/80 disabled:opacity-60 transition-colors"
+                        className="flex-1 py-2 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-[var(--admin-accent)]/80 disabled:opacity-60 transition-colors"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                         Retornar
@@ -1184,7 +1184,7 @@ export const WaitingQueue: React.FC = () => {
                           type="button"
                           disabled={actionLoadingId === item.id}
                           onClick={() => handleCancelQueuedAppointment(item)}
-                          className="flex-1 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60 transition-colors"
+                          className="flex-1 py-2 rounded-[var(--admin-radius-md)] bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60 transition-colors"
                         >
                           <X className="w-3.5 h-3.5" />
                           Cancelar
@@ -1194,7 +1194,7 @@ export const WaitingQueue: React.FC = () => {
                           type="button"
                           disabled={actionLoadingId === item.id}
                           onClick={() => handleDeleteAbandonedWalkIn(item)}
-                          className="flex-1 py-2 rounded-lg bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60 transition-colors"
+                          className="flex-1 py-2 rounded-[var(--admin-radius-md)] bg-status-error/10 text-status-error border border-status-error/20 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-status-error/20 disabled:opacity-60 transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           Excluir
@@ -1221,7 +1221,7 @@ export const WaitingQueue: React.FC = () => {
           footer={
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
               <div className="flex items-center gap-2 text-xs text-[var(--admin-text-muted)]">
-                <span className="w-2 h-2 rounded-full bg-[var(--admin-accent)] animate-pulse" />
+                <span className="w-2 h-2 rounded-[var(--admin-radius-full)] bg-[var(--admin-accent)] animate-pulse" />
                 <span>Encaixe será adicionado à fila de espera imediatamente</span>
               </div>
               <div className="flex items-center justify-end gap-2.5">
@@ -1265,7 +1265,7 @@ export const WaitingQueue: React.FC = () => {
               {/* Left Column: Cliente & Barbeiro (5 cols) */}
               <div className="lg:col-span-5 space-y-5">
                 {/* Bloco 1: Dados do Cliente */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-4">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-4">
                   <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                     <User className="w-4 h-4" />
                     <span>1. Dados do Cliente</span>
@@ -1285,7 +1285,7 @@ export const WaitingQueue: React.FC = () => {
                       value={newClientName}
                       onChange={(e) => setNewClientName(e.target.value)}
                       placeholder="Ex: Gabriel Santos"
-                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
                       required
                       autoFocus
                     />
@@ -1311,14 +1311,14 @@ export const WaitingQueue: React.FC = () => {
                         value={newClientPhone}
                         onChange={(e) => setNewClientPhone(e.target.value)}
                         placeholder="(11) 99887-1122"
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-10 pr-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Bloco 2: Profissional */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                       <Scissors className="w-4 h-4" />
@@ -1340,14 +1340,14 @@ export const WaitingQueue: React.FC = () => {
                             setNewProfessionalId(b.id);
                             setNewProfessionalName(b.name);
                           }}
-                          className={`p-3 rounded-xl border text-left flex items-center gap-3 transition-all ${
+                          className={`p-3 rounded-[var(--admin-radius-lg)] border text-left flex items-center gap-3 transition-all ${
                             isSelected
                               ? "bg-[var(--admin-accent)]/10 border-[var(--admin-accent)] text-[var(--admin-text-main)] shadow-sm"
                               : "bg-[var(--admin-bg)] border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:border-[var(--admin-accent)]/50 hover:text-[var(--admin-text-main)]"
                           }`}
                         >
                           <div
-                            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
+                            className="w-9 h-9 rounded-[var(--admin-radius-full)] flex items-center justify-center font-bold text-xs shrink-0"
                             style={{
                               background: isSelected
                                 ? "var(--admin-accent)"
@@ -1378,7 +1378,7 @@ export const WaitingQueue: React.FC = () => {
               {/* Right Column: Serviço & Observações (7 cols) */}
               <div className="lg:col-span-7 space-y-5">
                 {/* Bloco 3: Serviços */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                       <Sparkles className="w-4 h-4" />
@@ -1400,7 +1400,7 @@ export const WaitingQueue: React.FC = () => {
                           key={service.id}
                           type="button"
                           onClick={() => handleSelectWalkInService(service)}
-                          className={`p-3 rounded-xl border text-left flex flex-col justify-between gap-2 transition-all ${
+                          className={`p-3 rounded-[var(--admin-radius-lg)] border text-left flex flex-col justify-between gap-2 transition-all ${
                             isSelected
                               ? "bg-[var(--admin-accent)]/10 border-[var(--admin-accent)] shadow-sm"
                               : "bg-[var(--admin-bg)] border-[var(--admin-border)] hover:border-[var(--admin-accent)]/50"
@@ -1432,7 +1432,7 @@ export const WaitingQueue: React.FC = () => {
                 </div>
 
                 {/* Bloco 4: Observações */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-[var(--admin-surface)] border border-[var(--admin-border)] space-y-3.5">
                   <div className="flex items-center gap-2 text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                     <FileText className="w-4 h-4" />
                     <span>4. Observações</span>
@@ -1445,7 +1445,7 @@ export const WaitingQueue: React.FC = () => {
                       value={newNotes}
                       onChange={(e) => setNewNotes(e.target.value)}
                       placeholder="Ex: Aceitou aguardar 15 min"
-                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-3.5 py-2.5 text-sm text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors placeholder:text-[var(--admin-text-muted)]"
                     />
                   </div>
                 </div>
@@ -1458,7 +1458,7 @@ export const WaitingQueue: React.FC = () => {
               const price = Number(selectedService?.price || 0);
 
               return (
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--admin-surface)] to-[var(--admin-bg)] border border-[var(--admin-border)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="p-4 sm:p-5 rounded-[var(--admin-radius-xl)] bg-gradient-to-r from-[var(--admin-surface)] to-[var(--admin-bg)] border border-[var(--admin-border)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[var(--admin-accent)]/15 text-[var(--admin-accent)] border border-[var(--admin-accent)]/30">
@@ -1476,7 +1476,7 @@ export const WaitingQueue: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="text-left md:text-right shrink-0 bg-[var(--admin-bg)] md:bg-transparent p-3 md:p-0 rounded-xl w-full md:w-auto border md:border-0 border-[var(--admin-border)]">
+                  <div className="text-left md:text-right shrink-0 bg-[var(--admin-bg)] md:bg-transparent p-3 md:p-0 rounded-[var(--admin-radius-lg)] w-full md:w-auto border md:border-0 border-[var(--admin-border)]">
                     <span className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider block">
                       Valor Estimado
                     </span>
@@ -1579,7 +1579,7 @@ export const WaitingQueue: React.FC = () => {
               rows={4}
               value={customWaMessage}
               onChange={(e) => setCustomWaMessage(e.target.value)}
-              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-3 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[#25D366] resize-none mt-1.5 transition-colors"
+              className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-3 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[#25D366] resize-none mt-1.5 transition-colors"
             />
           </label>
         </AdminModalV2>

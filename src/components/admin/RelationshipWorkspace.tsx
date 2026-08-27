@@ -179,7 +179,7 @@ export const RelationshipWorkspace: React.FC<{
                 sectionRefs.current[section.id] = el;
               }}
               tabIndex={-1}
-              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-all duration-200 focus:outline-none ${
+              className={`scroll-mt-4 sm:scroll-mt-6 overflow-hidden rounded-[var(--admin-radius-lg)] border bg-[var(--admin-surface)] transition-all duration-200 focus:outline-none ${
                 isOpen
                   ? "border-[var(--admin-accent)]/40 ring-1 ring-[var(--admin-accent)]/20 shadow-xs"
                   : "border-[var(--admin-border)] hover:border-[var(--admin-border-subtle)] hover:bg-[var(--admin-surface-hover)]"
@@ -193,7 +193,7 @@ export const RelationshipWorkspace: React.FC<{
                 className="flex min-h-[64px] w-full items-center gap-3.5 px-4 py-3 text-left transition-colors hover:bg-[var(--admin-surface-hover)] sm:px-5 cursor-pointer"
               >
                 <span
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--admin-radius-md)] transition-colors ${
                     isOpen
                       ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
                       : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)]"
@@ -207,7 +207,7 @@ export const RelationshipWorkspace: React.FC<{
                     <span className="truncate text-sm font-semibold text-[var(--admin-text-main)]">
                       {section.label}
                     </span>
-                    <span className="inline-flex items-center rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2 py-0.5 text-[9px] font-semibold text-[var(--admin-text-muted)] uppercase tracking-wider">
+                    <span className="inline-flex items-center rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] border border-[var(--admin-border)] px-2 py-0.5 text-[9px] font-semibold text-[var(--admin-text-muted)] uppercase tracking-wider">
                       {section.category}
                     </span>
                   </span>

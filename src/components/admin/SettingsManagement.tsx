@@ -120,7 +120,7 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({
       />
 
       {/* MAIN CONTENT AREA */}
-      <div className="bg-[var(--admin-surface)] rounded-xl p-4 sm:p-6 min-w-0">
+      <div className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-4 sm:p-6 min-w-0">
         {renderContent()}
       </div>
     </div>
@@ -240,7 +240,7 @@ const EmailSettingsTab: React.FC = () => {
 
       {statusMsg && (
         <div
-          className={`p-3 rounded-xl flex items-center gap-2 text-xs font-bold ${statusMsg.type === "success" ? "bg-status-success/10 text-status-success" : "bg-status-error/10 text-status-error"}`}
+          className={`p-3 rounded-[var(--admin-radius-lg)] flex items-center gap-2 text-xs font-bold ${statusMsg.type === "success" ? "bg-status-success/10 text-status-success" : "bg-status-error/10 text-status-error"}`}
         >
           {statusMsg.type === "success" ? (
             <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -251,7 +251,7 @@ const EmailSettingsTab: React.FC = () => {
         </div>
       )}
 
-      <div className="flex items-center justify-between bg-[var(--admin-bg)]/70 p-3.5 rounded-xl">
+      <div className="flex items-center justify-between bg-[var(--admin-bg)]/70 p-3.5 rounded-[var(--admin-radius-lg)]">
         <div>
           <p className="text-xs font-bold text-[var(--admin-text-main)]">
             Ativar envio de e-mails
@@ -266,10 +266,10 @@ const EmailSettingsTab: React.FC = () => {
           role="switch"
           aria-checked={settings.enabled}
           onClick={() => update("enabled", !settings.enabled)}
-          className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${settings.enabled ? "bg-[var(--admin-accent)]" : "bg-[var(--admin-border)]"}`}
+          className={`w-11 h-6 rounded-[var(--admin-radius-full)] transition-colors shrink-0 relative ${settings.enabled ? "bg-[var(--admin-accent)]" : "bg-[var(--admin-border)]"}`}
         >
           <span
-            className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${settings.enabled ? "translate-x-5" : "translate-x-0.5"}`}
+            className={`absolute top-0.5 w-5 h-5 rounded-[var(--admin-radius-full)] bg-white shadow transition-transform ${settings.enabled ? "translate-x-5" : "translate-x-0.5"}`}
           />
         </button>
       </div>
@@ -285,7 +285,7 @@ const EmailSettingsTab: React.FC = () => {
               placeholder="smtp.gmail.com"
               value={settings.smtpHost}
               onChange={(e) => update("smtpHost", e.target.value)}
-              className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+              className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
             />
           </div>
           <div>
@@ -299,7 +299,7 @@ const EmailSettingsTab: React.FC = () => {
               onChange={(e) =>
                 update("smtpPort", Number(e.target.value) || 587)
               }
-              className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0 num-tabular"
+              className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0 num-tabular"
             />
           </div>
         </div>
@@ -324,7 +324,7 @@ const EmailSettingsTab: React.FC = () => {
             placeholder="seuemail@gmail.com"
             value={settings.smtpUser}
             onChange={(e) => update("smtpUser", e.target.value)}
-            className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+            className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
           />
         </div>
 
@@ -345,7 +345,7 @@ const EmailSettingsTab: React.FC = () => {
               }
               value={smtpPasswordInput}
               onChange={(e) => setSmtpPasswordInput(e.target.value)}
-              className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 pr-9 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+              className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 pr-9 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
             />
             <button
               type="button"
@@ -372,7 +372,7 @@ const EmailSettingsTab: React.FC = () => {
               placeholder="Navo Barber & Club"
               value={settings.fromName}
               onChange={(e) => update("fromName", e.target.value)}
-              className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+              className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
             />
           </div>
           <div>
@@ -384,7 +384,7 @@ const EmailSettingsTab: React.FC = () => {
               placeholder="contato@suabarbearia.com"
               value={settings.fromEmail}
               onChange={(e) => update("fromEmail", e.target.value)}
-              className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+              className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
             />
           </div>
         </div>
@@ -398,7 +398,7 @@ const EmailSettingsTab: React.FC = () => {
             placeholder="Vazio = usar o e-mail de envio"
             value={settings.replyTo}
             onChange={(e) => update("replyTo", e.target.value)}
-            className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+            className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
           />
         </div>
 
@@ -411,7 +411,7 @@ const EmailSettingsTab: React.FC = () => {
             placeholder="administrativo@suabarbearia.com"
             value={settings.notificationEmail}
             onChange={(e) => update("notificationEmail", e.target.value)}
-            className="w-full bg-[var(--admin-bg)]/70 rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+            className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
           />
           <p className="mt-1 text-xs text-[var(--admin-text-muted)]">
             Alertas de agenda, reagendamentos e cancelamentos. Vazio = sem
@@ -474,7 +474,7 @@ const EmailSettingsTab: React.FC = () => {
               );
           }}
           disabled={isSaving}
-          className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl bg-[var(--admin-bg)]/70 text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] text-xs font-bold transition-colors disabled:opacity-50"
+          className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] text-xs font-bold transition-colors disabled:opacity-50"
         >
           Cancelar
         </button>
@@ -482,7 +482,7 @@ const EmailSettingsTab: React.FC = () => {
           type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] hover:bg-[var(--admin-accent)]/90 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+          className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] hover:bg-[var(--admin-accent)]/90 rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
         >
           <Save className="w-4 h-4" />
           <span>{isSaving ? "Salvando..." : "Salvar Alterações"}</span>
@@ -490,7 +490,7 @@ const EmailSettingsTab: React.FC = () => {
       </div>
 
       {/* Test send */}
-      <div className="bg-[var(--admin-bg)]/70 p-4 rounded-xl space-y-2">
+      <div className="bg-[var(--admin-bg)]/70 p-4 rounded-[var(--admin-radius-lg)] space-y-2">
         <h3 className="text-xs font-bold text-[var(--admin-text-main)]">
           Testar envio
         </h3>
@@ -504,12 +504,12 @@ const EmailSettingsTab: React.FC = () => {
             placeholder="destinatario@exemplo.com"
             value={testEmail}
             onChange={(e) => setTestEmail(e.target.value)}
-            className="flex-1 bg-[var(--admin-surface)] rounded-xl p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+            className="flex-1 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
           />
           <button
             onClick={handleTestSend}
             disabled={isTesting || !testEmail.trim()}
-            className="h-10 px-4 bg-[var(--admin-surface)] hover:bg-surface-elevated text-[var(--admin-text-main)] rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap shrink-0"
+            className="h-10 px-4 bg-[var(--admin-surface)] hover:bg-surface-elevated text-[var(--admin-text-main)] rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap shrink-0"
           >
             <Send className="w-3.5 h-3.5" />
             <span>{isTesting ? "Enviando..." : "Enviar Teste"}</span>
@@ -698,7 +698,7 @@ const PrintSettingsTab: React.FC = () => {
 
       {status && (
         <div
-          className={`p-3 rounded-xl flex items-center gap-2 font-bold ${status.type === "success" ? "bg-status-success/10 text-status-success" : "bg-status-error/10 text-status-error"}`}
+          className={`p-3 rounded-[var(--admin-radius-lg)] flex items-center gap-2 font-bold ${status.type === "success" ? "bg-status-success/10 text-status-success" : "bg-status-error/10 text-status-error"}`}
         >
           <span>{status.text}</span>
         </div>
@@ -719,7 +719,7 @@ const PrintSettingsTab: React.FC = () => {
           ).map(([key, label, kind]) => (
             <div
               key={key}
-              className="bg-[var(--admin-bg)]/70 rounded-xl p-3 space-y-3"
+              className="bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-3 space-y-3"
             >
               <div>
                 <p className="font-bold text-[var(--admin-text-main)]">
@@ -732,7 +732,7 @@ const PrintSettingsTab: React.FC = () => {
               <select
                 value={settings[key]}
                 onChange={(e) => update(key, e.target.value as PrintFormat)}
-                className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+                className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
               >
                 <option value="thermal">Impressora térmica</option>
                 <option value="a4">Folha A4</option>
@@ -740,7 +740,7 @@ const PrintSettingsTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => openPreview(kind)}
-                className="w-full h-9 rounded-xl bg-[var(--admin-surface)] text-[var(--admin-text-main)] font-bold flex items-center justify-center gap-2 hover:bg-surface-elevated transition-colors"
+                className="w-full h-9 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] font-bold flex items-center justify-center gap-2 hover:bg-surface-elevated transition-colors"
               >
                 <Printer className="w-3.5 h-3.5" /> Pré-visualizar
               </button>
@@ -749,7 +749,7 @@ const PrintSettingsTab: React.FC = () => {
         </div>
       </section>
 
-      <section className="bg-[var(--admin-bg)]/70 rounded-xl p-4 space-y-4">
+      <section className="bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-4 space-y-4">
         <div>
           <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider">
             Papel e legibilidade
@@ -769,7 +769,7 @@ const PrintSettingsTab: React.FC = () => {
               onChange={(e) =>
                 update("thermalWidthMm", Number(e.target.value) as 58 | 80)
               }
-              className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             >
               <option value="58">58 mm</option>
               <option value="80">80 mm</option>
@@ -787,7 +787,7 @@ const PrintSettingsTab: React.FC = () => {
                   e.target.value as PrintSettings["a4Orientation"],
                 )
               }
-              className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+              className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
             >
               <option value="portrait">Retrato</option>
               <option value="landscape">Paisagem</option>
@@ -803,7 +803,7 @@ const PrintSettingsTab: React.FC = () => {
               max="18"
               value={settings.fontSize}
               onChange={(e) => update("fontSize", Number(e.target.value))}
-              className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] num-tabular"
+              className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] num-tabular"
             />
           </label>
           <label className="space-y-1">
@@ -816,7 +816,7 @@ const PrintSettingsTab: React.FC = () => {
               max="30"
               value={settings.marginMm}
               onChange={(e) => update("marginMm", Number(e.target.value))}
-              className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] num-tabular"
+              className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] num-tabular"
             />
           </label>
         </div>
@@ -829,7 +829,7 @@ const PrintSettingsTab: React.FC = () => {
             onChange={(e) =>
               update("density", e.target.value as PrintSettings["density"])
             }
-            className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+            className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
           >
             <option value="compact">Compacta — economiza papel</option>
             <option value="comfortable">Confortável — padrão</option>
@@ -838,7 +838,7 @@ const PrintSettingsTab: React.FC = () => {
         </label>
       </section>
 
-      <section className="bg-[var(--admin-bg)]/70 rounded-xl p-4 space-y-3">
+      <section className="bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-4 space-y-3">
         <div>
           <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider">
             Detalhes dos comprovantes
@@ -851,7 +851,7 @@ const PrintSettingsTab: React.FC = () => {
           {toggles.map(([key, label, description]) => (
             <label
               key={String(key)}
-              className="flex items-start gap-2 p-2.5 rounded-xl bg-[var(--admin-surface)]"
+              className="flex items-start gap-2 p-2.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)]"
             >
               <input
                 type="checkbox"
@@ -879,12 +879,12 @@ const PrintSettingsTab: React.FC = () => {
           <input
             value={settings.footerText}
             onChange={(e) => update("footerText", e.target.value)}
-            className="w-full bg-[var(--admin-surface)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+            className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
           />
         </label>
       </section>
 
-      <section className="bg-[var(--admin-bg)]/70 rounded-xl p-4 space-y-3">
+      <section className="bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-4 space-y-3">
         <div>
           <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider">
             Relatórios
@@ -894,7 +894,7 @@ const PrintSettingsTab: React.FC = () => {
             visual do relatório.
           </p>
         </div>
-        <label className="flex items-start gap-2 p-2.5 rounded-xl bg-[var(--admin-surface)]">
+        <label className="flex items-start gap-2 p-2.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)]">
           <input
             type="checkbox"
             checked={settings.reportIncludeCharts}
@@ -910,7 +910,7 @@ const PrintSettingsTab: React.FC = () => {
             </span>
           </span>
         </label>
-        <label className="flex items-start gap-2 p-2.5 rounded-xl bg-[var(--admin-surface)]">
+        <label className="flex items-start gap-2 p-2.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)]">
           <input
             type="checkbox"
             checked={settings.reportIncludeDetails}
@@ -933,7 +933,7 @@ const PrintSettingsTab: React.FC = () => {
           type="button"
           onClick={handleReset}
           disabled={saving}
-          className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl bg-[var(--admin-bg)]/70 text-[var(--admin-text-muted)] font-bold flex items-center justify-center gap-2 hover:text-[var(--admin-text-main)]"
+          className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)]/70 text-[var(--admin-text-muted)] font-bold flex items-center justify-center gap-2 hover:text-[var(--admin-text-main)]"
         >
           <RotateCcw className="w-4 h-4" />
           Cancelar
@@ -942,7 +942,7 @@ const PrintSettingsTab: React.FC = () => {
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+          className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <Save className="w-4 h-4" />
           {saving ? "Salvando..." : "Salvar Alterações"}

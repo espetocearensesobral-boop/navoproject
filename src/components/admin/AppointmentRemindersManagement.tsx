@@ -274,10 +274,10 @@ export const AppointmentRemindersManagement: React.FC = () => {
       />
 
       {/* Status da Conexão */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)]">
         <div className="flex items-center gap-2.5">
           <div
-            className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+            className={`w-8 h-8 rounded-[var(--admin-radius-lg)] flex items-center justify-center shrink-0 ${
               isEvolutionConnected
                 ? "bg-status-success/15 text-status-success"
                 : "bg-status-warning/15 text-status-warning"
@@ -302,7 +302,7 @@ export const AppointmentRemindersManagement: React.FC = () => {
 
       {feedback && (
         <div
-          className={`p-3 rounded-xl border text-xs font-semibold flex items-center gap-2 ${
+          className={`p-3 rounded-[var(--admin-radius-lg)] border text-xs font-semibold flex items-center gap-2 ${
             feedback.type === "success"
               ? "bg-status-success/10 border-status-success/30 text-status-success"
               : "bg-status-error/10 border-status-error/30 text-status-error"
@@ -331,18 +331,18 @@ export const AppointmentRemindersManagement: React.FC = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar por cliente, telefone ou barbeiro..."
-          className="flex-1 h-10 px-3 rounded-xl bg-[var(--admin-surface)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)]"
+          className="flex-1 h-10 px-3 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)]"
         />
       </div>
 
       {/* Lista de Lembretes */}
       {loading ? (
-        <div className="p-8 text-center text-xs text-[var(--admin-text-muted)] flex items-center justify-center gap-2 bg-[var(--admin-surface)] rounded-2xl border border-[var(--admin-border)]">
+        <div className="p-8 text-center text-xs text-[var(--admin-text-muted)] flex items-center justify-center gap-2 bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)]">
           <RefreshCw className="w-4 h-4 animate-spin" />
           <span>Carregando agenda e preparando mensagens...</span>
         </div>
       ) : filteredReminders.length === 0 ? (
-        <div className="p-8 text-center space-y-2 bg-[var(--admin-surface)] rounded-2xl border border-[var(--admin-border)]">
+        <div className="p-8 text-center space-y-2 bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)]">
           <CheckCircle2 className="w-8 h-8 text-status-success mx-auto" />
           <p className="text-sm font-bold text-[var(--admin-text-main)]">
             Nenhum lembrete pendente nesta categoria!
@@ -356,7 +356,7 @@ export const AppointmentRemindersManagement: React.FC = () => {
           {filteredReminders.map((item) => (
             <div
               key={item.id}
-              className={`p-4 rounded-2xl border transition-all ${
+              className={`p-4 rounded-[var(--admin-radius-xl)] border transition-all ${
                 item.status === "sent"
                   ? "bg-[var(--admin-surface)]/60 border-[var(--admin-border)]/60 opacity-80"
                   : "bg-[var(--admin-surface)] border-[var(--admin-border)] shadow-xs hover:border-[var(--admin-accent)]/40"
@@ -372,7 +372,7 @@ export const AppointmentRemindersManagement: React.FC = () => {
                       {item.clientPhone}
                     </span>
                     {item.status === "sent" && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-status-success/15 text-status-success">
+                      <span className="px-2 py-0.5 rounded-[var(--admin-radius-full)] text-[10px] font-bold bg-status-success/15 text-status-success">
                         Enviado hoje
                       </span>
                     )}
@@ -405,7 +405,7 @@ export const AppointmentRemindersManagement: React.FC = () => {
                         : handleSendDirectWhatsApp(item)
                     }
                     disabled={sendingId === item.id}
-                    className="min-h-[38px] px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-gold-hover transition-all active:scale-95 shadow-xs cursor-pointer"
+                    className="min-h-[38px] px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-gold-hover transition-all active:scale-95 shadow-xs cursor-pointer"
                   >
                     {sendingId === item.id ? (
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -419,7 +419,7 @@ export const AppointmentRemindersManagement: React.FC = () => {
                     type="button"
                     onClick={() => handleSendDirectWhatsApp(item)}
                     title="Abrir no WhatsApp Web/App"
-                    className="min-h-[38px] w-9 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center transition-colors"
+                    className="min-h-[38px] w-9 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center transition-colors"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                   </button>
@@ -427,7 +427,7 @@ export const AppointmentRemindersManagement: React.FC = () => {
               </div>
 
               {/* Prévia da Mensagem */}
-              <div className="mt-3 pt-2.5 border-t border-[var(--admin-border)] text-[11px] text-[var(--admin-text-muted)] bg-[var(--admin-bg)]/60 p-2.5 rounded-xl font-mono whitespace-pre-line leading-relaxed">
+              <div className="mt-3 pt-2.5 border-t border-[var(--admin-border)] text-[11px] text-[var(--admin-text-muted)] bg-[var(--admin-bg)]/60 p-2.5 rounded-[var(--admin-radius-lg)] font-mono whitespace-pre-line leading-relaxed">
                 {item.messageText}
               </div>
             </div>

@@ -22,7 +22,7 @@ import {
 type StatusMessage = { type: "success" | "error"; text: string } | null;
 
 const fieldClass =
-  "w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-3 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-w-0 num-tabular";
+  "w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-3 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-w-0 num-tabular";
 const labelClass =
   "text-xs font-bold text-[var(--admin-text-muted)] uppercase tracking-wider block mb-1.5";
 
@@ -133,7 +133,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
 
       {statusMsg && (
         <div
-          className={`p-3.5 rounded-xl flex items-start gap-2.5 text-sm font-bold ${statusMsg.type === "success" ? "bg-status-success/10 border border-status-success/30 text-status-success" : "bg-status-error/10 border border-status-error/30 text-status-error"}`}
+          className={`p-3.5 rounded-[var(--admin-radius-lg)] flex items-start gap-2.5 text-sm font-bold ${statusMsg.type === "success" ? "bg-status-success/10 border border-status-success/30 text-status-success" : "bg-status-error/10 border border-status-error/30 text-status-error"}`}
         >
           {statusMsg.type === "success" ? (
             <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
@@ -338,7 +338,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
           </div>
 
           <div className="sm:col-span-2 space-y-3">
-            <label className="flex items-start justify-between gap-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
+            <label className="flex items-start justify-between gap-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
               <span className="flex items-start gap-2.5">
                 <UserRoundCheck className="w-4 h-4 text-[var(--admin-accent)] mt-0.5 shrink-0" />
                 <span>
@@ -357,7 +357,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
                 className="mt-1 w-4 h-4 accent-gold-base"
               />
             </label>
-            <label className="flex items-start justify-between gap-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
+            <label className="flex items-start justify-between gap-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
               <span>
                 <strong className="block text-sm text-[var(--admin-text-main)]">
                   Exigir barbeiro
@@ -440,7 +440,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
             </p>
           </div>
           <div className="sm:col-span-2 space-y-3">
-            <label className="flex items-start justify-between gap-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
+            <label className="flex items-start justify-between gap-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
               <span>
                 <strong className="block text-sm text-[var(--admin-text-main)]">
                   Mostrar pendentes
@@ -458,7 +458,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
                 className="mt-1 w-4 h-4 accent-gold-base"
               />
             </label>
-            <label className="flex items-start justify-between gap-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
+            <label className="flex items-start justify-between gap-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
               <span>
                 <strong className="block text-sm text-[var(--admin-text-main)]">
                   Incluir cancelados
@@ -476,7 +476,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
                 className="mt-1 w-4 h-4 accent-gold-base"
               />
             </label>
-            <label className="flex items-start justify-between gap-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
+            <label className="flex items-start justify-between gap-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3.5 cursor-pointer">
               <span>
                 <strong className="block text-sm text-[var(--admin-text-main)]">
                   Incluir faltas
@@ -538,7 +538,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
           type="button"
           onClick={handleCancel}
           disabled={isSaving}
-          className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] text-sm font-bold transition-colors disabled:opacity-50"
+          className="h-11 sm:h-10 w-full sm:w-auto px-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] text-sm font-bold transition-colors disabled:opacity-50"
         >
           Cancelar
         </button>
@@ -546,7 +546,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
           type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] hover:bg-[var(--admin-accent)]/90 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+          className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] hover:bg-[var(--admin-accent)]/90 rounded-[var(--admin-radius-lg)] text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
         >
           <Save className="w-4 h-4" />
           <span>{isSaving ? "Salvando..." : "Salvar Alterações"}</span>

@@ -158,7 +158,7 @@ export const FinancialStatementManagement: React.FC = () => {
       {/* Ação (mobile) */}
       <button
         onClick={handleExportCsv}
-        className="md:hidden w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] hover:border-[var(--admin-accent)]/50 text-[var(--admin-text-main)] px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
+        className="md:hidden w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] hover:border-[var(--admin-accent)]/50 text-[var(--admin-text-main)] px-3 py-2.5 rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
       >
         <Download className="w-4 h-4 text-[var(--admin-accent)]" />
         <span>Baixar CSV</span>
@@ -166,12 +166,12 @@ export const FinancialStatementManagement: React.FC = () => {
 
       {loading && (
         <AdminSkeleton
-          className="h-11 rounded-xl"
+          className="h-11 rounded-[var(--admin-radius-lg)]"
           label="Carregando lançamentos"
         />
       )}
       {error && (
-        <div className="p-3 rounded-xl border border-status-error/30 bg-status-error/10 text-status-error text-xs font-semibold flex items-center justify-between gap-3">
+        <div className="p-3 rounded-[var(--admin-radius-lg)] border border-status-error/30 bg-status-error/10 text-status-error text-xs font-semibold flex items-center justify-between gap-3">
           <span>{error}</span>
           <button
             type="button"
@@ -188,12 +188,12 @@ export const FinancialStatementManagement: React.FC = () => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
         aria-busy={loading}
       >
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-status-success mb-1">
             <span className="text-xs font-bold uppercase tracking-wider admin-safe-wrap">
               Entradas
             </span>
-            <div className="w-6 h-6 rounded-lg bg-status-success/10 flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-status-success/10 flex items-center justify-center shrink-0">
               <ArrowUpRight className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -205,12 +205,12 @@ export const FinancialStatementManagement: React.FC = () => {
           </p>
         </div>
 
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-status-error mb-1">
             <span className="text-xs font-bold uppercase tracking-wider admin-safe-wrap">
               Saídas
             </span>
-            <div className="w-6 h-6 rounded-lg bg-status-error/10 flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-status-error/10 flex items-center justify-center shrink-0">
               <ArrowDownRight className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -222,12 +222,12 @@ export const FinancialStatementManagement: React.FC = () => {
           </p>
         </div>
 
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-[var(--admin-accent)] mb-1">
             <span className="text-xs font-bold uppercase tracking-wider admin-safe-wrap">
               Resultado
             </span>
-            <div className="w-6 h-6 rounded-lg bg-[var(--admin-accent)]/10 flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)]/10 flex items-center justify-center shrink-0">
               <PieChart className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -241,12 +241,12 @@ export const FinancialStatementManagement: React.FC = () => {
           </p>
         </div>
 
-        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
           <div className="flex items-center justify-between text-amber-500 mb-1">
             <span className="text-xs font-bold uppercase tracking-wider admin-safe-wrap">
               Pendentes
             </span>
-            <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-amber-500/10 flex items-center justify-center shrink-0">
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -269,12 +269,12 @@ export const FinancialStatementManagement: React.FC = () => {
               placeholder="Buscar lançamentos..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50 placeholder:text-[var(--admin-text-muted)]"
+              className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-10 pr-4 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50 placeholder:text-[var(--admin-text-muted)]"
             />
           </div>
           <div
             data-gesture-scroll="horizontal"
-            className="admin-category-scroll flex bg-[var(--admin-surface)] p-1 rounded-xl border border-[var(--admin-border)] shrink-0 overflow-x-auto no-scrollbar"
+            className="admin-category-scroll flex bg-[var(--admin-surface)] p-1 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] shrink-0 overflow-x-auto no-scrollbar"
           >
             {[
               { id: "today", label: "Hoje" },
@@ -285,7 +285,7 @@ export const FinancialStatementManagement: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => setPeriodFilter(item.id as typeof periodFilter)}
-                className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${periodFilter === item.id ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs" : "text-[var(--admin-text-muted)]"}`}
+                className={`shrink-0 px-3 py-1.5 rounded-[var(--admin-radius-md)] text-xs font-bold transition-all ${periodFilter === item.id ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs" : "text-[var(--admin-text-muted)]"}`}
               >
                 {item.label}
               </button>
@@ -304,7 +304,7 @@ export const FinancialStatementManagement: React.FC = () => {
             <button
               key={item.id}
               onClick={() => setFilterType(item.id as typeof filterType)}
-              className={`shrink-0 h-9 px-3.5 rounded-full border text-xs font-bold transition-colors ${filterType === item.id ? "bg-[var(--admin-accent)] border-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
+              className={`shrink-0 h-9 px-3.5 rounded-[var(--admin-radius-full)] border text-xs font-bold transition-colors ${filterType === item.id ? "bg-[var(--admin-accent)] border-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
             >
               {item.label}
             </button>
@@ -322,7 +322,7 @@ export const FinancialStatementManagement: React.FC = () => {
                     : (item.id as typeof filterStatus),
                 )
               }
-              className={`shrink-0 h-9 px-3.5 rounded-full border text-xs font-bold transition-colors ${filterStatus === item.id ? "bg-amber-500 border-amber-500 text-white" : "bg-[var(--admin-surface)] border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
+              className={`shrink-0 h-9 px-3.5 rounded-[var(--admin-radius-full)] border text-xs font-bold transition-colors ${filterStatus === item.id ? "bg-amber-500 border-amber-500 text-white" : "bg-[var(--admin-surface)] border-[var(--admin-border)] text-[var(--admin-text-muted)]"}`}
             >
               {item.label}
             </button>
@@ -331,7 +331,7 @@ export const FinancialStatementManagement: React.FC = () => {
       </div>
 
       {/* Transaction Table */}
-      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl overflow-hidden shadow-xs">
+      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] overflow-hidden shadow-xs">
         {loading ? (
           <AdminListSkeleton rows={6} className="p-4 sm:p-5" />
         ) : (
@@ -356,19 +356,19 @@ export const FinancialStatementManagement: React.FC = () => {
                     </td>
                     <td className="whitespace-nowrap">
                       <span
-                        className={`font-bold text-xs px-2 py-0.5 rounded-xl uppercase ${t.status === "pending" ? "bg-amber-500/15 text-amber-500" : "bg-status-success/15 text-status-success"}`}
+                        className={`font-bold text-xs px-2 py-0.5 rounded-[var(--admin-radius-lg)] uppercase ${t.status === "pending" ? "bg-amber-500/15 text-amber-500" : "bg-status-success/15 text-status-success"}`}
                       >
                         {t.status === "pending" ? "Pendente" : "Confirmado"}
                       </span>
                     </td>
                     <td className="whitespace-nowrap">
                       {t.type === "income" ? (
-                        <span className="bg-status-success/15 text-status-success font-bold text-xs px-2 py-0.5 rounded-xl uppercase inline-flex items-center gap-1">
+                        <span className="bg-status-success/15 text-status-success font-bold text-xs px-2 py-0.5 rounded-[var(--admin-radius-lg)] uppercase inline-flex items-center gap-1">
                           <ArrowUpRight className="w-3 h-3" />
                           Entrada
                         </span>
                       ) : (
-                        <span className="bg-status-error/15 text-status-error font-bold text-xs px-2 py-0.5 rounded-xl uppercase inline-flex items-center gap-1">
+                        <span className="bg-status-error/15 text-status-error font-bold text-xs px-2 py-0.5 rounded-[var(--admin-radius-lg)] uppercase inline-flex items-center gap-1">
                           <ArrowDownRight className="w-3 h-3" />
                           Saída
                         </span>

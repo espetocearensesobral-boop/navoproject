@@ -383,7 +383,7 @@ export const ServicesManagement: React.FC = () => {
 
       {/* Success Notification Banner */}
       {successMsg && (
-        <div className="p-3 bg-status-success/15 border border-status-success/30 text-status-success rounded-xl text-xs font-bold flex items-center justify-between animate-fade-in">
+        <div className="p-3 bg-status-success/15 border border-status-success/30 text-status-success rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center justify-between animate-fade-in">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>{successMsg}</span>
@@ -407,7 +407,7 @@ export const ServicesManagement: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nome ou descrição..."
-            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg pl-9 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] placeholder-[var(--admin-text-muted)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] pl-9 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] placeholder-[var(--admin-text-muted)] outline-none focus:border-[var(--admin-accent)] transition-colors"
           />
         </div>
 
@@ -419,7 +419,7 @@ export const ServicesManagement: React.FC = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-[var(--admin-surface)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-main)] rounded-lg px-3 py-1.5 outline-none focus:border-[var(--admin-accent)]"
+              className="bg-[var(--admin-surface)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-main)] rounded-[var(--admin-radius-md)] px-3 py-1.5 outline-none focus:border-[var(--admin-accent)]"
             >
               <option value="all">Todas categorias</option>
               {DEFAULT_CATEGORIES.map((cat) => (
@@ -431,10 +431,10 @@ export const ServicesManagement: React.FC = () => {
           </div>
 
           {/* Type Filter Buttons */}
-          <div className="flex items-center bg-[var(--admin-surface)] p-0.5 rounded-lg border border-[var(--admin-border)]">
+          <div className="flex items-center bg-[var(--admin-surface)] p-0.5 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)]">
             <button
               onClick={() => setFilterType("all")}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded-[var(--admin-radius-sm)] text-xs font-semibold transition-all ${
                 filterType === "all"
                   ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
@@ -444,7 +444,7 @@ export const ServicesManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setFilterType("combos")}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded-[var(--admin-radius-sm)] text-xs font-semibold transition-all ${
                 filterType === "combos"
                   ? "bg-status-success text-white"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
@@ -454,7 +454,7 @@ export const ServicesManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setFilterType("popular")}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded-[var(--admin-radius-sm)] text-xs font-semibold transition-all ${
                 filterType === "popular"
                   ? "bg-[var(--admin-accent)]/20 text-[var(--admin-accent)]"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
@@ -464,7 +464,7 @@ export const ServicesManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setFilterType("gallery")}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded-[var(--admin-radius-sm)] text-xs font-semibold transition-all ${
                 filterType === "gallery"
                   ? "bg-blue-500/20 text-blue-300"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
@@ -475,10 +475,10 @@ export const ServicesManagement: React.FC = () => {
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-[var(--admin-surface)] p-0.5 rounded-lg border border-[var(--admin-border)]">
+          <div className="flex items-center bg-[var(--admin-surface)] p-0.5 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)]">
             <button
               onClick={() => setViewMode("table")}
-              className={`h-7 px-2 rounded-md text-xs transition-all ${
+              className={`h-7 px-2 rounded-[var(--admin-radius-sm)] text-xs transition-all ${
                 viewMode === "table"
                   ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
@@ -489,7 +489,7 @@ export const ServicesManagement: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`h-7 px-2 rounded-md text-xs transition-all ${
+              className={`h-7 px-2 rounded-[var(--admin-radius-sm)] text-xs transition-all ${
                 viewMode === "list"
                   ? "bg-[var(--admin-accent)]/15 text-[var(--admin-accent)]"
                   : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
@@ -546,7 +546,7 @@ export const ServicesManagement: React.FC = () => {
                   return (
                     <tr key={service.id}>
                       <td>
-                        <div className="w-9 h-9 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-center justify-center overflow-hidden relative">
+                        <div className="w-9 h-9 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-center justify-center overflow-hidden relative">
                           {service.image_url || servicePhotos[0] ? (
                             <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -589,7 +589,7 @@ export const ServicesManagement: React.FC = () => {
                            <button
                              type="button"
                              onClick={() => handleToggleCombo(service)}
-                             className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider transition-colors ${
+                             className={`px-2 py-0.5 rounded-[var(--admin-radius-full)] text-[10px] uppercase font-bold tracking-wider transition-colors ${
                                service.is_combo
                                  ? "bg-status-success/10 text-status-success border border-status-success/20"
                                  : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface)]"
@@ -601,7 +601,7 @@ export const ServicesManagement: React.FC = () => {
                            <button
                              type="button"
                              onClick={() => handleTogglePopular(service)}
-                             className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider transition-colors ${
+                             className={`px-2 py-0.5 rounded-[var(--admin-radius-full)] text-[10px] uppercase font-bold tracking-wider transition-colors ${
                                service.popular
                                  ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border border-[var(--admin-accent)]/20"
                                  : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface)]"
@@ -617,7 +617,7 @@ export const ServicesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(service)}
-                            className="admin-btn-icon-sm rounded-md text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)]"
+                            className="admin-btn-icon-sm rounded-[var(--admin-radius-sm)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)]"
                             title="Editar"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -625,7 +625,7 @@ export const ServicesManagement: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleDelete(service.id)}
-                            className="admin-btn-icon-sm rounded-md text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
+                            className="admin-btn-icon-sm rounded-[var(--admin-radius-sm)] text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10"
                             title="Excluir"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -677,7 +677,7 @@ export const ServicesManagement: React.FC = () => {
                     aria-expanded={isExpanded}
                     className="w-full min-h-[72px] p-3 text-left flex items-center gap-3 hover:bg-[var(--admin-surface-hover)]"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0 relative">
+                    <div className="w-10 h-10 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] border border-[var(--admin-border)] overflow-hidden flex items-center justify-center shrink-0 relative">
                       {service.image_url || servicePhotos[0] ? (
                         <img src={service.image_url || servicePhotos[0]} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -695,7 +695,7 @@ export const ServicesManagement: React.FC = () => {
                           {categoryName}
                         </p>
                         {service.is_combo && (
-                          <span className="shrink-0 rounded-full px-2 py-0.5 bg-status-success/10 text-status-success border border-status-success/20 text-[9px] font-bold uppercase tracking-wider">
+                          <span className="shrink-0 rounded-[var(--admin-radius-full)] px-2 py-0.5 bg-status-success/10 text-status-success border border-status-success/20 text-[9px] font-bold uppercase tracking-wider">
                             VIP
                           </span>
                         )}
@@ -727,7 +727,7 @@ export const ServicesManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleToggleCombo(service)}
-                          className={`flex-1 min-h-9 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+                          className={`flex-1 min-h-9 rounded-[var(--admin-radius-md)] border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
                             service.is_combo
                               ? "bg-status-success/10 text-status-success border-status-success/20"
                               : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface-hover)]"
@@ -738,7 +738,7 @@ export const ServicesManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleTogglePopular(service)}
-                          className={`flex-1 min-h-9 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+                          className={`flex-1 min-h-9 rounded-[var(--admin-radius-md)] border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
                             service.popular
                               ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] border-[var(--admin-accent)]/20"
                               : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-surface-hover)]"
@@ -751,14 +751,14 @@ export const ServicesManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(service)}
-                          className="flex-1 min-h-9 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                          className="flex-1 min-h-9 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-surface-hover)] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                         >
                           <Edit2 className="w-3.5 h-3.5" /> Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(service.id)}
-                          className="w-9 h-9 shrink-0 rounded-lg border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center transition-colors"
+                          className="w-9 h-9 shrink-0 rounded-[var(--admin-radius-md)] border border-status-error/25 text-status-error hover:bg-status-error/10 flex items-center justify-center transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -826,11 +826,11 @@ export const ServicesManagement: React.FC = () => {
         >
           <div className="space-y-6">
             {/* Top Step Tabs */}
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-2 flex flex-wrap sm:flex-nowrap gap-2 shadow-xs">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-2 flex flex-wrap sm:flex-nowrap gap-2 shadow-xs">
               <button
                 type="button"
                 onClick={() => setActiveFormTab("general")}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-[var(--admin-radius-lg)] text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "general"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
@@ -843,7 +843,7 @@ export const ServicesManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveFormTab("pricing")}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-[var(--admin-radius-lg)] text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "pricing"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
@@ -856,7 +856,7 @@ export const ServicesManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveFormTab("gallery")}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-[var(--admin-radius-lg)] text-xs sm:text-sm font-bold transition-all ${
                   activeFormTab === "gallery"
                     ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] shadow-xs"
                     : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
@@ -876,7 +876,7 @@ export const ServicesManagement: React.FC = () => {
             >
               {/* TAB 1: GENERAL INFO */}
               {activeFormTab === "general" && (
-                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-6 shadow-xs">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="md:col-span-2">
                       <label className="block">
@@ -890,7 +890,7 @@ export const ServicesManagement: React.FC = () => {
                             setFormData({ ...formData, title: e.target.value })
                           }
                           placeholder="Ex: Corte Degradê Navalhado + Barba Terapia"
-                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors font-medium"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors font-medium"
                           required
                         />
                       </label>
@@ -909,7 +909,7 @@ export const ServicesManagement: React.FC = () => {
                               category_id: e.target.value,
                             })
                           }
-                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
+                          className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
                         >
                           {DEFAULT_CATEGORIES.map((cat) => (
                             <option key={cat.id} value={cat.id}>
@@ -939,7 +939,7 @@ export const ServicesManagement: React.FC = () => {
                               })
                             }
                             placeholder="35"
-                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 text-sm font-bold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
+                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-10 pr-4 text-sm font-bold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
                             required
                           />
                         </div>
@@ -962,19 +962,19 @@ export const ServicesManagement: React.FC = () => {
                           })
                         }
                         placeholder="Descreva as técnicas aplicadas, produtos utilizados e diferenciais do atendimento..."
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none resize-none transition-colors"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none resize-none transition-colors"
                       />
                     </label>
                   </div>
 
                   {/* Destaques & Selos */}
-                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-3">
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
                     <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1.5">
                       <Sparkles className="w-4 h-4" />
                       <span>Configurações de Destaque no Catálogo</span>
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <label className="flex items-center gap-3 p-3.5 rounded-xl bg-[var(--admin-surface)] border border-[var(--admin-border)] cursor-pointer hover:border-status-success/60 transition-colors">
+                      <label className="flex items-center gap-3 p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] border border-[var(--admin-border)] cursor-pointer hover:border-status-success/60 transition-colors">
                         <input
                           type="checkbox"
                           checked={formData.is_combo}
@@ -996,7 +996,7 @@ export const ServicesManagement: React.FC = () => {
                         </div>
                       </label>
 
-                      <label className="flex items-center gap-3 p-3.5 rounded-xl bg-[var(--admin-surface)] border border-[var(--admin-border)] cursor-pointer hover:border-[var(--admin-accent)]/60 transition-colors">
+                      <label className="flex items-center gap-3 p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-surface)] border border-[var(--admin-border)] cursor-pointer hover:border-[var(--admin-accent)]/60 transition-colors">
                         <input
                           type="checkbox"
                           checked={formData.popular}
@@ -1024,7 +1024,7 @@ export const ServicesManagement: React.FC = () => {
 
               {/* TAB 2: PRICING */}
               {activeFormTab === "pricing" && (
-                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-6 shadow-xs">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block">
@@ -1047,7 +1047,7 @@ export const ServicesManagement: React.FC = () => {
                               })
                             }
                             placeholder="60.00"
-                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-12 pr-4 text-base font-bold finance-positive focus:border-[var(--admin-accent)] outline-none transition-colors"
+                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-12 pr-4 text-base font-bold finance-positive focus:border-[var(--admin-accent)] outline-none transition-colors"
                             required
                           />
                         </div>
@@ -1077,7 +1077,7 @@ export const ServicesManagement: React.FC = () => {
                               })
                             }
                             placeholder="75.00"
-                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl pl-12 pr-4 text-base font-bold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
+                            className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-12 pr-4 text-base font-bold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
                           />
                         </div>
                       </label>
@@ -1086,7 +1086,7 @@ export const ServicesManagement: React.FC = () => {
 
                   {formData.original_price &&
                     formData.original_price > (formData.price || 0) && (
-                      <div className="p-4 finance-negative-soft finance-negative-border rounded-xl flex items-center justify-between">
+                      <div className="p-4 finance-negative-soft finance-negative-border rounded-[var(--admin-radius-lg)] flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
                           <Flame className="w-5 h-5 finance-negative" />
                           <div>
@@ -1103,7 +1103,7 @@ export const ServicesManagement: React.FC = () => {
                             </span>
                           </div>
                         </div>
-                        <span className="px-3 py-1 rounded-xl finance-negative-soft finance-negative font-black text-sm uppercase">
+                        <span className="px-3 py-1 rounded-[var(--admin-radius-lg)] finance-negative-soft finance-negative font-black text-sm uppercase">
                           {Math.round(
                             ((formData.original_price -
                               (formData.price || 0)) /
@@ -1115,7 +1115,7 @@ export const ServicesManagement: React.FC = () => {
                       </div>
                     )}
 
-                  <div className="p-4 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] text-xs text-[var(--admin-text-muted)] space-y-1">
+                  <div className="p-4 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] text-xs text-[var(--admin-text-muted)] space-y-1">
                     <p className="font-bold text-[var(--admin-text-main)] flex items-center gap-2 text-sm">
                       <Info className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
                       <span>Transparência e Comissões</span>
@@ -1129,7 +1129,7 @@ export const ServicesManagement: React.FC = () => {
 
               {/* TAB 3: GALLERY */}
               {activeFormTab === "gallery" && (
-                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] p-6 sm:p-8 space-y-6 shadow-xs">
                   <div>
                     <label className="block">
                       <span className="block text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] mb-2">
@@ -1145,12 +1145,12 @@ export const ServicesManagement: React.FC = () => {
                           })
                         }
                         placeholder="https://images.unsplash.com/..."
-                        className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
+                        className="w-full h-11 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-4 text-sm text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] outline-none transition-colors"
                       />
                     </label>
                   </div>
 
-                  <div className="p-5 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-3">
+                  <div className="p-5 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
                     <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                       Adicionar Nova Imagem à Galeria
                     </p>
@@ -1162,12 +1162,12 @@ export const ServicesManagement: React.FC = () => {
                           setNewGalleryUrlInput(e.target.value)
                         }
                         placeholder="Cole a URL direta da foto (ex: https://...)"
-                        className="flex-1 h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
+                        className="flex-1 h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-[var(--admin-accent)] transition-colors"
                       />
                       <button
                         type="button"
                         onClick={handleAddGalleryUrl}
-                        className="px-4 py-2 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs shrink-0 hover:opacity-90 transition-opacity"
+                        className="px-4 py-2 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs shrink-0 hover:opacity-90 transition-opacity"
                       >
                         + Adicionar
                       </button>
@@ -1186,7 +1186,7 @@ export const ServicesManagement: React.FC = () => {
                               onClick={() =>
                                 handleAddPresetImage(preset.url)
                               }
-                              className="relative rounded-xl overflow-hidden h-16 border border-[var(--admin-border)] hover:border-[var(--admin-accent)] text-left group transition-all"
+                              className="relative rounded-[var(--admin-radius-lg)] overflow-hidden h-16 border border-[var(--admin-border)] hover:border-[var(--admin-accent)] text-left group transition-all"
                             >
                               <img
                                 src={preset.url}
@@ -1217,7 +1217,7 @@ export const ServicesManagement: React.FC = () => {
                           return (
                             <div
                               key={index}
-                              className={`relative aspect-square rounded-xl overflow-hidden bg-[var(--admin-bg)] border ${
+                              className={`relative aspect-square rounded-[var(--admin-radius-lg)] overflow-hidden bg-[var(--admin-bg)] border ${
                                 isCover
                                   ? "border-[var(--admin-accent)] ring-2 ring-[var(--admin-accent)]"
                                   : "border-[var(--admin-border)]"
@@ -1229,7 +1229,7 @@ export const ServicesManagement: React.FC = () => {
                                 className="w-full h-full object-cover"
                               />
                               {isCover && (
-                                <span className="absolute top-1.5 left-1.5 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-[10px] font-black px-1.5 py-0.5 rounded-md shadow-xs">
+                                <span className="absolute top-1.5 left-1.5 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-[10px] font-black px-1.5 py-0.5 rounded-[var(--admin-radius-sm)] shadow-xs">
                                   CAPA
                                 </span>
                               )}
@@ -1240,7 +1240,7 @@ export const ServicesManagement: React.FC = () => {
                                     onClick={() =>
                                       handleSetCoverImage(imgUrl)
                                     }
-                                    className="px-2 py-1 rounded-lg bg-[var(--admin-bg)]/90 text-[var(--admin-accent)] text-[10px] font-bold hover:bg-[var(--admin-surface)]"
+                                    className="px-2 py-1 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)]/90 text-[var(--admin-accent)] text-[10px] font-bold hover:bg-[var(--admin-surface)]"
                                   >
                                     Capa
                                   </button>
@@ -1250,7 +1250,7 @@ export const ServicesManagement: React.FC = () => {
                                   onClick={() =>
                                     handleRemoveGalleryImage(index)
                                   }
-                                  className="p-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                                  className="p-1.5 rounded-[var(--admin-radius-md)] bg-red-600 text-white hover:bg-red-700"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -1260,7 +1260,7 @@ export const ServicesManagement: React.FC = () => {
                         })}
                       </div>
                     ) : (
-                      <div className="p-8 text-center border border-dashed border-[var(--admin-border)] rounded-2xl">
+                      <div className="p-8 text-center border border-dashed border-[var(--admin-border)] rounded-[var(--admin-radius-xl)]">
                         <ImageIcon className="w-8 h-8 text-[var(--admin-text-muted)] mx-auto mb-2 opacity-50" />
                         <p className="text-xs text-[var(--admin-text-muted)]">
                           Nenhuma foto cadastrada para este serviço ainda.

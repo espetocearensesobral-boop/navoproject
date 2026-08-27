@@ -98,8 +98,8 @@ export const AdminNotificationCenter: React.FC<
       : "Abrir notificações";
   const triggerClass =
     placement === "topbar"
-      ? "w-10 h-10 flex items-center justify-center rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] active:text-[var(--admin-accent)] active:scale-95 transition-transform"
-      : "w-8 h-8 flex items-center justify-center rounded-xl text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-accent)] active:bg-surface-elevated transition-colors shrink-0";
+      ? "w-10 h-10 flex items-center justify-center rounded-[var(--admin-radius-full)] border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-muted)] active:text-[var(--admin-accent)] active:scale-95 transition-transform"
+      : "w-8 h-8 flex items-center justify-center rounded-[var(--admin-radius-lg)] text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-accent)] active:bg-surface-elevated transition-colors shrink-0";
   const activeTriggerClass = notificationsActive ? "text-status-success" : "";
 
   return (
@@ -123,7 +123,7 @@ export const AdminNotificationCenter: React.FC<
             />
           )}
           {unreadCount > 0 && (
-            <span className="absolute -right-2 -top-2 min-w-4 h-4 px-1 rounded-full bg-status-error text-white text-xs font-black leading-4 text-center">
+            <span className="absolute -right-2 -top-2 min-w-4 h-4 px-1 rounded-[var(--admin-radius-full)] bg-status-error text-white text-xs font-black leading-4 text-center">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -148,13 +148,13 @@ export const AdminNotificationCenter: React.FC<
                     aria-checked={notificationsActive}
                     onClick={() => void onToggleNotifications()}
                     disabled={isBlocked || notificationsBusy}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-[var(--admin-radius-full)] border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
                       notificationsActive ? "bg-status-success" : "bg-[var(--admin-border)]"
                     }`}
                   >
                     <span
                       aria-hidden="true"
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-[var(--admin-radius-full)] bg-white shadow ring-0 transition duration-200 ease-in-out ${
                         notificationsActive ? "translate-x-5" : "translate-x-0"
                       }`}
                     />
@@ -200,7 +200,7 @@ export const AdminNotificationCenter: React.FC<
               </div>
             </div>
 
-            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl overflow-hidden divide-y divide-[var(--admin-border)]/50">
+            <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] overflow-hidden divide-y divide-[var(--admin-border)]/50">
               {history.length === 0 ? (
                 <div className="px-6 py-10 text-center">
                   <Bell className="w-8 h-8 mx-auto text-[var(--admin-text-muted)]/30" />
@@ -223,7 +223,7 @@ export const AdminNotificationCenter: React.FC<
                   >
                     <div className="flex items-start gap-3.5">
                       <span
-                        className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
+                        className={`mt-1.5 w-2 h-2 rounded-[var(--admin-radius-full)] shrink-0 ${
                           item.read ? "bg-[var(--admin-border)]" : "bg-[var(--admin-accent)] ring-4 ring-[var(--admin-accent)]/20"
                         }`}
                       />
@@ -232,7 +232,7 @@ export const AdminNotificationCenter: React.FC<
                           <span className={`text-sm font-bold truncate ${item.read ? "text-[var(--admin-text-muted)]" : "text-[var(--admin-text-main)]"}`}>
                             {item.title}
                           </span>
-                          <span className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)] shrink-0 font-bold bg-[var(--admin-bg)] px-2 py-0.5 rounded-full border border-[var(--admin-border)]">
+                          <span className="text-[10px] uppercase tracking-wider text-[var(--admin-text-muted)] shrink-0 font-bold bg-[var(--admin-bg)] px-2 py-0.5 rounded-[var(--admin-radius-full)] border border-[var(--admin-border)]">
                             {formatNotificationTime(item.createdAt)}
                           </span>
                         </div>

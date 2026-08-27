@@ -19,9 +19,9 @@ export const AdminEmptyState: React.FC<AdminEmptyStateProps> = ({
 }) => (
   <div
     role="status"
-    className="admin-empty-state flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-10 text-center animate-fade-in"
+    className="admin-empty-state flex flex-col items-center justify-center gap-2 rounded-[var(--admin-radius-xl)] border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-10 text-center animate-fade-in"
   >
-    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--admin-bg)] text-[var(--admin-text-muted)]">
+    <div className="flex h-12 w-12 items-center justify-center rounded-[var(--admin-radius-xl)] bg-[var(--admin-bg)] text-[var(--admin-text-muted)]">
       <Icon className="h-6 w-6" aria-hidden="true" />
     </div>
     <h3 className="admin-copy-title mt-1 text-sm font-bold text-[var(--admin-text-main)]">

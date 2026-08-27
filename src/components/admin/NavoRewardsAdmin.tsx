@@ -579,7 +579,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
   if (loading) {
     return (
       <div className="p-8 text-center space-y-3">
-        <div className="w-8 h-8 border-2 border-[var(--admin-accent)] border-t-transparent rounded-full animate-spin mx-auto" />
+        <div className="w-8 h-8 border-2 border-[var(--admin-accent)] border-t-transparent rounded-[var(--admin-radius-full)] animate-spin mx-auto" />
         <p className="text-xs text-[var(--admin-text-muted)]">
           Carregando painel Navo Rewards...
         </p>
@@ -610,12 +610,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
         <>
           {/* 2. KPIS (Sempre no topo, logo abaixo do Header) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+            <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
               <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
                 <span className="text-xs font-bold uppercase tracking-wider truncate">
                   Score NPS
                 </span>
-                <div className="w-6 h-6 rounded-lg bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
                   <Star className="w-3.5 h-3.5" />
                 </div>
               </div>
@@ -628,12 +628,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               </p>
             </div>
 
-            <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+            <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
               <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
                 <span className="text-xs font-bold uppercase tracking-wider truncate">
                   Pts Emitidos
                 </span>
-                <div className="w-6 h-6 rounded-lg bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center shrink-0">
                   <Sparkles className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
                 </div>
               </div>
@@ -645,12 +645,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               </p>
             </div>
 
-            <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+            <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
               <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
                 <span className="text-xs font-bold uppercase tracking-wider truncate">
                   Pts Resgatados
                 </span>
-                <div className="w-6 h-6 rounded-lg bg-status-error/10 text-status-error flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-status-error/10 text-status-error flex items-center justify-center shrink-0">
                   <Gift className="w-3.5 h-3.5" />
                 </div>
               </div>
@@ -662,12 +662,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               </p>
             </div>
 
-            <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+            <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
               <div className="flex items-center justify-between text-[var(--admin-text-muted)] mb-1">
                 <span className="text-xs font-bold uppercase tracking-wider truncate">
                   Avaliações
                 </span>
-                <div className="w-6 h-6 rounded-lg bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center shrink-0">
                   <MessageSquare className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
                 </div>
               </div>
@@ -682,9 +682,9 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           </div>
 
           {/* 3. LINHA DE CAMPANHA (com botão com verbo curto "Disparar", 1 linha) */}
-          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
+          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-3.5 rounded-[var(--admin-radius-lg)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
-              <div className="w-8 h-8 rounded-xl bg-[var(--admin-accent)]/10 border border-[var(--admin-accent)]/30 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)]/10 border border-[var(--admin-accent)]/30 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
                 <Megaphone className="w-4 h-4" />
               </div>
               <div className="min-w-0 flex-1">
@@ -701,7 +701,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             <button
               onClick={handleTriggerCampaign}
               disabled={campaignLoading}
-              className="h-9 px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] hover:bg-[var(--admin-accent)]/90 transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 whitespace-nowrap active:scale-95 disabled:opacity-50"
+              className="h-9 px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] hover:bg-[var(--admin-accent)]/90 transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 whitespace-nowrap active:scale-95 disabled:opacity-50"
             >
               <Megaphone className="w-3.5 h-3.5" />
               <span>{campaignLoading ? "Disparando..." : "Disparar"}</span>
@@ -709,7 +709,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           </div>
 
           {campaignMsg && (
-            <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-xl animate-fade-in">
+            <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-[var(--admin-radius-lg)] animate-fade-in">
               {campaignMsg}
             </div>
           )}
@@ -717,7 +717,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
       )}
 
       {configSuccessMsg && (
-        <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-xl animate-fade-in">
+        <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-[var(--admin-radius-lg)] animate-fade-in">
           {configSuccessMsg}
         </div>
       )}
@@ -747,19 +747,19 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
         <div className="space-y-4 min-w-0">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Distribuição por Nível VIP */}
-            <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-3">
+            <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
               <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
                 <Crown className="w-4 h-4 text-[var(--admin-accent)]" />
                 <span>Distribuição por Nível VIP</span>
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-                <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+                <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
                   <div className="flex items-center justify-between text-amber-700 mb-1">
                     <span className="text-xs font-bold uppercase tracking-wider truncate">
                       Bronze
                     </span>
-                    <div className="w-6 h-6 rounded-lg bg-amber-700/10 flex items-center justify-center shrink-0">
+                    <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-amber-700/10 flex items-center justify-center shrink-0">
                       <Crown className="w-3.5 h-3.5" />
                     </div>
                   </div>
@@ -773,12 +773,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   </p>
                 </div>
 
-                <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+                <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
                   <div className="flex items-center justify-between text-slate-400 mb-1">
                     <span className="text-xs font-bold uppercase tracking-wider truncate">
                       Prata
                     </span>
-                    <div className="w-6 h-6 rounded-lg bg-slate-400/10 flex items-center justify-center shrink-0">
+                    <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-slate-400/10 flex items-center justify-center shrink-0">
                       <Crown className="w-3.5 h-3.5" />
                     </div>
                   </div>
@@ -792,12 +792,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   </p>
                 </div>
 
-                <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+                <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
                   <div className="flex items-center justify-between text-[var(--admin-accent)] mb-1">
                     <span className="text-xs font-bold uppercase tracking-wider truncate">
                       Ouro
                     </span>
-                    <div className="w-6 h-6 rounded-lg bg-[var(--admin-accent)]/10 flex items-center justify-center shrink-0">
+                    <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)]/10 flex items-center justify-center shrink-0">
                       <Crown className="w-3.5 h-3.5" />
                     </div>
                   </div>
@@ -811,12 +811,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   </p>
                 </div>
 
-                <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl flex flex-col justify-between">
+                <div className="p-3 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-xl)] flex flex-col justify-between">
                   <div className="flex items-center justify-between text-cyan-400 mb-1">
                     <span className="text-xs font-bold uppercase tracking-wider truncate">
                       Diamante
                     </span>
-                    <div className="w-6 h-6 rounded-lg bg-cyan-400/10 flex items-center justify-center shrink-0">
+                    <div className="w-6 h-6 rounded-[var(--admin-radius-md)] bg-cyan-400/10 flex items-center justify-center shrink-0">
                       <Crown className="w-3.5 h-3.5" />
                     </div>
                   </div>
@@ -833,7 +833,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             </div>
 
             {/* Maiores Embaixadores */}
-            <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-3">
+            <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
               <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
                 <Users className="w-4 h-4 text-[var(--admin-accent)]" />
                 <span>Top embaixadores</span>
@@ -848,7 +848,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                     >
                       <div className="flex items-center space-x-2.5 min-w-0">
                         <span
-                          className={`w-6 h-6 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 ${
+                          className={`w-6 h-6 rounded-[var(--admin-radius-lg)] font-bold text-xs flex items-center justify-center shrink-0 ${
                             idx === 0
                               ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]"
                               : "bg-[var(--admin-bg)] text-[var(--admin-text-muted)] border border-[var(--admin-border)]"
@@ -893,7 +893,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           <form
             onKeyDown={handleEnterAsTab}
             onSubmit={handleSaveConfig}
-            className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-4"
+            className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-4"
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[var(--admin-border)]">
               <div>
@@ -909,7 +909,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               <button
                 type="submit"
                 disabled={savingConfig}
-                className="h-9 px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-2 hover:bg-[var(--admin-accent)]/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+                className="h-9 px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-2 hover:bg-[var(--admin-accent)]/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{savingConfig ? "Salvando..." : "Salvar Regras"}</span>
@@ -917,7 +917,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
+              <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
                 <label className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1">
                   <DollarSign className="w-3.5 h-3.5" /> Razão de Conversão
                 </label>
@@ -936,7 +936,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         currencyPerPoint: Number(e.target.value),
                       })
                     }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-[var(--admin-text-main)] text-xs font-bold focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
+                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] text-xs font-bold focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
                   />
                   <span className="text-[var(--admin-text-muted)] font-bold whitespace-nowrap">
                     = 1 Pts
@@ -944,7 +944,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
+              <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
                 <label className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" /> Validade (Dias)
                 </label>
@@ -959,7 +959,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         pointsValidityDays: Number(e.target.value),
                       })
                     }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-[var(--admin-text-main)] text-xs font-bold focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
+                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] text-xs font-bold focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
                   />
                   <span className="text-[var(--admin-text-muted)] font-bold">
                     dias
@@ -967,7 +967,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
+              <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
                 <label className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider flex items-center gap-1">
                   <Gift className="w-3.5 h-3.5" /> Bônus Aniversário
                 </label>
@@ -982,7 +982,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         birthdayBonus: Number(e.target.value),
                       })
                     }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-[var(--admin-text-main)] text-xs font-bold focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
+                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] text-xs font-bold focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
                   />
                   <span className="text-[var(--admin-text-muted)] font-bold">
                     pts
@@ -999,7 +999,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             </div>
           </form>
 
-          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-3">
+          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
@@ -1045,7 +1045,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               {tiers.map((tier, index) => (
                 <div
                   key={tier.id || index}
-                  className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_120px_100px_82px_70px_auto] gap-2 items-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-2.5"
+                  className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_120px_100px_82px_70px_auto] gap-2 items-center rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-2.5"
                 >
                   <input
                     value={tier.name}
@@ -1058,7 +1058,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         ),
                       )
                     }
-                    className="min-w-0 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg p-2 text-xs font-bold text-[var(--admin-text-main)]"
+                    className="min-w-0 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2 text-xs font-bold text-[var(--admin-text-main)]"
                     aria-label={`Nome do nível ${index + 1}`}
                   />
                   <input
@@ -1075,7 +1075,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         ),
                       )
                     }
-                    className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg p-2 text-xs text-[var(--admin-text-main)] num-tabular"
+                    className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2 text-xs text-[var(--admin-text-main)] num-tabular"
                     aria-label={`Pontos mínimos do nível ${index + 1}`}
                   />
                   <input
@@ -1093,7 +1093,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         ),
                       )
                     }
-                    className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg p-2 text-xs text-[var(--admin-text-main)] num-tabular"
+                    className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2 text-xs text-[var(--admin-text-main)] num-tabular"
                     aria-label={`Multiplicador do nível ${index + 1}`}
                   />
                   <input
@@ -1110,7 +1110,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         ),
                       )
                     }
-                    className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg p-2 text-xs text-[var(--admin-text-main)] num-tabular"
+                    className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-2 text-xs text-[var(--admin-text-main)] num-tabular"
                     aria-label={`Ordem do nível ${index + 1}`}
                   />
                   <input
@@ -1125,7 +1125,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         ),
                       )
                     }
-                    className="w-full h-9 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-lg p-1"
+                    className="w-full h-9 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] p-1"
                     aria-label={`Cor do nível ${index + 1}`}
                   />
                   <label className="flex items-center gap-2 text-xs text-[var(--admin-text-muted)]">
@@ -1150,7 +1150,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-3 min-w-0">
+            <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3 min-w-0">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider">
@@ -1177,7 +1177,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   benefits.map((benefit) => (
                     <div
                       key={benefit.id}
-                      className="p-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-start justify-between gap-3"
+                      className="p-3 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-start justify-between gap-3"
                     >
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-1.5">
@@ -1185,7 +1185,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             {benefit.name}
                           </span>
                           {!benefit.isActive && (
-                            <span className="text-xs rounded-full px-2 py-0.5 bg-status-error/10 text-status-error font-bold">
+                            <span className="text-xs rounded-[var(--admin-radius-full)] px-2 py-0.5 bg-status-error/10 text-status-error font-bold">
                               INATIVO
                             </span>
                           )}
@@ -1208,7 +1208,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         <button
                           type="button"
                           onClick={() => openBenefitEditor(benefit)}
-                          className="h-8 px-2.5 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] text-xs font-bold"
+                          className="h-8 px-2.5 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-[var(--admin-text-main)] text-xs font-bold"
                         >
                           Editar
                         </button>
@@ -1226,7 +1226,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                                 );
                               }
                             }}
-                            className="h-8 w-8 rounded-lg border border-[var(--admin-border)] text-status-error flex items-center justify-center"
+                            className="h-8 w-8 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-status-error flex items-center justify-center"
                             title="Desativar benefício"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1239,7 +1239,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               </div>
             </div>
 
-            <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-3 min-w-0">
+            <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3 min-w-0">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider">
@@ -1267,7 +1267,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   plans.map((plan) => (
                     <div
                       key={plan.id}
-                      className="p-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-start justify-between gap-3"
+                      className="p-3 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] flex items-start justify-between gap-3"
                     >
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-1.5">
@@ -1275,12 +1275,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             {plan.name}
                           </span>
                           <span
-                            className={`text-xs rounded-full px-2 py-0.5 font-bold ${plan.status === "active" ? "bg-status-success/10 text-status-success" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"}`}
+                            className={`text-xs rounded-[var(--admin-radius-full)] px-2 py-0.5 font-bold ${plan.status === "active" ? "bg-status-success/10 text-status-success" : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)]"}`}
                           >
                             {plan.status.toUpperCase()}
                           </span>
                           {plan.isFeatured && (
-                            <span className="text-xs rounded-full px-2 py-0.5 bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] font-bold">
+                            <span className="text-xs rounded-[var(--admin-radius-full)] px-2 py-0.5 bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] font-bold">
                               DESTAQUE
                             </span>
                           )}
@@ -1303,7 +1303,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         <button
                           type="button"
                           onClick={() => openPlanEditor(plan)}
-                          className="h-8 px-2.5 rounded-lg border border-[var(--admin-border)] text-[var(--admin-text-main)] text-xs font-bold"
+                          className="h-8 px-2.5 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-[var(--admin-text-main)] text-xs font-bold"
                         >
                           Editar
                         </button>
@@ -1319,7 +1319,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                                 alert(err.message || "Erro ao arquivar plano.");
                               }
                             }}
-                            className="h-8 w-8 rounded-lg border border-[var(--admin-border)] text-status-error flex items-center justify-center"
+                            className="h-8 w-8 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] text-status-error flex items-center justify-center"
                             title="Arquivar plano"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1335,7 +1335,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
 
           {showBenefitModal && (
             <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-[var(--admin-bg)]/80 backdrop-blur-md">
-              <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-[var(--admin-surface)] rounded-2xl border border-[var(--admin-border)] p-5 sm:p-6 shadow-2xl">
+              <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)] p-5 sm:p-6 shadow-2xl">
                 <div className="mb-4">
                   <h3 className="text-base font-serif font-bold text-[var(--admin-text-main)]">
                     {editingBenefit ? "Editar benefício" : "Novo benefício"}
@@ -1365,7 +1365,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             name: e.target.value,
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                       />
                     </label>
                     <label className="space-y-1">
@@ -1380,7 +1380,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             benefitType: e.target.value,
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                       >
                         <option value="discount_percent">
                           Desconto percentual
@@ -1409,7 +1409,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                           description: e.target.value,
                         })
                       }
-                      className="w-full min-h-[72px] bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                      className="w-full min-h-[72px] bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                     />
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1431,7 +1431,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                                 : Number(e.target.value),
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                         placeholder="Ex.: 10"
                       />
                     </label>
@@ -1447,7 +1447,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             valueText: e.target.value,
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                         placeholder="Ex.: 10% OFF"
                       />
                     </label>
@@ -1468,7 +1468,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                                 : Number(e.target.value),
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                         placeholder="Opcional"
                       />
                     </label>
@@ -1486,7 +1486,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             serviceId: e.target.value,
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                       >
                         <option value="">Todos os serviços</option>
                         {services.map((service) => (
@@ -1511,7 +1511,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             productId: e.target.value,
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                       >
                         <option value="">Todos os produtos</option>
                         {products.map((product) => (
@@ -1533,7 +1533,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                       {tiers.map((tier) => (
                         <label
                           key={tier.id}
-                          className="flex items-start gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-2 text-xs text-[var(--admin-text-main)]"
+                          className="flex items-start gap-2 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-2 text-xs text-[var(--admin-text-main)]"
                         >
                           <input
                             type="checkbox"
@@ -1570,14 +1570,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         setShowBenefitModal(false);
                         setEditingBenefit(null);
                       }}
-                      className="flex-1 h-10 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-muted)] font-bold"
+                      className="flex-1 h-10 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] font-bold"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={savingCatalogItem}
-                      className="flex-1 h-10 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold disabled:opacity-50"
+                      className="flex-1 h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold disabled:opacity-50"
                     >
                       {savingCatalogItem ? "Salvando..." : "Salvar benefício"}
                     </button>
@@ -1589,7 +1589,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
 
           {showPlanModal && (
             <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-[var(--admin-bg)]/80 backdrop-blur-md">
-              <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-[var(--admin-surface)] rounded-2xl border border-[var(--admin-border)] p-5 sm:p-6 shadow-2xl">
+              <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)] p-5 sm:p-6 shadow-2xl">
                 <div className="mb-4">
                   <h3 className="text-base font-serif font-bold text-[var(--admin-text-main)]">
                     {editingPlan ? "Editar plano" : "Novo plano"}
@@ -1616,7 +1616,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         onChange={(e) =>
                           setPlanDraft({ ...planDraft, name: e.target.value })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                       />
                     </label>
                     <label className="space-y-1">
@@ -1634,7 +1634,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             price: Number(e.target.value),
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                       />
                     </label>
                   </div>
@@ -1651,7 +1651,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                           description: e.target.value,
                         })
                       }
-                      className="w-full min-h-[72px] bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                      className="w-full min-h-[72px] bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                     />
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1667,7 +1667,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             billingPeriod: e.target.value,
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                       >
                         <option value="none">Pagamento único / catálogo</option>
                         <option value="monthly">Mensal</option>
@@ -1689,7 +1689,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                             pointsBonus: Number(e.target.value),
                           })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                       />
                     </label>
                     <label className="space-y-1">
@@ -1701,7 +1701,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         onChange={(e) =>
                           setPlanDraft({ ...planDraft, status: e.target.value })
                         }
-                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)]"
+                        className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)]"
                       >
                         <option value="draft">Rascunho</option>
                         <option value="active">Ativo</option>
@@ -1732,7 +1732,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         .map((benefit) => (
                           <label
                             key={benefit.id}
-                            className="flex items-start gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-2 text-xs text-[var(--admin-text-main)]"
+                            className="flex items-start gap-2 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-2 text-xs text-[var(--admin-text-main)]"
                           >
                             <input
                               type="checkbox"
@@ -1770,14 +1770,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         setShowPlanModal(false);
                         setEditingPlan(null);
                       }}
-                      className="flex-1 h-10 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-muted)] font-bold"
+                      className="flex-1 h-10 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] font-bold"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={savingCatalogItem}
-                      className="flex-1 h-10 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold disabled:opacity-50"
+                      className="flex-1 h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold disabled:opacity-50"
                     >
                       {savingCatalogItem ? "Salvando..." : "Salvar plano"}
                     </button>
@@ -1788,7 +1788,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           )}
 
           {/* Ajuste Manual */}
-          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-3">
+          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
             <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
               <Zap className="w-4 h-4 text-[var(--admin-accent)]" />
               <span>Ajuste Manual de Pontuação de Clientes</span>
@@ -1806,7 +1806,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 <select
                   value={selectedClient}
                   onChange={(e) => setSelectedClient(e.target.value)}
-                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                 >
                   <option value="">-- Escolha o cliente --</option>
                   {clients.map((c) => (
@@ -1829,7 +1829,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                     onChange={(e) =>
                       setManualPointsAmount(Number(e.target.value))
                     }
-                    className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
+                    className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
                   />
                 </div>
                 <div>
@@ -1841,20 +1841,20 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                     placeholder="Ex: Cortesia VIP"
                     value={manualPointsReason}
                     onChange={(e) => setManualPointsReason(e.target.value)}
-                    className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="h-9 px-4 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold rounded-xl hover:bg-[var(--admin-accent)]/90 text-xs active:scale-95"
+                className="h-9 px-4 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold rounded-[var(--admin-radius-lg)] hover:bg-[var(--admin-accent)]/90 text-xs active:scale-95"
               >
                 Aplicar Ajuste de Pontos
               </button>
 
               {manualSuccessMsg && (
-                <div className="p-2.5 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-xl">
+                <div className="p-2.5 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-[var(--admin-radius-lg)]">
                   {manualSuccessMsg}
                 </div>
               )}
@@ -1866,7 +1866,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
       {/* TAB 3: CATÁLOGO DE PRÊMIOS & CUPONS */}
       {activeTab === "rewards" && (
         <div className="space-y-4 min-w-0">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-[var(--admin-surface)] p-4 rounded-xl border border-[var(--admin-border)]">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-[var(--admin-surface)] p-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)]">
             <div>
               <h3 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
                 Prêmios e cupons
@@ -1878,7 +1878,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
 
             <button
               onClick={() => setShowAddRewardModal(true)}
-              className="h-9 px-3.5 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-1.5 shrink-0 hover:bg-[var(--admin-accent)]/90 active:scale-95 whitespace-nowrap"
+              className="h-9 px-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-1.5 shrink-0 hover:bg-[var(--admin-accent)]/90 active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Nova oferta</span>
@@ -1886,7 +1886,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           </div>
 
           {/* Validador de Voucher */}
-          <div className="bg-[var(--admin-surface)] p-4 rounded-xl border border-[var(--admin-border)] space-y-2.5 w-full">
+          <div className="bg-[var(--admin-surface)] p-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2.5 w-full">
             <h4 className="text-xs font-bold uppercase text-[var(--admin-accent)] tracking-wider flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" /> Validar Código de Voucher
               do Cliente
@@ -1897,17 +1897,17 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 placeholder="Ex: NAV-RWD-123456"
                 value={voucherCodeInput}
                 onChange={(e) => setVoucherCodeInput(e.target.value)}
-                className="flex-1 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2 text-xs text-[var(--admin-text-main)] font-mono uppercase focus:outline-none focus:border-[var(--admin-accent)] min-w-0"
+                className="flex-1 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-xs text-[var(--admin-text-main)] font-mono uppercase focus:outline-none focus:border-[var(--admin-accent)] min-w-0"
               />
               <button
                 onClick={handleValidateVoucher}
-                className="h-10 sm:h-9 w-full sm:w-auto px-4 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs rounded-xl hover:bg-[var(--admin-accent)]/90 active:scale-95 shrink-0 whitespace-nowrap"
+                className="h-10 sm:h-9 w-full sm:w-auto px-4 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs rounded-[var(--admin-radius-lg)] hover:bg-[var(--admin-accent)]/90 active:scale-95 shrink-0 whitespace-nowrap"
               >
                 Validar Voucher
               </button>
             </div>
             {voucherValidationResult && (
-              <div className="p-2.5 bg-[var(--admin-bg)] border border-[var(--admin-accent)]/30 text-[var(--admin-text-main)] text-xs font-medium rounded-xl">
+              <div className="p-2.5 bg-[var(--admin-bg)] border border-[var(--admin-accent)]/30 text-[var(--admin-text-main)] text-xs font-medium rounded-[var(--admin-radius-lg)]">
                 {voucherValidationResult}
               </div>
             )}
@@ -1918,10 +1918,10 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             {rewardsList.map((rw) => (
               <div
                 key={rw.id}
-                className="bg-[var(--admin-surface)] p-4 rounded-xl border border-[var(--admin-border)] flex items-center justify-between gap-3"
+                className="bg-[var(--admin-surface)] p-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] flex items-center justify-between gap-3"
               >
                 <div className="space-y-1 min-w-0 flex-1">
-                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold border border-[var(--admin-accent)]/30">
+                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold border border-[var(--admin-accent)]/30">
                     <Gift className="w-3 h-3" />
                     <span>{rw.pointsRequired} PONTOS</span>
                   </div>
@@ -1935,7 +1935,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
 
                 <button
                   onClick={() => handleDeleteReward(rw.id)}
-                  className="w-8 h-8 rounded-xl bg-[var(--admin-bg)] text-status-error border border-[var(--admin-border)] hover:border-status-error/50 shrink-0 flex items-center justify-center active:scale-95"
+                  className="w-8 h-8 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] text-status-error border border-[var(--admin-border)] hover:border-status-error/50 shrink-0 flex items-center justify-center active:scale-95"
                   title="Remover oferta"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -1947,7 +1947,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           {/* Modal Adicionar Oferta */}
           {showAddRewardModal && (
             <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-[var(--admin-bg)]/80 backdrop-blur-sm">
-              <div className="w-full max-w-md bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] p-5 space-y-4 shadow-lg">
+              <div className="w-full max-w-md bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-5 space-y-4 shadow-lg">
                 <h3 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
                   Adicionar Oferta ou Cupom
                 </h3>
@@ -1969,7 +1969,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                       onChange={(e) =>
                         setNewReward({ ...newReward, title: e.target.value })
                       }
-                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                     />
                   </div>
 
@@ -1988,7 +1988,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                           pointsRequired: Number(e.target.value),
                         })
                       }
-                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] num-tabular"
                     />
                   </div>
 
@@ -2004,7 +2004,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                           rewardType: e.target.value,
                         })
                       }
-                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                     >
                       <option value="upgrade">Upgrade de Serviço</option>
                       <option value="product">Produto Físico</option>
@@ -2029,7 +2029,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                           valueDescription: e.target.value,
                         })
                       }
-                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-h-[60px]"
+                      className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-h-[60px]"
                     />
                   </div>
 
@@ -2037,13 +2037,13 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowAddRewardModal(false)}
-                      className="flex-1 h-9 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-muted)] font-bold text-xs"
+                      className="flex-1 h-9 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] font-bold text-xs"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 h-9 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs"
+                      className="flex-1 h-9 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs"
                     >
                       Salvar Oferta
                     </button>
@@ -2061,7 +2061,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           <form
             onKeyDown={handleEnterAsTab}
             onSubmit={handleSaveConfig}
-            className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-4"
+            className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-4"
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[var(--admin-border)]">
               <div>
@@ -2077,7 +2077,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               <button
                 type="submit"
                 disabled={savingConfig}
-                className="h-9 px-4 rounded-xl bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-2 hover:bg-[var(--admin-accent)]/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+                className="h-9 px-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs flex items-center gap-2 hover:bg-[var(--admin-accent)]/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>{savingConfig ? "Salvando..." : "Salvar Regras"}</span>
@@ -2085,7 +2085,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-1.5">
+              <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1.5">
                 <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block admin-safe-wrap">
                   Bônus de Quem Indica
                 </span>
@@ -2102,7 +2102,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         },
                       })
                     }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
+                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
                   />
                   <span className="text-[var(--admin-text-muted)] font-bold">
                     pts
@@ -2110,7 +2110,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-1.5">
+              <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1.5">
                 <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block admin-safe-wrap">
                   Bônus do Amigo Indicado
                 </span>
@@ -2127,7 +2127,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         },
                       })
                     }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
+                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
                   />
                   <span className="text-[var(--admin-text-muted)] font-bold">
                     pts
@@ -2135,7 +2135,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-1.5">
+              <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1.5">
                 <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block admin-safe-wrap">
                   Meta Amigos (Milestone)
                 </span>
@@ -2152,7 +2152,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         },
                       })
                     }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
+                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
                   />
                   <span className="text-[var(--admin-text-muted)] font-bold">
                     amigos
@@ -2160,7 +2160,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-1.5">
+              <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1.5">
                 <span className="text-xs font-bold uppercase text-[var(--admin-accent)] block admin-safe-wrap">
                   Bônus Milestone
                 </span>
@@ -2177,7 +2177,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         },
                       })
                     }
-                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
+                    className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-[var(--admin-text-main)] font-bold text-xs num-tabular"
                   />
                   <span className="text-[var(--admin-text-muted)] font-bold">
                     pts
@@ -2188,7 +2188,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           </form>
 
           {/* Gerador de Link de Indicação */}
-          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-3">
+          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
             <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
               <Share2 className="w-4 h-4 text-[var(--admin-accent)]" />
               <span>Link de indicação</span>
@@ -2205,7 +2205,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                     const found = clients.find((c) => c.id === e.target.value);
                     if (found) setRefClient(found);
                   }}
-                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                 >
                   {clients.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -2222,11 +2222,11 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 <textarea
                   value={customRefMsg}
                   onChange={(e) => setCustomRefMsg(e.target.value)}
-                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-h-[60px]"
+                  className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] min-h-[60px]"
                 />
               </div>
 
-              <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2">
+              <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
                 <span className="text-xs font-bold uppercase text-[var(--admin-text-muted)] block">
                   Link Único Gerado
                 </span>
@@ -2235,11 +2235,11 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                     type="text"
                     readOnly
                     value={generatedRefUrl}
-                    className="flex-1 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-xs font-mono text-[var(--admin-accent)] min-w-0"
+                    className="flex-1 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-xs font-mono text-[var(--admin-accent)] min-w-0"
                   />
                   <button
                     onClick={() => copyToClipboard(generatedRefUrl)}
-                    className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs rounded-xl hover:bg-[var(--admin-accent)]/90 shrink-0 flex items-center justify-center gap-1"
+                    className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs rounded-[var(--admin-radius-lg)] hover:bg-[var(--admin-accent)]/90 shrink-0 flex items-center justify-center gap-1"
                   >
                     {copiedLink ? (
                       <Check className="w-3.5 h-3.5" />
@@ -2255,7 +2255,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                         `${customRefMsg} ${generatedRefUrl}`,
                       )
                     }
-                    className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-whatsapp text-whatsapp-on font-bold text-xs rounded-xl hover:opacity-90 shrink-0 flex items-center justify-center gap-1"
+                    className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-whatsapp text-whatsapp-on font-bold text-xs rounded-[var(--admin-radius-lg)] hover:opacity-90 shrink-0 flex items-center justify-center gap-1"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>WhatsApp</span>
@@ -2270,7 +2270,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
       {/* TAB 5: AVALIAÇÕES & NPS */}
       {activeTab === "reviews" && (
         <div className="space-y-4 min-w-0">
-          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-3">
+          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
                 <QrCode className="w-4 h-4 text-[var(--admin-accent)]" />
@@ -2280,14 +2280,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
               </h3>
               <button
                 onClick={() => setShowQrModal(true)}
-                className="h-8 px-3 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-accent)] hover:text-[var(--admin-text-main)] text-xs font-bold flex items-center gap-1.5 active:scale-95"
+                className="h-8 px-3 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] text-[var(--admin-accent)] hover:text-[var(--admin-text-main)] text-xs font-bold flex items-center gap-1.5 active:scale-95"
               >
                 <QrCode className="w-3.5 h-3.5" />
                 <span>Ver QR Code</span>
               </button>
             </div>
 
-            <div className="p-3 bg-[var(--admin-bg)] rounded-xl border border-[var(--admin-border)] space-y-2 w-full">
+            <div className="p-3 bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2 w-full">
               <span className="text-xs font-bold uppercase text-[var(--admin-text-muted)] block">
                 Link Público da Pesquisa NPS
               </span>
@@ -2296,11 +2296,11 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   type="text"
                   readOnly
                   value={generatedEvalUrl}
-                  className="flex-1 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-2 text-xs font-mono text-[var(--admin-accent)] min-w-0"
+                  className="flex-1 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-2 text-xs font-mono text-[var(--admin-accent)] min-w-0"
                 />
                 <button
                   onClick={() => copyToClipboard(generatedEvalUrl, true)}
-                  className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs rounded-xl hover:bg-[var(--admin-accent)]/90 shrink-0 flex items-center justify-center gap-1"
+                  className="h-10 sm:h-9 w-full sm:w-auto px-3 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold text-xs rounded-[var(--admin-radius-lg)] hover:bg-[var(--admin-accent)]/90 shrink-0 flex items-center justify-center gap-1"
                 >
                   {copiedEvalLink ? (
                     <Check className="w-3.5 h-3.5" />
@@ -2314,7 +2314,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           </div>
 
           {/* Feed de Avaliações */}
-          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-xl border border-[var(--admin-border)] space-y-3">
+          <div className="bg-[var(--admin-surface)] p-4 sm:p-5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h4 className="text-xs font-bold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-[var(--admin-accent)]" />
@@ -2326,7 +2326,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   onChange={(event) =>
                     setReviewStatusFilter(event.target.value)
                   }
-                  className="h-9 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-2 text-xs font-semibold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] focus:outline-none"
+                  className="h-9 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-2 text-xs font-semibold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] focus:outline-none"
                   aria-label="Filtrar status das avaliações"
                 >
                   <option value="all">Todos os status</option>
@@ -2341,7 +2341,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   onChange={(event) =>
                     setReviewPriorityFilter(event.target.value)
                   }
-                  className="h-9 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-2 text-xs font-semibold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] focus:outline-none"
+                  className="h-9 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] px-2 text-xs font-semibold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] focus:outline-none"
                   aria-label="Filtrar prioridade das avaliações"
                 >
                   <option value="all">Todas as prioridades</option>
@@ -2418,7 +2418,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                                   {clientLabel}
                                 </span>
                                 {rev.isAnonymous && (
-                                  <span className="mt-1 inline-flex rounded-full border border-[var(--admin-border)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--admin-text-muted)]">
+                                  <span className="mt-1 inline-flex rounded-[var(--admin-radius-full)] border border-[var(--admin-border)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--admin-text-muted)]">
                                     Anônimo
                                   </span>
                                 )}
@@ -2521,7 +2521,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
             >
               <form
                 onSubmit={handleSaveReviewFollowup}
-                className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5 shadow-2xl sm:p-6"
+                className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5 shadow-2xl sm:p-6"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
@@ -2544,14 +2544,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   <button
                     type="button"
                     onClick={() => setSelectedReview(null)}
-                    className="rounded-full px-3 py-1.5 text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
+                    className="rounded-[var(--admin-radius-full)] px-3 py-1.5 text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)] hover:text-[var(--admin-text-main)]"
                   >
                     Fechar
                   </button>
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3">
+                  <div className="rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3">
                     <span className="block text-[10px] font-bold uppercase tracking-wide text-[var(--admin-text-muted)]">
                       Nota
                     </span>
@@ -2559,7 +2559,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                       {selectedReview.rating}/5
                     </span>
                   </div>
-                  <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3">
+                  <div className="rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3">
                     <span className="block text-[10px] font-bold uppercase tracking-wide text-[var(--admin-text-muted)]">
                       Recomendação
                     </span>
@@ -2567,7 +2567,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                       {selectedReview.wouldRecommend || "Não informado"}
                     </span>
                   </div>
-                  <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3">
+                  <div className="rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3">
                     <span className="block text-[10px] font-bold uppercase tracking-wide text-[var(--admin-text-muted)]">
                       Recebida em
                     </span>
@@ -2591,7 +2591,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                           managementStatus: event.target.value,
                         })
                       }
-                      className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3 text-xs font-semibold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] focus:outline-none"
+                      className="w-full rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3 text-xs font-semibold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] focus:outline-none"
                     >
                       {Object.entries(reviewStatusLabels).map(
                         ([value, label]) => (
@@ -2612,7 +2612,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                           priority: event.target.value,
                         })
                       }
-                      className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3 text-xs font-semibold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] focus:outline-none"
+                      className="w-full rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3 text-xs font-semibold text-[var(--admin-text-main)] focus:border-[var(--admin-accent)] focus:outline-none"
                     >
                       {Object.entries(reviewPriorityLabels).map(
                         ([value, label]) => (
@@ -2638,7 +2638,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                     maxLength={2000}
                     rows={4}
                     placeholder="Registre uma ação, retorno necessário ou contexto operacional..."
-                    className="w-full resize-y rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3 text-xs font-medium text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-accent)] focus:outline-none"
+                    className="w-full resize-y rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3 text-xs font-medium text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:border-[var(--admin-accent)] focus:outline-none"
                   />
                   <span className="block text-right text-[10px] font-normal text-[var(--admin-text-muted)]">
                     {reviewDraft.internalNotes.length}/2000
@@ -2646,7 +2646,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                 </label>
 
                 {selectedReview.followupHistory?.length > 0 && (
-                  <div className="mt-4 space-y-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3">
+                  <div className="mt-4 space-y-2 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-bg)] p-3">
                     <p className="text-xs font-bold uppercase tracking-wide text-[var(--admin-text-muted)]">
                       Histórico de acompanhamento
                     </p>
@@ -2679,14 +2679,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
                   <button
                     type="button"
                     onClick={() => setSelectedReview(null)}
-                    className="h-10 rounded-xl border border-[var(--admin-border)] px-4 text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)]"
+                    className="h-10 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] px-4 text-xs font-bold text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg)]"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={savingReviewFollowup}
-                    className="h-10 rounded-xl bg-[var(--admin-accent)] px-5 text-xs font-bold text-[var(--admin-accent-text)] hover:bg-[var(--admin-accent)]/90 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-10 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)] px-5 text-xs font-bold text-[var(--admin-accent-text)] hover:bg-[var(--admin-accent)]/90 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {savingReviewFollowup
                       ? "Salvando..."
@@ -2700,12 +2700,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
           {/* Modal QR Code */}
           {showQrModal && (
             <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-[var(--admin-bg)]/80 backdrop-blur-sm">
-              <div className="w-full max-w-xs bg-[var(--admin-surface)] rounded-xl border border-[var(--admin-border)] p-5 space-y-3 text-center shadow-lg">
+              <div className="w-full max-w-xs bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-5 space-y-3 text-center shadow-lg">
                 <h3 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
                   QR Code para Mesas & Espelhos
                 </h3>
 
-                <div className="p-3 bg-white rounded-xl border border-[var(--admin-border)] inline-block mx-auto">
+                <div className="p-3 bg-white rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] inline-block mx-auto">
                   <QRCodeSVG
                     value={generatedEvalUrl}
                     size={200}
@@ -2724,7 +2724,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
 
                 <button
                   onClick={() => setShowQrModal(false)}
-                  className="w-full h-9 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold rounded-xl text-xs"
+                  className="w-full h-9 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] font-bold rounded-[var(--admin-radius-lg)] text-xs"
                 >
                   Fechar QR Code
                 </button>

@@ -186,7 +186,7 @@ export const ReceiptsManagement: React.FC = () => {
         {/* Cliente & Contato */}
         <td>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-[var(--admin-surface)] border border-[var(--admin-border)] flex items-center justify-center shrink-0 text-xs font-bold text-[var(--admin-accent)]">
+            <div className="w-8 h-8 rounded-[var(--admin-radius-full)] bg-[var(--admin-surface)] border border-[var(--admin-border)] flex items-center justify-center shrink-0 text-xs font-bold text-[var(--admin-accent)]">
               {item.clientName?.charAt(0)?.toUpperCase() || "C"}
             </div>
             <div className="min-w-0">
@@ -223,11 +223,11 @@ export const ReceiptsManagement: React.FC = () => {
         {/* Forma de Pagamento */}
         <td>
           {isPending ? (
-            <span className="inline-flex items-center gap-1 text-[11px] text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20 font-medium">
+            <span className="inline-flex items-center gap-1 text-[11px] text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-[var(--admin-radius-sm)] border border-amber-500/20 font-medium">
               <Clock3 className="w-3 h-3" /> Aguardando
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[11px] text-[var(--admin-text-main)] bg-[var(--admin-surface)] px-2 py-0.5 rounded-md border border-[var(--admin-border)] font-medium">
+            <span className="inline-flex items-center gap-1 text-[11px] text-[var(--admin-text-main)] bg-[var(--admin-surface)] px-2 py-0.5 rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] font-medium">
               <CreditCard className="w-3 h-3 text-[var(--admin-accent)]" />
               {paymentLabel[item.paymentMethod || "other"]}
             </span>
@@ -303,7 +303,7 @@ export const ReceiptsManagement: React.FC = () => {
           {/* Avatar e Dados do Cliente */}
           <div className="flex items-start gap-2.5 min-w-0 flex-1">
             <div
-              className={`w-9 h-9 rounded-xl shrink-0 flex items-center justify-center border ${
+              className={`w-9 h-9 rounded-[var(--admin-radius-lg)] shrink-0 flex items-center justify-center border ${
                 isPending
                   ? "bg-amber-500/10 text-amber-500 border-amber-500/30"
                   : "bg-status-success/10 text-status-success border-status-success/30"
@@ -411,7 +411,7 @@ export const ReceiptsManagement: React.FC = () => {
             <span className="text-[11px] uppercase font-bold tracking-wider text-[var(--admin-text-muted)]">
               Pendentes
             </span>
-            <div className="w-6 h-6 rounded-md bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs font-bold">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-sm)] bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs font-bold">
               {summary.pending.length}
             </div>
           </div>
@@ -433,7 +433,7 @@ export const ReceiptsManagement: React.FC = () => {
             <span className="text-[11px] uppercase font-bold tracking-wider text-[var(--admin-text-muted)]">
               Total Liquidado
             </span>
-            <div className="w-6 h-6 rounded-md bg-status-success/10 text-status-success flex items-center justify-center text-xs font-bold">
+            <div className="w-6 h-6 rounded-[var(--admin-radius-sm)] bg-status-success/10 text-status-success flex items-center justify-center text-xs font-bold">
               {summary.received.length}
             </div>
           </div>
@@ -493,7 +493,7 @@ export const ReceiptsManagement: React.FC = () => {
 
       {/* Alerta de Erro */}
       {error && (
-        <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 flex items-center justify-between gap-3 text-sm font-semibold text-status-error">
+        <div className="rounded-[var(--admin-radius-lg)] border border-status-error/30 bg-status-error/10 p-3.5 flex items-center justify-between gap-3 text-sm font-semibold text-status-error">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span className="admin-safe-wrap">{error}</span>
@@ -501,7 +501,7 @@ export const ReceiptsManagement: React.FC = () => {
           <button
             type="button"
             onClick={loadReceipts}
-            className="shrink-0 min-h-8 px-2.5 rounded-lg border border-status-error/30 text-xs font-bold hover:bg-status-error/10"
+            className="shrink-0 min-h-8 px-2.5 rounded-[var(--admin-radius-md)] border border-status-error/30 text-xs font-bold hover:bg-status-error/10"
           >
             Tentar novamente
           </button>
@@ -535,7 +535,7 @@ export const ReceiptsManagement: React.FC = () => {
               <select
                 value={period}
                 onChange={(e) => setPeriod(e.target.value as PeriodFilter)}
-                className="admin-input h-9 text-xs font-semibold px-2.5 pr-7 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-lg text-[var(--admin-text-main)] appearance-none cursor-pointer"
+                className="admin-input h-9 text-xs font-semibold px-2.5 pr-7 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] text-[var(--admin-text-main)] appearance-none cursor-pointer"
                 aria-label="Filtrar por período"
               >
                 <option value="all">Todo o período</option>
@@ -554,7 +554,7 @@ export const ReceiptsManagement: React.FC = () => {
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Buscar cliente, serviço..."
                 aria-label="Buscar recebimentos"
-                className="w-full h-9 rounded-lg bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-8 pr-7 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+                className="w-full h-9 rounded-[var(--admin-radius-md)] bg-[var(--admin-bg)] border border-[var(--admin-border)] pl-8 pr-7 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
               />
               {search && (
                 <button
@@ -715,7 +715,7 @@ const StatusBadge: React.FC<{ status: ReceiptItem["status"] }> = ({ status }) =>
   const cancelled = status === "cancelled";
   return (
     <span
-      className={`px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+      className={`px-2 py-0.5 rounded-[var(--admin-radius-full)] text-[10px] font-bold inline-flex items-center gap-1 ${
         received
           ? "bg-status-success/15 text-status-success border border-status-success/30"
           : cancelled

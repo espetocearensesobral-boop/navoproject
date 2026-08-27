@@ -229,7 +229,7 @@ export const ReportsManagement: React.FC = () => {
               key={option.id}
               type="button"
               onClick={() => setPeriod(option.id)}
-              className={`shrink-0 h-10 px-4 rounded-full text-sm font-bold transition-colors ${period === option.id ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"}`}
+              className={`shrink-0 h-10 px-4 rounded-[var(--admin-radius-full)] text-sm font-bold transition-colors ${period === option.id ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "bg-[var(--admin-surface)] border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"}`}
             >
               {option.label}
             </button>
@@ -240,7 +240,7 @@ export const ReportsManagement: React.FC = () => {
             type="button"
             onClick={printReport}
             disabled={!report || loading}
-            className="h-10 px-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm font-bold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center gap-2 disabled:opacity-50"
+            className="h-10 px-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm font-bold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <Printer className="w-4 h-4" />
             Imprimir
@@ -248,7 +248,7 @@ export const ReportsManagement: React.FC = () => {
           <button
             type="button"
             onClick={() => loadReport()}
-            className="h-10 px-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm font-bold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center gap-2"
+            className="h-10 px-4 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm font-bold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             Atualizar
@@ -257,13 +257,13 @@ export const ReportsManagement: React.FC = () => {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">
+        <div className="rounded-[var(--admin-radius-lg)] border border-status-error/30 bg-status-error/10 p-3.5 text-sm font-semibold text-status-error">
           {error}
         </div>
       )}
 
       {loading && !report ? (
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-12 text-center text-[var(--admin-text-muted)]">
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-12 text-center text-[var(--admin-text-muted)]">
           <Loader2 className="w-5 h-5 animate-spin inline mr-2" />
           Carregando relatório…
         </div>
@@ -315,7 +315,7 @@ export const ReportsManagement: React.FC = () => {
 
             {tab === "visao" && (
               <div className="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-4">
-                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="admin-copy-title text-base font-serif font-bold text-[var(--admin-text-main)]">
@@ -339,14 +339,14 @@ export const ReportsManagement: React.FC = () => {
                           <div className="w-full flex justify-center items-end gap-1 h-[calc(100%-1.75rem)]">
                             <span
                               title={`Entradas: ${money(day.income)}`}
-                              className="w-[42%] max-w-5 bg-status-success/75 rounded-t-md transition-all"
+                              className="w-[42%] max-w-5 bg-status-success/75 rounded-t-[var(--admin-radius-sm)] transition-all"
                               style={{
                                 height: `${Math.max(day.income ? 5 : 0, (day.income / maxDaily) * 100)}%`,
                               }}
                             />
                             <span
                               title={`Saídas: ${money(day.expense)}`}
-                              className="w-[42%] max-w-5 bg-status-error/70 rounded-t-md transition-all"
+                              className="w-[42%] max-w-5 bg-status-error/70 rounded-t-[var(--admin-radius-sm)] transition-all"
                               style={{
                                 height: `${Math.max(day.expense ? 5 : 0, (day.expense / maxDaily) * 100)}%`,
                               }}
@@ -361,16 +361,16 @@ export const ReportsManagement: React.FC = () => {
                   )}
                   <div className="mt-4 flex flex-wrap gap-4 text-xs text-[var(--admin-text-muted)]">
                     <span className="flex items-center gap-1.5">
-                      <i className="w-2.5 h-2.5 rounded-sm bg-status-success/75" />
+                      <i className="w-2.5 h-2.5 rounded-[var(--admin-radius-xs)] bg-status-success/75" />
                       Entradas
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <i className="w-2.5 h-2.5 rounded-sm bg-status-error/70" />
+                      <i className="w-2.5 h-2.5 rounded-[var(--admin-radius-xs)] bg-status-error/70" />
                       Saídas
                     </span>
                   </div>
                 </section>
-                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
                   <h2 className="admin-copy-title text-base font-serif font-bold text-[var(--admin-text-main)]">
                     Entradas
                   </h2>
@@ -406,7 +406,7 @@ export const ReportsManagement: React.FC = () => {
 
             {tab === "receitas" && (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
                   <SectionTitle
                     icon={Scissors}
                     title="Serviços recebidos"
@@ -433,7 +433,7 @@ export const ReportsManagement: React.FC = () => {
                     </div>
                   )}
                 </section>
-                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
                   <SectionTitle
                     icon={CreditCard}
                     title="Formas de pagamento"
@@ -465,7 +465,7 @@ export const ReportsManagement: React.FC = () => {
 
             {tab === "despesas" && (
               <div className="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-4">
-                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
                   <SectionTitle
                     icon={ArrowDownRight}
                     title="Saídas por categoria"
@@ -493,14 +493,14 @@ export const ReportsManagement: React.FC = () => {
                     </div>
                   )}
                 </section>
-                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
                   <h2 className="admin-copy-title text-base font-serif font-bold text-[var(--admin-text-main)]">
                     Leitura do resultado
                   </h2>
                   <p className="mt-1 text-sm text-[var(--admin-text-muted)]">
                     Resumo do período.
                   </p>
-                  <div className="mt-5 p-4 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)]">
+                  <div className="mt-5 p-4 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)]">
                     <p className="text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)]">
                       Margem após saídas
                     </p>
@@ -528,7 +528,7 @@ export const ReportsManagement: React.FC = () => {
 
             {tab === "operacao" && (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
                   <SectionTitle
                     icon={UserRound}
                     title="Clientes por valor recebido"
@@ -541,9 +541,9 @@ export const ReportsManagement: React.FC = () => {
                       {report.clients.slice(0, 12).map((client, index) => (
                         <div
                           key={`${client.clientName}-${index}`}
-                          className="p-3 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center gap-3"
+                          className="p-3 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center gap-3"
                         >
-                          <span className="w-8 h-8 rounded-lg bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] font-bold text-xs shrink-0 flex items-center justify-center">
+                          <span className="w-8 h-8 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] font-bold text-xs shrink-0 flex items-center justify-center">
                             #{index + 1}
                           </span>
                           <div className="min-w-0 flex-1">
@@ -567,7 +567,7 @@ export const ReportsManagement: React.FC = () => {
                     </div>
                   )}
                 </section>
-                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-4 sm:p-5">
+                <section className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] p-4 sm:p-5">
                   <SectionTitle
                     icon={Users}
                     title="Profissionais por receita"
@@ -580,7 +580,7 @@ export const ReportsManagement: React.FC = () => {
                       {report.professionals.map((professional, index) => (
                         <div
                           key={professional.professionalName}
-                          className="p-3.5 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)]"
+                          className="p-3.5 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)]"
                         >
                           <div className="flex items-center justify-between gap-3">
                             <div className="min-w-0">
@@ -642,13 +642,13 @@ const MetricCard: React.FC<{
         ? "finance-negative"
         : "text-[var(--admin-text-main)]";
   return (
-    <div className="min-w-0 p-3.5 sm:p-4 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl">
+    <div className="min-w-0 p-3.5 sm:p-4 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)]">
       <div className="flex items-start justify-between gap-2">
         <p className="admin-copy-label text-xs font-bold uppercase tracking-wider text-[var(--admin-text-muted)] admin-safe-wrap">
           {label}
         </p>
         <span
-          className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${toneClass}`}
+          className={`w-8 h-8 rounded-[var(--admin-radius-md)] shrink-0 flex items-center justify-center ${toneClass}`}
         >
           <Icon className="w-4 h-4" />
         </span>
@@ -718,11 +718,11 @@ const RankRow: React.FC<{
   percentage: number;
   valueTone?: "negative";
 }> = ({ position, title, subtitle, value, percentage, valueTone }) => (
-  <div className="p-3 rounded-xl bg-[var(--admin-bg)] border border-[var(--admin-border)]">
+  <div className="p-3 rounded-[var(--admin-radius-lg)] bg-[var(--admin-bg)] border border-[var(--admin-border)]">
     <div className="flex items-start gap-2">
       <>
         {position !== null && (
-          <span className="w-6 h-6 rounded-full bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold shrink-0 flex items-center justify-center">
+          <span className="w-6 h-6 rounded-[var(--admin-radius-full)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold shrink-0 flex items-center justify-center">
             #{position}
           </span>
         )}
@@ -743,9 +743,9 @@ const RankRow: React.FC<{
             {value}
           </strong>
         </div>
-        <div className="mt-3 h-1.5 rounded-full bg-[var(--admin-surface)] overflow-hidden">
+        <div className="mt-3 h-1.5 rounded-[var(--admin-radius-full)] bg-[var(--admin-surface)] overflow-hidden">
           <span
-            className={`block h-full rounded-full ${valueTone === "negative" ? "bg-status-error" : "bg-[var(--admin-accent)]"}`}
+            className={`block h-full rounded-[var(--admin-radius-full)] ${valueTone === "negative" ? "bg-status-error" : "bg-[var(--admin-accent)]"}`}
             style={{ width: `${Math.min(100, Math.max(0, percentage))}%` }}
           />
         </div>

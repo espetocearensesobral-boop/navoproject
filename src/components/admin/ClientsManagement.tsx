@@ -290,7 +290,7 @@ export const ClientsManagement: React.FC = () => {
             title="Busca local nos clientes carregados"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl pl-8 pr-3 py-2 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)]"
+            className="w-full bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] pl-8 pr-3 py-2 text-xs text-[var(--admin-text-main)] placeholder:text-[var(--admin-text-muted)] focus:outline-none focus:border-[var(--admin-accent)]"
           />
         </div>
       </div>
@@ -313,7 +313,7 @@ export const ClientsManagement: React.FC = () => {
             key={pill.id}
             type="button"
             onClick={() => setSelectedTier(pill.id)}
-            className={`shrink-0 min-h-9 px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer ${
+            className={`shrink-0 min-h-9 px-3.5 py-1.5 rounded-[var(--admin-radius-md)] text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer ${
               selectedTier === pill.id
                 ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)] border-[var(--admin-accent)] shadow-xs"
                 : "bg-[var(--admin-surface)] text-[var(--admin-text-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)]"
@@ -322,7 +322,7 @@ export const ClientsManagement: React.FC = () => {
             <span>{pill.label}</span>
             {pill.count !== undefined && (
               <span
-                className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                className={`ml-1.5 px-1.5 py-0.5 rounded-[var(--admin-radius-full)] text-[10px] font-bold ${
                   selectedTier === pill.id
                     ? "bg-[var(--admin-bg)]/20 text-surface-base"
                     : "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)]"
@@ -336,7 +336,7 @@ export const ClientsManagement: React.FC = () => {
       </div>
 
       {/* DESKTOP SEARCH BAR (MD AND UP) */}
-      <div className="hidden md:flex bg-[var(--admin-surface)] px-3.5 py-2.5 rounded-xl border border-[var(--admin-border)] justify-between items-center">
+      <div className="hidden md:flex bg-[var(--admin-surface)] px-3.5 py-2.5 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] justify-between items-center">
         <div className="relative w-80">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
           <input
@@ -345,7 +345,7 @@ export const ClientsManagement: React.FC = () => {
             title="Busca local nos clientes carregados"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-lg pl-9 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
+            className="w-full bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-md)] pl-9 pr-3 py-1.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] transition-colors"
           />
         </div>
         <p className="text-xs text-[var(--admin-text-muted)] font-medium">
@@ -391,7 +391,7 @@ export const ClientsManagement: React.FC = () => {
                     <tr key={client.id}>
                       <td>
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-xs shrink-0 overflow-hidden">
+                          <div className="w-9 h-9 rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-xs shrink-0 overflow-hidden">
                             {client.avatarUrl ? (
                               <img src={client.avatarUrl} alt="" className="w-full h-full object-cover" />
                             ) : (
@@ -401,7 +401,7 @@ export const ClientsManagement: React.FC = () => {
                           <div className="min-w-0">
                             <p className="font-bold text-[var(--admin-text-main)] truncate text-[13px]">{client.name || "Sem nome"}</p>
                             {isAdmin && (
-                              <span className="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-400 uppercase tracking-wider border border-purple-500/30">
+                              <span className="inline-block mt-0.5 px-2 py-0.5 rounded-[var(--admin-radius-full)] text-[10px] font-bold bg-purple-500/15 text-purple-400 uppercase tracking-wider border border-purple-500/30">
                                 Admin
                               </span>
                             )}
@@ -418,7 +418,7 @@ export const ClientsManagement: React.FC = () => {
                       </td>
                       <td>
                         <div className="flex items-center gap-2">
-                          <span className="inline-block px-2.5 py-0.5 rounded-full bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold border border-[var(--admin-accent)]/20 uppercase tracking-wider">
+                          <span className="inline-block px-2.5 py-0.5 rounded-[var(--admin-radius-full)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-xs font-bold border border-[var(--admin-accent)]/20 uppercase tracking-wider">
                             {tier}
                           </span>
                           <span className="font-bold text-[var(--admin-text-main)] text-[13px]">
@@ -434,7 +434,7 @@ export const ClientsManagement: React.FC = () => {
                               target="_blank"
                               rel="noreferrer"
                               title="Abrir WhatsApp"
-                              className="admin-btn-icon-sm hover:text-status-success hover:bg-status-success/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded-md"
+                              className="admin-btn-icon-sm hover:text-status-success hover:bg-status-success/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded-[var(--admin-radius-sm)]"
                             >
                               <Phone className="w-4 h-4" />
                             </a>
@@ -443,7 +443,7 @@ export const ClientsManagement: React.FC = () => {
                             type="button"
                             onClick={() => handleOpenModal(client)}
                             title="Editar"
-                            className="admin-btn-icon-sm hover:text-[var(--admin-accent)] hover:bg-[var(--admin-accent)]/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded-md"
+                            className="admin-btn-icon-sm hover:text-[var(--admin-accent)] hover:bg-[var(--admin-accent)]/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded-[var(--admin-radius-sm)]"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -452,10 +452,10 @@ export const ClientsManagement: React.FC = () => {
                             onClick={() => handleDelete(client.id)}
                             disabled={isDeleting}
                             title="Excluir"
-                            className="admin-btn-icon-sm hover:text-status-error hover:bg-status-error/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded-md disabled:opacity-50"
+                            className="admin-btn-icon-sm hover:text-status-error hover:bg-status-error/10 text-[var(--admin-text-muted)] flex items-center justify-center rounded-[var(--admin-radius-sm)] disabled:opacity-50"
                           >
                             {isDeleting && deleteTargetId === client.id ? (
-                              <span className="h-3 w-3 animate-spin rounded-full border border-status-error border-t-transparent" />
+                              <span className="h-3 w-3 animate-spin rounded-[var(--admin-radius-full)] border border-status-error border-t-transparent" />
                             ) : (
                               <Trash2 className="w-4 h-4" />
                             )}
@@ -487,7 +487,7 @@ export const ClientsManagement: React.FC = () => {
                 <article
                   key={client.id}
                   style={{ animationDelay: `${Math.min(index, 6) * 24}ms` }}
-                  className={`admin-list-item-enter overflow-hidden rounded-xl border bg-[var(--admin-surface)] transition-colors ${isExpanded ? "border-[var(--admin-accent)]/50" : "border-[var(--admin-border)]"}`}
+                  className={`admin-list-item-enter overflow-hidden rounded-[var(--admin-radius-lg)] border bg-[var(--admin-surface)] transition-colors ${isExpanded ? "border-[var(--admin-accent)]/50" : "border-[var(--admin-border)]"}`}
                 >
                   <button
                     type="button"
@@ -497,7 +497,7 @@ export const ClientsManagement: React.FC = () => {
                     aria-expanded={isExpanded}
                     className="w-full min-h-[76px] p-3 text-left flex items-center gap-3 hover:bg-[var(--admin-surface-hover)] active:scale-[0.995] transition-all"
                   >
-                    <div className="w-10 h-10 rounded-full bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-xs shrink-0 overflow-hidden">
+                    <div className="w-10 h-10 rounded-[var(--admin-radius-full)] bg-[var(--admin-bg)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-accent)] font-bold text-xs shrink-0 overflow-hidden">
                       {client.avatarUrl ? (
                         <img
                           src={client.avatarUrl}
@@ -513,7 +513,7 @@ export const ClientsManagement: React.FC = () => {
                         <h3 className="text-sm font-bold text-[var(--admin-text-main)] admin-clamp-2">
                           {client.name || "Cliente sem nome"}
                         </h3>
-                        <span className="shrink-0 px-2 py-0.5 rounded-full bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-[10px] font-bold">
+                        <span className="shrink-0 px-2 py-0.5 rounded-[var(--admin-radius-full)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] text-[10px] font-bold">
                           {tier}
                         </span>
                       </div>
@@ -531,7 +531,7 @@ export const ClientsManagement: React.FC = () => {
                   {isExpanded && (
                     <div className="border-t border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-3 space-y-2.5">
                       <div className="grid grid-cols-1 gap-2 text-xs">
-                        <div className="rounded-lg bg-[var(--admin-surface)] border border-[var(--admin-border)] p-2.5">
+                        <div className="rounded-[var(--admin-radius-md)] bg-[var(--admin-surface)] border border-[var(--admin-border)] p-2.5">
                           <p className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider font-bold mb-1">
                             Contato e Info
                           </p>
@@ -548,7 +548,7 @@ export const ClientsManagement: React.FC = () => {
                             </p>
                           )}
                         </div>
-                        <div className="rounded-lg bg-[var(--admin-surface)] border border-[var(--admin-border)] p-2.5 flex justify-between items-center">
+                        <div className="rounded-[var(--admin-radius-md)] bg-[var(--admin-surface)] border border-[var(--admin-border)] p-2.5 flex justify-between items-center">
                            <div>
                              <p className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider font-bold mb-0.5">
                                Pontos
@@ -573,7 +573,7 @@ export const ClientsManagement: React.FC = () => {
                             href={`https://wa.me/55${client.phone.replace(/\D/g, "")}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex-1 min-h-9 px-3 rounded-lg border border-status-success/30 bg-status-success/5 text-status-success text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-98 transition-all"
+                            className="flex-1 min-h-9 px-3 rounded-[var(--admin-radius-md)] border border-status-success/30 bg-status-success/5 text-status-success text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-98 transition-all"
                           >
                             <Phone className="w-3.5 h-3.5" />
                             WhatsApp
@@ -582,7 +582,7 @@ export const ClientsManagement: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenModal(client)}
-                          className="flex-1 min-h-9 px-3 rounded-lg bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-98 transition-all"
+                          className="flex-1 min-h-9 px-3 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)] text-[var(--admin-accent-text)] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-98 transition-all"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                           Editar
@@ -591,10 +591,10 @@ export const ClientsManagement: React.FC = () => {
                           type="button"
                           onClick={() => handleDelete(client.id)}
                           disabled={isDeleting}
-                          className="flex-none min-h-9 min-w-9 px-2.5 rounded-lg border border-status-error/25 bg-status-error/5 text-status-error flex items-center justify-center hover:bg-status-error/10 active:scale-98 transition-all disabled:opacity-50"
+                          className="flex-none min-h-9 min-w-9 px-2.5 rounded-[var(--admin-radius-md)] border border-status-error/25 bg-status-error/5 text-status-error flex items-center justify-center hover:bg-status-error/10 active:scale-98 transition-all disabled:opacity-50"
                         >
                           {isDeleting && deleteTargetId === client.id ? (
-                            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-status-error/30 border-t-status-error" />
+                            <span className="h-3.5 w-3.5 animate-spin rounded-[var(--admin-radius-full)] border-2 border-status-error/30 border-t-status-error" />
                           ) : (
                             <Trash2 className="w-3.5 h-3.5" />
                           )}
@@ -667,7 +667,7 @@ export const ClientsManagement: React.FC = () => {
         >
           <div className="space-y-3">
             {errorMsg && (
-              <div className="p-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs font-bold">
+              <div className="p-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-[var(--admin-radius-lg)] text-xs font-bold">
                 {errorMsg}
               </div>
             )}
@@ -697,7 +697,7 @@ export const ClientsManagement: React.FC = () => {
                     fieldErrors.name ? "client-name-error" : undefined
                   }
                   placeholder="Ex: Carlos Silva"
-                  className={`w-full h-10 bg-[var(--admin-bg)] border rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.name ? "border-status-error" : "border-[var(--admin-border)]"}`}
+                  className={`w-full h-10 bg-[var(--admin-bg)] border rounded-[var(--admin-radius-lg)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.name ? "border-status-error" : "border-[var(--admin-border)]"}`}
                 />
                 {fieldErrors.name && (
                   <p
@@ -728,7 +728,7 @@ export const ClientsManagement: React.FC = () => {
                       fieldErrors.email ? "client-email-error" : undefined
                     }
                     placeholder="carlos@email.com"
-                    className={`w-full h-10 bg-[var(--admin-bg)] border rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.email ? "border-status-error" : "border-[var(--admin-border)]"}`}
+                    className={`w-full h-10 bg-[var(--admin-bg)] border rounded-[var(--admin-radius-lg)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.email ? "border-status-error" : "border-[var(--admin-border)]"}`}
                   />
                   {fieldErrors.email && (
                     <p
@@ -759,7 +759,7 @@ export const ClientsManagement: React.FC = () => {
                       fieldErrors.phone ? "client-phone-error" : undefined
                     }
                     placeholder="(11) 99999-9999"
-                    className={`w-full h-10 bg-[var(--admin-bg)] border rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.phone ? "border-status-error" : "border-[var(--admin-border)]"}`}
+                    className={`w-full h-10 bg-[var(--admin-bg)] border rounded-[var(--admin-radius-lg)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)] ${fieldErrors.phone ? "border-status-error" : "border-[var(--admin-border)]"}`}
                   />
                   {fieldErrors.phone && (
                     <p
@@ -785,7 +785,7 @@ export const ClientsManagement: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, birthday: e.target.value })
                   }
-                  className="w-full h-10 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                  className="w-full h-10 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                 />
               </div>
 
@@ -806,11 +806,11 @@ export const ClientsManagement: React.FC = () => {
                     setFormData({ ...formData, password: e.target.value })
                   }
                   placeholder="••••••••"
-                  className="w-full h-10 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                  className="w-full h-10 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-3 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                 />
               </div>
 
-              <div className="p-3 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-xl space-y-2.5">
+              <div className="p-3 bg-[var(--admin-bg)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] space-y-2.5">
                 <p className="text-xs font-bold text-[var(--admin-accent)] uppercase tracking-wider">
                   Fidelidade & Permissões
                 </p>
@@ -823,7 +823,7 @@ export const ClientsManagement: React.FC = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, role: e.target.value })
                       }
-                      className="w-full h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                      className="w-full h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                     >
                       <option value="client">Cliente</option>
                       <option value="admin">Administrador</option>
@@ -840,7 +840,7 @@ export const ClientsManagement: React.FC = () => {
                           loyaltyTier: e.target.value,
                         })
                       }
-                      className="w-full h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                      className="w-full h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                     >
                       <option value="Bronze">Bronze</option>
                       <option value="Prata">Prata</option>
@@ -862,7 +862,7 @@ export const ClientsManagement: React.FC = () => {
                         loyaltyPoints: parseInt(e.target.value) || 0,
                       })
                     }
-                    className="w-full h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl px-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    className="w-full h-10 bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[var(--admin-radius-lg)] px-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:border-[var(--admin-accent)]"
                   />
                 </div>
               </div>

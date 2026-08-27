@@ -122,7 +122,7 @@ export const AuditLogsManagement: React.FC = () => {
       {/* Ação (mobile) */}
       <button
         onClick={handleExportLogs}
-        className="md:hidden w-full bg-[var(--admin-surface)] hover:bg-surface-elevated text-[var(--admin-text-main)] px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
+        className="md:hidden w-full bg-[var(--admin-surface)] hover:bg-surface-elevated text-[var(--admin-text-main)] px-3 py-2.5 rounded-[var(--admin-radius-lg)] text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
       >
         <Download className="w-4 h-4 text-[var(--admin-accent)]" />
         <span>Exportar logs</span>
@@ -137,14 +137,14 @@ export const AuditLogsManagement: React.FC = () => {
             placeholder="Operador, ação ou detalhe..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[var(--admin-surface)] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50"
+            className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] pl-10 pr-4 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50"
           />
         </div>
 
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="bg-[var(--admin-surface)] rounded-xl px-3 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50 shrink-0"
+          className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] px-3 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50 shrink-0"
         >
           <option value="all">Todas</option>
           <option value="comandas">Comandas</option>
@@ -185,7 +185,7 @@ export const AuditLogsManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="whitespace-nowrap">
-                      <span className="bg-[var(--admin-bg)]/80 text-[var(--admin-text-muted)] font-bold text-xs px-2.5 py-1 rounded-xl capitalize inline-flex items-center gap-1.5">
+                      <span className="bg-[var(--admin-bg)]/80 text-[var(--admin-text-muted)] font-bold text-xs px-2.5 py-1 rounded-[var(--admin-radius-lg)] capitalize inline-flex items-center gap-1.5">
                         <Icon className="w-3 h-3 text-[var(--admin-accent)]" />
                         {item.category}
                       </span>
