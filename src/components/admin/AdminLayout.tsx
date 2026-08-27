@@ -452,50 +452,35 @@ export const AdminLayout: React.FC = () => {
  // Agrupamento puramente visual da navegação: reduz uma lista plana de 12 itens
  // a 4 blocos com propósito claro. Não altera AdminTab, rotas ou persistência de aba.
  const navGroups: { label: string; tabs: AdminTab[] }[] = [
- { label:"Operação", tabs: ["dashboard","agenda","queue","atendimento"] },
- {
- label:"Financeiro",
- tabs: [
-"financeiro_recebimentos",
-"financeiro_extrato",
-"financeiro_saidas",
- ],
- },
- {
- label:"Gestão",
- tabs: ["relatorios"],
- },
- {
- label:"Clientes",
- tabs: ["clientes"],
- },
- {
- label:"Relacionamentos",
- tabs: [
-"relacionamento_overview",
-"relacionamento_reviews",
-"relacionamento_followup",
-"relacionamento_birthdays",
- ],
- },
- {
- label:"Fidelização",
- tabs: ["fidelidade","premios","assinaturas"],
- },
- {
- label:"Crescimento",
- tabs: ["campanhas","indicacoes"],
- },
- {
- label:"Catálogo",
- tabs: ["catalogo"],
- },
- {
- label:"Comunicação",
- tabs: ["lembretes"],
- },
- { label:"Configuração", tabs: ["sistema"] },
- ];
+  { label: "Operação", tabs: ["dashboard", "agenda", "queue", "atendimento"] },
+  {
+    label: "Clientes & CRM",
+    tabs: [
+      "clientes",
+      "relacionamento_overview",
+      "relacionamento_followup",
+      "relacionamento_reviews",
+      "relacionamento_birthdays",
+    ],
+  },
+  {
+    label: "Financeiro",
+    tabs: [
+      "financeiro_recebimentos",
+      "financeiro_extrato",
+      "financeiro_saidas",
+    ],
+  },
+  {
+    label: "Gestão",
+    tabs: ["relatorios", "catalogo"],
+  },
+  {
+    label: "Marketing & Retenção",
+    tabs: ["campanhas", "fidelidade", "premios", "assinaturas", "indicacoes"],
+  },
+  { label: "Configuração", tabs: ["lembretes", "sistema"] },
+];
 
  const renderSidebarNavigation = (mobile = false) => (
  <nav

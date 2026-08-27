@@ -188,11 +188,5 @@ export default app;
   // Stub or actual implementation if needed. 
   // We'll leave it as a no-op or console.log to fix the build.
 
-export const notifyClientByEmail = async (clientId: any, appointment: any, kind: string, oldApt?: any) => {
-  console.log(`Stub: notifyClientByEmail called for client ${clientId}, kind ${kind}`);
-  return true;
-};
-export const notifyShopByEmail = async (appointment: any, kind: string, oldApt?: any) => {
-  console.log(`Stub: notifyShopByEmail called for appointment, kind ${kind}`);
-  return true;
-};
+export const notifyClientByEmail = async (clientId: string, appointment: any, action: string, oldApt?: any) => { console.log("notifyClient", clientId, action); };
+export const notifyShopByEmail = async (appointment: any, action: string, oldApt?: any) => { console.log("notifyShop", action); };
