@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from"react";
+import { useToast } from "../ui/Toast";
 import { createPortal } from"react-dom";
 import {
  BarChart3,
@@ -219,17 +220,14 @@ export const GoogleAdsManagement: React.FC<GoogleAdsManagementProps> = ({
 
  const sync = async () => {
  setSyncing(true);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
  setConnection((previous) =>
  previous
  ? { ...previous, lastSyncedAt: new Date().toISOString() }
  : previous,
  );
- setMessage({
- type:"success",
- text:"Dados demonstrativos atualizados. Nenhuma conta externa foi consultada.",
- });
+ showToast("success", "Sucesso", "Dados demonstrativos atualizados. Nenhuma conta externa foi consultada.",);
  setSyncing(false);
  return;
  }
@@ -266,16 +264,9 @@ export const GoogleAdsManagement: React.FC<GoogleAdsManagementProps> = ({
  }
  : previous,
  );
- setMessage({
- type:"success",
- text:"Campanhas e métricas atualizadas a partir do Google Ads.",
- });
+ showToast("success", "Sucesso", "Campanhas e métricas atualizadas a partir do Google Ads.",);
  } catch (error: any) {
- setMessage({
- type:"error",
- text:
- error?.message ||"Não foi possível sincronizar com o Google Ads.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível sincronizar com o Google Ads.",);
  } finally {
  setSyncing(false);
  }
@@ -314,36 +305,27 @@ export const GoogleAdsManagement: React.FC<GoogleAdsManagementProps> = ({
  normalized.descriptions.length < 2 ||
  normalized.keywords.length < 1
  ) {
- setMessage({
- type:"error",
- text:"Informe o nome, 3 títulos, 2 descrições e pelo menos 1 palavra-chave.",
- });
+ showToast("error", "Erro", "Informe o nome, 3 títulos, 2 descrições e pelo menos 1 palavra-chave.",);
  return;
  }
  setBusy(true);
- setMessage(null);
+ 
  try {
  if (CAMPAIGNS_DEMO_MODE) {
  const campaign = createDemoGoogleCampaign(normalized, campaigns.length);
  setCampaigns((previous) => [campaign, ...previous]);
  setForm(initialForm);
  setFormOpen(false);
- setMessage({
- type:"success",
- text:"Campanha criada apenas para demonstração. Nenhuma conta externa foi alterada.",
- });
+ showToast("success", "Sucesso", "Campanha criada apenas para demonstração. Nenhuma conta externa foi alterada.",);
  return;
  }
  const response = await createGoogleCampaign(normalized);
  setCampaigns((previous) => [response.campaign, ...previous]);
  setForm(initialForm);
  setFormOpen(false);
- setMessage({ type:"success", text: response.message });
+ showToast("success", "Sucesso", response.message);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível criar a campanha Google.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível criar a campanha Google.",);
  } finally {
  setBusy(false);
  }
@@ -391,11 +373,7 @@ export const GoogleAdsManagement: React.FC<GoogleAdsManagementProps> = ({
  :"Campanha pausada no Google Ads.",
  });
  } catch (error: any) {
- setMessage({
- type:"error",
- text:
- error?.message ||"Não foi possível alterar o status da campanha.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível alterar o status da campanha.",);
  } finally {
  setBusy(false);
  setStatusTarget(null);

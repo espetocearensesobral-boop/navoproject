@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from"react";
+import { useToast } from "../ui/Toast";
 import { createPortal } from"react-dom";
 import {
  BarChart3,
@@ -216,17 +217,14 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
 
  const sync = async () => {
  setSyncing(true);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
  setConnection((previous) =>
  previous
  ? { ...previous, lastSyncedAt: new Date().toISOString() }
  : previous,
  );
- setMessage({
- type:"success",
- text:"Dados demonstrativos atualizados. Nenhuma conta externa foi consultada.",
- });
+ showToast("success", "Sucesso", "Dados demonstrativos atualizados. Nenhuma conta externa foi consultada.",);
  setSyncing(false);
  return;
  }
@@ -255,15 +253,9 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
  : previous,
  );
  setLoadError(null);
- setMessage({
- type:"success",
- text:"Campanhas e métricas atualizadas a partir da Meta.",
- });
+ showToast("success", "Sucesso", "Campanhas e métricas atualizadas a partir da Meta.",);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível sincronizar com a Meta.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível sincronizar com a Meta.",);
  } finally {
  setSyncing(false);
  }
@@ -277,14 +269,11 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
  const create = async (event: React.FormEvent) => {
  event.preventDefault();
  if (!form.name.trim() || !form.imageUrl.trim()) {
- setMessage({
- type:"error",
- text:"Informe o nome e uma URL pública de imagem para o anúncio.",
- });
+ showToast("error", "Erro", "Informe o nome e uma URL pública de imagem para o anúncio.",);
  return;
  }
  setBusy(true);
- setMessage(null);
+ 
  try {
  if (CAMPAIGNS_DEMO_MODE) {
  const campaign = createDemoMetaCampaign(
@@ -298,10 +287,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
  setCampaigns((previous) => [campaign, ...previous]);
  setForm(initialForm);
  setFormOpen(false);
- setMessage({
- type:"success",
- text:"Campanha criada apenas para demonstração. Nenhuma conta externa foi alterada.",
- });
+ showToast("success", "Sucesso", "Campanha criada apenas para demonstração. Nenhuma conta externa foi alterada.",);
  return;
  }
  const response = await createMetaCampaign({
@@ -313,12 +299,9 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
  setTotals((previous) => previous);
  setForm(initialForm);
  setFormOpen(false);
- setMessage({ type:"success", text: response.message });
+ showToast("success", "Sucesso", response.message);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível criar a campanha.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível criar a campanha.",);
  } finally {
  setBusy(false);
  }
@@ -366,11 +349,7 @@ export const MetaAdsManagement: React.FC<MetaAdsManagementProps> = ({
  :"Campanha pausada na Meta.",
  });
  } catch (error: any) {
- setMessage({
- type:"error",
- text:
- error?.message ||"Não foi possível alterar o status da campanha.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível alterar o status da campanha.",);
  } finally {
  setBusy(false);
  setStatusTarget(null);

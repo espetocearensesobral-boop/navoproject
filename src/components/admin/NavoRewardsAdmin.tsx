@@ -267,11 +267,11 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  setSavingTiers(true);
  try {
  await saveAdminLoyaltyTiers(tiers);
- setConfigSuccessMsg("Níveis salvos com sucesso!");
+ showToast("success", "Sucesso", "Níveis salvos com sucesso!");
  await loadData();
- setTimeout(() => setConfigSuccessMsg(null), 4000);
+ setTimeout(() => showToast("success", "Sucesso", null), 4000);
  } catch (err: any) {
- alert(err.message ||"Erro ao salvar níveis.");
+ showToast("error", "Erro", err.message ||"Erro ao salvar níveis.");
  } finally {
  setSavingTiers(false);
  }
@@ -322,11 +322,11 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  setShowBenefitModal(false);
  setEditingBenefit(null);
  resetBenefitDraft();
- setConfigSuccessMsg("Benefício salvo com sucesso!");
+ showToast("success", "Sucesso", "Benefício salvo com sucesso!");
  await loadData();
- setTimeout(() => setConfigSuccessMsg(null), 4000);
+ setTimeout(() => showToast("success", "Sucesso", null), 4000);
  } catch (err: any) {
- alert(err.message ||"Erro ao salvar benefício.");
+ showToast("error", "Erro", err.message ||"Erro ao salvar benefício.");
  } finally {
  setSavingCatalogItem(false);
  }
@@ -346,11 +346,11 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  setShowPlanModal(false);
  setEditingPlan(null);
  resetPlanDraft();
- setConfigSuccessMsg("Plano salvo com sucesso!");
+ showToast("success", "Sucesso", "Plano salvo com sucesso!");
  await loadData();
- setTimeout(() => setConfigSuccessMsg(null), 4000);
+ setTimeout(() => showToast("success", "Sucesso", null), 4000);
  } catch (err: any) {
- alert(err.message ||"Erro ao salvar plano.");
+ showToast("error", "Erro", err.message ||"Erro ao salvar plano.");
  } finally {
  setSavingCatalogItem(false);
  }
@@ -410,10 +410,10 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  setSavingConfig(true);
  try {
  const res = await saveLoyaltyConfig(config);
- setConfigSuccessMsg(res.message ||"Configurações salvas!");
- setTimeout(() => setConfigSuccessMsg(null), 4000);
+ showToast("success", "Sucesso", res.message ||"Configurações salvas!");
+ setTimeout(() => showToast("success", "Sucesso", null), 4000);
  } catch (err: any) {
- alert(err.message ||"Erro ao salvar configurações.");
+ showToast("error", "Erro", err.message ||"Erro ao salvar configurações.");
  } finally {
  setSavingConfig(false);
  }
@@ -429,11 +429,11 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  setCampaignLoading(true);
  try {
  const res = await triggerInactiveClientsCampaign();
- setCampaignMsg(res.message);
+ showToast("success", "Sucesso", res.message);
  await loadData();
- setTimeout(() => setCampaignMsg(null), 5000);
+ setTimeout(() => showToast("success", "Sucesso", null), 5000);
  } catch (err: any) {
- alert(err.message ||"Erro ao disparar campanha");
+ showToast("error", "Erro", err.message ||"Erro ao disparar campanha");
  } finally {
  setCampaignLoading(false);
  }
@@ -453,7 +453,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  });
  await loadData();
  } catch (err: any) {
- alert(err.message ||"Erro ao criar recompensa.");
+ showToast("error", "Erro", err.message ||"Erro ao criar recompensa.");
  }
  };
 
@@ -463,14 +463,14 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  await deleteAdminReward(id);
  await loadData();
  } catch (err: any) {
- alert(err.message ||"Erro ao remover recompensa.");
+ showToast("error", "Erro", err.message ||"Erro ao remover recompensa.");
  }
  };
 
  const handleManualPointsSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!selectedClient) {
- alert("Selecione um cliente.");
+ showToast("error", "Erro", "Selecione um cliente.");
  return;
  }
  try {
@@ -479,12 +479,12 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  Number(manualPointsAmount),
  manualPointsReason,
  );
- setManualSuccessMsg(res.message);
+ showToast("success", "Sucesso", res.message);
  setManualPointsReason("");
  await loadData();
- setTimeout(() => setManualSuccessMsg(null), 4000);
+ setTimeout(() => showToast("success", "Sucesso", null), 4000);
  } catch (err: any) {
- alert(err.message ||"Erro ao ajustar pontos.");
+ showToast("error", "Erro", err.message ||"Erro ao ajustar pontos.");
  }
  };
 
@@ -561,7 +561,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  );
  setSelectedReview(null);
  } catch (error: any) {
- alert(error.message ||"Não foi possível salvar o acompanhamento.");
+ showToast("error", "Erro", error.message ||"Não foi possível salvar o acompanhamento.");
  } finally {
  setSavingReviewFollowup(false);
  }
@@ -708,19 +708,11 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  </button>
  </div>
 
- {campaignMsg && (
- <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-[var(--admin-radius-lg)] animate-fade-in">
- {campaignMsg}
- </div>
- )}
+ 
  </>
  )}
 
- {configSuccessMsg && (
- <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-[var(--admin-radius-lg)] animate-fade-in">
- {configSuccessMsg}
- </div>
- )}
+ 
 
  {/* 4. TABS SECUNDÁRIAS — mantidas apenas para compatibilidade quando o componente é usado sem rota própria. */}
  {!initialTab && (

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from"react";
+import { useToast } from "../ui/Toast";
 import { Professional } from"../../types";
 import {
  fetchProfessionalsFromSupabase,
@@ -133,8 +134,8 @@ export const ProfessionalsManagement: React.FC = () => {
  };
 
  const showToast = (msg: string) => {
- setToastMsg(msg);
- setTimeout(() => setToastMsg(null), 3000);
+ showToast("success", "Sucesso", msg);
+ setTimeout(() => showToast("success", "Sucesso", null), 3000);
  };
 
  const handleOpenCreate = () => {

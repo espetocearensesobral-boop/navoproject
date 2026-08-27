@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import re
+
+with open('src/components/ui/Toast.tsx', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# I will just write a completely fresh clean version for Toast.tsx
+clean_toast = """import React, { createContext, useContext, useState, useCallback } from 'react';
 import { CheckCircle2, XCircle, Info, AlertTriangle, X } from 'lucide-react';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -87,3 +93,9 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     </ToastContext.Provider>
   );
 };
+"""
+
+with open('src/components/ui/Toast.tsx', 'w', encoding='utf-8') as f:
+    f.write(clean_toast)
+
+print("Rewrote toast clean")

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useToast } from "../ui/Toast";
 import { createPortal } from "react-dom";
 import { Bot, Mail, MessageSquare, Phone, Send, Sparkles, X, Loader2 } from "lucide-react";
 import { authFetch } from "../../lib/api";

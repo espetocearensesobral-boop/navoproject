@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from"react";
+import { useToast } from "../ui/Toast";
 import {
  AlertCircle,
  Bell,
@@ -163,7 +164,7 @@ export const WhatsAppManagement: React.FC = () => {
 
  const handleSave = async () => {
  setSaving(true);
- setMessage(null);
+ 
  try {
  const payload: EvolutionApiSettingsInput = {
  enabled: settings.enabled,
@@ -185,19 +186,13 @@ export const WhatsAppManagement: React.FC = () => {
  setSettings(saved);
  setApiKeyInput("");
  setWebhookSecretInput("");
- setMessage({
- type:"success",
- text:"Configurações do WhatsApp salvas com sucesso.",
- });
+ showToast("success", "Sucesso", "Configurações do WhatsApp salvas com sucesso.",);
  // Atualiza o status em segundo plano para não travar o botão de salvar
  void fetchEvolutionApiStatus()
  .then((st) => setStatus(st))
  .catch(() => {});
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível salvar a configuração.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível salvar a configuração.",);
  } finally {
  setSaving(false);
  }
@@ -205,18 +200,15 @@ export const WhatsAppManagement: React.FC = () => {
 
  const handleTest = async () => {
  setTesting(true);
- setMessage(null);
+ 
  try {
  const result = await testEvolutionApi();
- setMessage({ type:"success", text: result });
+ showToast("success", "Sucesso", result);
  void fetchEvolutionApiStatus()
  .then((st) => setStatus(st))
  .catch(() => {});
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível testar a conexão com a Evolution API.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível testar a conexão com a Evolution API.",);
  } finally {
  setTesting(false);
  }
@@ -224,18 +216,15 @@ export const WhatsAppManagement: React.FC = () => {
 
  const handleApplyWebhook = async () => {
  setApplyingWebhook(true);
- setMessage(null);
+ 
  try {
  const result = await applyEvolutionWebhook();
- setMessage({ type:"success", text: result });
+ showToast("success", "Sucesso", result);
  void fetchEvolutionApiStatus()
  .then((st) => setStatus(st))
  .catch(() => {});
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível aplicar o webhook.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível aplicar o webhook.",);
  } finally {
  setApplyingWebhook(false);
  }
@@ -264,15 +253,12 @@ export const WhatsAppManagement: React.FC = () => {
  const handleSendTest = async () => {
  if (!testNumber.trim() || !testText.trim()) return;
  setSending(true);
- setMessage(null);
+ 
  try {
  const result = await sendEvolutionApiTest(testNumber, testText);
- setMessage({ type:"success", text: result });
+ showToast("success", "Sucesso", result);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível enviar a mensagem.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível enviar a mensagem.",);
  } finally {
  setSending(false);
  }
@@ -285,36 +271,27 @@ export const WhatsAppManagement: React.FC = () => {
  setCopiedWebhook(true);
  setTimeout(() => setCopiedWebhook(false), 2000);
  } catch {
- setMessage({ type:"error", text:"Não foi possível copiar automaticamente."});
+ showToast("error", "Erro", "Não foi possível copiar automaticamente.");
  }
  };
 
  const handleUseOriginWebhook = () => {
  const url = `${window.location.origin}/api/evolution/webhook`;
  update("webhookUrl", url);
- setMessage({
- type:"success",
- text:"URL do Webhook atualizada com o domínio atual deste servidor.",
- });
+ showToast("success", "Sucesso", "URL do Webhook atualizada com o domínio atual deste servidor.",);
  };
 
  const handleSimulateInbound = async () => {
  if (!simPhone.trim() || !simText.trim()) return;
  setSimLoading(true);
  setSimResult(null);
- setMessage(null);
+ 
  try {
  const result = await simulateInboundMessage(simPhone.trim(), simText.trim(), simPushName.trim());
  setSimResult(result);
- setMessage({
- type:"success",
- text:"Simulação executada com sucesso! Veja o resultado do NavoBot abaixo.",
- });
+ showToast("success", "Sucesso", "Simulação executada com sucesso! Veja o resultado do NavoBot abaixo.",);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível executar a simulação.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível executar a simulação.",);
  } finally {
  setSimLoading(false);
  }

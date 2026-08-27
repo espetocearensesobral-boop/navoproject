@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from"react";
+import { useToast } from "../ui/Toast";
 import {
  AlertTriangle,
  Boxes,
@@ -103,8 +104,8 @@ export const ProductsManagement: React.FC = () => {
  });
 
  const showToast = (message: string) => {
- setToast(message);
- window.setTimeout(() => setToast(null), 3500);
+ showToast("success", "Sucesso", message);
+ window.setTimeout(() => showToast("success", "Sucesso", null), 3500);
  };
 
  const openCreate = () => {
@@ -202,11 +203,7 @@ export const ProductsManagement: React.FC = () => {
  ]}
  />
 
- {toast && (
- <div className="rounded-[var(--admin-radius-lg)] border border-status-success/30 bg-status-success/10 p-3 text-xs font-semibold text-status-success">
- {toast}
- </div>
- )}
+ 
  {error && (
  <div className="rounded-[var(--admin-radius-lg)] border border-status-error/30 bg-status-error/10 p-3 text-xs font-semibold text-status-error flex items-center justify-between gap-3">
  <span>{error}</span>

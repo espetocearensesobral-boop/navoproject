@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from"react";
+import { useToast } from "../ui/Toast";
 import {
  AlertCircle,
  CheckCircle2,
@@ -54,7 +55,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
  const load = async () => {
  setLoading(true);
  setLoadError(null);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
  setStatus({
  configured: true,
@@ -95,26 +96,17 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
  const result = params.get("google_ads_result");
  const reason = params.get("reason");
  if (result ==="connected")
- setMessage({
- type:"success",
- text:"Conta Google autorizada. Confirme a conta de anúncios abaixo.",
- });
+ showToast("success", "Sucesso", "Conta Google autorizada. Confirme a conta de anúncios abaixo.",);
  if (result ==="error")
- setMessage({
- type:"error",
- text: reason ||"A autorização Google não foi concluída.",
- });
+ showToast("error", "Erro", reason ||"A autorização Google não foi concluída.",);
  if (result) window.history.replaceState({},"","/admin");
  }, []);
 
  const connect = async () => {
  setBusy(true);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
- setMessage({
- type:"success",
- text:"A conexão Google é apenas demonstrativa. Nenhuma autorização foi iniciada.",
- });
+ showToast("success", "Sucesso", "A conexão Google é apenas demonstrativa. Nenhuma autorização foi iniciada.",);
  setBusy(false);
  return;
  }
@@ -122,18 +114,14 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
  const response = await startGoogleAdsOAuth();
  window.location.assign(response.url);
  } catch (error: any) {
- setMessage({
- type:"error",
- text:
- error?.message ||"Não foi possível iniciar a conexão Google Ads.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível iniciar a conexão Google Ads.",);
  setBusy(false);
  }
  };
 
  const refreshAssets = async () => {
  setBusy(true);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
  setCustomers([...demoGoogleCustomers]);
  setStatus((previous) =>
@@ -147,10 +135,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
  }
  : previous,
  );
- setMessage({
- type:"success",
- text:"Contas demonstrativas atualizadas. Nenhuma conta externa foi consultada.",
- });
+ showToast("success", "Sucesso", "Contas demonstrativas atualizadas. Nenhuma conta externa foi consultada.",);
  setBusy(false);
  return;
  }
@@ -160,13 +145,9 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
  setStatus((previous) =>
  previous ? { ...previous, connection: response.connection } : previous,
  );
- setMessage({ type:"success", text:"Contas Google Ads atualizadas."});
+ showToast("success", "Sucesso", "Contas Google Ads atualizadas.");
  } catch (error: any) {
- setMessage({
- type:"error",
- text:
- error?.message ||"Não foi possível atualizar as contas Google Ads.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível atualizar as contas Google Ads.",);
  } finally {
  setBusy(false);
  }
@@ -174,11 +155,11 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
 
  const saveCustomer = async () => {
  if (!customerId) {
- setMessage({ type:"error", text:"Selecione uma conta Google Ads."});
+ showToast("error", "Erro", "Selecione uma conta Google Ads.");
  return;
  }
  setBusy(true);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
  const customer = demoGoogleCustomers.find(
  (item) => item.customerId === customerId,
@@ -196,10 +177,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
  }
  : previous,
  );
- setMessage({
- type:"success",
- text:"Conta atualizada apenas na demonstração. Nenhuma conta Google foi alterada.",
- });
+ showToast("success", "Sucesso", "Conta atualizada apenas na demonstração. Nenhuma conta Google foi alterada.",);
  setBusy(false);
  return;
  }
@@ -209,15 +187,9 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
  previous ? { ...previous, connection: response.connection } : previous,
  );
  setLoadError(null);
- setMessage({
- type:"success",
- text:"Conta Google Ads salva. O módulo Campanhas já pode usar esta conta.",
- });
+ showToast("success", "Sucesso", "Conta Google Ads salva. O módulo Campanhas já pode usar esta conta.",);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível salvar a conta Google Ads.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível salvar a conta Google Ads.",);
  } finally {
  setBusy(false);
  }
@@ -241,10 +213,7 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
  );
  setCustomers([]);
  setCustomerId("");
- setMessage({
- type:"success",
- text:"Conexão demonstrativa removida apenas desta tela. Nenhum token ou ativo real foi alterado.",
- });
+ showToast("success", "Sucesso", "Conexão demonstrativa removida apenas desta tela. Nenhum token ou ativo real foi alterado.",);
  return;
  }
  await disconnectGoogleAds();
@@ -253,15 +222,9 @@ export const GoogleAdsSettings: React.FC<GoogleAdsSettingsProps> = ({
  );
  setCustomers([]);
  setCustomerId("");
- setMessage({
- type:"success",
- text:"Conexão removida do Navo. O histórico local de campanhas foi preservado.",
- });
+ showToast("success", "Sucesso", "Conexão removida do Navo. O histórico local de campanhas foi preservado.",);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível remover a conexão.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível remover a conexão.",);
  } finally {
  setBusy(false);
  setDisconnectOpen(false);

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from"react";
+import { useToast } from "../ui/Toast";
 import {
  CheckCircle2,
  ExternalLink,
@@ -58,7 +59,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
  const load = async () => {
  setLoading(true);
  setLoadError(null);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
  setStatus({
  configured: true,
@@ -101,26 +102,17 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
  const result = params.get("metaAds");
  const reason = params.get("reason");
  if (result ==="connected")
- setMessage({
- type:"success",
- text:"Conta Meta autorizada. Confirme a conta de anúncios e a Página abaixo.",
- });
+ showToast("success", "Sucesso", "Conta Meta autorizada. Confirme a conta de anúncios e a Página abaixo.",);
  if (result ==="error")
- setMessage({
- type:"error",
- text: reason ||"A autorização Meta não foi concluída.",
- });
+ showToast("error", "Erro", reason ||"A autorização Meta não foi concluída.",);
  if (result) window.history.replaceState({},"","/admin");
  }, []);
 
  const connect = async () => {
  setBusy(true);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
- setMessage({
- type:"success",
- text:"A conexão Meta é apenas demonstrativa. Nenhuma autorização foi iniciada.",
- });
+ showToast("success", "Sucesso", "A conexão Meta é apenas demonstrativa. Nenhuma autorização foi iniciada.",);
  setBusy(false);
  return;
  }
@@ -128,17 +120,14 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
  const response = await startMetaAdsOAuth();
  window.location.assign(response.url);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível iniciar a conexão Meta.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível iniciar a conexão Meta.",);
  setBusy(false);
  }
  };
 
  const refreshAssets = async () => {
  setBusy(true);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
  setAccounts([...demoMetaAccounts]);
  setPages([...demoMetaPages]);
@@ -153,10 +142,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
  }
  : previous,
  );
- setMessage({
- type:"success",
- text:"Ativos demonstrativos atualizados. Nenhuma conta externa foi consultada.",
- });
+ showToast("success", "Sucesso", "Ativos demonstrativos atualizados. Nenhuma conta externa foi consultada.",);
  setBusy(false);
  return;
  }
@@ -167,12 +153,9 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
  setStatus((previous) =>
  previous ? { ...previous, connection: response.connection } : previous,
  );
- setMessage({ type:"success", text:"Ativos da Meta atualizados."});
+ showToast("success", "Sucesso", "Ativos da Meta atualizados.");
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível atualizar os ativos.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível atualizar os ativos.",);
  } finally {
  setBusy(false);
  }
@@ -180,14 +163,11 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
 
  const saveAssets = async () => {
  if (!accountId || !pageId) {
- setMessage({
- type:"error",
- text:"Selecione uma conta de anúncios e uma Página.",
- });
+ showToast("error", "Erro", "Selecione uma conta de anúncios e uma Página.",);
  return;
  }
  setBusy(true);
- setMessage(null);
+ 
  if (CAMPAIGNS_DEMO_MODE) {
  const account = demoMetaAccounts.find((item) => item.id === accountId);
  const page = demoMetaPages.find((item) => item.id === pageId);
@@ -206,10 +186,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
  }
  : previous,
  );
- setMessage({
- type:"success",
- text:"Seleção atualizada apenas na demonstração. Nenhum ativo Meta foi alterado.",
- });
+ showToast("success", "Sucesso", "Seleção atualizada apenas na demonstração. Nenhum ativo Meta foi alterado.",);
  setBusy(false);
  return;
  }
@@ -219,15 +196,9 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
  previous ? { ...previous, connection: response.connection } : previous,
  );
  setLoadError(null);
- setMessage({
- type:"success",
- text:"Ativos Meta salvos. O módulo Campanhas já pode usar essa conta.",
- });
+ showToast("success", "Sucesso", "Ativos Meta salvos. O módulo Campanhas já pode usar essa conta.",);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível salvar os ativos.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível salvar os ativos.",);
  } finally {
  setBusy(false);
  }
@@ -254,10 +225,7 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
  setPages([]);
  setAccountId("");
  setPageId("");
- setMessage({
- type:"success",
- text:"Conexão demonstrativa removida apenas desta tela. Nenhum token ou ativo real foi alterado.",
- });
+ showToast("success", "Sucesso", "Conexão demonstrativa removida apenas desta tela. Nenhum token ou ativo real foi alterado.",);
  return;
  }
  await disconnectMetaAds();
@@ -268,15 +236,9 @@ export const MetaAdsSettings: React.FC<MetaAdsSettingsProps> = ({
  setPages([]);
  setAccountId("");
  setPageId("");
- setMessage({
- type:"success",
- text:"Conexão removida do Navo. O histórico local de campanhas foi preservado.",
- });
+ showToast("success", "Sucesso", "Conexão removida do Navo. O histórico local de campanhas foi preservado.",);
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível remover a conexão.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível remover a conexão.",);
  } finally {
  setBusy(false);
  setDisconnectOpen(false);

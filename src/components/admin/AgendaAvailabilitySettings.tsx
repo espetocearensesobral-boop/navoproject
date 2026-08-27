@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from"react";
+import { useToast } from "../ui/Toast";
 import {
  AlertCircle,
  BarChart3,
@@ -47,10 +48,7 @@ export const AgendaAvailabilitySettings: React.FC = () => {
  })
  .catch((error: any) => {
  if (!cancelled)
- setStatusMsg({
- type:"error",
- text: error.message ||"Não foi possível carregar a Agenda.",
- });
+ showToast("error", "Erro", error.message ||"Não foi possível carregar a Agenda.",);
  })
  .finally(() => {
  if (!cancelled) setLoading(false);
@@ -65,31 +63,25 @@ export const AgendaAvailabilitySettings: React.FC = () => {
  value: OperationSettings[K],
  ) => {
  setSettings((current) => ({ ...current, [key]: value }));
- setStatusMsg(null);
+ 
  };
 
  const handleCancel = () => {
  setSettings(savedSettings);
- setStatusMsg({ type:"success", text:"Alterações descartadas."});
+ showToast("success", "Sucesso", "Alterações descartadas.");
  };
 
  const handleSave = async () => {
- setStatusMsg(null);
+ 
  if (
  settings.maximumBookingHorizonDays < 1 ||
  settings.maximumBookingHorizonDays > 730
  ) {
- setStatusMsg({
- type:"error",
- text:"O limite deve ficar entre 1 e 730 dias.",
- });
+ showToast("error", "Erro", "O limite deve ficar entre 1 e 730 dias.",);
  return;
  }
  if (!/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(settings.reportsDayStartTime)) {
- setStatusMsg({
- type:"error",
- text:"Informe um início válido entre 00:00 e 23:59.",
- });
+ showToast("error", "Erro", "Informe um início válido entre 00:00 e 23:59.",);
  return;
  }
  setIsSaving(true);
@@ -97,12 +89,9 @@ export const AgendaAvailabilitySettings: React.FC = () => {
  const saved = await saveOperationSettings(settings);
  setSettings(saved);
  setSavedSettings(saved);
- setStatusMsg({ type:"success", text:"Configurações salvas."});
+ showToast("success", "Sucesso", "Configurações salvas.");
  } catch (error: any) {
- setStatusMsg({
- type:"error",
- text: error.message ||"Não foi possível salvar as configurações.",
- });
+ showToast("error", "Erro", error.message ||"Não foi possível salvar as configurações.",);
  } finally {
  setIsSaving(false);
  }

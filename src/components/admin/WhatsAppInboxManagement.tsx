@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from"react";
+import { useToast } from "../ui/Toast";
 import {
  Bot,
  CheckCircle2,
@@ -80,7 +81,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
  } catch (error: any) {
  console.error("Erro ao carregar conversas:", error);
  if (!silent) {
- setMessage({ type:"error", text:"Erro ao carregar conversas."});
+ showToast("error", "Erro", "Erro ao carregar conversas.");
  }
  } finally {
  if (!silent) setConversationsLoading(false);
@@ -100,16 +101,10 @@ export const WhatsAppInboxManagement: React.FC = () => {
  setResumingId(convId);
  try {
  await resumeBotForConversation(convId, true);
- setMessage({
- type:"success",
- text:"Assistente virtual reativado com sucesso para este cliente.",
- });
+ showToast("success", "Sucesso", "Assistente virtual reativado com sucesso para este cliente.",);
  await loadConversations();
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível reativar o robô.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível reativar o robô.",);
  } finally {
  setResumingId(null);
  }
@@ -119,16 +114,10 @@ export const WhatsAppInboxManagement: React.FC = () => {
  setResolvingId(convId);
  try {
  await resolveBotConversation(convId);
- setMessage({
- type:"success",
- text:"Atendimento concluído com sucesso.",
- });
+ showToast("success", "Sucesso", "Atendimento concluído com sucesso.",);
  await loadConversations();
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível concluir o atendimento.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível concluir o atendimento.",);
  } finally {
  setResolvingId(null);
  }
@@ -141,16 +130,10 @@ export const WhatsAppInboxManagement: React.FC = () => {
  try {
  await sendManualBotMessage(convId, text);
  setManualReplyText((prev) => ({ ...prev, [convId]:""}));
- setMessage({
- type:"success",
- text:"Mensagem enviada com sucesso ao cliente!",
- });
+ showToast("success", "Sucesso", "Mensagem enviada com sucesso ao cliente!",);
  await loadConversations();
  } catch (error: any) {
- setMessage({
- type:"error",
- text: error?.message ||"Não foi possível enviar a mensagem.",
- });
+ showToast("error", "Erro", error?.message ||"Não foi possível enviar a mensagem.",);
  } finally {
  setReplyingId(null);
  }

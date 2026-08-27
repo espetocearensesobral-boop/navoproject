@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from"react";
+import { useToast } from "../ui/Toast";
 import {
  Save,
  CheckCircle2,
@@ -150,10 +151,7 @@ const EmailSettingsTab: React.FC = () => {
  })
  .catch((e) => {
  if (!cancelled)
- setStatusMsg({
- type:"error",
- text: e.message ||"Erro ao carregar configurações.",
- });
+ showToast("error", "Erro", e.message ||"Erro ao carregar configurações.",);
  })
  .finally(() => {
  if (!cancelled) setLoading(false);
@@ -172,7 +170,7 @@ const EmailSettingsTab: React.FC = () => {
 
  const handleSave = async () => {
  setIsSaving(true);
- setStatusMsg(null);
+ 
  try {
  const payload: Partial<EmailSettings> & { smtpPassword?: string } = {
  ...settings,
@@ -185,15 +183,9 @@ const EmailSettingsTab: React.FC = () => {
  const saved = await saveEmailSettings(payload);
  setSettings(saved);
  setSmtpPasswordInput("");
- setStatusMsg({
- type:"success",
- text:"Configurações de e-mail salvas com sucesso!",
- });
+ showToast("success", "Sucesso", "Configurações de e-mail salvas com sucesso!",);
  } catch (e: any) {
- setStatusMsg({
- type:"error",
- text: e.message ||"Erro ao salvar configurações de e-mail.",
- });
+ showToast("error", "Erro", e.message ||"Erro ao salvar configurações de e-mail.",);
  } finally {
  setIsSaving(false);
  }
@@ -202,15 +194,12 @@ const EmailSettingsTab: React.FC = () => {
  const handleTestSend = async () => {
  if (!testEmail.trim()) return;
  setIsTesting(true);
- setStatusMsg(null);
+ 
  try {
  const msg = await sendTestEmail(testEmail.trim());
- setStatusMsg({ type:"success", text: msg });
+ showToast("success", "Sucesso", msg);
  } catch (e: any) {
- setStatusMsg({
- type:"error",
- text: e.message ||"Erro ao enviar e-mail de teste.",
- });
+ showToast("error", "Erro", e.message ||"Erro ao enviar e-mail de teste.",);
  } finally {
  setIsTesting(false);
  }
@@ -459,10 +448,7 @@ const EmailSettingsTab: React.FC = () => {
  .then((data) => {
  setSettings(data);
  setSmtpPasswordInput("");
- setStatusMsg({
- type:"success",
- text:"Alterações descartadas.",
- });
+ showToast("success", "Sucesso", "Alterações descartadas.",);
  })
  .catch((e) =>
  setStatusMsg({
@@ -565,10 +551,7 @@ const PrintSettingsTab: React.FC = () => {
  try {
  const saved = await savePrintSettings(settings);
  setSettings(saved);
- setStatus({
- type:"success",
- text:"Configurações de impressão salvas com sucesso.",
- });
+ showToast("success", "Sucesso", "Configurações de impressão salvas com sucesso.",);
  } catch (error: any) {
  setStatus({
  type:"error",
@@ -585,7 +568,7 @@ const PrintSettingsTab: React.FC = () => {
  try {
  const saved = await fetchPrintSettings();
  setSettings(saved);
- setStatus({ type:"success", text:"Alterações descartadas."});
+ showToast("success", "Sucesso", "Alterações descartadas.");
  } catch (error: any) {
  setStatus({
  type:"error",
@@ -599,10 +582,7 @@ const PrintSettingsTab: React.FC = () => {
  const openPreview = (kind:"receipt"|"report"|"qr") => {
  const popup = window.open("","_blank","width=760,height=900");
  if (!popup) {
- setStatus({
- type:"error",
- text:"O preview foi bloqueado pelo navegador. Permita pop-ups para testar a impressão.",
- });
+ showToast("error", "Erro", "O preview foi bloqueado pelo navegador. Permita pop-ups para testar a impressão.",);
  return;
  }
  const format =
