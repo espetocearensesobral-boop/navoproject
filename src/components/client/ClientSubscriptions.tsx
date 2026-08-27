@@ -1,10 +1,26 @@
 import React, { useState } from 'react';
-import { SUBSCRIPTION_PLANS, DEFAULT_USER_SUBSCRIPTION } from '../../data/constants';
+import { DEFAULT_USER_SUBSCRIPTION } from '../../data/constants';
+import { useEffect } from 'react';
 import { Crown, Check, AlertCircle, Sparkles, RefreshCw } from 'lucide-react';
 
 export const ClientSubscriptions: React.FC = () => {
   const [userSub, setUserSub] = useState(DEFAULT_USER_SUBSCRIPTION);
-  const [selectedPlanId, setSelectedPlanId] = useState<string>('plan_gold');
+  const [selectedPlanId, setSelectedPlanId] = useState<string>('');
+  const [subscriptionPlans, setSubscriptionPlans] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const res = await fetch('/api/subscriptions/plans');
+        if (res.ok) {
+          const data = await res.json();
+          setSubscriptionPlans(data);
+          if (data.length > 0) setSelectedPlanId(data[0].id);
+        }
+      } catch (e) {}
+    };
+    fetchPlans();
+  }, []);
 
   const handlePause = () => {
     setUserSub(prev => ({
@@ -69,7 +85,7 @@ export const ClientSubscriptions: React.FC = () => {
         </h3>
 
         <div className="space-y-4">
-          {SUBSCRIPTION_PLANS.map((plan) => {
+          {subscriptionPlans.map((plan) => {
             const isSelected = selectedPlanId === plan.id;
             return (
               <div

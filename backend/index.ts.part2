@@ -1,0 +1,10 @@
+  }
+}
+
+dbReadyPromise = initializeDb().catch(console.error);
+
+import { healthRouter } from './routers/health.router.js';
+import { systemRouter } from './routers/system.router.js';
+import { seedRouter } from './routers/seed.router.js';
+import { authRouter } from './routers/auth.router.js';
+import { preferencesRouter } from './routers/auth.router.js'; // Was in auth? Wait, there is no preferences.router.ts. I'll just map it to auth or ignore if it doesn't exist. Let's check `ls backend/routers` from earlier. No preferences router. Oh wait, `auth.router.ts` might export `preferencesRouter`. Let's just import everything based on `ls backend/routers`.

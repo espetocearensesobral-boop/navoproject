@@ -39,71 +39,31 @@ export interface AuditLogItem {
 }
 
 export const AuditLogsManagement: React.FC = () => {
-  const [logs, setLogs] = useState<AuditLogItem[]>(() => {
-    const saved = localStorage.getItem("navo_audit_logs_v1");
-    if (saved) {
+  const [logs, setLogs] = useState<AuditLogItem[]>([]);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
       try {
-        return JSON.parse(saved);
-      } catch (e) {
-        /* ignore */
-      }
-    }
-    return [
-      {
-        id: "log_01",
-        timestamp: new Date(Date.now() - 10 * 60000).toISOString(),
-        operatorName: "Gerente Carlos",
-        category: "comandas",
-        action: "Fechamento de Comanda CMD-001",
-        details:
-          "Comanda do cliente Marcos Oliveira encerrada com sucesso no valor de R$ 100,00 via PIX.",
-        ipAddress: "192.168.1.104",
-        status: "success",
-      },
-      {
-        id: "log_02",
-        timestamp: new Date(Date.now() - 45 * 60000).toISOString(),
-        operatorName: "Gerente Carlos",
-        category: "caixa",
-        action: "Abertura de Caixa do Dia",
-        details: "Caixa aberto com fundo inicial de troco de R$ 200,00.",
-        ipAddress: "192.168.1.104",
-        status: "success",
-      },
-      {
-        id: "log_03",
-        timestamp: new Date(Date.now() - 2 * 3600000).toISOString(),
-        operatorName: "Lucas Silva (Barbeiro)",
-        category: "agendamentos",
-        action: "Horário de Agendamento Alterado",
-        details:
-          "Agendamento #A-204 do cliente Rafael Costa alterado das 14:00 para as 14:30.",
-        ipAddress: "192.168.1.112",
-        status: "warning",
-      },
-      {
-        id: "log_04",
-        timestamp: new Date(Date.now() - 5 * 3600000).toISOString(),
-        operatorName: "Gerente Carlos",
-        category: "estoque",
-        action: "Ajuste de Estoque de Produto",
-        details:
-          'Produto "Pomada Matte Clay 100g" teve estoque reajustado de 15 para 25 unidades.',
-        ipAddress: "192.168.1.104",
-        status: "success",
-      },
-      {
-        id: "log_05",
-        timestamp: new Date(Date.now() - 24 * 3600000).toISOString(),
-        operatorName: "Sistema (Automação)",
-        category: "autenticacao",
-        action: "Login Administrativo Realizado",
-        details: "Sessão administrativa iniciada com perfil de Admin.",
-        ipAddress: "189.40.22.11",
-        status: "success",
-      },
-    ];
-  });
+        const res = await fetch('/api/audit');
+        if (res.ok) {
+          const data = await res.json();
+          // Map DB structure to AuditLogItem
+          const mapped = data.map((d: any) => ({
+            id: d.id,
+            timestamp: d.createdAt,
+            operatorName: d.user,
+            category: d.type,
+            action: d.action,
+            details: d.details,
+            status: 'success',
+            ipAddress: '127.0.0.1'
+          }));
+          setLogs(mapped);
+        }
+      } catch (e) {}
+    };
+    fetchLogs();
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");

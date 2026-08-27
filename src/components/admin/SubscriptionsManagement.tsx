@@ -50,109 +50,44 @@ export interface SubscriberMember {
 }
 
 export const SubscriptionsManagement: React.FC = () => {
-  const [plans, setPlans] = useState<SubscriptionPlan[]>(() => {
-    const saved = localStorage.getItem("navo_sub_plans_v1");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        /* ignore */
-      }
-    }
-    return [
-      {
-        id: "plan_barba",
-        name: "Clube Barba VIP",
-        price: 89.9,
-        billingCycle: "monthly",
-        includedServices: ["Barba Imperial", "Toalha Quente", "Acabamento"],
-        productDiscountPct: 10,
-        barberPerCutFee: 20.0,
-        activeSubscribersCount: 28,
-        popular: false,
-      },
-      {
-        id: "plan_gold",
-        name: "Clube Cabelo & Barba Gold",
-        price: 159.9,
-        billingCycle: "monthly",
-        includedServices: [
-          "Cortes Ilimitados",
-          "Barba Ilimitada",
-          "Bebida Cortesia",
-        ],
-        productDiscountPct: 15,
-        barberPerCutFee: 25.0,
-        activeSubscribersCount: 64,
-        popular: true,
-      },
-      {
-        id: "plan_executive",
-        name: "Clube Executive Club",
-        price: 249.9,
-        billingCycle: "monthly",
-        includedServices: [
-          "Corte + Barba Ilimitados",
-          "Selagem / Pigmentação",
-          "15% Desc. em Produtos",
-          "Atendimento Preferencial",
-        ],
-        productDiscountPct: 20,
-        barberPerCutFee: 35.0,
-        activeSubscribersCount: 19,
-        popular: false,
-      },
-    ];
-  });
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [members, setMembers] = useState<SubscriberMember[]>(() => {
-    const saved = localStorage.getItem("navo_sub_members_v1");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        /* ignore */
+  const fetchPlans = async () => {
+    try {
+      const res = await fetch('/api/subscriptions/plans');
+      if (res.ok) {
+        const data = await res.json();
+        setPlans(data);
       }
+    } catch (error) {
+      console.error(error);
     }
-    return [
-      {
-        id: "mem_1",
-        clientName: "Fernando Henrique",
-        clientPhone: "(11) 98877-6655",
-        planName: "Clube Cabelo & Barba Gold",
-        planId: "plan_gold",
-        status: "active",
-        joinedDate: "2026-01-15",
-        nextBillingDate: "2026-08-15",
-        cutsUsedThisMonth: 3,
-        monthlyLimit: "unlimited",
-      },
-      {
-        id: "mem_2",
-        clientName: "Lucas Mendes",
-        clientPhone: "(11) 97766-5544",
-        planName: "Clube Barba VIP",
-        planId: "plan_barba",
-        status: "active",
-        joinedDate: "2026-03-01",
-        nextBillingDate: "2026-09-01",
-        cutsUsedThisMonth: 2,
-        monthlyLimit: "unlimited",
-      },
-      {
-        id: "mem_3",
-        clientName: "Roberto Alves",
-        clientPhone: "(11) 96655-4433",
-        planName: "Clube Executive Club",
-        planId: "plan_executive",
-        status: "active",
-        joinedDate: "2025-11-10",
-        nextBillingDate: "2026-08-10",
-        cutsUsedThisMonth: 4,
-        monthlyLimit: "unlimited",
-      },
-    ];
-  });
+  };
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const [members, setMembers] = useState<SubscriberMember[]>([]);
+
+  const fetchMembers = async () => {
+    try {
+      const res = await fetch('/api/subscriptions/members');
+      if (res.ok) {
+        const data = await res.json();
+        setMembers(data);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMembers();
+  }, []);
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<
@@ -161,9 +96,7 @@ export const SubscriptionsManagement: React.FC = () => {
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    localStorage.setItem("navo_sub_plans_v1", JSON.stringify(plans));
-  }, [plans]);
+  
 
   // New Plan Form State
   const [newPlanName, setNewPlanName] = useState("");

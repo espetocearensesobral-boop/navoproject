@@ -802,3 +802,56 @@ export const googleAdsLeads = pgTable('google_ads_leads', {
   ownerIdx: index('google_ads_leads_owner_idx').on(table.ownerId),
   campaignIdx: index('google_ads_leads_campaign_idx').on(table.campaignId),
 }));
+
+export const subscriptionPlans = pgTable('subscription_plans', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  price: numeric('price', { precision: 10, scale: 2 }).notNull().default('0'),
+  billingCycle: text('billing_cycle').notNull().default('monthly'),
+  includedServices: jsonb('included_services').notNull().default('[]'),
+  productDiscountPct: numeric('product_discount_pct', { precision: 5, scale: 2 }).notNull().default('0'),
+  barberPerCutFee: numeric('barber_per_cut_fee', { precision: 10, scale: 2 }).notNull().default('0'),
+  activeSubscribersCount: integer('active_subscribers_count').notNull().default(0),
+  popular: boolean('popular').notNull().default(false),
+  description: text('description'),
+  features: jsonb('features').notNull().default('[]'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const subscriptionMembers = pgTable('subscription_members', {
+  id: text('id').primaryKey(),
+  clientName: text('client_name').notNull(),
+  clientPhone: text('client_phone').notNull(),
+  planName: text('plan_name').notNull(),
+  planId: text('plan_id').references(() => subscriptionPlans.id, { onDelete: 'set null' }),
+  status: text('status').notNull().default('active'),
+  joinedDate: text('joined_date').notNull(),
+  nextBillingDate: text('next_billing_date').notNull(),
+  cutsUsedThisMonth: integer('cuts_used_this_month').notNull().default(0),
+  monthlyLimit: integer('monthly_limit'), // null means unlimited
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const auditLogs = pgTable('audit_logs', {
+  id: text('id').primaryKey(),
+  action: text('action').notNull(),
+  user: text('user').notNull(),
+  date: text('date').notNull(),
+  details: text('details').notNull(),
+  type: text('type').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const appointmentReminders = pgTable('appointment_reminders', {
+  id: text('id').primaryKey(),
+  appointmentId: text('appointment_id').references(() => appointments.id, { onDelete: 'cascade' }),
+  clientName: text('client_name').notNull(),
+  clientPhone: text('client_phone').notNull(),
+  serviceTitle: text('service_title').notNull(),
+  professionalName: text('professional_name').notNull(),
+  date: text('date').notNull(),
+  timeSlot: text('time_slot').notNull(),
+  status: text('status').notNull().default('pending'),
+  sentAt: text('sent_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});

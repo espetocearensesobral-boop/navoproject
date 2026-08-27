@@ -56,14 +56,24 @@ export const AppointmentRemindersManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<ReminderCategory>("2h");
   const [search, setSearch] = useState("");
-  const [sentReminders, setSentReminders] = useState<Record<string, string>>(() => {
-    try {
-      const stored = localStorage.getItem("navo_sent_reminders_v1");
-      return stored ? JSON.parse(stored) : {};
-    } catch {
-      return {};
-    }
-  });
+  const [sentReminders, setSentReminders] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchRem = async () => {
+      try {
+        const res = await fetch('/api/reminders');
+        if (res.ok) {
+          const data = await res.json();
+          const mapped: Record<string, string> = {};
+          data.forEach((r: any) => {
+            mapped[r.appointmentId] = r.sentAt;
+          });
+          setSentReminders(mapped);
+        }
+      } catch(e){}
+    };
+    fetchRem();
+  }, []);
   const [evolutionSettings, setEvolutionSettings] = useState<EvolutionApiSettings | null>(null);
   const [evolutionStatus, setEvolutionStatus] = useState<EvolutionApiStatus | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
@@ -173,12 +183,27 @@ export const AppointmentRemindersManagement: React.FC = () => {
     });
   }, [reminders, activeCategory, search]);
 
-  const markAsSent = (id: string) => {
-    const updated = { ...sentReminders, [id]: new Date().toISOString() };
-    setSentReminders(updated);
+  const markAsSent = async (id: string, apt?: any) => {
+    const ts = new Date().toISOString();
+    setSentReminders(prev => ({ ...prev, [id]: ts }));
+    if (!apt) return;
     try {
-      localStorage.setItem("navo_sent_reminders_v1", JSON.stringify(updated));
-    } catch {}
+      await fetch('/api/reminders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appointmentId: id,
+          clientName: apt.clientName || 'Cliente',
+          clientPhone: apt.clientPhone || '000',
+          serviceTitle: apt.serviceTitle || 'Serviço',
+          professionalName: apt.professionalName || 'Profissional',
+          date: apt.date || '',
+          timeSlot: apt.timeSlot || '',
+          sentAt: ts,
+          status: 'sent'
+        })
+      });
+    } catch(e) {}
   };
 
   const handleSendDirectWhatsApp = (item: ReminderItem) => {
