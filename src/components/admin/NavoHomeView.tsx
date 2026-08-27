@@ -302,7 +302,7 @@ export const NavoHomeView: React.FC<NavoHomeViewProps> = ({
  </>
  ) : (
  <>
- <article className="admin-dashboard-metric is-emphasis">
+ <article className="admin-dashboard-metric">
  <div className="admin-dashboard-metric-label">
  <Banknote className="h-4 w-4"/>
  Recebido hoje
