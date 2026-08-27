@@ -1,11 +1,11 @@
-import React from "react";
-import { LucideIcon } from "lucide-react";
+import React from"react";
+import { LucideIcon } from"lucide-react";
 
 /**
  * Padrão único de abas (navegação secundária) para todas as telas do /admin.
  *
  * Antes desta unificação, cada tela reimplementava sua própria lista de
- * botões de aba com estilos visuais diferentes (algumas em "pílula" dourada,
+ * botões de aba com estilos visuais diferentes (algumas em"pílula"dourada,
  * outras com sublinhado, outras com cantos arredondados só em cima) e a
  * mesma string de className duplicada em cada `<button>`. Isso fazia o app
  * parecer inconsistente ao navegar entre módulos e multiplicava o trabalho
@@ -17,68 +17,68 @@ import { LucideIcon } from "lucide-react";
  */
 
 export interface AdminTabItem {
-  id: string;
-  label: string;
-  icon?: LucideIcon;
-  /** Contador opcional (ex: nº de comandas abertas) exibido como badge. */
-  count?: number;
-  disabled?: boolean;
+ id: string;
+ label: string;
+ icon?: LucideIcon;
+ /** Contador opcional (ex: nº de comandas abertas) exibido como badge. */
+ count?: number;
+ disabled?: boolean;
 }
 
 interface AdminTabsProps {
-  tabs: AdminTabItem[];
-  activeId: string;
-  onChange: (id: string) => void;
-  /** Classes extras opcionais (ex: espaçamento específico da tela). */
-  className?: string;
+ tabs: AdminTabItem[];
+ activeId: string;
+ onChange: (id: string) => void;
+ /** Classes extras opcionais (ex: espaçamento específico da tela). */
+ className?: string;
 }
 
 export const AdminTabs: React.FC<AdminTabsProps> = ({
-  tabs,
-  activeId,
-  onChange,
-  className = "",
+ tabs,
+ activeId,
+ onChange,
+ className ="",
 }) => {
-  return (
-    <div
-      className={`admin-tabs flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 ${className}`}
-    >
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
-        const isActive = activeId === tab.id;
-        return (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => !tab.disabled && onChange(tab.id)}
-            disabled={tab.disabled}
-            aria-disabled={tab.disabled || undefined}
-            aria-current={isActive ? "page" : undefined}
-            title={tab.label}
-            className={`admin-tab shrink-0 min-h-10 sm:min-h-9 min-w-0 px-3 text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-[0.98] ${
-              tab.disabled
-                ? "is-disabled text-[var(--admin-text-muted)]/50 cursor-not-allowed"
-                : isActive
-                  ? "is-active text-[var(--admin-text-main)]"
-                  : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
-            }`}
-          >
-            {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
-            <span className="admin-button-label">{tab.label}</span>
-            {typeof tab.count === "number" && (
-              <span
-                className={`admin-tab-count min-w-5 h-5 px-1 text-[10px] flex items-center justify-center font-bold shrink-0 ${
-                  isActive ? "is-active" : ""
-                }`}
-              >
-                {tab.count}
-              </span>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
+ return (
+ <div
+ className={`admin-tabs flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1 ${className}`}
+ >
+ {tabs.map((tab) => {
+ const Icon = tab.icon;
+ const isActive = activeId === tab.id;
+ return (
+ <button
+ key={tab.id}
+ type="button"
+ onClick={() => !tab.disabled && onChange(tab.id)}
+ disabled={tab.disabled}
+ aria-disabled={tab.disabled || undefined}
+ aria-current={isActive ?"page": undefined}
+ title={tab.label}
+ className={`admin-tab shrink-0 min-h-10 sm:min-h-9 min-w-0 px-3 text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-[0.98] ${
+ tab.disabled
+ ?"is-disabled text-[var(--admin-text-muted)]/50 cursor-not-allowed"
+ : isActive
+ ?"is-active text-[var(--admin-text-main)]"
+ :"text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"
+ }`}
+ >
+ {Icon && <Icon className="w-3.5 h-3.5 shrink-0"/>}
+ <span className="admin-button-label">{tab.label}</span>
+ {typeof tab.count ==="number"&& (
+ <span
+ className={`admin-tab-count min-w-5 h-5 px-1 text-[10px] flex items-center justify-center font-bold shrink-0 ${
+ isActive ?"is-active":""
+ }`}
+ >
+ {tab.count}
+ </span>
+ )}
+ </button>
+ );
+ })}
+ </div>
+ );
 };
 
 export default AdminTabs;
