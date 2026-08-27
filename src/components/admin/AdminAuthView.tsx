@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { authFetch } from "../../lib/api";
+import { Turnstile } from '@marsidev/react-turnstile';
 import {
   ShieldCheck,
   Lock,
@@ -19,6 +20,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
   onLoginSuccess,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -55,6 +57,10 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
       setErrorMsg("Informe a sua senha.");
       return;
     }
+    if (!turnstileToken) {
+      setErrorMsg("Por favor, confirme que você não é um robô.");
+      return;
+    }
 
     setIsLoading(true);
 
@@ -65,6 +71,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
         body: JSON.stringify({
           loginId: loginData.loginId.trim(),
           password: loginData.password,
+          turnstileToken,
         }),
       });
 
@@ -199,6 +206,13 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
               </div>
             </div>
 
+            <div className="flex justify-center my-4">
+              <Turnstile
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                onSuccess={(token) => setTurnstileToken(token)}
+                onError={() => setErrorMsg('Falha ao carregar o verificador de segurança. Atualize a página.')}
+              />
+            </div>
             <button
               type="submit"
               disabled={isLoading}

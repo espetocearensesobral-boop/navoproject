@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { authFetch, readApiJson } from '../../lib/api';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { X, Mail, Lock, User, Phone, Eye, EyeOff, KeyRound, CheckCircle, ArrowLeft, XCircle, ShieldCheck } from 'lucide-react';
 import { TermsAndPrivacyModal } from '../shared/TermsAndPrivacyModal';
 
@@ -35,6 +36,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
   const [isSubmittingForgot, setIsSubmittingForgot] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalTab, setModalTab] = useState<'terms' | 'privacy' | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
 
   // Reset-password step (after the WhatsApp code was requested)
   const [resetCode, setResetCode] = useState('');
@@ -167,7 +169,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
       const res = await authFetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ loginId: formData.loginId || formData.email })
+        body: JSON.stringify({ loginId: formData.loginId || formData.email, turnstileToken })
       });
       const data = await readApiJson<any>(res);
       setForgotSuccess(true);
@@ -222,7 +224,8 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
     setIsSubmitting(true);
     
     if (mode === 'register') {
-      if (!isRegisterValid) {
+      if (!isRegisterValid || !turnstileToken) {
+        setErrorMsg("Por favor, confirme que você não é um robô e preencha todos os campos.");
         setIsSubmitting(false);
         return;
       }
@@ -239,7 +242,8 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
             password: formData.password,
             lgpdConsent: formData.lgpdConsent,
             lgpdConsentDate: new Date().toISOString(),
-            referralCode: pendingRef || undefined
+            referralCode: pendingRef || undefined,
+            turnstileToken
           })
         });
 
@@ -265,7 +269,8 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
         setErrorMsg(err.message || 'Erro ao cadastrar. Tente novamente.');
       }
     } else {
-      if (!isLoginValid) {
+      if (!isLoginValid || !turnstileToken) {
+        setErrorMsg("Por favor, confirme que você não é um robô.");
         setIsSubmitting(false);
         return;
       }
@@ -275,7 +280,8 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             loginId: formData.loginId,
-            password: formData.password
+            password: formData.password,
+            turnstileToken
           })
         });
 
@@ -408,7 +414,15 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
               </div>
             </div>
 
-            <button
+            
+            <div className="flex justify-center my-4">
+              <Turnstile
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                onSuccess={(token) => setTurnstileToken(token)}
+                onError={() => setErrorMsg('Falha ao carregar o verificador de segurança. Atualize a página.')}
+              />
+            </div>
+<button
               type="submit"
               disabled={isSubmittingReset || resetCode.length !== 6 || resetNewPassword.length < 6}
               className="w-full bg-gold-base text-surface-base font-extrabold rounded-xl py-3 mt-2 active:scale-95 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"

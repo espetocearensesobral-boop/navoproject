@@ -1755,10 +1755,10 @@ button, a, input, select, textarea {
   max-height: 90dvh;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--admin-border);
   border-radius: 16px;
-  background: var(--color-surface-card);
-  color: var(--color-content-base);
+  background: var(--admin-surface);
+  color: var(--admin-text-main);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   isolation: isolate;
 }
@@ -1788,8 +1788,8 @@ button, a, input, select, textarea {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: var(--color-surface-base);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
   color: var(--color-gold-base);
 }
 
@@ -1800,9 +1800,9 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-header-icon--success {
-  background: color-mix(in srgb, var(--color-status-success) 12%, transparent);
-  border-color: color-mix(in srgb, var(--color-status-success) 25%, transparent);
-  color: var(--color-status-success);
+  background: color-mix(in srgb, var(--admin-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--admin-accent) 25%, transparent);
+  color: var(--admin-accent);
 }
 
 .receipt-v2-header-icon svg {
@@ -1817,7 +1817,7 @@ button, a, input, select, textarea {
 .receipt-v2-label,
 .receipt-v2-field-label {
   display: block;
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: 0.025em;
@@ -1833,7 +1833,7 @@ button, a, input, select, textarea {
 
 .receipt-v2-title {
   margin: 2px 0 0;
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-size: 17px;
   font-weight: 600;
   line-height: 1.25;
@@ -1850,12 +1850,12 @@ button, a, input, select, textarea {
   border: 0;
   border-radius: 8px !important;
   background: transparent;
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
 }
 
 .receipt-v2-close:hover {
-  background: var(--color-surface-base);
-  color: var(--color-content-base);
+  background: var(--admin-bg);
+  color: var(--admin-text-main);
 }
 
 .receipt-v2-close svg {
@@ -1877,7 +1877,7 @@ button, a, input, select, textarea {
   height: 8px;
   flex: 0 0 auto;
   border-radius: 50%;
-  background: var(--color-border-subtle);
+  background: var(--admin-border);
   transition: background-color 160ms ease, box-shadow 160ms ease;
 }
 
@@ -1894,7 +1894,7 @@ button, a, input, select, textarea {
   height: 2px;
   flex: 1 1 auto;
   border-radius: 1px;
-  background: var(--color-border-subtle);
+  background: var(--admin-border);
 }
 
 .receipt-v2-progress-line.is-done {
@@ -1936,14 +1936,14 @@ button, a, input, select, textarea {
 .receipt-v2-hero-label {
   display: block;
   margin-bottom: 6px;
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 12px;
   letter-spacing: 0.025em;
 }
 
 .receipt-v2-hero-value {
   display: block;
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-size: 42px;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
@@ -1959,8 +1959,8 @@ button, a, input, select, textarea {
   padding: 5px 14px;
   overflow: hidden;
   border-radius: 24px;
-  background: var(--color-surface-base);
-  color: var(--color-content-muted);
+  background: var(--admin-bg);
+  color: var(--admin-text-muted);
   font-size: 13px;
   line-height: 1.25;
   text-overflow: ellipsis;
@@ -1981,7 +1981,7 @@ button, a, input, select, textarea {
   padding: 14px 16px;
   margin: 0 0 20px;
   border-radius: 12px;
-  background: var(--color-surface-base);
+  background: var(--admin-bg);
 }
 
 .receipt-v2-service-icon {
@@ -1992,8 +1992,8 @@ button, a, input, select, textarea {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: var(--color-surface-card);
-  color: var(--color-content-muted);
+  background: var(--admin-surface);
+  color: var(--admin-text-muted);
 }
 
 .receipt-v2-service-icon svg {
@@ -2015,19 +2015,19 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-service strong {
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-size: 15px;
   font-weight: 500;
 }
 
 .receipt-v2-service span {
   margin-top: 2px;
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 13px;
 }
 
 .receipt-v2-service b {
-  color: var(--color-status-success);
+  color: var(--admin-accent);
   font-weight: 600;
 }
 
@@ -2043,21 +2043,21 @@ button, a, input, select, textarea {
   min-height: 0 !important;
   padding: 10px 0;
   border: 0 !important;
-  border-bottom: 1px solid var(--color-border-subtle) !important;
+  border-bottom: 1px solid var(--admin-border) !important;
   border-radius: 0 !important;
   outline: none;
   background: transparent !important;
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-family: inherit;
   font-size: 15px;
 }
 
 .receipt-v2-minimal-input:focus {
-  border-bottom-color: var(--color-content-base) !important;
+  border-bottom-color: var(--admin-text-main) !important;
 }
 
 .receipt-v2-minimal-input::placeholder {
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
 }
 
 .receipt-v2-notice {
@@ -2069,7 +2069,7 @@ button, a, input, select, textarea {
   border: 1px solid color-mix(in srgb, var(--color-status-warning) 18%, transparent);
   border-radius: 10px;
   background: color-mix(in srgb, var(--color-status-warning) 7%, transparent);
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 11px;
   line-height: 1.5;
 }
@@ -2093,8 +2093,8 @@ button, a, input, select, textarea {
   justify-content: space-between;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid var(--color-border-subtle);
-  color: var(--color-content-muted);
+  border-bottom: 1px solid var(--admin-border);
+  color: var(--admin-text-muted);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -2114,7 +2114,7 @@ button, a, input, select, textarea {
 
 .receipt-v2-summary-right span {
   overflow: hidden;
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 12px;
   font-weight: 400;
   text-overflow: ellipsis;
@@ -2152,7 +2152,7 @@ button, a, input, select, textarea {
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 6px;
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 12px;
 }
 
@@ -2172,7 +2172,7 @@ button, a, input, select, textarea {
   display: flex;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--admin-border);
   border-radius: 8px;
 }
 
@@ -2186,16 +2186,16 @@ button, a, input, select, textarea {
   min-height: 0 !important;
   padding: 9px 0;
   border: 0;
-  border-right: 1px solid var(--color-border-subtle);
+  border-right: 1px solid var(--admin-border);
   border-radius: 0 !important;
-  background: var(--color-surface-base);
-  color: var(--color-content-muted);
+  background: var(--admin-bg);
+  color: var(--admin-text-muted);
   font-size: 12px;
   font-weight: 600;
 }
 
 .receipt-v2-mode-toggle button[aria-pressed="true"] {
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
 }
 
 .receipt-v2-adjustment-input input,
@@ -2208,8 +2208,8 @@ button, a, input, select, textarea {
   border: 0 !important;
   border-radius: 0 !important;
   outline: none;
-  background: var(--color-surface-card);
-  color: var(--color-content-base);
+  background: var(--admin-surface);
+  color: var(--admin-text-main);
   font-family: inherit;
   font-size: 14px;
   font-variant-numeric: tabular-nums;
@@ -2226,18 +2226,18 @@ button, a, input, select, textarea {
   gap: 16px;
   padding: 14px 16px;
   margin: 0 0 20px;
-  border: 1px solid color-mix(in srgb, var(--color-status-success) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--admin-accent) 16%, transparent);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--color-status-success) 8%, transparent);
+  background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
 }
 
 .receipt-v2-total span {
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 14px;
 }
 
 .receipt-v2-total strong {
-  color: var(--color-status-success);
+  color: var(--admin-accent);
   font-size: 22px;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
@@ -2272,10 +2272,10 @@ button, a, input, select, textarea {
   align-items: center;
   gap: 6px;
   padding: 10px 16px;
-  border: 1.5px solid var(--color-border-subtle);
+  border: 1.5px solid var(--admin-border);
   border-radius: 24px !important;
-  background: var(--color-surface-card);
-  color: var(--color-content-muted);
+  background: var(--admin-surface);
+  color: var(--admin-text-muted);
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
@@ -2296,7 +2296,7 @@ button, a, input, select, textarea {
   padding: 16px;
   margin: 0 0 20px;
   border-radius: 12px;
-  background: var(--color-surface-base);
+  background: var(--admin-bg);
 }
 
 .receipt-v2-cash > p {
@@ -2304,7 +2304,7 @@ button, a, input, select, textarea {
   align-items: center;
   gap: 8px;
   margin: 0 0 12px;
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-size: 12px;
   font-weight: 700;
 }
@@ -2330,7 +2330,7 @@ button, a, input, select, textarea {
 .receipt-v2-cash-grid span {
   display: block;
   margin-bottom: 6px;
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 12px;
 }
 
@@ -2341,23 +2341,23 @@ button, a, input, select, textarea {
   height: 40px;
   align-items: center;
   padding: 9px 10px;
-  border: 1px solid var(--color-border-subtle) !important;
+  border: 1px solid var(--admin-border) !important;
   border-radius: 8px !important;
-  background: var(--color-surface-card);
-  color: var(--color-content-base);
+  background: var(--admin-surface);
+  color: var(--admin-text-main);
   font-size: 14px;
   font-variant-numeric: tabular-nums;
 }
 
 .receipt-v2-cash-grid strong {
-  color: var(--color-status-success);
+  color: var(--admin-accent);
 }
 
 .receipt-v2-review {
   padding: 16px;
   margin: 0 0 20px;
   border-radius: 12px;
-  background: var(--color-surface-base);
+  background: var(--admin-bg);
 }
 
 .receipt-v2-review-row {
@@ -2367,7 +2367,7 @@ button, a, input, select, textarea {
   justify-content: space-between;
   gap: 12px;
   padding: 8px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-border-subtle) 70%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--admin-border) 70%, transparent);
 }
 
 .receipt-v2-review-row:last-child {
@@ -2381,24 +2381,24 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-review-row span {
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 14px;
 }
 
 .receipt-v2-review-row strong {
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-size: 14px;
   font-weight: 500;
   text-align: right;
 }
 
 .receipt-v2-review-row .is-strong {
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-weight: 700;
 }
 
 .receipt-v2-review-row strong.is-positive {
-  color: var(--color-status-success);
+  color: var(--admin-accent);
 }
 
 .receipt-v2-review-row strong.is-negative {
@@ -2408,7 +2408,7 @@ button, a, input, select, textarea {
 .receipt-v2-review-total {
   padding-top: 4px;
   margin-top: 4px;
-  border-top: 2px solid var(--color-border-subtle);
+  border-top: 2px solid var(--admin-border);
 }
 
 .receipt-v2-review-total .receipt-v2-review-row {
@@ -2428,7 +2428,7 @@ button, a, input, select, textarea {
   min-width: 0;
   align-items: center;
   gap: 8px;
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-size: 14px;
   font-weight: 700;
 }
@@ -2440,7 +2440,7 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-receipt-heading strong {
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 11px;
 }
@@ -2448,17 +2448,17 @@ button, a, input, select, textarea {
 .receipt-v2-observations {
   padding-top: 8px;
   margin-top: 4px;
-  border-top: 1px solid var(--color-border-subtle);
+  border-top: 1px solid var(--admin-border);
 }
 
 .receipt-v2-observations span {
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 12px;
 }
 
 .receipt-v2-observations p {
   margin: 4px 0 0;
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-size: 14px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -2471,7 +2471,7 @@ button, a, input, select, textarea {
   gap: 8px;
   padding: 0 0 4px;
   margin: 0 0 12px;
-  color: var(--color-status-success);
+  color: var(--admin-accent);
   font-size: 14px;
 }
 
@@ -2510,20 +2510,20 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-secondary {
-  border: 1px solid var(--color-border-subtle);
-  background: var(--color-surface-card);
-  color: var(--color-content-muted);
+  border: 1px solid var(--admin-border);
+  background: var(--admin-surface);
+  color: var(--admin-text-muted);
 }
 
 .receipt-v2-secondary:hover {
-  background: var(--color-surface-base);
-  color: var(--color-content-base);
+  background: var(--admin-bg);
+  color: var(--admin-text-main);
 }
 
 .receipt-v2-primary {
   border: 0;
-  background: var(--color-content-base);
-  color: var(--color-surface-card);
+  background: var(--admin-text-main);
+  color: var(--admin-surface);
 }
 
 .receipt-v2-primary:hover {
@@ -2553,7 +2553,7 @@ button, a, input, select, textarea {
   padding: 16px;
   margin: 0 0 20px;
   border-radius: 12px;
-  background: var(--color-surface-base);
+  background: var(--admin-bg);
 }
 
 .receipt-v2-decision-icon {
@@ -2564,8 +2564,8 @@ button, a, input, select, textarea {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: color-mix(in srgb, var(--color-status-success) 10%, transparent);
-  color: var(--color-status-success);
+  background: color-mix(in srgb, var(--admin-accent) 10%, transparent);
+  color: var(--admin-accent);
 }
 
 .receipt-v2-decision-icon svg {
@@ -2575,14 +2575,14 @@ button, a, input, select, textarea {
 
 .receipt-v2-decision-card strong {
   display: block;
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-size: 14px;
 }
 
 .receipt-v2-decision-card p,
 .receipt-v2-decision-copy p {
   margin: 4px 0 0;
-  color: var(--color-content-muted);
+  color: var(--admin-text-muted);
   font-size: 13px;
   line-height: 1.45;
 }
@@ -2599,7 +2599,7 @@ button, a, input, select, textarea {
 
 .receipt-v2-decision-copy h3 {
   margin: 0;
-  color: var(--color-content-base);
+  color: var(--admin-text-main);
   font-size: 16px;
   font-weight: 700;
 }
@@ -3094,7 +3094,7 @@ button, a, input, select, textarea {
   z-index: 2;
   padding: 12px 0 0;
   margin-bottom: 0;
-  background: var(--color-surface-card);
+  background: var(--admin-surface);
 }
 
 .receipt-v2-scroll .receipt-v2-actions::before,
@@ -3104,7 +3104,7 @@ button, a, input, select, textarea {
   right: 0;
   left: 0;
   height: 1px;
-  background: var(--color-border-subtle);
+  background: var(--admin-border);
   content: '';
 }
 

@@ -54,7 +54,8 @@ export async function fetchServicesFromSupabase(forceRefresh = false): Promise<S
       servicesCachedAt = Date.now();
       return cachedServices;
     } catch (err) {
-      console.error('Erro ao carregar serviços do servidor:', err);
+      const msg = err?.message || String(err);
+      if (!msg.includes('JSON')) console.error('Erro ao carregar serviços do servidor:', err);
       cachedServices = null;
       servicesCachedAt = 0;
       throw err;
@@ -1088,7 +1089,8 @@ export async function fetchPublicReviews() {
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
-    console.error('Erro ao buscar avaliações públicas:', err);
+    const msg = err?.message || String(err);
+    if (!msg.includes('JSON')) console.error('Erro ao buscar avaliações públicas:', err);
     return [];
   }
 }

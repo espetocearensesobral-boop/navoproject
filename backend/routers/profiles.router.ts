@@ -7,7 +7,7 @@ import { db, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { JWT_SECRET } from '../config/env.js';
 import { authLimiter, requireAuth, setAuthCookie } from '../middleware/index.js';
-import { sanitizePhone, matchPhoneNumbers, handleError, formatProfile, userErrors } from '../utils/index.js';
+import { sanitizePhone, matchPhoneNumbers, handleError, formatProfile, userErrors, verifyTurnstileToken } from '../utils/index.js';
 
 export const profilesRouter = express.Router();
 
@@ -48,7 +48,11 @@ profilesRouter.post("/", authLimiter, async (req, res) => {
     if (!isDbConnected || !db) {
       return res.status(503).json({ error: userErrors.dbDisconnected });
     }
-    const { name, email, phone, birthday, password, role, id, avatar_url, avatarUrl, lgpdConsent, lgpdConsentDate, ...rest } = req.body;
+    const { name, email, phone, birthday, password, role, id, avatar_url, avatarUrl, lgpdConsent, lgpdConsentDate, turnstileToken, ...rest } = req.body;
+
+    if (!(await verifyTurnstileToken(turnstileToken))) {
+      return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
+    }
 
     if (!name) {
       return res.status(400).json({ error: 'Nome é obrigatório.' });

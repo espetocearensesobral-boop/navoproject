@@ -6,7 +6,7 @@ import { db, isDbConnected } from '../index.js';
 import * as schema from '../../src/db/schema.js';
 import { JWT_SECRET } from '../config/env.js';
 import { authLimiter, requireAuth, setAuthCookie, clearAuthCookie } from '../middleware/index.js';
-import { sanitizePhone, matchPhoneNumbers, handleError, formatProfile, userErrors } from '../utils/index.js';
+import { sanitizePhone, matchPhoneNumbers, handleError, formatProfile, userErrors, verifyTurnstileToken } from '../utils/index.js';
 import { sendWhatsAppMessage } from '../whatsapp.js';
 import { z } from 'zod';
 
@@ -47,7 +47,11 @@ authRouter.post("/login", authLimiter, async (req, res) => {
     if (!isDbConnected || !db) {
       return res.status(503).json({ error: userErrors.dbDisconnected });
     }
-    const { loginId, password } = req.body;
+    const { loginId, password, turnstileToken } = req.body;
+
+    if (!(await verifyTurnstileToken(turnstileToken))) {
+      return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
+    }
     
     if (!loginId || !password) {
       return res.status(400).json({ error: 'E-mail/telefone e senha são obrigatórios.' });
@@ -133,7 +137,11 @@ const handleAdminLogin = async (req: any, res: any) => {
     if (!isDbConnected || !db) {
       return res.status(503).json({ error: userErrors.dbDisconnected });
     }
-    const { loginId, password } = req.body;
+    const { loginId, password, turnstileToken } = req.body;
+
+    if (!(await verifyTurnstileToken(turnstileToken))) {
+      return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
+    }
     
     if (!loginId || !password) {
       return res.status(400).json({ error: 'E-mail/telefone e senha são obrigatórios.' });
@@ -198,7 +206,11 @@ authRouter.post("/admin-login", authLimiter, handleAdminLogin);
 
 authRouter.post("/forgot-password", authLimiter, async (req, res) => {
   try {
-    const { loginId } = req.body;
+    const { loginId, turnstileToken } = req.body;
+
+    if (!(await verifyTurnstileToken(turnstileToken))) {
+      return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
+    }
     if (!loginId) {
       return res.status(400).json({ error: 'E-mail ou telefone é obrigatório.' });
     }
@@ -240,7 +252,11 @@ authRouter.post("/forgot-password", authLimiter, async (req, res) => {
 
 authRouter.post("/reset-password", authLimiter, async (req, res) => {
   try {
-    const { loginId, code, newPassword } = req.body;
+    const { loginId, code, newPassword, turnstileToken } = req.body;
+
+    if (!(await verifyTurnstileToken(turnstileToken))) {
+      return res.status(403).json({ error: 'Validação de segurança (Cloudflare) falhou. Tente novamente.' });
+    }
     if (!loginId || !code || !newPassword) {
       return res.status(400).json({ error: 'Código e nova senha são obrigatórios.' });
     }

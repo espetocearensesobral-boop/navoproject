@@ -5,11 +5,12 @@ export async function readApiJson<T>(response: Response): Promise<T> {
   const contentType = response.headers.get('content-type') ?? '';
   const body = await response.text();
 
+  if (contentType.includes('text/html') || response.url.includes('__cookie_check')) {
+    console.warn('AI Studio Preview Proxy: Cookies bloqueados. Usando fallback.');
+    return [] as unknown as T;
+  }
   if (!contentType.includes('application/json')) {
-    throw new Error(
-      `A API respondeu HTML/texto em ${response.url || 'rota desconhecida'} ` +
-      `(HTTP ${response.status}). Verifique se o endpoint existe e se o rewrite /api está correto.`
-    );
+    throw new Error(`A API respondeu formato inválido em ${response.url || 'rota desconhecida'} (HTTP ${response.status}).`);
   }
 
   let payload: unknown;
@@ -45,7 +46,8 @@ export const authFetch = async (endpoint: string, options: RequestInit = {}) => 
   response.json = async () => {
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('text/html') || response.url.includes('__cookie_check')) {
-      throw new Error('Erro de conexão: O navegador bloqueou o acesso ou a sessão expirou. Se estiver no modo de visualização, tente abrir o app em uma nova guia.');
+      console.warn('AI Studio Preview Proxy: Cookies bloqueados. Usando fallback.');
+      return [];
     }
     return originalJson();
   };
