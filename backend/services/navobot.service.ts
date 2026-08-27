@@ -65,6 +65,8 @@ type Conversation = {
   handoffRequested: boolean;
 };
 
+const GEMINI_NAVOBOT_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+
 function getAiClient(): GoogleGenAI | null {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
   if (!apiKey) return null;
@@ -226,9 +228,9 @@ async function transcribeAudioWithGemini(audio: ExtractedEvolutionAudio): Promis
   }
 
   try {
-    console.info(`[NavoBot][Voice] Transcrevendo áudio com Gemini (mime: ${normalizedMimeType})...`);
+    console.info(`[NavoBot][Voice] Transcrevendo áudio com Gemini (mime: ${normalizedMimeType}, model: ${GEMINI_NAVOBOT_MODEL})...`);
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_NAVOBOT_MODEL,
       contents: [
         {
           role: 'user',
@@ -276,9 +278,9 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
     return 'unknown';
   }
   try {
-    console.info(`[NavoBot][Gemini] Classificando mensagem no estado ${state}.`);
+    console.info(`[NavoBot][Gemini] Classificando mensagem no estado ${state} com modelo ${GEMINI_NAVOBOT_MODEL}.`);
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_NAVOBOT_MODEL,
       contents: [{ role: 'user', parts: [{ text: `Estado atual: ${state}\nContexto já coletado: ${JSON.stringify({ pendingAction: context.pendingAction, appointmentId: context.appointmentId, serviceIds: context.serviceIds, date: context.date, timeSlot: context.timeSlot, professionalId: context.professionalId })}\nMensagem do cliente: ${text}` }] }],
       config: {
         temperature: 0.1,
@@ -1030,7 +1032,7 @@ MENSAGEM DO CLIENTE:
       if (!ai) return null;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: GEMINI_NAVOBOT_MODEL,
         contents: [{ role: 'user', parts: [{ text: promptInput }] }],
         config: {
           temperature: 0.2,
@@ -1798,12 +1800,12 @@ MENSAGEM DO CLIENTE:
   async function testAiConnection() {
     const ai = getAiClient();
     if (!ai) {
-      return { ok: false, configured: false, usedGemini: false, model: 'gemini-2.5-flash', latencyMs: 0, message: 'GEMINI_API_KEY não está configurada no ambiente.' };
+      return { ok: false, configured: false, usedGemini: false, model: GEMINI_NAVOBOT_MODEL, latencyMs: 0, message: 'GEMINI_API_KEY não está configurada no ambiente.' };
     }
     const startedAt = Date.now();
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: GEMINI_NAVOBOT_MODEL,
         contents: [{ role: 'user', parts: [{ text: 'Responda somente com a palavra OK.' }] }],
         config: { temperature: 0, maxOutputTokens: 32, thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL } },
       });
@@ -1813,7 +1815,7 @@ MENSAGEM DO CLIENTE:
         ok: !!responseText,
         configured: true,
         usedGemini: true,
-        model: 'gemini-2.5-flash',
+        model: GEMINI_NAVOBOT_MODEL,
         latencyMs: Date.now() - startedAt,
         response: responseText.slice(0, 40),
         message: responseText ? 'Gemini respondeu com sucesso.' : `Gemini foi chamado, mas não retornou texto${diagnostics ? ` (${diagnostics})` : ''}.`,
@@ -1823,7 +1825,7 @@ MENSAGEM DO CLIENTE:
         ok: false,
         configured: true,
         usedGemini: false,
-        model: 'gemini-2.5-flash',
+        model: GEMINI_NAVOBOT_MODEL,
         latencyMs: Date.now() - startedAt,
         message: `Falha ao chamar o Gemini: ${String(error?.message || 'erro desconhecido').slice(0, 240)}`,
       };

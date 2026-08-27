@@ -539,7 +539,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
           ok: false,
           configured: false,
           usedGemini: false,
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3.6-flash',
           latencyMs: 0,
           message: 'Serviço de IA do NavoBot não inicializado.',
         });
@@ -551,7 +551,7 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
         ok: false,
         configured: false,
         usedGemini: false,
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.6-flash',
         latencyMs: 0,
         message: error?.message || 'Falha ao testar conexão com o Gemini.',
       });

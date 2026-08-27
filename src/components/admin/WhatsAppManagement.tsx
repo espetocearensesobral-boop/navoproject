@@ -240,7 +240,7 @@ export const WhatsAppManagement: React.FC = () => {
  ok: false,
  configured: false,
  usedGemini: false,
- model:"gemini-2.5-flash",
+ model:"gemini-3.6-flash",
  latencyMs: 0,
  message:
  error?.message ||"Não foi possível testar o Gemini do NavoBot.",
@@ -913,7 +913,7 @@ export const WhatsAppManagement: React.FC = () => {
  Diagnóstico do Gemini
  </h2>
  <p className="text-xs text-[var(--admin-text-muted)] mt-1">
- Executa uma chamada real ao <code>gemini-2.5-flash</code> usado
+ Executa uma chamada real ao <code>gemini-3.6-flash</code> usado
  pelo NavoBot. Use para confirmar a chave e a comunicação com a
  API.
  </p>

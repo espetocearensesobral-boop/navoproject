@@ -147,7 +147,7 @@ const evolutionApiModule = createEvolutionApiModule({
   eq,
   onWebhook: (payload) => (navobotService ? navobotService.handleWebhook(payload) : Promise.resolve({ ignored: true, reason: 'navobot_not_ready' })),
   onInactivitySweep: () => (navobotService ? navobotService.processInactivitySweep() : Promise.resolve({ skipped: true, reason: 'navobot_not_ready' })),
-  onTestAi: () => (navobotService ? navobotService.testAiConnection() : Promise.resolve({ ok: false, configured: false, usedGemini: false, model: 'gemini-2.5-flash', latencyMs: 0, message: 'NavoBot não inicializado.' })),
+  onTestAi: () => (navobotService ? navobotService.testAiConnection() : Promise.resolve({ ok: false, configured: false, usedGemini: false, model: 'gemini-3.6-flash', latencyMs: 0, message: 'NavoBot não inicializado.' })),
 });
 
 navobotService = createNavoBotService({
@@ -204,7 +204,7 @@ app.post('/api/admin/navobot/ai-test', requireAuth, requireAdmin, async (req, re
       ok: false,
       configured: false,
       usedGemini: false,
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.6-flash',
       latencyMs: 0,
       message: 'Serviço de IA do NavoBot não inicializado.',
     });

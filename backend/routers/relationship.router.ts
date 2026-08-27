@@ -210,7 +210,7 @@ Não invente promoções a menos que seja um cliente inativo há mais de 90 dias
 Traga a mensagem pronta para enviar, sem aspas e sem placeholders. Use emojis adequados.
 `;
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
       contents: prompt,
     });
     const message = response.text || 'Olá! Sentimos sua falta. Que tal agendar um horário com a gente?';
