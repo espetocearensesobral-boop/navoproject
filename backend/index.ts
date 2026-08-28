@@ -88,7 +88,11 @@ export async function initializeDb(): Promise<void> {
         await sqlClient`ALTER TABLE evolution_api_settings ADD COLUMN IF NOT EXISTS manager_notification_phone text DEFAULT ''`;
         await sqlClient`ALTER TABLE evolution_api_settings ADD COLUMN IF NOT EXISTS notify_barber_on_handoff boolean NOT NULL DEFAULT true`;
         await sqlClient`ALTER TABLE evolution_api_settings ADD COLUMN IF NOT EXISTS notify_manager_on_handoff boolean NOT NULL DEFAULT true`;
-        console.log('[API] ✅ Migração de evolution_api_settings aplicada com sucesso.');
+        await sqlClient`ALTER TABLE shop_settings ADD COLUMN IF NOT EXISTS unit_name text DEFAULT 'Unidade Expectativa'`;
+        await sqlClient`ALTER TABLE shop_settings ADD COLUMN IF NOT EXISTS slogan text DEFAULT 'Estilo, Tradição e Excelência na Medida Certa'`;
+        await sqlClient`ALTER TABLE shop_settings ADD COLUMN IF NOT EXISTS allow_outside_hours_approval boolean DEFAULT false`;
+        await sqlClient`ALTER TABLE shop_settings ADD COLUMN IF NOT EXISTS theme_palette text DEFAULT 'heritage'`;
+        console.log('[API] ✅ Migrações automáticas aplicadas com sucesso.');
       } catch (e) {
         console.error('[API] Falha na migração automática:', e);
       }
@@ -165,9 +169,11 @@ const evolutionApiRouter = evolutionApiModule.router;
 import { subscriptionsRouter } from './routers/subscriptions.router.js';
 import { auditRouter } from './routers/audit.router.js';
 import { remindersRouter } from './routers/reminders.router.js';
+import { shopProfileRouter } from './routers/shop-profile.router.js';
 
 app.use('/api/health', healthRouter);
 app.use('/api/system', systemRouter);
+app.use('/api/shop-profile', shopProfileRouter);
 app.use('/api/seed', seedRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/profiles', profilesRouter);

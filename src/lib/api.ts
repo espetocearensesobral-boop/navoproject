@@ -1,4 +1,4 @@
-const configuredApiBase = (import.meta.env.VITE_API_BASE_URL || '').trim();
+const configuredApiBase = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL : '').trim();
 export const API_BASE = configuredApiBase.replace(/\/$/, '');
 
 export async function readApiJson<T>(response: Response): Promise<T> {
