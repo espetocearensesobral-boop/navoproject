@@ -26,12 +26,15 @@ body,
   --text-body-sm: 0.75rem; /* 12px */
   --text-caption: 0.6875rem; /* 11px */
 
-  /* Dimensões da Sidebar */
-  --admin-sidebar-width: 240px;
-  --admin-sidebar-bg: #15151c;
-  --admin-sidebar-border: color-mix(in srgb, var(--admin-sidebar-bg) 85%, #ffffff);
-  --admin-sidebar-text: #ffffff;
-  --admin-sidebar-text-muted: #8A8F98;
+  /* Dimensões da Sidebar & Tokens de Nitidez Alta */
+  --admin-sidebar-width: 248px;
+  --admin-sidebar-bg: #111319;
+  --admin-sidebar-border: rgba(255, 255, 255, 0.08);
+  --admin-sidebar-text: #FFFFFF;
+  --admin-sidebar-text-muted: #94A3B8;
+  --admin-sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+  --admin-sidebar-active-bg: color-mix(in srgb, var(--admin-accent) 15%, rgba(255, 255, 255, 0.05));
+  --admin-sidebar-active-text: #FFFFFF;
   
   --admin-header-height: 52px;
   --admin-content-max-width: 100%;
@@ -634,24 +637,25 @@ body,
   background: var(--admin-surface-hover);
 }
 
-/* Sidebar: compact, grouped, with a quiet active marker. */
+/* Sidebar: compact, grouped, with high contrast & crisp clarity in both light & dark themes */
 .admin-shell .admin-nav-item {
   min-height: 2.25rem;
   padding: 0.45rem 0.625rem;
   margin: 1px 0.5rem;
   border-radius: var(--admin-radius-sm);
-  color: var(--admin-text-muted);
+  color: var(--admin-sidebar-text-muted);
 }
 
 .admin-shell .admin-nav-item:hover {
-  color: var(--admin-text-main);
-  background: var(--admin-surface-hover);
+  color: var(--admin-sidebar-text);
+  background: var(--admin-sidebar-hover-bg);
 }
 
 .admin-shell .admin-nav-item.active {
-  color: var(--admin-text-main);
-  background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
-  box-shadow: inset 2px 0 0 var(--admin-accent);
+  color: var(--admin-sidebar-active-text);
+  background: var(--admin-sidebar-active-bg);
+  box-shadow: inset 3px 0 0 var(--admin-accent);
+  font-weight: 600;
 }
 
 .admin-shell .admin-nav-item.active svg {
@@ -1558,82 +1562,57 @@ body,
   }
 }
 
-/* Dark Theme Overrides (Proton-inspired) */
+/* Dark Theme Overrides */
 [data-theme="dark"] .admin-shell {
-  --admin-bg: #0f1115;
-  --admin-surface: #191b23;
-  --admin-surface-subtle: #1c1e26;
-  --admin-surface-hover: #262833;
-  --admin-surface-active: #323544;
+  --admin-bg: #12131A;
+  --admin-surface: #1A1D26;
+  --admin-surface-subtle: #21252F;
+  --admin-surface-hover: rgba(255, 255, 255, 0.05);
+  --admin-surface-active: rgba(255, 255, 255, 0.08);
   
-  --admin-border: #2e303d;
-  --admin-border-focus: #8b5cf6;
+  --admin-border: rgba(242, 237, 228, 0.08);
+  --admin-border-focus: var(--color-gold-base);
   
-  --admin-text-main: #ffffff;
-  --admin-text-muted: #8a8f98;
+  --admin-text-main: #F2EDE4;
+  --admin-text-muted: #8A8F98;
   
-  --admin-accent: #8b5cf6;
-  --admin-accent-hover: #a78bfa;
-  --admin-accent-text: #ffffff;
+  --admin-accent: var(--color-gold-base);
+  --admin-accent-hover: var(--color-gold-hover);
+  --admin-accent-text: var(--color-content-on-accent);
   
-  --admin-sidebar-bg: #0f1115;
-  --admin-sidebar-border: #2e303d;
-  --admin-sidebar-text: #ffffff;
-  --admin-sidebar-text-muted: #8a8f98;
-  
-  --admin-radius-xs: 6px;
-  --admin-radius-sm: 8px;
-  --admin-radius-md: 10px;
-  --admin-radius-lg: 16px;
-  --admin-radius-xl: 24px;
-  
-  --text-display: 2.25rem;
-  --text-h1: 1.75rem; /* 28px */
-  --text-h2: 1.5rem; /* 24px */
-  --text-h3: 1.125rem; /* 18px */
-  --text-body: 0.875rem; /* 14px */
-  --text-body-sm: 0.8125rem; /* 13px */
-  --text-caption: 0.75rem; /* 12px */
-  
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --admin-sidebar-bg: #111319;
+  --admin-sidebar-border: rgba(255, 255, 255, 0.08);
+  --admin-sidebar-text: #FFFFFF;
+  --admin-sidebar-text-muted: #94A3B8;
+  --admin-sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+  --admin-sidebar-active-bg: color-mix(in srgb, var(--admin-accent) 15%, rgba(255, 255, 255, 0.05));
+  --admin-sidebar-active-text: #FFFFFF;
 }
 
-/* Light Theme Overrides (Proton-inspired) */
+/* Light Theme Overrides */
 [data-theme="light"] .admin-shell {
-  --admin-bg: #f9f9fb;
-  --admin-surface: #ffffff;
-  --admin-surface-subtle: #f4f5f7;
-  --admin-surface-hover: #f4f5f7;
-  --admin-surface-active: #e2e4e9;
+  --admin-bg: #F5F5F2;
+  --admin-surface: #FFFFFF;
+  --admin-surface-subtle: #F0F0EC;
+  --admin-surface-hover: rgba(0, 0, 0, 0.04);
+  --admin-surface-active: rgba(0, 0, 0, 0.07);
   
-  --admin-border: #e6e8eb;
-  --admin-border-focus: #111111;
+  --admin-border: rgba(26, 28, 30, 0.1);
+  --admin-border-focus: var(--color-gold-base);
   
-  --admin-text-main: #111111;
-  --admin-text-muted: #6b7280;
+  --admin-text-main: #1A1C1E;
+  --admin-text-muted: #64748B;
   
-  --admin-accent: #111111;
-  --admin-accent-hover: #374151;
-  --admin-accent-text: #ffffff;
+  --admin-accent: var(--color-gold-base);
+  --admin-accent-hover: var(--color-gold-hover);
+  --admin-accent-text: var(--color-content-on-accent);
   
-  --admin-sidebar-bg: #0f1115;
-  --admin-sidebar-border: #2e303d;
-  --admin-sidebar-text: #ffffff;
-  --admin-sidebar-text-muted: #8a8f98;
-  
-  --admin-radius-xs: 6px;
-  --admin-radius-sm: 8px;
-  --admin-radius-md: 10px;
-  --admin-radius-lg: 16px;
-  --admin-radius-xl: 24px;
-  
-  --text-display: 2.25rem;
-  --text-h1: 1.75rem; /* 28px */
-  --text-h2: 1.5rem; /* 24px */
-  --text-h3: 1.125rem; /* 18px */
-  --text-body: 0.875rem; /* 14px */
-  --text-body-sm: 0.8125rem; /* 13px */
-  --text-caption: 0.75rem; /* 12px */
-  
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* A sidebar mantém a mesma identidade escura de alto contraste e nitidez perfeita do tema escuro */
+  --admin-sidebar-bg: #111319;
+  --admin-sidebar-border: rgba(255, 255, 255, 0.08);
+  --admin-sidebar-text: #FFFFFF;
+  --admin-sidebar-text-muted: #94A3B8;
+  --admin-sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+  --admin-sidebar-active-bg: color-mix(in srgb, var(--admin-accent) 15%, rgba(255, 255, 255, 0.05));
+  --admin-sidebar-active-text: #FFFFFF;
 }

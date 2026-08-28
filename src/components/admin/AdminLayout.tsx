@@ -495,7 +495,7 @@ export const AdminLayout: React.FC = () => {
  {navGroups.map((group, groupIndex) => (
  <div key={group.label} className={groupIndex > 0 ?"mt-4":""}>
  <p
- className={`px-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-[var(--admin-sidebar-text-muted)]/70 ${mobile ?"px-3":""}`}
+ className={`px-2 mb-1.5 text-[11px] font-bold uppercase tracking-wider text-[var(--admin-sidebar-text-muted)] ${mobile ?"px-3":""}`}
  >
  {group.label}
  </p>
@@ -652,14 +652,14 @@ export const AdminLayout: React.FC = () => {
  <div className="flex items-center gap-2">
  <button
  onClick={toggleTheme}
- className="admin-btn-secondary flex-1 h-9 px-0"
+ className="flex-1 h-9 px-0 rounded-[var(--admin-radius-sm)] bg-white/5 border border-white/10 text-[var(--admin-sidebar-text)] hover:bg-white/10 hover:border-white/20 transition-colors flex items-center justify-center"
  title={theme ==="dark"?"Modo claro":"Modo escuro"}
  aria-label="Alternar tema"
  >
  {theme ==="dark"? (
  <Sun className="w-4 h-4 text-[var(--admin-accent)]"/>
  ) : (
- <Moon className="w-4 h-4 text-[var(--admin-text-muted)]"/>
+ <Moon className="w-4 h-4 text-[var(--admin-sidebar-text-muted)]"/>
  )}
  </button>
  <div className="flex-1 flex justify-center">
@@ -673,7 +673,7 @@ export const AdminLayout: React.FC = () => {
  </div>
  <button
  onClick={handleLogout}
- className="admin-btn-secondary text-status-error hover:bg-status-error/10 hover:border-status-error/30 flex-1 h-9 px-0"
+ className="flex-1 h-9 px-0 rounded-[var(--admin-radius-sm)] bg-white/5 border border-white/10 text-status-error hover:bg-status-error/15 hover:border-status-error/30 transition-colors flex items-center justify-center"
  title="Sair"
  aria-label="Sair"
  >
@@ -814,7 +814,7 @@ export const AdminLayout: React.FC = () => {
  <button
  type="button"
  onClick={toggleTheme}
- className="admin-btn-secondary flex-1 h-10 px-0"
+ className="flex-1 h-10 px-0 rounded-[var(--admin-radius-sm)] bg-white/5 border border-white/10 text-[var(--admin-sidebar-text)] hover:bg-white/10 hover:border-white/20 transition-colors flex items-center justify-center"
  title={theme ==="dark"?"Modo claro":"Modo escuro"}
  aria-label={
  theme ==="dark"?"Ativar modo claro":"Ativar modo escuro"
@@ -823,16 +823,16 @@ export const AdminLayout: React.FC = () => {
  {theme ==="dark"? (
  <Sun className="w-4 h-4 text-[var(--admin-accent)]"/>
  ) : (
- <Moon className="w-4 h-4"/>
+ <Moon className="w-4 h-4 text-[var(--admin-sidebar-text-muted)]"/>
  )}
  </button>
  <button
  type="button"
  onClick={handleLogout}
- className="admin-btn-secondary flex-[2] h-10 text-status-error hover:bg-status-error/10 hover:border-status-error/30"
+ className="flex-[2] h-10 rounded-[var(--admin-radius-sm)] bg-white/5 border border-white/10 text-status-error hover:bg-status-error/15 hover:border-status-error/30 transition-colors flex items-center justify-center gap-2"
  >
  <LogOut className="w-4 h-4 shrink-0"/>
- <span className="admin-button-label">Sair</span>
+ <span className="admin-button-label text-sm font-semibold">Sair</span>
  </button>
  </div>
  </div>
