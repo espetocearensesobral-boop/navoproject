@@ -787,5 +787,46 @@ export function createEvolutionApiModule({ getDb, schema, eq, onWebhook, onInact
     }
   });
 
-  return { router, getSettings, sendText, sendButtons, sendList };
+  async function fetchMediaBase64(messageId: string, rawMessage?: any): Promise<{ base64?: string; mimetype?: string } | null> {
+    try {
+      const settings = await requireConfigured();
+      const instance = encodeURIComponent(settings.instanceName);
+
+      const payloads = [
+        rawMessage ? { message: rawMessage, convertToMp4: false } : null,
+        messageId ? { message: { key: { id: messageId } }, convertToMp4: false } : null,
+        messageId ? { messageId, convertToMp4: false } : null,
+      ].filter(Boolean);
+
+      const endpoints = [
+        `/chat/getBase64FromMediaMessage/${instance}`,
+        `/message/getBase64FromMediaMessage/${instance}`,
+      ];
+
+      for (const ep of endpoints) {
+        for (const body of payloads) {
+          try {
+            const res: any = await evolutionRequest(settings.baseUrl, settings.apiKey, ep, {
+              method: 'POST',
+              body: JSON.stringify(body),
+            });
+            const base64 = res?.base64 || res?.data || res?.media;
+            if (typeof base64 === 'string' && base64.trim().length > 20) {
+              return {
+                base64: base64.trim(),
+                mimetype: res?.mimetype || res?.mimeType || 'audio/ogg; codecs=opus',
+              };
+            }
+          } catch {
+            // Tenta próxima variação
+          }
+        }
+      }
+    } catch (error: any) {
+      console.warn('[Evolution API] Falha ao tentar buscar mídia descriptografada:', error?.message || error);
+    }
+    return null;
+  }
+
+  return { router, getSettings, sendText, sendButtons, sendList, fetchMediaBase64 };
 }

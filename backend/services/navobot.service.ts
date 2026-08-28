@@ -33,6 +33,7 @@ export type NavoBotDeps = {
   sendText: (phone: string, text: string) => Promise<boolean>;
   sendButtons: (phone: string, payload: any) => Promise<boolean>;
   sendList: (phone: string, payload: any) => Promise<boolean>;
+  fetchMediaBase64?: (messageId: string, rawMessage?: any) => Promise<{ base64?: string; mimetype?: string } | null>;
   useInteractiveMessages?: () => Promise<boolean>;
 };
 
@@ -179,7 +180,11 @@ function geminiResponseDiagnostics(response: any): string {
   return [finishReason && `finishReason=${finishReason}`, blockReason && `blockReason=${blockReason}`].filter(Boolean).join(', ');
 }
 
-async function transcribeAudioWithGemini(audio: ExtractedEvolutionAudio): Promise<string | null> {
+async function transcribeAudioWithGemini(
+  audio: ExtractedEvolutionAudio,
+  messageId?: string,
+  fetchMediaBase64?: (messageId: string, rawMessage?: any) => Promise<{ base64?: string; mimetype?: string } | null>
+): Promise<string | null> {
   const ai = getAiClient();
   if (!ai) {
     console.warn('[NavoBot][Voice] Transcrição de áudio não realizada: GEMINI_API_KEY ausente.');
@@ -189,26 +194,46 @@ async function transcribeAudioWithGemini(audio: ExtractedEvolutionAudio): Promis
   let base64Data = audio.base64;
   let mimeType = audio.mimetype || 'audio/ogg; codecs=opus';
 
-  // Se vier apenas a URL, faz o download do áudio e converte para base64
-  if (!base64Data && audio.url) {
+  // 1. Se não tiver base64 imediato, tenta obter via Evolution API decrypt endpoint
+  if (!base64Data && fetchMediaBase64 && (messageId || audio.rawMessage)) {
     try {
-      console.info(`[NavoBot][Voice] Baixando áudio a partir da URL: ${audio.url.slice(0, 60)}...`);
-      const response = await fetch(audio.url, { headers: { 'User-Agent': 'NavoBot/1.0' } });
-      if (!response.ok) {
-        console.warn(`[NavoBot][Voice] Falha ao baixar áudio da URL: status ${response.status}`);
-        return null;
+      console.info(`[NavoBot][Voice] Solicitando base64 do áudio decriptografado à Evolution API (id: ${messageId})...`);
+      const mediaResult = await fetchMediaBase64(messageId || '', audio.rawMessage);
+      if (mediaResult?.base64) {
+        base64Data = mediaResult.base64;
+        if (mediaResult.mimetype) mimeType = mediaResult.mimetype;
+        console.info(`[NavoBot][Voice] Áudio obtido com sucesso da Evolution API (${base64Data.length} chars).`);
       }
-      const arrayBuffer = await response.arrayBuffer();
-      base64Data = Buffer.from(arrayBuffer).toString('base64');
-      const detectedMime = response.headers.get('content-type');
-      if (detectedMime) mimeType = detectedMime;
     } catch (err: any) {
-      console.warn(`[NavoBot][Voice] Erro ao baixar áudio para transcrição: ${err?.message || err}`);
-      return null;
+      console.warn(`[NavoBot][Voice] Erro ao buscar áudio decriptografado via Evolution API: ${err?.message || err}`);
     }
   }
 
-  // Se o base64 contiver data URL prefix (ex: data:audio/ogg;base64,...), limpa
+  // 2. Se vier apenas a URL acessível (ex: MinIO/S3/HTTP público), faz o download
+  if (!base64Data && audio.url) {
+    try {
+      console.info(`[NavoBot][Voice] Tentando baixar áudio da URL: ${audio.url.slice(0, 60)}...`);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const response = await fetch(audio.url, {
+        headers: { 'User-Agent': 'NavoBot/1.0' },
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (response.ok) {
+        const arrayBuffer = await response.arrayBuffer();
+        base64Data = Buffer.from(arrayBuffer).toString('base64');
+        const detectedMime = response.headers.get('content-type');
+        if (detectedMime) mimeType = detectedMime;
+      } else {
+        console.warn(`[NavoBot][Voice] Falha ao baixar áudio da URL: status ${response.status}`);
+      }
+    } catch (err: any) {
+      console.warn(`[NavoBot][Voice] Erro ao baixar áudio da URL: ${err?.message || err}`);
+    }
+  }
+
+  // 3. Se o base64 contiver data URL prefix (ex: data:audio/ogg;base64,...), limpa
   if (base64Data && base64Data.includes('base64,')) {
     const parts = base64Data.split('base64,');
     const mimeMatch = parts[0].match(/data:(.*?);/);
@@ -216,15 +241,23 @@ async function transcribeAudioWithGemini(audio: ExtractedEvolutionAudio): Promis
     base64Data = parts[1];
   }
 
-  if (!base64Data) {
+  if (!base64Data || base64Data.trim().length < 10) {
     console.warn('[NavoBot][Voice] Mensagem de áudio recebida sem dados base64 nem URL acessível.');
     return null;
   }
 
-  // Normaliza o MIME type para formato aceito pelo Gemini
-  let normalizedMimeType = mimeType.split(';')[0].trim().toLowerCase();
-  if (!normalizedMimeType || normalizedMimeType === 'audio/*') {
+  // Normaliza o MIME type para formato suportado pelo Gemini
+  let normalizedMimeType = (mimeType || 'audio/ogg').split(';')[0].trim().toLowerCase();
+  if (!normalizedMimeType || normalizedMimeType === 'audio/*' || normalizedMimeType.includes('opus') || normalizedMimeType.includes('ogg')) {
     normalizedMimeType = 'audio/ogg';
+  } else if (normalizedMimeType.includes('mp3') || normalizedMimeType.includes('mpeg')) {
+    normalizedMimeType = 'audio/mp3';
+  } else if (normalizedMimeType.includes('wav')) {
+    normalizedMimeType = 'audio/wav';
+  } else if (normalizedMimeType.includes('m4a') || normalizedMimeType.includes('mp4') || normalizedMimeType.includes('aac')) {
+    normalizedMimeType = 'audio/aac';
+  } else if (normalizedMimeType.includes('webm')) {
+    normalizedMimeType = 'audio/webm';
   }
 
   try {
@@ -237,29 +270,30 @@ async function transcribeAudioWithGemini(audio: ExtractedEvolutionAudio): Promis
           parts: [
             {
               inlineData: {
-                data: base64Data,
+                data: base64Data.trim(),
                 mimeType: normalizedMimeType,
               },
             },
             {
-              text: 'Transcreva com precisão a mensagem de voz deste cliente de barbearia/salão para texto em português. Retorne APENAS a transcrição textual exata do que foi dito pelo cliente, sem introduções, aspas ou comentários adicionais.',
+              text: 'Transcreva com precisão o que o cliente disse neste áudio em português do Brasil. Retorne EXCLUSIVAMENTE o texto transcrito, sem introduções, sem aspas e sem explicações. Se o áudio for inaudível, vazio ou ruído estático, responda apenas "[INAUDIVEL]".',
             },
           ],
         },
       ],
       config: {
-        temperature: 0.0,
+        temperature: 0.1,
         maxOutputTokens: 256,
         thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
       },
     });
 
     const transcribed = extractGeminiText(response);
-    if (transcribed) {
-      console.info(`[NavoBot][Voice] Áudio transcrito com sucesso: "${transcribed.slice(0, 100)}..."`);
-      return transcribed.trim();
+    if (transcribed && !transcribed.includes('[INAUDIVEL]')) {
+      const clean = transcribed.replace(/^["']|["']$/g, '').trim();
+      console.info(`[NavoBot][Voice] Áudio transcrito com sucesso: "${clean}"`);
+      return clean;
     }
-    console.warn(`[NavoBot][Voice] Gemini processou áudio mas não retornou texto transcrito. ${geminiResponseDiagnostics(response)}`);
+    console.warn(`[NavoBot][Voice] Gemini processou áudio mas não retornou texto transcrito útil. ${geminiResponseDiagnostics(response)}`);
     return null;
   } catch (error: any) {
     console.error('[NavoBot][Voice] Erro ao transcrever áudio com Gemini:', error?.message || error);
@@ -334,7 +368,7 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
   }
 }
 
-export function createNavoBotService({ getDb, schema, sendText, sendButtons, sendList, useInteractiveMessages }: NavoBotDeps) {
+export function createNavoBotService({ getDb, schema, sendText, sendButtons, sendList, fetchMediaBase64, useInteractiveMessages }: NavoBotDeps) {
   async function getConversation(phone: string, instanceName: string): Promise<Conversation> {
     const db = getDb();
     const normalizedPhone = sanitizePhone(phone);
@@ -1838,8 +1872,8 @@ MENSAGEM DO CLIENTE:
 
     // Se a mensagem for de áudio (ou não tiver texto e tiver áudio), transcreve com Gemini
     if (message.audio && (!message.text || !message.text.trim())) {
-      console.info(`[NavoBot] Mensagem de voz recebida de ${message.phone}. Iniciando reconhecimento de voz...`);
-      const transcribedText = await transcribeAudioWithGemini(message.audio);
+      console.info(`[NavoBot] Mensagem de voz recebida de ${message.phone} (msgId: ${message.messageId}). Iniciando reconhecimento de voz...`);
+      const transcribedText = await transcribeAudioWithGemini(message.audio, message.messageId, fetchMediaBase64);
       if (transcribedText) {
         message.text = transcribedText;
         console.info(`[NavoBot] Áudio de ${message.phone} transcrito para: "${transcribedText}"`);
@@ -1847,7 +1881,7 @@ MENSAGEM DO CLIENTE:
         console.warn(`[NavoBot] Não foi possível transcrever áudio de ${message.phone}. Enviando aviso amigável ao cliente.`);
         await sendText(
           message.phone,
-          'Recebi seu áudio, mas não consegui entender com clareza o que foi dito. Poderia, por favor, enviar por texto ou mandar outro áudio?'
+          '🎤 Recebi seu áudio, mas não consegui ouvir com clareza. Você poderia, por favor, digitar sua mensagem ou enviar um novo áudio?'
         );
         return { ignored: false, processed: true, audioTranscriptionFailed: true };
       }

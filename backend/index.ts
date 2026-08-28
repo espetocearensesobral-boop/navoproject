@@ -156,6 +156,7 @@ navobotService = createNavoBotService({
   sendText: evolutionApiModule.sendText,
   sendButtons: evolutionApiModule.sendButtons,
   sendList: evolutionApiModule.sendList,
+  fetchMediaBase64: evolutionApiModule.fetchMediaBase64,
 });
 
 const evolutionApiRouter = evolutionApiModule.router;

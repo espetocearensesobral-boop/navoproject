@@ -24,6 +24,7 @@ export type ExtractedEvolutionAudio = {
   url?: string;
   mimetype?: string;
   seconds?: number;
+  rawMessage?: any;
 };
 
 export type ExtractedEvolutionMessage = {
@@ -33,6 +34,7 @@ export type ExtractedEvolutionMessage = {
   text: string;
   pushName?: string;
   audio?: ExtractedEvolutionAudio;
+  rawPayload?: any;
 };
 
 const WEEKDAY_ALIASES: Record<string, keyof typeof WEEKDAY_OFFSETS> = {
@@ -242,6 +244,7 @@ export function extractBookingCode(text: string): string | null {
 
 function unwrapMessageContent(msg: any): any {
   if (!msg || typeof msg !== 'object') return {};
+  if (msg.message && typeof msg.message === 'object') return unwrapMessageContent(msg.message);
   if (msg.ephemeralMessage?.message) return unwrapMessageContent(msg.ephemeralMessage.message);
   if (msg.viewOnceMessage?.message) return unwrapMessageContent(msg.viewOnceMessage.message);
   if (msg.viewOnceMessageV2?.message) return unwrapMessageContent(msg.viewOnceMessageV2.message);
@@ -309,42 +312,47 @@ function extractTextFromWhatsAppMessage(msg: any): string {
   return '';
 }
 
-function extractAudioFromWhatsAppMessage(msg: any): ExtractedEvolutionAudio | null {
-  if (!msg) return null;
-  const unwrapped = unwrapMessageContent(msg);
+function extractAudioFromWhatsAppMessage(msg: any, rawContext?: any): ExtractedEvolutionAudio | null {
+  if (!msg && !rawContext) return null;
+  const unwrapped = unwrapMessageContent(msg || rawContext);
   if (!unwrapped || typeof unwrapped !== 'object') return null;
 
-  const audioObj = unwrapped.audioMessage || unwrapped.pttMessage || unwrapped.voiceMessage || unwrapped.audio;
-  if (!audioObj) return null;
+  const audioObj = unwrapped.audioMessage || unwrapped.pttMessage || unwrapped.voiceMessage || unwrapped.audio || (rawContext?.messageType === 'audioMessage' ? unwrapped : null);
+  if (!audioObj && rawContext?.messageType !== 'audioMessage') return null;
 
-  const base64 = typeof audioObj.base64 === 'string' && audioObj.base64.trim()
-    ? audioObj.base64.trim()
+  const targetAudio = audioObj || unwrapped;
+
+  const base64 = typeof targetAudio.base64 === 'string' && targetAudio.base64.trim()
+    ? targetAudio.base64.trim()
     : typeof unwrapped.base64 === 'string' && unwrapped.base64.trim()
     ? unwrapped.base64.trim()
+    : typeof rawContext?.base64 === 'string' && rawContext.base64.trim()
+    ? rawContext.base64.trim()
     : undefined;
 
-  const url = typeof audioObj.url === 'string' && audioObj.url.trim()
-    ? audioObj.url.trim()
-    : typeof audioObj.mediaUrl === 'string' && audioObj.mediaUrl.trim()
-    ? audioObj.mediaUrl.trim()
+  const url = typeof targetAudio.url === 'string' && targetAudio.url.trim()
+    ? targetAudio.url.trim()
+    : typeof targetAudio.mediaUrl === 'string' && targetAudio.mediaUrl.trim()
+    ? targetAudio.mediaUrl.trim()
     : typeof unwrapped.mediaUrl === 'string' && unwrapped.mediaUrl.trim()
     ? unwrapped.mediaUrl.trim()
     : undefined;
 
-  const mimetype = typeof audioObj.mimetype === 'string' && audioObj.mimetype.trim()
-    ? audioObj.mimetype.trim()
-    : typeof audioObj.mimeType === 'string' && audioObj.mimeType.trim()
-    ? audioObj.mimeType.trim()
+  const mimetype = typeof targetAudio.mimetype === 'string' && targetAudio.mimetype.trim()
+    ? targetAudio.mimetype.trim()
+    : typeof targetAudio.mimeType === 'string' && targetAudio.mimeType.trim()
+    ? targetAudio.mimeType.trim()
     : 'audio/ogg; codecs=opus';
 
-  const seconds = typeof audioObj.seconds === 'number' ? audioObj.seconds : undefined;
+  const seconds = typeof targetAudio.seconds === 'number' ? targetAudio.seconds : undefined;
 
-  if (base64 || url) {
-    return { base64, url, mimetype, seconds };
-  }
-
-  // Se audioObj existir mesmo sem base64/url imediatos, retorna os metadados
-  return { mimetype, seconds };
+  return {
+    base64,
+    url,
+    mimetype,
+    seconds,
+    rawMessage: msg || rawContext,
+  };
 }
 
 export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage | null {
@@ -407,7 +415,7 @@ export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage
   if (digits.length < 8) return null;
 
   // Extrai o áudio se presente
-  const audio = extractAudioFromWhatsAppMessage(dataItem.message || dataItem);
+  const audio = extractAudioFromWhatsAppMessage(dataItem.message || dataItem, dataItem);
 
   // Extrai o texto da mensagem
   const text = extractTextFromWhatsAppMessage(dataItem.message || dataItem);
@@ -428,6 +436,7 @@ export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage
     text: text || '',
     pushName: pushName ? String(pushName) : undefined,
     audio: audio || undefined,
+    rawPayload: payload,
   };
 }
 
