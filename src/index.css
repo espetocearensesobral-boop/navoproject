@@ -835,15 +835,15 @@ button, a, input, select, textarea {
 
 .admin-shell .admin-sidebar-item:hover svg,
 .admin-shell .admin-sidebar-item:focus-visible svg {
-  color: var(--color-gold-base) !important;
+  color: var(--admin-accent) !important;
   opacity: 1;
 }
 
 
 .admin-shell .admin-sidebar-item-active {
-  color: var(--color-accent-text) !important;
-  background: color-mix(in srgb, var(--color-gold-base) 18%, transparent) !important;
-  box-shadow: inset 3px 0 0 var(--color-gold-base), 0 1px 2px color-mix(in srgb, var(--color-gold-base) 12%, transparent) !important;
+  color: var(--admin-accent) !important;
+  background: color-mix(in srgb, var(--admin-accent) 18%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--admin-accent), 0 1px 2px color-mix(in srgb, var(--admin-accent) 12%, transparent) !important;
 }
 
 .admin-shell .admin-sidebar-item-active svg,
@@ -1769,9 +1769,9 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-header-icon--success {
-  background: color-mix(in srgb, var(--admin-accent) 12%, transparent);
-  border-color: color-mix(in srgb, var(--admin-accent) 25%, transparent);
-  color: var(--admin-accent);
+  background: color-mix(in srgb, var(--color-gold-base) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-gold-base) 25%, transparent);
+  color: var(--color-gold-base);
 }
 
 .receipt-v2-header-icon svg {
@@ -1996,7 +1996,7 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-service b {
-  color: var(--admin-accent);
+  color: var(--color-gold-base);
   font-weight: 600;
 }
 
@@ -2195,9 +2195,9 @@ button, a, input, select, textarea {
   gap: 16px;
   padding: 14px 16px;
   margin: 0 0 20px;
-  border: 1px solid color-mix(in srgb, var(--admin-accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-gold-base) 16%, transparent);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
+  background: color-mix(in srgb, var(--color-gold-base) 8%, transparent);
 }
 
 .receipt-v2-total span {
@@ -2206,7 +2206,7 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-total strong {
-  color: var(--admin-accent);
+  color: var(--color-gold-base);
   font-size: 22px;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
@@ -2319,7 +2319,7 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-cash-grid strong {
-  color: var(--admin-accent);
+  color: var(--color-gold-base);
 }
 
 .receipt-v2-review {
@@ -2367,7 +2367,7 @@ button, a, input, select, textarea {
 }
 
 .receipt-v2-review-row strong.is-positive {
-  color: var(--admin-accent);
+  color: var(--color-gold-base);
 }
 
 .receipt-v2-review-row strong.is-negative {
@@ -2440,7 +2440,7 @@ button, a, input, select, textarea {
   gap: 8px;
   padding: 0 0 4px;
   margin: 0 0 12px;
-  color: var(--admin-accent);
+  color: var(--color-gold-base);
   font-size: 14px;
 }
 
@@ -2533,8 +2533,8 @@ button, a, input, select, textarea {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: color-mix(in srgb, var(--admin-accent) 10%, transparent);
-  color: var(--admin-accent);
+  background: color-mix(in srgb, var(--color-gold-base) 10%, transparent);
+  color: var(--color-gold-base);
 }
 
 .receipt-v2-decision-icon svg {
@@ -2782,7 +2782,7 @@ button, a, input, select, textarea {
   border-radius: 12px;
   background: var(--admin-bg);
   border: 1px solid var(--admin-border);
-  color: var(--admin-accent);
+  color: var(--color-gold-base);
 }
 
 .admin-modal-v2-header-icon svg {
@@ -2791,9 +2791,9 @@ button, a, input, select, textarea {
 }
 
 .admin-modal-v2-header-icon--gold {
-  background: color-mix(in srgb, var(--admin-accent) 15%, transparent);
-  border-color: color-mix(in srgb, var(--admin-accent) 30%, transparent);
-  color: var(--admin-accent);
+  background: color-mix(in srgb, var(--color-gold-base) 15%, transparent);
+  border-color: color-mix(in srgb, var(--color-gold-base) 30%, transparent);
+  color: var(--color-gold-base);
 }
 
 .admin-modal-v2-header-icon--whatsapp {
@@ -2808,7 +2808,7 @@ button, a, input, select, textarea {
 
 .admin-modal-v2-label {
   display: block;
-  color: var(--admin-accent);
+  color: var(--color-gold-base);
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -2854,7 +2854,7 @@ button, a, input, select, textarea {
 .admin-modal-v2-close:hover {
   background: var(--admin-surface);
   color: var(--admin-text-main);
-  border-color: var(--admin-accent);
+  border-color: var(--color-gold-base);
 }
 
 .admin-modal-v2-close svg {
