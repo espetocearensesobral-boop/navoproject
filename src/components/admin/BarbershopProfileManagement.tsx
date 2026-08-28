@@ -217,7 +217,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
  onChange={(e) =>
  setProfile((p) => ({ ...p, name: e.target.value }))
  }
- placeholder="Ex: Navo Barber & Club"
+ placeholder="Ex: NavoClub"
  className="w-full bg-[var(--admin-bg)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  />
  </div>

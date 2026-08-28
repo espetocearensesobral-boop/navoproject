@@ -80,7 +80,7 @@ export function createEmailModule(getDb: () => any, schema: any, eq: any) {
 
       const transporter = buildTransporter(cfg);
       await transporter.sendMail({
-        from: `"${cfg.fromName || 'Navo Barber & Club'}" <${cfg.fromEmail}>`,
+        from: `"${cfg.fromName || 'NavoClub'}" <${cfg.fromEmail}>`,
         to,
         replyTo: cfg.replyTo || cfg.fromEmail,
         subject,
@@ -122,7 +122,7 @@ export function createEmailModule(getDb: () => any, schema: any, eq: any) {
       if (!cfg) {
         return res.json({
           enabled: false, smtpHost: '', smtpPort: 587, smtpSecure: false,
-          smtpUser: '', hasPassword: false, fromName: 'Navo Barber & Club',
+          smtpUser: '', hasPassword: false, fromName: 'NavoClub',
           fromEmail: '', replyTo: '', notificationEmail: '', notifyOnBooking: true, notifyOnReschedule: true, notifyOnCancel: true,
         });
       }
@@ -154,7 +154,7 @@ export function createEmailModule(getDb: () => any, schema: any, eq: any) {
         smtpPassword: (data.smtpPassword === undefined || data.smtpPassword === '••••••••')
           ? (existing?.smtpPassword || '')
           : data.smtpPassword,
-        fromName: (data.fromName || 'Navo Barber & Club').trim(),
+        fromName: (data.fromName || 'NavoClub').trim(),
         fromEmail: (data.fromEmail || '').trim(),
         replyTo: (data.replyTo || '').trim(),
         notificationEmail: data.notificationEmail !== undefined
@@ -202,11 +202,11 @@ export function createEmailModule(getDb: () => any, schema: any, eq: any) {
       // Envia mesmo com "enabled" desligado, pra permitir validar antes de ativar de vez.
       const transporter = buildTransporter(cfg);
       await transporter.sendMail({
-        from: `"${cfg.fromName || 'Navo Barber & Club'}" <${cfg.fromEmail}>`,
+        from: `"${cfg.fromName || 'NavoClub'}" <${cfg.fromEmail}>`,
         to,
         replyTo: cfg.replyTo || cfg.fromEmail,
-        subject: 'Teste de envio — Navo Barber & Club',
-        html: '<p>Este é um e-mail de teste do painel administrativo do Navo Barber &amp; Club.</p>'
+        subject: 'Teste de envio — NavoClub',
+        html: '<p>Este é um e-mail de teste do painel administrativo do NavoClub.</p>'
           + '<p>Se você recebeu esta mensagem, a configuração SMTP está funcionando corretamente. ✅</p>',
       });
 

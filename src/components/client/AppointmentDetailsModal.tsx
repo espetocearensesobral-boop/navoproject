@@ -313,11 +313,11 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
   // Google Calendar URL Generator
   const getGoogleCalendarUrl = () => {
-    const title = encodeURIComponent(`Navo Premium - ${currentApt.services?.[0]?.title || 'Agendamento'}`);
+    const title = encodeURIComponent(`NavoClub - ${currentApt.services?.[0]?.title || 'Agendamento'}`);
     const details = encodeURIComponent(
-      `Agendamento Navo Premium\nBarbeiro: ${currentApt.professional_name}\nServiços: ${(currentApt.services || []).map(s => s.title).join(', ')}\nLocal: Navo Premium - Rua Fortaleza, 1420 - Expectativa, Sobral - CE`
+      `Agendamento NavoClub\nBarbeiro: ${currentApt.professional_name}\nServiços: ${(currentApt.services || []).map(s => s.title).join(', ')}\nLocal: NavoClub - Rua Fortaleza, 1420 - Expectativa, Sobral - CE`
     );
-    const location = encodeURIComponent('Navo Premium - Rua Fortaleza, 1420 - Expectativa, Sobral - CE');
+    const location = encodeURIComponent('NavoClub - Rua Fortaleza, 1420 - Expectativa, Sobral - CE');
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}`;
   };
 
@@ -568,7 +568,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                       <MapPin className="w-3.5 h-3.5" />
                     </div>
                     <div>
-                      <div className="text-[13px] font-semibold text-content-base leading-tight">Navo Premium</div>
+                      <div className="text-[13px] font-semibold text-content-base leading-tight">NavoClub</div>
                       <div className="text-[11px] text-[#7a7268]">Rua Fortaleza, 1420 — Expectativa, Sobral</div>
                     </div>
                   </div>

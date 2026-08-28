@@ -66,7 +66,7 @@ export const LOYALTY_REWARDS: LoyaltyReward[] = [
   },
   {
     id: 'rew_2',
-    title: 'Pomada Modeladora Matte Navo Premium',
+    title: 'Pomada Modeladora Matte NavoClub',
     points_required: 350,
     reward_type: 'free_product',
     value_description: 'Retire na recepção da barbearia',

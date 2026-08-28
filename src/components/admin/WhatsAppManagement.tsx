@@ -115,7 +115,7 @@ export const WhatsAppManagement: React.FC = () => {
  const [aiResult, setAiResult] = useState<NavoBotAiTestResult | null>(null);
  const [testNumber, setTestNumber] = useState("");
  const [testText, setTestText] = useState(
-"Olá! Esta é uma mensagem de teste do Navo Premium.",
+"Olá! Esta é uma mensagem de teste do NavoClub.",
  );
  const [copiedWebhook, setCopiedWebhook] = useState(false);
  const [simPhone, setSimPhone] = useState("5511999998888");

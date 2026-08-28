@@ -1,8 +1,8 @@
 {
   "id": "/admin",
-  "short_name": "Administrativo",
-  "name": "Navo Administrativo",
-  "description": "Painel administrativo da Navo Premium para gestão de agenda, equipe e operação.",
+  "short_name": "Navo Admin",
+  "name": "NavoClub Administrativo",
+  "description": "Painel administrativo do NavoClub para gestão de agenda, equipe, financeiro e operação.",
   "icons": [
     {
       "src": "/pwa-admin-192x192.svg",

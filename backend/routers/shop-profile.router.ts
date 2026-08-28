@@ -6,7 +6,7 @@ import { requireAuth, requireAdmin } from '../middleware/index.js';
 import { handleError } from '../utils/index.js';
 
 export const defaultShopProfileData = {
-  name: 'Navo Barber & Club',
+  name: 'NavoClub',
   unitName: 'Unidade Expectativa',
   slogan: 'Estilo, Tradição e Excelência na Medida Certa',
   address: 'Rua Fortaleza, 1420 - Expectativa, Sobral - CE',
@@ -30,7 +30,7 @@ export const defaultShopProfileData = {
   instagram: 'barbearia.navo',
   facebookUrl: '',
   logoUrl: '',
-  description: 'A Navo Barber & Club é referência em estética masculina e serviços de alto padrão.',
+  description: 'A NavoClub é referência em estética masculina e serviços de alto padrão.',
   allowOutsideHoursApproval: false,
   themePalette: 'heritage'
 };

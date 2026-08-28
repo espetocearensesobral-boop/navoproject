@@ -107,7 +107,7 @@ function conversationId(phone: string, instanceName: string): string {
 function greetingText(name?: string): string {
   const greeting = name ? `Olá, *${name}*! Tudo bem?` : 'Olá! Tudo bem?';
   return `${greeting} 💈\n\n` +
-    'Sou o assistente virtual da *Navo Barber & Club*. Estou aqui para te ajudar!\n\n' +
+    'Sou o assistente virtual da *NavoClub*. Estou aqui para te ajudar!\n\n' +
     '💬 *Como posso te atender hoje?*\n' +
     'Você pode me dizer diretamente o que precisa, por exemplo:\n' +
     '• _"Quero agendar um corte amanhã às 15h"_\n' +
@@ -536,7 +536,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
         const barberPhone = sanitizePhone(assignedBarber.phone).replace(/\D/g, '');
         if (barberPhone && barberPhone !== cleanPhone) {
           const barberMessage =
-            `💈 *[Navo Barber - Encaminhamento de Cliente]*\n\n` +
+            `💈 *[NavoClub - Encaminhamento de Cliente]*\n\n` +
             `Olá *${assignedBarber.name}*, um cliente solicitou atendimento no WhatsApp da barbearia!\n\n` +
             `👤 *Cliente:* ${clientName}\n` +
             `📞 *Telefone:* ${rawClientPhone}\n` +
@@ -555,7 +555,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
 
       if (notifyManager && managerPhone && managerPhone !== cleanPhone) {
         const managerMessage =
-          `🔔 *[Navo Barber - Alerta de Atendimento Humano]*\n\n` +
+          `🔔 *[NavoClub - Alerta de Atendimento Humano]*\n\n` +
           `Um cliente no WhatsApp foi transferido para a equipe.\n\n` +
           `👤 *Cliente:* ${clientName} (${rawClientPhone})\n` +
           `✂️ *Barbeiro vinculado:* ${assignedBarber?.name || 'Geral / Não atribuído'}\n` +
@@ -1091,7 +1091,7 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     const services = (await db.query.services.findMany()).filter((s: any) => s.title && Number(s.durationMinutes) > 0);
 
     return {
-      shopName: shop.name || 'Navo Barber & Club',
+      shopName: shop.name || 'NavoClub',
       unitName: shop.unitName || 'Unidade Principal',
       address: shop.address || 'Rua Fortaleza, 1420 - Expectativa, Sobral - CE',
       phone: shop.phone || '(88) 99999-9999',

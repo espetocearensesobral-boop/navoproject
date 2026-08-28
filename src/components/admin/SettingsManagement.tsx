@@ -358,7 +358,7 @@ const EmailSettingsTab: React.FC = () => {
  </label>
  <input
  type="text"
- placeholder="Navo Barber & Club"
+ placeholder="NavoClub"
  value={settings.fromName}
  onChange={(e) => update("fromName", e.target.value)}
  className="w-full bg-[var(--admin-bg)]/70 rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
@@ -614,7 +614,7 @@ const PrintSettingsTab: React.FC = () => {
  ? '<div class="qr">QR</div><h1>NAVO PREMIUM</h1><p>Aponte a câmera para agendar seu horário.</p>'
  : kind ==="report"
  ? '<h1>Relatório financeiro</h1><p>Período: exemplo de validação</p><hr><div class="metric"><strong>Entradas confirmadas</strong><b>R$ 1.280,00</b></div><div class="metric"><strong>Saídas registradas</strong><b>R$ 320,00</b></div><div class="metric"><strong>Resultado líquido</strong><b>R$ 960,00</b></div>'
- : '<h1>Navo Barber & Club</h1><p>Comprovante de recebimento</p><hr><p><strong>Cliente:</strong> Cliente de teste</p><p><strong>Serviço:</strong> Corte Premium</p><p><strong>Profissional:</strong> Profissional Navo</p><hr><div class="metric"><strong>Total recebido</strong><b>R$ 85,00</b></div>';
+ : '<h1>NavoClub</h1><p>Comprovante de recebimento</p><hr><p><strong>Cliente:</strong> Cliente de teste</p><p><strong>Serviço:</strong> Corte Premium</p><p><strong>Profissional:</strong> Profissional Navo</p><hr><div class="metric"><strong>Total recebido</strong><b>R$ 85,00</b></div>';
  popup.document.write(
  `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${title}</title><style>@page{size:${pageSize};margin:${settings.marginMm}mm}*{box-sizing:border-box}body{width:${width};max-width:100%;margin:0 auto;padding:${settings.marginMm}mm;font-family:Arial,sans-serif;color:#111;font-size:${settings.fontSize}px;line-height:1.35}h1{text-align:center;font-size:${settings.fontSize + 6}px;margin:0 0 ${density} 0}p{margin:${density} 0}hr{border:0;border-top:1px dashed #777;margin:${Number.parseInt(density) * 2}px 0}.metric{display:flex;justify-content:space-between;gap:12px;padding:${density} 0}.qr{width:48mm;height:48mm;margin:10mm auto;border:3px solid #111;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700}@media print{body{box-shadow:none}}button{font-size:14px;padding:10px 16px}</style></head><body>${content}${settings.showFooter ? `<footer style="text-align:center;margin-top:24px;color:#555">${settings.footerText}</footer>` :""}<p style="text-align:center;margin-top:28px"><button onclick="window.print()">Imprimir teste</button></p></body></html>`,
  );
@@ -632,7 +632,7 @@ const PrintSettingsTab: React.FC = () => {
  [
 "showLogo",
 "Exibir marca da barbearia",
-"Cabeçalho com Navo Barber & Club.",
+"Cabeçalho com NavoClub.",
  ],
  [
 "showClientData",

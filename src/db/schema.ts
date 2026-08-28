@@ -491,7 +491,7 @@ export const adminPushSubscriptionsRelations = relations(adminPushSubscriptions,
 
 export const shopSettings = pgTable('shop_settings', {
   id: text('id').primaryKey().default('default'),
-  name: text('name').notNull().default('Navo Barber & Club'),
+  name: text('name').notNull().default('NavoClub'),
   unitName: text('unit_name').notNull().default('Unidade Expectativa'),
   slogan: text('slogan').notNull().default('Estilo, Tradição e Excelência na Medida Certa'),
   address: text('address').notNull().default('Rua Fortaleza, 1420 - Expectativa, Sobral - CE'),
@@ -556,7 +556,7 @@ export const emailSettings = pgTable('email_settings', {
   smtpSecure: boolean('smtp_secure').notNull().default(false),
   smtpUser: text('smtp_user').default(''),
   smtpPassword: text('smtp_password').default(''),
-  fromName: text('from_name').notNull().default('Navo Barber & Club'),
+  fromName: text('from_name').notNull().default('NavoClub'),
   fromEmail: text('from_email').default(''),
   replyTo: text('reply_to').default(''),
   notificationEmail: text('notification_email').default(''),

@@ -432,7 +432,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
  )
  .join("");
 
- const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' :""}<h2 class="print-center">Comprovante de Pagamento</h2><hr class="print-divider">${contextRows}${extraRowsHtml ? `<hr class="print-divider"><p><strong>Itens da Comanda:</strong></p>${extraRowsHtml}` :""}<hr class="print-divider">${valueRows}${settings.showObservations && receipt.observations ? `<hr class="print-divider"><p><strong>Observações:</strong> ${escapePrintHtml(receipt.observations)}</p>` :""}`;
+ const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">NavoClub</h1>' :""}<h2 class="print-center">Comprovante de Pagamento</h2><hr class="print-divider">${contextRows}${extraRowsHtml ? `<hr class="print-divider"><p><strong>Itens da Comanda:</strong></p>${extraRowsHtml}` :""}<hr class="print-divider">${valueRows}${settings.showObservations && receipt.observations ? `<hr class="print-divider"><p><strong>Observações:</strong> ${escapePrintHtml(receipt.observations)}</p>` :""}`;
  if (
  !openPrintWindow({
  title:"Comprovante de Pagamento",
@@ -475,7 +475,7 @@ export const ReceiptCheckoutModal: React.FC<ReceiptCheckoutModalProps> = ({
  itemsStr += `\n• Gorjeta: ${money(tipAmount)}`;
  }
 
- const msg = `*Navo Barber & Club - Comprovante de Pagamento*\n\nOlá, ${clientName}!\nConfirmamos o pagamento da sua comanda/atendimento.\n\n*Itens e Consumo:*\n${itemsStr}\n\n*Resumo:*\n• Profissional: ${receipt.professionalName ||"Profissional"}\n• Forma: ${methodStr}\n• Total Pago: *${totalFormatted}*\n• Data: ${dateFormatted}\n\nAgradecemos a preferência e até a próxima!`;
+ const msg = `*NavoClub - Comprovante de Pagamento*\n\nOlá, ${clientName}!\nConfirmamos o pagamento da sua comanda/atendimento.\n\n*Itens e Consumo:*\n${itemsStr}\n\n*Resumo:*\n• Profissional: ${receipt.professionalName ||"Profissional"}\n• Forma: ${methodStr}\n• Total Pago: *${totalFormatted}*\n• Data: ${dateFormatted}\n\nAgradecemos a preferência e até a próxima!`;
 
  const targetUrl = phone
  ? `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`

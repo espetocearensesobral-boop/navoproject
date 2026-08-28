@@ -629,7 +629,7 @@ export const AdminLayout: React.FC = () => {
  <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-md)] flex items-center justify-center shrink-0 font-bold">
  <Scissors className="w-4 h-4"/>
  </div>
- <h1 className="admin-title-h3 truncate">Navo Premium</h1>
+ <h1 className="admin-title-h3 truncate">NavoClub</h1>
  </div>
  </div>
 
@@ -691,7 +691,7 @@ export const AdminLayout: React.FC = () => {
             <Scissors className="w-3.5 h-3.5" />
           </div>
           <h1 className="text-xs sm:text-sm font-bold tracking-tight text-[var(--admin-sidebar-text)] truncate">
-            {navItems.find((i) => i.id === activeTab)?.label || "Navo Premium"}
+            {navItems.find((i) => i.id === activeTab)?.label || "NavoClub"}
           </h1>
         </div>
 
@@ -800,7 +800,7 @@ export const AdminLayout: React.FC = () => {
               <div className="w-7 h-7 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-sm)] flex items-center justify-center shrink-0 font-bold shadow-sm">
                 <Scissors className="w-3.5 h-3.5" />
               </div>
-              <h1 className="text-sm font-bold text-[var(--admin-sidebar-text)] truncate">Navo Premium</h1>
+              <h1 className="text-sm font-bold text-[var(--admin-sidebar-text)] truncate">NavoClub</h1>
             </div>
             <button
               type="button"

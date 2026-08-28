@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "short_name": "Agendamentos",
-  "name": "Navo Agendamentos",
-  "description": "App PWA de agendamentos, fila de espera em tempo real e experiência VIP da Navo Premium",
+  "short_name": "NavoClub",
+  "name": "NavoClub",
+  "description": "App PWA de agendamentos, clube de benefícios, pontos e experiência VIP do NavoClub",
   "icons": [
     {
       "src": "pwa-192x192.svg",

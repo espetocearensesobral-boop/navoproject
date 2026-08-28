@@ -56,7 +56,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
               <h2 id="terms-modal-title" className="text-sm font-serif font-bold text-content-base">
                 {activeTab === 'terms' ? 'Termos de Serviço' : 'Política de Privacidade'}
               </h2>
-              <p className="text-[10px] text-content-muted">Navo Barber & Club — Última atualização: 10 de agosto de 2026</p>
+              <p className="text-[10px] text-content-muted">NavoClub — Última atualização: 10 de agosto de 2026</p>
             </div>
           </div>
 
@@ -99,7 +99,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
           {activeTab === 'terms' ? (
             <div className="space-y-4">
               <p className="text-content-muted">
-                Estes Termos de Serviço (&quot;Termos&quot;) regem o uso da plataforma de agendamentos e gestão de barbearias (&quot;Plataforma&quot;), fornecida por <strong>Navo Barber & Club</strong> (&quot;nós&quot;, &quot;nosso&quot; ou &quot;Plataforma&quot;).
+                Estes Termos de Serviço (&quot;Termos&quot;) regem o uso da plataforma de agendamentos e gestão de barbearias (&quot;Plataforma&quot;), fornecida por <strong>NavoClub</strong> (&quot;nós&quot;, &quot;nosso&quot; ou &quot;Plataforma&quot;).
               </p>
               <p className="text-content-muted">
                 Ao criar uma conta, acessar ou utilizar nossa Plataforma, você (&quot;Usuário&quot;, &quot;Barbearia&quot; ou &quot;Cliente&quot;) concorda expressamente com estes Termos. Se você não concordar com alguma disposição, não deverá utilizar nossos serviços.
@@ -146,7 +146,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
               <div className="space-y-2">
                 <h3 className="font-bold text-sm text-gold-base">4. Propriedade Intelectual</h3>
                 <p className="text-content-muted">
-                  4.1. Todos os direitos de propriedade intelectual relacionados à Plataforma (código-fonte, design, logotipos, marcas, textos e funcionalidades) pertencem exclusivamente ao <strong>Navo Barber & Club</strong>.
+                  4.1. Todos os direitos de propriedade intelectual relacionados à Plataforma (código-fonte, design, logotipos, marcas, textos e funcionalidades) pertencem exclusivamente ao <strong>NavoClub</strong>.
                 </p>
               </div>
 
@@ -167,7 +167,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
           ) : (
             <div className="space-y-4">
               <p className="text-content-muted">
-                Esta Política de Privacidade descreve como o <strong>Navo Barber & Club</strong> coleta, usa, armazena e protege as informações dos usuários e clientes finais, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).
+                Esta Política de Privacidade descreve como o <strong>NavoClub</strong> coleta, usa, armazena e protege as informações dos usuários e clientes finais, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).
               </p>
 
               <hr className="border-border-subtle my-3" />

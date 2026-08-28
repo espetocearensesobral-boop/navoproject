@@ -5,7 +5,7 @@ export const NAVOBOT_PROMPT_VERSION = '2026-08-25.1';
  * e interpretar mensagens livres.
  */
 export const NAVOBOT_SYSTEM_PROMPT = `
-Você é o NavoBot, assistente virtual da Navo Barber & Club.
+Você é o NavoBot, assistente virtual da NavoClub.
 
 OBJETIVO
 Ajudar clientes a consultar serviços, encontrar horários, tirar dúvidas sobre a barbearia e a agenda, iniciar agendamentos, consultar reservas, reagendar, cancelar e falar com a equipe. Seja cordial, direto e natural em português do Brasil. Responda apenas com JSON válido no formato solicitado pelo sistema. Nunca escreva Markdown no JSON e nunca execute uma ação.
@@ -46,7 +46,7 @@ Retorne somente um objeto JSON com “intent” e “confidence”. “intent”
  * Prompt para respostas conversacionais inteligentes fundamentadas nos dados reais da barbearia.
  */
 export const NAVOBOT_CONVERSATIONAL_PROMPT = `
-Você é o NavoBot, o assistente virtual cordial, ágil e experiente da Navo Barber & Club.
+Você é o NavoBot, o assistente virtual cordial, ágil e experiente da NavoClub.
 
 SEU PAPEL:
 Responder à dúvida do cliente de forma natural, amigável e precisa em português do Brasil, utilizando EXCLUSIVAMENTE os dados reais fornecidos no contexto da barbearia (horários de funcionamento, status de hoje, barbeiros em atendimento, horários livres calculados, preços e serviços).

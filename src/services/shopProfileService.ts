@@ -38,7 +38,7 @@ export interface ShopProfile {
 }
 
 export const defaultShopProfile: ShopProfile = {
-  name: 'Navo Barber & Club',
+  name: 'NavoClub',
   unitName: 'Unidade Expectativa',
   slogan: 'Estilo, Tradição e Excelência na Medida Certa',
   address: 'Rua Fortaleza, 1420 - Expectativa, Sobral - CE',

@@ -64,7 +64,7 @@ export const GuestSignupPromptModal: React.FC<GuestSignupPromptModalProps> = ({
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-base/10 border border-gold-base/30 text-gold-base text-[10px] font-extrabold uppercase tracking-widest mb-1">
             <UserPlus className="w-3 h-3" />
-            <span>Benefícios VIP Navo Premium</span>
+            <span>Benefícios VIP NavoClub</span>
           </div>
           
           <h3 id="guest-modal-title" className="text-xl font-serif text-content-base font-semibold">Crie sua Conta Grátis</h3>

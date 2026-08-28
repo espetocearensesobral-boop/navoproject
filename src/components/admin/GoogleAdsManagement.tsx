@@ -55,11 +55,11 @@ const initialForm: GoogleCampaignForm = {
  destinationUrl:"https://navoproject.vercel.app/?catalog=1",
  headlines: [
 "Agende seu horário",
-"Navo Barber & Club",
+"NavoClub",
 "Barbearia em Sobral",
  ],
  descriptions: [
-"Agende seu atendimento na Navo Barber & Club.",
+"Agende seu atendimento na NavoClub.",
 "Escolha seu horário online com facilidade.",
  ],
  keywords: [

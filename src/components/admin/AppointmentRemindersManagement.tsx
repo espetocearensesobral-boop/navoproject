@@ -130,14 +130,14 @@ export const AppointmentRemindersManagement: React.FC = () => {
  if (apt.date === todayStr) {
  if (diffMinutes >= 0 && diffMinutes <= 180) {
  cat ="2h";
- msg = `*Lembrete de Agendamento - Navo Barber & Club*\n\nOlá, *${apt.client_name}*!\nLembramos que seu atendimento para *${serviceName}* com *${barber}* é hoje às *${apt.time_slot}*.\n\n📍 Nosso endereço: Rua dos Barbeiros, 120\nEsperamos você!`;
+ msg = `*Lembrete de Agendamento - NavoClub*\n\nOlá, *${apt.client_name}*!\nLembramos que seu atendimento para *${serviceName}* com *${barber}* é hoje às *${apt.time_slot}*.\n\n📍 Nosso endereço: Rua dos Barbeiros, 120\nEsperamos você!`;
  } else {
  cat ="today";
- msg = `*Lembrete de Horário Hoje - Navo Barber & Club*\n\nOlá, *${apt.client_name}*!\nConfirmando seu horário de *${serviceName}* hoje às *${apt.time_slot}* com *${barber}*.\n\nCaso precise de algum ajuste, nos avise por aqui!`;
+ msg = `*Lembrete de Horário Hoje - NavoClub*\n\nOlá, *${apt.client_name}*!\nConfirmando seu horário de *${serviceName}* hoje às *${apt.time_slot}* com *${barber}*.\n\nCaso precise de algum ajuste, nos avise por aqui!`;
  }
  } else if (apt.date === tomorrowStr) {
  cat ="tomorrow";
- msg = `*Confirmação de Agendamento Amanhã - Navo Barber & Club*\n\nOlá, *${apt.client_name}*!\nSeu horário para *${serviceName}* com *${barber}* está confirmado para amanhã (${new Date(`${tomorrowStr}T12:00:00`).toLocaleDateString("pt-BR")}) às *${apt.time_slot}*.\n\nAté breve!`;
+ msg = `*Confirmação de Agendamento Amanhã - NavoClub*\n\nOlá, *${apt.client_name}*!\nSeu horário para *${serviceName}* com *${barber}* está confirmado para amanhã (${new Date(`${tomorrowStr}T12:00:00`).toLocaleDateString("pt-BR")}) às *${apt.time_slot}*.\n\nAté breve!`;
  }
 
  if (cat) {

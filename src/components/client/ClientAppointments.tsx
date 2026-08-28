@@ -653,7 +653,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
           <div className="py-2.5 flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
               <h3 className="text-sm sm:text-base font-extrabold text-content-base capitalize truncate leading-tight">
-                {currentAppointment.services?.map(s => s.title).join(', ') || 'Atendimento Navo Premium'}
+                {currentAppointment.services?.map(s => s.title).join(', ') || 'Atendimento NavoClub'}
               </h3>
               <p className="text-[11px] text-content-muted font-medium mt-0.5 capitalize">
                 {currentAppointment.date} às <strong className="text-content-base">{currentAppointment.time_slot}</strong>

@@ -1,6 +1,6 @@
-# Navo Premium | Barbearia & Club
+# NavoClub | Barbearia & Club
 
-Navo Premium is a modern barber shop application.
+NavoClub is a modern barber shop application.
 
 ## Key Features
 - Online Booking System (Step-by-step: Services -> Barbers -> Date/Time -> Review -> Confirmation)

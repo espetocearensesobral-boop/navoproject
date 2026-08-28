@@ -179,7 +179,7 @@ export const ReportsManagement: React.FC = () => {
  )
  .join("")}`
  :"";
- const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">Navo Barber &amp; Club</h1>' :""}<h2 class="print-center">Relatório financeiro</h2><p class="print-center print-muted">${escapePrintHtml(report.period.label)} — ${escapePrintHtml(report.period.from)} até ${escapePrintHtml(report.period.to)}</p><hr class="print-divider">${metric("Entradas confirmadas", money(report.summary.totalIncome))}${metric("Saídas confirmadas", money(report.summary.totalExpenses))}${metric("Resultado líquido", money(report.summary.netResult))}${metric("Recebimentos pendentes", money(report.summary.pendingAmount))}${chart}${details}`;
+ const bodyHtml = `${settings.showLogo ? '<h1 class="print-center">NavoClub</h1>' :""}<h2 class="print-center">Relatório financeiro</h2><p class="print-center print-muted">${escapePrintHtml(report.period.label)} — ${escapePrintHtml(report.period.from)} até ${escapePrintHtml(report.period.to)}</p><hr class="print-divider">${metric("Entradas confirmadas", money(report.summary.totalIncome))}${metric("Saídas confirmadas", money(report.summary.totalExpenses))}${metric("Resultado líquido", money(report.summary.netResult))}${metric("Recebimentos pendentes", money(report.summary.pendingAmount))}${chart}${details}`;
  openPrintWindow({
  title:"Relatório financeiro",
  settings,

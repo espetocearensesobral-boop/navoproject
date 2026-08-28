@@ -11,23 +11,23 @@ export const CAMPAIGNS_DEMO_MODE = campaignDemoEnv?.VITE_CAMPAIGNS_DEMO_MODE !==
 const demoTimestamp = '2026-08-22T12:00:00.000Z';
 
 export const demoMetaAccounts: MetaAdAccount[] = [
-  { id: 'act_demo_navo', name: 'Navo Barber & Club — Conta demonstrativa', currency: 'BRL', accountStatus: 1 },
+  { id: 'act_demo_navo', name: 'NavoClub — Conta demonstrativa', currency: 'BRL', accountStatus: 1 },
 ];
 
 export const demoMetaPages: MetaPage[] = [
-  { id: 'demo-navo-page', name: 'Navo Barber & Club (Página demonstrativa)' },
+  { id: 'demo-navo-page', name: 'NavoClub (Página demonstrativa)' },
 ];
 
 export const demoMetaConnection: MetaAdsConnection = {
   id: 'demo-meta-connection',
   status: 'connected',
   metaUserId: 'demo-meta-user',
-  metaUserName: 'Navo Barber & Club (demonstração)',
+  metaUserName: 'NavoClub (demonstração)',
   adAccountId: 'act_demo_navo',
-  adAccountName: 'Navo Barber & Club — Conta demonstrativa',
+  adAccountName: 'NavoClub — Conta demonstrativa',
   currency: 'BRL',
   pageId: 'demo-navo-page',
-  pageName: 'Navo Barber & Club',
+  pageName: 'NavoClub',
   lastSyncedAt: demoTimestamp,
   lastError: null,
 };
@@ -44,7 +44,7 @@ export const demoMetaCampaigns: MetaCampaign[] = [
     endDate: '2026-08-31',
     locationLabel: 'Sobral e região',
     destinationUrl: 'https://navoproject.vercel.app/?catalog=1',
-    adText: 'Agende seu atendimento na Navo Barber & Club.',
+    adText: 'Agende seu atendimento na NavoClub.',
     headline: 'Agende seu horário',
     imageUrl: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=900&q=80',
     impressions: 12480,
@@ -84,15 +84,15 @@ export const demoMetaCampaigns: MetaCampaign[] = [
 ];
 
 export const demoGoogleCustomers: GoogleAdsCustomer[] = [
-  { customerId: '000-000-0000', resourceName: 'customers/0000000000', name: 'Navo Barber & Club — Conta demonstrativa', currency: 'BRL', manager: false },
+  { customerId: '000-000-0000', resourceName: 'customers/0000000000', name: 'NavoClub — Conta demonstrativa', currency: 'BRL', manager: false },
 ];
 
 export const demoGoogleConnection: GoogleAdsConnection = {
   id: 'demo-google-connection',
   googleUserId: 'demo-google-user',
-  googleUserName: 'Navo Barber & Club (demonstração)',
+  googleUserName: 'NavoClub (demonstração)',
   customerId: '000-000-0000',
-  customerName: 'Navo Barber & Club — Conta demonstrativa',
+  customerName: 'NavoClub — Conta demonstrativa',
   managerCustomerId: null,
   currency: 'BRL',
   status: 'connected',

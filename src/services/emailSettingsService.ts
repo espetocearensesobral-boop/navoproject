@@ -26,7 +26,7 @@ export const defaultEmailSettings: EmailSettings = {
   smtpSecure: false,
   smtpUser: '',
   hasPassword: false,
-  fromName: 'Navo Barber & Club',
+  fromName: 'NavoClub',
   fromEmail: '',
   replyTo: '',
   notificationEmail: '',

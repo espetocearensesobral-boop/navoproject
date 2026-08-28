@@ -55,7 +55,7 @@ const initialForm: MetaCampaignForm = {
  locationLabel:"Sobral e região",
  locationKey:"",
  destinationUrl:"https://navoproject.vercel.app/?catalog=1",
- adText:"Agende seu atendimento na Navo Barber & Club.",
+ adText:"Agende seu atendimento na NavoClub.",
  headline:"Agende seu horário",
  imageUrl:"",
 };

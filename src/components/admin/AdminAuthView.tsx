@@ -31,7 +31,7 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [shopLogo, setShopLogo] = useState<string | null>(null);
-  const [shopName, setShopName] = useState<string>("Navo Premium");
+  const [shopName, setShopName] = useState<string>("NavoClub");
 
   const [loginData, setLoginData] = useState({
     loginId: "",

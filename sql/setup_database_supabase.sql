@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- 3. Configurações da Loja
 CREATE TABLE IF NOT EXISTS public.shop_settings (
   id TEXT PRIMARY KEY DEFAULT 'default',
-  name TEXT NOT NULL DEFAULT 'Navo Barber & Club',
+  name TEXT NOT NULL DEFAULT 'NavoClub',
   unit_name TEXT DEFAULT 'Unidade Expectativa',
   slogan TEXT DEFAULT 'Estilo, Tradição e Excelência na Medida Certa',
   address TEXT DEFAULT 'Rua Fortaleza, 1420 - Expectativa, Sobral - CE',
@@ -311,7 +311,7 @@ CREATE TABLE IF NOT EXISTS public.print_settings (
 
 CREATE TABLE IF NOT EXISTS public.site_settings (
   id TEXT PRIMARY KEY DEFAULT 'default',
-  meta_title TEXT DEFAULT 'Navo Barber & Club',
+  meta_title TEXT DEFAULT 'NavoClub',
   meta_description TEXT,
   favicon_url TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -363,7 +363,7 @@ CREATE TABLE IF NOT EXISTS public.notification_deliveries (
 INSERT INTO public.shop_settings (id, name, unit_name, slogan, address, phone, whatsapp, open_time, close_time)
 VALUES (
   'default',
-  'Navo Barber & Club',
+  'NavoClub',
   'Unidade Expectativa',
   'Estilo, Tradição e Excelência na Medida Certa',
   'Rua Fortaleza, 1420 - Expectativa, Sobral - CE',
