@@ -31,6 +31,8 @@ import {
  UserCheck,
  MessageCircle,
  Calendar,
+ LayoutGrid,
+ List,
 } from"lucide-react";
 
 // Preset avatar photos for quick professional selection
@@ -88,6 +90,7 @@ export const ProfessionalsManagement: React.FC = () => {
 "all"|"active"|"inactive"
  >("all");
  const [expandedBarberId, setExpandedBarberId] = useState<string | null>(null);
+ const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
 
  const [isModalOpen, setIsModalOpen] = useState(false);
  const [activeFormTab, setActiveFormTab] = useState<
@@ -497,13 +500,173 @@ export const ProfessionalsManagement: React.FC = () => {
  Pausados ({totalBarbers - activeBarbers})
  </button>
  </div>
+
+ <div className="hidden md:flex items-center gap-1 border border-[var(--admin-border)] bg-[var(--admin-surface)] p-1 rounded-[var(--admin-radius-lg)]">
+ <button
+ type="button"
+ onClick={() => setViewMode("grid")}
+ className={`p-1.5 rounded-[var(--admin-radius-md)] transition-colors ${viewMode === "grid" ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"}`}
+ title="Visualização em Grade (Cards)"
+ aria-label="Visualização em Grade"
+ >
+ <LayoutGrid className="w-4 h-4" />
+ </button>
+ <button
+ type="button"
+ onClick={() => setViewMode("table")}
+ className={`p-1.5 rounded-[var(--admin-radius-md)] transition-colors ${viewMode === "table" ? "bg-[var(--admin-accent)] text-[var(--admin-accent-text)]" : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)]"}`}
+ title="Visualização em Tabela"
+ aria-label="Visualização em Tabela"
+ >
+ <List className="w-4 h-4" />
+ </button>
+ </div>
  </div>
  </div>
 
- {/* CARDS VIEW */}
+ {/* CARDS / BENTO GRID VIEW */}
  <div className="admin-table-container">
- {/* DESKTOP TABLE VIEW */}
+ {/* DESKTOP BENTO GRID / TABLE VIEW */}
  <div className="hidden md:block">
+ {viewMode === "grid" ? (
+ <div>
+ {loading ? (
+ <div className="p-12 text-center text-[var(--admin-text-muted)] bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)]">
+ <Scissors className="w-6 h-6 text-[var(--admin-accent)] animate-spin mx-auto mb-2" />
+ Carregando profissionais...
+ </div>
+ ) : filteredBarbers.length === 0 ? (
+ <div className="p-12 text-center text-[var(--admin-text-muted)] bg-[var(--admin-surface)] rounded-[var(--admin-radius-xl)] border border-[var(--admin-border)]">
+ Nenhum profissional encontrado.
+ </div>
+ ) : (
+ <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+ {filteredBarbers.map((barber) => {
+ const isActive = barber.is_active ?? true;
+ const commissionPercent = Math.round((barber.commission_rate || 0.45) * 100);
+
+ return (
+ <article
+ key={barber.id}
+ className={`bg-[var(--admin-surface)] border rounded-[var(--admin-radius-xl)] p-4 flex flex-col justify-between transition-all hover:shadow-md ${
+ !isActive ? "border-[var(--admin-border)] opacity-75" : "border-[var(--admin-border)] hover:border-[var(--admin-accent)]/50"
+ }`}
+ >
+ <div>
+ {/* Header: Avatar + Name + Status Badge */}
+ <div className="flex items-start gap-3 mb-3">
+ <div className="relative w-12 h-12 rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] overflow-hidden shrink-0 bg-[var(--admin-bg)]">
+ <img src={barber.photo_url} alt={barber.name} className="w-full h-full object-cover" />
+ <span
+ className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[var(--admin-surface)] ${
+ isActive ? "bg-status-success" : "bg-status-error"
+ }`}
+ />
+ </div>
+ <div className="min-w-0 flex-1">
+ <div className="flex items-center justify-between gap-1">
+ <h3 className="font-bold text-sm text-[var(--admin-text-main)] truncate">
+ {barber.name}
+ </h3>
+ <span
+ className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+ isActive
+ ? "bg-status-success/15 text-status-success"
+ : "bg-status-error/15 text-status-error"
+ }`}
+ >
+ {isActive ? "Ativo" : "Pausado"}
+ </span>
+ </div>
+ {barber.nickname && (
+ <p className="text-xs text-[var(--admin-text-muted)] truncate">"{barber.nickname}"</p>
+ )}
+ <div className="mt-1 flex items-center gap-1.5">
+ <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-[var(--admin-bg)] text-[var(--admin-accent)] border border-[var(--admin-border)] uppercase tracking-wider">
+ {barber.role}
+ </span>
+ </div>
+ </div>
+ </div>
+
+ {/* Info Row: Rating, Hours, Commission */}
+ <div className="grid grid-cols-3 gap-2 p-2.5 bg-[var(--admin-bg)]/60 rounded-[var(--admin-radius-md)] border border-[var(--admin-border)]/60 text-xs mb-3">
+ <div>
+ <span className="text-[10px] text-[var(--admin-text-muted)] uppercase font-semibold block">Avaliação</span>
+ <div className="flex items-center gap-1 text-amber-500 font-bold mt-0.5">
+ <Star className="w-3 h-3 fill-amber-500" />
+ {(barber.rating || 5.0).toFixed(1)}
+ </div>
+ </div>
+ <div>
+ <span className="text-[10px] text-[var(--admin-text-muted)] uppercase font-semibold block">Comissão</span>
+ <span className="font-mono font-bold text-[var(--admin-text-main)] mt-0.5 block">
+ {commissionPercent}%
+ </span>
+ </div>
+ <div>
+ <span className="text-[10px] text-[var(--admin-text-muted)] uppercase font-semibold block">Turno</span>
+ <span className="text-[11px] font-bold text-[var(--admin-text-main)] mt-0.5 block truncate">
+ {barber.working_hours?.start || "08:00"}–{barber.working_hours?.end || "19:00"}
+ </span>
+ </div>
+ </div>
+ </div>
+
+ {/* Actions Footer */}
+ <div className="flex items-center justify-between gap-2 pt-2 border-t border-[var(--admin-border)]/60">
+ <div className="flex items-center gap-1.5">
+ {barber.phone && (
+ <a
+ href={`https://wa.me/55${barber.phone.replace(/\D/g, "")}`}
+ target="_blank"
+ rel="noreferrer"
+ className="p-2 rounded-[var(--admin-radius-sm)] text-[var(--admin-text-muted)] hover:text-status-success hover:bg-status-success/10 transition-colors"
+ title="WhatsApp"
+ >
+ <MessageCircle className="w-4 h-4" />
+ </a>
+ )}
+ <button
+ type="button"
+ onClick={() => handleToggleStatus(barber)}
+ className={`p-2 rounded-[var(--admin-radius-sm)] transition-colors ${
+ isActive
+ ? "text-status-success hover:bg-status-success/10"
+ : "text-status-error hover:bg-status-error/10"
+ }`}
+ title={isActive ? "Pausar" : "Ativar"}
+ >
+ <Power className="w-4 h-4" />
+ </button>
+ </div>
+
+ <div className="flex items-center gap-1">
+ <button
+ type="button"
+ onClick={() => handleOpenEdit(barber)}
+ className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-[var(--admin-radius-sm)] text-xs font-semibold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)] transition-colors"
+ >
+ <Edit2 className="w-3.5 h-3.5" />
+ Editar
+ </button>
+ <button
+ type="button"
+ onClick={() => handleDelete(barber.id)}
+ className="p-1.5 rounded-[var(--admin-radius-sm)] text-[var(--admin-text-muted)] hover:text-status-error hover:bg-status-error/10 transition-colors"
+ title="Excluir"
+ >
+ <Trash2 className="w-3.5 h-3.5" />
+ </button>
+ </div>
+ </div>
+ </article>
+ );
+ })}
+ </div>
+ )}
+ </div>
+ ) : (
  <table className="admin-table">
  <thead>
  <tr>
@@ -626,6 +789,7 @@ export const ProfessionalsManagement: React.FC = () => {
  )}
  </tbody>
  </table>
+ )}
  </div>
 
  {/* MOBILE LIST VIEW */}
