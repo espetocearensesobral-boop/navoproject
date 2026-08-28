@@ -536,7 +536,7 @@ body,
 }
 
 .admin-shell .admin-layout-sidebar {
-  background: var(--admin-bg);
+  background: var(--admin-sidebar-bg);
   border-right-color: var(--admin-border);
 }
 
@@ -800,7 +800,7 @@ body,
 
   .admin-shell .admin-mobile-topbar,
   .admin-shell .admin-mobile-bottom-bar {
-    background: var(--admin-bg);
+    background: var(--admin-sidebar-bg);
     border-color: var(--admin-border);
   }
 
@@ -1616,10 +1616,10 @@ body,
   --admin-accent-hover: #374151;
   --admin-accent-text: #ffffff;
   
-  --admin-sidebar-bg: #f9f9fb;
-  --admin-sidebar-border: #e6e8eb;
-  --admin-sidebar-text: #111111;
-  --admin-sidebar-text-muted: #6b7280;
+  --admin-sidebar-bg: #0f1115;
+  --admin-sidebar-border: #2e303d;
+  --admin-sidebar-text: #ffffff;
+  --admin-sidebar-text-muted: #8a8f98;
   
   --admin-radius-xs: 6px;
   --admin-radius-sm: 8px;
