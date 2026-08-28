@@ -272,9 +272,9 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
               </div>
             </div>
 
-            <div className="flex justify-center items-center my-4 min-h-[65px] w-full overflow-hidden">
+            <div className="flex justify-center items-center my-4 min-h-[65px] w-full">
               <Turnstile
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAEeQDhUHqW5LUyd4"}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"}
                 options={{ theme: "auto", size: "normal", action: "admin-login" }}
                 onSuccess={(token) => {
                   setTurnstileToken(token);
@@ -282,9 +282,6 @@ export const AdminAuthView: React.FC<AdminAuthViewProps> = ({
                 }}
                 onError={(errCode) => {
                   console.warn("Cloudflare Turnstile error:", errCode);
-                  setErrorMsg(
-                    "Não foi possível carregar a validação Cloudflare. Verifique se o domínio está cadastrado no painel Cloudflare.",
-                  );
                 }}
                 onExpire={() => setTurnstileToken("")}
               />

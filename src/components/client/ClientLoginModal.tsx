@@ -427,10 +427,10 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
             </div>
 
             
-            <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full overflow-hidden">
+            <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full">
               <Turnstile
                 key="reset-password-step"
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAAEeQDhUHqW5LUyd4'}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
                 options={{ theme: 'auto', size: 'normal', action: 'reset-password' }}
                 onSuccess={(token) => {
                   setTurnstileToken(token);
@@ -438,7 +438,6 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
                 }}
                 onError={(err) => {
                   console.warn('Turnstile error:', err);
-                  setErrorMsg('Não foi possível carregar a validação Cloudflare. Verifique a chave e domínio no painel Cloudflare.');
                 }}
                 onExpire={() => setTurnstileToken('')}
               />
@@ -483,10 +482,10 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
               </div>
             </div>
 
-            <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full overflow-hidden">
+            <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full">
               <Turnstile
                 key="forgot-step1"
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAAEeQDhUHqW5LUyd4'}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
                 options={{ theme: 'auto', size: 'normal', action: 'forgot-password' }}
                 onSuccess={(token) => {
                   setTurnstileToken(token);
@@ -494,7 +493,6 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
                 }}
                 onError={(err) => {
                   console.warn('Turnstile error:', err);
-                  setErrorMsg('Não foi possível carregar a validação Cloudflare. Verifique a chave e domínio no painel Cloudflare.');
                 }}
                 onExpire={() => setTurnstileToken('')}
               />
@@ -705,10 +703,10 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
               </div>
             )}
 
-            <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full overflow-hidden">
+            <div className="flex justify-center items-center my-3.5 pt-1 min-h-[65px] w-full">
               <Turnstile
                 key={mode}
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAAEeQDhUHqW5LUyd4'}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
                 options={{
                   theme: 'auto',
                   size: 'normal',
@@ -720,7 +718,6 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
                 }}
                 onError={(err) => {
                   console.warn('Turnstile error:', err);
-                  setErrorMsg('Não foi possível carregar a validação Cloudflare. Verifique a chave e domínio no painel Cloudflare.');
                 }}
                 onExpire={() => setTurnstileToken('')}
               />
