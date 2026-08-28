@@ -444,10 +444,11 @@ export const AdminLayout: React.FC = () => {
 
  // Quick bottom bar items matching mobile model
  const bottomBarItems = [
- { id:"dashboard"as AdminTab, label:"Hoje", icon: TrendingUp },
- { id:"agenda"as AdminTab, label:"Agenda", icon: Calendar },
- { id:"queue"as AdminTab, label:"Espera", icon: Clock },
- ];
+    { id: "dashboard" as AdminTab, label: "Hoje", icon: TrendingUp },
+    { id: "agenda" as AdminTab, label: "Agenda", icon: Calendar },
+    { id: "queue" as AdminTab, label: "Fila", icon: Clock },
+    { id: "atendimento" as AdminTab, label: "Chat", icon: MessageCircle },
+  ];
 
  // Agrupamento puramente visual da navegação: reduz uma lista plana de 12 itens
  // a 4 blocos com propósito claro. Não altera AdminTab, rotas ou persistência de aba.
@@ -684,162 +685,168 @@ export const AdminLayout: React.FC = () => {
  </aside>
 
  {/* Mobile Topbar */}
- <header className="admin-mobile-topbar lg:hidden fixed top-0 left-0 right-0 bg-[var(--admin-sidebar-bg)] text-[var(--admin-sidebar-text)] border-b border-[var(--admin-sidebar-border)] z-40 px-3 flex items-center justify-between h-[var(--admin-header-height)]">
- <div className="flex items-center gap-3 min-w-0 px-1">
- <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-sm)] flex items-center justify-center shrink-0">
- <Scissors className="w-4 h-4"/>
- </div>
- <h1 className="admin-title-h3 truncate">
- {navItems.find((i) => i.id === activeTab)?.label ||"Navo Premium"}
- </h1>
- </div>
+      <header className="admin-mobile-topbar lg:hidden fixed top-0 left-0 right-0 bg-[var(--admin-sidebar-bg)]/95 backdrop-blur-md text-[var(--admin-sidebar-text)] border-b border-white/[0.06] z-40 px-3 flex items-center justify-between h-[var(--admin-header-height)]">
+        <div className="flex items-center gap-2.5 min-w-0 px-1">
+          <div className="w-7 h-7 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-sm)] flex items-center justify-center shrink-0 shadow-sm">
+            <Scissors className="w-3.5 h-3.5" />
+          </div>
+          <h1 className="text-xs sm:text-sm font-bold tracking-tight text-[var(--admin-sidebar-text)] truncate">
+            {navItems.find((i) => i.id === activeTab)?.label || "Navo Premium"}
+          </h1>
+        </div>
 
- <div className="flex items-center gap-1.5 shrink-0">
- <AdminNotificationCenter
- notificationsSupported={notificationsSupported}
- notificationPermission={notificationPermission}
- notificationsActive={notificationsActive}
- notificationsBusy={notificationsBusy}
- onToggleNotifications={toggleNotifications}
- />
- <button
- type="button"
- onClick={toggleTheme}
- className="admin-btn-icon admin-btn-ghost rounded-[var(--admin-radius-full)]"
- title={theme ==="dark"?"Modo claro":"Modo escuro"}
- aria-label={
- theme ==="dark"?"Ativar modo claro":"Ativar modo escuro"
- }
- >
- {theme ==="dark"? (
- <Sun className="w-5 h-5 text-[var(--admin-accent)]"/>
- ) : (
- <Moon className="w-5 h-5"/>
- )}
- </button>
- <button
- type="button"
- onClick={openMobileNavigation}
- className="admin-btn-icon admin-btn-ghost rounded-[var(--admin-radius-full)]"
- aria-label="Abrir Menu de Navegação"
- >
- <Menu className="w-5 h-5"/>
- </button>
- </div>
- </header>
+        <div className="flex items-center gap-1 shrink-0">
+          <AdminNotificationCenter
+            notificationsSupported={notificationsSupported}
+            notificationPermission={notificationPermission}
+            notificationsActive={notificationsActive}
+            notificationsBusy={notificationsBusy}
+            onToggleNotifications={toggleNotifications}
+          />
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="w-9 h-9 flex items-center justify-center rounded-full text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)] hover:bg-white/5 active:scale-95 transition-all"
+            title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+            aria-label={
+              theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"
+            }
+          >
+            {theme === "dark" ? (
+              <Sun className="w-4 h-4 text-[var(--admin-accent)]" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={openMobileNavigation}
+            className="w-9 h-9 flex items-center justify-center rounded-full text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)] hover:bg-white/5 active:scale-95 transition-all"
+            aria-label="Abrir Menu de Navegação"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+        </div>
+      </header>
 
- {/* Mobile Bottom Navigation Bar */}
- <nav className="admin-mobile-bottom-bar lg:hidden fixed bottom-0 left-0 right-0 bg-[var(--admin-sidebar-bg)] text-[var(--admin-sidebar-text)] border-t border-[var(--admin-sidebar-border)] z-40 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
- {bottomBarItems.map((item) => {
- const Icon = item.icon;
- const isActive = activeTab === item.id;
- return (
- <button
- key={item.id}
- type="button"
- onClick={() => handleSidebarTabChange(item.id, true)}
- aria-current={isActive ?"page": undefined}
- className={`flex-1 min-h-[64px] flex flex-col items-center justify-center gap-1 rounded-[var(--admin-radius-md)] my-1 mx-0.5 transition-colors active:scale-[0.97] ${
- isActive
- ?"text-[var(--admin-accent)] font-semibold bg-[var(--admin-accent)]/10"
- :"text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)] hover:bg-white/5"
- }`}
- >
- <Icon className="w-5 h-5 shrink-0"/>
- <span className="text-[10px] font-medium tracking-tight max-w-[76px] truncate">
- {item.label}
- </span>
- </button>
- );
- })}
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="admin-mobile-bottom-bar lg:hidden fixed bottom-0 left-0 right-0 bg-[var(--admin-sidebar-bg)]/95 backdrop-blur-xl text-[var(--admin-sidebar-text)] border-t border-white/[0.06] z-40 flex items-center justify-around px-1 pb-[env(safe-area-inset-bottom)]">
+        {bottomBarItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleSidebarTabChange(item.id, true)}
+              aria-current={isActive ? "page" : undefined}
+              className={`flex-1 h-12 flex flex-col items-center justify-center gap-0.5 rounded-[var(--admin-radius-md)] my-1 mx-0.5 transition-all select-none active:scale-90 ${
+                isActive
+                  ? "text-[var(--admin-accent)] font-semibold bg-[var(--admin-accent)]/15"
+                  : "text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)]"
+              }`}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+              <span className="text-[10px] font-medium tracking-tight max-w-[68px] truncate">
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
 
- {/* 4th Item: Menu / Mais */}
- <button
- type="button"
- onClick={openMobileNavigation}
- className={`flex-1 min-h-[64px] flex flex-col items-center justify-center gap-1 rounded-[var(--admin-radius-md)] my-1 mx-0.5 transition-colors active:scale-[0.97] ${
- isMoreActive
- ?"text-[var(--admin-accent)] font-semibold bg-[var(--admin-accent)]/10"
- :"text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)] hover:bg-white/5"
- }`}
- >
- <MoreHorizontal className="w-5 h-5 shrink-0"/>
- <span className="text-[10px] font-medium tracking-tight max-w-[76px] truncate">
- Mais
- </span>
- </button>
- </nav>
+        {/* 5th Item: Menu / Mais */}
+        <button
+          type="button"
+          onClick={openMobileNavigation}
+          className={`flex-1 h-12 flex flex-col items-center justify-center gap-0.5 rounded-[var(--admin-radius-md)] my-1 mx-0.5 transition-all select-none active:scale-90 ${
+            isMoreActive
+              ? "text-[var(--admin-accent)] font-semibold bg-[var(--admin-accent)]/15"
+              : "text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)]"
+          }`}
+        >
+          <MoreHorizontal className="w-4 h-4 shrink-0" />
+          <span className="text-[10px] font-medium tracking-tight max-w-[68px] truncate">
+            Mais
+          </span>
+        </button>
+      </nav>
 
- {/* Mobile Drawer (Side sheet) */}
- <div
- className={`admin-mobile-drawer lg:hidden fixed inset-0 z-50 flex justify-start ${sidebarOpen ?"pointer-events-auto":"pointer-events-none"}`}
- aria-hidden={!sidebarOpen}
- inert={!sidebarOpen}
- >
- <div
- className={`fixed inset-0 bg-black/55 transition-opacity duration-200 ${sidebarOpen ?"opacity-100":"opacity-0"}`}
- onClick={closeMobileNavigation}
- aria-hidden="true"
- />
+      {/* Mobile Drawer (Side sheet) */}
+      <div
+        className={`admin-mobile-drawer lg:hidden fixed inset-0 z-50 flex justify-start ${
+          sidebarOpen ? "pointer-events-auto" : "pointer-events-none"
+        }`}
+        aria-hidden={!sidebarOpen}
+        inert={!sidebarOpen}
+      >
+        <div
+          className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ${
+            sidebarOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={closeMobileNavigation}
+          aria-hidden="true"
+        />
 
- <aside
- ref={sidebarRef}
- tabIndex={-1}
- className={`relative w-[min(280px,84vw)] bg-[var(--admin-sidebar-bg)] text-[var(--admin-sidebar-text)] flex flex-col border-r border-[var(--admin-sidebar-border)] h-[100dvh] outline-none transform transition-transform duration-200 ease-out ${sidebarOpen ?"translate-x-0":"-translate-x-full"}`}
- >
- {/* Header */}
- <div className="flex items-center justify-between min-h-[var(--admin-header-height)] px-4 pt-[env(safe-area-inset-top)] border-b border-[var(--admin-sidebar-border)] shrink-0">
- <div className="flex items-center gap-3 min-w-0">
- <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-sm)] flex items-center justify-center shrink-0 font-bold">
- <Scissors className="w-4 h-4"/>
- </div>
- <h1 className="admin-title-h3 truncate">Navo Premium</h1>
- </div>
- <button
- type="button"
- onClick={closeMobileNavigation}
- className="admin-btn-icon-sm rounded-[var(--admin-radius-sm)] text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)] hover:bg-white/5"
- aria-label="Fechar menu"
- >
- <X className="w-5 h-5"/>
- </button>
- </div>
+        <aside
+          ref={sidebarRef}
+          tabIndex={-1}
+          className={`relative w-[min(290px,82vw)] bg-[var(--admin-sidebar-bg)] text-[var(--admin-sidebar-text)] flex flex-col rounded-r-2xl border-r border-white/[0.08] shadow-2xl h-[100dvh] outline-none transform transition-transform duration-200 ease-out ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between min-h-[var(--admin-header-height)] px-4 pt-[env(safe-area-inset-top)] border-b border-white/[0.06] shrink-0">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-sm)] flex items-center justify-center shrink-0 font-bold shadow-sm">
+                <Scissors className="w-3.5 h-3.5" />
+              </div>
+              <h1 className="text-sm font-bold text-[var(--admin-sidebar-text)] truncate">Navo Premium</h1>
+            </div>
+            <button
+              type="button"
+              onClick={closeMobileNavigation}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)] hover:bg-white/5 active:scale-95 transition-all"
+              aria-label="Fechar menu"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
- {/* Navigation */}
- {renderSidebarNavigation(true)}
+          {/* Navigation */}
+          {renderSidebarNavigation(true)}
 
- {/* Mobile Footer */}
- <div className="p-4 border-t border-[var(--admin-sidebar-border)] shrink-0 space-y-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
- <div className="flex items-center gap-2">
- <button
- type="button"
- onClick={toggleTheme}
- className="flex-1 h-10 px-0 rounded-[var(--admin-radius-sm)] bg-white/5 border border-white/10 text-[var(--admin-sidebar-text)] hover:bg-white/10 hover:border-white/20 transition-colors flex items-center justify-center"
- title={theme ==="dark"?"Modo claro":"Modo escuro"}
- aria-label={
- theme ==="dark"?"Ativar modo claro":"Ativar modo escuro"
- }
- >
- {theme ==="dark"? (
- <Sun className="w-4 h-4 text-[var(--admin-accent)]"/>
- ) : (
- <Moon className="w-4 h-4 text-[var(--admin-sidebar-text-muted)]"/>
- )}
- </button>
- <button
- type="button"
- onClick={handleLogout}
- className="flex-[2] h-10 rounded-[var(--admin-radius-sm)] bg-white/5 border border-white/10 text-status-error hover:bg-status-error/15 hover:border-status-error/30 transition-colors flex items-center justify-center gap-2"
- >
- <LogOut className="w-4 h-4 shrink-0"/>
- <span className="admin-button-label text-sm font-semibold">Sair</span>
- </button>
- </div>
- </div>
- </aside>
- </div>
+          {/* Mobile Footer */}
+          <div className="p-3 border-t border-white/[0.06] shrink-0 space-y-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="flex-1 h-9 px-0 rounded-[var(--admin-radius-sm)] bg-white/5 border border-white/10 text-[var(--admin-sidebar-text)] hover:bg-white/10 hover:border-white/20 transition-colors flex items-center justify-center"
+                title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+                aria-label={
+                  theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"
+                }
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-4 h-4 text-[var(--admin-accent)]" />
+                ) : (
+                  <Moon className="w-4 h-4 text-[var(--admin-sidebar-text-muted)]" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex-[2] h-9 rounded-[var(--admin-radius-sm)] bg-white/5 border border-white/10 text-status-error hover:bg-status-error/15 hover:border-status-error/30 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <LogOut className="w-3.5 h-3.5 shrink-0" />
+                <span className="text-xs font-semibold">Sair</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
 
- {/* Main Content Area */}
+      {/* Main Content Area */}
  <main
  ref={mainRef}
  className="admin-layout-main lg:ml-[var(--admin-sidebar-width)] pt-[calc(var(--admin-header-height)+env(safe-area-inset-top))] lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full"

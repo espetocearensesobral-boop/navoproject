@@ -798,19 +798,49 @@ body,
 }
 
 @media (max-width: 1023px) {
-  .admin-shell .admin-content-wrapper {
-    padding: 1rem 0.875rem 5rem;
+  .admin-shell {
+    --admin-header-height: 48px;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .admin-shell .admin-mobile-topbar,
+  .admin-shell .admin-content-wrapper {
+    padding: 0.75rem 0.625rem calc(4.25rem + env(safe-area-inset-bottom));
+  }
+
+  /* Seamless mobile surfaces without competing borders or rigid box grids */
+  .admin-shell .admin-card,
+  .admin-shell .admin-panel,
+  .admin-shell .admin-table-container {
+    border-color: color-mix(in srgb, var(--admin-text-main) 6%, transparent);
+    box-shadow: none;
+  }
+
+  .admin-shell .admin-mobile-topbar {
+    height: 48px;
+    background: color-mix(in srgb, var(--admin-sidebar-bg) 94%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
   .admin-shell .admin-mobile-bottom-bar {
-    background: var(--admin-sidebar-bg);
-    border-color: var(--admin-border);
+    min-height: 52px;
+    background: color-mix(in srgb, var(--admin-sidebar-bg) 94%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .admin-shell .admin-mobile-bottom-bar button[aria-current="page"] {
-    background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
-    color: var(--admin-text-main);
+    background: color-mix(in srgb, var(--admin-accent) 14%, transparent);
+    color: var(--admin-sidebar-text);
+  }
+
+  /* Touch scrolling optimizations */
+  .admin-shell .admin-layout-main,
+  .admin-shell [data-admin-sidebar-navigation="mobile"] {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
 }
 
