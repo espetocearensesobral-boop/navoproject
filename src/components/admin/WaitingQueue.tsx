@@ -594,7 +594,7 @@ export const WaitingQueue: React.FC = () => {
  {activeTab ==="kanban"? (
  <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.85fr)] gap-4 items-stretch">
  {/* EM ATENDIMENTO: ações em curso */}
- <section className="order-2 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-[var(--admin-radius-lg)] p-3 sm:p-4">
+ <section className="admin-mobile-edge order-2 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 bg-status-success/[0.035] border border-status-success/20 rounded-[var(--admin-radius-lg)] p-3 sm:p-4">
  <div className="flex items-center justify-between gap-3 shrink-0">
  <div className="flex items-center gap-2">
  <div className="w-2 h-2 rounded-[var(--admin-radius-full)] bg-status-success"/>
@@ -703,7 +703,7 @@ export const WaitingQueue: React.FC = () => {
  </section>
 
  {/* RECEPÇÃO: FILA DE PRÓXIMAS AÇÕES */}
- <section className="order-1 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 admin-card p-3 sm:p-4 rounded-[var(--admin-radius-lg)]">
+ <section className="admin-mobile-edge order-1 flex min-h-0 h-[26rem] xl:h-[30rem] flex-col space-y-3 admin-card p-3 sm:p-4 rounded-[var(--admin-radius-lg)]">
  <div className="flex items-center justify-between gap-3 pb-2 border-b border-[var(--admin-border)] shrink-0">
  <div className="flex items-center gap-1.5">
  <Clock className="w-3.5 h-3.5 text-[var(--admin-accent)]"/>
