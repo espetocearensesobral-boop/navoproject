@@ -1,6 +1,7 @@
 import { addDaysBRT, getDayOfWeekKey, getTodayStringBRT } from '../utils/datetime.js';
 
 export type NavoBotIntent =
+  | 'greeting'
   | 'menu'
   | 'appointments'
   | 'availability'
@@ -91,62 +92,111 @@ function normalizeText(value: string): string {
 export function classifyDeterministicIntent(text: string): NavoBotIntent | null {
   const normalized = normalizeText(text);
   if (!normalized) return null;
-  if (/^1(?:\s*[-.)]|\s|$)/.test(normalized)) return 'book';
-  if (/^2(?:\s*[-.)]|\s|$)/.test(normalized)) return 'appointments';
-  if (/^3(?:\s*[-.)]|\s|$)/.test(normalized)) return 'reschedule';
-  if (/^4(?:\s*[-.)]|\s|$)/.test(normalized)) return 'cancel';
-  if (/^5(?:\s*[-.)]|\s|$)/.test(normalized)) return 'human';
-  if (/^(oi|ola|olá|menu|inicio|início|ajuda|bom dia|boa tarde|boa noite)\b/.test(normalized)) return 'menu';
-  if (/\b(atendente|humano|pessoa|equipe|falar com alguem|falar com alguém)\b/.test(normalized)) return 'human';
-  if (/\b(reclamar|reclamacao|insatisfeito|insatisfacao|decepcionado|decepcao|indignado|absurdo|horrivel|pessimo|nao gostei|servico ruim|atendimento ruim|problema no atendimento|cobranca indevida|cobranca errada|cobraram errado|cobrou errado|atraso no atendimento|atendimento atrasado|demorou no atendimento|esperei demais|ainda estou esperando|estou esperando|ninguem me atendeu|sem retorno|nao tive retorno|desrespeito|desrespeitaram|maltratado|grosseiro|erro no atendimento|falha no atendimento|quero denunciar)\b/.test(normalized)) return 'complaint';
-  if (/\b(cancelar|cancela|cancele|cancelamento|desmarcar|desmarque)\b/.test(normalized) && /\b(todos?|todas?|tudo|agendamentos?|reservas?|horarios?)\b/.test(normalized)) return 'cancel_all';
-  if (/\b(cancelar|cancela|cancele|cancelamento|desmarcar|desmarque|nao vou conseguir ir|nao posso ir)\b/.test(normalized)) return 'cancel';
-  if (/\b(reagendar|remarcar|mudar (o )?horario|trocar (o )?horario|alterar (o )?agendamento|mudar minha reserva|outro dia|outro horario|adiar)\b/.test(normalized)) return 'reschedule';
-  if (/\b(meu|minha|minhas)\b.*\b(agendamento|agenda|reserva|horario|marcacao|voucher)\b/.test(normalized)) return 'appointments';
 
-  // 1. Perguntas de Horário de Funcionamento / Aberto / Fechado / Localização
+  // 1. Atalhos numéricos diretos (1 a 5)
+  if (/^1(?:\s*[-.)]|\s*$)/.test(normalized)) return 'book';
+  if (/^2(?:\s*[-.)]|\s*$)/.test(normalized)) return 'appointments';
+  if (/^3(?:\s*[-.)]|\s*$)/.test(normalized)) return 'reschedule';
+  if (/^4(?:\s*[-.)]|\s*$)/.test(normalized)) return 'cancel';
+  if (/^5(?:\s*[-.)]|\s*$)/.test(normalized)) return 'human';
+
+  // 2. Pedido explícito de menu/opções/comandos/ajuda
+  if (/^(menu|inicio|início|ajuda|opcoes|opções|comandos|voltar ao menu)[\s!.,?]*$/.test(normalized)) return 'menu';
+
+  // 3. Agradecimentos e encerramentos
+  if (/^(obrigad[oa]|valeu|valeu demais|show|perfeito obrigado|muito obrigad[oa]|otimo obrigado|ótimo obrigad[oa]|tchau|ate mais|até mais|falou)[\s!.,?]*$/.test(normalized)) {
+    return 'gratitude';
+  }
+
+  // 4. Confirmação positiva/negativa isolada
+  if (/^(sim|s|ok|pode ser|confirmo|confirmar|fechar|fechado|isso|perfeito)[\s!.,?]*$/.test(normalized)) return 'confirm';
+
+  // 5. Reclamações e insatisfação
+  if (/\b(reclamar|reclamacao|insatisfeito|insatisfacao|decepcionado|decepcao|indignado|absurdo|horrivel|pessimo|nao gostei|servico ruim|atendimento ruim|problema no atendimento|cobranca indevida|cobranca errada|cobraram errado|cobrou errado|atraso no atendimento|atendimento atrasado|demorou no atendimento|esperei demais|ainda estou esperando|estou esperando|ninguem me atendeu|sem retorno|nao tive retorno|desrespeito|desrespeitaram|maltratado|grosseiro|erro no atendimento|falha no atendimento|quero denunciar)\b/.test(normalized)) {
+    return 'complaint';
+  }
+
+  // 6. Atendimento Humano
+  if (/\b(atendente|humano|pessoa|equipe|falar com atendente|falar com humano|falar com pessoa|falar com alguem|falar com alguém)\b/.test(normalized)) {
+    return 'human';
+  }
+
+  // 7. Cancelamentos
+  if (/\b(cancelar|cancela|cancele|cancelamento|desmarcar|desmarque)\b/.test(normalized) && /\b(todos?|todas?|tudo|agendamentos?|reservas?|horarios?)\b/.test(normalized)) {
+    return 'cancel_all';
+  }
+  if (/\b(cancelar|cancela|cancele|cancelamento|desmarcar|desmarque|nao vou conseguir ir|nao posso ir|desistir do horario)\b/.test(normalized)) {
+    return 'cancel';
+  }
+
+  // 8. Reagendamentos
+  if (/\b(reagendar|remarcar|mudar (o )?horario|trocar (o )?horario|alterar (o )?agendamento|mudar minha reserva|outro dia|outro horario|adiar)\b/.test(normalized)) {
+    return 'reschedule';
+  }
+
+  // 9. Consultar agendamentos próprios
+  if (
+    /\b(meu|minha|minhas|meus)\b.*\b(agendamento|agenda|reserva|horario|marcacao|voucher)\b/.test(normalized) ||
+    /\b(consultar|consulto|ver|checar|saber)\b.*\b(agendamento|horario|reserva|marcacao)\b|\b(meu agendamento|minha agenda|minhas reservas|minha reserva|meus horarios|minhas marcacoes|qual (e o )?meu horario|voucher)\b/.test(normalized)
+  ) {
+    return 'appointments';
+  }
+
+  // 10. Perguntas de Horário de Funcionamento / Aberto / Fechado / Localização
   if (
     /\b(que horas\s+(fecha|abre|encerra|comeca|inicia)|horario\s+de\s+(funcionamento|atendimento|abertura|fechamento)|ta\s+aberto|esta\s+aberto|abre\s+hoje|fecha\s+hoje|abrem\s+hoje|aberto\s+hoje|fechado\s+hoje|funcionam\s+hoje|abre\s+(aos?\s+)?(sabados?|domingos?)|onde\s+fica|qual\s+(o\s+)?endereco|localizacao|como\s+chego)\b/.test(normalized)
   ) {
     return 'shop_info';
   }
 
-  // 2. Perguntas sobre Horário mais próximo / Primeiro horário / Vaga imediata
+  // 11. Perguntas sobre Horário mais próximo / Primeiro horário / Vaga imediata
   if (
     /\b(horario\s+mais\s+(proximo|perto|cedo)|primeiro\s+horario|tem\s+vaga\s+(agora|hoje|pra hoje|mais cedo|pra daqui a pouco)|vaga\s+(agora|imediata|mais cedo)|encaixe|consegue\s+me\s+encaixar|tem\s+horario\s+(livre\s+)?(agora|hoje|mais cedo|pra hoje))\b/.test(normalized)
   ) {
     return 'next_slot';
   }
 
-  // 3. Perguntas sobre Último horário do dia
+  // 12. Perguntas sobre Último horário do dia
   if (
     /\b(ultimo\s+horario|ultima\s+vaga|ate\s+que\s+horas\s+(atendem|posso\s+agendar|tem\s+horario|da\s+pra\s+(ir|cortar|marcar))|qual\s+o\s+ultimo)\b/.test(normalized)
   ) {
     return 'last_slot';
   }
 
-  // 4. Perguntas sobre Barbeiros / Quem está atendendo / Barbeiro liberado
+  // 13. Perguntas sobre Barbeiros / Quem está atendendo / Barbeiro liberado
   if (
     /\b((qual|quais)\s+barbeiros?\s+(esta|tao|estao)?\s*(liberado|livre|atendendo|disponivel)|quem\s+(esta|ta)\s+(atendendo|trabalhando|escalado|livre|liberado)|barbeiro\s+(livre|liberado|disponivel))\b/.test(normalized)
   ) {
     return 'barbers';
   }
 
-  // 5. Perguntas sobre Preço e Duração de Serviços
+  // 14. Perguntas sobre Preço e Duração de Serviços
   if (
     /\b(quanto\s+(custa|e|sai|fica)|qual\s+(o\s+)?(preco|valor)|tabela\s+de\s+precos|valores\s+dos\s+servicos|quanto\s+tempo\s+(demora|dura|leva))\b/.test(normalized)
   ) {
     return 'service_info';
   }
 
-  if (/\b(servicos?|precos?|catalogo|ver (os )?servicos?|mostrar (os )?servicos?|lista de servicos?)\b/.test(normalized)) return 'book';
+  // 15. Consultar disponibilidade em geral
   const asksAvailability = /\b(horarios?|horas?|disponiveis?|disponibilidade|vagas?|livres?)\b/.test(normalized);
-  const asksPersonalAppointment = /\b(meu|minha|minhas|meus)\b.*\b(agendamento|agenda|reserva|horario|marcacao|voucher)\b/.test(normalized);
-  const startsBooking = /\b(agendar|marcar|reservar|novo agendamento|fazer (um )?agendamento|quero (um )?horario|quero cortar|quero fazer)\b/.test(normalized);
-  if (asksAvailability && !asksPersonalAppointment && !startsBooking && !/\b(servicos?|catalogo|precos?)\b/.test(normalized)) return 'availability';
-  if (/\b(consultar|consulto|ver|checar|saber)\b.*\b(agendamento|horario|reserva|marcacao)\b|\b(meu agendamento|minha agenda|minhas reservas|minha reserva|meus horarios|minhas marcacoes|qual (e o )?meu horario|voucher)\b/.test(normalized)) return 'appointments';
-  if (/\b(agendar|agenda[r]?|marcar|novo agendamento|fazer um agendamento|gostaria de agendar|quero reservar|quero cortar|quero fazer|tem (um )?horario|tem vaga|disponibilidade|marcar um horario|quero (um )?horario)\b/.test(normalized)) return 'book';
-  if (/\b(confirmar|confirmo|confirma|confirmacao|confirmado|esta confirmado)\b/.test(normalized)) return 'confirm';
+  const startsBooking = /\b(agendar|agenda[r]?|marcar|reservar|novo agendamento|fazer (um )?agendamento|gostaria de agendar|quero (um )?horario|quero cortar|quero fazer|cortar o cabelo|fazer a barba|fazer barba|cortar cabelo|marcar um corte|marcar barba)\b/.test(normalized);
+
+  if (asksAvailability && !startsBooking && !/\b(servicos?|catalogo|precos?)\b/.test(normalized)) {
+    return 'availability';
+  }
+
+  // 16. Iniciar agendamento ou pedir catálogo
+  if (startsBooking || /\b(servicos?|precos?|catalogo|ver (os )?servicos?|mostrar (os )?servicos?|lista de servicos?)\b/.test(normalized)) {
+    return 'book';
+  }
+
+  // 17. Saudação Pura (primeiro contato cordial)
+  if (
+    /^(oi|ola|olaa+|olá|bom dia|boa tarde|boa noite|opa|e ai|e aí|salve|fala ai|fala aí|tudo bem|tudo bom|opa tudo bem|ola tudo bem|oi tudo bem)[\s!.,?]*$/i.test(normalized)
+  ) {
+    return 'greeting';
+  }
+
   return null;
 }
 
@@ -442,6 +492,8 @@ export function extractEvolutionMessage(payload: any): ExtractedEvolutionMessage
 
 export function normalizeIntentName(value: unknown): NavoBotIntent {
   const normalized = normalizeText(String(value || ''));
+  if (['greeting', 'saudacao', 'saudacoes', 'ola', 'oi', 'bom dia', 'boa tarde', 'boa noite'].includes(normalized)) return 'greeting';
+  if (['gratitude', 'agradecimento', 'obrigado', 'valeu', 'tchau'].includes(normalized)) return 'gratitude';
   if (['menu', 'inicio', 'ajuda'].includes(normalized)) return 'menu';
   if (['appointments', 'agendamentos', 'agenda'].includes(normalized)) return 'appointments';
   if (['availability', 'disponibilidade', 'horarios', 'horas', 'vagas'].includes(normalized)) return 'availability';
@@ -486,6 +538,16 @@ const GENERIC_SERVICE_QUERY_WORDS = new Set([
   'gostaria',
 ]);
 
+function isTokenMatch(queryToken: string, titleToken: string): boolean {
+  if (queryToken === titleToken) return true;
+  if (titleToken.startsWith(queryToken) || queryToken.startsWith(titleToken)) return true;
+  // Radicais comuns de barbearia (corte/cortar, barba/barbear/barboterapia, platinar/platinado, luzes/mechas, etc.)
+  if (queryToken.length >= 4 && titleToken.length >= 4) {
+    if (queryToken.slice(0, 4) === titleToken.slice(0, 4)) return true;
+  }
+  return false;
+}
+
 function serviceTokens(value: string): string[] {
   return value
     .normalize('NFD')
@@ -502,12 +564,12 @@ export function findServiceMatches(services: Array<{ id: string; title: string }
   if (!semanticQueryTokens.length) return [];
   const exact = services.filter((service) => {
     const titleTokens = serviceTokens(String(service.title));
-    return semanticQueryTokens.every((queryToken) => titleTokens.some((titleToken) => titleToken === queryToken || titleToken.startsWith(queryToken)));
+    return semanticQueryTokens.every((queryToken) => titleTokens.some((titleToken) => isTokenMatch(queryToken, titleToken)));
   });
   if (exact.length) return exact;
   const scored = services.map((service) => {
     const titleTokens = serviceTokens(String(service.title));
-    const matched = semanticQueryTokens.filter((queryToken) => titleTokens.some((titleToken) => titleToken === queryToken || titleToken.startsWith(queryToken))).length;
+    const matched = semanticQueryTokens.filter((queryToken) => titleTokens.some((titleToken) => isTokenMatch(queryToken, titleToken))).length;
     return { service, matched, coverage: matched / semanticQueryTokens.length };
   }).filter((item) => item.matched > 0 && item.coverage >= 0.5);
   if (!scored.length) return [];

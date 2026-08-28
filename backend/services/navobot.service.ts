@@ -104,6 +104,20 @@ function conversationId(phone: string, instanceName: string): string {
   return `nbc_${phone}_${safeInstanceName(instanceName).replace(/[^a-zA-Z0-9_-]/g, '_')}`;
 }
 
+function greetingText(name?: string): string {
+  const greeting = name ? `Olá, *${name}*! Tudo bem?` : 'Olá! Tudo bem?';
+  return `${greeting} 💈\n\n` +
+    'Sou o assistente virtual da *Navo Barber & Club*. Estou aqui para te ajudar!\n\n' +
+    '💬 *Como posso te atender hoje?*\n' +
+    'Você pode me dizer diretamente o que precisa, por exemplo:\n' +
+    '• _"Quero agendar um corte amanhã às 15h"_\n' +
+    '• _"Tem horário livre para hoje?"_\n' +
+    '• _"Quanto custa corte e barba?"_\n' +
+    '• _"Quais barbeiros estão atendendo?"_\n' +
+    '• _"Ver meus agendamentos"_\n\n' +
+    '_(Ou envie *MENU* para ver as opções numéricas)_';
+}
+
 function menuText(name?: string): string {
   const greeting = name ? `Olá, *${name}*!` : 'Olá!';
   return `${greeting} Sou o *NavoBot* 🤖\n\n` +
@@ -327,6 +341,7 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
             intent: {
               type: 'STRING',
               enum: [
+                'greeting',
                 'menu',
                 'appointments',
                 'availability',
@@ -342,6 +357,7 @@ async function classifyWithAi(text: string, state: string, context: BotContext =
                 'last_slot',
                 'barbers',
                 'service_info',
+                'gratitude',
                 'unknown',
               ],
             },
@@ -857,16 +873,96 @@ export function createNavoBotService({ getDb, schema, sendText, sendButtons, sen
     context.pendingAction = 'book';
     context.serviceIds = context.serviceIds || [];
     const db = getDb();
-    const services = await db.query.services.findMany();
-    const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const matchedService = services.find((service: any) => normalized.includes(String(service.title).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
-    if (matchedService && !context.serviceIds.includes(matchedService.id)) context.serviceIds.push(matchedService.id);
+    const services = (await db.query.services.findMany()).filter((s: any) => s.title && Number(s.durationMinutes) > 0);
+    const professionals = (await db.query.professionals.findMany()).filter((p: any) => p.isActive !== false);
+
+    const matchedServices = findServiceMatches(services, text);
+    if (matchedServices.length > 0) {
+      for (const service of matchedServices) {
+        if (!context.serviceIds.includes(service.id)) {
+          context.serviceIds.push(service.id);
+        }
+      }
+      context.serviceId = context.serviceIds[0];
+    }
+
+    const matchedProfs = findProfessionalMatches(professionals, text);
+    if (matchedProfs.length === 1) {
+      context.professionalId = matchedProfs[0].id;
+    }
+
     const date = parseDateFromText(text);
     const time = parseTimeFromText(text);
     if (date) context.date = date;
     if (time) context.timeSlot = time;
-    if (!context.serviceIds.length) return listServices(conversation, context);
-    return askMoreServices(conversation, context);
+
+    if (!context.serviceIds.length) {
+      return listServices(conversation, context);
+    }
+
+    const selectedServices = await getServices(context);
+    const totalDuration = selectedServices.reduce((sum: number, s: any) => sum + Number(s.durationMinutes || 30), 0);
+    const serviceTitles = selectedServices.map((s: any) => s.title).join(' e ');
+
+    if (context.date && context.timeSlot) {
+      const check = await checkSlotAvailability({
+        dateStr: context.date,
+        startMins: timeToMinutes(context.timeSlot),
+        reqDuration: totalDuration,
+        profId: context.professionalId || '',
+        todayBRT: getTodayStringBRT(),
+        currTimeBRT: getCurrentTimeBRT(),
+      });
+
+      if (check.available) {
+        context.professionalId = check.chosenProf?.id || context.professionalId || 'prof_any';
+        await updateConversation(conversation, 'awaiting_confirmation', context);
+        return replyConfirmation(conversation, 'book', { professionalName: check.chosenProf?.name }, context, selectedServices);
+      } else {
+        const slots = await suggestSlots(context.date, totalDuration, context.professionalId || '');
+        await updateConversation(conversation, 'awaiting_time', context);
+        if (slots.length) {
+          return reply(
+            conversation,
+            `⚠️ O horário das *${context.timeSlot}* não está disponível em *${dateLabel(context.date)}* para *${serviceTitles}*.\n\n` +
+            `🕒 *Próximos horários livres para ${dateLabel(context.date)}:*\n${slots.map((s) => `▪️ *${s}*`).join('   ')}\n\n` +
+            `Qual desses horários você prefere? (Ou informe outro horário)`
+          );
+        } else {
+          return reply(
+            conversation,
+            `❌ Não encontramos horários livres em *${dateLabel(context.date)}* para *${serviceTitles}*.\n\n` +
+            `Gostaria de consultar para outro dia? (Ex: *amanhã*, *sábado*)`
+          );
+        }
+      }
+    }
+
+    if (context.date && !context.timeSlot) {
+      const slots = await suggestSlots(context.date, totalDuration, context.professionalId || '');
+      await updateConversation(conversation, 'awaiting_time', context);
+      if (slots.length) {
+        return reply(
+          conversation,
+          `✂️ Entendido! Anotei *${serviceTitles}* para *${dateLabel(context.date)}*.\n\n` +
+          `🕒 *Horários disponíveis para este dia:*\n${slots.map((s) => `▪️ *${s}*`).join('   ')}\n\n` +
+          `Qual horário você prefere? (Basta enviar o horário desejado)`
+        );
+      } else {
+        return reply(
+          conversation,
+          `❌ Não há mais horários livres em *${dateLabel(context.date)}* para *${serviceTitles}*.\n\n` +
+          `Por favor, informe outro dia para agendarmos (Ex: *amanhã*, *sábado*).`
+        );
+      }
+    }
+
+    await updateConversation(conversation, 'awaiting_date', context);
+    return reply(
+      conversation,
+      `✂️ Combinado! Anotei *${serviceTitles}*.\n\n` +
+      `📅 Para qual dia você prefere agendar? (Ex: *hoje*, *amanhã*, *sábado* ou informe uma data como *28/08*)`
+    );
   }
 
   async function handleAvailabilityRequest(conversation: Conversation, context: BotContext, text: string) {
@@ -1544,6 +1640,11 @@ MENSAGEM DO CLIENTE:
       await updateConversation(conversation, 'idle', preservedContext);
       return reply(conversation, menuText());
     }
+    if (stateIntent === 'greeting') {
+      const preservedContext = context.clientName ? { clientName: context.clientName } : {};
+      await updateConversation(conversation, 'idle', preservedContext);
+      return reply(conversation, greetingText(context.clientName));
+    }
     if (stateIntent === 'gratitude') {
       const preservedContext = context.clientName ? { clientName: context.clientName } : {};
       await updateConversation(conversation, 'idle', preservedContext);
@@ -1750,6 +1851,7 @@ MENSAGEM DO CLIENTE:
       ? await classifyWithAi(message.text, conversation.state, context)
       : null;
     const interruptIntents = new Set<NavoBotIntent>([
+      'greeting',
       'menu',
       'appointments',
       'availability',
@@ -1771,13 +1873,43 @@ MENSAGEM DO CLIENTE:
     if (stateReply !== null) return { handled: true, intent: contextualIntent || aiIntent || 'state' };
 
     const intent = contextualIntent || aiIntent || await classifyWithAi(message.text, conversation.state, context);
+    if (intent === 'greeting') {
+      await updateConversation(conversation, 'idle', context);
+      await reply(conversation, greetingText(message.pushName));
+      return { handled: true, intent };
+    }
+    if (intent === 'gratitude') {
+      await updateConversation(conversation, 'idle', context);
+      await reply(conversation, 'De nada! Estou à disposição. Se precisar de um corte ou cuidar da barba, é só chamar! 💈✂️ Tenha um ótimo dia!');
+      return { handled: true, intent };
+    }
     if (['shop_info', 'next_slot', 'last_slot', 'barbers', 'service_info'].includes(intent)) {
       await handleAgendaContextualQuery(conversation, context, message.text, intent, 'idle');
       return { handled: true, intent };
     }
-    if (intent === 'menu' || intent === 'unknown') {
+    if (intent === 'menu') {
       await updateConversation(conversation, 'idle', context);
       await reply(conversation, menuText(message.pushName));
+      return { handled: true, intent };
+    }
+    if (intent === 'unknown') {
+      const contextualResponse = await answerContextualQueryWithAi({
+        text: message.text,
+        intent: 'unknown',
+        snapshot: await getShopAgendaSnapshot(),
+        context,
+        sourceState: 'idle',
+      });
+      if (contextualResponse) {
+        await reply(conversation, contextualResponse);
+        return { handled: true, intent };
+      }
+      await updateConversation(conversation, 'idle', context);
+      await reply(
+        conversation,
+        'Olá! Não entendi exatamente como posso te ajudar.\n\n' +
+        'Você pode me dizer o que precisa de forma natural (ex: *"Quero agendar corte amanhã"*, *"Qual o horário livre?"*, *"Quanto custa o corte?"*) ou enviar *MENU* para ver as opções.'
+      );
       return { handled: true, intent };
     }
     if (intent === 'complaint') {
