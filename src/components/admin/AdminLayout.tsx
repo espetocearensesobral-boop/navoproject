@@ -495,7 +495,7 @@ export const AdminLayout: React.FC = () => {
  {navGroups.map((group, groupIndex) => (
  <div key={group.label} className={groupIndex > 0 ?"mt-4":""}>
  <p
- className={`px-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-[var(--admin-text-muted)]/70 ${mobile ?"px-3":""}`}
+ className={`px-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-[var(--admin-sidebar-text-muted)]/70 ${mobile ?"px-3":""}`}
  >
  {group.label}
  </p>
@@ -623,7 +623,7 @@ export const AdminLayout: React.FC = () => {
  {/* Desktop Sidebar (Fixed layout for screens >= 1024px) */}
  <aside className="hidden lg:flex admin-layout-sidebar lg:fixed lg:inset-y-0 lg:left-0 z-30">
  {/* Logo Header */}
- <div className="flex items-center h-[var(--admin-header-height)] px-4 border-b border-[var(--admin-border)] shrink-0">
+ <div className="flex items-center h-[var(--admin-header-height)] px-4 border-b border-[var(--admin-sidebar-border)] shrink-0">
  <div className="flex items-center gap-3 min-w-0">
  <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-md)] flex items-center justify-center shrink-0 font-bold">
  <Scissors className="w-4 h-4"/>
@@ -636,16 +636,16 @@ export const AdminLayout: React.FC = () => {
  {renderSidebarNavigation()}
 
  {/* User Profile Footer */}
- <div className="p-4 border-t border-[var(--admin-border)] shrink-0 flex flex-col gap-3">
+ <div className="p-4 border-t border-[var(--admin-sidebar-border)] shrink-0 flex flex-col gap-3">
  <div className="flex items-center gap-3">
  <div className="w-10 h-10 rounded-[var(--admin-radius-md)] bg-[var(--admin-accent)] flex items-center justify-center text-[var(--admin-accent-text)] font-bold text-sm uppercase shrink-0">
  {adminName.substring(0, 2)}
  </div>
  <div className="flex-1 min-w-0">
- <p className="admin-text-body font-semibold truncate text-[var(--admin-text-main)]">
+ <p className="admin-text-body font-semibold truncate text-[var(--admin-sidebar-text)]">
  {adminName}
  </p>
- <p className="admin-label mt-0.5">Administrador</p>
+ <p className="admin-label mt-0.5 text-[var(--admin-sidebar-text-muted)]">Administrador</p>
  </div>
  </div>
 
@@ -684,7 +684,7 @@ export const AdminLayout: React.FC = () => {
  </aside>
 
  {/* Mobile Topbar */}
- <header className="admin-mobile-topbar lg:hidden fixed top-0 left-0 right-0 bg-[var(--admin-surface)] border-b border-[var(--admin-border)] z-40 px-3 flex items-center justify-between h-[var(--admin-header-height)]">
+ <header className="admin-mobile-topbar lg:hidden fixed top-0 left-0 right-0 bg-[var(--admin-sidebar-bg)] text-[var(--admin-sidebar-text)] border-b border-[var(--admin-sidebar-border)] z-40 px-3 flex items-center justify-between h-[var(--admin-header-height)]">
  <div className="flex items-center gap-3 min-w-0 px-1">
  <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-sm)] flex items-center justify-center shrink-0">
  <Scissors className="w-4 h-4"/>
@@ -729,7 +729,7 @@ export const AdminLayout: React.FC = () => {
  </header>
 
  {/* Mobile Bottom Navigation Bar */}
- <nav className="admin-mobile-bottom-bar lg:hidden fixed bottom-0 left-0 right-0 bg-[var(--admin-surface)] border-t border-[var(--admin-border)] z-40 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+ <nav className="admin-mobile-bottom-bar lg:hidden fixed bottom-0 left-0 right-0 bg-[var(--admin-sidebar-bg)] text-[var(--admin-sidebar-text)] border-t border-[var(--admin-sidebar-border)] z-40 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
  {bottomBarItems.map((item) => {
  const Icon = item.icon;
  const isActive = activeTab === item.id;
@@ -742,7 +742,7 @@ export const AdminLayout: React.FC = () => {
  className={`flex-1 min-h-[64px] flex flex-col items-center justify-center gap-1 rounded-[var(--admin-radius-md)] my-1 mx-0.5 transition-colors active:scale-[0.97] ${
  isActive
  ?"text-[var(--admin-accent)] font-semibold bg-[var(--admin-accent)]/10"
- :"text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)]"
+ :"text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)] hover:bg-white/5"
  }`}
  >
  <Icon className="w-5 h-5 shrink-0"/>
@@ -760,7 +760,7 @@ export const AdminLayout: React.FC = () => {
  className={`flex-1 min-h-[64px] flex flex-col items-center justify-center gap-1 rounded-[var(--admin-radius-md)] my-1 mx-0.5 transition-colors active:scale-[0.97] ${
  isMoreActive
  ?"text-[var(--admin-accent)] font-semibold bg-[var(--admin-accent)]/10"
- :"text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-bg)]"
+ :"text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)] hover:bg-white/5"
  }`}
  >
  <MoreHorizontal className="w-5 h-5 shrink-0"/>
@@ -785,10 +785,10 @@ export const AdminLayout: React.FC = () => {
  <aside
  ref={sidebarRef}
  tabIndex={-1}
- className={`relative w-[min(280px,84vw)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] flex flex-col border-r border-[var(--admin-border)] h-[100dvh] outline-none transform transition-transform duration-200 ease-out ${sidebarOpen ?"translate-x-0":"-translate-x-full"}`}
+ className={`relative w-[min(280px,84vw)] bg-[var(--admin-sidebar-bg)] text-[var(--admin-sidebar-text)] flex flex-col border-r border-[var(--admin-sidebar-border)] h-[100dvh] outline-none transform transition-transform duration-200 ease-out ${sidebarOpen ?"translate-x-0":"-translate-x-full"}`}
  >
  {/* Header */}
- <div className="flex items-center justify-between min-h-[var(--admin-header-height)] px-4 pt-[env(safe-area-inset-top)] border-b border-[var(--admin-border)] shrink-0">
+ <div className="flex items-center justify-between min-h-[var(--admin-header-height)] px-4 pt-[env(safe-area-inset-top)] border-b border-[var(--admin-sidebar-border)] shrink-0">
  <div className="flex items-center gap-3 min-w-0">
  <div className="w-8 h-8 bg-[var(--admin-accent)] text-[var(--admin-accent-text)] rounded-[var(--admin-radius-sm)] flex items-center justify-center shrink-0 font-bold">
  <Scissors className="w-4 h-4"/>
@@ -798,7 +798,7 @@ export const AdminLayout: React.FC = () => {
  <button
  type="button"
  onClick={closeMobileNavigation}
- className="admin-btn-icon-sm admin-btn-ghost rounded-[var(--admin-radius-sm)]"
+ className="admin-btn-icon-sm rounded-[var(--admin-radius-sm)] text-[var(--admin-sidebar-text-muted)] hover:text-[var(--admin-sidebar-text)] hover:bg-white/5"
  aria-label="Fechar menu"
  >
  <X className="w-5 h-5"/>
@@ -809,7 +809,7 @@ export const AdminLayout: React.FC = () => {
  {renderSidebarNavigation(true)}
 
  {/* Mobile Footer */}
- <div className="p-4 border-t border-[var(--admin-border)] shrink-0 space-y-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+ <div className="p-4 border-t border-[var(--admin-sidebar-border)] shrink-0 space-y-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
  <div className="flex items-center gap-2">
  <button
  type="button"

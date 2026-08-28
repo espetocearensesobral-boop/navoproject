@@ -26,8 +26,13 @@ body,
   --text-body-sm: 0.75rem; /* 12px */
   --text-caption: 0.6875rem; /* 11px */
 
-  /* Estrutura & Dimensões */
+  /* Dimensões da Sidebar */
   --admin-sidebar-width: 240px;
+  --admin-sidebar-bg: #15151c;
+  --admin-sidebar-border: color-mix(in srgb, var(--admin-sidebar-bg) 85%, #ffffff);
+  --admin-sidebar-text: #ffffff;
+  --admin-sidebar-text-muted: #8A8F98;
+  
   --admin-header-height: 52px;
   --admin-content-max-width: 100%;
 
@@ -346,8 +351,9 @@ body,
    ========================================================================== */
 .admin-layout-sidebar {
   width: var(--admin-sidebar-width);
-  background-color: var(--admin-surface);
-  border-right: 1px solid var(--admin-border);
+  background-color: var(--admin-sidebar-bg);
+  color: var(--admin-sidebar-text);
+  border-right: 1px solid var(--admin-sidebar-border);
   flex-direction: column;
 }
 
@@ -358,15 +364,15 @@ body,
   padding: 8px 12px;
   margin: 1px 8px;
   border-radius: var(--admin-radius-sm);
-  color: var(--admin-text-muted);
+  color: var(--admin-sidebar-text-muted);
   font-size: var(--text-body);
   font-weight: 500;
   transition: all 0.15s ease;
 }
 
 .admin-nav-item:hover {
-  color: var(--admin-text-main);
-  background-color: var(--admin-surface-hover);
+  color: var(--admin-sidebar-text);
+  background-color: color-mix(in srgb, var(--admin-sidebar-text) 5%, transparent);
 }
 
 .admin-nav-item.active {
