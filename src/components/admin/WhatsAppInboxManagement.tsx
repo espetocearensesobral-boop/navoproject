@@ -281,7 +281,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
 
  {/* CONVERSATION CARDS */}
  {filteredConversations.length === 0 ? (
- <div className="p-10 text-center bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-2">
+ <div className="p-10 text-center bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] space-y-2">
  <Headphones className="w-8 h-8 text-[var(--admin-text-muted)] mx-auto opacity-50"/>
  <p className="text-sm font-bold text-[var(--admin-text-main)]">
  Nenhuma conversa encontrada
@@ -303,7 +303,7 @@ export const WhatsAppInboxManagement: React.FC = () => {
  return (
  <article
  key={conv.id}
- className={`bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border transition-all overflow-hidden ${
+ className={`bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border transition-all overflow-hidden ${
  isHuman
  ?"border-status-warning/30 shadow-sm"
  :"border-[var(--admin-border)]"

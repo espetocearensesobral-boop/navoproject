@@ -137,14 +137,14 @@ export const AuditLogsManagement: React.FC = () => {
  placeholder="Operador, ação ou detalhe..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] pl-10 pr-4 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] pl-10 pr-4 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50"
  />
  </div>
 
  <select
  value={selectedCategory}
  onChange={(e) => setSelectedCategory(e.target.value)}
- className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] px-3 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50 shrink-0"
+ className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] px-3 py-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]/50 shrink-0"
  >
  <option value="all">Todas</option>
  <option value="comandas">Comandas</option>

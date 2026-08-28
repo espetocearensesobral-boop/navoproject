@@ -1098,7 +1098,7 @@ export const ProfessionalsManagement: React.FC = () => {
  <p className="text-xs text-[var(--admin-accent)] font-bold uppercase tracking-wider">
  Simulador de Repasse Financeiro Automático
  </p>
- <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] gap-3">
+ <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] gap-3">
  <div>
  <span className="text-xs text-[var(--admin-text-muted)] block">Para cada R$ 100,00 faturados na comanda:</span>
  <span className="text-base font-bold text-[var(--admin-text-main)]">

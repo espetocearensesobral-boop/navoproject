@@ -121,7 +121,7 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({
  />
 
  {/* MAIN CONTENT AREA */}
- <div className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-4 sm:p-6 min-w-0">
+ <div className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-4 sm:p-6 min-w-0">
  {renderContent()}
  </div>
  </div>
@@ -490,7 +490,7 @@ const EmailSettingsTab: React.FC = () => {
  placeholder="destinatario@exemplo.com"
  value={testEmail}
  onChange={(e) => setTestEmail(e.target.value)}
- className="flex-1 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+ className="flex-1 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
  />
  <button
  onClick={handleTestSend}
@@ -712,7 +712,7 @@ const PrintSettingsTab: React.FC = () => {
  <select
  value={settings[key]}
  onChange={(e) => update(key, e.target.value as PrintFormat)}
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  >
  <option value="thermal">Impressora térmica</option>
  <option value="a4">Folha A4</option>
@@ -749,7 +749,7 @@ const PrintSettingsTab: React.FC = () => {
  onChange={(e) =>
  update("thermalWidthMm", Number(e.target.value) as 58 | 80)
  }
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  >
  <option value="58">58 mm</option>
  <option value="80">80 mm</option>
@@ -767,7 +767,7 @@ const PrintSettingsTab: React.FC = () => {
  e.target.value as PrintSettings["a4Orientation"],
  )
  }
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  >
  <option value="portrait">Retrato</option>
  <option value="landscape">Paisagem</option>
@@ -783,7 +783,7 @@ const PrintSettingsTab: React.FC = () => {
  max="18"
  value={settings.fontSize}
  onChange={(e) => update("fontSize", Number(e.target.value))}
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] num-tabular"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] num-tabular"
  />
  </label>
  <label className="space-y-1">
@@ -796,7 +796,7 @@ const PrintSettingsTab: React.FC = () => {
  max="30"
  value={settings.marginMm}
  onChange={(e) => update("marginMm", Number(e.target.value))}
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] num-tabular"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] num-tabular"
  />
  </label>
  </div>
@@ -809,7 +809,7 @@ const PrintSettingsTab: React.FC = () => {
  onChange={(e) =>
  update("density", e.target.value as PrintSettings["density"])
  }
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  >
  <option value="compact">Compacta — economiza papel</option>
  <option value="comfortable">Confortável — padrão</option>
@@ -859,7 +859,7 @@ const PrintSettingsTab: React.FC = () => {
  <input
  value={settings.footerText}
  onChange={(e) => update("footerText", e.target.value)}
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  />
  </label>
  </section>

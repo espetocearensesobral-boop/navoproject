@@ -649,7 +649,7 @@ export const WaitingQueue: React.FC = () => {
  )}
  </div>
 
- <div className="p-2 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-1 text-xs">
+ <div className="p-2 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] space-y-1 text-xs">
  <div className="flex justify-between text-[var(--admin-text-muted)]">
  <span>Barbeiro:</span>
  <strong className="text-[var(--admin-text-main)]">

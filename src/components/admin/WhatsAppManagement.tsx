@@ -385,7 +385,7 @@ export const WhatsAppManagement: React.FC = () => {
  {/* TAB 2: ALERTAS & ENCAMINHAMENTO WHATSAPP */}
  {activeTab ==="handoff_settings"&& (
  <div className="space-y-4">
- <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-4">
+ <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] space-y-4">
  <div className="flex items-start gap-3">
  <div className="w-9 h-9 rounded-[var(--admin-radius-lg)] bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] flex items-center justify-center shrink-0">
  <Bell className="w-5 h-5"/>
@@ -550,7 +550,7 @@ export const WhatsAppManagement: React.FC = () => {
  {/* TAB 3: CONEXÃO & API EVOLUTION */}
  {activeTab ==="connection"&& (
  <div className="space-y-4">
- <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-4">
+ <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] space-y-4">
  <div className="flex items-start justify-between gap-4">
  <div className="min-w-0">
  <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
@@ -652,7 +652,7 @@ export const WhatsAppManagement: React.FC = () => {
  .value as EvolutionApiSettings["whatsappAccountType"],
  )
  }
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  >
  <option value="personal_qr">WhatsApp pessoal</option>
  <option value="business_qr">WhatsApp Business</option>
@@ -809,7 +809,7 @@ export const WhatsAppManagement: React.FC = () => {
  update("webhookUrl", event.target.value)
  }
  placeholder={`${window.location.origin}/api/evolution/webhook`}
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0 font-mono"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0 font-mono"
  />
  </label>
  <label className="space-y-1 block">
@@ -830,7 +830,7 @@ export const WhatsAppManagement: React.FC = () => {
  ?"••••••••"
  :"Defina um segredo ou deixe vazio para auto-gerar"
  }
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2.5 text-xs text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)] min-w-0"
  />
  </label>
  </div>
@@ -905,7 +905,7 @@ export const WhatsAppManagement: React.FC = () => {
  </div>
  </section>
 
- <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
+ <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] space-y-3">
  <div className="flex items-start justify-between gap-3">
  <div className="min-w-0">
  <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
@@ -948,7 +948,7 @@ export const WhatsAppManagement: React.FC = () => {
  )}
  </section>
 
- <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
+ <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] space-y-3">
  <div>
  <h2 className="text-sm font-bold text-[var(--admin-text-main)] flex items-center gap-2">
  <Play className="w-4 h-4 text-[var(--admin-accent)]"/>
@@ -1018,7 +1018,7 @@ export const WhatsAppManagement: React.FC = () => {
  )}
  </section>
 
- <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] space-y-3">
+ <section className="p-4 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] space-y-3">
  <div>
  <h2 className="text-sm font-bold text-[var(--admin-text-main)]">
  Mensagem de teste (Envio Direto)

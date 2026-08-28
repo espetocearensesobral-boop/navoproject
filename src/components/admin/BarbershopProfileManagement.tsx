@@ -420,7 +420,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
  onChange={(e) =>
  setProfile((p) => ({ ...p, openTime: e.target.value }))
  }
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  />
  </div>
  <div>
@@ -433,7 +433,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
  onChange={(e) =>
  setProfile((p) => ({ ...p, closeTime: e.target.value }))
  }
- className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="w-full bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-2 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  />
  </div>
  </div>
@@ -547,7 +547,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
  e.target.value,
  )
  }
- className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  />
  </div>
 
@@ -569,7 +569,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
  e.target.value,
  )
  }
- className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
+ className="bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] px-2 py-1 text-xs font-mono text-[var(--admin-text-main)] focus:outline-none focus:ring-1 focus:ring-[var(--admin-accent)]"
  />
  </div>
  </div>
@@ -595,7 +595,7 @@ export const BarbershopProfileManagement: React.FC<BarbershopProfileManagementPr
  sampleSlots.map((slot) => (
  <span
  key={slot}
- className="px-2 py-1 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] text-xs font-mono font-bold text-[var(--admin-accent)]"
+ className="px-2 py-1 bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] text-xs font-mono font-bold text-[var(--admin-accent)]"
  >
  {slot}
  </span>

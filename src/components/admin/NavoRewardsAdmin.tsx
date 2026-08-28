@@ -1249,7 +1249,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  {/* Modal Adicionar Oferta */}
  {showAddRewardModal && (
  <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-[var(--admin-bg)]/80 backdrop-blur-sm">
- <div className="w-full max-w-md bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-5 space-y-4 shadow-lg">
+ <div className="w-full max-w-md bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] p-5 space-y-4 shadow-lg">
  <h3 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
  Adicionar Oferta ou Cupom
  </h3>
@@ -2002,7 +2002,7 @@ export const NavoRewardsAdmin: React.FC<NavoRewardsAdminProps> = ({
  {/* Modal QR Code */}
  {showQrModal && (
  <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-[var(--admin-bg)]/80 backdrop-blur-sm">
- <div className="w-full max-w-xs bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] p-5 space-y-3 text-center shadow-lg">
+ <div className="w-full max-w-xs bg-[var(--admin-surface)] rounded-[var(--admin-radius-lg)] border border-[var(--admin-border)] border border-[var(--admin-border)] p-5 space-y-3 text-center shadow-lg">
  <h3 className="text-sm font-serif font-bold text-[var(--admin-text-main)]">
  QR Code para Mesas & Espelhos
  </h3>
